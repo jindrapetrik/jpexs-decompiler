@@ -12,17 +12,14 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph.model;
 
-import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.flash.helpers.LoopWithType;
-import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
-import com.jpexs.decompiler.graph.TypeItem;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,72 +27,15 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class UniversalLoopItem extends LoopItem implements Block {
+public class UniversalLoopItem extends WhileItem implements Block {
 
-    public List<GraphTargetItem> commands;
+    static final List<GraphTargetItem> TRUE_EXPRESSION = new ArrayList<>();
 
-    private boolean labelUsed;
-
-    public UniversalLoopItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop) {
-        super(src, lineStartIns, loop);
+    static {
+        TRUE_EXPRESSION.add(new TrueItem(null, null));
     }
 
-    @Override
-    public boolean needsSemicolon() {
-        return false;
-    }
-
-    @Override
-    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if (writer instanceof NulWriter) {
-            ((NulWriter) writer).startLoop(loop.id, LoopWithType.LOOP_TYPE_LOOP);
-        }
-        if (labelUsed) {
-            writer.append("loop").append(loop.id).append(":").newLine();
-        }
-        writer.append("while");
-        if (writer.getFormatting().spaceBeforeParenthesesWhileParentheses) {
-            writer.append(" ");
-        }
-        writer.append("(true)");
-        appendBlock(null, writer, localData, commands);
-        if (writer instanceof NulWriter) {
-            LoopWithType loopOjb = ((NulWriter) writer).endLoop(loop.id);
-            labelUsed = loopOjb.used;
-        }
-        return writer;
-    }
-
-    @Override
-    public List<ContinueItem> getContinues() {
-        List<ContinueItem> ret = new ArrayList<>();
-        for (GraphTargetItem ti : commands) {
-            if (ti instanceof ContinueItem) {
-                ret.add((ContinueItem) ti);
-            }
-            if (ti instanceof Block) {
-                ret.addAll(((Block) ti).getContinues());
-            }
-        }
-        return ret;
-    }
-
-    @Override
-    public List<List<GraphTargetItem>> getSubs() {
-        List<List<GraphTargetItem>> ret = new ArrayList<>();
-        if (commands != null) {
-            ret.add(commands);
-        }
-        return ret;
-    }
-
-    @Override
-    public boolean hasReturnValue() {
-        return false;
-    }
-
-    @Override
-    public GraphTargetItem returnType() {
-        return TypeItem.UNBOUNDED;
+    public UniversalLoopItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> commands) {
+        super(src, lineStartIns, loop, TRUE_EXPRESSION, commands);
     }
 }

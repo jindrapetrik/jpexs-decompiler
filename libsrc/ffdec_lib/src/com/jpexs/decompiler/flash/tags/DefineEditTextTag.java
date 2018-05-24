@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -1023,7 +1024,7 @@ public class DefineEditTextTag extends TextTag {
 
                     ge.glyphIndex = -1; // always use system character glyphs in edit text
 
-                    String fontName = ge.fontFace != null ? ge.fontFace : FontTag.defaultFontName;
+                    String fontName = ge.fontFace != null ? ge.fontFace : FontTag.getDefaultFontName();
                     int fontStyle = font == null ? ge.fontStyle : font.getFontStyle();
                     ge.glyphAdvance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar));
 

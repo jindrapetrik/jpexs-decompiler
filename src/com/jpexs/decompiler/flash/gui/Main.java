@@ -35,7 +35,7 @@ import com.jpexs.decompiler.flash.SwfOpenException;
 import com.jpexs.decompiler.flash.UrlResolver;
 import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
+import com.jpexs.helpers.Reference;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
@@ -375,7 +375,7 @@ public class Main {
                     }
                     if (instrSWF != null) {
                         String swfFileName = fTempFile.getAbsolutePath();
-                        if (swfFileName.toLowerCase().endsWith(".swf")) {
+                        if (swfFileName.toLowerCase(Locale.ENGLISH).endsWith(".swf")) {
                             swfFileName = swfFileName.substring(0, swfFileName.length() - 4) + ".swd";
                         } else {
                             swfFileName = swfFileName + ".swd";
@@ -806,7 +806,7 @@ public class Main {
 
                                             @Override
                                             public boolean accept(File f) {
-                                                String name = f.getName().toLowerCase();
+                                                String name = f.getName().toLowerCase(Locale.ENGLISH);
                                                 for (String ext : supportedExtensions) {
                                                     if (name.endsWith(ext)) {
                                                         return true;
@@ -825,7 +825,7 @@ public class Main {
                                         FileFilter swfFilter = new FileFilter() {
                                             @Override
                                             public boolean accept(File f) {
-                                                return (f.getName().toLowerCase().endsWith(".swf")) || (f.isDirectory());
+                                                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf")) || (f.isDirectory());
                                             }
 
                                             @Override
@@ -838,7 +838,7 @@ public class Main {
                                         FileFilter gfxFilter = new FileFilter() {
                                             @Override
                                             public boolean accept(File f) {
-                                                return (f.getName().toLowerCase().endsWith(".gfx")) || (f.isDirectory());
+                                                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".gfx")) || (f.isDirectory());
                                             }
 
                                             @Override
@@ -1354,7 +1354,7 @@ public class Main {
         FileFilter swfFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().toLowerCase().endsWith(".swf")) || (f.isDirectory());
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf")) || (f.isDirectory());
             }
 
             @Override
@@ -1366,7 +1366,7 @@ public class Main {
         FileFilter gfxFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().toLowerCase().endsWith(".gfx")) || (f.isDirectory());
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".gfx")) || (f.isDirectory());
             }
 
             @Override
@@ -1405,7 +1405,7 @@ public class Main {
             FileFilter exeFilter = new FileFilter() {
                 @Override
                 public boolean accept(File f) {
-                    return (f.getName().toLowerCase().endsWith(fext)) || (f.isDirectory());
+                    return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(fext)) || (f.isDirectory());
                 }
 
                 @Override
@@ -1431,13 +1431,13 @@ public class Main {
             try {
                 String fileName = file.getAbsolutePath();
                 if (selFilter == swfFilter) {
-                    if (!fileName.toLowerCase().endsWith(extension)) {
+                    if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(extension)) {
                         fileName += extension;
                     }
                     swf.gfx = false;
                 }
                 if (selFilter == gfxFilter) {
-                    if (!fileName.toLowerCase().endsWith(".gfx")) {
+                    if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(".gfx")) {
                         fileName += ".gfx";
                     }
                     swf.gfx = true;
@@ -1465,7 +1465,7 @@ public class Main {
 
             @Override
             public boolean accept(File f) {
-                String name = f.getName().toLowerCase();
+                String name = f.getName().toLowerCase(Locale.ENGLISH);
                 for (String ext : supportedExtensions) {
                     if (name.endsWith(ext)) {
                         return true;
@@ -1484,7 +1484,7 @@ public class Main {
         FileFilter swfFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().toLowerCase().endsWith(".swf")) || (f.isDirectory());
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf")) || (f.isDirectory());
             }
 
             @Override
@@ -1497,7 +1497,7 @@ public class Main {
         FileFilter swcFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().toLowerCase().endsWith(".swc")) || (f.isDirectory());
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".swc")) || (f.isDirectory());
             }
 
             @Override
@@ -1510,7 +1510,7 @@ public class Main {
         FileFilter gfxFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().toLowerCase().endsWith(".gfx")) || (f.isDirectory());
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".gfx")) || (f.isDirectory());
             }
 
             @Override
@@ -1523,7 +1523,7 @@ public class Main {
         FileFilter iggyFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().toLowerCase().endsWith(".iggy")) || (f.isDirectory());
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".iggy")) || (f.isDirectory());
             }
 
             @Override
@@ -1536,7 +1536,7 @@ public class Main {
         FileFilter zipFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                return (f.getName().toLowerCase().endsWith(".zip")) || (f.isDirectory());
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".zip")) || (f.isDirectory());
             }
 
             @Override

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.AppResources;
@@ -20,9 +21,10 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
+import com.jpexs.helpers.Reference;
 import com.jpexs.decompiler.flash.action.deobfuscation.ActionDeobfuscator;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
+import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.ExtendsActionItem;
@@ -65,6 +67,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphSource;
@@ -78,6 +81,7 @@ import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.PopItem;
+import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
@@ -756,7 +760,7 @@ public abstract class Action implements GraphSourceItem {
      * @param path the value of path
      * @throws java.lang.InterruptedException
      */
-    public void translate(GraphSourceItem lineStartIns, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
+    public void translate(boolean insideDoInitAction, GraphSourceItem lineStartIns, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
     }
 
     @Override
@@ -832,8 +836,8 @@ public abstract class Action implements GraphSourceItem {
         return -1;
     }
 
-    public static List<GraphTargetItem> actionsToTree(List<Action> actions, int version, int staticOperation, String path) throws InterruptedException {
-        return actionsToTree(new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path);
+    public static List<GraphTargetItem> actionsToTree(boolean insideDoInitAction, List<Action> actions, int version, int staticOperation, String path) throws InterruptedException {
+        return actionsToTree(insideDoInitAction, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path);
     }
 
     /**
@@ -858,7 +862,8 @@ public abstract class Action implements GraphSourceItem {
                 @Override
                 public List<GraphTargetItem> call() throws Exception {
                     int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
-                    List<GraphTargetItem> tree = actionsToTree(new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path);
+                    boolean insideDoInitAction = (asm instanceof DoInitActionTag);
+                    List<GraphTargetItem> tree = actionsToTree(insideDoInitAction, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path);
                     SWFDecompilerPlugin.fireActionTreeCreated(tree, swf);
                     if (Configuration.autoDeobfuscate.get()) {
                         new ActionDeobfuscator().actionTreeCreated(tree, swf);
@@ -916,8 +921,8 @@ public abstract class Action implements GraphSourceItem {
      * @return List of treeItems
      * @throws java.lang.InterruptedException
      */
-    public static List<GraphTargetItem> actionsToTree(HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path) throws InterruptedException {
-        return ActionGraph.translateViaGraph(regNames, variables, functions, actions, version, staticOperation, path);
+    public static List<GraphTargetItem> actionsToTree(boolean insideDoInitAction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path) throws InterruptedException {
+        return ActionGraph.translateViaGraph(insideDoInitAction, regNames, variables, functions, actions, version, staticOperation, path);
     }
 
     @Override
@@ -929,7 +934,7 @@ public abstract class Action implements GraphSourceItem {
          }
          expectedSize += getStackPushCount(localData, stack);*/
 
-        translate(aLocalData.lineStartAction, stack, output, aLocalData.regNames, aLocalData.variables, aLocalData.functions, staticOperation, path);
+        translate(aLocalData.insideDoInitAction, aLocalData.lineStartAction, stack, output, aLocalData.regNames, aLocalData.variables, aLocalData.functions, staticOperation, path);
         /*if (stack.size() != expectedSize && !(this instanceof ActionPushDuplicate)) {
          throw new Error("HONFIKA stack size mismatch");
          }*/
@@ -965,11 +970,11 @@ public abstract class Action implements GraphSourceItem {
         this.ignored = ignored;
     }
 
-    public static List<GraphTargetItem> actionsPartToTree(Reference<GraphSourceItem> fi, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, TranslateStack stack, List<Action> actions, int start, int end, int version, int staticOperation, String path) throws InterruptedException {
+    public static List<GraphTargetItem> actionsPartToTree(boolean insideDoInitAction, Reference<GraphSourceItem> fi, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, TranslateStack stack, List<Action> actions, int start, int end, int version, int staticOperation, String path) throws InterruptedException {
         if (start < actions.size() && (end > 0) && (start > 0)) {
             logger.log(Level.FINE, "Entering {0}-{1}{2}", new Object[]{start, end, actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""});
         }
-        ActionLocalData localData = new ActionLocalData(registerNames, variables, functions);
+        ActionLocalData localData = new ActionLocalData(insideDoInitAction, registerNames, variables, functions);
         localData.lineStartAction = fi.getVal();
         List<GraphTargetItem> output = new ArrayList<>();
         int ip = start;
@@ -1039,7 +1044,7 @@ public abstract class Action implements GraphSourceItem {
                                 }
                             }
                         }
-                        out = ActionGraph.translateViaGraph(regNames, variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
+                        out = ActionGraph.translateViaGraph(insideDoInitAction, regNames, variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
                     } catch (OutOfMemoryError | TranslateException | StackOverflowError ex) {
                         logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);
                         if (ex instanceof OutOfMemoryError) {
@@ -1072,7 +1077,7 @@ public abstract class Action implements GraphSourceItem {
                         if (actions.get(ip + 2) instanceof ActionNot) {
                             if (actions.get(ip + 3) instanceof ActionIf) {
                                 ActionIf aif = (ActionIf) actions.get(ip + 3);
-                                if (adr2ip(actions, ip2adr(actions, ip + 4) + aif.getJumpOffset()) == ip) {
+                                if (adr2ip(actions, ip2adr(actions, ip + 3) + 5 + aif.getJumpOffset()) == ip) {
                                     ip += 4;
                                     continue;
                                 }
@@ -1082,103 +1087,16 @@ public abstract class Action implements GraphSourceItem {
                 }
             }
 
-            /*ActionJump && ActionIf removed*/
- /*if ((action instanceof ActionEnumerate2) || (action instanceof ActionEnumerate)) {
-             loopStart = ip + 1;
-             isForIn = true;
-             ip += 4;
-             action.translate(localData, stack, output);
-             EnumerateActionItem en = (EnumerateActionItem) stack.peek();
-             inItem = en.object;
-             continue;
-             } else*/ /*if (action instanceof ActionTry) {
-             ActionTry atry = (ActionTry) action;
-             List<GraphTargetItem> tryCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.tryBody, version);
-             ActionItem catchName;
-             if (atry.catchInRegisterFlag) {
-             catchName = new DirectValueActionItem(atry, -1, new RegisterNumber(atry.catchRegister), new ArrayList<>());
-             } else {
-             catchName = new DirectValueActionItem(atry, -1, atry.catchName, new ArrayList<>());
-             }
-             List<GraphTargetItem> catchExceptions = new ArrayList<GraphTargetItem>();
-             catchExceptions.add(catchName);
-             List<List<GraphTargetItem>> catchCommands = new ArrayList<List<GraphTargetItem>>();
-             catchCommands.add(ActionGraph.translateViaGraph(registerNames, variables, functions, atry.catchBody, version));
-             List<GraphTargetItem> finallyCommands = ActionGraph.translateViaGraph(registerNames, variables, functions, atry.finallyBody, version);
-             output.add(new TryActionItem(tryCommands, catchExceptions, catchCommands, finallyCommands));
-             } else  if (action instanceof ActionWith) {
-             ActionWith awith = (ActionWith) action;
-             List<GraphTargetItem> withCommands = ActionGraph.translateViaGraph(registerNames, variables, functions,new ArrayList<Action>() , version); //TODO:parse with actions
-             output.add(new WithActionItem(action, stack.pop(), withCommands));
-             } else */ if (false) {
-            } /*if (action instanceof ActionStoreRegister) {
-             if ((ip + 1 <= end) && (actions.get(ip + 1) instanceof ActionPop)) {
-             action.translate(localData, stack, output);
-             stack.pop();
-             ip++;
-             } else {
-             try {
-             action.translate(localData, stack, output);
-             } catch (Exception ex) {
-             // ignore
-             }
-             }
-             } */ /*else if (action instanceof ActionStrictEquals) {
-             if ((ip + 1 < actions.size()) && (actions.get(ip + 1) instanceof ActionIf)) {
-             List<ActionItem> caseValues = new ArrayList<ActionItem>();
-             List<List<ActionItem>> caseCommands = new ArrayList<List<ActionItem>>();
-             caseValues.add(stack.pop());
-             ActionItem switchedObject = stack.pop();
-             if (output.size() > 0) {
-             if (output.get(output.size() - 1) instanceof StoreRegisterActionItem) {
-             output.remove(output.size() - 1);
-             }
-             }
-             int caseStart = ip + 2;
-             List<Integer> caseBodyIps = new ArrayList<Integer>();
-             long defaultAddr = 0;
-             caseBodyIps.add(adr2ip(actions, ((ActionIf) actions.get(ip + 1)).getRef(version), version));
-             ip++;
-             do {
-             ip++;
-             if ((actions.get(ip - 1) instanceof ActionStrictEquals) && (actions.get(ip) instanceof ActionIf)) {
-             caseValues.add(actionsToStackTree(registerNames, jumpsOrIfs, actions, constants, caseStart, ip - 2, version).pop());
-             caseStart = ip + 1;
-             caseBodyIps.add(adr2ip(actions, ((ActionIf) actions.get(ip)).getRef(version), version));
-             if (actions.get(ip + 1) instanceof ActionJump) {
-             defaultAddr = ((ActionJump) actions.get(ip + 1)).getRef(version);
-             ip = adr2ip(actions, defaultAddr, version);
-             break;
-             }
-             }
-             } while (ip < end);
-
-             for (int i = 0; i < caseBodyIps.size(); i++) {
-             int caseEnd = ip - 1;
-             if (i < caseBodyIps.size() - 1) {
-             caseEnd = caseBodyIps.get(i + 1) - 1;
-             }
-             caseCommands.add(actionsToTree(registerNames, unknownJumps, loopList, jumpsOrIfs, stack, constants, actions, caseBodyIps.get(i), caseEnd, version));
-             }
-             output.add(new SwitchActionItem(action, defaultAddr, switchedObject, caseValues, caseCommands, null));
-             continue;
-             } else {
-             action.translate(stack, constants, output, registerNames);
-             }
-             } */ else {
-
-                if (action instanceof ActionStore) {
-                    ActionStore store = (ActionStore) action;
-                    store.setStore(actions.subList(ip + 1, ip + 1 + store.getStoreSize()));
-                    ip = ip + 1 + store.getStoreSize() - 1/*ip++ will be next*/;
-                }
-
-                action.translate(localData, stack, output, staticOperation, path);
+            if (action instanceof ActionStore) {
+                ActionStore store = (ActionStore) action;
+                store.setStore(actions.subList(ip + 1, ip + 1 + store.getStoreSize()));
+                ip = ip + 1 + store.getStoreSize() - 1/*ip++ will be next*/;
             }
+
+            action.translate(localData, stack, output, staticOperation, path);
 
             ip++;
         }
-        //output = checkClass(output);
         logger.log(Level.FINE, "Leaving {0}-{1}", new Object[]{start, end});
         return output;
     }
@@ -1209,155 +1127,6 @@ public abstract class Action implements GraphSourceItem {
             }
         }
         return ti;
-    }
-
-    public static List<GraphTargetItem> checkClass(List<GraphTargetItem> output) {
-        if (true) {
-            //return output;
-        }
-        List<GraphTargetItem> ret = new ArrayList<>();
-        List<GraphTargetItem> functions = new ArrayList<>();
-        List<GraphTargetItem> staticFunctions = new ArrayList<>();
-        List<MyEntry<GraphTargetItem, GraphTargetItem>> vars = new ArrayList<>();
-        List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars = new ArrayList<>();
-        GraphTargetItem className;
-        GraphTargetItem extendsOp = null;
-        List<GraphTargetItem> implementsOp = new ArrayList<>();
-        boolean ok = true;
-        int prevCount = 0;
-        for (GraphTargetItem t : output) {
-            if (t instanceof IfItem) {
-                IfItem it = (IfItem) t;
-                if (it.expression instanceof NotItem) {
-                    NotItem nti = (NotItem) it.expression;
-                    if ((nti.value instanceof GetMemberActionItem) || (nti.value instanceof GetVariableActionItem)) {
-                        if (true) { //it.onFalse.isEmpty()){ //||(it.onFalse.get(0) instanceof UnsupportedActionItem)) {
-                            if ((it.onTrue.size() == 1) && (it.onTrue.get(0) instanceof SetMemberActionItem) && (((SetMemberActionItem) it.onTrue.get(0)).value instanceof NewObjectActionItem)) {
-                                // ignore
-                            } else {
-                                List<GraphTargetItem> parts = it.onTrue;
-                                className = getWithoutGlobal(nti.value);
-                                if (parts.size() >= 1) {
-                                    int ipos = 0;
-
-                                    while ((parts.get(ipos) instanceof PopItem) || ((parts.get(ipos) instanceof IfItem) && ((((IfItem) parts.get(ipos)).onTrue.size() == 1) && (((IfItem) parts.get(ipos)).onTrue.get(0) instanceof SetMemberActionItem) && (((SetMemberActionItem) ((IfItem) parts.get(ipos)).onTrue.get(0)).value instanceof NewObjectActionItem)))) {
-                                        ipos++;
-                                    }
-                                    if (parts.get(ipos) instanceof ExtendsActionItem) {
-                                        ExtendsActionItem et = (ExtendsActionItem) parts.get(ipos);
-                                        extendsOp = getWithoutGlobal(et.superclass);
-                                        ipos++;
-                                    }
-                                    if (parts.get(ipos) instanceof StoreRegisterActionItem) {
-                                        StoreRegisterActionItem sr = (StoreRegisterActionItem) parts.get(ipos);
-                                        int instanceReg = sr.register.number;
-                                        if (sr.value instanceof GetMemberActionItem) {
-                                            GetMemberActionItem gm = (GetMemberActionItem) sr.value;
-                                            //gm.memberName should be "prototype"
-                                            if (gm.object instanceof TemporaryRegister) {
-                                                TemporaryRegister tm = (TemporaryRegister) gm.object;
-                                                int classReg = tm.getRegId();
-                                                if (tm.value instanceof SetMemberActionItem) {
-                                                    SetMemberActionItem sm = (SetMemberActionItem) tm.value;
-                                                    if (sm.value instanceof StoreRegisterActionItem) {
-                                                        sr = (StoreRegisterActionItem) sm.value;
-                                                        if (sr.value instanceof FunctionActionItem) {
-                                                            ((FunctionActionItem) (sr.value)).calculatedFunctionName = (className instanceof GetMemberActionItem) ? ((GetMemberActionItem) className).memberName : className;
-                                                            functions.add((FunctionActionItem) sr.value);
-
-                                                            for (; ipos < parts.size(); ipos++) {
-                                                                if (parts.get(ipos) instanceof ImplementsOpActionItem) {
-                                                                    ImplementsOpActionItem io = (ImplementsOpActionItem) parts.get(ipos);
-                                                                    implementsOp = io.superclasses;
-                                                                    continue;
-                                                                }
-                                                                if (parts.get(ipos) instanceof SetMemberActionItem) {
-                                                                    sm = (SetMemberActionItem) parts.get(ipos);
-                                                                    int rnum = -1;
-                                                                    if (sm.object instanceof DirectValueActionItem) {
-                                                                        DirectValueActionItem dv = (DirectValueActionItem) sm.object;
-                                                                        if (dv.value instanceof RegisterNumber) {
-                                                                            RegisterNumber rn = (RegisterNumber) dv.value;
-                                                                            rnum = rn.number;
-                                                                        }
-                                                                    }
-                                                                    if (sm.object instanceof TemporaryRegister) {
-                                                                        rnum = ((TemporaryRegister) sm.object).getRegId();
-                                                                    }
-                                                                    if (rnum == instanceReg) {
-                                                                        if (sm.value instanceof FunctionActionItem) {
-                                                                            ((FunctionActionItem) sm.value).calculatedFunctionName = sm.objectName;
-                                                                            functions.add((FunctionActionItem) sm.value);
-                                                                        } else {
-                                                                            vars.add(new MyEntry<>(sm.objectName, sm.value));
-                                                                        }
-                                                                    } else if (rnum == classReg) {
-                                                                        if (sm.value instanceof FunctionActionItem) {
-                                                                            ((FunctionActionItem) sm.value).calculatedFunctionName = sm.objectName;
-                                                                            staticFunctions.add((FunctionActionItem) sm.value);
-                                                                        } else {
-                                                                            staticVars.add(new MyEntry<>(sm.objectName, sm.value));
-                                                                        }
-                                                                    }
-
-                                                                }
-                                                            }
-
-                                                        }
-
-                                                    }
-                                                }
-                                                List<GraphTargetItem> output2 = new ArrayList<>();
-                                                for (int i = 0; i < prevCount; i++) {
-                                                    output2.add(output.get(i));
-                                                }
-                                                output2.add(new ClassActionItem(className, extendsOp, implementsOp, null/*FIXME*/, functions, vars, staticFunctions, staticVars));
-                                                return output2;
-                                            }
-                                        }
-                                    } else if (parts.get(ipos) instanceof SetMemberActionItem) {
-                                        SetMemberActionItem sm = (SetMemberActionItem) parts.get(0);
-                                        if (sm.value instanceof FunctionActionItem) {
-                                            FunctionActionItem f = (FunctionActionItem) sm.value;
-                                            if (f.actions.isEmpty()) {
-                                                if (parts.size() == 2) {
-                                                    if (parts.get(1) instanceof ImplementsOpActionItem) {
-                                                        ImplementsOpActionItem iot = (ImplementsOpActionItem) parts.get(1);
-                                                        implementsOp = iot.superclasses;
-                                                    } else {
-                                                        //ok = false;
-                                                        break;
-                                                    }
-                                                }
-                                                List<GraphTargetItem> output2 = new ArrayList<>();
-                                                for (int i = 0; i < prevCount; i++) {
-                                                    output2.add(output.get(i));
-                                                }
-                                                output2.add(new InterfaceActionItem(sm.objectName, implementsOp));
-                                                return output2;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-                            //ok = false;
-                        }
-                    } else {
-                        ok = false;
-                    }
-                } else {
-                    ok = false;
-                }
-            } else if (!(t instanceof PopItem)) {
-                prevCount++;
-                //ok = false;
-            }
-            if (!ok) {
-                break;
-            }
-        }
-        return output;
     }
 
     @Override

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -121,14 +122,19 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return fontNameTag.fontCopyright;
     }
 
-    public static Map<String, Map<String, Font>> installedFontsByFamily;
+    private static Map<String, Map<String, Font>> installedFontsByFamily;
 
-    public static Map<String, Font> installedFontsByName;
+    private static Map<String, Font> installedFontsByName;
 
-    public static String defaultFontName;
+    private static String defaultFontName;
 
-    static {
-        reload();
+    private static boolean firstLoaded = false;
+
+    private static void ensureLoaded() {
+        if (!firstLoaded) {
+            reload();
+        }
+        firstLoaded = true;
     }
 
     public int getFontId() {
@@ -259,6 +265,11 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return gm.getAdvanceX();
     }
 
+    public static String getDefaultFontName() {
+        ensureLoaded();
+        return defaultFontName;
+    }
+
     public static void reload() {
         installedFontsByFamily = FontHelper.getInstalledFonts();
         installedFontsByName = new HashMap<>();
@@ -279,6 +290,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     public static String getFontNameWithFallback(String fontName) {
+        ensureLoaded();
         if (installedFontsByFamily.containsKey(fontName)) {
             return fontName;
         }
@@ -307,6 +319,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     public static String findInstalledFontName(String fontName) {
+        ensureLoaded();
         if (installedFontsByName.containsKey(fontName)) {
             return fontName;
         }
@@ -413,4 +426,15 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     public FontTag toClassicFont() {
         return this;
     }
+
+    public static Map<String, Map<String, Font>> getInstalledFontsByFamily() {
+        ensureLoaded();
+        return installedFontsByFamily;
+    }
+
+    public static Map<String, Font> getInstalledFontsByName() {
+        ensureLoaded();
+        return installedFontsByName;
+    }
+
 }

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import SevenZip.Compression.LZMA.Decoder;
@@ -347,6 +348,8 @@ public final class SWF implements SWFContainerItem, Timelined {
     public final AS3Cache as3Cache = new AS3Cache();
 
     private static final DecompilerPool decompilerPool = new DecompilerPool();
+
+    public static final String AS2_PKG_PREFIX = "__Packages.";
 
     public static List<String> swfSignatures = Arrays.asList(
             "FWS", // Uncompressed Flash
@@ -1708,8 +1711,9 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     private void getASMs(boolean exportFileNames, TreeItem treeItem, List<TreeItem> nodesToExport, boolean exportAll, Map<String, ASMSource> asmsToExport, String path) {
-        boolean exportNode = nodesToExport.contains(treeItem);
         TreeItem realItem = treeItem instanceof TagScript ? ((TagScript) treeItem).getTag() : treeItem;
+        boolean exportNode = nodesToExport.contains(treeItem) || nodesToExport.contains(realItem);
+
         if (realItem instanceof ASMSource && (exportAll || exportNode)) {
             String npath = path;
             String exPath = path;
@@ -1965,6 +1969,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     private static void getVariables(ConstantPool constantPool, BaseLocalData localData, TranslateStack stack, List<GraphTargetItem> output, ActionGraphSource code, int ip, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, List<Integer> visited, HashMap<DirectValueActionItem, String> usageTypes, String path) throws InterruptedException {
+        ActionLocalData aLocalData = (ActionLocalData) localData;
         boolean debugMode = false;
         while ((ip > -1) && ip < code.size()) {
             if (visited.contains(ip)) {
@@ -2031,7 +2036,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     ip = code.adr2pos(addr);
                     addr += size;
                     int nextip = code.adr2pos(addr);
-                    getVariables(variables, functions, strings, usageTypes, new ActionGraphSource(code.getActions().subList(ip, nextip), code.version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path + (cntName == null ? "" : "/" + cntName));
+                    getVariables(aLocalData.insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(path, aLocalData.insideDoInitAction, code.getActions().subList(ip, nextip), code.version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path + (cntName == null ? "" : "/" + cntName));
                     ip = nextip;
                 }
                 List<List<GraphTargetItem>> r = new ArrayList<>();
@@ -2122,39 +2127,40 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-    private static void getVariables(List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ActionGraphSource code, int addr, String path) throws InterruptedException {
-        ActionLocalData localData = new ActionLocalData();
+    private static void getVariables(boolean insideDoInitAction, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ActionGraphSource code, int addr, String path) throws InterruptedException {
+        ActionLocalData localData = new ActionLocalData(insideDoInitAction);
         getVariables(null, localData, new TranslateStack(path), new ArrayList<>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<>(), usageTypes, path);
     }
 
-    private List<MyEntry<DirectValueActionItem, ConstantPool>> getVariables(List<MyEntry<DirectValueActionItem, ConstantPool>> variables, HashMap<ASMSource, ActionList> actionsMap, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ASMSource src, String path) throws InterruptedException {
+    private List<MyEntry<DirectValueActionItem, ConstantPool>> getVariables(boolean insideDefineFunction1, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, HashMap<ASMSource, ActionList> actionsMap, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ASMSource src, String path) throws InterruptedException {
         List<MyEntry<DirectValueActionItem, ConstantPool>> ret = new ArrayList<>();
         ActionList actions = src.getActions();
         actionsMap.put(src, actions);
-        getVariables(variables, functions, strings, usageTypes, new ActionGraphSource(actions, version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path);
+        boolean insideDoInitAction = src instanceof DoInitActionTag;
+        getVariables(insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(path, insideDoInitAction, actions, version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path);
         return ret;
     }
 
-    private void getVariables(Iterable<Tag> tags, String path, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, HashMap<ASMSource, ActionList> actionsMap, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes) throws InterruptedException {
+    private void getVariables(boolean insideDefineFunction1, Iterable<Tag> tags, String path, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, HashMap<ASMSource, ActionList> actionsMap, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes) throws InterruptedException {
         List<String> processed = new ArrayList<>();
         for (Tag t : tags) {
             String subPath = path + "/" + t.toString();
             if (t instanceof ASMSource) {
-                addVariable((ASMSource) t, subPath, processed, variables, actionsMap, functions, strings, usageTypes);
+                addVariable(insideDefineFunction1, (ASMSource) t, subPath, processed, variables, actionsMap, functions, strings, usageTypes);
             }
             if (t instanceof ASMSourceContainer) {
                 List<String> processed2 = new ArrayList<>();
                 for (ASMSource asm : ((ASMSourceContainer) t).getSubItems()) {
-                    addVariable(asm, subPath + "/" + asm.toString(), processed2, variables, actionsMap, functions, strings, usageTypes);
+                    addVariable(insideDefineFunction1, asm, subPath + "/" + asm.toString(), processed2, variables, actionsMap, functions, strings, usageTypes);
                 }
             }
             if (t instanceof DefineSpriteTag) {
-                getVariables(((DefineSpriteTag) t).getTags(), path + "/" + t.toString(), variables, actionsMap, functions, strings, usageTypes);
+                getVariables(insideDefineFunction1, ((DefineSpriteTag) t).getTags(), path + "/" + t.toString(), variables, actionsMap, functions, strings, usageTypes);
             }
         }
     }
 
-    private void addVariable(ASMSource asm, String path, List<String> processed, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, HashMap<ASMSource, ActionList> actionsMap, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes) throws InterruptedException {
+    private void addVariable(boolean insideDefineFunction1, ASMSource asm, String path, List<String> processed, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, HashMap<ASMSource, ActionList> actionsMap, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes) throws InterruptedException {
         int pos = 1;
         String infPath2 = path;
         while (processed.contains(infPath2)) {
@@ -2163,7 +2169,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
         processed.add(infPath2);
         informListeners("getVariables", infPath2);
-        getVariables(variables, actionsMap, functions, strings, usageTypes, asm, path);
+        getVariables(insideDefineFunction1, variables, actionsMap, functions, strings, usageTypes, asm, path);
     }
 
     public boolean as3StringConstantExists(String str) {
@@ -2252,7 +2258,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         HashMap<DirectValueActionItem, String> usageTypes = new HashMap<>();
 
         int ret = 0;
-        getVariables(getTags(), "", allVariableNames, actionsMap, allFunctions, allStrings, usageTypes);
+        getVariables(false, getTags(), "", allVariableNames, actionsMap, allFunctions, allStrings, usageTypes);
         informListeners("rename", "");
         int fc = 0;
         for (MyEntry<DirectValueActionItem, ConstantPool> it : allVariableNames) {
@@ -2275,10 +2281,9 @@ public final class SWF implements SWFContainerItem, Timelined {
                 DoInitActionTag dia = (DoInitActionTag) t;
                 String exportName = getExportName(dia.spriteId);
                 exportName = exportName != null ? exportName : "_unk_";
-                final String pkgPrefix = "__Packages.";
                 String[] classNameParts = null;
-                if (exportName.startsWith(pkgPrefix)) {
-                    String className = exportName.substring(pkgPrefix.length());
+                if (exportName.startsWith(AS2_PKG_PREFIX)) {
+                    String className = exportName.substring(AS2_PKG_PREFIX.length());
                     if (className.contains(".")) {
                         classNameParts = className.split("\\.");
                     } else {
@@ -2288,7 +2293,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
                 List<GraphTargetItem> dec;
                 try {
-                    dec = Action.actionsToTree(dia.getActions(), version, staticOperation, ""/*FIXME*/);
+                    dec = Action.actionsToTree(true /*Yes, inside doInitAction*/, dia.getActions(), version, staticOperation, ""/*FIXME*/);
                 } catch (EmptyStackException ex) {
                     continue;
                 }
@@ -2297,9 +2302,15 @@ public final class SWF implements SWFContainerItem, Timelined {
                     if (it instanceof ClassActionItem) {
                         ClassActionItem cti = (ClassActionItem) it;
                         List<GraphTargetItem> methods = new ArrayList<>();
-                        methods.addAll(cti.functions);
-                        methods.addAll(cti.staticFunctions);
+                        List<GraphTargetItem> vars = new ArrayList<>();
 
+                        for (MyEntry<GraphTargetItem, GraphTargetItem> trait : cti.traits) {
+                            if (trait.getValue() instanceof FunctionActionItem) {
+                                methods.add(trait.getValue());
+                            } else {
+                                vars.add(trait.getValue());
+                            }
+                        }
                         for (GraphTargetItem gti : methods) {
                             if (gti instanceof FunctionActionItem) {
                                 FunctionActionItem fun = (FunctionActionItem) gti;
@@ -2314,13 +2325,6 @@ public final class SWF implements SWFContainerItem, Timelined {
                             }
                         }
 
-                        List<GraphTargetItem> vars = new ArrayList<>();
-                        for (MyEntry<GraphTargetItem, GraphTargetItem> item : cti.vars) {
-                            vars.add(item.getKey());
-                        }
-                        for (MyEntry<GraphTargetItem, GraphTargetItem> item : cti.staticVars) {
-                            vars.add(item.getKey());
-                        }
                         for (GraphTargetItem gti : vars) {
                             if (gti instanceof DirectValueActionItem) {
                                 DirectValueActionItem dvf = (DirectValueActionItem) gti;

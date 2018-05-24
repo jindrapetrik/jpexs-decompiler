@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -571,8 +572,8 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) {
-        super.finalProcessAfter(list, level, localData);
+    protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
+        super.finalProcessAfter(list, level, localData, path);
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i) instanceof SetLocalAVM2Item) {
                 SetLocalAVM2Item ri = (SetLocalAVM2Item) list.get(i);
@@ -585,7 +586,7 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData) throws InterruptedException {
+    protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
 
         if (level == 0) {
             if (!list.isEmpty()) {
@@ -702,7 +703,7 @@ public class AVM2Graph extends Graph {
             }
         }
         //Handle for loops at the end:
-        super.finalProcess(list, level, localData);
+        super.finalProcess(list, level, localData, path);
     }
 
     @Override

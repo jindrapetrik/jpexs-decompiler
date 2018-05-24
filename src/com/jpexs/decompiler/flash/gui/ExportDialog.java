@@ -45,6 +45,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -53,6 +54,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -92,14 +94,14 @@ public class ExportDialog extends AppDialog {
         {ImageTag.class},
         {DefineVideoStreamTag.class},
         {SoundTag.class},
-        {ASMSource.class, ScriptPack.class},
+        {ASMSource.class, ScriptPack.class, TagScript.class},
         {DefineBinaryDataTag.class},
         {Frame.class},
         {Frame.class},
         {ButtonTag.class},
         {FontTag.class},
         {MorphShapeTag.class},
-        {SymbolClassTypeTag.class},
+        {SymbolClassTypeTag.class}
     };
 
     //Enum classes for values
@@ -116,7 +118,7 @@ public class ExportDialog extends AppDialog {
         ButtonExportMode.class,
         FontExportMode.class,
         MorphShapeExportMode.class,
-        SymbolClassExportMode.class,
+        SymbolClassExportMode.class
     };
 
     Class[] zoomClasses = {
@@ -125,7 +127,7 @@ public class ExportDialog extends AppDialog {
         TextExportMode.class,
         FrameExportMode.class,
         SpriteExportMode.class,
-        ButtonExportMode.class,
+        ButtonExportMode.class
     };
 
     private final JComboBox[] combos;
@@ -167,7 +169,7 @@ public class ExportDialog extends AppDialog {
             int selIndex = combos[i].getSelectedIndex();
             Class c = optionClasses[i];
             Object[] vals = c.getEnumConstants();
-            String key = optionNames[i] + "." + vals[selIndex].toString().toLowerCase();
+            String key = optionNames[i] + "." + vals[selIndex].toString().toLowerCase(Locale.ENGLISH);
             if (i > 0) {
                 cfg.append(",");
             }
@@ -275,7 +277,7 @@ public class ExportDialog extends AppDialog {
             int itemIndex = -1;
             for (int j = 0; j < vals.length; j++) {
 
-                String key = optionNames[i] + "." + vals[j].toString().toLowerCase();
+                String key = optionNames[i] + "." + vals[j].toString().toLowerCase(Locale.ENGLISH);
                 if (exportFormats.contains(key)) {
                     itemIndex = j;
                 }

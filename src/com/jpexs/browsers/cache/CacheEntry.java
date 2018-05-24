@@ -19,6 +19,7 @@ package com.jpexs.browsers.cache;
 import com.jpexs.helpers.LimitedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
@@ -102,7 +103,7 @@ public abstract class CacheEntry {
             return null;
         }
         for (String k : m.keySet()) {
-            if (k.toLowerCase().equals(header.toLowerCase())) {
+            if (k.toLowerCase(Locale.ENGLISH).equals(header.toLowerCase(Locale.ENGLISH))) {
                 return m.get(k);
             }
         }

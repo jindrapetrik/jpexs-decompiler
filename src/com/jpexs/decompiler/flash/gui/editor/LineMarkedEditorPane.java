@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.editor;
 
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
+import com.jpexs.helpers.Reference;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import java.awt.Color;

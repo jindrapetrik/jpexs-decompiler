@@ -24,6 +24,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -97,7 +98,7 @@ public class FirefoxCache implements CacheImplementation {
         OSId id = OSId.UNIX;
         String osName = AccessController.doPrivileged(doGetOSName);
         if (osName != null) {
-            if (osName.toLowerCase().startsWith("mac os x")) {
+            if (osName.toLowerCase(Locale.ENGLISH).startsWith("mac os x")) {
                 id = OSId.OSX;
             } else if (osName.contains("Windows")) {
                 id = OSId.WINDOWS;

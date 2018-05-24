@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -41,7 +42,11 @@ public class RandomNumberActionItem extends ActionItem {
     }
 
     public static Integer getResult(Object maximum) {
-        return rnd.nextInt(EcmaScript.toInt32(maximum));
+        int maximumInt = EcmaScript.toInt32(maximum);
+        if (maximumInt <= 0) {
+            return 0;
+        }
+        return rnd.nextInt(maximumInt);
     }
 
     @Override

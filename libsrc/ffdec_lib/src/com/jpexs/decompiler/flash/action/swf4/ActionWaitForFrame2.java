@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -145,9 +146,9 @@ public class ActionWaitForFrame2 extends Action implements ActionStore {
     }
 
     @Override
-    public void translate(GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
+    public void translate(boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
         GraphTargetItem frame = stack.pop();
-        List<GraphTargetItem> body = ActionGraph.translateViaGraph(regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path);
+        List<GraphTargetItem> body = ActionGraph.translateViaGraph(insideDoInitAction, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path);
         output.add(new IfFrameLoadedActionItem(frame, body, this, lineStartAction));
     }
 

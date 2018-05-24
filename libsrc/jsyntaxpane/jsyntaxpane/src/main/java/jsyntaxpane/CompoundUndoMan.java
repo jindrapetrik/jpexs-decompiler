@@ -16,14 +16,16 @@ package jsyntaxpane;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
+import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
 /**
- * A revised UndoManager that groups undos based on positions.  If the change is relatively next to the
- * previous change, like when continuous typing, then the undoes are grouped together.
+ * A revised UndoManager that groups undos based on positions. If the change is
+ * relatively next to the previous change, like when continuous typing, then the
+ * undoes are grouped together.
  *
  * This is cutomized from the
  *
@@ -34,107 +36,164 @@ import javax.swing.undo.UndoableEdit;
  * http://tips4java.wordpress.com/2008/10/27/compound-undo-manager/
  *
  * @author Ayman Al-Sairafi
+ *
+ *
+ * JPEXS - updated for java 9+
+ * https://github.com/nordfalk/jsyntaxpane/blob/master/jsyntaxpane/src/main/java/jsyntaxpane/CompoundUndoManager.java
+ *
  */
 public class CompoundUndoMan extends UndoManager {
 
-	private CompoundEdit compoundEdit;
-	// This allows us to start combining operations.
-	// it will be reset after the first change.
-	private boolean startCombine = false;
-	// This holds the start of the last line edited, if edits are on multiple
-	// lines, then they will not be combined.
-	private int	lastLine = -1;
+    private final SyntaxDocument doc;
 
-	public CompoundUndoMan(SyntaxDocument doc) {
-		doc.addUndoableEditListener(this);
-		lastLine = doc.getStartPosition().getOffset();
-	}
+    private CompoundEdit compoundEdit;
+    // This allows us to start combining operations.
+    // it will be reset after the first change.
+    private boolean startCombine = false;
+    // This holds the start of the last line edited, if edits are on multiple
+    // lines, then they will not be combined.
+    private int lastLine = -1;
 
-	/**
-	 *  Whenever an UndoableEdit happens the edit will either be absorbed
-	 *  by the current compound edit or a new compound edit will be started
-	 */
-	@Override
-	public void undoableEditHappened(UndoableEditEvent e) {
-		//  Start a new compound edit
+    public CompoundUndoMan(SyntaxDocument doc) {
+        this.doc = doc;
+        doc.addUndoableEditListener(this);
+        lastLine = doc.getStartPosition().getOffset();
+    }
 
-		AbstractDocument.DefaultDocumentEvent docEvt = (DefaultDocumentEvent) e.getEdit();
+    /**
+     * Whenever an UndoableEdit happens the edit will either be absorbed by the
+     * current compound edit or a new compound edit will be started
+     */
+    @Override
+    public void undoableEditHappened(UndoableEditEvent e) {
+        //  Start a new compound edit
 
-		if (compoundEdit == null) {
-			compoundEdit = startCompoundEdit(e.getEdit());
-			startCombine = false;
-			return;
-		}
+        if (compoundEdit == null) {
+            compoundEdit = startCompoundEdit(e.getEdit());
+            startCombine = false;
+            updateDirty();
+            return;
+        }
+        if (e.getEdit() instanceof DefaultDocumentEvent) {
+            // Java 6 to 8
+            AbstractDocument.DefaultDocumentEvent docEvt = (DefaultDocumentEvent) e.getEdit();
 
-		int editLine = ((SyntaxDocument)docEvt.getDocument()).getLineNumberAt(docEvt.getOffset());
+            int editLine = doc.getLineNumberAt(docEvt.getOffset());
 
-		//  Check for an incremental edit or backspace.
-		//  The Change in Caret position and Document length should both be
-		//  either 1 or -1.
-		if ((startCombine || Math.abs(docEvt.getLength()) == 1) && editLine == lastLine) {
-			compoundEdit.addEdit(e.getEdit());
-			startCombine = false;
-			return;
-		}
+            //  Check for an incremental edit or backspace.
+            //  The Change in Caret position and Document length should both be
+            //  either 1 or -1.
+            if ((startCombine || Math.abs(docEvt.getLength()) == 1) && editLine == lastLine) {
+                compoundEdit.addEdit(e.getEdit());
+                startCombine = false;
+                updateDirty();
+                return;
+            }
 
-		//  Not incremental edit, end previous edit and start a new one
-		lastLine = editLine;
+            //  Not incremental edit, end previous edit and start a new one
+            lastLine = editLine;
 
-		compoundEdit.end();
-		compoundEdit = startCompoundEdit(e.getEdit());
-	}
+        } else // Java 9: It seems that all the edits are wrapped and we cannot get line number!
+        // See https://github.com/netroby/jdk9-dev/blob/master/jdk/src/java.desktop/share/classes/javax/swing/text/AbstractDocument.java#L279
+        // AbstractDocument.DefaultDocumentEventUndoableWrapper docEvt = e.getEdit();
+        {
+            if (startCombine && !e.getEdit().isSignificant()) {
+                compoundEdit.addEdit(e.getEdit());
+                startCombine = false;
+                updateDirty();
+                return;
+            }
+        }
 
-	/*
-	 **  Each CompoundEdit will store a group of related incremental edits
-	 **  (ie. each character typed or backspaced is an incremental edit)
-	 */
-	private CompoundEdit startCompoundEdit(UndoableEdit anEdit) {
-		//  Track Caret and Document information of this compound edit
-		AbstractDocument.DefaultDocumentEvent docEvt = (DefaultDocumentEvent) anEdit;
+        compoundEdit.end();
+        compoundEdit = startCompoundEdit(e.getEdit());
 
-		//  The compound edit is used to store incremental edits
+        updateDirty();
+    }
 
-		compoundEdit = new MyCompoundEdit();
-		compoundEdit.addEdit(anEdit);
+    private void updateDirty() {
+        doc.setCanUndo(canUndo());
+        doc.setCanRedo(canRedo());
+    }
 
-		//  The compound edit is added to the UndoManager. All incremental
-		//  edits stored in the compound edit will be undone/redone at once
+    @Override
+    protected void undoTo(UndoableEdit edit) throws CannotUndoException {
+        super.undoTo(edit);
+        updateDirty();
+    }
 
-		addEdit(compoundEdit);
+    @Override
+    public synchronized void undo() throws CannotUndoException {
+        super.undo();
+        updateDirty();
+    }
 
-		return compoundEdit;
-	}
+    @Override
+    protected void redoTo(UndoableEdit edit) throws CannotRedoException {
+        super.redoTo(edit);
+        updateDirty();
+    }
 
-	class MyCompoundEdit extends CompoundEdit {
+    @Override
+    public synchronized void redo() throws CannotRedoException {
+        super.redo();
+        updateDirty();
+    }
 
-		@Override
-		public boolean isInProgress() {
-			//  in order for the canUndo() and canRedo() methods to work
-			//  assume that the compound edit is never in progress
-			return false;
-		}
+    @Override
+    public synchronized void discardAllEdits() {
+        super.discardAllEdits();
+        updateDirty();
+    }
 
-		@Override
-		public void undo() throws CannotUndoException {
-			//  End the edit so future edits don't get absorbed by this edit
+    /*
+                         **  Each CompoundEdit will store a group of related incremental edits
+                         **  (ie. each character typed or backspaced is an incremental edit)
+     */
+    private CompoundEdit startCompoundEdit(UndoableEdit anEdit) {
+        //  Track Caret and Document information of this compound edit
+        // AbstractDocument.DefaultDocumentEvent docEvt = (DefaultDocumentEvent) anEdit;
 
-			if (compoundEdit != null) {
-				compoundEdit.end();
-			}
+        //  The compound edit is used to store incremental edits
+        compoundEdit = new MyCompoundEdit();
+        compoundEdit.addEdit(anEdit);
 
-			super.undo();
+        //  The compound edit is added to the UndoManager. All incremental
+        //  edits stored in the compound edit will be undone/redone at once
+        addEdit(compoundEdit);
 
-			//  Always start a new compound edit after an undo
+        return compoundEdit;
+    }
 
-			compoundEdit = null;
-		}
-	}
+    class MyCompoundEdit extends CompoundEdit {
 
-	/**
-	 * Start to combine the next operations together.  Only the next operation is combined.
-	 * The flag is then automatically reset.
-	 */
-	public void startCombine() {
-		startCombine = true;
-	}
+        @Override
+        public boolean isInProgress() {
+            //  in order for the canUndo() and canRedo() methods to work
+            //  assume that the compound edit is never in progress
+            return false;
+        }
+
+        @Override
+        public void undo() throws CannotUndoException {
+            //  End the edit so future edits don't get absorbed by this edit
+
+            if (compoundEdit != null) {
+                compoundEdit.end();
+            }
+
+            super.undo();
+
+            //  Always start a new compound edit after an undo
+            compoundEdit = null;
+        }
+    }
+
+    /**
+     * Start to combine the next operations together. Only the next operation is
+     * combined. The flag is then automatically reset.
+     */
+    public void startCombine() {
+        startCombine = true;
+    }
 }

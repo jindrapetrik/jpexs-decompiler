@@ -92,7 +92,7 @@ public class FontPanel extends JPanel {
 
     public static ComboBoxModel<FontFamily> getFamilyModel() {
         Set<FontFamily> famSet = new TreeSet<>();
-        for (Font f : FontTag.installedFontsByName.values()) {
+        for (Font f : FontTag.getInstalledFontsByName().values()) {
             famSet.add(new FontFamily(f));
         }
         return new DefaultComboBoxModel<>(new Vector<>(famSet));
@@ -101,7 +101,7 @@ public class FontPanel extends JPanel {
     public static ComboBoxModel<FontFace> getFaceModel(FontFamily family) {
 
         Set<FontFace> faceSet = new TreeSet<>();
-        for (Font f : FontTag.installedFontsByFamily.get(family.familyEn).values()) {
+        for (Font f : FontTag.getInstalledFontsByFamily().get(family.familyEn).values()) {
             faceSet.add(new FontFace(f));
         }
 
@@ -403,7 +403,7 @@ public class FontPanel extends JPanel {
 
         fontFamilyNameSelection.setPreferredSize(new Dimension(100, fontFamilyNameSelection.getMinimumSize().height));
         fontFamilyNameSelection.setModel(getFamilyModel());
-        fontFamilyNameSelection.setSelectedItem(FontTag.defaultFontName);
+        fontFamilyNameSelection.setSelectedItem(FontTag.getDefaultFontName());
         fontFaceSelection.setModel(getFaceModel((FontFamily) fontFamilyNameSelection.getSelectedItem()));
         fontFamilyNameSelection.addItemListener(new ItemListener() {
             @Override

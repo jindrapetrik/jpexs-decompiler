@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model.clauses;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -44,56 +45,39 @@ import java.util.Set;
  */
 public class ClassActionItem extends ActionItem implements Block {
 
-    public List<GraphTargetItem> functions;
-
-    public List<GraphTargetItem> staticFunctions;
-
     public GraphTargetItem extendsOp;
 
     public List<GraphTargetItem> implementsOp;
 
     public GraphTargetItem className;
 
-    public GraphTargetItem constructor;
-
-    public List<MyEntry<GraphTargetItem, GraphTargetItem>> vars;
-
-    public List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars;
+    //public GraphTargetItem constructor;
+    public List<MyEntry<GraphTargetItem, GraphTargetItem>> traits;
+    public List<Boolean> traitsStatic;
 
     public Set<String> uninitializedVars;
 
     @Override
     public List<List<GraphTargetItem>> getSubs() {
         List<List<GraphTargetItem>> ret = new ArrayList<>();
-        if (functions != null) {
-            ret.add(functions);
-        }
-        if (staticFunctions != null) {
-            ret.add(staticFunctions);
-        }
+        //? is this needed for traits ?
         return ret;
     }
 
-    public ClassActionItem(GraphTargetItem className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, GraphTargetItem constructor, List<GraphTargetItem> functions, List<MyEntry<GraphTargetItem, GraphTargetItem>> vars, List<GraphTargetItem> staticFunctions, List<MyEntry<GraphTargetItem, GraphTargetItem>> staticVars) {
+    public ClassActionItem(GraphTargetItem className, GraphTargetItem extendsOp, List<GraphTargetItem> implementsOp, List<MyEntry<GraphTargetItem, GraphTargetItem>> traits, List<Boolean> traitsStatic) {
         super(null, null, NOPRECEDENCE);
         this.className = className;
-        this.functions = functions;
-        this.vars = vars;
+        this.traits = traits;
+        this.traitsStatic = traitsStatic;
         this.extendsOp = extendsOp;
         this.implementsOp = implementsOp;
-        this.staticFunctions = staticFunctions;
-        this.staticVars = staticVars;
-        this.constructor = constructor;
+        //this.constructor = constructor;
 
-        List<GraphTargetItem> allFunc = new ArrayList<>(functions);
-        if (constructor != null) {
-            allFunc.add(constructor);
-        }
         this.uninitializedVars = new HashSet<>();
         List<GraphTargetItem> allUsages = new ArrayList<>();
-        for (GraphTargetItem it : allFunc) {
-            if (it instanceof FunctionActionItem) {
-                FunctionActionItem f = (FunctionActionItem) it;
+        for (MyEntry<GraphTargetItem, GraphTargetItem> it : traits) {
+            if (it.getValue() instanceof FunctionActionItem) {
+                FunctionActionItem f = (FunctionActionItem) it.getValue();
                 detectUnitializedVars(f.actions, allUsages);
             }
         }
@@ -102,7 +86,7 @@ public class ClassActionItem extends ActionItem implements Block {
             allMembers.add(it.toStringNoQuotes(LocalData.empty));
         }
         uninitializedVars.addAll(allMembers);
-        for (MyEntry<GraphTargetItem, GraphTargetItem> v : vars) {
+        for (MyEntry<GraphTargetItem, GraphTargetItem> v : traits) {
             String s = v.getKey().toStringNoQuotes(LocalData.empty);
             if (uninitializedVars.contains(s)) {
                 uninitializedVars.remove(s);
@@ -176,38 +160,49 @@ public class ClassActionItem extends ActionItem implements Block {
         }
         writer.startBlock();
 
-        if (constructor != null) {
+        /*if (constructor != null) {
             constructor.toString(writer, localData).newLine();
-        }
+        }*/
+        for (int pass = 1; pass <= 2; pass++) {
+            looptraits:
+            for (int i = 0; i < traits.size(); i++) {
+                MyEntry<GraphTargetItem, GraphTargetItem> item = traits.get(i);
 
-        for (MyEntry<GraphTargetItem, GraphTargetItem> item : vars) {
-            writer.append("var ");
-            item.getKey().toStringNoQuotes(writer, localData);
-            writer.append(" = ");
-            item.getValue().toString(writer, localData);
-            writer.append(";").newLine();
+                switch (pass) {
+                    //pass 1: add variables
+                    case 1:
+                        if (item.getValue() instanceof FunctionActionItem) { //ignore methods
+                            continue looptraits;
+                        }
+                        break;
+                    //pass 2: add methods
+                    case 2:
+                        if (!(item.getValue() instanceof FunctionActionItem)) { //ignore nonmethods
+                            continue looptraits;
+                        }
+                        break;
+
+                }
+
+                if (traitsStatic.get(i)) {
+                    writer.append("static ");
+                }
+                if (item.getValue() instanceof FunctionActionItem) {
+                    item.getValue().toString(writer, localData).newLine();
+                } else {
+                    writer.append("var ");
+                    item.getKey().toStringNoQuotes(writer, localData);
+                    writer.append(" = ");
+                    item.getValue().toString(writer, localData);
+                    writer.append(";").newLine();
+                }
+            }
         }
         for (String v : uninitializedVars) {
             writer.append("var ");
             writer.append(v);
             writer.append(";").newLine();
         }
-        for (MyEntry<GraphTargetItem, GraphTargetItem> item : staticVars) {
-            writer.append("static var ");
-            item.getKey().toStringNoQuotes(writer, localData);
-            writer.append(" = ");
-            item.getValue().toString(writer, localData);
-            writer.append(";").newLine();
-        }
-
-        for (GraphTargetItem f : functions) {
-            f.toString(writer, localData).newLine();
-        }
-        for (GraphTargetItem f : staticFunctions) {
-            writer.append("static ");
-            f.toString(writer, localData).newLine();
-        }
-
         writer.endBlock();
         writer.endClass();
         return writer;
@@ -230,7 +225,7 @@ public class ClassActionItem extends ActionItem implements Block {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         SourceGeneratorLocalData localData2 = Helper.deepCopy(localData);
         asGenerator.setInMethod(localData2, true);
-        ret.addAll(asGenerator.generateTraits(localData2, false, className, extendsOp, implementsOp, constructor, functions, vars, staticFunctions, staticVars));
+        ret.addAll(asGenerator.generateTraits(localData2, false, className, extendsOp, implementsOp, traits, traitsStatic));
         return ret;
     }
 

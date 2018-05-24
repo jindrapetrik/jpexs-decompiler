@@ -12,11 +12,12 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.Reference;
+import com.jpexs.helpers.Reference;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -45,16 +46,22 @@ public class ActionGraphSource extends GraphSource {
 
     private final HashMap<String, GraphTargetItem> functions;
 
+    private final boolean insideDoInitAction;
+
+    private final String path;
+
     public List<Action> getActions() {
         return actions;
     }
 
-    public ActionGraphSource(List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public ActionGraphSource(String path, boolean insideDoInitAction, List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         this.actions = actions;
         this.version = version;
         this.registerNames = registerNames;
         this.variables = variables;
         this.functions = functions;
+        this.insideDoInitAction = insideDoInitAction;
+        this.path = path;
     }
 
     @Override
@@ -80,7 +87,7 @@ public class ActionGraphSource extends GraphSource {
     public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException {
         Reference<GraphSourceItem> fi = new Reference<>(localData.lineStartInstruction);
 
-        List<GraphTargetItem> r = Action.actionsPartToTree(fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path);
+        List<GraphTargetItem> r = Action.actionsPartToTree(this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path);
         localData.lineStartInstruction = fi.getVal();
         return r;
     }
@@ -135,7 +142,7 @@ public class ActionGraphSource extends GraphSource {
             }
             //ret = adr2posInside(adr);
             if (ret == -1) {
-                Logger.getLogger(ActionGraphSource.class.getName()).log(Level.SEVERE, "Address loc" + Helper.formatAddress(adr) + " not found");
+                Logger.getLogger(ActionGraphSource.class.getName()).log(Level.SEVERE, "{0} - address loc{1} not found", new Object[]{path, Helper.formatAddress(adr)});
                 /*System.err.println("Addr loc"+Helper.formatAddress(adr)+" not found");
                  int pos=0;
                  for(long l:posCache){

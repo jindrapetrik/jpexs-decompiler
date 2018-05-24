@@ -55,6 +55,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.search.ActionScriptSearch;
 import com.jpexs.decompiler.flash.search.ActionSearchResult;
 import com.jpexs.decompiler.flash.search.ScriptSearchListener;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
@@ -186,7 +187,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         int pos = decompiledEditor.getCaretPosition();
         return getStringUnderPosition(pos, decompiledEditor);
     }
-    
+
     public String getStringUnderPosition(int pos, JTextComponent component) {
         SyntaxDocument sDoc = ActionUtils.getSyntaxDocument(component);
         if (sDoc != null) {
@@ -439,7 +440,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         }
 
         boolean decompile = Configuration.decompile.get();
-        HighlightedText decompiledText = null;
+        HighlightedText decompiledText;
         if (!decompile) {
             decompiledText = new HighlightedText(Helper.getDecompilationSkippedComment());
         } else {
@@ -939,7 +940,8 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     private void graphButtonActionPerformed(ActionEvent evt) {
         if (lastCode != null) {
             try {
-                GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(), new ActionGraph(lastCode, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION), "");
+                boolean insideDoInitAction = (this.src instanceof DoInitActionTag);
+                GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(), new ActionGraph(this.src.getScriptName(), insideDoInitAction, lastCode, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION), "");
                 gf.setVisible(true);
             } catch (InterruptedException ex) {
                 logger.log(Level.SEVERE, null, ex);

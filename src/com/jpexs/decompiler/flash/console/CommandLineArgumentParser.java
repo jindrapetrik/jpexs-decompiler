@@ -774,7 +774,7 @@ public class CommandLineArgumentParser {
         while (true) {
             nextParamOriginal = args.pop();
             if (nextParamOriginal != null) {
-                nextParam = nextParamOriginal.toLowerCase();
+                nextParam = nextParamOriginal.toLowerCase(Locale.ENGLISH);
             }
             if (nextParam == null) {
                 nextParam = "";
@@ -1025,7 +1025,7 @@ public class CommandLineArgumentParser {
                 cp = new String[]{cp[0], "1"};
             }
 
-            Field field = fields.get(cp[0].toLowerCase());
+            Field field = fields.get(cp[0].toLowerCase(Locale.ENGLISH));
             ConfigurationItem<?> item = ConfigurationItem.getItem(field);
             String stringValue = cp[1];
             Class<?> type = ConfigurationItem.getConfigurationFieldType(field);
@@ -1078,7 +1078,7 @@ public class CommandLineArgumentParser {
         }
 
         Boolean bValue = null;
-        value = value.toLowerCase();
+        value = value.toLowerCase(Locale.ENGLISH);
         if (value.equals("0") || value.equals("false") || value.equals("no") || value.equals("off")) {
             bValue = false;
         }
@@ -1139,7 +1139,7 @@ public class CommandLineArgumentParser {
         File stdOutFile = null;
         File swfFile = null;
         while (!args.isEmpty()) {
-            String paramName = args.pop().toLowerCase();
+            String paramName = args.pop().toLowerCase(Locale.ENGLISH);
             switch (paramName) {
                 case "-outfile":
                     if (args.empty()) {
@@ -1188,7 +1188,7 @@ public class CommandLineArgumentParser {
         File swfFile = null;
 
         while (!args.empty()) {
-            String paramName = args.pop().toLowerCase();
+            String paramName = args.pop().toLowerCase(Locale.ENGLISH);
             if (processedParams.contains(paramName)) {
                 System.err.println("Parameter " + paramName + " can appear only once.");
             }
@@ -1333,7 +1333,7 @@ public class CommandLineArgumentParser {
         File valueFile = null;
 
         while (!args.empty()) {
-            String paramName = args.pop().toLowerCase();
+            String paramName = args.pop().toLowerCase(Locale.ENGLISH);
             if (processedParams.contains(paramName)) {
                 System.err.println("Parameter " + paramName + " can appear only once.");
             }
@@ -1540,7 +1540,7 @@ public class CommandLineArgumentParser {
         File swfFile = null;
         File outFile = null;
         while (!args.empty()) {
-            String paramName = args.pop().toLowerCase();
+            String paramName = args.pop().toLowerCase(Locale.ENGLISH);
             if (processedParams.contains(paramName)) {
                 System.err.println("Parameter " + paramName + " can appear only once.");
             }
@@ -1914,7 +1914,7 @@ public class CommandLineArgumentParser {
     }
 
     private static void parseDebugTool(Stack<String> args) {
-        String cmd = args.pop().toLowerCase();
+        String cmd = args.pop().toLowerCase(Locale.ENGLISH);
         switch (cmd) {
             case "findtag": {
                 String folder = args.pop();
@@ -2026,7 +2026,7 @@ public class CommandLineArgumentParser {
     }
 
     private static void parseCompareResources(Stack<String> args) {
-        String revision = args.pop().toLowerCase();
+        String revision = args.pop().toLowerCase(Locale.ENGLISH);
         String revision2 = null;
         if (!args.isEmpty()) {
             revision2 = args.pop();
@@ -2102,7 +2102,7 @@ public class CommandLineArgumentParser {
             handler = new ConsoleAbortRetryIgnoreHandler(AbortRetryIgnoreHandler.UNDEFINED, 0);
         }
 
-        String exportFormatString = args.pop().toLowerCase();
+        String exportFormatString = args.pop().toLowerCase(Locale.ENGLISH);
         List<String> exportFormats = Arrays.asList(exportFormatString.split(","));
         long startTime = System.currentTimeMillis();
 
@@ -2399,7 +2399,7 @@ public class CommandLineArgumentParser {
             outFile = Path.combine(outFile, exportFormat);
         };
 
-        String outFileName = inFile.getName().toLowerCase().endsWith(".swf") ? inFile.getName().substring(0, inFile.getName().length() - 3) + exportFormat : inFile.getName();
+        String outFileName = inFile.getName().toLowerCase(Locale.ENGLISH).endsWith(".swf") ? inFile.getName().substring(0, inFile.getName().length() - 3) + exportFormat : inFile.getName();
         outFile = Path.combine(outFile, outFileName);
         XFLExportSettings settings = new XFLExportSettings();
         settings.compressed = compressed;
@@ -2495,7 +2495,7 @@ public class CommandLineArgumentParser {
             SWFCompression compression = SWFCompression.ZLIB;
             String compressionString = !args.isEmpty() ? args.pop() : null;
             if (compressionString != null) {
-                switch (compressionString.toLowerCase()) {
+                switch (compressionString.toLowerCase(Locale.ENGLISH)) {
                     case "zlib":
                         compression = SWFCompression.ZLIB;
                         break;
@@ -2598,7 +2598,7 @@ public class CommandLineArgumentParser {
         boolean noCheck = false;
         String output = null;
 
-        if (args.size() > 0 && args.peek().toLowerCase().equals("-o")) {
+        if (args.size() > 0 && args.peek().toLowerCase(Locale.ENGLISH).equals("-o")) {
             args.pop();
             if (args.size() < 1) {
                 badArguments("extract");
@@ -2606,13 +2606,13 @@ public class CommandLineArgumentParser {
             output = args.pop();
         }
 
-        if (args.size() > 0 && args.peek().toLowerCase().equals("nocheck")) {
+        if (args.size() > 0 && args.peek().toLowerCase(Locale.ENGLISH).equals("nocheck")) {
             noCheck = true;
             args.pop();
         }
 
         if (args.size() > 0) {
-            String modeStr = args.pop().toLowerCase();
+            String modeStr = args.pop().toLowerCase(Locale.ENGLISH);
             switch (modeStr) {
                 case "biggest":
                     mode = SearchMode.BIGGEST;
@@ -2766,7 +2766,7 @@ public class CommandLineArgumentParser {
 
         String renameTypeStr = args.pop();
         RenameType renameType;
-        switch (renameTypeStr.toLowerCase()) {
+        switch (renameTypeStr.toLowerCase(Locale.ENGLISH)) {
             case "typenumber":
                 renameType = RenameType.TYPENUMBER;
                 break;
@@ -2813,7 +2813,7 @@ public class CommandLineArgumentParser {
                 badArguments("format");
             }
             String[] parts = fmt.split(":");
-            ret.put(parts[0].toLowerCase(), parts[1].toLowerCase());
+            ret.put(parts[0].toLowerCase(Locale.ENGLISH), parts[1].toLowerCase(Locale.ENGLISH));
         }
         return ret;
     }
@@ -2960,7 +2960,7 @@ public class CommandLineArgumentParser {
                         } else if (characterTag instanceof SoundTag) {
                             SoundTag st = (SoundTag) characterTag;
                             int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
-                            if (repFile.toLowerCase().endsWith(".mp3")) {
+                            if (repFile.toLowerCase(Locale.ENGLISH).endsWith(".mp3")) {
                                 soundFormat = SoundFormat.FORMAT_MP3;
                             }
                             boolean ok = st.setSound(new ByteArrayInputStream(data), soundFormat);
@@ -3051,7 +3051,7 @@ public class CommandLineArgumentParser {
             return 0;
         }
 
-        int res = ImageImporter.getImageTagType(args.peek().toLowerCase());
+        int res = ImageImporter.getImageTagType(args.peek().toLowerCase(Locale.ENGLISH));
         if (res != 0) {
             args.pop();
         }
@@ -3187,7 +3187,7 @@ public class CommandLineArgumentParser {
         try {
             try (FileInputStream is = new FileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
-                String arg = args.pop().toLowerCase();
+                String arg = args.pop().toLowerCase(Locale.ENGLISH);
                 if (arg.equals("pack")) {
                     swf.packCharacterIds();
                 } else if (arg.equals("sort")) {
@@ -3259,7 +3259,7 @@ public class CommandLineArgumentParser {
                 }
 
                 CharacterTag characterTag = swf.getCharacter(characterId);
-                String targetType = args.pop().toLowerCase();
+                String targetType = args.pop().toLowerCase(Locale.ENGLISH);
                 if (characterTag instanceof ImageTag) {
                     int format = ImageImporter.getImageTagType(targetType);
                     ImageTag imageTag = (ImageTag) characterTag;
@@ -3916,7 +3916,7 @@ public class CommandLineArgumentParser {
                     swf = new SWF(fis, Configuration.parallelSpeedUp.get());
                     fis.close();
                     String outSwd = outfile;
-                    if (outSwd.toLowerCase().endsWith(".swf")) {
+                    if (outSwd.toLowerCase(Locale.ENGLISH).endsWith(".swf")) {
                         outSwd = outSwd.substring(0, outSwd.length() - 4) + ".swd";
                     } else {
                         outSwd = outSwd + ".swd";
@@ -3968,7 +3968,7 @@ public class CommandLineArgumentParser {
     }
 
     private static FilenameFilter getSwfFilter() {
-        return (File dir, String name) -> name.toLowerCase().endsWith(".swf");
+        return (File dir, String name) -> name.toLowerCase(Locale.ENGLISH).endsWith(".swf");
     }
 
     private static <E extends Enum> E enumFromStr(String str, Class<E> cls) {
@@ -3977,7 +3977,7 @@ public class CommandLineArgumentParser {
             return vals[0];
         }
         for (E e : vals) {
-            if (e.toString().toLowerCase().replace("_", "").equals(str.toLowerCase().replace("_", ""))) {
+            if (e.toString().toLowerCase(Locale.ENGLISH).replace("_", "").equals(str.toLowerCase(Locale.ENGLISH).replace("_", ""))) {
                 return e;
             }
         }
