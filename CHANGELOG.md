@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [11.1.0] - 2018-05-24
 ### Added
 - [#1449] Turkish translation by Osman ÖZ
 - AS2 classes: maintain order of variables, and methods (place variables before methods)
