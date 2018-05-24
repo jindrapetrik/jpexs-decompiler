@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
+import com.jpexs.decompiler.flash.action.model.UnresolvedConstantActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
@@ -394,7 +395,8 @@ public class ActionPush extends Action {
         for (Object o : values) {
             if (o instanceof ConstantIndex) {
                 if ((constantPool == null) || (((ConstantIndex) o).index >= constantPool.size())) {
-                    o = "\u00A7\u00A7constant" + ((ConstantIndex) o).index;
+                    stack.push(new UnresolvedConstantActionItem(((ConstantIndex) o).index));
+                    continue;
                 } else {
                     o = constantPool.get(((ConstantIndex) o).index);
                 }

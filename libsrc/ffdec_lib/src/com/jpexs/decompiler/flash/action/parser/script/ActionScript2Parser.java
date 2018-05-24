@@ -80,6 +80,7 @@ import com.jpexs.decompiler.flash.action.model.TraceActionItem;
 import com.jpexs.decompiler.flash.action.model.TypeOfActionItem;
 import com.jpexs.decompiler.flash.action.model.UnLoadMovieActionItem;
 import com.jpexs.decompiler.flash.action.model.UnLoadMovieNumActionItem;
+import com.jpexs.decompiler.flash.action.model.UnresolvedConstantActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.ClassActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.ForInActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.IfFrameLoadedActionItem;
@@ -1583,6 +1584,12 @@ public class ActionScript2Parser {
                 expectedType(SymbolType.PARENT_OPEN);
                 switch ("" + s.value) {
                     //AS 1/2:
+                    //AS2:
+                    case "constant":
+                        s = lexer.lex();
+                        expected(s, lexer.yyline(), SymbolType.INTEGER);
+                        ret = new UnresolvedConstantActionItem((int) (long) (Long) s.value);
+                        break;
                     case "enumerate":
                         ret = new EnumerateActionItem(null, null, expression(inFunction, inMethod, allowRemainder, variables, functions));
                         break;
