@@ -40,6 +40,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.TraitMultinameUsage;
+import com.jpexs.decompiler.flash.action.deobfuscation.BrokenScriptDetector;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
@@ -83,7 +84,9 @@ import com.jpexs.helpers.Helper;
 import de.hameister.treetable.MyTreeTable;
 import de.hameister.treetable.MyTreeTableModel;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -106,6 +109,8 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -121,6 +126,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.ToolTipManager;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.TreeModelEvent;
@@ -165,6 +171,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     public final DetailPanel detailPanel;
 
     private final JPanel navPanel;
+
+    public final JPanel brokenHintPanel;
 
     public final JTabbedPane tabbedPane;
 
@@ -821,25 +829,26 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 }
             }
         }
-        
+
         public String TryGetDebugHoverToolTipText(String varName) {
-            String lowerName      = varName.toLowerCase();
+            String lowerName = varName.toLowerCase();
             StringBuilder builder = new StringBuilder();
-            
+
             FindVarAndAppendDataToString(root, lowerName, builder);
             String text = builder.toString();
-            
-            if (text == null || text.isEmpty())
+
+            if (text == null || text.isEmpty()) {
                 return null;
-            else
+            } else {
                 return "<html>" + text + "</html>";
+            }
         }
 
         private void FindVarAndAppendDataToString(VariableNode node, String lowerVarName, StringBuilder builder) {
             if (node.var != null && node.var.name.toLowerCase().contains(lowerVarName)) {
                 builder.append(node.var.name + ": " + node.var.getValueAsStr() + "<br>");
             }
-            
+
             if (node.childs != null) {
                 for (int i = 0; i < node.childs.size(); i++) {
                     FindVarAndAppendDataToString(node.childs.get(i), lowerVarName, builder);
@@ -877,8 +886,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         // So that #getToolTipText(MouseEvent) gets invoked when the mouse
         // hovers the component, and we can show debug information
         ToolTipManager.sharedInstance().registerComponent(decompiledTextArea);
-        decompiledTextArea.addMouseListener(new MouseAdapter() 
-        {    
+        decompiledTextArea.addMouseListener(new MouseAdapter() {
             final int initialTimeout = ToolTipManager.sharedInstance().getInitialDelay();
             final int dismissTimeout = ToolTipManager.sharedInstance().getDismissDelay();
 
@@ -894,8 +902,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 ToolTipManager.sharedInstance().setDismissDelay(dismissTimeout);
             }
         });
-        
+
         searchPanel = new SearchPanel<>(new FlowLayout(), this);
+
+        brokenHintPanel = new JPanel(new BorderLayout(10, 10));
+        brokenHintPanel.add(new JLabel("<html>" + AppStrings.translate("script.seemsBroken") + "</html>"), BorderLayout.CENTER);
+        brokenHintPanel.setBackground(new Color(253, 205, 137));
+        brokenHintPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED), new EmptyBorder(5, 5, 5, 5)));
 
         decompiledScrollPane = new JScrollPane(decompiledTextArea);
 
@@ -916,8 +929,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         decompiledScrollPane.setAlignmentX(0);
         iconDecPanel.add(scriptNameLabel);
         iconDecPanel.add(iconsPanel);
-        iconDecPanel.add(decompiledScrollPane);
 
+        JPanel panelWithHint = new JPanel(new BorderLayout());
+        panelWithHint.setAlignmentX(0);
+        panelWithHint.add(brokenHintPanel, BorderLayout.NORTH);
+        panelWithHint.add(decompiledScrollPane, BorderLayout.CENTER);
+
+        iconDecPanel.add(panelWithHint);
         final JPanel decButtonsPan = new JPanel(new FlowLayout());
         decButtonsPan.setBorder(new BevelBorder(BevelBorder.RAISED));
         decButtonsPan.add(editDecompiledButton);
@@ -1582,7 +1600,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         return detailPanel.isEditing() || isModified();
     }
-    
+
     public DebugPanel getDebugPanel() {
         return debugPanel;
     }

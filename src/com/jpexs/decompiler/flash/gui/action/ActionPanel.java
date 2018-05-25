@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
+import com.jpexs.decompiler.flash.action.deobfuscation.BrokenScriptDetector;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
@@ -61,6 +62,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
@@ -72,6 +74,8 @@ import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -82,6 +86,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.Highlighter;
@@ -100,6 +106,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     private static final Logger logger = Logger.getLogger(ActionPanel.class.getName());
 
+    private JPanel brokenHintPanel;
     private MainPanel mainPanel;
 
     public DebuggableEditorPane editor;
@@ -280,6 +287,13 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         ignoreCarret = true;
         decompiledEditor.setScriptName(scriptName);
         decompiledEditor.setText(text);
+        BrokenScriptDetector det = new BrokenScriptDetector();
+        if (det.codeIsBroken(text)) {
+            brokenHintPanel.setVisible(true);
+        } else {
+            brokenHintPanel.setVisible(false);
+        }
+
         ignoreCarret = false;
     }
 
@@ -746,7 +760,16 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
         DebugPanel debugPanel = new DebugPanel();
 
-        panA.add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(decompiledEditor), debugPanel, Configuration.guiActionVarsSplitPaneDividerLocationPercent), BorderLayout.CENTER);
+        JPanel panelWithHint = new JPanel(new BorderLayout());
+        brokenHintPanel = new JPanel(new BorderLayout(10, 10));
+        brokenHintPanel.add(new JLabel("<html>" + AppStrings.translate("script.seemsBroken") + "</html>"), BorderLayout.CENTER);
+        brokenHintPanel.setBackground(new Color(253, 205, 137));
+        brokenHintPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED), new EmptyBorder(5, 5, 5, 5)));
+
+        panelWithHint.add(brokenHintPanel, BorderLayout.NORTH);
+        panelWithHint.add(new JScrollPane(decompiledEditor), BorderLayout.CENTER);
+
+        panA.add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, panelWithHint, debugPanel, Configuration.guiActionVarsSplitPaneDividerLocationPercent), BorderLayout.CENTER);
         panA.add(decButtonsPan, BorderLayout.SOUTH);
 
         //decPanel.add(searchPanel, BorderLayout.NORTH);

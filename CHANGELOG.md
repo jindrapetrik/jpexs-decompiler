@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Warning panel on scripts containing §§ instructions (Tip for Settings/Automatic deobfuscation)
+
 ### Changed
 - AS1/2 Better unresolved constant handling - §§constant(xx) func instead of §§constantxx
 
