@@ -1948,4 +1948,29 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "trace(\"after\");\r\n"
         );
     }
+
+    @Test
+    public void frame70_forWithContinue2Test() {
+        compareSrc(70, "trace(\"forWithContinue2Test\");\r\n"
+                + "var s = \"A\";\r\n"
+                + "var i = 0;\r\n"
+                + "for(; i < 10; i++)\r\n"
+                + "{\r\n"
+                + "if(s == \"B\")\r\n"
+                + "{\r\n"
+                + "if(s == \"C\")\r\n"
+                + "{\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"D\");\r\n"
+                + "var j = 0;\r\n"
+                + "while(j < 29)\r\n"
+                + "{\r\n"
+                + "trace(\"E\");\r\n"
+                + "j++;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+        );
+    }
 }
