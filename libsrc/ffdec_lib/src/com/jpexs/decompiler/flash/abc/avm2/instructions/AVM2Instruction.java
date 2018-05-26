@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -123,6 +124,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         return bos.toByteArray();
     }
 
+    @Override
     public int getBytesLength() {
         int cnt = 1;
         for (int i = 0; i < definition.operands.length; i++) {

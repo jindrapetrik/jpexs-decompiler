@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.script;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -98,6 +99,8 @@ public class ExportScriptTask implements Callable<File> {
                         asm.getActionSourcePrefix(writer2);
                         asm.getActionBytesAsHex(writer2);
                         asm.getActionSourceSuffix(writer2);
+                    } else if (exportMode == ScriptExportMode.PCODE_GRAPHVIZ) {
+                        new PcodeGraphVizExporter().exportAs12(asm, writer2);
                     } else if (exportMode != ScriptExportMode.AS) {
                         asm.getActionSourcePrefix(writer2);
                         asm.getASMSource(exportMode, writer2, null);

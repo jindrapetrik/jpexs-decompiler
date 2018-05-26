@@ -18,10 +18,12 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -36,6 +38,10 @@ public abstract class GraphSource implements Serializable {
     public abstract boolean isEmpty();
 
     public abstract List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException;
+
+    public abstract Set<Long> getImportantAddresses();
+
+    public abstract String insToString(int pos);
 
     private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs, int endIp) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
@@ -109,4 +115,20 @@ public abstract class GraphSource implements Serializable {
     public abstract int adr2pos(long adr);
 
     public abstract long pos2adr(int pos);
+
+    public long getAddressAfterCode() {
+        if (isEmpty()) {
+            return 0;
+        }
+        long lastAddr = pos2adr(size() - 1);
+        return lastAddr + get(size() - 1).getBytesLength();
+    }
+
+    public final long pos2adr(int pos, boolean allowPosAfterCode) {
+        if (pos == size() && allowPosAfterCode) {
+            return getAddressAfterCode();
+        }
+        return pos2adr(pos);
+    }
+;
 }
