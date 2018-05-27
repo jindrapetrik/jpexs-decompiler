@@ -2018,4 +2018,15 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "trace(\"forInSwitchTest\");\r\n"
         );
     }
+
+    @Test
+    public void frame73_deleteTest() {
+        compareSrc(73, "trace(\"deleteTest\");\r\n"
+                + "var obj = {a:1,b:2};\r\n"
+                + "obj[\"salam likum\"] = 58;\r\n"
+                + "delete obj.a;\r\n"
+                + "delete obj[\"salam likum\"];\r\n"
+                + "delete \"bagr aa\";\r\n"
+        );
+    }
 }

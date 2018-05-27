@@ -606,6 +606,8 @@ public class ActionScript2Parser {
                 } else if (varDel instanceof VariableActionItem) {
                     variables.remove(varDel);
                     ret = new DeleteActionItem(null, null, null, pushConst(((VariableActionItem) varDel).getVariableName()));
+                } else if (varDel instanceof DirectValueActionItem) {
+                    ret = new DeleteActionItem(null, null, null, varDel);
                 } else {
                     throw new ActionParseException("Not a property", lexer.yyline());
                 }

@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf5.ActionDelete;
 import com.jpexs.decompiler.flash.action.swf5.ActionDelete2;
@@ -55,12 +57,25 @@ public class DeleteActionItem extends ActionItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("delete ");
-        if (object == null) {
-            return propertyName.toStringNoQuotes(writer, localData);
+        if (object != null) {
+            object.toStringNoQuotes(writer, localData);
+            if (IdentifiersDeobfuscation.isValidName(false, propertyName.toStringNoQuotes(localData))) {
+                writer.append(".");
+                propertyName.toStringNoQuotes(writer, localData);
+            } else {
+                writer.append("[");
+                propertyName.toString(writer, localData);
+                writer.append("]");
+            }
+            return writer;
         }
-        object.toStringNoQuotes(writer, localData);
-        writer.append(".");
-        return propertyName.toStringNoQuotes(writer, localData);
+
+        if (IdentifiersDeobfuscation.isValidName(false, propertyName.toStringNoQuotes(localData))) {
+            propertyName.toStringNoQuotes(writer, localData);
+        } else {
+            propertyName.toString(writer, localData);
+        }
+        return writer;
     }
 
     @Override
