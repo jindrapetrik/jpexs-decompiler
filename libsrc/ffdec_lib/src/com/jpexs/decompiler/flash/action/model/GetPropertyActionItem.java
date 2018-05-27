@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -57,8 +58,20 @@ public class GetPropertyActionItem extends ActionItem {
         if (isEmptyString(target)) {
             return writer.append(Action.propertyNames[propertyIndex]);
         }
-        target.toString(writer, localData);
-        return writer.append(".").append(Action.propertyNames[propertyIndex]);
+
+        if ((target instanceof DirectValueActionItem) && ((DirectValueActionItem) target).isString()) {
+            target.toStringNoQuotes(writer, localData);
+            return writer.append(":" + Action.propertyNames[propertyIndex]);
+        }
+
+        writer.append("getProperty");
+        writer.spaceBeforeCallParenthesies(2);
+        writer.append("(");
+        target.appendTo(writer, localData);
+        writer.append(", ");
+        writer.append(Action.propertyNames[propertyIndex]);
+        writer.append(")");
+        return writer;
     }
 
     @Override

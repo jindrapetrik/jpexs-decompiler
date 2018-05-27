@@ -7,13 +7,16 @@ All notable changes to this project will be documented in this file.
 - Export AS1/2 P-code as GraphViz
 - Display better Graph using GraphViz (Must be configured in Advanced settings / Path)
 - Copy AS1/2 Graph source (GraphViz) to clipboard - rightclick menu on graph
+- AS1 slash syntax support (decompilation, direct editation)
 
 ### Changed
 - AS1/2 Better unresolved constant handling - §§constant(xx) func instead of §§constantxx
+- AS1/2 Using eval, set functions on obfuscated names instead of §§ syntax
 
 ### Fixed
 - Better continue in for handling
-- Using temporary registers after for..in (causing §§pop instructions, etc.)
+- AS1/2 Using temporary registers after for..in (causing incorrect chained assignments handling, etc.)
+- AS1/2 getProperty, setProperty handling
 
 ## [11.1.0] - 2018-05-24
 ### Added

@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.action.model.EvalActionItem;
 import com.jpexs.decompiler.flash.action.model.FSCommandActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
+import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
 import com.jpexs.decompiler.flash.action.model.GetTimeActionItem;
 import com.jpexs.decompiler.flash.action.model.GetURL2ActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
@@ -63,6 +64,7 @@ import com.jpexs.decompiler.flash.action.model.RandomNumberActionItem;
 import com.jpexs.decompiler.flash.action.model.RemoveSpriteActionItem;
 import com.jpexs.decompiler.flash.action.model.ReturnActionItem;
 import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
+import com.jpexs.decompiler.flash.action.model.SetPropertyActionItem;
 import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.StartDragActionItem;
 import com.jpexs.decompiler.flash.action.model.StopActionItem;
@@ -1784,10 +1786,18 @@ public class ActionScript2Parser {
             case IDENTIFIER:
             case THIS:
             case SUPER:
+            case PATH:
                 if (s.value.equals("not")) {
                     ret = new NotItem(null, null, expressionPrimary(false, inFunction, inMethod, false, variables, functions));
                 } else {
-                    ret = new VariableActionItem(s.value.toString(), null, false);
+                    if (s.type == SymbolType.PATH) {
+                        expectedType(SymbolType.COLON);
+                        ParsedSymbol s2 = lex();
+                        expected(s2, lexer.yyline(), SymbolType.IDENTIFIER);
+                        ret = new VariableActionItem(s.value.toString() + ":" + s2.value.toString(), null, false);
+                    } else {
+                        ret = new VariableActionItem(s.value.toString(), null, false);
+                    }
                     variables.add((VariableActionItem) ret);
                     allowMemberOrCall = true;
                 }
@@ -1877,10 +1887,34 @@ public class ActionScript2Parser {
         for (VariableActionItem v : vars) {
             String varName = v.getVariableName();
             GraphTargetItem stored = v.getStoreValue();
+            int propIndex = -1;
+            boolean hasSubVars = false;
+            if (varName.contains(":")) {
+                hasSubVars = true;
+                String lowerNameStr = varName.toLowerCase();
+                for (int p = 0; p < Action.propertyNames.length; p++) {
+                    String prop = Action.propertyNames[p];
+                    if (lowerNameStr.endsWith(":" + prop.toLowerCase())) {
+                        propIndex = p;
+                        varName = varName.substring(0, varName.lastIndexOf(":"));
+                        break;
+                    }
+                }
+            }
             if (v.isDefinition()) {
+                if (hasSubVars) {
+                    throw new ActionParseException("Invalid : character in variable definition", lexer.yyline());
+                }
                 v.setBoxedValue(new DefineLocalActionItem(null, null, pushConst(varName), stored));
             } else if (stored != null) {
-                v.setBoxedValue(new SetVariableActionItem(null, null, pushConst(varName), stored));
+                if (propIndex > -1) {
+                    v.setBoxedValue(new SetPropertyActionItem(null, null, pushConst(varName), propIndex, stored));
+                } else {
+                    v.setBoxedValue(new SetVariableActionItem(null, null, pushConst(varName), stored));
+                }
+
+            } else if (propIndex > -1) {
+                v.setBoxedValue(new GetPropertyActionItem(null, null, pushConst(varName), propIndex));
             } else {
                 v.setBoxedValue(new GetVariableActionItem(null, null, pushConst(varName)));
             }

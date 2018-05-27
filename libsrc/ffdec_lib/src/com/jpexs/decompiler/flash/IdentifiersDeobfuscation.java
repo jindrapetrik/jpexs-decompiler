@@ -238,6 +238,46 @@ public class IdentifiersDeobfuscation {
         return null;
     }
 
+    private static boolean isValidSlashPath(String s, String... exceptions) {
+        String[] slashParts = s.split("\\/");
+        if (s.isEmpty()) {
+            return false;
+        }
+        for (int p = 0; p < slashParts.length; p++) {
+            String part = slashParts[p];
+            if (p == 0 && part.isEmpty()) {
+                continue;
+            }
+            if (part.isEmpty() && p < slashParts.length - 1) { //  two slashesh xx//yy
+                return false;
+            }
+            if ("..".equals(part)) {
+                continue; //okay
+            }
+            if (!isValidName(false, part, exceptions)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isValidNameWithSlash(String s, String... exceptions) {
+        if (s.contains(":")) {
+            String pathVar[] = s.split(":");
+            if (!isValidSlashPath(pathVar[0], exceptions)) {
+                return false;
+            }
+            for (int i = 1; i < pathVar.length; i++) {
+                if (!isValidName(false, pathVar[i], exceptions)) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return isValidName(false, s, exceptions);
+        }
+    }
+
     public static boolean isValidNameWithDot(boolean as3, String s, String... exceptions) {
         for (String e : exceptions) {
             if (e.equals(s)) {

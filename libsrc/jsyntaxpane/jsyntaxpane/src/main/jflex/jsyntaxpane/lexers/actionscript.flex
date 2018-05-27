@@ -70,6 +70,12 @@ IdentNext = {IdentFirst} | [\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}]
 /* identifiers */
 Identifier = {IdentFirst}{IdentNext}*
 
+IdentifierOrParent = {Identifier} | ".."
+
+Path = "/" | "/"? {IdentifierOrParent} ("/" {IdentifierOrParent})* "/"?
+
+SlashVariable = {Path} ":" {Identifier}
+
 /* identifiers */
 
 IdentifierNs = {Identifier} ":" {Identifier}
@@ -291,6 +297,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                     xmlTagName = s.substring(1);
                                  }*/
   /* identifiers */
+  {SlashVariable}                { return token(TokenType.IDENTIFIER); }
   {Identifier}{NamespaceSuffix}  { return token(TokenType.REGEX); }
   {Identifier}                   { return token(TokenType.IDENTIFIER); }
   

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
@@ -60,7 +61,14 @@ public class CallFunctionActionItem extends ActionItem {
         srcData.localName = functionName.toStringNoQuotes(localData);
 
         if (functionName instanceof DirectValueActionItem) {
-            writer.append(IdentifiersDeobfuscation.printIdentifier(false, (functionName).toStringNoQuotes(localData)));
+            if (!IdentifiersDeobfuscation.isValidName(false, (functionName).toStringNoQuotes(localData))) {
+                writer.append("eval(");
+                functionName.toString(writer, localData);
+                writer.append(")");
+            } else {
+                functionName.toStringNoQuotes(writer, localData);
+            }
+            //writer.append(IdentifiersDeobfuscation.printIdentifier(false, (functionName).toStringNoQuotes(localData)));
         } else {
             functionName.appendTry(writer, localData);
         }
