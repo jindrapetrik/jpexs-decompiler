@@ -2544,6 +2544,9 @@ public class Graph {
             if (commands.get(commands.size() - 1) instanceof BreakItem) {
                 clen--;
             }
+            if (commands.get(commands.size() - 1) instanceof ContinueItem) {
+                clen--;
+            }
         }
         while (stack.size() > 0) {
             GraphTargetItem p = stack.pop();
