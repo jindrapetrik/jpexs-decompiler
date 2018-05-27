@@ -20,7 +20,9 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
+import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
+import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.AndItem;
@@ -1309,6 +1311,10 @@ public class Graph {
         clearLoops(loops);
     }
 
+    protected boolean canBeBreakCandidate(GraphPart part) {
+        return true;
+    }
+
     private void getLoops(BaseLocalData localData, GraphPart part, List<Loop> loops, List<GraphPart> stopPart, boolean first, int level, List<GraphPart> visited) throws InterruptedException {
 
         if (part == null) {
@@ -1339,7 +1345,7 @@ public class Graph {
 
             }
         }
-        if (lastP1 != null) {
+        if (lastP1 != null && canBeBreakCandidate(part)) {
             if (lastP1.breakCandidates.contains(part)) {
                 lastP1.breakCandidates.add(part);
                 lastP1.breakCandidatesLevels.add(level);

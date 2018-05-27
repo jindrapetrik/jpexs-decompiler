@@ -1991,4 +1991,31 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "var v1 = {};\r\n"
         );
     }
+
+    @Test
+    public void frame72_forInSwitchTest() {
+        compareSrc(72, "function f()\r\n"
+                + "{\r\n"
+                + "var _loc3_ = {};\r\n"
+                + "var _loc2_ = {};\r\n"
+                + "for(var _loc4_ in _loc3_)\r\n"
+                + "{\r\n"
+                + "var _loc1_ = _loc2_[_loc4_];\r\n"
+                + "switch(_loc1_)\r\n"
+                + "{\r\n"
+                + "case \"A\":\r\n"
+                + "case \"B\":\r\n"
+                + "case \"C\":\r\n"
+                + "trace(\"Ret 5\");\r\n"
+                + "return 5;\r\n"
+                + "default:\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"Final\");\r\n"
+                + "return 10;\r\n"
+                + "}\r\n"
+                + "trace(\"forInSwitchTest\");\r\n"
+        );
+    }
 }

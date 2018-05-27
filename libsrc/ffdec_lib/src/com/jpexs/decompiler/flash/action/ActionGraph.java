@@ -56,6 +56,7 @@ import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
+import com.jpexs.decompiler.graph.model.UniversalLoopItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
@@ -138,6 +139,24 @@ public class ActionGraph extends Graph {
                 }
             }
         }
+    }
+
+    @Override
+    protected boolean canBeBreakCandidate(GraphPart part) {
+        if (part.refs.size() <= 1) {
+            return true;
+        }
+        boolean isSwitch = true;
+        for (GraphPart r : part.refs) {
+            if (code.get(r.end) instanceof ActionIf) {
+                if (!(r.start < r.end - 1 && (code.get(r.end - 1) instanceof ActionStrictEquals))) {
+                    isSwitch = false;
+                }
+            } else {
+                isSwitch = false;
+            }
+        }
+        return !isSwitch;
     }
 
     @Override
