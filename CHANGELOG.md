@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 Using temporary registers after for..in (causing incorrect chained assignments handling, etc.)
 - AS1/2 getProperty, setProperty handling
 - AS1/2 callmethod action arguments
+- Fixed §§push after continue - should be before (usually on obfuscated code)
 
 ## [11.1.0] - 2018-05-24
 ### Added
