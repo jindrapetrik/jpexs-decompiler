@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - Better continue in for handling
 - AS1/2 Using temporary registers after for..in (causing incorrect chained assignments handling, etc.)
 - AS1/2 getProperty, setProperty handling
+- AS1/2 callmethod action arguments
 
 ## [11.1.0] - 2018-05-24
 ### Added
