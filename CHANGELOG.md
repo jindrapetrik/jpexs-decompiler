@@ -8,10 +8,12 @@ All notable changes to this project will be documented in this file.
 - Display better Graph using GraphViz (Must be configured in Advanced settings / Path)
 - Copy AS1/2 Graph source (GraphViz) to clipboard - rightclick menu on graph
 - AS1 slash syntax support (decompilation, direct editation)
+- Setting of limit of executed instructions during AS1/2 deobfuscation
 
 ### Changed
 - AS1/2 Better unresolved constant handling - §§constant(xx) func instead of §§constantxx
 - AS1/2 Using eval, set functions on obfuscated names instead of §§ syntax
+- Default limit of maximum executed instructions during AS1/2 deobfuscation raised to 10000
 
 ### Fixed
 - Better continue in for handling

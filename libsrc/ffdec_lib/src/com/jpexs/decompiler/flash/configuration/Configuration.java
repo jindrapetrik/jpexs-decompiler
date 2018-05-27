@@ -207,6 +207,13 @@ public final class Configuration {
     public static final ConfigurationItem<Integer> decompilationTimeoutFile = null;
 
     /**
+     * AS1/2 deobfuscator execution limit (max number of instructions processed)
+     */
+    @ConfigurationDefaultInt(10000)
+    @ConfigurationCategory("limit")
+    public static final ConfigurationItem<Integer> as12DeobfuscatorExecutionLimit = null;
+
+    /**
      * Using parameter names in decompiling may cause problems because official
      * programs like Flash CS 5.5 inserts wrong parameter names indices
      */
