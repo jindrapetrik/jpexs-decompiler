@@ -1973,4 +1973,22 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "}\r\n"
         );
     }
+
+    @Test
+    public void frame71_chainedAfterForInTest() {
+        compareSrc(71, "function f()\r\n"
+                + "{\r\n"
+                + "var _loc4_ = 5;\r\n"
+                + "var _loc3_ = {};\r\n"
+                + "var _loc2_ = \"bagr\";\r\n"
+                + "for(var _loc1_ in _locy_)\r\n"
+                + "{\r\n"
+                + "trace(_loc1_);\r\n"
+                + "}\r\n"
+                + "_loc3_.r1 = _loc2_ + 1 + \". \" + (!_loc4_?_loc3_.r2 = v1[_loc2_][0]:\"unk\");\r\n"
+                + "}\r\n"
+                + "trace(\"chainedAfterForInTest\");\r\n"
+                + "var v1 = {};\r\n"
+        );
+    }
 }

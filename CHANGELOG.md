@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Better continue in for handling
+- Using temporary registers after for..in (causing §§pop instructions, etc.)
 
 ## [11.1.0] - 2018-05-24
 ### Added

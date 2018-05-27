@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -24,6 +25,8 @@ import com.jpexs.decompiler.flash.action.StoreTypeAction;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.EnumeratedValueActionItem;
+import com.jpexs.decompiler.flash.action.model.EnumerationAssignmentValueActionItem;
 import com.jpexs.decompiler.flash.action.model.IncrementActionItem;
 import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.PostIncrementActionItem;
@@ -113,6 +116,13 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
         if (regNames.containsKey(registerNumber)) {
             define = false;
         }
+
+        if (value instanceof TemporaryRegister) {
+            if (((TemporaryRegister) value).value instanceof EnumerationAssignmentValueActionItem) {
+                value = ((TemporaryRegister) value).value;
+            }
+        }
+
         variables.put("__register" + registerNumber, value);
         if (value instanceof DirectValueActionItem) {
             if (((DirectValueActionItem) value).value instanceof RegisterNumber) {
@@ -146,6 +156,10 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
                 stack.push(obj);
                 return;
             }
+        }
+
+        if ((value instanceof EnumeratedValueActionItem)) {
+            variables.put("__register" + registerNumber, new TemporaryRegister(registerNumber, new EnumerationAssignmentValueActionItem()));
         }
         stack.push(new StoreRegisterActionItem(this, lineStartAction, rn, value, define));
     }

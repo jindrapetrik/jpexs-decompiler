@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.AndItem;
+import com.jpexs.decompiler.graph.model.BranchStackResistant;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DefaultItem;
@@ -1729,7 +1730,13 @@ public class Graph {
         if (isLoop) {
             //makeAllCommands(currentRet, stack);
             stack = (TranslateStack) stack.clone();
+
+            //hack for as1/2 for..in to get enumeration through
+            GraphTargetItem topBsr = !stack.isEmpty() && (stack.peek() instanceof BranchStackResistant) ? stack.peek() : null;
             stack.clear();
+            if (topBsr != null) {
+                stack.push(topBsr);
+            }
             loopItem = new UniversalLoopItem(null, localData.lineStartInstruction, currentLoop, new ArrayList<>());
             //loopItem.commands=printGraph(visited, localData, stack, allParts, parent, part, stopPart, loops);
             currentRet.add(loopItem);
@@ -1980,9 +1987,15 @@ public class Graph {
                     GraphPart next = getCommonPart(localData, nps, loops);
                     TranslateStack trueStack = (TranslateStack) stack.clone();
                     TranslateStack falseStack = (TranslateStack) stack.clone();
+
+                    //hack for as1/2 for..in to get enumeration through
+                    GraphTargetItem topBsr = !stack.isEmpty() && (stack.peek() instanceof BranchStackResistant) ? stack.peek() : null;
                     trueStack.clear();
                     falseStack.clear();
-
+                    if (topBsr != null) {
+                        trueStack.add(topBsr);
+                        falseStack.add(topBsr);
+                    }
                     if (isEmpty) {
                         next = nps.get(0);
                     }
@@ -2534,6 +2547,9 @@ public class Graph {
         }
         while (stack.size() > 0) {
             GraphTargetItem p = stack.pop();
+            if (p instanceof BranchStackResistant) {
+                continue;
+            }
             if (!(p instanceof PopItem)) {
                 if (p instanceof FunctionActionItem) {
                     commands.add(clen, p);
