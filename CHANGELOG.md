@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 callmethod action arguments
 - Fixed §§push after continue - should be before (usually on obfuscated code)
 - AS1/2 Delete operator with nonIdentifier parameters (e.g. spaces or obfuscated)
+- DefineBits (with JPEGTables) tag export
 
 ## [11.1.0] - 2018-05-24
 ### Added
