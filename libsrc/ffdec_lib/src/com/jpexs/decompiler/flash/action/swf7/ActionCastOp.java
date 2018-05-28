@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf7;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -47,16 +48,16 @@ public class ActionCastOp extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.size() < 2) {
+        if (!lda.stackHasMinSize(2)) {
             return false;
         }
 
         ActionScriptObject obj = (ActionScriptObject) lda.pop();
         ActionScriptObject constr = (ActionScriptObject) lda.pop();
         if (ActionInstanceOf.getInstanceOfResult(obj, constr)) {
-            lda.stack.push(obj);
+            lda.push(obj);
         } else {
-            lda.stack.push(Null.INSTANCE);
+            lda.push(Null.INSTANCE);
         }
 
         return true;

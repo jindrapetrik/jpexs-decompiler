@@ -48,13 +48,13 @@ public class ActionCloneSprite extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.size() < 3) {
+        if (!lda.stackHasMinSize(3)) {
             return false;
         }
 
-        int depth = EcmaScript.toInt32(lda.stack.pop());
-        String source = EcmaScript.toString(lda.stack.pop());
-        String target = EcmaScript.toString(lda.stack.pop());
+        int depth = EcmaScript.toInt32(lda.pop());
+        String source = EcmaScript.toString(lda.pop());
+        String target = EcmaScript.toString(lda.pop());
         Object clonedMember = lda.stage.getMember(source);
         if (clonedMember != Undefined.INSTANCE) {
             lda.stage.setMember(target, ((ActionScriptObject) clonedMember).clone());

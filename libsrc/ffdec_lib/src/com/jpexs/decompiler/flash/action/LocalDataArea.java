@@ -12,10 +12,12 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -51,6 +53,10 @@ public class LocalDataArea {
 
     public String executionException;
 
+    public boolean checkStackSize = true;
+
+    public int undefinedCount = 0;
+
     public LocalDataArea(Stage stage) {
         this.stage = stage;
         this.target = this.stage;
@@ -62,6 +68,20 @@ public class LocalDataArea {
         if (preserveVariableOrder) {
             localVariables = new LinkedHashMap<>();
         }
+    }
+
+    public boolean stackIsEmpty() {
+        if (!checkStackSize) {
+            return false;
+        }
+        return stack.isEmpty();
+    }
+
+    public boolean stackHasMinSize(int count) {
+        if (!checkStackSize) {
+            return true;
+        }
+        return stack.size() >= count;
     }
 
     public void clear() {
@@ -76,17 +96,36 @@ public class LocalDataArea {
         returnValue = null;
         executionException = null;
         target = stage;
+        undefinedCount = 0;
     }
 
-    public Object pop() {
+    public synchronized Object push(Object val) {
+        return stack.push(val);
+    }
+
+    public synchronized Object peek() {
+        if (!checkStackSize && stack.isEmpty()) {
+            undefinedCount++;
+            stack.push(Undefined.INSTANCE);
+            return Undefined.INSTANCE;
+        }
+        return stack.peek();
+    }
+
+    public synchronized Object pop() {
+        boolean isEmpty = stack.isEmpty();
+        if (!checkStackSize && stack.isEmpty()) {
+            undefinedCount++;
+            return Undefined.INSTANCE;
+        }
         return stack.pop();
     }
 
-    public Double popAsNumber() {
-        return EcmaScript.toNumberAs2(stack.pop());
+    public synchronized Double popAsNumber() {
+        return EcmaScript.toNumberAs2(pop());
     }
 
-    public String popAsString() {
-        return EcmaScript.toString(stack.pop());
+    public synchronized String popAsString() {
+        return EcmaScript.toString(pop());
     }
 }

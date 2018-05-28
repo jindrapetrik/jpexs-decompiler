@@ -210,11 +210,23 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
             ActionItem actionItem = iterator.next();
             result.clear();
             localData.clear();
-            /*ActionItem container = actions.getContainer(actionItem);
-             actions.setExcludedFlags(false);
-             if (container != null) {
-             markContainerActions(container, actions);
-             }*/
+
+            /*
+            When running code from first action,
+            there can be pops from stack when the stack is empty
+            which results in Undefined popped.
+            Some obfuscated code checks for these undefineds like:
+            
+            Not
+            If loc1
+                ConstantPool
+                Jump loc2
+            loc1:
+                <code>
+            loc2:
+            
+             */
+            localData.checkStackSize = !first; //this enables popping undefineds
 
             executeActions(actionItem, localData, cPool, result, fakeFunctions, useVariables, first);
 

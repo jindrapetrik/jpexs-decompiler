@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -108,11 +109,11 @@ public class ActionGotoFrame2 extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.isEmpty()) {
+        if (lda.stackIsEmpty()) {
             return false;
         }
 
-        String frame = EcmaScript.toString(lda.stack.pop());
+        String frame = EcmaScript.toString(lda.pop());
         String target = "/";
         if (frame.contains(":")) {
             target = frame.substring(0, frame.indexOf(':'));

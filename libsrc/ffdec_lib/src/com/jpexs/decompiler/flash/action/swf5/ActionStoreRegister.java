@@ -55,7 +55,7 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.size() < 1) {
+        if (!lda.stackHasMinSize(1)) {
             return false;
         }
 

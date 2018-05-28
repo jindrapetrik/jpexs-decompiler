@@ -57,7 +57,7 @@ public class ActionCallFunction extends Action {
 
         for (ActionScriptFunction f : lda.functions) {
             if (functionName.equals(f.getFunctionName())) {
-                lda.stack.push(lda.stage.callFunction(f.getFunctionOffset(), f.getFunctionLength(), args, f.getFuncRegNames(), Undefined.INSTANCE /*?*/));
+                lda.push(lda.stage.callFunction(f.getFunctionOffset(), f.getFunctionLength(), args, f.getFuncRegNames(), Undefined.INSTANCE /*?*/));
                 return true;
             }
         }

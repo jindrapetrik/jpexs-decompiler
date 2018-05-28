@@ -45,11 +45,11 @@ public class ActionAdd extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.size() < 2) {
+        if (!lda.stackHasMinSize(2)) {
             return false;
         }
 
-        lda.stack.push(AddActionItem.getResult(lda.pop(), lda.pop(), false));
+        lda.push(AddActionItem.getResult(lda.pop(), lda.pop(), false));
         return true;
     }
 

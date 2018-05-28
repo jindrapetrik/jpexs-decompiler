@@ -48,19 +48,19 @@ public class ActionEnumerate extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.isEmpty()) {
+        if (lda.stackIsEmpty()) {
             return false;
         }
 
         String objectName = lda.popAsString();
-        lda.stack.push(Null.INSTANCE);
+        lda.push(Null.INSTANCE);
 
         Object o = lda.stage.getMember(objectName);
 
         if (o instanceof ActionScriptObject) {
             List<String> members = ((ActionScriptObject) o).enumerate();
             for (String m : members) {
-                lda.stack.push(m);
+                lda.push(m);
             }
         }
         return true;

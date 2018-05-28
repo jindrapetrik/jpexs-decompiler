@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -47,14 +48,14 @@ public class ActionNewMethod extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.size() < 3) {
+        if (!lda.stackHasMinSize(3)) {
             return false;
         }
 
         String methodName = lda.popAsString();
         ActionScriptObject obj = (ActionScriptObject) lda.pop();
         int numArgs = (int) (double) lda.popAsNumber();
-        if (lda.stack.size() < numArgs) {
+        if (!lda.stackHasMinSize(numArgs)) {
             return false;
         }
 
@@ -66,7 +67,7 @@ public class ActionNewMethod extends Action {
         ActionScriptObject nobj = new ActionScriptObject();
         ActionScriptFunction f = (ActionScriptFunction) obj.getMember(methodName);
         lda.stage.callFunction(f.getFunctionOffset(), f.getFunctionLength(), args, f.getFuncRegNames(), nobj);
-        lda.stack.push(nobj);
+        lda.push(nobj);
         return true;
     }
 

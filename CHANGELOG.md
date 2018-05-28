@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Copy AS1/2 Graph source (GraphViz) to clipboard - rightclick menu on graph
 - AS1 slash syntax support (decompilation, direct editation)
 - Setting of limit of executed instructions during AS1/2 deobfuscation
+- AS1/2 deobfuscation of empty stack pops
 
 ### Changed
 - AS1/2 Better unresolved constant handling - §§constant(xx) func instead of §§constantxx
