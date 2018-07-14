@@ -376,10 +376,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             }
 
             //current var is getter function - set it to value really got
-            //if ((var.flags & VariableFlags.HAS_GETTER) > 0)
-            {
+            if ((var.flags & VariableFlags.HAS_GETTER) > 0) {
                 varInsideGetter = igv.parent;
             }
+
             Variable curTrait = null;
             for (int i = 0; i < igv.childs.size(); i++) {
                 if (!isTraits(igv.childs.get(i))) {
@@ -410,6 +410,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         public VariableNode(List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait) {
             this.var = var;
+            this.varInsideGetter = var;
             this.parentObjectId = parentObjectId;
             this.level = level;
             this.trait = trait;
@@ -420,6 +421,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
         public VariableNode(List<VariableNode> parentPath, int level, Variable var, Long parentObjectId, Variable trait, List<VariableNode> subvars) {
             this.var = var;
+            this.varInsideGetter = var;
             this.parentObjectId = parentObjectId;
             this.level = level;
             this.trait = trait;
@@ -830,11 +832,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             }
         }
 
-        public String TryGetDebugHoverToolTipText(String varName) {
+        public String tryGetDebugHoverToolTipText(String varName) {
             String lowerName = varName.toLowerCase();
             StringBuilder builder = new StringBuilder();
 
-            FindVarAndAppendDataToString(root, lowerName, builder);
+            findVarAndAppendDataToString(root, lowerName, builder);
             String text = builder.toString();
 
             if (text == null || text.isEmpty()) {
@@ -844,14 +846,14 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             }
         }
 
-        private void FindVarAndAppendDataToString(VariableNode node, String lowerVarName, StringBuilder builder) {
+        private void findVarAndAppendDataToString(VariableNode node, String lowerVarName, StringBuilder builder) {
             if (node.var != null && node.var.name.toLowerCase().contains(lowerVarName)) {
                 builder.append(node.var.name + ": " + node.var.getValueAsStr() + "<br>");
             }
 
             if (node.childs != null) {
                 for (int i = 0; i < node.childs.size(); i++) {
-                    FindVarAndAppendDataToString(node.childs.get(i), lowerVarName, builder);
+                    findVarAndAppendDataToString(node.childs.get(i), lowerVarName, builder);
                 }
             }
         }

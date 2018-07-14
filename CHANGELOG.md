@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 Delete operator with nonIdentifier parameters (e.g. spaces or obfuscated)
 - DefineBits (with JPEGTables) tag export
 - No disabling autoOpenLoadedSWFs checkbox when ActiveX player not available (User can use Run button)
+- Displaying contents of local variables (AS3) while debugging
 
 ## [11.1.0] - 2018-05-24
 ### Added
