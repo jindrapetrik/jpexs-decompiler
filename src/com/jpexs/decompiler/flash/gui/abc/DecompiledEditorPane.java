@@ -811,7 +811,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         final String identifier = abcPanel.getMainPanel().getActionPanel().getStringUnderPosition(pos, abcPanel.decompiledTextArea);
 
         if (identifier != null && !identifier.isEmpty()) {
-            String tooltipText = abcPanel.getDebugPanel().localsTable.TryGetDebugHoverToolTipText(identifier);
+            String tooltipText = abcPanel.getDebugPanel().localsTable.tryGetDebugHoverToolTipText(identifier);
             return (tooltipText == null ? super.getToolTipText() : tooltipText);
         }
 

@@ -632,8 +632,8 @@ public class DebuggerHandler implements DebugConnectionListener {
                             @Override
                             public void run() {
                                 try {
-                                    con.sendMessage(new OutGetSwf(con, (int) s.index), InGetSwf.class);
-                                    con.sendMessage(new OutGetSwd(con, (int) s.index), InGetSwd.class);
+                                    con.sendMessageWithTimeout(new OutGetSwf(con, (int) s.index), InGetSwf.class);
+                                    con.sendMessageWithTimeout(new OutGetSwd(con, (int) s.index), InGetSwd.class);
                                 } catch (IOException ex) {
                                     //ignore
                                 }
@@ -693,8 +693,8 @@ public class DebuggerHandler implements DebugConnectionListener {
                     }
 
                     try {
-                        breakInfo = con.getMessage(InBreakAtExt.class);
-                        breakReason = con.sendMessage(new OutGetBreakReason(con), InBreakReason.class);
+                        breakInfo = con.getMessage(InBreakAtExt.class, DebuggerConnection.PREF_RESPONSE_TIMEOUT);
+                        breakReason = con.sendMessageWithTimeout(new OutGetBreakReason(con), InBreakReason.class);
 
                         String newBreakScriptName = "unknown";
                         if (modulePaths.containsKey(message.file)) {
@@ -764,7 +764,6 @@ public class DebuggerHandler implements DebugConnectionListener {
             }
 
         } catch (IOException ex) {
-
             synchronized (this) {
                 connected = false;
             }
