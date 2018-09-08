@@ -76,6 +76,7 @@ import com.jpexs.decompiler.flash.action.swf5.ActionToString;
 import com.jpexs.decompiler.flash.action.swf5.ActionTypeOf;
 import com.jpexs.decompiler.flash.action.swf6.ActionGreater;
 import com.jpexs.decompiler.flash.action.swf6.ActionStringGreater;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
 import com.jpexs.decompiler.flash.helpers.collections.FixItemCounterStack;
@@ -96,8 +97,6 @@ import java.util.Stack;
  * @author JPEXS
  */
 public class ActionDeobfuscator extends SWFDecompilerAdapter {
-
-    private final int executionLimit = 5000;
 
     @Override
     public void actionListParsed(ActionList actions, SWF swf) throws InterruptedException {
@@ -211,11 +210,23 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
             ActionItem actionItem = iterator.next();
             result.clear();
             localData.clear();
-            /*ActionItem container = actions.getContainer(actionItem);
-             actions.setExcludedFlags(false);
-             if (container != null) {
-             markContainerActions(container, actions);
-             }*/
+
+            /*
+            When running code from first action,
+            there can be pops from stack when the stack is empty
+            which results in Undefined popped.
+            Some obfuscated code checks for these undefineds like:
+            
+            Not
+            If loc1
+                ConstantPool
+                Jump loc2
+            loc1:
+                <code>
+            loc2:
+            
+             */
+            localData.checkStackSize = !first; //this enables popping undefineds
 
             executeActions(actionItem, localData, cPool, result, fakeFunctions, useVariables, first);
 
@@ -447,6 +458,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         int skippedInstructions = 0;
         ActionConstantPool lastConstantPool = null;
 
+        int executionLimit = Configuration.as12DeobfuscatorExecutionLimit.get();
         boolean skippedInstructionsUnknown = false;
         boolean jumpedHere = true;
         boolean jumpFound = false;

@@ -1,6 +1,35 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- Warning panel on scripts containing §§ instructions (Tip for Settings/Automatic deobfuscation)
+- Export AS1/2 P-code as GraphViz
+- Display better Graph using GraphViz (Must be configured in Advanced settings / Path)
+- Copy AS1/2 Graph source (GraphViz) to clipboard - rightclick menu on graph
+- AS1 slash syntax support (decompilation, direct editation)
+- Setting of limit of executed instructions during AS1/2 deobfuscation
+- AS1/2 deobfuscation of empty stack pops
+
+### Changed
+- AS1/2 Better unresolved constant handling - §§constant(xx) func instead of §§constantxx
+- AS1/2 Using eval, set functions on obfuscated names instead of §§ syntax
+- Default limit of maximum executed instructions during AS1/2 deobfuscation raised to 10000
+
+### Fixed
+- Better continue in for handling
+- AS1/2 For in break detection with inner switch statement
+- AS1/2 Using temporary registers after for..in (causing incorrect chained assignments handling, etc.)
+- AS1/2 getProperty, setProperty handling
+- AS1/2 callmethod action arguments
+- Fixed §§push after continue - should be before (usually on obfuscated code)
+- AS1/2 Delete operator with nonIdentifier parameters (e.g. spaces or obfuscated)
+- DefineBits (with JPEGTables) tag export
+- No disabling autoOpenLoadedSWFs checkbox when ActiveX player not available (User can use Run button)
+- Displaying contents of local variables (AS3) while debugging
+- #1415 freezing on manually closing Flash player debug session
+- #1484 AS import error printout on commandline (NullPointer)
+
 ## [11.1.0] - 2018-05-24
 ### Added
 - [#1449] Turkish translation by Osman ÖZ

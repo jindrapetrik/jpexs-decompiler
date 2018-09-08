@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import java.io.File;
@@ -54,6 +55,7 @@ public abstract class FileTestBase {
         Object[][] ret = new Object[files.size() + 2][1];
         ret[0][0] = "testdata/as2/as2.swf";
         ret[1][0] = "testdata/as3/as3.swf";
+        ret[1][0] = "testdata/as2_slash_syntax/slash_syntax.swf";
         for (int f = 0; f < files.size(); f++) {
             ret[f + 2][0] = files.get(f);
         }

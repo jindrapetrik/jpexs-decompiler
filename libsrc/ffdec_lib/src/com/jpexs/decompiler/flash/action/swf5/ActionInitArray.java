@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -41,21 +42,21 @@ public class ActionInitArray extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.isEmpty()) {
+        if (lda.stackIsEmpty()) {
             return false;
         }
 
         int num = (int) (double) lda.popAsNumber();
-        if (lda.stack.size() < num) {
+        if (!lda.stackHasMinSize(num)) {
             return false;
         }
 
         ActionScriptArray arr = new ActionScriptArray();
         for (int i = 0; i < num; i++) {
-            arr.setValueAtIndex(i, lda.stack.pop());
+            arr.setValueAtIndex(i, lda.pop());
         }
 
-        lda.stack.push(arr);
+        lda.push(arr);
         return true;
     }
 

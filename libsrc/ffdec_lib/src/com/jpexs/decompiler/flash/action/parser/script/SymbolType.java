@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.parser.script;
 
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -129,7 +130,6 @@ public enum SymbolType {
     //Other
     STRING(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     COMMENT,
-    XML,
     IDENTIFIER(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     INTEGER(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     DOUBLE(GraphTargetItem.PRECEDENCE_PRIMARY, false),
@@ -183,7 +183,8 @@ public enum SymbolType {
     UNLOADMOVIE(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     UNLOADMOVIENUM(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     FSCOMMAND(GraphTargetItem.PRECEDENCE_PRIMARY, false),
-    PREPROCESSOR(GraphTargetItem.PRECEDENCE_PRIMARY, false);
+    PREPROCESSOR(GraphTargetItem.PRECEDENCE_PRIMARY, false),
+    PATH(GraphTargetItem.PRECEDENCE_PRIMARY, false);
 
     private int precedence = GraphTargetItem.NOPRECEDENCE;
 

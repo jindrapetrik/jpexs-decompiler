@@ -65,7 +65,7 @@ public class ActionDefineFunction extends Action implements GraphSourceItemConta
     @Override
     public boolean execute(LocalDataArea lda) {
         ActionScriptFunction f = new ActionScriptFunction(fileOffset, codeSize, functionName, paramNames, getRegNames());
-        lda.stack.push(f);
+        lda.push(f);
         lda.functions.add(f);
         ((ActionScriptObject) lda.target).setMember(functionName, f);
         return true;

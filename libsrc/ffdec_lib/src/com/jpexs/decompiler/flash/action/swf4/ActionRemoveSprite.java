@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -45,11 +46,11 @@ public class ActionRemoveSprite extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.isEmpty()) {
+        if (lda.stackIsEmpty()) {
             return false;
         }
 
-        String target = EcmaScript.toString(lda.stack.pop());
+        String target = EcmaScript.toString(lda.pop());
         lda.stage.removeMember(target);
         return true;
     }

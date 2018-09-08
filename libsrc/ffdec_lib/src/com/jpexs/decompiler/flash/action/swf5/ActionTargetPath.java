@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -45,7 +46,7 @@ public class ActionTargetPath extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.isEmpty()) {
+        if (lda.stackIsEmpty()) {
             return false;
         }
 
@@ -53,9 +54,9 @@ public class ActionTargetPath extends Action {
 
         String path = lda.stage.getMemberPath(obj);
         if (path == null) {
-            lda.stack.push(Undefined.INSTANCE);
+            lda.push(Undefined.INSTANCE);
         } else {
-            lda.stack.push(path);
+            lda.push(path);
         }
 
         return true;

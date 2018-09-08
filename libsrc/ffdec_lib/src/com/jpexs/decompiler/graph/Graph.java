@@ -20,8 +20,13 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
+import com.jpexs.decompiler.flash.action.swf4.ActionIf;
+import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
+import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
+import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.AndItem;
+import com.jpexs.decompiler.graph.model.BranchStackResistant;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DefaultItem;
@@ -51,6 +56,7 @@ import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +85,14 @@ public class Graph {
     private boolean debugPrintLoopList = false;
     private boolean debugGetLoops = false;
     private boolean debugPrintGraph = false;
+
+    public GraphSource getGraphCode() {
+        return code;
+    }
+
+    public LinkedHashMap<String, Graph> getSubGraphs() {
+        return new LinkedHashMap<>();
+    }
 
     /**
      * Identify loop exits
@@ -1141,6 +1155,7 @@ public class Graph {
         }
 
         if (stopPart.contains(part)) {
+            //System.err.println("/stopped part " + part);
             return;
         }
         for (Loop el : loops) {
@@ -1163,9 +1178,11 @@ public class Graph {
 
         if (visited.contains(part)) {
             part.level = 0;
+            //System.err.println("set level " + part + " to zero");
         } else {
             visited.add(part);
             part.level = level;
+            //System.err.println("set level " + part + " to " + level);
         }
 
         boolean isLoop = false;
@@ -1183,9 +1200,18 @@ public class Graph {
         if (nextParts == null) {
             nextParts = part.nextParts;
         }
+        nextParts = new ArrayList<>(nextParts);
+
+        if (nextParts.size() == 2 && stopPart.contains(nextParts.get(1))) {
+            nextParts.remove(1);
+        }
+        if (nextParts.size() >= 1 && stopPart.contains(nextParts.get(0))) {
+            nextParts.remove(0);
+        }
 
         if (nextParts.size() == 2) {
             GraphPart next = getCommonPart(localData, nextParts, loops);//part.getNextPartPath(new ArrayList<GraphPart>());
+            //System.err.println("- common part of " + nextParts.get(0) + " and " + nextParts.get(1) + " is " + next);
             List<GraphPart> stopParts2 = new ArrayList<>();  //stopPart);
             if (next != null) {
                 stopParts2.add(next);
@@ -1193,12 +1219,20 @@ public class Graph {
                 stopParts2.add(stopPart.get(stopPart.size() - 1));
             }
             if (next != nextParts.get(0)) {
+                // System.err.println("- going to branch 0 nextpart from " + part + " to " + nextParts.get(0));
                 markLevels(path, localData, nextParts.get(0), allParts, loops, next == null ? stopPart : stopParts2, level + 1, visited, recursionLevel + 1);
+            } else {
+                //System.err.println("- branch 0 of " + part + " is skipped (=next)");
             }
+
             if (next != nextParts.get(1)) {
+                //System.err.println("- going to branch 1 nextpart from " + part + " to " + nextParts.get(1));
                 markLevels(path, localData, nextParts.get(1), allParts, loops, next == null ? stopPart : stopParts2, level + 1, visited, recursionLevel + 1);
+            } else {
+                //System.err.println("- branch 1 of " + part + " is skipped (=next)");
             }
             if (next != null) {
+                //System.err.println("- going to next from " + part + " to " + next);
                 markLevels(path, localData, next, allParts, loops, stopPart, level, visited, recursionLevel + 1);
             }
         }
@@ -1235,6 +1269,7 @@ public class Graph {
         }
 
         if (nextParts.size() == 1) {
+            //System.err.println("going to one nexpart from " + part + " to " + nextParts.get(0));
             markLevels(path, localData, nextParts.get(0), allParts, loops, stopPart, level, visited, recursionLevel + 1);
         }
 
@@ -1258,6 +1293,7 @@ public class Graph {
         if (isLoop) {
             if (currentLoop != null && currentLoop.loopBreak != null) {
                 currentLoop.phase = 2;
+                //System.err.println("- going to break of loop " + currentLoop.loopBreak);
                 markLevels(path, localData, currentLoop.loopBreak, allParts, loops, stopPart, level, visited, recursionLevel + 1);
             }
         }
@@ -1273,6 +1309,10 @@ public class Graph {
         clearLoops(loops);
         getLoops(localData, part, loops, stopPart, true, 1, new ArrayList<>());
         clearLoops(loops);
+    }
+
+    protected boolean canBeBreakCandidate(GraphPart part) {
+        return true;
     }
 
     private void getLoops(BaseLocalData localData, GraphPart part, List<Loop> loops, List<GraphPart> stopPart, boolean first, int level, List<GraphPart> visited) throws InterruptedException {
@@ -1305,7 +1345,7 @@ public class Graph {
 
             }
         }
-        if (lastP1 != null) {
+        if (lastP1 != null && canBeBreakCandidate(part)) {
             if (lastP1.breakCandidates.contains(part)) {
                 lastP1.breakCandidates.add(part);
                 lastP1.breakCandidatesLevels.add(level);
@@ -1696,7 +1736,13 @@ public class Graph {
         if (isLoop) {
             //makeAllCommands(currentRet, stack);
             stack = (TranslateStack) stack.clone();
+
+            //hack for as1/2 for..in to get enumeration through
+            GraphTargetItem topBsr = !stack.isEmpty() && (stack.peek() instanceof BranchStackResistant) ? stack.peek() : null;
             stack.clear();
+            if (topBsr != null) {
+                stack.push(topBsr);
+            }
             loopItem = new UniversalLoopItem(null, localData.lineStartInstruction, currentLoop, new ArrayList<>());
             //loopItem.commands=printGraph(visited, localData, stack, allParts, parent, part, stopPart, loops);
             currentRet.add(loopItem);
@@ -1947,9 +1993,15 @@ public class Graph {
                     GraphPart next = getCommonPart(localData, nps, loops);
                     TranslateStack trueStack = (TranslateStack) stack.clone();
                     TranslateStack falseStack = (TranslateStack) stack.clone();
+
+                    //hack for as1/2 for..in to get enumeration through
+                    GraphTargetItem topBsr = !stack.isEmpty() && (stack.peek() instanceof BranchStackResistant) ? stack.peek() : null;
                     trueStack.clear();
                     falseStack.clear();
-
+                    if (topBsr != null) {
+                        trueStack.add(topBsr);
+                        falseStack.add(topBsr);
+                    }
                     if (isEmpty) {
                         next = nps.get(0);
                     }
@@ -2179,13 +2231,6 @@ public class Graph {
 
                         if (!bodyBranch.isEmpty()) {
                             ret.add(index, loopItem);
-                            /*
-                             loopItem.commands.remove(loopItem.commands.size() - 1);
-                             exprList.addAll(loopItem.commands);
-                             commands.addAll(bodyBranch);
-                             exprList.add(expr);
-                             checkContinueAtTheEnd(commands, currentLoop);
-                             ret.add(index, li = new WhileItem(null, currentLoop, exprList, commands));*/
                         } else {
                             loopItem.commands.remove(loopItem.commands.size() - 1);
                             commands.addAll(loopItem.commands);
@@ -2267,7 +2312,7 @@ public class Graph {
     protected void checkGraph(List<GraphPart> allBlocks) {
     }
 
-    private List<GraphPart> makeGraph(GraphSource code, List<GraphPart> allBlocks, List<Integer> alternateEntries) throws InterruptedException {
+    public List<GraphPart> makeGraph(GraphSource code, List<GraphPart> allBlocks, List<Integer> alternateEntries) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = code.visitCode(alternateEntries);
         List<GraphPart> ret = new ArrayList<>();
         boolean[] visited = new boolean[code.size()];
@@ -2344,7 +2389,18 @@ public class Graph {
                         endAddr += size;
                     }
                     ip = code.adr2pos(endAddr);
+
+                    if ((ins instanceof ActionDefineFunction) || (ins instanceof ActionDefineFunction2)) {
+                        part.end = lastIp;
+                        allBlocks.add(part);
+                        GraphPart gp = new GraphPart(ip, -1);
+                        gp.path = path;
+                        part.nextParts.add(gp);
+                        gp.refs.add(part);
+                        part = gp;
+                    }
                 }
+
                 continue;
             } else if (ins.isExit()) {
                 part.end = ip;
@@ -2494,9 +2550,15 @@ public class Graph {
             if (commands.get(commands.size() - 1) instanceof BreakItem) {
                 clen--;
             }
+            if (commands.get(commands.size() - 1) instanceof ContinueItem) {
+                clen--;
+            }
         }
         while (stack.size() > 0) {
             GraphTargetItem p = stack.pop();
+            if (p instanceof BranchStackResistant) {
+                continue;
+            }
             if (!(p instanceof PopItem)) {
                 if (p instanceof FunctionActionItem) {
                     commands.add(clen, p);

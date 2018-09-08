@@ -582,7 +582,7 @@ public class FlashPlayerTest {
                             }
                         }
 
-                        Object res = lda.stack.pop();
+                        Object res = lda.pop();
                         ffdecExecuteResult = "Result:" + EcmaScript.toString(res) + " Type:" + EcmaScript.typeString(res);
                     } catch (Exception e) {
                         ffdecExecuteResult = "Error:" + e.getMessage();

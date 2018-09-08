@@ -44,7 +44,7 @@ public class ActionGetTime extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        lda.stack.push(lda.stage.getTime());
+        lda.push(lda.stage.getTime());
         return true;
     }
 

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -44,11 +45,11 @@ public class ActionBitOr extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.size() < 2) {
+        if (!lda.stackHasMinSize(2)) {
             return false;
         }
 
-        lda.stack.push(BitOrActionItem.getResult(lda.pop(), lda.pop()));
+        lda.push(BitOrActionItem.getResult(lda.pop(), lda.pop()));
         return true;
     }
 

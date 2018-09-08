@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.parser.script;
 
 /**
@@ -25,7 +26,6 @@ public enum SymbolGroup {
     KEYWORD,
     STRING,
     COMMENT,
-    XML,
     IDENTIFIER,
     INTEGER,
     DOUBLE,
@@ -33,5 +33,6 @@ public enum SymbolGroup {
     EOF,
     GLOBALFUNC,
     GLOBALCONST,
-    PREPROCESSOR
+    PREPROCESSOR,
+    PATH
 }

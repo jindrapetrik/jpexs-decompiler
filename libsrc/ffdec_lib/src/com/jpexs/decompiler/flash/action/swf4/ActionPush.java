@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
+import com.jpexs.decompiler.flash.action.model.UnresolvedConstantActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
@@ -372,16 +373,16 @@ public class ActionPush extends Action {
             if (value instanceof ConstantIndex) {
                 ConstantIndex constantIndex = (ConstantIndex) value;
                 List<String> cPool = lda.constantPool != null ? lda.constantPool : constantPool;
-                lda.stack.push(constantIndex.toStringNoQ(cPool, true));
+                lda.push(constantIndex.toStringNoQ(cPool, true));
             } else if (value instanceof RegisterNumber) {
                 int rn = ((RegisterNumber) value).number;
                 if (lda.localRegisters.containsKey(rn)) {
-                    lda.stack.push(lda.localRegisters.get(rn));
+                    lda.push(lda.localRegisters.get(rn));
                 } else {
-                    lda.stack.push(Undefined.INSTANCE);
+                    lda.push(Undefined.INSTANCE);
                 }
             } else {
-                lda.stack.push(value);
+                lda.push(value);
             }
         }
 
@@ -394,7 +395,8 @@ public class ActionPush extends Action {
         for (Object o : values) {
             if (o instanceof ConstantIndex) {
                 if ((constantPool == null) || (((ConstantIndex) o).index >= constantPool.size())) {
-                    o = "\u00A7\u00A7constant" + ((ConstantIndex) o).index;
+                    stack.push(new UnresolvedConstantActionItem(((ConstantIndex) o).index));
+                    continue;
                 } else {
                     o = constantPool.get(((ConstantIndex) o).index);
                 }

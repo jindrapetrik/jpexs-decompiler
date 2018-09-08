@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
@@ -58,9 +59,9 @@ public class CallMethodActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        boolean blankMethod = false;
-        boolean dvai = methodName instanceof DirectValueActionItem;
-        if (dvai) {
+        if (methodName instanceof DirectValueActionItem) {
+            boolean blankMethod = false;
+
             if (((DirectValueActionItem) methodName).value == Undefined.INSTANCE) {
                 blankMethod = true;
             }
@@ -78,25 +79,36 @@ public class CallMethodActionItem extends ActionItem {
                 } else {
                     scriptObject.toString(writer, localData);
                 }
-                writer.append(".");
-                writer.append(IdentifiersDeobfuscation.printIdentifier(false, methodName.toStringNoQuotes(localData)));
+                if (IdentifiersDeobfuscation.isValidName(false, methodName.toStringNoQuotes(localData))) {
+                    writer.append(".");
+                    methodName.toStringNoQuotes(writer, localData);
+                } else {
+                    writer.append("[");
+                    methodName.toString(writer, localData);
+                    writer.append("]");
+                }
+                //writer.append(IdentifiersDeobfuscation.printIdentifier(false, methodName.toStringNoQuotes(localData)));
             } else {
                 scriptObject.toString(writer, localData);
             }
         } else {
-            writer.append("this[");
+            if (scriptObject.getPrecedence() > this.precedence) {
+                writer.append("(");
+                scriptObject.toString(writer, localData);
+                writer.append(")");
+            } else {
+                scriptObject.toString(writer, localData);
+            }
+
+            writer.append("[");
             methodName.appendTry(writer, localData);
-            writer.append("].call");
+            writer.append("]");
         }
 
         writer.spaceBeforeCallParenthesies(arguments.size());
         writer.append("(");
-        if (!dvai) {
-            writer.append("this");
-        }
-
         for (int t = 0; t < arguments.size(); t++) {
-            if (t > 0 || !dvai) {
+            if (t > 0) {
                 writer.append(",");
             }
             arguments.get(t).toStringNL(writer, localData);

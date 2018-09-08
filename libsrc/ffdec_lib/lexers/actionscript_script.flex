@@ -105,15 +105,9 @@ EndOfLineComment = "//" {InputCharacter}* {LineTerminator}?
 /* identifiers */
 Identifier = [:jletter:][:jletterdigit:]*
 
-IdentifierNs = {Identifier} ":" {Identifier}
+IdentifierOrParent = {Identifier} | ".."
 
-TypeNameSpec = ".<" {Identifier} ">"
-
-/* XML */
-XMLIdentifier = {Identifier} | {IdentifierNs}
-XMLAttribute = " "* {XMLIdentifier} " "* "=" " "* \" {InputCharacter}* \" " "*
-XMLBeginOneTag = "<" {XMLIdentifier} {XMLAttribute}* ">"
-XMLEndTag = "</" {XMLIdentifier} ">"
+Path = "/" | "/"? {IdentifierOrParent} ("/" {IdentifierOrParent})* "/"?
 
 /* integer literals */
 DecIntegerLiteral = 0 | [1-9][0-9]*
@@ -337,40 +331,11 @@ Preprocessor = \u00A7\u00A7 {Identifier}
   {LineTerminator}               { yyline++;}
   /* whitespace */
   {WhiteSpace}                   { /*ignore*/ }
-  {TypeNameSpec}                 { String t = yytext(); return new ParsedSymbol(SymbolGroup.TYPENAME, SymbolType.TYPENAME, t.substring(2, t.length() - 1)); }
-  {XMLBeginOneTag}                  {string.setLength(0);
-                                    yybegin(XML);
-                                    String s = yytext();
-                                    s = s.substring(1, s.length() - 1);
-                                    if (s.contains(" ")){
-                                       s = s.substring(0, s.indexOf(' '));
-                                    }
-                                    xmlTagName = s;
-                                    string.append(yytext());
-                                 }
   /* identifiers */
   {Identifier}                   { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, yytext()); }
+  {Path}                         { return new ParsedSymbol(SymbolGroup.PATH, SymbolType.PATH, yytext()); }
 }
 
-<XMLSTARTTAG> {
-   {XMLAttribute}                { string.append(yytext());}
-   {LineTerminator}               { string.append(yytext());  yyline++;}
-   {WhiteSpace}                   { string.append(yytext()); }
-   ">"                             { yybegin(XML);  string.append(yytext());}
-}
-<XML> {
-   {XMLBeginOneTag}                 { string.append(yytext());}
-   {XMLEndTag}                   { string.append(yytext());
-                                   String endtagname = yytext();
-                                   endtagname = endtagname.substring(2, endtagname.length() - 1);
-                                   if (endtagname.equals(xmlTagName)){
-                                       yybegin(YYINITIAL);
-                                       return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML, string.toString());
-                                   }
-                                 }
-   {LineTerminator}               { string.append(yytext()); yyline++;}
-   [^]                           { string.append(yytext()); }
-}
 
 <OIDENTIFIER> {
     "\u00A7"                         {

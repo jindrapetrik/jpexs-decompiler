@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.configuration;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
@@ -204,6 +205,13 @@ public final class Configuration {
     @ConfigurationDefaultInt(5 * 60)
     @ConfigurationCategory("limit")
     public static final ConfigurationItem<Integer> decompilationTimeoutFile = null;
+
+    /**
+     * AS1/2 deobfuscator execution limit (max number of instructions processed)
+     */
+    @ConfigurationDefaultInt(10000)
+    @ConfigurationCategory("limit")
+    public static final ConfigurationItem<Integer> as12DeobfuscatorExecutionLimit = null;
 
     /**
      * Using parameter names in decompiling may cause problems because official
@@ -630,6 +638,11 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static final ConfigurationItem<Boolean> showSetAdvanceValuesMessage = null;
+
+    @ConfigurationDefaultString("")
+    @ConfigurationCategory("paths")
+    @ConfigurationFile
+    public static final ConfigurationItem<String> graphVizDotLocation = null;
 
     private enum OSId {
         WINDOWS, OSX, UNIX

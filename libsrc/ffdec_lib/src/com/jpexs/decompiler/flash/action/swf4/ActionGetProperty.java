@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -48,18 +49,18 @@ public class ActionGetProperty extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.size() < 2) {
+        if (!lda.stackHasMinSize(2)) {
             return false;
         }
 
-        int index = EcmaScript.toInt32(lda.stack.pop());
-        String target = EcmaScript.toString(lda.stack.pop());
+        int index = EcmaScript.toInt32(lda.pop());
+        String target = EcmaScript.toString(lda.pop());
         Object movieClip = lda.stage.getMember(target);
         if (movieClip instanceof ActionScriptObject) {
-            lda.stack.push(((ActionScriptObject) movieClip).getProperty(index));
+            lda.push(((ActionScriptObject) movieClip).getProperty(index));
             return true;
         }
-        lda.stack.push(Undefined.INSTANCE);
+        lda.push(Undefined.INSTANCE);
         return true;
     }
 

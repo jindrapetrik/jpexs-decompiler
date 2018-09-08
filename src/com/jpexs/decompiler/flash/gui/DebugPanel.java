@@ -86,7 +86,7 @@ public class DebugPanel extends JPanel {
     private boolean loading = false;
 
     public ABCPanel.VariablesTableModel localsTable;
-    
+
     public static enum SelectedTab {
 
         LOG, STACK, SCOPECHAIN, LOCALS, REGISTERS, CALLSTACK, CONSTANTPOOL

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf6;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -20,6 +21,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionScriptObject;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
+import com.jpexs.decompiler.flash.action.model.EnumeratedValueActionItem;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -47,6 +49,7 @@ public class ActionEnumerate2 extends Action {
     @Override
     public void translate(boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) {
         GraphTargetItem object = stack.pop();
+        stack.push(new EnumeratedValueActionItem());
         output.add(new EnumerateActionItem(this, lineStartAction, object));
     }
 
@@ -57,17 +60,17 @@ public class ActionEnumerate2 extends Action {
 
     @Override
     public boolean execute(LocalDataArea lda) {
-        if (lda.stack.isEmpty()) {
+        if (lda.stackIsEmpty()) {
             return false;
         }
 
         Object o = lda.pop();
-        lda.stack.push(Null.INSTANCE);
+        lda.push(Null.INSTANCE);
 
         if (o instanceof ActionScriptObject) {
             List<String> members = ((ActionScriptObject) o).enumerate();
             for (String m : members) {
-                lda.stack.push(m);
+                lda.push(m);
             }
         }
 

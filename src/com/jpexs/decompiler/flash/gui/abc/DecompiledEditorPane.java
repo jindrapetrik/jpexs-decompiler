@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.action.deobfuscation.BrokenScriptDetector;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
@@ -750,6 +751,13 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         highlightedText = decompiledText;
         if (decompiledText != null) {
             String hilightedCode = decompiledText.text;
+            BrokenScriptDetector det = new BrokenScriptDetector();
+            if (det.codeIsBroken(hilightedCode)) {
+                abcPanel.brokenHintPanel.setVisible(true);
+            } else {
+                abcPanel.brokenHintPanel.setVisible(false);
+            }
+
             setText(hilightedCode);
 
             if (highlightedText.getClassHighlights().size() > 0) {
@@ -792,21 +800,21 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     }
 
     @Override
-    public String getToolTipText(MouseEvent e) {    
+    public String getToolTipText(MouseEvent e) {
         // not debugging: so return existing text
-        if (abcPanel.getDebugPanel().localsTable == null)
-           return super.getToolTipText();
-                
-        final Point point       = new Point(e.getX(), e.getY());
-        final int pos           = abcPanel.decompiledTextArea.viewToModel(point);
+        if (abcPanel.getDebugPanel().localsTable == null) {
+            return super.getToolTipText();
+        }
+
+        final Point point = new Point(e.getX(), e.getY());
+        final int pos = abcPanel.decompiledTextArea.viewToModel(point);
         final String identifier = abcPanel.getMainPanel().getActionPanel().getStringUnderPosition(pos, abcPanel.decompiledTextArea);
 
-        if (identifier != null && !identifier.isEmpty())
-        {
-            String tooltipText = abcPanel.getDebugPanel().localsTable.TryGetDebugHoverToolTipText(identifier);
+        if (identifier != null && !identifier.isEmpty()) {
+            String tooltipText = abcPanel.getDebugPanel().localsTable.tryGetDebugHoverToolTipText(identifier);
             return (tooltipText == null ? super.getToolTipText() : tooltipText);
         }
-        
+
         // not found: so return existing text
         return super.getToolTipText();
     }

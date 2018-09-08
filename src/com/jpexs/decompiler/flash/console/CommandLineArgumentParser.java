@@ -3651,7 +3651,11 @@ public class CommandLineArgumentParser {
             pack.abc.replaceScriptPack(scriptReplacer, pack, as);
         } catch (As3ScriptReplaceException asre) {
             for (As3ScriptReplaceExceptionItem item : asre.getExceptionItems()) {
-                logger.log(Level.SEVERE, "%error% on line %line%, column %col%, file: %file%".replace("%error%", item.getMessage()).replace("%line%", Long.toString(item.getLine())).replace("%file%", item.getFile()).replace("%col%", "" + item.getCol()));
+                String r = "%error% on line %line%, column %col%, file: %file%".replace("%error%", "" + item.getMessage());
+                r = r.replace("%line%", Long.toString(item.getLine()));
+                r = r.replace("%file%", "" + item.getFile());
+                r = r.replace("%col%", "" + item.getCol());
+                logger.log(Level.SEVERE, r);
             }
             System.exit(1);
         }

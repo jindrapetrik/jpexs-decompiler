@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.settings;
 
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -42,6 +43,8 @@ public class ScriptExportSettings {
             case AS:
             case AS_METHOD_STUBS:
                 return ".as";
+            case PCODE_GRAPHVIZ:
+                return ".gv";
             case PCODE:
             case PCODE_HEX:
                 return ".pcode";

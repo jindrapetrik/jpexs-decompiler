@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.modes;
 
 /**
@@ -23,7 +24,8 @@ public enum ScriptExportMode {
     AS,
     PCODE,
     PCODE_HEX,
+    PCODE_GRAPHVIZ,
     HEX,
     CONSTANTS, // AS1/2 ConstantPool
-    AS_METHOD_STUBS;
+    AS_METHOD_STUBS
 }

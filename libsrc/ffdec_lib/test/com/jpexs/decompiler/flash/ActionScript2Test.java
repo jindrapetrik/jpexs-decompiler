@@ -732,7 +732,7 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "a = escape(\"how\");\r\n"
                 + "var f = a;\r\n"
                 + "fscommand(\"alert(\\\"hi\\\");\");\r\n"
-                + "a = mc._alpha;\r\n"
+                + "a = getProperty(mc, _alpha);\r\n"
                 + "a = getTimer();\r\n"
                 + "getURL(\"http://localhost/\",\"wnd\",\"POST\");\r\n"
                 + "a = getVersion();\r\n"
@@ -772,8 +772,8 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "a = random(10);\r\n"
                 + "removeMovieClip(mc);\r\n"
                 + "setInterval(tst,5,f);\r\n"
-                + "mc._alpha = 25;\r\n"
-                + "setTimeout(tst,5,f);\r\n"
+                + "setProperty(mc, _alpha, 25);\r\n"
+                + "setTimeout(ts,5,f);\r\n"
                 + "showRedrawRegions(false,0);\r\n"
                 + "startDrag(mc,1,5,5,6,6);\r\n"
                 + "stop();\r\n"
@@ -1946,6 +1946,87 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "break;\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n"
+        );
+    }
+
+    @Test
+    public void frame70_forWithContinue2Test() {
+        compareSrc(70, "trace(\"forWithContinue2Test\");\r\n"
+                + "var s = \"A\";\r\n"
+                + "var i = 0;\r\n"
+                + "for(; i < 10; i++)\r\n"
+                + "{\r\n"
+                + "if(s == \"B\")\r\n"
+                + "{\r\n"
+                + "if(s == \"C\")\r\n"
+                + "{\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"D\");\r\n"
+                + "var j = 0;\r\n"
+                + "while(j < 29)\r\n"
+                + "{\r\n"
+                + "trace(\"E\");\r\n"
+                + "j++;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+        );
+    }
+
+    @Test
+    public void frame71_chainedAfterForInTest() {
+        compareSrc(71, "function f()\r\n"
+                + "{\r\n"
+                + "var _loc4_ = 5;\r\n"
+                + "var _loc3_ = {};\r\n"
+                + "var _loc2_ = \"bagr\";\r\n"
+                + "for(var _loc1_ in _locy_)\r\n"
+                + "{\r\n"
+                + "trace(_loc1_);\r\n"
+                + "}\r\n"
+                + "_loc3_.r1 = _loc2_ + 1 + \". \" + (!_loc4_?_loc3_.r2 = v1[_loc2_][0]:\"unk\");\r\n"
+                + "}\r\n"
+                + "trace(\"chainedAfterForInTest\");\r\n"
+                + "var v1 = {};\r\n"
+        );
+    }
+
+    @Test
+    public void frame72_forInSwitchTest() {
+        compareSrc(72, "function f()\r\n"
+                + "{\r\n"
+                + "var _loc3_ = {};\r\n"
+                + "var _loc2_ = {};\r\n"
+                + "for(var _loc4_ in _loc3_)\r\n"
+                + "{\r\n"
+                + "var _loc1_ = _loc2_[_loc4_];\r\n"
+                + "switch(_loc1_)\r\n"
+                + "{\r\n"
+                + "case \"A\":\r\n"
+                + "case \"B\":\r\n"
+                + "case \"C\":\r\n"
+                + "trace(\"Ret 5\");\r\n"
+                + "return 5;\r\n"
+                + "default:\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"Final\");\r\n"
+                + "return 10;\r\n"
+                + "}\r\n"
+                + "trace(\"forInSwitchTest\");\r\n"
+        );
+    }
+
+    @Test
+    public void frame73_deleteTest() {
+        compareSrc(73, "trace(\"deleteTest\");\r\n"
+                + "var obj = {a:1,b:2};\r\n"
+                + "obj[\"salam likum\"] = 58;\r\n"
+                + "delete obj.a;\r\n"
+                + "delete obj[\"salam likum\"];\r\n"
+                + "delete \"bagr aa\";\r\n"
         );
     }
 }
