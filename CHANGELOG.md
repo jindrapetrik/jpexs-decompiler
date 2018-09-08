@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
 - No disabling autoOpenLoadedSWFs checkbox when ActiveX player not available (User can use Run button)
 - Displaying contents of local variables (AS3) while debugging
 - #1415 freezing on manually closing Flash player debug session
+- #1484 AS import error printout on commandline (NullPointer)
 
 ## [11.1.0] - 2018-05-24
 ### Added
