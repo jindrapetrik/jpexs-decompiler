@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [11.2.0] - 2018-09-08
 ### Added
 - Warning panel on scripts containing §§ instructions (Tip for Settings/Automatic deobfuscation)
 - Export AS1/2 P-code as GraphViz
