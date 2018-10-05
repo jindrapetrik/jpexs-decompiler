@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- updated turkish translation
+
 ### Fixed
 - #1457 AS3 switch without lookupswitch ins detection
 
