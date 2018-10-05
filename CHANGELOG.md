@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - #1457 AS3 switch without lookupswitch ins detection
+- #1457 pushing on stack before exit item (return/throw)
 
 ## [11.2.0] - 2018-09-08
 ### Added
