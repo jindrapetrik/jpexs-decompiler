@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictEqIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIns;
@@ -35,6 +36,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NextNameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NextValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnVoidAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
@@ -47,16 +49,21 @@ import com.jpexs.decompiler.flash.abc.avm2.model.clauses.FilterAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForEachInAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForInAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.TryAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.StrictEqAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSource;
+import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.BreakItem;
+import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LoopItem;
@@ -442,6 +449,277 @@ public class AVM2Graph extends Graph {
             ret.addAll(output);
             return ret;
         }
+        
+        
+        if ((part.nextParts.size() == 2) && (!stack.isEmpty()) && (stack.peek() instanceof StrictEqAVM2Item)) {
+            GraphSourceItem switchStartItem = code.get(part.start);
+
+            GraphTargetItem switchedObject = null;
+            if (!output.isEmpty()) {
+                if (output.get(output.size() - 1) instanceof SetLocalAVM2Item) {
+                    switchedObject = ((SetLocalAVM2Item) output.get(output.size() - 1)).value;
+                }
+            }
+            List<GraphTargetItem> caseValuesMapLeft = new ArrayList<>();
+            List<GraphTargetItem> caseValuesMapRight = new ArrayList<>();
+
+            StrictEqAVM2Item set = (StrictEqAVM2Item) stack.pop();
+            caseValuesMapLeft.add(set.leftSide);
+            caseValuesMapRight.add(set.rightSide);
+            
+            List<GraphPart> caseBodyParts = new ArrayList<>();
+            caseBodyParts.add(part.nextParts.get(0));
+            GraphTargetItem top = null;
+            int cnt = 1;
+            while (part.nextParts.size() > 1
+                    && part.nextParts.get(1).getHeight() > 1
+                    && ((AVM2Instruction)code.get(part.nextParts.get(1).end >= code.size() ? code.size() - 1 : part.nextParts.get(1).end)).definition instanceof IfStrictEqIns
+                    && ((top = translatePartGetStack(localData, part.nextParts.get(1), stack, staticOperation)) instanceof StrictEqAVM2Item)) {
+                cnt++;
+                part = part.nextParts.get(1);
+                caseBodyParts.add(part.nextParts.get(0));
+
+                set = (StrictEqAVM2Item) top;
+                caseValuesMapLeft.add(set.leftSide);
+                caseValuesMapRight.add(set.rightSide);
+            }
+            List<GraphTargetItem> caseValuesMap = caseValuesMapLeft;
+            
+            
+            //determine whether local register are on left or on right side of === operator
+            // -1 = there's no register, 
+            // -2 = there are mixed registers, 
+            // N = there is always register number N
+            int leftReg = -1;
+            int rightReg = -1;
+            for(int cv=0;cv<caseValuesMapLeft.size();cv++){
+                if(caseValuesMapLeft.get(cv) instanceof LocalRegAVM2Item)
+                {
+                    int reg = ((LocalRegAVM2Item)caseValuesMapLeft.get(cv)).regIndex;
+                    if(leftReg == -1)
+                    {
+                        leftReg = reg;
+                    }else{
+                        if(leftReg != reg)
+                        {
+                            leftReg = -2;
+                        }
+                    }
+                }
+                if(caseValuesMapRight.get(cv) instanceof LocalRegAVM2Item)
+                {
+                    int reg = ((LocalRegAVM2Item)caseValuesMapRight.get(cv)).regIndex;
+                    if(rightReg == -1)
+                    {
+                        rightReg = reg;
+                    }else{
+                        if(rightReg != reg)
+                        {
+                            rightReg = -2;
+                        }
+                    }
+                }
+            }
+            
+            
+            if(leftReg > 0) {
+                switchedObject = new LocalRegAVM2Item(null, null, leftReg, null);
+                caseValuesMap = caseValuesMapRight;
+            }
+            else if(rightReg > 0)
+            {
+                switchedObject = new LocalRegAVM2Item(null, null, rightReg, null);                
+            }
+            
+            if(leftReg < 0 && rightReg < 0){
+                
+            } else if (cnt == 1) {
+                stack.push(set);
+            } else {
+                part = part.nextParts.get(1);
+                GraphPart defaultPart = part;
+                if (code.size() > defaultPart.start && ((AVM2Instruction)code.get(defaultPart.start)).definition instanceof JumpIns) {
+                    defaultPart = defaultPart.nextParts.get(0);
+                }
+
+                boolean hasDefault = false;
+                /*
+                case 4:
+                case 5:
+                default: 
+                    trace("5 & def");
+                    ...
+                case 6:
+                
+                 */
+                //must go backwards to hit case 5, not case 4
+                for (int i = caseBodyParts.size() - 1; i >= 0; i--) {
+                    if (caseBodyParts.get(i) == defaultPart) {
+                        DefaultItem di = new DefaultItem();
+                        caseValuesMap.add(i + 1, di);
+                        caseBodyParts.add(i + 1, defaultPart);
+                        hasDefault = true;
+                        break;
+                    }
+                }
+
+                if (!hasDefault) {
+                    /*
+                    case 1:
+                        trace("1");
+                    case 2:
+                        trace("2"); //no break
+                    default:
+                        trace("def");
+                        ...
+                    case 3:  
+                     */
+                    //must go backwards to hit case 2, not case 1
+                    for (int i = caseBodyParts.size() - 1; i >= 0; i--) {
+                        if (caseBodyParts.get(i).leadsTo(localData, this, code, defaultPart, loops)) {
+                            DefaultItem di = new DefaultItem();
+                            caseValuesMap.add(i + 1, di);
+                            caseBodyParts.add(i + 1, defaultPart);
+                            hasDefault = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!hasDefault) {
+                    /*
+                    case 1:
+                        trace("1");
+                        break;
+                    default:
+                        trace("def"); //no break
+                    case 2:
+                        trace("2");                    
+                     */
+                    for (int i = 0; i < caseBodyParts.size(); i++) {
+                        if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops)) {
+                            DefaultItem di = new DefaultItem();
+                            caseValuesMap.add(i, di);
+                            caseBodyParts.add(i, defaultPart);
+                            hasDefault = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!hasDefault) {
+                    /*
+                        case 1:
+                        ...
+                        case 2:
+                        ...
+                        default:
+                            trace("def");                        
+                     */
+                    caseValuesMap.add(new DefaultItem());
+                    caseBodyParts.add(defaultPart);
+                }
+
+                GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops);
+                List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
+                GraphPart next = breakPart;
+
+                GraphTargetItem ti = checkLoop(next, stopPart, loops);
+
+                //create switch as new loop break command detection to work
+                currentLoop = new Loop(loops.size(), null, next);
+                currentLoop.phase = 1;
+                loops.add(currentLoop);
+                List<Integer> valuesMapping = new ArrayList<>();
+                List<GraphPart> caseBodies = new ArrayList<>();
+                for (int i = 0; i < caseValuesMap.size(); i++) {
+                    GraphPart cur = caseBodyParts.get(i);
+                    if (!caseBodies.contains(cur)) {
+                        caseBodies.add(cur);
+                    }
+                    valuesMapping.add(caseBodies.indexOf(cur));
+                }
+
+                for (int i = 0; i < caseBodies.size(); i++) {
+                    List<GraphTargetItem> currentCaseCommands = new ArrayList<>();
+                    GraphPart nextCase = next;
+                    if (next != null) {
+                        if (i < caseBodies.size() - 1) {
+                            if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops)) {
+                                currentCaseCommands.add(new BreakItem(null, localData.lineStartInstruction, currentLoop.id));
+                            } else {
+                                nextCase = caseBodies.get(i + 1);
+                            }
+                        }
+                    }
+                    List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
+                    for (GraphPart b : caseBodies) {
+                        if (b != caseBodies.get(i)) {
+                            stopPart2x.add(b);
+                        }
+                    }
+                    if (breakPart != null) {
+                        stopPart2x.add(breakPart);
+                    }
+                    currentCaseCommands.addAll(0, printGraph(partCodes, partCodePos, localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops, staticOperation, path));
+                    if (currentCaseCommands.size() >= 2) {
+                        if (currentCaseCommands.get(currentCaseCommands.size() - 1) instanceof BreakItem) {
+                            if ((currentCaseCommands.get(currentCaseCommands.size() - 2) instanceof ContinueItem) || (currentCaseCommands.get(currentCaseCommands.size() - 2) instanceof BreakItem)) {
+                                currentCaseCommands.remove(currentCaseCommands.size() - 1);
+                            }
+                        }
+                    }
+                    caseCommands.add(currentCaseCommands);
+                }
+
+                //If the lastone is default empty and alone, remove it
+                if (!caseCommands.isEmpty()) {
+                    List<GraphTargetItem> lastc = caseCommands.get(caseCommands.size() - 1);
+                    if (!lastc.isEmpty() && (lastc.get(lastc.size() - 1) instanceof BreakItem)) {
+                        BreakItem bi = (BreakItem) lastc.get(lastc.size() - 1);
+                        lastc.remove(lastc.size() - 1);
+                    }
+                    if (lastc.isEmpty()) {
+                        int cnt2 = 0;
+                        if (caseValuesMap.get(caseValuesMap.size() - 1) instanceof DefaultItem) {
+                            for (int i = valuesMapping.size() - 1; i >= 0; i--) {
+                                if (valuesMapping.get(i) == caseCommands.size() - 1) {
+                                    cnt2++;
+                                }
+                            }
+
+                            caseValuesMap.remove(caseValuesMap.size() - 1);
+                            valuesMapping.remove(valuesMapping.size() - 1);
+                            if (cnt2 == 1) {
+                                caseCommands.remove(lastc);
+                            }
+                        }
+                    }
+                }
+                //remove last break from last section                
+                if (!caseCommands.isEmpty()) {
+                    List<GraphTargetItem> lastc = caseCommands.get(caseCommands.size() - 1);
+                    if (!lastc.isEmpty() && (lastc.get(lastc.size() - 1) instanceof BreakItem)) {
+                        BreakItem bi = (BreakItem) lastc.get(lastc.size() - 1);
+                        lastc.remove(lastc.size() - 1);
+                    }
+                }
+
+                ret = new ArrayList<>();
+                ret.addAll(output);
+                SwitchItem sti = new SwitchItem(null, switchStartItem, currentLoop, switchedObject, caseValuesMap, caseCommands, valuesMapping);
+                ret.add(sti);
+                currentLoop.phase = 2;
+                if (next != null) {
+                    if (ti != null) {
+                        ret.add(ti);
+                    } else {
+                        ret.addAll(printGraph(partCodes, partCodePos, localData, stack, allParts, null, next, stopPart, loops, staticOperation, path));
+                    }
+                }
+            }
+        }
+        
         return ret;
     }
 

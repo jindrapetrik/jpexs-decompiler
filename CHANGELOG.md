@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- #1457 AS3 switch without lookupswitch ins detection
 
 ## [11.2.0] - 2018-09-08
 ### Added
