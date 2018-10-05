@@ -2546,11 +2546,23 @@ public class Graph {
 
     protected static void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
         int clen = commands.size();
-        if (!commands.isEmpty()) {
-            if (commands.get(commands.size() - 1) instanceof BreakItem) {
+        if (clen > 0) {
+            if (commands.get(clen - 1) instanceof ScriptEndItem) {
                 clen--;
             }
-            if (commands.get(commands.size() - 1) instanceof ContinueItem) {
+        }
+        if (clen > 0) {
+            if (commands.get(clen - 1) instanceof ExitItem) {
+                clen--;
+            }
+        }
+        if (clen > 0) {
+            if (commands.get(clen - 1) instanceof BreakItem) {
+                clen--;
+            }
+        }
+        if (clen > 0) {
+            if (commands.get(clen - 1) instanceof ContinueItem) {
                 clen--;
             }
         }
