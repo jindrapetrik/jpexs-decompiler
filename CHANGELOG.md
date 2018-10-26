@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
+- Possibility to open SWF files using open on Mac
+
+### Added
 - updated turkish translation
 
 ### Fixed
