@@ -4,9 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - Possibility to open SWF files using open on Mac
-
-### Added
-- updated turkish translation
+- Updated turkish translation
 
 ### Fixed
 - #1457 AS3 switch without lookupswitch ins detection
