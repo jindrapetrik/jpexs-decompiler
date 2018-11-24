@@ -1,5 +1,11 @@
 # JPEXS Free Flash Decompiler
 
+![GitHub tag (latest by date)](https://img.shields.io/github/tag-date/jindrapetrik/jpexs-decompiler.svg)
+[![Rawsec's CyberSecurity Inventory](https://inventory.rawsec.ml/img/badges/Rawsec-inventoried-FF5050_flat.svg)](https://inventory.rawsec.ml/tools.html#JPEXS%20Free%20Flash%20Decompiler)
+[![GitHub stars](https://img.shields.io/github/stars/jindrapetrik/jpexs-decompiler.svg)](https://github.com/jindrapetrik/jpexs-decompiler/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/jindrapetrik/jpexs-decompiler.svg)](https://github.com/jindrapetrik/jpexs-decompiler/network)
+[![GitHub license](https://img.shields.io/github/license/jindrapetrik/jpexs-decompiler.svg)](https://github.com/jindrapetrik/jpexs-decompiler/blob/master/license.txt)
+
 Opensource flash SWF decompiler and editor. Extract resources, convert SWF to FLA, edit ActionScript, replace images, sounds, texts or fonts. Various output formats available. Works with Java on Windows, Linux or MacOS.
 
 ## Application description and features
