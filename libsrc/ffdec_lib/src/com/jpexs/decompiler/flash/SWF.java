@@ -214,7 +214,7 @@ public final class SWF implements SWFContainerItem, Timelined {
      * Maximum SWF file format version Needs to be fixed when SWF versions
      * reaches this value
      */
-    public static final int MAX_VERSION = 32;
+    public static final int MAX_VERSION = 64;
 
     /**
      * Tags inside of file
