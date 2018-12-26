@@ -425,12 +425,12 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("dumpas2")) {
             out.println(" " + (cnt++) + ") -dumpAS2 <infile>");
-            out.println("  ...dumps list of AS1/2 sctipts to console");
+            out.println("  ...dumps list of AS1/2 scripts to console");
         }
 
         if (filter == null || filter.equals("dumpas3")) {
             out.println(" " + (cnt++) + ") -dumpAS3 <infile>");
-            out.println("  ...dumps list of AS3 sctipts to console");
+            out.println("  ...dumps list of AS3 scripts to console");
         }
 
         if (filter == null || filter.equals("compress")) {
