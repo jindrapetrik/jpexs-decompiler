@@ -3,9 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
-- updated turkish translation
+- Possibility to open SWF files using open on Mac
+- Updated turkish translation
 
 ### Fixed
+- #1500 Maximum SWF version constant increased, which is used by the memory search and also in the header editor
 - #1457 AS3 switch without lookupswitch ins detection
 - #1457 pushing on stack before exit item (return/throw)
 
