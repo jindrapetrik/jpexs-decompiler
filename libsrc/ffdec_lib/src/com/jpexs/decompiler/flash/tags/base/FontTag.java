@@ -306,12 +306,13 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     public static String isFontFamilyInstalled(String fontFamily) {
-        if (installedFontsByFamily != null && installedFontsByFamily.containsKey(fontFamily)) {
+        ensureLoaded();
+        if (installedFontsByFamily.containsKey(fontFamily)) {
             return fontFamily;
         }
         if (fontFamily.contains("_")) {
             String beforeUnderscore = fontFamily.substring(0, fontFamily.indexOf('_'));
-            if (installedFontsByFamily != null && installedFontsByFamily.containsKey(beforeUnderscore)) {
+            if (installedFontsByFamily.containsKey(beforeUnderscore)) {
                 return beforeUnderscore;
             }
         }
