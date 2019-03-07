@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - #1500 Maximum SWF version constant increased, which is used by the memory search and also in the header editor
 - #1457 AS3 switch without lookupswitch ins detection
 - #1457 pushing on stack before exit item (return/throw)
+- #1503 NullPointer Exception on commandline FLA export
 
 ## [11.2.0] - 2018-09-08
 ### Added
