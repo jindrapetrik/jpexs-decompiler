@@ -661,7 +661,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             bodiesOffsets.add(0, -(insToBytes(bodies).length + casesLen));
         }
         lookupOp.operands[0] = defOffset;
-        lookupOp.operands[1] = item.valuesMapping.size();
+        lookupOp.operands[1] = item.valuesMapping.size() - 1; // as per avm2 spec: "There are case_count+1 case offsets"
         for (int i = 0; i < item.valuesMapping.size(); i++) {
             lookupOp.operands[2 + i] = bodiesOffsets.get(item.valuesMapping.get(i));
         }
