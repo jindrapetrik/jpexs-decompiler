@@ -249,7 +249,27 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                 otherNs.add(n.getCpoolIndex(abcIndex));
                             }
                         }
-                        if (AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, false, abcIndex, ftn.getWithoutLast(), ftn.getLast(), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc)) {
+                        if ((object instanceof NameAVM2Item) && "super".equals(((NameAVM2Item) object).getVariableName()))
+                        {
+                            // super is special cause its static type is the super class, but it still allows access to protected members
+                            // so for super to work we need to also allow the protected namespace of the super class
+                            // however this namespace is in the ABC of the super class and not in abcIndex.getSelectedAbc()
+                            AbcIndexing.ClassIndex ci = abcIndex.findClass(objType);
+                            int superProtectedNs = ci.abc.instance_info.get(ci.index).protectedNS;
+                            AbcIndexing.TraitIndex sp = abcIndex.findProperty(new AbcIndexing.PropertyDef(propertyName, objType, ci.abc, superProtectedNs), false, true);
+                            if (sp != null) {
+                                objType = sp.objType;
+                                Namespace ns = sp.trait.getName(sp.abc).getNamespace(sp.abc.constants);
+                                propIndex = constants.getMultinameId(Multiname.createQName(false,
+                                        constants.getStringId(propertyName, true),
+                                        constants.getNamespaceId(ns.kind, ns.getName(sp.abc.constants), sp.abc == abc ? abc.constants.getNamespaceSubIndex(sp.trait.getName(sp.abc).namespace_index) : 0, true)), true
+                                );
+                                propType = sp.returnType;
+                                propValue = sp.value;
+                                propValueAbc = sp.abc;
+                            }
+                        }
+                        if (propType == null && AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, false, abcIndex, ftn.getWithoutLast(), ftn.getLast(), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc)) {
                             objType = new TypeItem(outNs.getVal().addWithSuffix(outName.getVal()));
                             propType = outPropType.getVal();
                             propIndex = constants.getMultinameId(Multiname.createQName(false,
