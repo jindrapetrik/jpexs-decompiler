@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - #1457 pushing on stack before exit item (return/throw)
 - #1503 NullPointer Exception on commandline FLA export
 - AS3 direct editation - invalid generation of lookupswitch
+- AS3 direct editation - fix access to protected members with super
 
 ## [11.2.0] - 2018-09-08
 ### Added
