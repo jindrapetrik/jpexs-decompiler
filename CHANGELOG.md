@@ -14,6 +14,10 @@ All notable changes to this project will be documented in this file.
 - AS3 direct editation - invalid generation of lookupswitch
 - AS3 direct editation - fix access to protected members with super
 
+### Changed
+- #1378 Transparent background on PNG/GIF sprite export
+- SWF background on shape BMP export
+
 ## [11.2.0] - 2018-09-08
 ### Added
 - Warning panel on scripts containing §§ instructions (Tip for Settings/Automatic deobfuscation)
