@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.importers.svg;
 
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
@@ -1062,7 +1063,7 @@ public class SvgImporter {
         swf.assignExportNamesToSymbols();
         st.shapeBounds.Xmax = (int) (si.getWidth() * SWF.unitDivisor);
         st.shapeBounds.Ymax = (int) (si.getHeight() * SWF.unitDivisor);
-        new ShapeExporter().exportShapes(null, "./outex/", new ReadOnlyTagList(li), new ShapeExportSettings(ShapeExportMode.SVG, 1), null);
+        new ShapeExporter().exportShapes(null, "./outex/", swf, new ReadOnlyTagList(li), new ShapeExportSettings(ShapeExportMode.SVG, 1), null);
     }
 
     //Test for SVG

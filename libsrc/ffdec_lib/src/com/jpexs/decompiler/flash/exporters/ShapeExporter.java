@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -35,11 +36,13 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import java.awt.Graphics2D;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -59,7 +62,7 @@ import java.util.logging.Logger;
  */
 public class ShapeExporter {
 
-    public List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, ReadOnlyTagList tags, final ShapeExportSettings settings, EventListener evl) throws IOException, InterruptedException {
+    public List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, final SWF swf, ReadOnlyTagList tags, final ShapeExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -109,6 +112,14 @@ public class ShapeExporter {
                             int newHeight = (int) (rect.getHeight() * settings.zoom / SWF.unitDivisor) + 1;
                             SerializableImage img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
                             img.fillTransparent();
+                            if (settings.mode == ShapeExportMode.BMP) {
+                                RGB backColor = swf.getBackgroundColor().backgroundColor;
+                                if (backColor != null) {
+                                    Graphics2D g = (Graphics2D) img.getGraphics();
+                                    g.setColor(backColor.toColor());
+                                    g.fillRect(0, 0, img.getWidth(), img.getHeight());
+                                }
+                            }
                             Matrix m = Matrix.getScaleInstance(settings.zoom);
                             m.translate(-rect.Xmin, -rect.Ymin);
                             st.toImage(0, 0, 0, new RenderContext(), img, false, m, m, m, new CXFORMWITHALPHA());
