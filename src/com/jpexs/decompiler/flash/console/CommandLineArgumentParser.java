@@ -2239,7 +2239,7 @@ public class CommandLineArgumentParser {
 
                 if (exportAll || exportFormats.contains("shape")) {
                     System.out.println("Exporting shapes...");
-                    new ShapeExporter().exportShapes(handler, outDir + (multipleExportTypes ? File.separator + ShapeExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new ShapeExportSettings(enumFromStr(formats.get("shape"), ShapeExportMode.class), zoom), evl);
+                    new ShapeExporter().exportShapes(handler, outDir + (multipleExportTypes ? File.separator + ShapeExportSettings.EXPORT_FOLDER_NAME : ""), swf, new ReadOnlyTagList(extags), new ShapeExportSettings(enumFromStr(formats.get("shape"), ShapeExportMode.class), zoom), evl);
                 }
 
                 if (exportAll || exportFormats.contains("morphshape")) {
