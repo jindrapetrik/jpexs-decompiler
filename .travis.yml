@@ -1,5 +1,9 @@
 language: java
 jdk: [oraclejdk9]
+addons:
+    apt:
+        packages:
+            - ant
 before_install: 
     - sudo chmod a+x ./travis/*.sh
     - "./travis/before_install.sh"
