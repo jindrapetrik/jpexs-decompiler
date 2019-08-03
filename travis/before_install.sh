@@ -13,7 +13,7 @@ sudo apt-get install -y unzip
 sudo apt-get install -y jq
 sudo apt-get install -y curl
 #For parsing changelog
-sudo apt-get install -y php5-cli
+sudo apt-get install -y php7.2-cli
 
 # create directory where tools will be downloaded and installed
 mkdir $tools_dir
