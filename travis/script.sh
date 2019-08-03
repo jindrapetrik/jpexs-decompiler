@@ -10,12 +10,14 @@ VERSION_PROP_FILE="version.properties"
 
 if [ -z ${GITHUB_ACCESS_TOKEN+x} ]; then
   # password not set,  just make private release without publishing result
+  echo "No password set, making private release..."
   ant all
 else
   # if tag set
   if [ -n "$TRAVIS_TAG" ]; then
     #tag starts with "version" prefix
     if [[ $TRAVIS_TAG =~ ^version.* ]] ; then
+      echo "Version tag, creating new version..."
     
       #generate prop file
       VERSION_NUMBER=`echo $TRAVIS_TAG|sed 's/version//'`
@@ -45,11 +47,13 @@ else
       export DO_DEPLOY=1
     else
       # regular build
+      echo "Other tag, regular build..."
       ant all            
     fi
   else
     #if we are on dev branch and it's not a pull request
     if [ $TRAVIS_BRANCH = "dev" ] && [ $TRAVIS_PULL_REQUEST = "false" ]; then       
+      echo "On dev branch and no pull request, creating nightly..."
       # create nightly build...
       
       TAGGER_NAME="Travis CI"
@@ -104,6 +108,7 @@ else
       export DO_DEPLOY=1
     else
       #tag not set - regular build
+      echo "Other branch or pull request, regular build..."
       ant all                    
     fi  
   fi    
