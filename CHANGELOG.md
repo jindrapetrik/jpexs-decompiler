@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - #1503 NullPointer Exception on commandline FLA export
 - AS3 direct editation - invalid generation of lookupswitch
 - AS3 direct editation - fix access to protected members with super
+- #1529 commandline selection of tag ids now applies to sprites and buttons
 
 ### Changed
 - #1378 Transparent background on PNG/GIF sprite export

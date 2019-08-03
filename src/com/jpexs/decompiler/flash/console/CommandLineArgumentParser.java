@@ -2293,9 +2293,9 @@ public class CommandLineArgumentParser {
                 if (exportAll || exportFormats.contains("sprite")) {
                     System.out.println("Exporting sprite...");
                     SpriteExportSettings ses = new SpriteExportSettings(enumFromStr(formats.get("sprite"), SpriteExportMode.class), zoom);
-                    for (CharacterTag c : swf.getCharacters().values()) {
-                        if (c instanceof DefineSpriteTag) {
-                            frameExporter.exportSpriteFrames(handler, outDir + (multipleExportTypes ? File.separator + SpriteExportSettings.EXPORT_FOLDER_NAME : ""), swf, c.getCharacterId(), null, ses, evl);
+                    for (Tag t : extags) {
+                        if (t instanceof DefineSpriteTag) {
+                            frameExporter.exportSpriteFrames(handler, outDir + (multipleExportTypes ? File.separator + SpriteExportSettings.EXPORT_FOLDER_NAME : ""), swf, ((DefineSpriteTag) t).getCharacterId(), null, ses, evl);
                         }
                     }
                 }
@@ -2303,9 +2303,9 @@ public class CommandLineArgumentParser {
                 if (exportAll || exportFormats.contains("button")) {
                     System.out.println("Exporting buttons...");
                     ButtonExportSettings bes = new ButtonExportSettings(enumFromStr(formats.get("button"), ButtonExportMode.class), zoom);
-                    for (CharacterTag c : swf.getCharacters().values()) {
-                        if (c instanceof ButtonTag) {
-                            frameExporter.exportButtonFrames(handler, outDir + (multipleExportTypes ? File.separator + ButtonExportSettings.EXPORT_FOLDER_NAME : ""), swf, c.getCharacterId(), null, bes, evl);
+                    for (Tag t : extags) {
+                        if (t instanceof ButtonTag) {
+                            frameExporter.exportButtonFrames(handler, outDir + (multipleExportTypes ? File.separator + ButtonExportSettings.EXPORT_FOLDER_NAME : ""), swf, ((ButtonTag) t).getCharacterId(), null, bes, evl);
                         }
                     }
                 }
