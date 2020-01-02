@@ -73,6 +73,15 @@ if [ "`uname`" = "Darwin" ]; then
 	args=(-Xdock:name=FFDec -Xdock:icon=icon.png "${args[@]}")
 fi
 
+# If on macOS, ask macOS directly
+if [ "$(uname)" == "Darwin" ]; then
+	# Ask OSX directly
+	JRE_PATH=`/usr/libexec/java_home -v 1.8` # java 8 required
+	if [ -x "$JRE_PATH" ]; then
+		exec $JRE_PATH/bin/java "${args[@]}"
+	fi
+fi
+
 # Check default java
 if [ -x "`which java`" ]; then
 	JAVA_VERSION_OUTPUT=`java -version 2>&1`
