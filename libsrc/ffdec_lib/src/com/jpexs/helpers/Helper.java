@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.AppResources;
@@ -885,9 +886,9 @@ public class Helper {
             try {
                 f.setAccessible(true);
 
-                Field modifiersField = Field.class.getDeclaredField("modifiers");
-                modifiersField.setAccessible(true);
-                modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+                //Field modifiersField = Field.class.getDeclaredField("modifiers");
+                //modifiersField.setAccessible(true);
+                //modifiersField.setInt(f, f.getModifiers() & ~Modifier.FINAL);
 
                 Object v = f.get(obj);
                 if (v != null) {
@@ -911,7 +912,7 @@ public class Helper {
 
                     f.set(obj, null);
                 }
-            } catch (UnsupportedOperationException | SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchFieldException ex) {
+            } catch (UnsupportedOperationException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
                 throw new Error(ex);
             }
         }

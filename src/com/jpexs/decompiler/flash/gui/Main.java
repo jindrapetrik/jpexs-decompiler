@@ -1942,11 +1942,7 @@ public class Main {
 
         clearTemp();
 
-        try {
-            SWFDecompilerPlugin.loadPlugins();
-        } catch (Throwable ex) {
-            logger.log(Level.SEVERE, "Failed to load plugins", ex);
-        }
+        SWFDecompilerPlugin.loadPlugins();
 
         AppStrings.setResourceClass(MainFrame.class);
         initLogging(Configuration._debugMode.get());

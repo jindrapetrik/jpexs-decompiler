@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -174,25 +175,8 @@ public class SwfXmlImporter {
     }
 
     private static void setFieldValue(Field field, Object obj, Object value) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-
-        //Remove final attribute temporary (For example Multiname.namespace_set_index
-        int originalModifiers = field.getModifiers();
-        if ((originalModifiers & Modifier.FINAL) > 0) {
-            modifiersField.setInt(field, originalModifiers & ~Modifier.FINAL);
-        }
-
         field.setAccessible(true);
-
-        int newModifiers = field.getModifiers();
-
         field.set(obj, value);
-
-        //Put final back in
-        if (originalModifiers != newModifiers) {
-            modifiersField.setInt(field, originalModifiers);
-        }
     }
 
     private void processElement(Element element, Object obj, SWF swf, Tag tag) {
