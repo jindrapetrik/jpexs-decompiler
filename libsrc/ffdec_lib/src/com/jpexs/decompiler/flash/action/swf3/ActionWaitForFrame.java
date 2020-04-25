@@ -101,7 +101,7 @@ public class ActionWaitForFrame extends Action implements ActionStore {
 
     @Override
     public void translate(boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
-        GraphTargetItem frameTi = new DirectValueActionItem(null, null, 0, new Long(frame), new ArrayList<>());
+        GraphTargetItem frameTi = new DirectValueActionItem(null, null, 0, (Long)((long)frame), new ArrayList<>());
         List<GraphTargetItem> body = ActionGraph.translateViaGraph(insideDoInitAction, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path);
         output.add(new IfFrameLoadedActionItem(frameTi, body, this, lineStartAction));
     }

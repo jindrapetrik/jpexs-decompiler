@@ -69,92 +69,92 @@ public final class Configuration {
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> openMultipleFiles = null;
+    public static ConfigurationItem<Boolean> openMultipleFiles = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> decompile = null;
+    public static ConfigurationItem<Boolean> decompile = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("decompilation")
-    public static final ConfigurationItem<Boolean> parallelSpeedUp = null;
+    public static ConfigurationItem<Boolean> parallelSpeedUp = null;
 
     @ConfigurationDefaultInt(10)
     @ConfigurationCategory("decompilation")
-    private static final ConfigurationItem<Integer> parallelSpeedUpThreadCount = null;
+    private static ConfigurationItem<Integer> parallelSpeedUpThreadCount = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> autoDeobfuscate = null;
+    public static ConfigurationItem<Boolean> autoDeobfuscate = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("")
-    public static final ConfigurationItem<Boolean> cacheOnDisk = null;
+    public static ConfigurationItem<Boolean> cacheOnDisk = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("")
-    public static final ConfigurationItem<Boolean> cacheImages = null;
+    public static ConfigurationItem<Boolean> cacheImages = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
-    public static final ConfigurationItem<Boolean> internalFlashViewer = null;
+    public static ConfigurationItem<Boolean> internalFlashViewer = null;
 
     @ConfigurationDefaultInt(1000)
     @ConfigurationCategory("display")
-    public static final ConfigurationItem<Integer> setMovieDelay = null;
+    public static ConfigurationItem<Integer> setMovieDelay = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
-    public static final ConfigurationItem<Boolean> dumpView = null;
+    public static ConfigurationItem<Boolean> dumpView = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
-    public static final ConfigurationItem<Boolean> useHexColorFormat = null;
+    public static ConfigurationItem<Boolean> useHexColorFormat = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
-    public static final ConfigurationItem<Boolean> showOldTextDuringTextEditing = null;
+    public static ConfigurationItem<Boolean> showOldTextDuringTextEditing = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> gotoMainClassOnStartup = null;
+    public static ConfigurationItem<Boolean> gotoMainClassOnStartup = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> autoRenameIdentifiers = null;
+    public static ConfigurationItem<Boolean> autoRenameIdentifiers = null;
 
     @ConfigurationDefaultBoolean(false)
-    public static final ConfigurationItem<Boolean> offeredAssociation = null;
-
-    @ConfigurationDefaultBoolean(false)
-    @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> decimalAddress = null;
+    public static ConfigurationItem<Boolean> offeredAssociation = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> showAllAddresses = null;
+    public static ConfigurationItem<Boolean> decimalAddress = null;
+
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> showAllAddresses = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("display")
-    public static final ConfigurationItem<Boolean> useFrameCache = null;
+    public static ConfigurationItem<Boolean> useFrameCache = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> useRibbonInterface = null;
+    public static ConfigurationItem<Boolean> useRibbonInterface = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("export")
-    public static final ConfigurationItem<Boolean> overwriteExistingFiles = null;
+    public static ConfigurationItem<Boolean> overwriteExistingFiles = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
-    public static final ConfigurationItem<Boolean> openFolderAfterFlaExport = null;
+    public static ConfigurationItem<Boolean> openFolderAfterFlaExport = null;
 
     @ConfigurationCategory("export")
-    public static final ConfigurationItem<String> overrideTextExportFileName = null;
+    public static ConfigurationItem<String> overrideTextExportFileName = null;
 
     @ConfigurationDefaultBoolean(false)
-    public static final ConfigurationItem<Boolean> useDetailedLogging = null;
+    public static ConfigurationItem<Boolean> useDetailedLogging = null;
 
     /**
      * Debug mode = throwing an error when comparing original file and
@@ -162,56 +162,56 @@ public final class Configuration {
      */
     @ConfigurationDefaultBoolean(false)
     @ConfigurationInternal
-    public static final ConfigurationItem<Boolean> _debugMode = null;
+    public static ConfigurationItem<Boolean> _debugMode = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationInternal
-    public static final ConfigurationItem<Boolean> _showDebugMenu = null;
+    public static ConfigurationItem<Boolean> _showDebugMenu = null;
 
     /**
      * Turn off resolving constants in ActionScript 2
      */
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> resolveConstants = null;
+    public static ConfigurationItem<Boolean> resolveConstants = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
     @ConfigurationInternal
-    public static final ConfigurationItem<Boolean> showFileOffsetInPcodeHex = null;
+    public static ConfigurationItem<Boolean> showFileOffsetInPcodeHex = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
     @ConfigurationInternal
-    public static final ConfigurationItem<Boolean> showOriginalBytesInPcodeHex = null;
+    public static ConfigurationItem<Boolean> showOriginalBytesInPcodeHex = null;
 
     /**
      * Limit of code subs (for obfuscated code)
      */
     @ConfigurationDefaultInt(500)
     @ConfigurationCategory("limit")
-    public static final ConfigurationItem<Integer> sublimiter = null;
+    public static ConfigurationItem<Integer> sublimiter = null;
 
     /**
      * Total export timeout in seconds
      */
     @ConfigurationDefaultInt(30 * 60)
     @ConfigurationCategory("limit")
-    public static final ConfigurationItem<Integer> exportTimeout = null;
+    public static ConfigurationItem<Integer> exportTimeout = null;
 
     /**
      * Decompilation timeout in seconds for a single file
      */
     @ConfigurationDefaultInt(5 * 60)
     @ConfigurationCategory("limit")
-    public static final ConfigurationItem<Integer> decompilationTimeoutFile = null;
+    public static ConfigurationItem<Integer> decompilationTimeoutFile = null;
 
     /**
      * AS1/2 deobfuscator execution limit (max number of instructions processed)
      */
     @ConfigurationDefaultInt(10000)
     @ConfigurationCategory("limit")
-    public static final ConfigurationItem<Integer> as12DeobfuscatorExecutionLimit = null;
+    public static ConfigurationItem<Integer> as12DeobfuscatorExecutionLimit = null;
 
     /**
      * Using parameter names in decompiling may cause problems because official
@@ -219,430 +219,430 @@ public final class Configuration {
      */
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> paramNamesEnable = null;
+    public static ConfigurationItem<Boolean> paramNamesEnable = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> displayFileName = null;
+    public static ConfigurationItem<Boolean> displayFileName = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationInternal
-    public static final ConfigurationItem<Boolean> _debugCopy = null;
+    public static ConfigurationItem<Boolean> _debugCopy = null;
 
     @ConfigurationDefaultBoolean(false)
-    public static final ConfigurationItem<Boolean> dumpTags = null;
+    public static ConfigurationItem<Boolean> dumpTags = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("export")
-    public static final ConfigurationItem<Boolean> setFFDecVersionInExportedFont = null;
+    public static ConfigurationItem<Boolean> setFFDecVersionInExportedFont = null;
 
     @ConfigurationDefaultInt(60)
     @ConfigurationCategory("limit")
-    public static final ConfigurationItem<Integer> decompilationTimeoutSingleMethod = null;
+    public static ConfigurationItem<Integer> decompilationTimeoutSingleMethod = null;
 
     @ConfigurationDefaultInt(1)
-    public static final ConfigurationItem<Integer> lastRenameType = null;
+    public static ConfigurationItem<Integer> lastRenameType = null;
 
     @ConfigurationDefaultString(".")
     @ConfigurationDirectory
-    public static final ConfigurationItem<String> lastSaveDir = null;
+    public static ConfigurationItem<String> lastSaveDir = null;
 
     @ConfigurationDefaultString(".")
     @ConfigurationDirectory
-    public static final ConfigurationItem<String> lastOpenDir = null;
+    public static ConfigurationItem<String> lastOpenDir = null;
 
     @ConfigurationDefaultString(".")
     @ConfigurationDirectory
-    public static final ConfigurationItem<String> lastExportDir = null;
+    public static ConfigurationItem<String> lastExportDir = null;
 
     @ConfigurationDefaultString("en")
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<String> locale = null;
+    public static ConfigurationItem<String> locale = null;
 
     @ConfigurationDefaultString("_loc%d_")
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<String> registerNameFormat = null;
+    public static ConfigurationItem<String> registerNameFormat = null;
 
     @ConfigurationDefaultInt(15)
-    public static final ConfigurationItem<Integer> maxRecentFileCount = null;
+    public static ConfigurationItem<Integer> maxRecentFileCount = null;
 
-    public static final ConfigurationItem<String> recentFiles = null;
+    public static ConfigurationItem<String> recentFiles = null;
 
-    public static final ConfigurationItem<HashMap<String, String>> fontPairingMap = null;
+    public static ConfigurationItem<HashMap<String, String>> fontPairingMap = null;
 
-    public static final ConfigurationItem<HashMap<String, SwfSpecificConfiguration>> swfSpecificConfigs = null;
+    public static ConfigurationItem<HashMap<String, SwfSpecificConfiguration>> swfSpecificConfigs = null;
 
     @ConfigurationDefaultCalendar(0)
-    public static final ConfigurationItem<Calendar> lastUpdatesCheckDate = null;
+    public static ConfigurationItem<Calendar> lastUpdatesCheckDate = null;
 
     @ConfigurationDefaultInt(1000)
     @ConfigurationName("gui.window.width")
-    public static final ConfigurationItem<Integer> guiWindowWidth = null;
+    public static ConfigurationItem<Integer> guiWindowWidth = null;
 
     @ConfigurationDefaultInt(700)
     @ConfigurationName("gui.window.height")
-    public static final ConfigurationItem<Integer> guiWindowHeight = null;
+    public static ConfigurationItem<Integer> guiWindowHeight = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationName("gui.window.maximized.horizontal")
-    public static final ConfigurationItem<Boolean> guiWindowMaximizedHorizontal = null;
+    public static ConfigurationItem<Boolean> guiWindowMaximizedHorizontal = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationName("gui.window.maximized.vertical")
-    public static final ConfigurationItem<Boolean> guiWindowMaximizedVertical = null;
+    public static ConfigurationItem<Boolean> guiWindowMaximizedVertical = null;
 
     @ConfigurationDefaultDouble(1)
     @ConfigurationCategory("display")
     @ConfigurationName("gui.fontSizeMultiplier")
-    public static final ConfigurationItem<Double> guiFontSizeMultiplier = null;
+    public static ConfigurationItem<Double> guiFontSizeMultiplier = null;
 
     // font used in AS1/2/3 source area, P-Code area, Define Text area and in Metadata area
     @ConfigurationDefaultString("Monospaced-Plain-12")
     @ConfigurationCategory("display")
     @ConfigurationName("gui.sourceFont")
-    public static final ConfigurationItem<String> sourceFontString = null;
+    public static ConfigurationItem<String> sourceFontString = null;
 
     @ConfigurationDefaultDouble(0.5)
     @ConfigurationName("gui.avm2.splitPane.dividerLocationPercent")
     @ConfigurationInternal
-    public static final ConfigurationItem<Double> guiAvm2SplitPaneDividerLocationPercent = null;
+    public static ConfigurationItem<Double> guiAvm2SplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultDouble(0.5)
     @ConfigurationName("gui.actionSplitPane.dividerLocationPercent")
     @ConfigurationInternal
-    public static final ConfigurationItem<Double> guiActionSplitPaneDividerLocationPercent = null;
+    public static ConfigurationItem<Double> guiActionSplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultDouble(0.5)
     @ConfigurationName("gui.previewSplitPane.dividerLocationPercent")
     @ConfigurationInternal
-    public static final ConfigurationItem<Double> guiPreviewSplitPaneDividerLocationPercent = null;
+    public static ConfigurationItem<Double> guiPreviewSplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultDouble(0.3333333333)
     @ConfigurationName("gui.splitPane1.dividerLocationPercent")
     @ConfigurationInternal
-    public static final ConfigurationItem<Double> guiSplitPane1DividerLocationPercent = null;
+    public static ConfigurationItem<Double> guiSplitPane1DividerLocationPercent = null;
 
     @ConfigurationDefaultDouble(0.6)
     @ConfigurationName("gui.splitPane2.dividerLocationPercent")
     @ConfigurationInternal
-    public static final ConfigurationItem<Double> guiSplitPane2DividerLocationPercent = null;
+    public static ConfigurationItem<Double> guiSplitPane2DividerLocationPercent = null;
 
     @ConfigurationDefaultDouble(0.5)
     @ConfigurationName("gui.timeLineSplitPane.dividerLocationPercent")
     @ConfigurationInternal
-    public static final ConfigurationItem<Double> guiTimeLineSplitPaneDividerLocationPercent = null;
+    public static ConfigurationItem<Double> guiTimeLineSplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultDouble(0.6)
     @ConfigurationName("gui.dump.splitPane.dividerLocationPercent")
     @ConfigurationInternal
-    public static final ConfigurationItem<Double> guiDumpSplitPaneDividerLocationPercent = null;
+    public static ConfigurationItem<Double> guiDumpSplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultString("com.jpexs.decompiler.flash.gui.OceanicSkin")
     @ConfigurationName("gui.skin")
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<String> guiSkin = null;
+    public static ConfigurationItem<String> guiSkin = null;
 
     @ConfigurationDefaultInt(3)
     @ConfigurationCategory("export")
-    public static final ConfigurationItem<Integer> saveAsExeScaleMode = null;
+    public static ConfigurationItem<Integer> saveAsExeScaleMode = null;
 
     @ConfigurationCategory("export")
-    public static final ConfigurationItem<ExeExportMode> exeExportMode = null;
+    public static ConfigurationItem<ExeExportMode> exeExportMode = null;
 
     @ConfigurationDefaultInt(1024 * 1024/*1MiB*/)
     @ConfigurationCategory("limit")
-    public static final ConfigurationItem<Integer> syntaxHighlightLimit = null;
+    public static ConfigurationItem<Integer> syntaxHighlightLimit = null;
 
-    public static final ConfigurationItem<Integer> guiFontPreviewSampleText = null;
+    public static ConfigurationItem<Integer> guiFontPreviewSampleText = null;
 
     @ConfigurationName("gui.fontPreviewWindow.width")
-    public static final ConfigurationItem<Integer> guiFontPreviewWidth = null;
+    public static ConfigurationItem<Integer> guiFontPreviewWidth = null;
 
     @ConfigurationName("gui.fontPreviewWindow.height")
-    public static final ConfigurationItem<Integer> guiFontPreviewHeight = null;
+    public static ConfigurationItem<Integer> guiFontPreviewHeight = null;
 
     @ConfigurationName("gui.fontPreviewWindow.posX")
-    public static final ConfigurationItem<Integer> guiFontPreviewPosX = null;
+    public static ConfigurationItem<Integer> guiFontPreviewPosX = null;
 
     @ConfigurationName("gui.fontPreviewWindow.posY")
-    public static final ConfigurationItem<Integer> guiFontPreviewPosY = null;
+    public static ConfigurationItem<Integer> guiFontPreviewPosY = null;
 
     @ConfigurationDefaultInt(3)
     @ConfigurationName("formatting.indent.size")
     @ConfigurationCategory("format")
-    public static final ConfigurationItem<Integer> indentSize = null;
+    public static ConfigurationItem<Integer> indentSize = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationName("formatting.indent.useTabs")
     @ConfigurationCategory("format")
-    public static final ConfigurationItem<Boolean> indentUseTabs = null;
+    public static ConfigurationItem<Boolean> indentUseTabs = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("format")
-    public static final ConfigurationItem<Boolean> beginBlockOnNewLine = null;
+    public static ConfigurationItem<Boolean> beginBlockOnNewLine = null;
 
     @ConfigurationDefaultInt(1000 * 60 * 60 * 24)
     @ConfigurationCategory("update")
     @ConfigurationName("check.updates.delay")
-    public static final ConfigurationItem<Integer> checkForUpdatesDelay = null;
+    public static ConfigurationItem<Integer> checkForUpdatesDelay = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("update")
     @ConfigurationName("check.updates.stable")
-    public static final ConfigurationItem<Boolean> checkForUpdatesStable = null;
+    public static ConfigurationItem<Boolean> checkForUpdatesStable = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("update")
     @ConfigurationName("check.updates.nightly")
-    public static final ConfigurationItem<Boolean> checkForUpdatesNightly = null;
+    public static ConfigurationItem<Boolean> checkForUpdatesNightly = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("update")
     @ConfigurationName("check.updates.enabled")
-    public static final ConfigurationItem<Boolean> checkForUpdatesAuto = null;
+    public static ConfigurationItem<Boolean> checkForUpdatesAuto = null;
 
     @ConfigurationCategory("update")
-    public static final ConfigurationItem<String> updateProxyAddress = null;
+    public static ConfigurationItem<String> updateProxyAddress = null;
 
     @ConfigurationDefaultString("")
     @ConfigurationName("export.formats")
-    public static final ConfigurationItem<String> lastSelectedExportFormats = null;
+    public static ConfigurationItem<String> lastSelectedExportFormats = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
-    public static final ConfigurationItem<Boolean> textExportSingleFile = null;
+    public static ConfigurationItem<Boolean> textExportSingleFile = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
-    public static final ConfigurationItem<Boolean> scriptExportSingleFile = null;
+    public static ConfigurationItem<Boolean> scriptExportSingleFile = null;
 
     @ConfigurationDefaultString("--- SEPARATOR ---")
     @ConfigurationCategory("export")
-    public static final ConfigurationItem<String> textExportSingleFileSeparator = null;
+    public static ConfigurationItem<String> textExportSingleFileSeparator = null;
 
     @ConfigurationDefaultString("--- RECORDSEPARATOR ---")
     @ConfigurationCategory("export")
-    public static final ConfigurationItem<String> textExportSingleFileRecordSeparator = null;
+    public static ConfigurationItem<String> textExportSingleFileRecordSeparator = null;
 
     @ConfigurationCategory("import")
-    public static final ConfigurationItem<TextImportResizeTextBoundsMode> textImportResizeTextBoundsMode = null;
+    public static ConfigurationItem<TextImportResizeTextBoundsMode> textImportResizeTextBoundsMode = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("import")
-    public static final ConfigurationItem<Boolean> resetLetterSpacingOnTextImport = null;
+    public static ConfigurationItem<Boolean> resetLetterSpacingOnTextImport = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationName("warning.experimental.as12edit")
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> warningExperimentalAS12Edit = null;
+    public static ConfigurationItem<Boolean> warningExperimentalAS12Edit = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationName("warning.experimental.as3edit")
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> warningExperimentalAS3Edit = null;
+    public static ConfigurationItem<Boolean> warningExperimentalAS3Edit = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> showCodeSavedMessage = null;
+    public static ConfigurationItem<Boolean> showCodeSavedMessage = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> showTraitSavedMessage = null;
+    public static ConfigurationItem<Boolean> showTraitSavedMessage = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("export")
-    public static final ConfigurationItem<Boolean> packJavaScripts = null;
+    public static ConfigurationItem<Boolean> packJavaScripts = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("export")
-    public static final ConfigurationItem<Boolean> textExportExportFontFace = null;
+    public static ConfigurationItem<Boolean> textExportExportFontFace = null;
 
     @ConfigurationDefaultInt(128)
-    public static final ConfigurationItem<Integer> lzmaFastBytes = null;
+    public static ConfigurationItem<Integer> lzmaFastBytes = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> showMethodBodyId = null;
+    public static ConfigurationItem<Boolean> showMethodBodyId = null;
 
     @ConfigurationDefaultDouble(1.0)
     @ConfigurationName("export.zoom")
-    public static final ConfigurationItem<Double> lastSelectedExportZoom = null;
+    public static ConfigurationItem<Double> lastSelectedExportZoom = null;
 
-    public static final ConfigurationItem<String> pluginPath = null;
+    public static ConfigurationItem<String> pluginPath = null;
 
     @ConfigurationDefaultInt(55556)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Integer> debuggerPort = null;
+    public static ConfigurationItem<Integer> debuggerPort = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> randomDebuggerPackage = null;
+    public static ConfigurationItem<Boolean> randomDebuggerPackage = null;
 
     @ConfigurationDefaultBoolean(true)
-    public static final ConfigurationItem<Boolean> displayDebuggerInfo = null;
+    public static ConfigurationItem<Boolean> displayDebuggerInfo = null;
 
     @ConfigurationDefaultString("debugConsole")
-    public static final ConfigurationItem<String> lastDebuggerReplaceFunction = null;
+    public static ConfigurationItem<String> lastDebuggerReplaceFunction = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> getLocalNamesFromDebugInfo = null;
+    public static ConfigurationItem<Boolean> getLocalNamesFromDebugInfo = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> tagTreeShowEmptyFolders = null;
+    public static ConfigurationItem<Boolean> tagTreeShowEmptyFolders = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> autoLoadEmbeddedSwfs = null;
+    public static ConfigurationItem<Boolean> autoLoadEmbeddedSwfs = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> showCloseConfirmation = null;
+    public static ConfigurationItem<Boolean> showCloseConfirmation = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> editorMode = null;
+    public static ConfigurationItem<Boolean> editorMode = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> autoSaveTagModifications = null;
+    public static ConfigurationItem<Boolean> autoSaveTagModifications = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> saveSessionOnExit = null;
+    public static ConfigurationItem<Boolean> saveSessionOnExit = null;
 
-    public static final ConfigurationItem<String> lastSessionFiles = null;
+    public static ConfigurationItem<String> lastSessionFiles = null;
 
-    public static final ConfigurationItem<String> lastSessionFileTitles = null;
+    public static ConfigurationItem<String> lastSessionFileTitles = null;
 
-    public static final ConfigurationItem<String> lastSessionSelection = null;
-
-    @ConfigurationDefaultBoolean(true)
-    @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> loopMedia = null;
+    public static ConfigurationItem<String> lastSessionSelection = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> allowOnlyOneInstance = null;
+    public static ConfigurationItem<Boolean> loopMedia = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> allowOnlyOneInstance = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> ignoreCLikePackages = null;
+    public static ConfigurationItem<Boolean> ignoreCLikePackages = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> smartNumberFormatting = null;
+    public static ConfigurationItem<Boolean> smartNumberFormatting = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> enableScriptInitializerDisplay = null;
+    public static ConfigurationItem<Boolean> enableScriptInitializerDisplay = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> autoOpenLoadedSWFs = null;
+    public static ConfigurationItem<Boolean> autoOpenLoadedSWFs = null;
 
     @ConfigurationDefaultString("")
     @ConfigurationCategory("paths")
     @ConfigurationFile
-    public static final ConfigurationItem<String> playerLocation = null;
+    public static ConfigurationItem<String> playerLocation = null;
 
     @ConfigurationDefaultString("")
     @ConfigurationCategory("paths")
     @ConfigurationFile
-    public static final ConfigurationItem<String> playerDebugLocation = null;
+    public static ConfigurationItem<String> playerDebugLocation = null;
 
     @ConfigurationDefaultString("")
     @ConfigurationCategory("paths")
     @ConfigurationFile(".*\\.swc$")
-    public static final ConfigurationItem<String> playerLibLocation = null;
+    public static ConfigurationItem<String> playerLibLocation = null;
 
     @ConfigurationDefaultString("")
     @ConfigurationCategory("paths")
     @ConfigurationDirectory
-    public static final ConfigurationItem<String> flexSdkLocation = null;
+    public static ConfigurationItem<String> flexSdkLocation = null;
 
     @ConfigurationDefaultDouble(0.7)
     @ConfigurationName("gui.avm2.splitPane.vars.dividerLocationPercent")
     @ConfigurationInternal
-    public static final ConfigurationItem<Double> guiAvm2VarsSplitPaneDividerLocationPercent = null;
+    public static ConfigurationItem<Double> guiAvm2VarsSplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultDouble(0.7)
     @ConfigurationName("gui.action.splitPane.vars.dividerLocationPercent")
     @ConfigurationInternal
-    public static final ConfigurationItem<Double> guiActionVarsSplitPaneDividerLocationPercent = null;
+    public static ConfigurationItem<Double> guiActionVarsSplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> debugHalt = null;
+    public static ConfigurationItem<Boolean> debugHalt = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationName("warning.svgImport")
     @ConfigurationCategory("import")
-    public static final ConfigurationItem<Boolean> warningSvgImport = null;
+    public static ConfigurationItem<Boolean> warningSvgImport = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationName("warning.hexViewNotUpToDate")
     @ConfigurationCategory("import")
-    public static final ConfigurationItem<Boolean> warningHexViewNotUpToDate = null;
+    public static ConfigurationItem<Boolean> warningHexViewNotUpToDate = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationName("shapeImport.useNonSmoothedFill")
     @ConfigurationCategory("import")
-    public static final ConfigurationItem<Boolean> shapeImportUseNonSmoothedFill = null;
+    public static ConfigurationItem<Boolean> shapeImportUseNonSmoothedFill = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
     @ConfigurationName("internalFlashViewer.execute.as12")
-    public static final ConfigurationItem<Boolean> internalFlashViewerExecuteAs12 = null;
+    public static ConfigurationItem<Boolean> internalFlashViewerExecuteAs12 = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> displayDupInstructions = null;
+    public static ConfigurationItem<Boolean> displayDupInstructions = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> useRegExprLiteral = null;
+    public static ConfigurationItem<Boolean> useRegExprLiteral = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> handleSkinPartsAutomatically = null;
+    public static ConfigurationItem<Boolean> handleSkinPartsAutomatically = null;
 
     @ConfigurationDefaultBoolean(false)
     //@ConfigurationCategory("script")
     @ConfigurationInternal
-    public static final ConfigurationItem<Boolean> _ignoreAdditionalFlexClasses = null;
+    public static ConfigurationItem<Boolean> _ignoreAdditionalFlexClasses = null;
 
     @ConfigurationDefaultBoolean(false)
     //@ConfigurationCategory("script")
     @ConfigurationInternal
-    public static final ConfigurationItem<Boolean> _enableFlexExport = null;
+    public static ConfigurationItem<Boolean> _enableFlexExport = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> simplifyExpressions = null;
+    public static ConfigurationItem<Boolean> simplifyExpressions = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationInternal
-    public static final ConfigurationItem<Boolean> hwAcceleratedGraphics = null;
+    public static ConfigurationItem<Boolean> hwAcceleratedGraphics = null;
 
     @ConfigurationDefaultDouble(0.85)
     @ConfigurationName("gui.avm2.splitPane.docs.dividerLocationPercent")
     @ConfigurationInternal
-    public static final ConfigurationItem<Double> guiAvm2DocsSplitPaneDividerLocationPercent = null;
+    public static ConfigurationItem<Double> guiAvm2DocsSplitPaneDividerLocationPercent = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
-    public static final ConfigurationItem<Boolean> useFlexAs3Compiler = null;
+    public static ConfigurationItem<Boolean> useFlexAs3Compiler = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
-    public static final ConfigurationItem<Boolean> showSetAdvanceValuesMessage = null;
+    public static ConfigurationItem<Boolean> showSetAdvanceValuesMessage = null;
 
     @ConfigurationDefaultString("")
     @ConfigurationCategory("paths")
     @ConfigurationFile
-    public static final ConfigurationItem<String> graphVizDotLocation = null;
+    public static ConfigurationItem<String> graphVizDotLocation = null;
 
     private enum OSId {
         WINDOWS, OSX, UNIX
@@ -865,10 +865,12 @@ public final class Configuration {
             for (Entry<String, Field> entry : getConfigurationFields().entrySet()) {
                 String name = entry.getKey();
                 Field field = entry.getValue();
+                /* Unsupported in java 9+
                 // remove final modifier from field
                 Field modifiersField = field.getClass().getDeclaredField("modifiers");
                 modifiersField.setAccessible(true);
                 modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+                */
 
                 Object defaultValue = getDefaultValue(field);
                 Object value = null;
@@ -888,7 +890,7 @@ public final class Configuration {
                     field.set(null, new ConfigurationItem(name, defaultValue));
                 }
             }
-        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException ex) {
+        } catch (IllegalArgumentException | IllegalAccessException | SecurityException ex) {
             // Reflection exceptions. This should never happen
             throw new Error(ex.getMessage());
         } catch (IOException ex) {

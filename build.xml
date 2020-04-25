@@ -80,7 +80,7 @@
         <mkdir dir="${compile.dir}"/>
         <javac srcdir="${src.dir}" destdir="${compile.dir}" includes="**/*.java" target="${target.java}" source="${target.java}" debug="true"
                debuglevel="lines,vars,source" includeantruntime="false" encoding="utf-8">
-            <compilerarg line="-Xlint:unchecked"/> <!-- For Java 8: -Xdiags:verbose -->
+            <compilerarg line="-Xlint:unchecked -Xlint:deprecation"/> <!-- For Java 8: -Xdiags:verbose -->
             <classpath>
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
             </classpath>

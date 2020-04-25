@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers;
 
 import java.awt.Canvas;
@@ -43,10 +44,11 @@ import java.util.Map;
  */
 public class FontHelper {
 
+    /*NOT AVAILABLE SINCE JAVA9+
     private static Object getFontManager() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         Class<?> clFmFactory = Class.forName("sun.font.FontManagerFactory");
         return clFmFactory.getDeclaredMethod("getInstance").invoke(null);
-    }
+    }*/
 
     /**
      * Gets all available fonts in the system
@@ -54,6 +56,8 @@ public class FontHelper {
      * @return Map<FamilyName,Map<FontNAme,Font>>
      */
     public static Map<String, Map<String, Font>> getInstalledFonts() {
+        return new HashMap<>();
+        /*NOT AVAILABLE SINCE JAVA9+
         Map<String, Map<String, Font>> ret = new HashMap<>();
         Font[] fonts = null;
 
@@ -103,7 +107,7 @@ public class FontHelper {
             ret.get(fam).put(f.getFontName(Locale.ENGLISH), f);
         }
 
-        return ret;
+        return ret;*/
     }
 
     public static String fontToString(Font font) {
@@ -166,7 +170,8 @@ public class FontHelper {
      * @return
      */
     public static List<KerningPair> getFontKerningPairs(Font font, int size) {
-        File fontFile = getFontFile(font);
+        //NOT AVAILABLE IN java9+
+        /*File fontFile = getFontFile(font);
         if (fontFile != null && fontFile.getName().toLowerCase().endsWith(".ttf")) {
             KerningLoader k = new KerningLoader();
             try {
@@ -187,7 +192,8 @@ public class FontHelper {
             ret.addAll(getFontKerningPairsOneChar(availableChars, font, c1));
 
         }
-        return ret;
+        return ret;*/
+        return new ArrayList<>();
     }
 
     public static float getFontAdvance(Font font, char ch) {
@@ -289,9 +295,10 @@ public class FontHelper {
         }
     }
 
-    private static Object getFont2d(Font f) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    //NOT AVAILABLE IN java9+
+    /*private static Object getFont2d(Font f) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         Object fm = getFontManager();
-        return Class.forName("sun.font.FontManager").getDeclaredMethod("findFont2D", String.class, int.class, int.class).invoke(fm, f.getFontName(), f.getStyle(), 2/*LOGICAL_FALLBACK*/);
+        return Class.forName("sun.font.FontManager").getDeclaredMethod("findFont2D", String.class, int.class, int.class).invoke(fm, f.getFontName(), f.getStyle(), 2/*LOGICAL_FALLBACK*//*);
     }
 
     public static File getFontFile(Font f) {
@@ -305,7 +312,7 @@ public class FontHelper {
         } catch (Throwable e) {
             return null;
         }
-    }
+    }*/
 
     private static Map<Integer, Character> getFontGlyphToCharMap(Font f) {
         Map<Integer, Character> ret = new HashMap<>();
