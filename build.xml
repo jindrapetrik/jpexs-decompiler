@@ -428,14 +428,14 @@
         </echoxml>
     </target>    
     <target name="-exe-linux" unless="is_windows" depends="-load-tools,-exe-config">
-        <exec dir="${launch4j.path}" executable="${launch4j.path}/launch4j" failonerror="true">
-            <arg file="${exe.config}" />
-        </exec>
+        <java jar="${launch4j.path}/launch4j.jar" fork="true">
+            <arg line="${exe.config}" />
+        </java>
     </target>
     <target name="-exe-windows" if="is_windows" depends="-load-tools,-exe-config">
-        <exec dir="${launch4j.path}" executable="${launch4j.path}\launch4jc.exe" failonerror="true">
-            <arg file="${exe.config}" />
-        </exec>
+        <java jar="${launch4j.path}/launch4j.jar" fork="true">
+            <arg line="${exe.config}" />
+        </java>
     </target>   
     <target name="exe" depends="-set-gui-type,-exe-linux,-exe-windows">
         
