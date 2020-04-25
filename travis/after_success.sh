@@ -55,9 +55,11 @@ if [ "$DO_DEPLOY" = 1 ]; then
     #-delete tag
     git config --local user.email "travis@travis-ci.org"
     git config --local user.name "Travis CI"
-    git remote add myorigin https://${GITHUB_ACCESS_TOKEN}@github.com/$TRAVIS_REPO_SLUG.git > /dev/null 2>&1
+    git remote add myorigin https://${GITHUB_ACCESS_TOKEN}@github.com/$TRAVIS_REPO_SLUG.git
+    #> /dev/null 2>&1
     git tag -d $DEPLOY_RELEASE_TO_REMOVE
-    git push --quiet myorigin :refs/tags/$DEPLOY_RELEASE_TO_REMOVE > /dev/null 2>&1        
+    git push --quiet --delete myorigin $DEPLOY_RELEASE_TO_REMOVE
+    #> /dev/null 2>&1        
   fi  
   echo "FINISHED"
 fi
