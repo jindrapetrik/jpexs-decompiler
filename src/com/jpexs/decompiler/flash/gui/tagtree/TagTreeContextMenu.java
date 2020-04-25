@@ -149,6 +149,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         rawEditMenuItem = new JMenuItem(mainPanel.translate("contextmenu.rawEdit"));
         rawEditMenuItem.addActionListener(this::rawEditActionPerformed);
+        rawEditMenuItem.setEnabled(false); //NOT AVAILABLE IN Java9+
         add(rawEditMenuItem);
 
         jumpToCharacterMenuItem = new JMenuItem(mainPanel.translate("contextmenu.jumpToCharacter"));
