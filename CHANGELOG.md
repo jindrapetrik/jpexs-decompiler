@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - XML import/export
 - Raw editation of tags 
 - Generic editation of tags through treeview (affects tags like FileAttributes, ExportAssets)
+- Support for installing java in FFDec windows installer
 
 ## [11.3.0] - 2020-04-25
 ### Added
