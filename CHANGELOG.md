@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [11.3.0] - 2020-04-25
+
 ### Added
 - Possibility to open SWF files using open on Mac
 - Updated turkish translation
