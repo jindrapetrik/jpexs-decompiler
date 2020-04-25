@@ -560,6 +560,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     public void showGenericTagPanel(Tag tag) {
         showCardLeft(GENERIC_TAG_CARD);
         genericEditButton.setVisible(!tag.isReadOnly());
+        genericEditButton.setEnabled(false/*NOT AVAILABLE IN JAVA9+*/);
         genericSaveButton.setVisible(false);
         genericCancelButton.setVisible(false);
         genericTagPanel.setEditMode(false, tag);

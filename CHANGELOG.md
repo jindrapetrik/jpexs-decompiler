@@ -1,6 +1,17 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- Java 9+ support
+
+### Removed
+- Due to Java9+ limited support of reflection, following features were removed:
+- Support for detecting installed fonts - affects fonts editation
+- XML import/export
+- Raw editation of tags 
+- Generic editation of tags through treeview (affects tags like FileAttributes, ExportAssets)
+
 ## [11.3.0] - 2020-04-25
 ### Added
 - Possibility to open SWF files using open on Mac
