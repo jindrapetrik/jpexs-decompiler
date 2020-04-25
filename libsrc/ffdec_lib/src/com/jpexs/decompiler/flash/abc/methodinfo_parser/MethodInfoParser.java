@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.methodinfo_parser;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -176,7 +177,7 @@ public class MethodInfoParser {
                 if (symb.type == ParsedSymbol.TYPE_COLON) {
                     ParsedSymbol symbType = lexer.yylex();
                     if (symbType.type == ParsedSymbol.TYPE_STAR) {
-                        paramTypes.add(new Long(0));
+                        paramTypes.add((Long)0L);
                     } else if (symbType.type == ParsedSymbol.TYPE_MULTINAME) {
                         paramTypes.add((Long) symbType.value);
                     } else {
