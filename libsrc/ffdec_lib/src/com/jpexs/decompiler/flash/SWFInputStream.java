@@ -675,12 +675,7 @@ public class SWFInputStream implements AutoCloseable {
         newDumpLevel(name, "FIXED8");
         int afterPoint = readEx();
         int beforePoint = readSI8Internal();
-        float ret;
-        if (beforePoint < 0) {
-            ret = beforePoint - ((float) afterPoint) / 256;
-        } else {
-            ret = beforePoint + ((float) afterPoint) / 256;
-        }
+        float ret = beforePoint + ((float) afterPoint) / 256;
         endDumpLevel(ret);
         return ret;
     }
