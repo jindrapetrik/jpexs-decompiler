@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Based on Freerapid Downloader startup script - created by Petris 2009
 
 # FFDec requires Oracle Java 8
