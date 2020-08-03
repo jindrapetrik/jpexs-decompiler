@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.function.Predicate;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -149,7 +150,6 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         rawEditMenuItem = new JMenuItem(mainPanel.translate("contextmenu.rawEdit"));
         rawEditMenuItem.addActionListener(this::rawEditActionPerformed);
-        rawEditMenuItem.setEnabled(false); //NOT AVAILABLE IN Java9+
         add(rawEditMenuItem);
 
         jumpToCharacterMenuItem = new JMenuItem(mainPanel.translate("contextmenu.jumpToCharacter"));
@@ -328,30 +328,34 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
 
         boolean singleSelect = items.size() == 1;
+        Predicate<Predicate<TreeItem>> canReplace = p -> {
+            for (TreeItem ti : items) if (!p.test(ti)) return false;
+            return true;
+        };
+
+        // replace
+        if (canReplace.test(it -> it instanceof ImageTag && ((ImageTag) it).importSupported())) {
+            replaceMenuItem.setVisible(true);
+        }
+
+        if (canReplace.test(it -> it instanceof ShapeTag)) {
+            replaceMenuItem.setVisible(true);
+            replaceNoFillMenuItem.setVisible(true);
+        }
+
+        if (canReplace.test(it -> it instanceof DefineBinaryDataTag)) {
+            replaceMenuItem.setVisible(true);
+        }
+
+        if (canReplace.test(it -> it instanceof DefineSoundTag)) {
+            replaceMenuItem.setVisible(true);
+        }
 
         if (singleSelect) {
             final TreeItem firstItem = items.get(0);
 
             if (firstItem instanceof CharacterTag) {
                 replaceWithTagMenuItem.setVisible(true);
-            }
-
-            // replace
-            if (firstItem instanceof ImageTag && ((ImageTag) firstItem).importSupported()) {
-                replaceMenuItem.setVisible(true);
-            }
-
-            if (firstItem instanceof ShapeTag) {
-                replaceMenuItem.setVisible(true);
-                replaceNoFillMenuItem.setVisible(true);
-            }
-
-            if (firstItem instanceof DefineBinaryDataTag) {
-                replaceMenuItem.setVisible(true);
-            }
-
-            if (firstItem instanceof DefineSoundTag) {
-                replaceMenuItem.setVisible(true);
             }
 
             addTagMenu.removeAll();
