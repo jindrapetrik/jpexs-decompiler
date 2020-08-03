@@ -2751,100 +2751,107 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void replaceButtonActionPerformed(ActionEvent evt) {
-        TreeItem item = tagTree.getCurrentTreeItem();
-        if (item == null) {
+        List<TreeItem> items = tagTree.getSelected();
+        if (items.size() == 0) {
             return;
         }
 
+        TreeItem ti0 = items.get(0);
+        File file = null;
+        if (ti0 instanceof DefineSoundTag) {
+            file = showImportFileChooser("filter.sounds|*.mp3;*.wav|filter.sounds.mp3|*.mp3|filter.sounds.wav|*.wav");
+        }
+        if (ti0 instanceof ImageTag) {
+            file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp");
+        }
+        if (ti0 instanceof ShapeTag) {
+            file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg");
+        }
+        if (ti0 instanceof DefineBinaryDataTag) {
+            file = showImportFileChooser("");
+        }
+        for (TreeItem ti : items) {
+            doReplaceAction(ti, file);
+        }
+    }
+    private void doReplaceAction(TreeItem item, File selectedFile) {
+        if (selectedFile == null) return;
         if (item instanceof DefineSoundTag) {
-            File selectedFile = showImportFileChooser("filter.sounds|*.mp3;*.wav|filter.sounds.mp3|*.mp3|filter.sounds.wav|*.wav");
-            if (selectedFile != null) {
-                File selfile = Helper.fixDialogFile(selectedFile);
-                DefineSoundTag ds = (DefineSoundTag) item;
-                int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
-                if (selfile.getName().toLowerCase(Locale.ENGLISH).endsWith(".mp3")) {
-                    soundFormat = SoundFormat.FORMAT_MP3;
-                }
+            File selfile = Helper.fixDialogFile(selectedFile);
+            DefineSoundTag ds = (DefineSoundTag) item;
+            int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
+            if (selfile.getName().toLowerCase(Locale.ENGLISH).endsWith(".mp3")) {
+                soundFormat = SoundFormat.FORMAT_MP3;
+            }
 
-                boolean ok = false;
-                try {
-                    ok = ds.setSound(new FileInputStream(selfile), soundFormat);
-                    ds.getSwf().clearSoundCache();
-                } catch (IOException ex) {
-                    //ignore
-                }
+            boolean ok = false;
+            try {
+                ok = ds.setSound(new FileInputStream(selfile), soundFormat);
+                ds.getSwf().clearSoundCache();
+            } catch (IOException ex) {
+                //ignore
+            }
 
-                if (!ok) {
-                    View.showMessageDialog(null, translate("error.sound.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
-                } else {
-                    reload(true);
-                }
+            if (!ok) {
+                View.showMessageDialog(null, translate("error.sound.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+            } else {
+                reload(true);
             }
         }
         if (item instanceof ImageTag) {
             ImageTag it = (ImageTag) item;
             if (it.importSupported()) {
-                File selectedFile = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp");
-                if (selectedFile != null) {
-                    File selfile = Helper.fixDialogFile(selectedFile);
-                    byte[] data = Helper.readFile(selfile.getAbsolutePath());
-                    try {
-                        Tag newTag = new ImageImporter().importImage(it, data);
-                        SWF swf = it.getSwf();
-                        if (newTag != null) {
-                            refreshTree(swf);
-                            setTagTreeSelectedNode(newTag);
-                        }
-                        swf.clearImageCache();
-                    } catch (IOException ex) {
-                        logger.log(Level.SEVERE, "Invalid image", ex);
-                        View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
-                    }
-
-                    reload(true);
-                }
-            }
-        }
-        if (item instanceof ShapeTag) {
-            ShapeTag st = (ShapeTag) item;
-            String filter = "filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg";
-            File selectedFile = showImportFileChooser(filter);
-            if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
-                byte[] data = null;
-                String svgText = null;
-                if (".svg".equals(Path.getExtension(selfile))) {
-                    svgText = Helper.readTextFile(selfile.getAbsolutePath());
-                    showSvgImportWarning();
-                } else {
-                    data = Helper.readFile(selfile.getAbsolutePath());
-                }
+                byte[] data = Helper.readFile(selfile.getAbsolutePath());
                 try {
-                    Tag newTag = svgText != null ? new SvgImporter().importSvg(st, svgText) : new ShapeImporter().importImage(st, data);
-                    SWF swf = st.getSwf();
+                    Tag newTag = new ImageImporter().importImage(it, data);
+                    SWF swf = it.getSwf();
                     if (newTag != null) {
                         refreshTree(swf);
                         setTagTreeSelectedNode(newTag);
                     }
-
                     swf.clearImageCache();
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, "Invalid image", ex);
                     View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
+
                 reload(true);
             }
         }
+        if (item instanceof ShapeTag) {
+        ShapeTag st = (ShapeTag) item;
+            File selfile = Helper.fixDialogFile(selectedFile);
+            byte[] data = null;
+            String svgText = null;
+            if (".svg".equals(Path.getExtension(selfile))) {
+                svgText = Helper.readTextFile(selfile.getAbsolutePath());
+                showSvgImportWarning();
+            } else {
+                data = Helper.readFile(selfile.getAbsolutePath());
+            }
+            try {
+                Tag newTag = svgText != null ? new SvgImporter().importSvg(st, svgText) : new ShapeImporter().importImage(st, data);
+                SWF swf = st.getSwf();
+                if (newTag != null) {
+                    refreshTree(swf);
+                    setTagTreeSelectedNode(newTag);
+                }
+
+                swf.clearImageCache();
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "Invalid image", ex);
+                View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+            }
+            reload(true);
+        }
         if (item instanceof DefineBinaryDataTag) {
             DefineBinaryDataTag bt = (DefineBinaryDataTag) item;
-            File selectedFile = showImportFileChooser("");
-            if (selectedFile != null) {
-                File selfile = Helper.fixDialogFile(selectedFile);
-                byte[] data = Helper.readFile(selfile.getAbsolutePath());
-                new BinaryDataImporter().importData(bt, data);
-                refreshTree(bt.getSwf());
-                reload(true);
-            }
+            File selfile = Helper.fixDialogFile(selectedFile);
+            byte[] data = Helper.readFile(selfile.getAbsolutePath());
+            new BinaryDataImporter().importData(bt, data);
+            refreshTree(bt.getSwf());
+            reload(true);
         }
     }
 
