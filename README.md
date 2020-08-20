@@ -127,6 +127,7 @@ The application was made in Czech republic.
 * **pepka** - ukrainian and dutch translation
 * **poxyran** - spanish translation
 * **realmaster42** - portugese-brasil translation
+* **晓之车** - chinese translation
 * **Rtsjx** - chinese translation
 
 ## Contact
