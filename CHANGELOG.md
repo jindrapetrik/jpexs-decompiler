@@ -13,6 +13,9 @@ All notable changes to this project will be documented in this file.
 - Generic editation of tags through treeview (affects tags like FileAttributes, ExportAssets)
 - Support for installing java in FFDec windows installer
 
+### Changed
+- Chinese translation updated
+
 ## [11.3.0] - 2020-04-25
 ### Added
 - Possibility to open SWF files using open on Mac
