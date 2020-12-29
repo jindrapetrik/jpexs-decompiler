@@ -135,6 +135,8 @@ You might look for some answers to the old issues in our issue tracker on
 [https://www.free-decompiler.com/flash/issues](https://www.free-decompiler.com/flash/issues)
 But it's currently read only.
 
+See [Frequently Asked Questions (FAQ)](FAQ.md) before you try to contact me.
+
 ### Email contact
 Emergency contact to JPEXS developer is `jindra.petrik@gmail.com`.
 But as stated previously, the development has stopped so there's no way
