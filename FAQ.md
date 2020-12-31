@@ -26,9 +26,11 @@ A) Variable identifiers which have invalid characters in their name are displaye
 This allows easier direct editation.
 
 B) Also, there exist few special instructions/functions with prefix §§:
-- `§§push(item)`
-- `§§pop()`
-- `§§dup()`
-- `§§goto(label)`
+- `§§push(item)` - pushes item on stack
+- `§§pop()` - pops from stack
+- `§§dup()` - duplicates value on stack
+- `§§goto(label)` - jump to address
+- `§§constant(number)` - unresolved constant (unknown constantpool)
 
 These functions usually pop out when you try to decompile some obfuscated / unstructured code.
+You can try Settings/Automatic deobfuscation option for handle some kinds of this code properly.
