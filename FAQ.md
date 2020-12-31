@@ -19,7 +19,7 @@ No, we no longer work on the decompiler. But decompiler is opensource, you can i
 No, sorry, we no longer fix any bugs. Ask somebody else.
 
 ## Is there a documentation for FFDec library?
-No, there is'nt one.
+No, there isn't one.
 
 ## What's that thing with § character in scripts?
 A) Variable identifiers which have invalid characters in their name are displayed in the form `§name§` (for example `§s-r/rg§` ).
