@@ -16,6 +16,9 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Chinese translation updated
 
+### Fixed
+- Scaling - Distorted images/canvas on Hi-dpi monitors for Java 9 and later
+
 ## [11.3.0] - 2020-04-25
 ### Added
 - Possibility to open SWF files using open on Mac
