@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Scaling - Distorted images/canvas on Hi-dpi monitors for Java 9 and later
+- Radial gradients focal point reading/writing
 
 ## [11.3.0] - 2020-04-25
 ### Added
