@@ -405,6 +405,7 @@
                     <maxHeapPercent>${max.heap.size.percent}</maxHeapPercent>
                     <opt>-Djava.net.preferIPv4Stack=true</opt>
                     <opt>-Djna.nosys=true</opt>
+                    <opt>-Dsun.java2d.uiScale=1.0</opt>
                 </jre>
                 <splash>
                     <file>graphics/splash2.bmp</file>
@@ -667,6 +668,7 @@
         <java jar="${dist.dir}/${jar.filename}.jar" fork="true">
             <jvmarg value="-Xmx${max.heap.size.run}m" />
             <jvmarg value="-Djava.net.preferIPv4Stack=true" />
+            <jvmarg value="-Dsun.java2d.uiScale=1.0" />
             <arg line="${run.params}" />
         </java>
     </target>

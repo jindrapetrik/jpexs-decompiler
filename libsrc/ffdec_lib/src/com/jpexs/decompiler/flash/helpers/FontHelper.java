@@ -56,11 +56,10 @@ public class FontHelper {
      * @return Map<FamilyName,Map<FontNAme,Font>>
      */
     public static Map<String, Map<String, Font>> getInstalledFonts() {
-        return new HashMap<>();
-        /*NOT AVAILABLE SINCE JAVA9+
         Map<String, Map<String, Font>> ret = new HashMap<>();
         Font[] fonts = null;
 
+        /*Refreshing list of installed fonts - reflection access NOT AVAILABLE SINCE JAVA9+
         try {
 
             Object fm = getFontManager();
@@ -88,7 +87,7 @@ public class FontHelper {
         } catch (Throwable ex) {
             // ignore
         }
-
+        */
         if (fonts == null) {
             fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
         }
@@ -107,7 +106,7 @@ public class FontHelper {
             ret.get(fam).put(f.getFontName(Locale.ENGLISH), f);
         }
 
-        return ret;*/
+        return ret;
     }
 
     public static String fontToString(Font font) {

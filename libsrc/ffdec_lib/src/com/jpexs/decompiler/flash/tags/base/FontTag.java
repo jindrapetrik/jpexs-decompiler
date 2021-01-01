@@ -303,11 +303,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
             return "Arial";
         }
 
-        //NOT AVAILABLE SINCE JAVA9+
-        //First font
-        //return installedFontsByFamily.keySet().iterator().next();
-        
-        return "Dialog";
+        return installedFontsByFamily.keySet().iterator().next();
     }
 
     public static String isFontFamilyInstalled(String fontFamily) {
