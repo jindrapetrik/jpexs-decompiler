@@ -424,7 +424,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private JPanel createFolderPreviewCard() {
         JPanel folderPreviewCard = new JPanel(new BorderLayout());
         folderPreviewPanel = new FolderPreviewPanel(this, new ArrayList<>());
-        folderPreviewCard.add(new JScrollPane(folderPreviewPanel), BorderLayout.CENTER);
+	final JScrollPane jScrollPane = new JScrollPane(folderPreviewPanel);
+	jScrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        folderPreviewCard.add(jScrollPane, BorderLayout.CENTER);
 
         return folderPreviewCard;
     }

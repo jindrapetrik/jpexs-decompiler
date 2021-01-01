@@ -101,7 +101,6 @@ public class FontPanel extends JPanel {
     public static ComboBoxModel<FontFace> getFaceModel(FontFamily family) {
 
         Set<FontFace> faceSet = new TreeSet<>();
-        
         for (Font f : FontTag.getInstalledFontsByFamily().get(family.familyEn).values()) {
             faceSet.add(new FontFace(f));
         }

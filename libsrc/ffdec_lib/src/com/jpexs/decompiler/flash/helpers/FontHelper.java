@@ -56,7 +56,6 @@ public class FontHelper {
      * @return Map<FamilyName,Map<FontNAme,Font>>
      */
     public static Map<String, Map<String, Font>> getInstalledFonts() {
-        
         Map<String, Map<String, Font>> ret = new HashMap<>();
         Font[] fonts = null;
 
