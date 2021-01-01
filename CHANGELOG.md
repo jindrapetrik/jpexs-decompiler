@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Java 9+ support
 - Chinese translation updated
+- Enable bulk replace for single typed tags
 
 ### Removed
 - Due to Java9+ limited support of reflection, following features were removed:
