@@ -52,6 +52,8 @@ if [ "$DO_DEPLOY" = 1 ]; then
     TAG_INFO=`curl --silent --user $GITHUB_USER:$GITHUB_ACCESS_TOKEN https://api.github.com/repos/$GITHUB_REPO/releases/tags/$DEPLOY_RELEASE_TO_REMOVE`
     RELEASE_ID=`echo $TAG_INFO|jq '.id'`
     curl --silent --request DELETE --user $GITHUB_USER:$GITHUB_ACCESS_TOKEN https://api.github.com/repos/$GITHUB_REPO/releases/$RELEASE_ID>/dev/null
+    # wait few seconds before DELETE properly propagates so we can delete tag then
+    sleep 5
     #-delete tag
     git config --local user.email "travis@travis-ci.org"
     git config --local user.name "Travis CI"
@@ -59,7 +61,7 @@ if [ "$DO_DEPLOY" = 1 ]; then
     #> /dev/null 2>&1
     git tag -d $DEPLOY_RELEASE_TO_REMOVE
     git push --quiet --delete myorigin $DEPLOY_RELEASE_TO_REMOVE
-    #> /dev/null 2>&1        
+    #> /dev/null 2>&1
   fi  
   echo "FINISHED"
 fi
