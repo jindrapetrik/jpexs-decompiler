@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 - Due to Java9+ limited support of reflection, following features were removed:
-- Support for detecting installed fonts - affects fonts editation
+- Automatic detection of installed fonts changes (on font editation) - FFDec needs to be restarted to font changes to take effect
 - XML import/export
 - Raw editation of tags 
 - Generic editation of tags through treeview (affects tags like FileAttributes, ExportAssets)

@@ -285,9 +285,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         } else if (installedFontsByFamily.containsKey("Arial")) {
             defaultFontName = "Arial";
         } else {
-            //NOT AVAILABLE SINCE JAVA9+
-            //defaultFontName = installedFontsByFamily.keySet().iterator().next();
-            defaultFontName = "Dialog";
+            defaultFontName = installedFontsByFamily.keySet().iterator().next();
         }
     }
 
@@ -303,11 +301,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
             return "Arial";
         }
 
-        //NOT AVAILABLE SINCE JAVA9+
-        //First font
-        //return installedFontsByFamily.keySet().iterator().next();
-        
-        return "Dialog";
+        return installedFontsByFamily.keySet().iterator().next();
     }
 
     public static String isFontFamilyInstalled(String fontFamily) {
