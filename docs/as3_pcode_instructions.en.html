@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>html, body {margin:0px; padding: 0px;}
+.instruction {background-color: #f5f5b5; color:black;}
+.otherdoc {background-color: #f5f5b5; color:black;}
+li.instruction-item {list-style:none; padding:0px;border:1px solid black; border-bottom:none; border-collapse:collapse; }
+ul.instruction-list {padding-left:0; display:table; border-bottom:1px solid black;}
+strong.instruction-name {font-weight: bold; color: blue;}
+strong.stack-title {font-weight: bold;}
+strong.flags-title {font-weight: bold;}
+.hidden {display:none}
+.filter-flag-title {display:inline-block; width: 50ex;}
+.instruction {padding:5px;}
+.instruction.instruction-flag-noFlashPlayer {background-color: #ccc;}
+body {font-family: serif;}
+h1, h2, h3, h4, h5 {font-family: sans-serif;}
+.instruction-signature {font-family: "Courier New", monospace; font-size: 1.05em;}
+.filter {font-family: sans-serif; }
+.path {font-weight: bold; color: blue;}
+.path-block {}
+.path-docs {}</style>
+		<script>var txt_filter_hide = "Hide: ";
+var txt_filter_byname = "Find by name: ";
+var txt_filter_order = "Order by: ";
+var txt_filter_order_code = "code";
+var txt_filter_order_name = "name";
+var order_set = "name";var flags_set = {};
+var flags = {};
+flags["undocumented"] = "Undocumented";
+flags_set["undocumented"] = false;
+flags["unknownStack"] = "Unknown stack";
+flags_set["unknownStack"] = false;
+flags["es4NumericsMinor"] = "ES4 numerics (ABC minor 17)";
+flags_set["es4NumericsMinor"] = false;
+flags["floatMajor"] = "Float values (ABC major 47)";
+flags_set["floatMajor"] = false;
+flags["unknownOperands"] = "Unknown operands";
+flags_set["unknownOperands"] = false;
+flags["noFlashPlayer"] = "Not in standard Flash Player";
+flags_set["noFlashPlayer"] = false;
+flags["deprecated"] = "Deprecated";
+flags_set["deprecated"] = false;
+flags["domainMemory"] = "Domain memory operation";
+flags_set["domainMemory"] = false;
+flags_set["noFlashPlayer"] = true;
+function bind(el, evt, func) {
+    if (el.addEventListener) {
+        el.addEventListener(evt, func, false);
+    } else if (el.attachEvent) {
+        el.attachEvent('on' + evt, func);
+    }
+}
+
+function showhide(e, show) {
+    var cls = " " + e.className + " ";
+    if (show && cls.indexOf(" hidden ") > -1) {
+        cls = cls.replace(" hidden ", " ");
+    } else if (!show && cls.indexOf(" hidden ") == -1) {
+        cls = cls + "hidden ";
+    }
+    cls = cls.trim();
+    e.className = cls;
+}
+
+function hideNoName(name) {
+    var lis = document.getElementsByTagName("li");
+    loopi:for (var i = 0; i < lis.length; i++) {
+        if (lis[i].className == "instruction-item") {
+            if ((typeof name) != "undefined" && name.trim() != "") {
+                var ss = lis[i].getElementsByTagName("strong");
+                for (var s = 0; s < ss.length; s++) {
+                    if (ss[s].className == "instruction-name")
+                    {
+                        var insName = ss[s].innerHTML;
+                        if (insName.toLowerCase().indexOf(name.toLowerCase()) != 0) { //does not start with desired name
+                            showhide(lis[i], false);
+                            continue loopi;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+function showFlags(show, flagType) {
+    var lis = document.getElementsByTagName("div");
+    loopi:for (var i = 0; i < lis.length; i++) {
+        var cls = " " + lis[i].className + " ";
+        if ((typeof flagType) != "undefined") {
+            if (cls.indexOf("instruction-flag-" + flagType) == -1) {
+                continue;
+            }
+        }
+        showhide(lis[i].parentNode, show);
+    }
+}
+
+
+function sortInstructions(order) {
+    var newUl = document.createElement("ul");
+    newUl.className = "instruction-list";
+
+
+    var smallestItem = null;
+    var smallestVal = null;
+    var originalUl = null;
+
+    do {
+        smallestItem = null;
+        smallestVal = null;
+        var lis = document.getElementsByTagName("li");
+        loopi:for (var i = 0; i < lis.length; i++) {
+            var cls = " " + lis[i].className + " ";
+            if (cls.indexOf(" instruction-item ") != -1) {
+                var ss = lis[i].getElementsByTagName(order == "code" ? "span" : "strong");
+                for (var s = 0; s < ss.length; s++) {
+                    if (ss[s].className == "instruction-" + order)
+                    {
+                        var checkedVal = ss[s].innerHTML;
+                        if (smallestVal == null || smallestVal > checkedVal)
+                        {
+                            smallestItem = lis[i];
+                            smallestVal = checkedVal;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        if (smallestItem != null) {
+            originalUl = smallestItem.parentNode;
+            originalUl.removeChild(smallestItem);
+            newUl.appendChild(smallestItem);
+        }
+    } while (smallestItem != null);
+    originalUl.parentNode.replaceChild(newUl, originalUl);
+
+}
+
+function applyFilter() {
+    var order_new = document.getElementById("filter_order").value;
+    if (order_set != order_new) {
+        order_set = order_new;
+        sortInstructions(order_new);
+    }
+    showFlags(true);
+    hideNoName(document.getElementById("filter-byname").value);
+    var inputs = document.getElementsByTagName("input");
+    for (var i = 0; i < inputs.length; i++) {
+        if (inputs[i].type == "checkbox" && inputs[i].className == "filter" && inputs[i].hasAttribute("data-flag")) {
+            var flag = inputs[i].getAttribute("data-flag");
+            if (inputs[i].checked) {
+                showFlags(false, flag);
+            }
+        }
+    }
+}
+
+function init() {
+    var js_switcher = document.getElementById("js-switcher");
+    if (!js_switcher) {
+        return;
+    }
+    var t = "";
+    t += "<div class=\"filter\">";
+
+    t += "<div class=\"filter-item\">";
+    t += "<label for=\"filter-byname\"><strong class=\"filter-byname-title\">" + txt_filter_byname + "</strong></label>";
+    t += "<input onkeydown=\"applyFilter();\" onkeyup=\"applyFilter();\" onkeypress=\"applyFilter();\" type=\"text\" id=\"filter-byname\" size=\"15\" />";
+    t += "</div>";
+
+    t += "<div class=\"filter-item\">";
+    t += "<strong class=\"filter-hide-title\">" + txt_filter_hide + "</strong><br />";
+    for (var flag in flags) {
+        var flagDesc = flags[flag];
+        var flagSet = flags_set[flag];
+        t += '<input class="filter" data-flag="' + flag + '" onchange="applyFilter();" type="checkbox"' + (flagSet ? ' checked="checked"' : '') + ' id="flag-' + flag + '-switch"/><label for="flag-' + flag + '-switch">' + flagDesc + '</label><br />';
+    }
+
+    t += "<div class=\"filter-item\">";
+    t += "<label for=\"filter-order\"><strong class=\"filter-order-title\">" + txt_filter_order + "</strong></label>";
+    t += "<select id=\"filter_order\" onchange=\"applyFilter();\">";
+    t += "<option value=\"code\"" + (order_set == "code" ? ' selected="selected"' : '') + ">" + txt_filter_order_code + "</option>";
+    t += "<option value=\"name\"" + (order_set == "name" ? ' selected="selected"' : '') + ">" + txt_filter_order_name + "</option>";
+    t += "</select>";
+    t += "</div>";
+    t += "</div>";
+
+    t += "</div>"; //.filter
+
+
+    js_switcher.innerHTML = t;
+    applyFilter();
+}
+
+bind(window, "load", init);</script>
+		<meta charset="UTF-8">
+		<meta name="generator" content="JPEXS Free Flash Decompiler v.11.3.0 nightly build 1727">
+		<meta name="description" content="List of all known ActionScript 3 - AVM2 instructions with their operands and stack values">
+		<meta property="og:title" content="AVM2 Instruction list">
+		<meta property="og:type" content="article">
+		<meta property="og:description" content="List of all known ActionScript 3 - AVM2 instructions with their operands and stack values">
+		<meta name="date" content="2021-01-02T08:19:39Z">
+		<title>AVM2 Instruction list</title>
+	</head>
+		<h1>AVM2 Instruction list</h1>
+<span id="js-switcher" class="js"></span>		<ul class="instruction-list">
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-undocumented instruction-flag-unknownOperands instruction-flag-noFlashPlayer instruction-flag-unknownStack"><div class="instruction-signature"><span class="instruction-code">0xEE</span> <strong class="instruction-name">abs_jump</strong> ???
+				</div>
+				<div class="short-description">Absolute jump</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xA0</span> <strong class="instruction-name">add</strong></div>
+				<div class="short-description">Add two values</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-unknownOperands instruction-flag-unknownStack instruction-flag-undocumented"><div class="instruction-signature"><span class="instruction-code">0x9B</span> <strong class="instruction-name">add_d</strong> ???
+				</div>
+				<div class="short-description">Add_d</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xC5</span> <strong class="instruction-name">add_i</strong></div>
+				<div class="short-description">Add two integer values</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-es4NumericsMinor instruction-flag-noFlashPlayer"><div class="instruction-signature"><span class="instruction-code">0xB5</span> <strong class="instruction-name">add_p</strong> numberContext(U30)</div>
+				<div class="short-description">Add two values using number context</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-es4NumericsMinor">ES4 numerics (ABC minor 17)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-undocumented instruction-flag-unknownOperands instruction-flag-unknownStack"><div class="instruction-signature"><span class="instruction-code">0xF6</span> <strong class="instruction-name">alloc</strong> ???
+				</div>
+				<div class="short-description">Alloc</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x53</span> <strong class="instruction-name">applytype</strong> typeParamCount:argCount(U30)</div>
+				<div class="short-description">Apply type parameters</div>
+				<div class="description"><strong class="description-title">Description: </strong>Apply parameter types to base type. For example when Vector&lt;String&gt; is resolved at runtime. String is parameter, Vector is baseclass.</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., baseType, typeParam1, ..., typeParamN</span><span class="stack-to"> ➞ </span><span class="stack-after">..., baseType&lt;typeParam1, ..., typeParamN&gt;</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x86</span> <strong class="instruction-name">astype</strong> type:multinameIndex(U30)</div>
+				<div class="short-description">Return same value or null if not specified type</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x87</span> <strong class="instruction-name">astypelate</strong></div>
+				<div class="short-description">Return same value or null if not specified type (stack based)</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value, type</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xA8</span> <strong class="instruction-name">bitand</strong></div>
+				<div class="short-description">Bitwise and</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x97</span> <strong class="instruction-name">bitnot</strong></div>
+				<div class="short-description">Bitwise negate</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., ~value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xA9</span> <strong class="instruction-name">bitor</strong></div>
+				<div class="short-description">Bitwise or</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xAA</span> <strong class="instruction-name">bitxor</strong></div>
+				<div class="short-description">Bitwise xor</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x01</span> <strong class="instruction-name">bkpt</strong></div>
+				<div class="short-description">Breakpoint</div>
+				<div class="description"><strong class="description-title">Description: </strong>Breakpoint when debugging</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xF2</span> <strong class="instruction-name">bkptline</strong> lineNumber:linenum(U30)</div>
+				<div class="short-description">Breakpoint on line</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x41</span> <strong class="instruction-name">call</strong> argCount(U30)</div>
+				<div class="short-description">Call function on the stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., function, this, arg1, ..., argN</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-unknownStack instruction-flag-undocumented"><div class="instruction-signature"><span class="instruction-code">0x4D</span> <strong class="instruction-name">callinterface</strong> interface:classIndex(U30)</div>
+				<div class="short-description">Call interface</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x43</span> <strong class="instruction-name">callmethod</strong> method:dispatchId(U30), argCount(U30)</div>
+				<div class="short-description">Call method of object by dispatch id</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., this, arg1, ..., argN</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x46</span> <strong class="instruction-name">callproperty</strong> property:multinameIndex(U30), argCount(U30)</div>
+				<div class="short-description">Call property</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, [ns], [name], arg1, ..., argN</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x4C</span> <strong class="instruction-name">callproplex</strong> property:multinameIndex(U30), argCount(U30)</div>
+				<div class="short-description">Call property with null as this</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, [ns], [name], arg1, ..., argN</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x4F</span> <strong class="instruction-name">callpropvoid</strong> property:multinameIndex(U30), argCount(U30)</div>
+				<div class="short-description">Call property, discard return value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, [ns], [name], arg1, ..., argN</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x44</span> <strong class="instruction-name">callstatic</strong> method:methodIndex(U30), argCount(U30)</div>
+				<div class="short-description">Call method by method id in ABC file</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., this, arg1, ..., argN</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x45</span> <strong class="instruction-name">callsuper</strong> methodName:multinameIndex(U30), argCount(U30)</div>
+				<div class="short-description">Call method on parent class</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, [ns], [name], arg1, ..., argN</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-undocumented instruction-flag-unknownOperands instruction-flag-unknownStack"><div class="instruction-signature"><span class="instruction-code">0x4B</span> <strong class="instruction-name">callsuperid</strong> ???
+				</div>
+				<div class="short-description">Call super id</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x4E</span> <strong class="instruction-name">callsupervoid</strong> methodName:multinameIndex(U30), argCount(U30)</div>
+				<div class="short-description">Call method on parent class, discard return value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, [ns], [name], arg1, ..., argN</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x78</span> <strong class="instruction-name">checkfilter</strong></div>
+				<div class="short-description">Check that object can have filter operation applied</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-undocumented instruction-flag-unknownOperands instruction-flag-unknownStack instruction-flag-noFlashPlayer"><div class="instruction-signature"><span class="instruction-code">0xFD</span> <strong class="instruction-name">codegenop</strong> ???
+				</div>
+				<div class="short-description">CodeGenOp</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x80</span> <strong class="instruction-name">coerce</strong> type:multinameIndex(U30)</div>
+				<div class="short-description">Coerce value to specified type</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., coercedValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x82</span> <strong class="instruction-name">coerce_a</strong></div>
+				<div class="short-description">Coerce value to any type</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-deprecated"><div class="instruction-signature"><span class="instruction-code">0x81</span> <strong class="instruction-name">coerce_b</strong></div>
+				<div class="short-description">Coerce value to boolean</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., booleanValue</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-deprecated">Deprecated: <span class="flag-deprecated-detail">Use convert_b instead</span></li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-deprecated"><div class="instruction-signature"><span class="instruction-code">0x84</span> <strong class="instruction-name">coerce_d</strong></div>
+				<div class="short-description">Coerce value to double</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., doubleValue</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-deprecated">Deprecated: <span class="flag-deprecated-detail">Use convert_d instead</span></li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-deprecated"><div class="instruction-signature"><span class="instruction-code">0x83</span> <strong class="instruction-name">coerce_i</strong></div>
+				<div class="short-description">Coerce value to integer</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., intValue</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-deprecated">Deprecated: <span class="flag-deprecated-detail">Use convert_i instead</span></li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x89</span> <strong class="instruction-name">coerce_o</strong></div>
+				<div class="short-description">Coerce value to Object</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x85</span> <strong class="instruction-name">coerce_s</strong></div>
+				<div class="short-description">Coerce value to string</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., stringValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x88</span> <strong class="instruction-name">coerce_u</strong></div>
+				<div class="short-description">Coerce value to unsigned integer</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., uintValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-undocumented instruction-flag-unknownOperands instruction-flag-unknownStack"><div class="instruction-signature"><span class="instruction-code">0x9A</span> <strong class="instruction-name">concat</strong> ???
+				</div>
+				<div class="short-description">Concat</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x42</span> <strong class="instruction-name">construct</strong> argCount(U30)</div>
+				<div class="short-description">Call constructor function on the stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., function, arg1, ..., argN</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x4A</span> <strong class="instruction-name">constructprop</strong> property:multinameIndex(U30), argCount(U30)</div>
+				<div class="short-description">Construct a property of an object</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, [ns], [name], arg1, ..., argN</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x49</span> <strong class="instruction-name">constructsuper</strong> argCount(U30)</div>
+				<div class="short-description">Call parent constructor of an object</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, arg1, ..., argN</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x76</span> <strong class="instruction-name">convert_b</strong></div>
+				<div class="short-description">Convert value to boolean</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., booleanValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x75</span> <strong class="instruction-name">convert_d</strong></div>
+				<div class="short-description">Convert value to double</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., doubleValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-floatMajor instruction-flag-noFlashPlayer"><div class="instruction-signature"><span class="instruction-code">0x79</span> <strong class="instruction-name">convert_f</strong></div>
+				<div class="short-description">Convert value to float</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., floatValue</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-floatMajor">Float values (ABC major 47)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-floatMajor instruction-flag-noFlashPlayer"><div class="instruction-signature"><span class="instruction-code">0x7B</span> <strong class="instruction-name">convert_f4</strong></div>
+				<div class="short-description">Convert value to float4</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., float4Value</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-floatMajor">Float values (ABC major 47)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x73</span> <strong class="instruction-name">convert_i</strong></div>
+				<div class="short-description">Convert value to integer</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., intValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-es4NumericsMinor instruction-flag-noFlashPlayer"><div class="instruction-signature"><span class="instruction-code">0x79</span> <strong class="instruction-name">convert_m</strong></div>
+				<div class="short-description">Convert value to decimal</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., decimalValue</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-es4NumericsMinor">ES4 numerics (ABC minor 17)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-es4NumericsMinor instruction-flag-noFlashPlayer"><div class="instruction-signature"><span class="instruction-code">0x7A</span> <strong class="instruction-name">convert_m_p</strong> numberContext(U30)</div>
+				<div class="short-description">Convert value to decimal with number context</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., decimalValue</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-es4NumericsMinor">ES4 numerics (ABC minor 17)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x77</span> <strong class="instruction-name">convert_o</strong></div>
+				<div class="short-description">Convert value to Object</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x70</span> <strong class="instruction-name">convert_s</strong></div>
+				<div class="short-description">Convert value to string</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., stringValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x74</span> <strong class="instruction-name">convert_u</strong></div>
+				<div class="short-description">Convert value to unsigned integer</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., uintValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xEF</span> <strong class="instruction-name">debug</strong> debugType(U8), regName:stringIndex(U30), localRegister:registerIndex(U8), extra:U30</div>
+				<div class="short-description">Debugging info</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xF1</span> <strong class="instruction-name">debugfile</strong> fileName:stringIndex(U30)</div>
+				<div class="short-description">Debugging file info</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xF0</span> <strong class="instruction-name">debugline</strong> lineNumber:linenum(U30)</div>
+				<div class="short-description">Debugging line number info</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x94</span> <strong class="instruction-name">declocal</strong> localRegister:localRegIndex(U30)</div>
+				<div class="short-description">Decrement local register</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xC3</span> <strong class="instruction-name">declocal_i</strong> localRegister:localRegIndex(U30)</div>
+				<div class="short-description">Decrement local register integer value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-es4NumericsMinor instruction-flag-noFlashPlayer"><div class="instruction-signature"><span class="instruction-code">0x9F</span> <strong class="instruction-name">declocal_p</strong> numberContext(U30), localRegister:localRegIndex(U30)</div>
+				<div class="short-description">Decrement local register using number context</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-es4NumericsMinor">ES4 numerics (ABC minor 17)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-undocumented instruction-flag-unknownOperands instruction-flag-unknownStack"><div class="instruction-signature"><span class="instruction-code">0xFF</span> <strong class="instruction-name">decode</strong> ???
+				</div>
+				<div class="short-description">Decode</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x93</span> <strong class="instruction-name">decrement</strong></div>
+				<div class="short-description">Decrement value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., decrementedValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xC1</span> <strong class="instruction-name">decrement_i</strong></div>
+				<div class="short-description">Decrement integer value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., decrementedValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-es4NumericsMinor instruction-flag-noFlashPlayer"><div class="instruction-signature"><span class="instruction-code">0x9E</span> <strong class="instruction-name">decrement_p</strong> numberContext(U30)</div>
+				<div class="short-description">Decrement value using number context</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., decrementedValue</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-es4NumericsMinor">ES4 numerics (ABC minor 17)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-unknownStack instruction-flag-undocumented"><div class="instruction-signature"><span class="instruction-code">0x5B</span> <strong class="instruction-name">deldescendants</strong> :multinameIndex(U30)</div>
+				<div class="short-description">Delete descendants</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x6A</span> <strong class="instruction-name">deleteproperty</strong> property:multinameIndex(U30)</div>
+				<div class="short-description">Delete property</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, [ns], [name]</span><span class="stack-to"> ➞ </span><span class="stack-after">..., boolResult</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-undocumented instruction-flag-unknownStack"><div class="instruction-signature"><span class="instruction-code">0x6B</span> <strong class="instruction-name">deletepropertylate</strong></div>
+				<div class="short-description">Delete property (stack based)</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xA3</span> <strong class="instruction-name">divide</strong></div>
+				<div class="short-description">Divide two values</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-es4NumericsMinor instruction-flag-noFlashPlayer"><div class="instruction-signature"><span class="instruction-code">0xB8</span> <strong class="instruction-name">divide_p</strong> numberContext(U30)</div>
+				<div class="short-description">Divide two values using number context</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-es4NumericsMinor">ES4 numerics (ABC minor 17)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-undocumented instruction-flag-unknownOperands instruction-flag-unknownStack instruction-flag-noFlashPlayer"><div class="instruction-signature"><span class="instruction-code">0xFB</span> <strong class="instruction-name">doubletoatom</strong> ???
+				</div>
+				<div class="short-description">Double to atom</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x2A</span> <strong class="instruction-name">dup</strong></div>
+				<div class="short-description">Duplicate value on stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value, value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x06</span> <strong class="instruction-name">dxns</strong> uriString:stringIndex(U30)</div>
+				<div class="short-description">Set default XML namespace</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x07</span> <strong class="instruction-name">dxnslate</strong></div>
+				<div class="short-description">Set default XML namespace at runtime</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., uriValue</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xAB</span> <strong class="instruction-name">equals</strong></div>
+				<div class="short-description">Compare two values</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., booleanResult</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x72</span> <strong class="instruction-name">esc_xattr</strong></div>
+				<div class="short-description">Escape XML attribute</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., stringValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x71</span> <strong class="instruction-name">esc_xelem</strong></div>
+				<div class="short-description">Escape XML element</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., stringValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x5F</span> <strong class="instruction-name">finddef</strong> property:multinameIndex(U30)</div>
+				<div class="short-description">Search script level definition</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., [ns], [name]</span><span class="stack-to"> ➞ </span><span class="stack-after">..., obj</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x5E</span> <strong class="instruction-name">findproperty</strong> property:multinameIndex(U30)</div>
+				<div class="short-description">Search property in scope stack, top object when not found</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., [ns], [name]</span><span class="stack-to"> ➞ </span><span class="stack-after">..., obj</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-unknownStack"><div class="instruction-signature"><span class="instruction-code">0x5C</span> <strong class="instruction-name">findpropglobal</strong> property:multinameIndex(U30)</div>
+				<div class="short-description">Search property in global scope</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x5D</span> <strong class="instruction-name">findpropstrict</strong> property:multinameIndex(U30)</div>
+				<div class="short-description">Search property in scope stack, error when not found</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., [ns], [name]</span><span class="stack-to"> ➞ </span><span class="stack-after">..., obj</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x59</span> <strong class="instruction-name">getdescendants</strong> operand1:multinameIndex(U30)</div>
+				<div class="short-description">Get descendants</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, [ns], [name]</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x64</span> <strong class="instruction-name">getglobalscope</strong></div>
+				<div class="short-description">Get global scope</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., obj</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x6E</span> <strong class="instruction-name">getglobalslot</strong> slotIndex(U30)</div>
+				<div class="short-description">Get value of slot on global scope</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x60</span> <strong class="instruction-name">getlex</strong> property:multinameIndex(U30)</div>
+				<div class="short-description">Find and get property</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., obj</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x62</span> <strong class="instruction-name">getlocal</strong> localRegIndex(U30)</div>
+				<div class="short-description">Get local register value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xD0</span> <strong class="instruction-name">getlocal_0</strong></div>
+				<div class="short-description">Get local register 0</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xD1</span> <strong class="instruction-name">getlocal_1</strong></div>
+				<div class="short-description">Get local register 1</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xD2</span> <strong class="instruction-name">getlocal_2</strong></div>
+				<div class="short-description">Get local register 2</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xD3</span> <strong class="instruction-name">getlocal_3</strong></div>
+				<div class="short-description">Get local register 3</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x67</span> <strong class="instruction-name">getouterscope</strong> allLevelScopeIndex:scopeIndex(U30)</div>
+				<div class="short-description">Get scope object on all levels</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., obj</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x66</span> <strong class="instruction-name">getproperty</strong> property:multinameIndex(U30)</div>
+				<div class="short-description">Get property</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, [ns], [name]</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x65</span> <strong class="instruction-name">getscopeobject</strong> scopeIndex(U30)</div>
+				<div class="short-description">Get scope object</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., obj</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x6C</span> <strong class="instruction-name">getslot</strong> slotIndex(U30)</div>
+				<div class="short-description">Get value of a slot</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x04</span> <strong class="instruction-name">getsuper</strong> parentClassMultiname:multinameIndex(U30)</div>
+				<div class="short-description">Get parent class property</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, [ns], [name]</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xB0</span> <strong class="instruction-name">greaterequals</strong></div>
+				<div class="short-description">Check that value is greater or equal than other value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., booleanResult</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xAF</span> <strong class="instruction-name">greaterthan</strong></div>
+				<div class="short-description">Check that value is greater or equal than other value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., booleanResult</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x1F</span> <strong class="instruction-name">hasnext</strong></div>
+				<div class="short-description">Check if the object has more properties</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, currentIndex</span><span class="stack-to"> ➞ </span><span class="stack-after">..., nextIndex</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x32</span> <strong class="instruction-name">hasnext2</strong> objectReg:localRegIndex(U30), indexReg:localRegIndex(U30)</div>
+				<div class="short-description">Check if the object has more properties (register based)</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., boolValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x13</span> <strong class="instruction-name">ifeq</strong> branchTarget:offset(S24)</div>
+				<div class="short-description">Branch if equal</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x12</span> <strong class="instruction-name">iffalse</strong> branchTarget:offset(S24)</div>
+				<div class="short-description">Branch if false</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x18</span> <strong class="instruction-name">ifge</strong> branchTarget:offset(S24)</div>
+				<div class="short-description">Branch if greater or equal</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x17</span> <strong class="instruction-name">ifgt</strong> branchTarget:offset(S24)</div>
+				<div class="short-description">Branch if greater than</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x16</span> <strong class="instruction-name">ifle</strong> branchTarget:offset(S24)</div>
+				<div class="short-description">Branch if lower or equal</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x15</span> <strong class="instruction-name">iflt</strong> branchTarget:offset(S24)</div>
+				<div class="short-description">Branch if lower than</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x14</span> <strong class="instruction-name">ifne</strong> branchTarget:offset(S24)</div>
+				<div class="short-description">Branch if not equal</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x0F</span> <strong class="instruction-name">ifnge</strong> branchTarget:offset(S24)</div>
+				<div class="short-description">Branch if not greater ot equal</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x0E</span> <strong class="instruction-name">ifngt</strong> branchTarget:offset(S24)</div>
+				<div class="short-description">Branch if not greater than</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x0D</span> <strong class="instruction-name">ifnle</strong> branchTarget:offset(S24)</div>
+				<div class="short-description">Branch if not lower or equal</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x0C</span> <strong class="instruction-name">ifnlt</strong> branchTarget:offset(S24)</div>
+				<div class="short-description">Branch if not lower than</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x19</span> <strong class="instruction-name">ifstricteq</strong> branchTarget:offset(S24)</div>
+				<div class="short-description">Branch if strict equal</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x1A</span> <strong class="instruction-name">ifstrictne</strong> branchTarget:offset(S24)</div>
+				<div class="short-description">Branch if not strict equal</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x11</span> <strong class="instruction-name">iftrue</strong> branchTarget:offset(S24)</div>
+				<div class="short-description">Branch if true</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xB4</span> <strong class="instruction-name">in</strong></div>
+				<div class="short-description">Check that object has named property</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., name, obj</span><span class="stack-to"> ➞ </span><span class="stack-after">..., booleanResult</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x92</span> <strong class="instruction-name">inclocal</strong> localRegister:localRegIndex(U30)</div>
+				<div class="short-description">Increment local register</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xC2</span> <strong class="instruction-name">inclocal_i</strong> localRegister:localRegIndex(U30)</div>
+				<div class="short-description">Increment local register integer value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-es4NumericsMinor instruction-flag-noFlashPlayer"><div class="instruction-signature"><span class="instruction-code">0x9D</span> <strong class="instruction-name">inclocal_p</strong> numberContext(U30), localRegister:localRegIndex(U30)</div>
+				<div class="short-description">Increment local register using number context</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-es4NumericsMinor">ES4 numerics (ABC minor 17)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x91</span> <strong class="instruction-name">increment</strong></div>
+				<div class="short-description">Increment value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., incrementedValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xC0</span> <strong class="instruction-name">increment_i</strong></div>
+				<div class="short-description">Increment integer value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., incrementedValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-es4NumericsMinor instruction-flag-noFlashPlayer"><div class="instruction-signature"><span class="instruction-code">0x9C</span> <strong class="instruction-name">increment_p</strong> numberContext(U30)</div>
+				<div class="short-description">Increment value using number context</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., incrementedValue</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-es4NumericsMinor">ES4 numerics (ABC minor 17)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x68</span> <strong class="instruction-name">initproperty</strong> property:multinameIndex(U30)</div>
+				<div class="short-description">Initialize property</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, [ns], [name], value</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xB1</span> <strong class="instruction-name">instanceof</strong></div>
+				<div class="short-description">Check that type exists in object prototype chain</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value, type</span><span class="stack-to"> ➞ </span><span class="stack-after">..., booleanResult</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-unknownOperands instruction-flag-unknownStack instruction-flag-undocumented"><div class="instruction-signature"><span class="instruction-code">0xED</span> <strong class="instruction-name">invalid</strong> ???
+				</div>
+				<div class="short-description">Invalid</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xB2</span> <strong class="instruction-name">istype</strong> type:multinameIndex(U30)</div>
+				<div class="short-description">Check that object is of specified type</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., booleanResult</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xB3</span> <strong class="instruction-name">istypelate</strong></div>
+				<div class="short-description">Check that object is of specified type (stack based)</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value, type</span><span class="stack-to"> ➞ </span><span class="stack-after">..., booleanResult</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x10</span> <strong class="instruction-name">jump</strong> location:offset(S24)</div>
+				<div class="short-description">Jump to location</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x08</span> <strong class="instruction-name">kill</strong> killedRegister:localRegIndex(U30)</div>
+				<div class="short-description">Kill local register</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x09</span> <strong class="instruction-name">label</strong></div>
+				<div class="short-description">Target of a branch</div>
+				<div class="description"><strong class="description-title">Description: </strong>Just a mark that this is target of following branch</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xAE</span> <strong class="instruction-name">lessequals</strong></div>
+				<div class="short-description">Check that value is less or equal than other value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., booleanResult</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xAD</span> <strong class="instruction-name">lessthan</strong></div>
+				<div class="short-description">Check that value is less than other value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., booleanResult</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-domainMemory"><div class="instruction-signature"><span class="instruction-code">0x38</span> <strong class="instruction-name">lf32</strong></div>
+				<div class="short-description">Load 32bit float value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., address</span><span class="stack-to"> ➞ </span><span class="stack-after">..., float32Value</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-domainMemory">Domain memory operation</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-domainMemory instruction-flag-floatMajor"><div class="instruction-signature"><span class="instruction-code">0x0A</span> <strong class="instruction-name">lf32x4</strong></div>
+				<div class="short-description">Load 32bit float4</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., address</span><span class="stack-to"> ➞ </span><span class="stack-after">..., float4Value</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-floatMajor">Float values (ABC major 47)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+					<li class="flag flag-domainMemory">Domain memory operation</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-domainMemory"><div class="instruction-signature"><span class="instruction-code">0x39</span> <strong class="instruction-name">lf64</strong></div>
+				<div class="short-description">Load 64bit float value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., address</span><span class="stack-to"> ➞ </span><span class="stack-after">..., float64Value</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-domainMemory">Domain memory operation</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-domainMemory"><div class="instruction-signature"><span class="instruction-code">0x36</span> <strong class="instruction-name">li16</strong></div>
+				<div class="short-description">Load 16bit integer value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., address</span><span class="stack-to"> ➞ </span><span class="stack-after">..., int16Value</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-domainMemory">Domain memory operation</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-domainMemory"><div class="instruction-signature"><span class="instruction-code">0x37</span> <strong class="instruction-name">li32</strong></div>
+				<div class="short-description">Load 32bit integer value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., address</span><span class="stack-to"> ➞ </span><span class="stack-after">..., int32Value</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-domainMemory">Domain memory operation</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-domainMemory"><div class="instruction-signature"><span class="instruction-code">0x35</span> <strong class="instruction-name">li8</strong></div>
+				<div class="short-description">Load 8bit integer value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., address</span><span class="stack-to"> ➞ </span><span class="stack-after">..., int8Value</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-domainMemory">Domain memory operation</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x1B</span> <strong class="instruction-name">lookupswitch</strong> defaultTarget:caseBaseoffset(S24), caseCount:number(U30), case0Target:offset(S24), case1Target:offset(S24), ...</div>
+				<div class="short-description">Branch based on index</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., index</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xA5</span> <strong class="instruction-name">lshift</strong></div>
+				<div class="short-description">Bitwise left shift</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-undocumented instruction-flag-unknownStack instruction-flag-unknownOperands"><div class="instruction-signature"><span class="instruction-code">0xF7</span> <strong class="instruction-name">mark</strong> ???
+				</div>
+				<div class="short-description">Mark</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xA4</span> <strong class="instruction-name">modulo</strong></div>
+				<div class="short-description">Modulo divide two values</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-es4NumericsMinor"><div class="instruction-signature"><span class="instruction-code">0xB9</span> <strong class="instruction-name">modulo_p</strong> numberContext(U30)</div>
+				<div class="short-description">Modulo divide two values using number context</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-es4NumericsMinor">ES4 numerics (ABC minor 17)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xA2</span> <strong class="instruction-name">multiply</strong></div>
+				<div class="short-description">Multiply two values</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xC7</span> <strong class="instruction-name">multiply_i</strong></div>
+				<div class="short-description">Multiply two integer values</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-es4NumericsMinor"><div class="instruction-signature"><span class="instruction-code">0xB7</span> <strong class="instruction-name">multiply_p</strong> numberContext(U30)</div>
+				<div class="short-description">Multiply two values using number context</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-es4NumericsMinor">ES4 numerics (ABC minor 17)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x90</span> <strong class="instruction-name">negate</strong></div>
+				<div class="short-description">Negate value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., -value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xC4</span> <strong class="instruction-name">negate_i</strong></div>
+				<div class="short-description">Negate integer value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., -value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-es4NumericsMinor"><div class="instruction-signature"><span class="instruction-code">0x8F</span> <strong class="instruction-name">negate_p</strong> operand1:numberContext(U30)</div>
+				<div class="short-description">Negate value using number context</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., -value</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-es4NumericsMinor">ES4 numerics (ABC minor 17)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x57</span> <strong class="instruction-name">newactivation</strong></div>
+				<div class="short-description">Creates new activation object</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., newActivation</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x56</span> <strong class="instruction-name">newarray</strong> valueCount:argCount(U30)</div>
+				<div class="short-description">Creates new array</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2, ..., valueN</span><span class="stack-to"> ➞ </span><span class="stack-after">..., newArray</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x5A</span> <strong class="instruction-name">newcatch</strong> exception:exceptionIndex(U30)</div>
+				<div class="short-description">Create new catch scope</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., catchScope</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x58</span> <strong class="instruction-name">newclass</strong> class:classIndex(U30)</div>
+				<div class="short-description">Creates new class</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., baseType</span><span class="stack-to"> ➞ </span><span class="stack-after">..., newClass</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x40</span> <strong class="instruction-name">newfunction</strong> method:methodIndex(U30)</div>
+				<div class="short-description">Create new Function object</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., function</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x55</span> <strong class="instruction-name">newobject</strong> propertyCount:argCount(U30)</div>
+				<div class="short-description">Creates new object</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., name1, value1, name2, value2, ..., nameN, valueN</span><span class="stack-to"> ➞ </span><span class="stack-after">..., newObject</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x1E</span> <strong class="instruction-name">nextname</strong></div>
+				<div class="short-description">Get name of next property</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, index</span><span class="stack-to"> ➞ </span><span class="stack-after">..., name</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x23</span> <strong class="instruction-name">nextvalue</strong></div>
+				<div class="short-description">Get value of next property</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, index</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x02</span> <strong class="instruction-name">nop</strong></div>
+				<div class="short-description">No operation</div>
+				<div class="description"><strong class="description-title">Description: </strong>Does nothing</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x96</span> <strong class="instruction-name">not</strong></div>
+				<div class="short-description">Boolean negate</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., !value</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x29</span> <strong class="instruction-name">pop</strong></div>
+				<div class="short-description">Pop top value from stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x1D</span> <strong class="instruction-name">popscope</strong></div>
+				<div class="short-description">Pop from scope stack and discard value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-unknownStack instruction-flag-unknownOperands instruction-flag-undocumented"><div class="instruction-signature"><span class="instruction-code">0xF9</span> <strong class="instruction-name">prologue</strong> ???
+				</div>
+				<div class="short-description">Prologue</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x24</span> <strong class="instruction-name">pushbyte</strong> value:S8</div>
+				<div class="short-description">Push byte value on stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., byteValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-undocumented instruction-flag-unknownStack"><div class="instruction-signature"><span class="instruction-code">0x22</span> <strong class="instruction-name">pushconstant</strong> value:U30</div>
+				<div class="short-description">Push constant value on stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-es4NumericsMinor"><div class="instruction-signature"><span class="instruction-code">0x33</span> <strong class="instruction-name">pushdecimal</strong> value:decimalIndex(U30)</div>
+				<div class="short-description">Push decimal value on the stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., decimalValue</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-es4NumericsMinor">ES4 numerics (ABC minor 17)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-es4NumericsMinor instruction-flag-unknownStack"><div class="instruction-signature"><span class="instruction-code">0x34</span> <strong class="instruction-name">pushdnan</strong></div>
+				<div class="short-description">Push decimal NaN value on the stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-es4NumericsMinor">ES4 numerics (ABC minor 17)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x2F</span> <strong class="instruction-name">pushdouble</strong> value:doubleIndex(U30)</div>
+				<div class="short-description">Push double precision value on the stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., doubleValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x27</span> <strong class="instruction-name">pushfalse</strong></div>
+				<div class="short-description">Push false on stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., false</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-floatMajor"><div class="instruction-signature"><span class="instruction-code">0x22</span> <strong class="instruction-name">pushfloat</strong> float:floatIndex(U30)</div>
+				<div class="short-description">Push float value on stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., floatValue</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-floatMajor">Float values (ABC major 47)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-floatMajor"><div class="instruction-signature"><span class="instruction-code">0x54</span> <strong class="instruction-name">pushfloat4</strong> float4:float4Index(U30)</div>
+				<div class="short-description">Push float4 value on the stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., float4Value</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-floatMajor">Float values (ABC major 47)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x2D</span> <strong class="instruction-name">pushint</strong> value:intIndex(U30)</div>
+				<div class="short-description">Push integer value on the stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., intValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x31</span> <strong class="instruction-name">pushnamespace</strong> value:namespaceIndex(U30)</div>
+				<div class="short-description">Push namespace on the stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., namespace</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x28</span> <strong class="instruction-name">pushnan</strong></div>
+				<div class="short-description">Push NaN value on stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., NaN</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x20</span> <strong class="instruction-name">pushnull</strong></div>
+				<div class="short-description">Push null value on stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., null</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x30</span> <strong class="instruction-name">pushscope</strong></div>
+				<div class="short-description">Push object on the scope stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x25</span> <strong class="instruction-name">pushshort</strong> value:S16</div>
+				<div class="short-description">Push short value on stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., shortValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x2C</span> <strong class="instruction-name">pushstring</strong> value:stringIndex(U30)</div>
+				<div class="short-description">Push string value on the stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., stringValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x26</span> <strong class="instruction-name">pushtrue</strong></div>
+				<div class="short-description">Push true on stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., true</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x2E</span> <strong class="instruction-name">pushuint</strong> value:uintIndex(U30)</div>
+				<div class="short-description">Push unsigned integer value on the stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., uintValue</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x21</span> <strong class="instruction-name">pushundefined</strong></div>
+				<div class="short-description">Push undefined value on stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">..., undefined</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x1C</span> <strong class="instruction-name">pushwith</strong></div>
+				<div class="short-description">Push with onto scope stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., withScope</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x48</span> <strong class="instruction-name">returnvalue</strong></div>
+				<div class="short-description">Return value from a method</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x47</span> <strong class="instruction-name">returnvoid</strong></div>
+				<div class="short-description">Return from a method</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xA6</span> <strong class="instruction-name">rshift</strong></div>
+				<div class="short-description">Bitwise right shift</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-undocumented instruction-flag-unknownOperands instruction-flag-unknownStack"><div class="instruction-signature"><span class="instruction-code">0xFA</span> <strong class="instruction-name">sendenter</strong> ???
+				</div>
+				<div class="short-description">Send enter</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x6F</span> <strong class="instruction-name">setglobalslot</strong> slotIndex(U30)</div>
+				<div class="short-description">Set value of slot on global scope</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x63</span> <strong class="instruction-name">setlocal</strong> localRegIndex(U30)</div>
+				<div class="short-description">Set local register value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xD4</span> <strong class="instruction-name">setlocal_0</strong></div>
+				<div class="short-description">Set local register 0</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xD5</span> <strong class="instruction-name">setlocal_1</strong></div>
+				<div class="short-description">Set local register 1</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xD6</span> <strong class="instruction-name">setlocal_2</strong></div>
+				<div class="short-description">Set local register 2</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xD7</span> <strong class="instruction-name">setlocal_3</strong></div>
+				<div class="short-description">Set local register 3</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x61</span> <strong class="instruction-name">setproperty</strong> property:multinameIndex(U30)</div>
+				<div class="short-description">Set property</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, [ns], [name], value</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-unknownOperands instruction-flag-unknownStack instruction-flag-undocumented"><div class="instruction-signature"><span class="instruction-code">0x69</span> <strong class="instruction-name">setpropertylate</strong> ???
+				</div>
+				<div class="short-description">Set property (stack based)</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x6D</span> <strong class="instruction-name">setslot</strong> slotIndex(U30)</div>
+				<div class="short-description">Set value of a slot</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, value</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x05</span> <strong class="instruction-name">setsuper</strong> parentClassMultiname:multinameIndex(U30)</div>
+				<div class="short-description">Set parent class property</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., obj, [ns], [name], value</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-domainMemory"><div class="instruction-signature"><span class="instruction-code">0x3D</span> <strong class="instruction-name">sf32</strong></div>
+				<div class="short-description">Store 32bit float value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value, address</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-domainMemory">Domain memory operation</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-domainMemory instruction-flag-floatMajor"><div class="instruction-signature"><span class="instruction-code">0x0B</span> <strong class="instruction-name">sf32x4</strong></div>
+				<div class="short-description">Store 32bit float4</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., float4Value, address</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-floatMajor">Float values (ABC major 47)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+					<li class="flag flag-domainMemory">Domain memory operation</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-domainMemory"><div class="instruction-signature"><span class="instruction-code">0x3E</span> <strong class="instruction-name">sf64</strong></div>
+				<div class="short-description">Store 64bit float value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value, address</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-domainMemory">Domain memory operation</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-domainMemory"><div class="instruction-signature"><span class="instruction-code">0x3B</span> <strong class="instruction-name">si16</strong></div>
+				<div class="short-description">Store 16bit integer value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value, address</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-domainMemory">Domain memory operation</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-domainMemory"><div class="instruction-signature"><span class="instruction-code">0x3C</span> <strong class="instruction-name">si32</strong></div>
+				<div class="short-description">Store 32bit integer value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value, address</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-domainMemory">Domain memory operation</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-domainMemory"><div class="instruction-signature"><span class="instruction-code">0x3A</span> <strong class="instruction-name">si8</strong></div>
+				<div class="short-description">Store 8bit integer value</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value, address</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-domainMemory">Domain memory operation</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xAC</span> <strong class="instruction-name">strictequals</strong></div>
+				<div class="short-description">Strict compare two values</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., booleanResult</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xA1</span> <strong class="instruction-name">subtract</strong></div>
+				<div class="short-description">Subtract two values</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xC6</span> <strong class="instruction-name">subtract_i</strong></div>
+				<div class="short-description">Subtract two integer values</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-es4NumericsMinor instruction-flag-noFlashPlayer"><div class="instruction-signature"><span class="instruction-code">0xB6</span> <strong class="instruction-name">subtract_p</strong> numberContext(U30)</div>
+				<div class="short-description">Subtract two values using number context</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-es4NumericsMinor">ES4 numerics (ABC minor 17)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x2B</span> <strong class="instruction-name">swap</strong></div>
+				<div class="short-description">Swap two values on top of the stack</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value2, value1</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-unknownOperands instruction-flag-unknownStack instruction-flag-undocumented"><div class="instruction-signature"><span class="instruction-code">0xFC</span> <strong class="instruction-name">sweep</strong> ???
+				</div>
+				<div class="short-description">Sweep</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-domainMemory"><div class="instruction-signature"><span class="instruction-code">0x50</span> <strong class="instruction-name">sxi1</strong></div>
+				<div class="short-description">Sign extend 1bit value to 32bits</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., valueExtended</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-domainMemory">Domain memory operation</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-domainMemory"><div class="instruction-signature"><span class="instruction-code">0x52</span> <strong class="instruction-name">sxi16</strong></div>
+				<div class="short-description">Sign extend 16bit value to 32bits</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., valueExtended</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-domainMemory">Domain memory operation</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-domainMemory"><div class="instruction-signature"><span class="instruction-code">0x51</span> <strong class="instruction-name">sxi8</strong></div>
+				<div class="short-description">Sign extend 8bit value to 32bits</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., valueExtended</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-domainMemory">Domain memory operation</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x03</span> <strong class="instruction-name">throw</strong></div>
+				<div class="short-description">Throw exception</div>
+				<div class="description"><strong class="description-title">Description: </strong>Pops value off the stack and throws it</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-undocumented"><div class="instruction-signature"><span class="instruction-code">0xF3</span> <strong class="instruction-name">timestamp</strong></div>
+				<div class="short-description">Timestamp</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">...</span><span class="stack-to"> ➞ </span><span class="stack-after">...</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0x95</span> <strong class="instruction-name">typeof</strong></div>
+				<div class="short-description">Get name of value type</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., typeName</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-floatMajor instruction-flag-noFlashPlayer"><div class="instruction-signature"><span class="instruction-code">0x7A</span> <strong class="instruction-name">unplus</strong></div>
+				<div class="short-description">Unary plus - coerce to numeric</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value</span></span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-floatMajor">Float values (ABC major 47)</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction"><div class="instruction-signature"><span class="instruction-code">0xA7</span> <strong class="instruction-name">urshift</strong></div>
+				<div class="short-description">Unsigned bitwise right shift</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values "><span class="stack-before">..., value1, value2</span><span class="stack-to"> ➞ </span><span class="stack-after">..., value3</span></span></div>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-unknownOperands instruction-flag-unknownStack instruction-flag-undocumented"><div class="instruction-signature"><span class="instruction-code">0xFE</span> <strong class="instruction-name">verifyop</strong> ???
+				</div>
+				<div class="short-description">VerifyOp</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-undocumented instruction-flag-unknownOperands instruction-flag-unknownStack"><div class="instruction-signature"><span class="instruction-code">0xF5</span> <strong class="instruction-name">verifypass</strong> ???
+				</div>
+				<div class="short-description">Verify pass</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+			<li class="instruction-item">
+				<div class="instruction instruction-flag-noFlashPlayer instruction-flag-undocumented instruction-flag-unknownOperands instruction-flag-unknownStack"><div class="instruction-signature"><span class="instruction-code">0xF8</span> <strong class="instruction-name">wb</strong> ???
+				</div>
+				<div class="short-description">Wb</div>
+				<div class="stack"><strong class="stack-title">Stack: </strong><span class="stack-values  unknown">???</span></div>
+				<strong class="flags-title">Flags: </strong><br />
+				<ul class="flags">
+					<li class="flag flag-undocumented">Undocumented</li>
+					<li class="flag flag-unknownStack">Unknown stack</li>
+					<li class="flag flag-unknownOperands">Unknown operands</li>
+					<li class="flag flag-noFlashPlayer">Not in standard Flash Player</li>
+				</ul>
+				</div>
+			</li>
+		</ul>
+	</body>
+</html>
