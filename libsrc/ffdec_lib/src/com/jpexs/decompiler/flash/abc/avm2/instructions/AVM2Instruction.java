@@ -72,6 +72,9 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     @Override
     public long getLineOffset() {
+        if (virtualAddress > -1) {
+            return virtualAddress;
+        }
         return getAddress();
     }
 

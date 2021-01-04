@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - Scaling - Distorted images/canvas on Hi-dpi monitors for Java 9 and later
 - Radial gradients focal point reading/writing
 - Correct AS/P-code matching in editor for AS3 after using deobfuscation
+- Correct line matching in debugger of AS3 after using deobfuscation
 
 ## [11.3.0] - 2020-04-25
 ### Added
