@@ -2937,4 +2937,10 @@ public class AVM2Code implements Cloneable {
             throw new RuntimeException();
         }
     }
+
+    public void markVirtualAddresses() {
+        for (AVM2Instruction ins : code) {
+            ins.setVirtualAddress(ins.getAddress());
+        }
+    }
 }
