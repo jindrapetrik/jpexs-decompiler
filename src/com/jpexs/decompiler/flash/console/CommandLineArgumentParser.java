@@ -443,7 +443,6 @@ public class CommandLineArgumentParser {
             out.println("  ...Decompress <infile> and save it to <outfile>");
         }
 
-        /* UNAVAILABLE IN JAVA9+
         if (filter == null || filter.equals("swf2xml")) {
             out.println(" " + (cnt++) + ") -swf2xml <infile> <outfile>");
             out.println("  ...Converts the <infile> SWF to <outfile> XML file");
@@ -452,7 +451,7 @@ public class CommandLineArgumentParser {
         if (filter == null || filter.equals("xml2swf")) {
             out.println(" " + (cnt++) + ") -xml2swf <infile> <outfile>");
             out.println("  ...Converts the <infile> XML to <outfile> SWF file");
-        }*/
+        }
 
         if (filter == null || filter.equals("extract")) {
             out.println(" " + (cnt++) + ") -extract <infile> [-o <outpath>|<outfile>] [nocheck] [(all|biggest|smallest|first|last)]");
@@ -894,12 +893,11 @@ public class CommandLineArgumentParser {
             parseCompress(args);
         } else if (command.equals("decompress")) {
             parseDecompress(args);
-        } else/*  UNAVAILABLE IN JAVA9+
-            if (command.equals("swf2xml")) {
+        } else if (command.equals("swf2xml")) {
             parseSwf2Xml(args);
         } else if (command.equals("xml2swf")) {
             parseXml2Swf(args);
-        } else*/ if (command.equals("extract")) {
+        } else if (command.equals("extract")) {
             parseExtract(args);
         } else if (command.equals("memorysearch")) {
             parseMemorySearch(args);

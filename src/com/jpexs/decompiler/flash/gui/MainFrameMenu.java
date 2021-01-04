@@ -724,13 +724,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/file/export/exportFla", swfSelected && !isWorking);
         setMenuEnabled("_/exportSelected", swfSelected && !isWorking);
         setMenuEnabled("/file/export/exportSelected", swfSelected && !isWorking);
-        setMenuEnabled("/file/export/exportXml", false /*NOT AVAILABLE IN JAVA9+*/); //swfSelected && !isWorking);
+        setMenuEnabled("/file/export/exportXml", swfSelected && !isWorking);
 
         setMenuEnabled("/file/import", swfSelected);
         setMenuEnabled("/file/import/importText", swfSelected && !isWorking);
         setMenuEnabled("/file/import/importScript", swfSelected && !isWorking);
         setMenuEnabled("/file/import/importSymbolClass", swfSelected && !isWorking);
-        setMenuEnabled("/file/import/importXml", false /*NOT AVAILABLE IN JAVA9+*/); //swfSelected && !isWorking);
+        setMenuEnabled("/file/import/importXml", swfSelected && !isWorking);
 
         setMenuEnabled("/tools/deobfuscation", swfSelected);
         setMenuEnabled("/tools/deobfuscation/renameOneIdentifier", swfSelected && !isWorking);

@@ -285,9 +285,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         } else if (installedFontsByFamily.containsKey("Arial")) {
             defaultFontName = "Arial";
         } else {
-            //NOT AVAILABLE SINCE JAVA9+
-            //defaultFontName = installedFontsByFamily.keySet().iterator().next();
-            defaultFontName = "Dialog";
+            defaultFontName = installedFontsByFamily.keySet().iterator().next();
         }
     }
 
