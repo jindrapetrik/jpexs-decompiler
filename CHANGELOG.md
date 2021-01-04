@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - Radial gradients focal point reading/writing
 - Correct AS/P-code matching in editor for AS3 after using deobfuscation
 - Correct line matching in debugger of AS3 after using deobfuscation
+- Concurrent access while in debugger
 
 ## [11.3.0] - 2020-04-25
 ### Added
