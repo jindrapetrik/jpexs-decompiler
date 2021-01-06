@@ -206,7 +206,7 @@
     <target name="-load-version" depends="-check-versionfile-exists,-load-version-file,-load-version-private"> 
         <property name="version" value="${version.major}.${version.minor}.${version.release}" />
         <property name="version.number" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
-        <script language="javascript">
+        <script language="beanshell" classpathref="ant.lib.classpath">
             
             if(project.getProperty("version.major")=="0") {
                 project.setProperty("private",true);                
@@ -285,16 +285,12 @@
                 <globmapper from="*" to="/*"/>
             </chainedmapper>
         </pathconvert>
-        <script language="javascript"><![CDATA[
-        var classpath = project.getProperty("lexers");
-        // + '' converts from a Java string to a JavaScript string, in order
-        // to have .split() behave predictably on all installations.
-        // Otherwise, some versions of ANT will treat it's argument as a regex
-        // while others will not.
-        var parts = (classpath + '').split('|');
-        for each (var part in parts) {
+        <script language="beanshell" classpathref="ant.lib.classpath"><![CDATA[
+        String classpath = project.getProperty("lexers");
+        String[] parts = (classpath + "").split("\\|");
+        for (String part : parts) {
             project.setProperty("lexer",project.getProperty("lexers.dir")+part);
-            self.project.executeTarget("-lexer");
+            project.executeTarget("-lexer");
         }
     ]]></script>
     </target>

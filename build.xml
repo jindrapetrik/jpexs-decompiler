@@ -65,9 +65,9 @@
         <loadproperties srcfile="${version_info}" prefix="version"/> 
         <property name="version" value="${version.major}.${version.minor}.${version.release}" />
         <property name="version.number" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
-        <script language="javascript">
+        <script language="beanshell" classpathref="ant.lib.classpath">
             if(project.getProperty("version.debug")=="true"){
-            project.setProperty("nightly",true);
+                project.setProperty("nightly",true);
             }
         </script>
         <echo level="info" message="Loaded Version:${version.major}.${version.minor}.${version.release}.${version.build}"/>
