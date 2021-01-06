@@ -208,10 +208,10 @@
         <property name="version.number" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
         <script language="beanshell" classpathref="ant.lib.classpath">
             
-            if(project.getProperty("version.major")=="0") {
-                project.setProperty("private",true);                
-            } else if(project.getProperty("version.debug")=="true") {
-                project.setProperty("nightly",true);
+            if("0".equals(project.getProperty("version.major"))) {
+                project.setProperty("private","true");                
+            } else if("true".equals("" + project.getProperty("version.debug"))) {
+                project.setProperty("nightly","true");
             }
         </script>                 
     </target>
