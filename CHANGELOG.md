@@ -25,6 +25,8 @@ All notable changes to this project will be documented in this file.
 - Correct line matching in debugger of AS3 after using deobfuscation
 - Concurrent access while in debugger
 - Correct body index for script initializer in P-code debugging
+- #1548 TTF export - correctly handle duplicate unicode codes
+- #1548 correctly handle empty generated file names
 
 ## [11.3.0] - 2020-04-25
 ### Added

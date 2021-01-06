@@ -843,13 +843,15 @@ public class Helper {
             }
         }
 
-        char lastChar = sb.charAt(sb.length() - 1);
-        if (lastChar == ' ') {
-            sb.setLength(sb.length() - 1);
-            sb.append("%20");
-        } else if (lastChar == '.') {
-            sb.setLength(sb.length() - 1);
-            sb.append("%2E");
+        if (!sb.isEmpty()) {
+            char lastChar = sb.charAt(sb.length() - 1);
+            if (lastChar == ' ') {
+                sb.setLength(sb.length() - 1);
+                sb.append("%20");
+            } else if (lastChar == '.') {
+                sb.setLength(sb.length() - 1);
+                sb.append("%2E");
+            }
         }
 
         str = sb.toString();
