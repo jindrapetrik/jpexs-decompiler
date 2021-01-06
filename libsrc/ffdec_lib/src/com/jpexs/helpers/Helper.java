@@ -843,7 +843,7 @@ public class Helper {
             }
         }
 
-        if (!sb.isEmpty()) {
+        if (sb.length() > 0) {
             char lastChar = sb.charAt(sb.length() - 1);
             if (lastChar == ' ') {
                 sb.setLength(sb.length() - 1);
