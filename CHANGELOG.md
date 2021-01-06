@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - Correct body index for script initializer in P-code debugging
 - #1550 TTF export - correctly handle duplicate unicode codes
 - #1548 correctly handle empty generated file names
+- #1379 AS3 - better handling local registers postincrement/decrement
 
 ## [11.3.0] - 2020-04-25
 ### Added
