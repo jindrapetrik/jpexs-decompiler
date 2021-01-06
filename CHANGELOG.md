@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Increased scrolling speed in folder preview
 - Changed /bin/bash to /usr/bin/env bash
+- Building does not require Naashorn - uses Beanshell instead
 
 ### Fixed
 - Scaling - Distorted images/canvas on Hi-dpi monitors for Java 9 and later
@@ -23,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - Correct AS/P-code matching in editor for AS3 after using deobfuscation
 - Correct line matching in debugger of AS3 after using deobfuscation
 - Concurrent access while in debugger
+- Correct body index for script initializer in P-code debugging
 
 ## [11.3.0] - 2020-04-25
 ### Added
