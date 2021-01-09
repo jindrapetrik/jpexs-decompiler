@@ -43,7 +43,7 @@ public class SetGlobalSlotAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("setglobalslot");
+        writer.append("§§setglobalslot");
         writer.spaceBeforeCallParenthesies(2);
         writer.append("(");
         writer.append(slotId).append(",");
