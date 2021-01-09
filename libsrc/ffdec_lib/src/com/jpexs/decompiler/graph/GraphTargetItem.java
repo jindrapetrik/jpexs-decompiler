@@ -503,10 +503,37 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         visit(new AbstractGraphTargetVisitor() {
             @Override
             public void visit(GraphTargetItem item) {
+                if (item != null) {
+                    ret.add(item);
+                }
+            }
+        });
+        return ret;
+    }
+
+    public Set<GraphTargetItem> getAllSubItemsRecursively() {
+        Set<GraphTargetItem> ret = new HashSet<>();
+        visitRecursively(new AbstractGraphTargetVisitor() {
+            @Override
+            public void visit(GraphTargetItem item) {
                 ret.add(item);
             }
         });
         return ret;
+    }
+
+    public final void visitRecursively(GraphTargetVisitorInterface visitor) {
+        Set<GraphTargetItem> visitedItems = new HashSet<>();
+        visit(new AbstractGraphTargetVisitor() {
+            @Override
+            public void visit(GraphTargetItem item) {
+                if (item != null && !visitedItems.contains(item)) {
+                    visitedItems.add(item);
+                    visitor.visit(item);
+                    item.visit(this);
+                }
+            }
+        });
     }
 
     public void visit(GraphTargetVisitorInterface visitor) {
