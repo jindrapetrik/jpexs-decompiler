@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - Increased scrolling speed in folder preview
 - Changed /bin/bash to /usr/bin/env bash
 - Building does not require Naashorn - uses Beanshell instead
+- Use object.§§slot[index] syntax instead of /* UnknownSlot */ comment when slot cannot be determined (AS3)
 
 ### Fixed
 - Scaling - Distorted images/canvas on Hi-dpi monitors for Java 9 and later
