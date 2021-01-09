@@ -131,6 +131,7 @@ public class PcodeGraphVizExporter {
                 }
             }
             String labelStr = blkCodeBuilder.toString();
+            labelStr = labelStr.replace("\\", "\\\\");
             labelStr = labelStr.replace("\"", "\\\"");
             labelStr = labelStr.replace("\r\n", "\\l");
             String partBlockName = getBlockName(graphSource, part);

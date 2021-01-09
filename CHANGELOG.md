@@ -31,6 +31,7 @@ All notable changes to this project will be documented in this file.
 - #1548 correctly handle empty generated file names
 - #1379 AS3 - better handling local registers postincrement/decrement
 - Better unresolved if handling
+- Escaping in P-code Graphviz exporter (Problems with graphs containing backslash strings)
 
 ## [11.3.0] - 2020-04-25
 ### Added
