@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -43,6 +44,12 @@ public class GetSlotAVM2Item extends AVM2Item {
         this.scope = scope;
         this.slotObject = slotObject;
         this.slotIndex = slotIndex;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(scope);
+        visitor.visit(slotObject);
     }
 
     @Override

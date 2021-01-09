@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -41,6 +42,12 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
     public GraphTargetItem slotObject;
 
     public int slotIndex;
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(scope);
+        visitor.visit(slotObject);
+    }
 
     @Override
     public DeclarationAVM2Item getDeclaration() {

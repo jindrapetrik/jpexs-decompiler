@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
@@ -21,6 +22,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -68,6 +70,16 @@ public class FullMultinameAVM2Item extends AVM2Item {
         this.namespace = namespace;
         this.property = property;
         this.resolvedMultinameName = resolvedMultinameName;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        if (name != null) {
+            visitor.visit(name);
+        }
+        if (namespace != null) {
+            visitor.visit(namespace);
+        }
     }
 
     public boolean isRuntime() {
