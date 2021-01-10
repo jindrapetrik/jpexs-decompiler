@@ -140,6 +140,7 @@ public class PcodeGraphVizExporter {
                 blkStyle = "shape=\"circle\"";
                 labelStr = "FINISH";
             }
+            labelStr = part.toString() + ":\\l" + labelStr;
             writer.append(partBlockName + " [" + blkStyle + " label=\"" + labelStr + "\"];\r\n");
             for (int n = 0; n < part.nextParts.size(); n++) {
                 GraphPart next = part.nextParts.get(n);

@@ -54,14 +54,17 @@ import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.UniversalLoopItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 /**
  *
@@ -85,6 +88,8 @@ public class Graph {
     private boolean debugPrintLoopList = false;
     private boolean debugGetLoops = false;
     private boolean debugPrintGraph = false;
+
+    private static Logger logger = Logger.getLogger(Graph.class.getName());
 
     public GraphSource getGraphCode() {
         return code;
@@ -680,7 +685,10 @@ public class Graph {
         }
 
         //TODO: Make getPrecontinues faster
-        getPrecontinues(path, localData, null, heads.get(0), allParts, loops, null);
+        getBackEdges(localData, loops);
+        //getPrecontinues(path, localData, null, heads.get(0), allParts, loops, null);
+        //getPrecontinues2(path, localData, null, heads.get(0), allParts, loops, null);
+        getPrecontinues3(path, localData, null, heads.get(0), allParts, loops);
 
         /*System.err.println("<loopspre>");
          for (Loop el : loops) {
@@ -692,6 +700,431 @@ public class Graph {
         finalProcessStack(stack, ret, path);
         finalProcessAll(ret, 0, new FinalProcessLocalData(loops), path);
         return ret;
+    }
+
+    private static class Edge {
+
+        public GraphPart from;
+        public GraphPart to;
+
+        public Edge(GraphPart from, GraphPart to) {
+            this.from = from;
+            this.to = to;
+        }
+
+        @Override
+        public String toString() {
+            return from.toString() + " -> " + to.toString();
+        }
+
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 37 * hash + Objects.hashCode(this.from);
+            hash = 37 * hash + Objects.hashCode(this.to);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final Edge other = (Edge) obj;
+            if (!Objects.equals(this.from, other.from)) {
+                return false;
+            }
+            if (!Objects.equals(this.to, other.to)) {
+                return false;
+            }
+            return true;
+        }
+
+    }
+
+    private List<GraphPart> getCommonPrefix(List<List<GraphPart>> listOfLists) {
+        List<GraphPart> result = new ArrayList<>();
+        if (listOfLists.isEmpty()) {
+            return result;
+        }
+
+        int maxlen = Integer.MAX_VALUE;
+        for (int j = 0; j < listOfLists.size(); j++) {
+            if (listOfLists.get(j).size() < maxlen) {
+                maxlen = listOfLists.get(j).size();
+            }
+        }
+        for (int i = 0; i < maxlen; i++) {
+            List<GraphPart> firstList = listOfLists.get(0);
+            for (int j = 1; j < listOfLists.size(); j++) {
+                if (!listOfLists.get(j).get(i).equals(firstList.get(i))) {
+                    return result;
+                }
+            }
+            result.add(firstList.get(i));
+        }
+        return result;
+    }
+
+    private GraphPart getDominator(GraphPart graphStart, GraphPart targetPart, List<Loop> loops) {
+        Set<GraphPart> refs = new LinkedHashSet<>();
+        List<GraphPart> parts = targetPart.refs;
+
+        List<List<GraphPart>> allPredecessorsLists = new ArrayList<>();
+        for (GraphPart part : parts) {
+            List<GraphPart> allPredecessors = new ArrayList<>();
+            getAllPredecessors(part, allPredecessors, loops, null);
+            //allRefs.addAll(allPredecessors);
+            logger.info("predecessors of part " + part + " are: " + pathToString(allPredecessors));
+            allPredecessorsLists.add(allPredecessors);
+        }
+        List<GraphPart> firstList = allPredecessorsLists.get(0);
+        GraphPart commonPart = null;
+        looppart:
+        for (GraphPart part : firstList) {
+            for (int i = 1; i < allPredecessorsLists.size(); i++) {
+                if (!allPredecessorsLists.get(i).contains(part)) {
+                    continue looppart;
+                }
+            }
+            logger.info("checking predeccessor " + part);
+            for (GraphPart part2 : parts) {
+                List<GraphPart> allPredecessors = new ArrayList<>();
+                getAllPredecessors(part2, allPredecessors, loops, part);
+                logger.info("predecessors of " + part2 + ": " + allPredecessors);
+                if (allPredecessors.contains(graphStart)) {
+                    logger.info("graphstart(" + graphStart + ") found, " + part + " will not be correct");
+                    continue looppart;
+                }
+            }
+
+            commonPart = part;
+
+            break;
+        }
+
+        return commonPart;
+    }
+
+    private void getAllPredecessors(GraphPart part, List<GraphPart> ret, List<Loop> loops, GraphPart ignored) {
+        List<GraphPart> toprocess = new ArrayList<>();
+        loopref:
+        for (GraphPart ref : part.refs) {
+            for (Loop el : loops) {
+                if (part.equals(el.loopContinue) && el.backEdges.contains(ref)) {
+                    continue loopref;
+                }
+            }
+            if (ref == ignored) {
+                continue;
+            }
+            if (!ret.contains(ref)) {
+                ret.add(0, ref);
+                toprocess.add(ref);
+            }
+        }
+        for (GraphPart ref : toprocess) {
+            getAllPredecessors(ref, ret, loops, ignored);
+        }
+    }
+
+    private void getPrecontinues3(String path, BaseLocalData localData, GraphPart parent, GraphPart startPart, Set<GraphPart> allParts, List<Loop> loops) {
+        if (!path.equals("classes.tests/ForTest1.test")) {
+            //return;
+        }
+        logger.info("GETTING precontinues of " + path + " =================");
+        Set<GraphPart> opened = new HashSet<>();
+        Set<GraphPart> closed = new HashSet<>();
+        Set<GraphPart> closedBranches = new HashSet<>();
+        Set<Edge> exitEdges = new HashSet<>();
+        Set<Edge> backEdges = new HashSet<>();
+        for (Loop el : loops) {
+            for (GraphPart g : el.backEdges) {
+                backEdges.add(new Edge(g, el.loopContinue));
+            }
+        }
+        Map<Edge, List<GraphPart>> edgeToBranches = new HashMap<>();
+        opened.add(startPart);
+        GraphPart start = startPart;
+        Stack<Edge> walkStack = new Stack<>();
+        walkStack.push(new Edge(startPart, startPart));
+        loopwalk:
+        while (!walkStack.isEmpty()) {
+            Edge e = walkStack.pop();
+            GraphPart p = e.to;
+            if (closed.contains(p)) {
+                logger.fine("part " + p + " is already closed, skipping");
+                continue;
+            }
+            logger.fine("processing " + p);
+            if (!edgeToBranches.containsKey(e)) {
+                edgeToBranches.put(e, new ArrayList<>());
+            }
+            List<GraphPart> branches = edgeToBranches.get(e);
+            if (p != start) {
+                List<GraphPart> refs = getUnicatePartList(p.refs);
+
+                List<List<GraphPart>> comparedPaths = new ArrayList<>();
+                List<Edge> comparedPathsEdges = new ArrayList<>();
+                for (GraphPart r : refs) {
+                    Edge re = new Edge(r, p);
+                    if (backEdges.contains(re)) {
+                        logger.fine("ref edge " + re + " is backedge, ignored");
+                        continue;
+                    }
+                    if (!edgeToBranches.containsKey(re)) {
+                        //edge not yet processed
+                        logger.fine("ref edge " + re + " NOT yet processed");
+                        continue loopwalk;
+                    } else {
+                        logger.fine("ref edge " + re + " already processed");
+                    }
+                    comparedPaths.add(edgeToBranches.get(re));
+                    comparedPathsEdges.add(re);
+
+                }
+                loopi:
+                for (int i = 0; i < comparedPaths.size(); i++) {
+                    for (int j = 0; j < comparedPaths.size(); j++) {
+                        if (i == j) {
+                            continue;
+                        }
+                        if (comparedPaths.get(i).equals(comparedPaths.get(j))) {
+                            //logger.info("paths match: " + comparedPaths.get(i));
+                            if (comparedPaths.get(i).isEmpty()) {
+                                //logger.info("path isempty, removing it ");
+                                comparedPaths.remove(i);
+                                comparedPathsEdges.remove(i);
+                                i--;
+                                continue loopi;
+                            }
+                            //remove last path component
+                            int last = i > j ? i : j;
+                            int first = i < j ? i : j;
+
+                            comparedPaths.get(first).remove(comparedPaths.get(first).size() - 1);
+                            comparedPaths.remove(last);
+                            comparedPathsEdges.remove(last);
+                            i = -1;
+                            continue loopi;
+                        }
+                    }
+                }
+                for (List<GraphPart> cp : comparedPaths) {
+                    logger.fine("- branches:" + pathToString(cp));
+                }
+                if (comparedPaths.size() > 1) {
+                    logger.fine("not a single path");
+                    List<GraphPart> prefix = getCommonPrefix(comparedPaths);
+                    Set<GraphPart> partsToClose = new HashSet<>();
+                    boolean isEndOfBlock = false;
+                    for (int i = 0; i < comparedPaths.size(); i++) {
+                        for (int j = prefix.size(); j < comparedPaths.get(i).size(); j++) {
+                            GraphPart partToClose = comparedPaths.get(i).get(j);
+                            Edge edgeToClose = comparedPathsEdges.get(i);
+                            if (!closedBranches.contains(partToClose)) {
+                                logger.info("on part " + p);
+                                logger.info("closing branch " + partToClose);
+                                partsToClose.add(partToClose);
+                            } else {
+                                logger.fine("probably break edge: " + edgeToClose);
+                                isEndOfBlock = true;
+                            }
+                        }
+                    }
+                    closedBranches.addAll(partsToClose);
+                    branches = prefix;
+                    if (!branches.isEmpty()) {
+                        branches.remove(branches.size() - 1);
+                    }
+
+                    if (isEndOfBlock) {
+                        //GraphPart blockStartPart = getDominator(startPart, p, loops);
+                        logger.info("found breaks to  to " + p);
+                    }
+
+                }
+
+            }
+
+            //filter out backedges           
+            List<GraphPart> nexts = new ArrayList<>();
+            for (GraphPart n : p.nextParts) {
+                Edge ne = new Edge(p, n);
+                if (!backEdges.contains(ne)) {
+                    nexts.add(n);
+                } else {
+                    logger.fine("next edge " + ne + " is backedge, ignored");
+                }
+            }
+
+            closed.add(p);
+
+            logger.fine("processing nextparts of " + p);
+            for (GraphPart n : nexts) {
+                Edge ne = new Edge(p, n);
+                List<GraphPart> subBranches = branches;
+                if (nexts.size() > 1) {
+                    subBranches = new ArrayList<>(branches);
+                    subBranches.add(p);
+                }
+                edgeToBranches.put(ne, subBranches);
+                walkStack.push(ne);
+            }
+
+        }
+    }
+
+    private void getPrecontinues2(String path, BaseLocalData localData, GraphPart parent, GraphPart part, Set<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart) throws InterruptedException {
+        for (Loop el : loops) {
+            if (el.backEdges.size() == 1) { //for statement has single real continue
+                GraphPart backEdge = (GraphPart) el.backEdges.toArray()[0];
+
+                GraphPart g = backEdge;
+                Set<GraphPart> openedParts = new HashSet<GraphPart>();
+                openedParts.addAll(g.nextParts);
+                List<GraphPart> level0Parts = new ArrayList<GraphPart>();
+                getPrecontinues2Walk(new HashMap<GraphPart, Integer>(), level0Parts, new HashMap<GraphPart, List<List<GraphPart>>>(), openedParts, g, loops, el, 0, new HashMap<GraphPart, List<GraphPart>>(), new ArrayList<>());
+                if (!level0Parts.isEmpty()) {
+                    GraphPart lastPart = level0Parts.get(level0Parts.size() - 1);
+                    el.loopPreContinue = lastPart;
+                    logger.info("Found precontinue: " + lastPart);
+                }
+
+            }
+        }
+    }
+
+    private String pathToString(Collection<GraphPart> list) {
+        List<String> strs = new ArrayList<>();
+        for (GraphPart p : list) {
+            strs.add(p.toString());
+        }
+        return "[" + String.join(", ", strs) + "]";
+    }
+
+    private List<GraphPart> getUnicatePartList(List<GraphPart> list) {
+        List<GraphPart> result = new ArrayList<>();
+        for (GraphPart p : list) {
+            if (!result.contains(p)) {
+                result.add(p);
+            }
+        }
+        return result;
+    }
+
+    private List<GraphPart> getUsableRefs(GraphPart g, List<Loop> loops) {
+        List<GraphPart> ret = getUnicatePartList(g.refs);
+        for (Loop el : loops) {
+            for (GraphPart be : el.backEdges) {
+                if (ret.contains(be)) {
+                    ret.remove(be);
+                }
+            }
+        }
+        return ret;
+    }
+
+    private void getPrecontinues2Walk(Map<GraphPart, Integer> numRefsRemaining, List<GraphPart> level0Parts, Map<GraphPart, List<List<GraphPart>>> joinedPaths, Set<GraphPart> openedParts, GraphPart g, List<Loop> loops, Loop currentLoop, int partId, Map<GraphPart, List<GraphPart>> partPaths, List<GraphPart> path) {
+        logger.fine("start walk " + g);
+        if (g == currentLoop.loopContinue) {
+            return;
+        }
+        if (openedParts.contains(g)) {
+            logger.fine("- already walked - terminate");
+            return; //already walked
+        }
+
+        if (!joinedPaths.containsKey(g)) {
+            joinedPaths.put(g, new ArrayList<>());
+        }
+        joinedPaths.get(g).add(path);
+
+        boolean checkNext = true;
+        for (Loop el : loops) {
+            if (el.loopContinue == g) {
+                checkNext = false;
+                logger.fine("do not check next as current is loopcontinue");
+                break;
+            }
+        }
+        logger.fine("opened parts: " + pathToString(openedParts));
+
+        if (checkNext) {
+            //Do not proceed up before handling all descendants
+            for (GraphPart next : g.nextParts) {
+                if (!openedParts.contains(next)) {
+                    logger.fine("- waiting for next descendats - terminate");
+                    return;
+                }
+            }
+        }
+
+        List<GraphPart> jp1 = joinedPaths.get(g).get(0);
+        for (List<GraphPart> jp : joinedPaths.get(g)) {
+            if (!jp.equals(jp1)) {
+                //paths in both branches do not match, do not continue up                
+                logger.fine("- Paths mismatch - terminate");
+                logger.fine("path " + pathToString(jp) + " does not match " + pathToString(jp1));
+                return;
+            }
+        }
+
+        if (!path.isEmpty() && g.nextParts.size() > 1) {
+            GraphPart lastPathComponent = path.get(path.size() - 1);
+            logger.fine("numrefs before = " + numRefsRemaining.get(lastPathComponent));
+            numRefsRemaining.put(lastPathComponent, numRefsRemaining.get(lastPathComponent) - 1);
+            logger.fine("numrefs = " + numRefsRemaining.get(lastPathComponent));
+            if (numRefsRemaining.get(lastPathComponent) == 1) {
+                logger.fine("numrefs is zero, removing last item of path " + pathToString(path));
+                path.remove(path.size() - 1);
+            }
+        }
+        if (path.isEmpty()) {
+            logger.fine("path is empty, adding current item");
+            level0Parts.add(g);
+        }
+
+        logger.fine("added to openedParts");
+        openedParts.add(g);
+
+        List<GraphPart> refs = getUsableRefs(g, loops);
+        numRefsRemaining.put(g, refs.size());
+        logger.fine("setting numrefs to " + refs.size());
+        logger.fine("all refs = " + pathToString(refs));
+        for (GraphPart ref : refs) {
+            logger.fine("going to ref " + ref + "...");
+            List<GraphPart> subPath = new ArrayList<GraphPart>(path);
+            if (refs.size() > 1) {
+                subPath.add(g);
+            }
+            getPrecontinues2Walk(numRefsRemaining, level0Parts, joinedPaths, openedParts, ref, loops, currentLoop, partId, partPaths, subPath);
+        }
+        logger.fine("/All refs of " + g + " processed");
+    }
+
+    /**/
+    //if (ref.nextParts)
+    private void getBackEdges(BaseLocalData localData, List<Loop> loops) throws InterruptedException {
+        clearLoops(loops);
+        for (Loop el : loops) {
+            el.backEdges.clear();
+            Set<GraphPart> uniqueRefs = new HashSet<>(el.loopContinue.refs);
+            for (GraphPart r : uniqueRefs) {
+                if (el.loopContinue.leadsTo(localData, this, code, r, loops)) {
+                    el.backEdges.add(r);
+                }
+            }
+            el.phase = 1;
+        }
+        clearLoops(loops);
     }
 
     public void finalProcessStack(TranslateStack stack, List<GraphTargetItem> output, String path) {
@@ -845,6 +1278,9 @@ public class Graph {
 
     private void processIfs(List<GraphTargetItem> list) {
 
+        if (true) {
+            return; //FIXMe
+        }
         for (int i = 0; i < list.size(); i++) {
             GraphTargetItem item = list.get(i);
             if ((item instanceof LoopItem) && (item instanceof Block)) {
@@ -1079,224 +1515,6 @@ public class Graph {
 
     protected GraphTargetItem checkLoop(LoopItem loopItem, BaseLocalData localData, List<Loop> loops) {
         return loopItem;
-    }
-
-    //TODO: Make this faster!!!
-    private void getPrecontinues(String path, BaseLocalData localData, GraphPart parent, GraphPart part, Set<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart) throws InterruptedException {
-        try {
-            markLevels(path, localData, part, allParts, loops);
-        } catch (ThreadDeath | InterruptedException ex) {
-            throw ex;
-        } catch (Throwable ex) {
-            //It is unusual code so markLevels failed, nevermind, it can still work
-        }
-        //Note: this also marks part as precontinue when there is if
-        /*
-         while(k<10){
-         if(k==7){
-         trace(a);
-         }else{
-         trace(b);
-         }
-         //precontinue
-         k++;
-         }
-
-         */
-        looploops:
-        for (Loop l : loops) {
-            if (l.loopContinue != null) {
-                Set<GraphPart> uniqueRefs = new HashSet<>();
-                uniqueRefs.addAll(l.loopContinue.refs);
-                if (uniqueRefs.size() == 2) { //only one path - from precontinue
-                    List<GraphPart> uniqueRefsList = new ArrayList<>(uniqueRefs);
-                    if (uniqueRefsList.get(0).discoveredTime > uniqueRefsList.get(1).discoveredTime) { //latch node is discovered later
-                        part = uniqueRefsList.get(0);
-                    } else {
-                        part = uniqueRefsList.get(1);
-                    }
-                    if (part == l.loopContinue) {
-                        continue looploops;
-                    }
-
-                    while (part.refs.size() == 1) {
-                        if (part.refs.get(0).nextParts.size() != 1) {
-                            continue looploops;
-                        }
-
-                        part = part.refs.get(0);
-                        if (part == l.loopContinue) {
-                            break;
-                        }
-                    }
-                    if (part.level == 0 && part != l.loopContinue) {
-                        l.loopPreContinue = part;
-                    }
-                }
-            }
-        }
-        /*clearLoops(loops);
-         getPrecontinues(parent, part, loops, stopPart, 0, new ArrayList<GraphPart>());
-         clearLoops(loops);*/
-    }
-
-    private void markLevels(String path, BaseLocalData localData, GraphPart part, Set<GraphPart> allParts, List<Loop> loops) throws InterruptedException {
-        clearLoops(loops);
-        markLevels(path, localData, part, allParts, loops, new ArrayList<>(), 1, new HashSet<>(), 0);
-        clearLoops(loops);
-    }
-
-    private void markLevels(String path, BaseLocalData localData, GraphPart part, Set<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart, int level, Set<GraphPart> visited, int recursionLevel) throws InterruptedException {
-        if (stopPart == null) {
-            stopPart = new ArrayList<>();
-        }
-        if (recursionLevel > allParts.size() + 1) {
-            throw new RuntimeException(path + ": markLevels max recursion level reached");
-        }
-
-        if (stopPart.contains(part)) {
-            //System.err.println("/stopped part " + part);
-            return;
-        }
-        for (Loop el : loops) {
-            if ((el.phase == 2) && (el.loopContinue == part)) {
-                return;
-            }
-            if (el.phase != 1) {
-                continue;
-            }
-            if (el.loopContinue == part) {
-                return;
-            }
-            if (el.loopPreContinue == part) {
-                return;
-            }
-            if (el.loopBreak == part) {
-                return;
-            }
-        }
-
-        if (visited.contains(part)) {
-            part.level = 0;
-            //System.err.println("set level " + part + " to zero");
-        } else {
-            visited.add(part);
-            part.level = level;
-            //System.err.println("set level " + part + " to " + level);
-        }
-
-        boolean isLoop = false;
-        Loop currentLoop = null;
-        for (Loop el : loops) {
-            if ((el.phase == 0) && (el.loopContinue == part)) {
-                isLoop = true;
-                currentLoop = el;
-                el.phase = 1;
-                break;
-            }
-        }
-
-        List<GraphPart> nextParts = checkPrecoNextParts(part);
-        if (nextParts == null) {
-            nextParts = part.nextParts;
-        }
-        nextParts = new ArrayList<>(nextParts);
-
-        if (nextParts.size() == 2 && stopPart.contains(nextParts.get(1))) {
-            nextParts.remove(1);
-        }
-        if (nextParts.size() >= 1 && stopPart.contains(nextParts.get(0))) {
-            nextParts.remove(0);
-        }
-
-        if (nextParts.size() == 2) {
-            GraphPart next = getCommonPart(localData, nextParts, loops);//part.getNextPartPath(new ArrayList<GraphPart>());
-            //System.err.println("- common part of " + nextParts.get(0) + " and " + nextParts.get(1) + " is " + next);
-            List<GraphPart> stopParts2 = new ArrayList<>();  //stopPart);
-            if (next != null) {
-                stopParts2.add(next);
-            } else if (!stopPart.isEmpty()) {
-                stopParts2.add(stopPart.get(stopPart.size() - 1));
-            }
-            if (next != nextParts.get(0)) {
-                // System.err.println("- going to branch 0 nextpart from " + part + " to " + nextParts.get(0));
-                markLevels(path, localData, nextParts.get(0), allParts, loops, next == null ? stopPart : stopParts2, level + 1, visited, recursionLevel + 1);
-            } else {
-                //System.err.println("- branch 0 of " + part + " is skipped (=next)");
-            }
-
-            if (next != nextParts.get(1)) {
-                //System.err.println("- going to branch 1 nextpart from " + part + " to " + nextParts.get(1));
-                markLevels(path, localData, nextParts.get(1), allParts, loops, next == null ? stopPart : stopParts2, level + 1, visited, recursionLevel + 1);
-            } else {
-                //System.err.println("- branch 1 of " + part + " is skipped (=next)");
-            }
-            if (next != null) {
-                //System.err.println("- going to next from " + part + " to " + next);
-                markLevels(path, localData, next, allParts, loops, stopPart, level, visited, recursionLevel + 1);
-            }
-        }
-
-        if (nextParts.size() > 2) {
-            GraphPart next = getMostCommonPart(localData, nextParts, loops);
-            List<GraphPart> vis = new ArrayList<>();
-            for (GraphPart p : nextParts) {
-                if (vis.contains(p)) {
-                    continue;
-                }
-                List<GraphPart> stopPart2 = new ArrayList<>(); //(stopPart);
-                if (next != null) {
-                    stopPart2.add(next);
-                } else if (!stopPart.isEmpty()) {
-                    stopPart2.add(stopPart.get(stopPart.size() - 1));
-                }
-                for (GraphPart p2 : nextParts) {
-                    if (p2 == p) {
-                        continue;
-                    }
-                    if (!stopPart2.contains(p2)) {
-                        stopPart2.add(p2);
-                    }
-                }
-                if (next != p) {
-                    markLevels(path, localData, p, allParts, loops, stopPart2, level + 1, visited, recursionLevel + 1);
-                    vis.add(p);
-                }
-            }
-            if (next != null) {
-                markLevels(path, localData, next, allParts, loops, stopPart, level, visited, recursionLevel + 1);
-            }
-        }
-
-        if (nextParts.size() == 1) {
-            //System.err.println("going to one nexpart from " + part + " to " + nextParts.get(0));
-            markLevels(path, localData, nextParts.get(0), allParts, loops, stopPart, level, visited, recursionLevel + 1);
-        }
-
-        for (GraphPart t : part.throwParts) {
-            if (!visited.contains(t)) {
-                List<GraphPart> stopPart2 = new ArrayList<>();
-                List<GraphPart> cmn = new ArrayList<>();
-                cmn.add(part);
-                cmn.add(t);
-                GraphPart next = getCommonPart(localData, cmn, loops);
-                if (next != null) {
-                    stopPart2.add(next);
-                } else {
-                    stopPart2 = stopPart;
-                }
-
-                markLevels(path, localData, t, allParts, loops, stopPart2, level, visited, recursionLevel + 1);
-            }
-        }
-
-        if (isLoop) {
-            if (currentLoop != null && currentLoop.loopBreak != null) {
-                currentLoop.phase = 2;
-                //System.err.println("- going to break of loop " + currentLoop.loopBreak);
-                markLevels(path, localData, currentLoop.loopBreak, allParts, loops, stopPart, level, visited, recursionLevel + 1);
-            }
-        }
     }
 
     private void clearLoops(List<Loop> loops) {
@@ -1696,6 +1914,10 @@ public class Graph {
             }
         }
 
+        if (debugPrintGraph) {
+            System.err.println("stopParts: " + pathToString(stopPart));
+        }
+
         if (stopPart.contains(part)) {
             if (currentLoop != null) {
                 currentLoop.phase = 0;
@@ -1712,6 +1934,9 @@ public class Graph {
         }
 
         if (visited.contains(part)) {
+            if (debugPrintGraph) {
+                System.err.println("Already visited part " + part + ", adding goto");
+            }
             String labelName = "addr" + part.start;
             List<GraphTargetItem> firstCode = partCodes.get(part);
             int firstCodePos = partCodePos.get(part);
