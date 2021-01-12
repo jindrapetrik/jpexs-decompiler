@@ -301,7 +301,6 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
             return "Arial";
         }
 
-        //First font
         return installedFontsByFamily.keySet().iterator().next();
     }
 

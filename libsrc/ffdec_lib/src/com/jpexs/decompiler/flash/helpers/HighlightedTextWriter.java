@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -201,7 +202,12 @@ public class HighlightedTextWriter extends GraphTextWriter {
                 HighlightData ndata = new HighlightData();
                 ndata.merge(itemPos.data);
                 ndata.merge(data);
-                ndata.offset = src.getAddress() + pos;
+                long virtualAddress = src.getVirtualAddress();
+                if (virtualAddress != -1) {
+                    ndata.offset = virtualAddress + pos;
+                } else {
+                    ndata.offset = src.getAddress() + pos;
+                }
                 ndata.fileOffset = src.getFileOffset();
                 if (itemPos.startLineItem != null) {
                     ndata.firstLineOffset = itemPos.startLineItem.getLineOffset();

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
@@ -63,11 +64,11 @@ public class Multiname {
 
     public int namespace_index;
 
-    public final int namespace_set_index;
+    public /*final JAVA 9*/ int namespace_set_index;
 
-    public final int qname_index; //for TypeName
+    public /*final JAVA 9*/ int qname_index; //for TypeName
 
-    public final int[] params; //for TypeName
+    public /*final JAVA 9*/ int[] params; //for TypeName
 
     @Internal
     public boolean deleted;

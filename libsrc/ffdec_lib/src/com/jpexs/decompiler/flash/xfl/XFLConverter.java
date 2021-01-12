@@ -153,6 +153,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.OutputKeys;
@@ -169,7 +171,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  *
@@ -3840,7 +3841,8 @@ public class XFLConverter {
         XMLReader parser;
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
-            parser = XMLReaderFactory.createXMLReader();
+            SAXParser sparser = factory.newSAXParser();   
+            parser = sparser.getXMLReader();
             parser.setContentHandler(tparser);
             parser.setErrorHandler(tparser);
             html = "<?xml version=\"1.0\"?>\n"
@@ -3853,7 +3855,7 @@ public class XFLConverter {
                 System.out.println(html);
                 System.err.println(tparser.result);
             }
-        } catch (SAXException | IOException e) {
+        } catch (SAXException | IOException| ParserConfigurationException e) {
             logger.log(Level.SEVERE, "Error while converting HTML", e);
         }
         return tparser.result.toString();

@@ -127,6 +127,8 @@ public abstract class Action implements GraphSourceItem {
 
     private long address;
 
+    private long virtualAddress = -1;
+
     @Override
     public long getLineOffset() {
         return fileOffset;
@@ -1231,5 +1233,15 @@ public abstract class Action implements GraphSourceItem {
     @Override
     public String getFile() {
         return null;
+    }
+
+    @Override
+    public long getVirtualAddress() {
+        return virtualAddress;
+    }
+
+    @Override
+    public void setVirtualAddress(long virtualAddress) {
+        this.virtualAddress = virtualAddress;
     }
 }

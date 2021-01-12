@@ -63,6 +63,8 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     private String file;
 
+    private long virtualAddress = -1;
+
     @Override
     public long getFileOffset() {
         return -1;
@@ -70,6 +72,9 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     @Override
     public long getLineOffset() {
+        if (virtualAddress > -1) {
+            return virtualAddress;
+        }
         return getAddress();
     }
 
@@ -530,4 +535,13 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
         body.setModified();
     }
 
+    @Override
+    public long getVirtualAddress() {
+        return virtualAddress;
+    }
+
+    @Override
+    public void setVirtualAddress(long virtualAddress) {
+        this.virtualAddress = virtualAddress;
+    }
 }

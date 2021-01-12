@@ -10,6 +10,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import static com.jpexs.decompiler.graph.GraphTargetItem.PRECEDENCE_PRIMARY;
 import static com.jpexs.decompiler.graph.GraphTargetItem.toSourceMerge;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BranchStackResistant;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -23,9 +24,8 @@ import java.util.List;
 public class EnumerationAssignmentValueActionItem extends ActionItem {
 
     @Override
-    public List<GraphTargetItem> getAllSubItems() {
-        List<GraphTargetItem> ret = new ArrayList<>();
-        return ret;
+    public void visit(GraphTargetVisitorInterface visitor) {
+
     }
 
     public EnumerationAssignmentValueActionItem() {

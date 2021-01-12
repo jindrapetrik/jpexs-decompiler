@@ -12,13 +12,15 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -32,31 +34,40 @@ public class GetSlotAVM2Item extends AVM2Item {
 
     public GraphTargetItem scope;
 
-    public GetSlotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope, Multiname slotName) {
+    public GraphTargetItem slotObject;
+
+    public int slotIndex;
+
+    public GetSlotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope, GraphTargetItem slotObject, int slotIndex, Multiname slotName) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.slotName = slotName;
         this.scope = scope;
+        this.slotObject = slotObject;
+        this.slotIndex = slotIndex;
     }
 
     @Override
-    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        if (slotName == null) {
-            return writer.append("/*UnknownSlot*/");
-        }
-
-        getSrcData().localName = getNameAsStr(localData);
-        return writer.append(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true));
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(scope);
+        visitor.visit(slotObject);
     }
 
-    public String getNameAsStr(LocalData localData) {
+    @Override
+    public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        String name = getNameAsStr(localData);
+        getSrcData().localName = name;
+        return writer.append(name);
+    }
+
+    public String getNameAsStr(LocalData localData) throws InterruptedException {
+        if (slotName == null) {
+            return slotObject.toString(localData) + ".§§slot[" + slotIndex + "]";
+        }
         return slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true);
     }
 
-    public GraphTextWriter getName(GraphTextWriter writer, LocalData localData) {
-        if (slotName == null) {
-            return writer.append("/*UnknownSlot*/");
-        }
-        return writer.append(slotName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true));
+    public GraphTextWriter getName(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        return writer.append(getNameAsStr(localData));
     }
 
     @Override

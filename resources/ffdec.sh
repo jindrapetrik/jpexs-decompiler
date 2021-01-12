@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Based on Freerapid Downloader startup script - created by Petris 2009
 
 # FFDec requires Oracle Java 8
@@ -67,7 +67,7 @@ fi
 
 popd > /dev/null
 
-args=(-Djava.net.preferIPv4Stack=true -Xmx$MEMORY -jar $JAR_FILE "$@")
+args=(-Djava.net.preferIPv4Stack=true -Dsun.java2d.uiScale=1.0 -Xmx$MEMORY -jar $JAR_FILE "$@")
 
 if [ "`uname`" = "Darwin" ]; then
 	args=(-Xdock:name=FFDec -Xdock:icon=icon.png "${args[@]}")

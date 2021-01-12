@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -162,7 +163,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
             }
         }
 
-        output.add(new SetSlotAVM2Item(ins, localData.lineStartInstruction, obj, slotname, value));
+        output.add(new SetSlotAVM2Item(ins, localData.lineStartInstruction, obj, objnoreg, slotIndex, slotname, value));
     }
 
     @Override

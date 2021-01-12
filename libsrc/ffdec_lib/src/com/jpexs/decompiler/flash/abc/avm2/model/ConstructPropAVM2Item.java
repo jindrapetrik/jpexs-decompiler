@@ -12,12 +12,14 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
@@ -42,11 +44,17 @@ public class ConstructPropAVM2Item extends AVM2Item {
     }
 
     @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(object);
+        visitor.visit(propertyName);
+        visitor.visitAll(args);
+    }
+
+    @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("new ");
-        int idx = writer.getLength();
-        object.toString(writer, localData);
-        if (idx < writer.getLength()) {
+        if (!(object instanceof FindPropertyAVM2Item)) {
+            object.toString(writer, localData);
             writer.append(".");
         }
         propertyName.toString(writer, localData);

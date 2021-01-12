@@ -11,7 +11,7 @@
         <fileset dir="${ant.lib.dir}" includes="**/*.jar"/>
     </path>
     <taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="ant.lib.classpath"  />
-    <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="ant.lib.classpath" />
+    <!--<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="ant.lib.classpath" />-->
     <taskdef name="jflex" classname="jflex.anttask.JFlexTask" classpathref="ant.lib.classpath" />
         
     
@@ -44,7 +44,7 @@
         <mkdir dir="${lib.dir}"/>        
         <javac srcdir="${src.dir}" destdir="${compile.dir}" includes="**/*.java" target="${target.java}" source="${target.java}" debug="true"
                debuglevel="lines,vars,source" includeantruntime="false" encoding="utf-8">
-            <compilerarg line="-Xlint:unchecked"/> <!-- For Java 8: -Xdiags:verbose -->
+            <compilerarg line="-Xlint:unchecked -Xlint:deprecation"/> <!-- For Java 8: -Xdiags:verbose -->
             <classpath>
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
             </classpath>
@@ -84,7 +84,7 @@
         <mkdir dir="${test.result.dir}/raw/"/>
         
          <mkdir dir="${coverage.dir}" />
-        <jacoco:coverage destfile="${coverage.dir}/jacoco.exec">
+        <!--<jacoco:coverage destfile="${coverage.dir}/jacoco.exec">-->
         <testng 
             outputDir="${test.result.dir}"
             haltOnFailure="${test.halt}" verbose="2" workingDir="${basedir}" >
@@ -99,11 +99,11 @@
             <classfileset dir="${compile.test.dir}" includes="**/*.class" />                        
             
         </testng>      
-        </jacoco:coverage>          
+        <!--</jacoco:coverage>-->
         <!-- Coverage report -->
         <mkdir dir="${coverage.result.dir}"/>
         
-        <jacoco:report>
+        <!--<jacoco:report>
             <executiondata>
                 <file file="${coverage.dir}/jacoco.exec" />
             </executiondata>
@@ -117,6 +117,7 @@
             </structure>
             <html destdir="${coverage.result.dir}" />
         </jacoco:report>        
+    -->
     </target>
     
    
@@ -205,12 +206,12 @@
     <target name="-load-version" depends="-check-versionfile-exists,-load-version-file,-load-version-private"> 
         <property name="version" value="${version.major}.${version.minor}.${version.release}" />
         <property name="version.number" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
-        <script language="javascript">
+        <script language="beanshell" classpathref="ant.lib.classpath">
             
-            if(project.getProperty("version.major")=="0") {
-                project.setProperty("private",true);                
-            } else if(project.getProperty("version.debug")=="true") {
-                project.setProperty("nightly",true);
+            if("0".equals(project.getProperty("version.major"))) {
+                project.setProperty("private","true");                
+            } else if("true".equals("" + project.getProperty("version.debug"))) {
+                project.setProperty("nightly","true");
             }
         </script>                 
     </target>
@@ -284,16 +285,12 @@
                 <globmapper from="*" to="/*"/>
             </chainedmapper>
         </pathconvert>
-        <script language="javascript"><![CDATA[
-        var classpath = project.getProperty("lexers");
-        // + '' converts from a Java string to a JavaScript string, in order
-        // to have .split() behave predictably on all installations.
-        // Otherwise, some versions of ANT will treat it's argument as a regex
-        // while others will not.
-        var parts = (classpath + '').split('|');
-        for each (var part in parts) {
+        <script language="beanshell" classpathref="ant.lib.classpath"><![CDATA[
+        String classpath = project.getProperty("lexers");
+        String[] parts = (classpath + "").split("\\|");
+        for (String part : parts) {
             project.setProperty("lexer",project.getProperty("lexers.dir")+part);
-            self.project.executeTarget("-lexer");
+            project.executeTarget("-lexer");
         }
     ]]></script>
     </target>

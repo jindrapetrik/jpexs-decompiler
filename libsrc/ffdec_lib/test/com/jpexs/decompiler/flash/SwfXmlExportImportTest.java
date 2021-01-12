@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.NotSameException;
@@ -83,7 +84,7 @@ public class SwfXmlExportImportTest extends FileTestBase {
         }
     }
 
-    @Test(dataProvider = "provideFiles")
+    @Test(dataProvider = "provideFiles", enabled = false)
     public void testExportImportXml(String filePath) {
         try {
             File f = new File(filePath);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="FFDec" basedir="." default="all" xmlns:jacoco="antlib:org.jacoco.ant">
+<project name="FFDec" basedir="." default="all"> <!-- xmlns:jacoco="antlib:org.jacoco.ant" -->
     <description>Builds project FFDec</description>    
                              
     <loadproperties srcfile="build.properties" />
@@ -14,7 +14,7 @@
     
     <taskdef name="mkbom" classname="com.jpexs.jbomutils.ant.MkBomTask" classpathref="ant.lib.classpath" />
     <taskdef name="xar" classname="com.jpexs.xar.ant.XarTask" classpathref="ant.lib.classpath" />
-    <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="ant.lib.classpath" />
+    <!--<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="ant.lib.classpath" />-->
     <taskdef name="cpio" classname="org.apache.ant.compress.taskdefs.Cpio" classpathref="ant.lib.classpath" />       
     <taskdef name="deb" classname="com.googlecode.ant_deb_task.Deb" classpathref="ant.lib.classpath" />
     <taskdef name="desktopentry" classname="com.googlecode.ant_deb_task.DesktopEntry" classpathref="ant.lib.classpath" />
@@ -65,9 +65,9 @@
         <loadproperties srcfile="${version_info}" prefix="version"/> 
         <property name="version" value="${version.major}.${version.minor}.${version.release}" />
         <property name="version.number" value="${version.major}.${version.minor}.${version.release}.${version.build}" />  
-        <script language="javascript">
-            if(project.getProperty("version.debug")=="true"){
-            project.setProperty("nightly",true);
+        <script language="beanshell" classpathref="ant.lib.classpath">
+            if("true".equals("" + project.getProperty("version.debug"))) {
+                project.setProperty("nightly","true");
             }
         </script>
         <echo level="info" message="Loaded Version:${version.major}.${version.minor}.${version.release}.${version.build}"/>
@@ -80,7 +80,7 @@
         <mkdir dir="${compile.dir}"/>
         <javac srcdir="${src.dir}" destdir="${compile.dir}" includes="**/*.java" target="${target.java}" source="${target.java}" debug="true"
                debuglevel="lines,vars,source" includeantruntime="false" encoding="utf-8">
-            <compilerarg line="-Xlint:unchecked"/> <!-- For Java 8: -Xdiags:verbose -->
+            <compilerarg line="-Xlint:unchecked -Xlint:deprecation"/> <!-- For Java 8: -Xdiags:verbose -->
             <classpath>
                 <fileset dir="${lib.dir}" includes="**/*.jar"/>
             </classpath>
@@ -131,7 +131,7 @@
          
         
         <mkdir dir="${coverage.dir}" />
-        <jacoco:coverage destfile="${coverage.dir}/jacoco.exec">
+        <!--<jacoco:coverage destfile="${coverage.dir}/jacoco.exec">-->
             <testng 
                 outputDir="${test.result.dir}"
                 haltOnFailure="${test.halt.failure}" verbose="2" workingDir="${basedir}">
@@ -145,9 +145,9 @@
                 <jvmarg value="-noverify" />
                 <classfileset dir="${compile.test.dir}" includes="**/*.class" />                                    
             </testng>  
-        </jacoco:coverage>
+        <!--</jacoco:coverage>-->
                   
-        <!-- Coverage report -->
+        <!-- Coverage report 
         <mkdir dir="${coverage.result.dir}"/>
         <jacoco:report>
             <executiondata>
@@ -162,7 +162,7 @@
                 </sourcefiles>
             </structure>
             <html destdir="${coverage.result.dir}" />
-        </jacoco:report> 
+        </jacoco:report> -->
     </target>
     
     <condition property="is_windows">
@@ -263,12 +263,12 @@
             <fileset dir="${app.installer.dir}/root" />
         </length>
         
-        <script language="javascript">
+        <script language="beanshell" classpathref="ant.lib.classpath">
         <![CDATA[
-            var length_bytes = project.getProperty("app.installer.files.size.bytes");
-            var length_kbytes = Math.round((length_bytes / 1024) * Math.pow(10,2))
+            long length_bytes = Long.parseLong(project.getProperty("app.installer.files.size.bytes"));
+            long length_kbytes = Math.round((length_bytes / 1024) * Math.pow(10,2))
                               / Math.pow(10,2);            
-            project.setNewProperty("app.installer.files.size.kilobytes", length_kbytes);
+            project.setNewProperty("app.installer.files.size.kilobytes", "" + length_kbytes);
         ]]>
         </script>
         
@@ -323,7 +323,7 @@
     
     <target name="osx-app-bundle" depends="-loadversion,dist">
         <property name="app.script.temp" value="${app.bundle.dir}/${app.osx.dir}.app/Contents/MacOS/${app.osx.dir}"/>
-        <echo file="${app.script.temp}">#!/bin/bash&#10;$(dirname "$${BASH_SOURCE[0]}")/../Resources/${app.script} "$$&#64;"</echo>
+        <echo file="${app.script.temp}">#!/usr/bin/env bash&#10;$(dirname "$${BASH_SOURCE[0]}")/../Resources/${app.script} "$$&#64;"</echo>
         <property name="app.info.temp" value="${app.bundle.dir}/${app.osx.dir}.app/Contents/Info.plist"/>
         <echo file="${app.info.temp}"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -405,6 +405,7 @@
                     <maxHeapPercent>${max.heap.size.percent}</maxHeapPercent>
                     <opt>-Djava.net.preferIPv4Stack=true</opt>
                     <opt>-Djna.nosys=true</opt>
+                    <opt>-Dsun.java2d.uiScale=1.0</opt>
                 </jre>
                 <splash>
                     <file>graphics/splash2.bmp</file>
@@ -428,14 +429,14 @@
         </echoxml>
     </target>    
     <target name="-exe-linux" unless="is_windows" depends="-load-tools,-exe-config">
-        <exec dir="${launch4j.path}" executable="${launch4j.path}/launch4j" failonerror="true">
-            <arg file="${exe.config}" />
-        </exec>
+        <java jar="${launch4j.path}/launch4j.jar" fork="true">
+            <arg line="${exe.config}" />
+        </java>
     </target>
     <target name="-exe-windows" if="is_windows" depends="-load-tools,-exe-config">
-        <exec dir="${launch4j.path}" executable="${launch4j.path}\launch4jc.exe" failonerror="true">
-            <arg file="${exe.config}" />
-        </exec>
+        <java jar="${launch4j.path}/launch4j.jar" fork="true">
+            <arg line="${exe.config}" />
+        </java>
     </target>   
     <target name="exe" depends="-set-gui-type,-exe-linux,-exe-windows">
         
@@ -667,6 +668,7 @@
         <java jar="${dist.dir}/${jar.filename}.jar" fork="true">
             <jvmarg value="-Xmx${max.heap.size.run}m" />
             <jvmarg value="-Djava.net.preferIPv4Stack=true" />
+            <jvmarg value="-Dsun.java2d.uiScale=1.0" />
             <arg line="${run.params}" />
         </java>
     </target>

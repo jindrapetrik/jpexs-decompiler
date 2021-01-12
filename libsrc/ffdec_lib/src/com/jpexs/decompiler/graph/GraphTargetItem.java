@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -42,6 +43,7 @@ import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -498,10 +500,46 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public List<GraphTargetItem> getAllSubItems() {
         List<GraphTargetItem> ret = new ArrayList<>();
-        if (value != null) {
-            ret.add(value);
-        }
+        visit(new AbstractGraphTargetVisitor() {
+            @Override
+            public void visit(GraphTargetItem item) {
+                if (item != null) {
+                    ret.add(item);
+                }
+            }
+        });
         return ret;
+    }
+
+    public Set<GraphTargetItem> getAllSubItemsRecursively() {
+        Set<GraphTargetItem> ret = new HashSet<>();
+        visitRecursively(new AbstractGraphTargetVisitor() {
+            @Override
+            public void visit(GraphTargetItem item) {
+                ret.add(item);
+            }
+        });
+        return ret;
+    }
+
+    public final void visitRecursively(GraphTargetVisitorInterface visitor) {
+        Set<GraphTargetItem> visitedItems = new HashSet<>();
+        visit(new AbstractGraphTargetVisitor() {
+            @Override
+            public void visit(GraphTargetItem item) {
+                if (item != null && !visitedItems.contains(item)) {
+                    visitedItems.add(item);
+                    visitor.visit(item);
+                    item.visit(this);
+                }
+            }
+        });
+    }
+
+    public void visit(GraphTargetVisitorInterface visitor) {
+        if (value != null) {
+            visitor.visit(value);
+        }
     }
 
     public abstract GraphTargetItem returnType();
