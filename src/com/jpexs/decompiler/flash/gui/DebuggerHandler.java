@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -330,7 +331,7 @@ public class DebuggerHandler implements DebugConnectionListener {
 
     private InBreakReason breakReason;
 
-    private final List<BreakListener> breakListeners = new ArrayList<>();
+    private final List<BreakListener> breakListeners = new CopyOnWriteArrayList<>();
 
     private final List<TraceListener> traceListeners = new ArrayList<>();
 

@@ -2065,7 +2065,8 @@ public class Graph {
                                     isIf = false;
                                     stack.push(new OrItem(null, localData.lineStartInstruction, leftSide, rightSide));
                                 } else {
-                                    //:-(
+                                    stack.push(prevExpr); //push it back
+                                    //Still unstructured
                                 }
                             } else {
                                 isIf = false;

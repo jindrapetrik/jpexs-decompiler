@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -29,6 +30,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
@@ -67,6 +69,24 @@ public class TryAVM2Item extends AVM2Item implements Block {
             ret.add(finallyCommands);
         }
         return ret;
+    }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        if (tryCommands != null) {
+            visitor.visitAll(tryCommands);
+        }
+        for (List<AssignableAVM2Item> c : catchVariables) {
+            for (AssignableAVM2Item ai : c) {
+                visitor.visit(ai);
+            }
+        }
+        for (List<GraphTargetItem> c : catchCommands) {
+            visitor.visitAll(c);
+        }
+        if (finallyCommands != null) {
+            visitor.visitAll(finallyCommands);
+        }
     }
 
     public TryAVM2Item(List<GraphTargetItem> tryCommands, List<ABCException> catchExceptions, List<List<GraphTargetItem>> catchCommands, List<GraphTargetItem> finallyCommands, String finCatchName) {

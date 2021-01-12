@@ -59,4 +59,20 @@ public interface GraphSourceItem extends Serializable, Cloneable {
     public String getFile();
 
     public abstract int getBytesLength();
+
+    /**
+     * Gets virtual address. A virtual adress can be used for storing original
+     * address before applying deobfuscation
+     *
+     * @return
+     */
+    public long getVirtualAddress();
+
+    /**
+     * Sets virtual address. A virtual adress can be used for storing original
+     * address before applying deobfuscation
+     *
+     * @param virtualAddress
+     */
+    public void setVirtualAddress(long virtualAddress);
 }

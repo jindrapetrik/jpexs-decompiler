@@ -25,6 +25,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
@@ -44,8 +45,8 @@ public class CallFunctionActionItem extends ActionItem {
     public GraphTargetItem calculatedFunction;
 
     @Override
-    public List<GraphTargetItem> getAllSubItems() {
-        return arguments;
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visitAll(arguments);
     }
 
     public CallFunctionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem functionName, List<GraphTargetItem> arguments) {

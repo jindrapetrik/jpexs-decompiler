@@ -12,12 +12,14 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
 
@@ -59,8 +61,8 @@ public class TemporaryRegister extends ActionItem {
     }
 
     @Override
-    public List<GraphTargetItem> getAllSubItems() {
-        return value.getAllSubItems();
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(value);
     }
 
     @Override

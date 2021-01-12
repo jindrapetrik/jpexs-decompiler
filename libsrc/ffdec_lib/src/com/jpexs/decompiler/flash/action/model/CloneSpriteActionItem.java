@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -22,6 +23,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
@@ -40,12 +42,9 @@ public class CloneSpriteActionItem extends ActionItem {
     public GraphTargetItem depth;
 
     @Override
-    public List<GraphTargetItem> getAllSubItems() {
-        List<GraphTargetItem> ret = new ArrayList<>();
-        ret.add(target);
-        ret.add(source);
-        ret.add(depth);
-        return ret;
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(source);
+        visitor.visit(depth);
     }
 
     public CloneSpriteActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem source, GraphTargetItem target, GraphTargetItem depth) {

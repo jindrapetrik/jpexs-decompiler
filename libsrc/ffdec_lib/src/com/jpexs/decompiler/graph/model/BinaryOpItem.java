@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -20,6 +21,7 @@ import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -208,10 +210,8 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
     }
 
     @Override
-    public List<GraphTargetItem> getAllSubItems() {
-        List<GraphTargetItem> ret = new ArrayList<>();
-        ret.add(getLeftSide());
-        ret.add(getRightSide());
-        return ret;
+    public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(getLeftSide());
+        visitor.visit(getRightSide());
     }
 }

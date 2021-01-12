@@ -312,9 +312,9 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeFIXED8(float value) throws IOException {
-        final int divisor = 1 << 8;
-        int beforePoint = (int) value;
-        int afterPoint = Math.abs((int) (value * divisor)) % divisor;
+        int valueInt = (int) (value * (1 << 8));
+        int beforePoint = (int) valueInt >> 8;
+        int afterPoint = (int) valueInt % (1 << 8);
         writeUI8(afterPoint);
         writeSI8(beforePoint);
     }

@@ -1,6 +1,40 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- Java 9+ support
+- Chinese translation updated
+- Enable bulk replace for single typed tags
+- Option to use logging configuration file (ffdec home / logging.properties)
+
+### Removed
+- Due to Java9+ limited support of reflection, following features were removed:
+- Automatic detection of installed fonts changes (on font editation) - FFDec needs to be restarted to font changes to take effect
+- Using kerning pairs of installed fonts
+- Support for installing java in FFDec windows installer
+
+### Changed
+- Making internal flash viewer a default viewer + move FP option switch to Advanced settings / others
+- Increased scrolling speed in folder preview
+- Changed /bin/bash to /usr/bin/env bash
+- Building does not require Naashorn - uses Beanshell instead
+- Use object.§§slot[index] syntax instead of /* UnknownSlot */ comment when slot cannot be determined (AS3)
+- Show §§findproperty when neccessary (AS3)
+
+### Fixed
+- Scaling - Distorted images/canvas on Hi-dpi monitors for Java 9 and later
+- Radial gradients focal point reading/writing
+- Correct AS/P-code matching in editor for AS3 after using deobfuscation
+- Correct line matching in debugger of AS3 after using deobfuscation
+- Concurrent access while in debugger
+- Correct body index for script initializer in P-code debugging
+- #1550 TTF export - correctly handle duplicate unicode codes
+- #1548 correctly handle empty generated file names
+- #1379 AS3 - better handling local registers postincrement/decrement
+- Better unresolved if handling
+- Escaping in P-code Graphviz exporter (Problems with graphs containing backslash strings)
+
 ## [11.3.0] - 2020-04-25
 ### Added
 - Possibility to open SWF files using open on Mac
