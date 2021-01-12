@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [12.0.0] - 2021-01-12
 ### Added
 - Java 9+ support
 - Chinese translation updated
