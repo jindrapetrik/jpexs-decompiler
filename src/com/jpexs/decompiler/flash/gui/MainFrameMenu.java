@@ -99,10 +99,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     protected final Map<String, ActionListener> menuActions = new HashMap<>();
 
-    public boolean isInternalFlashViewerSelected() {
+    /*public boolean isInternalFlashViewerSelected() {
         return isMenuChecked("/settings/internalViewer"); //miInternalViewer.isSelected();
-    }
-
+    }*/
     private final boolean externalFlashPlayerUnavailable;
 
     public MainFrameMenu(MainFrame mainFrame, boolean externalFlashPlayerUnavailable) {
@@ -648,14 +647,14 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
     }
 
-    protected void internalViewerSwitchActionPerformed(ActionEvent evt) {
+    /*protected void internalViewerSwitchActionPerformed(ActionEvent evt) {
         AbstractButton button = (AbstractButton) evt.getSource();
         boolean selected = button.isSelected();
 
         Configuration.internalFlashViewer.set(selected);
         mainFrame.getPanel().reload(true);
     }
-
+     */
     protected void simplifyExpressionsActionPerformed(ActionEvent evt) {
         AbstractButton button = (AbstractButton) evt.getSource();
         boolean selected = button.isSelected();
@@ -935,7 +934,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         addToggleMenuItem("/settings/autoDeobfuscation", translate("menu.settings.autodeobfuscation"), null, null, this::autoDeobfuscationActionPerformed, 0, null);
         addToggleMenuItem("/settings/simplifyExpressions", translate("menu.settings.simplifyExpressions"), null, null, this::simplifyExpressionsActionPerformed, 0, null);
-        addToggleMenuItem("/settings/internalViewer", translate("menu.settings.internalflashviewer"), null, null, this::internalViewerSwitchActionPerformed, 0, null);
+        //addToggleMenuItem("/settings/internalViewer", translate("menu.settings.internalflashviewer"), null, null, this::internalViewerSwitchActionPerformed, 0, null);
         addToggleMenuItem("/settings/parallelSpeedUp", translate("menu.settings.parallelspeedup"), null, null, this::parallelSpeedUpActionPerformed, 0, null);
         addToggleMenuItem("/settings/disableDecompilation", translate("menu.settings.disabledecompilation"), null, null, this::disableDecompilationActionPerformed, 0, null);
         //addToggleMenuItem("/settings/cacheOnDisk", translate("menu.settings.cacheOnDisk"), null, null, this::cacheOnDiskActionPerformed, 0, null);
@@ -976,11 +975,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
             setMenuChecked("/settings/simplifyExpressions", newValue);
         });
 
-        setMenuChecked("/settings/internalViewer", Configuration.internalFlashViewer.get() || externalFlashPlayerUnavailable);
+        /*setMenuChecked("/settings/internalViewer", Configuration.internalFlashViewer.get() || externalFlashPlayerUnavailable);
         Configuration.internalFlashViewer.addListener(configListenerInternalFlashViewer = (Boolean newValue) -> {
             setMenuChecked("/settings/internalViewer", newValue || externalFlashPlayerUnavailable);
         });
-
+         */
         setMenuChecked("/settings/parallelSpeedUp", Configuration.parallelSpeedUp.get());
         Configuration.parallelSpeedUp.addListener(configListenerParallelSpeedUp = (Boolean newValue) -> {
             setMenuChecked("/settings/parallelSpeedUp", newValue);
@@ -1178,7 +1177,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         Configuration.autoDeobfuscate.removeListener(configListenerAutoDeobfuscate);
         Configuration.simplifyExpressions.removeListener(configListenerSimplifyExpressions);
-        Configuration.internalFlashViewer.removeListener(configListenerInternalFlashViewer);
+        //Configuration.internalFlashViewer.removeListener(configListenerInternalFlashViewer);
         Configuration.parallelSpeedUp.removeListener(configListenerParallelSpeedUp);
         Configuration.decompile.removeListener(configListenerDecompile);
         //Configuration.cacheOnDisk.removeListener(configListenerCacheOnDisk);

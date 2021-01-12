@@ -3118,8 +3118,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public boolean isInternalFlashViewerSelected() {
-        return mainMenu.isInternalFlashViewerSelected();
+    public boolean isAdobeFlashPlayerEnabled() {
+        return Configuration.useAdobeFlashPlayerForPreviews.get();
     }
 
     public static final int VIEW_RESOURCES = 0;
@@ -3302,7 +3302,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showEmpty();
             return;
         }
-        boolean internalViewer = isInternalFlashViewerSelected();
+        boolean internalViewer = !isAdobeFlashPlayerEnabled();
         if (treeItem instanceof SWF) {
             SWF swf = (SWF) treeItem;
             if (internalViewer) {
@@ -3422,7 +3422,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         previewPanel.setImageReplaceButtonVisible(false, false);
 
-        boolean internalViewer = isInternalFlashViewerSelected();
+        boolean internalViewer = !isAdobeFlashPlayerEnabled();
 
         if (treeItem instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) treeItem;

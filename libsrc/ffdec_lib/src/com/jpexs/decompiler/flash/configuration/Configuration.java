@@ -95,9 +95,14 @@ public final class Configuration {
     @ConfigurationCategory("")
     public static ConfigurationItem<Boolean> cacheImages = null;
 
+    /*
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> internalFlashViewer = null;
+    */
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationInternal
+    public static ConfigurationItem<Boolean> useAdobeFlashPlayerForPreviews = null;
 
     @ConfigurationDefaultInt(1000)
     @ConfigurationCategory("display")
