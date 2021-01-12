@@ -77,6 +77,7 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -106,6 +107,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import java.util.regex.Matcher;
@@ -2357,6 +2359,16 @@ public class Main {
     }
 
     public static void initLogging(boolean debug) {
+        File loggingFile = new File(Configuration.getFFDecHome() + "/logging.properties");
+        if (loggingFile.exists()) { //use manual configuration file
+            final LogManager logManager = LogManager.getLogManager();
+            try {
+                logManager.readConfiguration(new FileInputStream(loggingFile));
+                return;
+            } catch (IOException ex) {
+                //ignore
+            }
+        }
         try {
             Logger logger = Logger.getLogger("");
             logger.setLevel(Configuration.logLevel);
