@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- Using new FFDec icon on Mac
+
 ## [12.0.1] - 2021-01-14
 ### Fixed
 - Critical fix - application GUI did not start on OSes without flashplayer (Linux, MacOS, even Windows)
