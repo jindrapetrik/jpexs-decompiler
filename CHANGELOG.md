@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [12.0.1] - 2021-01-14
+### Fixed
+- Critical fix - application GUI did not start on OSes without flashplayer (Linux, MacOS, even Windows)
+
 ## [12.0.0] - 2021-01-12
 ### Added
 - Java 9+ support
