@@ -1009,9 +1009,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
             setMenuChecked("/settings/autoOpenLoadedSWFs", newValue);
         });
 
+        /*
         if (externalFlashPlayerUnavailable) {
             setMenuEnabled("/settings/internalViewer", false);
         }
+         */
 
         /*int deobfuscationMode = Configuration.deobfuscationMode.get();
          switch (deobfuscationMode) {
