@@ -55,6 +55,7 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
+import com.jpexs.decompiler.graph.GraphPartEdge;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -65,6 +66,7 @@ import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
+import com.jpexs.decompiler.graph.model.GotoItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LoopItem;
 import com.jpexs.decompiler.graph.model.NotItem;
@@ -79,6 +81,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  *
@@ -152,6 +155,7 @@ public class AVM2Graph extends Graph {
             }
             for (GraphPart p : allBlocks) {
                 if (avm2code.pos2adr(p.start) >= ex.start && avm2code.pos2adr(p.end) <= ex.end && target != null) {
+                    //Logger.getLogger(Graph.class.getName()).fine("ADDING throwpart " + target + " to " + p);
                     p.throwParts.add(target);
                     target.refs.add(p);
                 }
@@ -160,7 +164,7 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected List<GraphTargetItem> check(Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> check(List<GotoItem> foundGotos, List<GraphPartEdge> gotoTargets, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         List<GraphTargetItem> ret = null;
 
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
@@ -282,7 +286,7 @@ public class AVM2Graph extends Graph {
                                     finallyJumps.clear();
                                     ignoredSwitches.put(e, swPos);
                                     st.push(new PopItem(null, aLocalData.lineStartInstruction));
-                                    finallyCommands = printGraph(partCodes, partCodePos, localData, st, allParts, parent, fpart, null, loops, staticOperation, path);
+                                    finallyCommands = printGraph(foundGotos, gotoTargets, partCodes, partCodePos, localData, st, allParts, parent, fpart, null, loops, staticOperation, path);
                                     //ignoredSwitches.remove(igs_size-1);
                                     finallyJumps.putAll(oldFinallyJumps);
                                     if (!finallyJumps.containsKey(e)) {
@@ -341,7 +345,7 @@ public class AVM2Graph extends Graph {
                         stopPart2.add(retPart);
                     }
 
-                    List<GraphTargetItem> ncatchedCommands = printGraph(partCodes, partCodePos, localData2, st2, allParts, parent, npart, stopPart2, loops, staticOperation, path);
+                    List<GraphTargetItem> ncatchedCommands = printGraph(foundGotos, gotoTargets, partCodes, partCodePos, localData2, st2, allParts, parent, npart, stopPart2, loops, staticOperation, path);
                     if (catchedExceptions.get(e).isFinally() && (catchedExceptions.size() > 1 || hasFinally)) {
                         catchedExceptions.remove(e);
                         e--;
@@ -381,7 +385,7 @@ public class AVM2Graph extends Graph {
                 }
                 TranslateStack st = (TranslateStack) stack.clone();
                 st.clear();
-                List<GraphTargetItem> tryCommands = printGraph(partCodes, partCodePos, localData, st, allParts, parent, part, stopPart2, loops, staticOperation, path);
+                List<GraphTargetItem> tryCommands = printGraph(foundGotos, gotoTargets, partCodes, partCodePos, localData, st, allParts, parent, part, stopPart2, loops, staticOperation, path);
                 if (retPart != null && avm2code.code.get(retPart.start).isExit() && !(!tryCommands.isEmpty() && (tryCommands.get(tryCommands.size() - 1) instanceof ExitItem))) {
                     avm2code.code.get(retPart.start).translate(localData, st, tryCommands, staticOperation, path);
                 }
@@ -417,7 +421,7 @@ public class AVM2Graph extends Graph {
                 TranslateStack st = (TranslateStack) stack.clone();
                 st.clear();
 
-                ret.addAll(printGraph(partCodes, partCodePos, localData, st, allParts, null, part, stopPart, loops, staticOperation, path));
+                ret.addAll(printGraph(foundGotos, gotoTargets, partCodes, partCodePos, localData, st, allParts, null, part, stopPart, loops, staticOperation, path));
             } else {
                 ret.add(lop);
             }
@@ -466,7 +470,8 @@ public class AVM2Graph extends Graph {
             StrictEqAVM2Item set = (StrictEqAVM2Item) stack.pop();
             caseValuesMapLeft.add(set.leftSide);
             caseValuesMapRight.add(set.rightSide);
-            
+
+            GraphPart origPart = part;
             List<GraphPart> caseBodyParts = new ArrayList<>();
             caseBodyParts.add(part.nextParts.get(0));
             GraphTargetItem top = null;
@@ -576,7 +581,7 @@ public class AVM2Graph extends Graph {
                      */
                     //must go backwards to hit case 2, not case 1
                     for (int i = caseBodyParts.size() - 1; i >= 0; i--) {
-                        if (caseBodyParts.get(i).leadsTo(localData, this, code, defaultPart, loops)) {
+                        if (caseBodyParts.get(i).leadsTo(localData, this, code, defaultPart, loops, new ArrayList<>())) {
                             DefaultItem di = new DefaultItem();
                             caseValuesMap.add(i + 1, di);
                             caseBodyParts.add(i + 1, defaultPart);
@@ -597,7 +602,7 @@ public class AVM2Graph extends Graph {
                         trace("2");                    
                      */
                     for (int i = 0; i < caseBodyParts.size(); i++) {
-                        if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops)) {
+                        if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops, new ArrayList<>())) {
                             DefaultItem di = new DefaultItem();
                             caseValuesMap.add(i, di);
                             caseBodyParts.add(i, defaultPart);
@@ -620,7 +625,9 @@ public class AVM2Graph extends Graph {
                     caseBodyParts.add(defaultPart);
                 }
 
-                GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops);
+                GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops, new ArrayList<>());
+                removeEdgeToFromList(gotoTargets, breakPart);
+
                 List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
                 GraphPart next = breakPart;
 
@@ -645,7 +652,7 @@ public class AVM2Graph extends Graph {
                     GraphPart nextCase = next;
                     if (next != null) {
                         if (i < caseBodies.size() - 1) {
-                            if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops)) {
+                            if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops, new ArrayList<>())) {
                                 currentCaseCommands.add(new BreakItem(null, localData.lineStartInstruction, currentLoop.id));
                             } else {
                                 nextCase = caseBodies.get(i + 1);
@@ -661,7 +668,7 @@ public class AVM2Graph extends Graph {
                     if (breakPart != null) {
                         stopPart2x.add(breakPart);
                     }
-                    currentCaseCommands.addAll(0, printGraph(partCodes, partCodePos, localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops, staticOperation, path));
+                    currentCaseCommands.addAll(0, printGraph(foundGotos, gotoTargets, partCodes, partCodePos, localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops, staticOperation, path));
                     if (currentCaseCommands.size() >= 2) {
                         if (currentCaseCommands.get(currentCaseCommands.size() - 1) instanceof BreakItem) {
                             if ((currentCaseCommands.get(currentCaseCommands.size() - 2) instanceof ContinueItem) || (currentCaseCommands.get(currentCaseCommands.size() - 2) instanceof BreakItem)) {
@@ -714,7 +721,7 @@ public class AVM2Graph extends Graph {
                     if (ti != null) {
                         ret.add(ti);
                     } else {
-                        ret.addAll(printGraph(partCodes, partCodePos, localData, stack, allParts, null, next, stopPart, loops, staticOperation, path));
+                        ret.addAll(printGraph(foundGotos, gotoTargets, partCodes, partCodePos, localData, stack, allParts, null, next, stopPart, loops, staticOperation, path));
                     }
                 }
             }

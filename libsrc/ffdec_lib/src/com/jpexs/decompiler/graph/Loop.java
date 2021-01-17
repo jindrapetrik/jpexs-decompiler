@@ -50,6 +50,8 @@ public class Loop implements Serializable {
 
     public int breakCandidatesLocked = 0;
 
+    public List<GraphTargetItem> precontinueCommands = null;
+
     public Loop(long id, GraphPart loopContinue, GraphPart loopBreak) {
         this.loopContinue = loopContinue;
         this.loopBreak = loopBreak;
