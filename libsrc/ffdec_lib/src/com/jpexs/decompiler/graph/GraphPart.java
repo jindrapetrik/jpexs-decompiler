@@ -12,12 +12,14 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
@@ -184,7 +186,10 @@ public class GraphPart implements Serializable {
         return false;
     }
 
-    public boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart part, List<Loop> loops) throws InterruptedException {
+    public boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart part, List<Loop> loops, List<GraphPartEdge> gotoParts) throws InterruptedException {
+        if (gotoParts.contains(new GraphPartEdge(this, part))) {
+            return false;
+        }
         for (Loop l : loops) {
             l.leadsToMark = 0;
         }

@@ -557,13 +557,15 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         return new NotItem(src, getLineStartItem(), this);
     }
 
-    public GraphTextWriter appendBlock(GraphTargetItem prevLineItem, GraphTextWriter writer, LocalData localData, List<GraphTargetItem> commands) throws InterruptedException {
+    public GraphTextWriter appendCommands(GraphTargetItem prevLineItem, GraphTextWriter writer, LocalData localData, List<GraphTargetItem> commands, boolean asBlock) throws InterruptedException {
 
         //This may be useful in the future, but we must handle obfuscated SWFs where there is only one debugline instruction on the beggining.
         final boolean useLineInfo = false;
 
         int prevLine = prevLineItem == null ? 0 : prevLineItem.getLine();
-        writer.startBlock();
+        if (asBlock) {
+            writer.startBlock();
+        }
         boolean first = true;
         for (GraphTargetItem ti : commands) {
             if (!ti.isEmpty()) {
@@ -576,10 +578,18 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
                 ti.toStringSemicoloned(writer, localData);
             }
         }
-        if (!first) {
-            writer.newLine();
+        if (asBlock) {
+            if (!first) {
+                writer.newLine();
+            }
+
+            writer.endBlock();
         }
-        writer.endBlock();
+        return writer;
+    }
+
+    public GraphTextWriter appendBlock(GraphTargetItem prevLineItem, GraphTextWriter writer, LocalData localData, List<GraphTargetItem> commands) throws InterruptedException {
+        appendCommands(prevLineItem, writer, localData, commands, true);
         return writer;
     }
 
