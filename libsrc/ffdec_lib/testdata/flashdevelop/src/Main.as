@@ -27,12 +27,15 @@ package
 		TestExpressions;
 		TestFinallyZeroJump;
 		TestFor;
+		TestForAnd;
 		TestForBreak;
 		TestForContinue;
 		TestForEach;
 		TestForEachObjectArray;
 		TestForEachObjectAttribute;
+		TestForGoto;
 		TestForIn;
+		TestForXml;
 		TestHello;
 		TestIf;
 		TestIfElse;
