@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - Using new FFDec icon on Mac
+- AS3: get/set slot for global scope
+- Better continue in for / goto detection
+
+### Changed
+- AS3 test methods separated to classes
 
 ## [12.0.1] - 2021-01-14
 ### Fixed
