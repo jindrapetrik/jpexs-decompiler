@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -24,16 +25,22 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -49,25 +56,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     private SWF swf;
 
-    private int clsIndex;
-
-    private ABC abc;
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {
         //Main.initLogging(false);
-        swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")), false);
-        DoABC2Tag tag = null;
-        for (Tag t : swf.getTags()) {
-            if (t instanceof DoABC2Tag) {
-                tag = (DoABC2Tag) t;
-                break;
-            }
-        }
-        assertNotNull(tag);
-        clsIndex = tag.getABC().findClassByName(new DottedChain(new String[]{"classes", "Test"}, ""));
-        assertTrue(clsIndex > -1);
-        this.abc = tag.getABC();
+        swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/flashdevelop/bin/flashdevelop.swf")), false);
+
         Configuration.autoDeobfuscate.set(false);
         Configuration.simplifyExpressions.set(false);
 
@@ -77,15 +71,42 @@ public class ActionScript3Test extends ActionScriptTestBase {
     }
 
     private void decompileMethod(String methodName, String expectedResult, boolean isStatic) {
-        int bodyIndex = abc.findMethodBodyByName(clsIndex, methodName);
+        String className = methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
+
+        int clsIndex = -1;
+        int scriptIndex = -1;
+
+        ABC abc = null;
+        List<ABC> abcs = new ArrayList<>();
+        for (ABCContainerTag abcTag : swf.getAbcList()) {
+            abcs.add(abcTag.getABC());
+        }
+        ScriptPack scriptPack = null;
+        for (ABC a : abcs) {
+            scriptPack = a.findScriptPackByPath("tests." + className, abcs);
+            if (scriptPack != null) {
+                break;
+            }
+        }
+        assertNotNull(scriptPack);
+        abc = scriptPack.abc;
+        scriptIndex = scriptPack.scriptIndex;
+
+        clsIndex = abc.findClassByName(new DottedChain(new String[]{"tests", className}, ""));
+
+        assertTrue(clsIndex > -1);
+        assertTrue(scriptIndex > -1);
+
+        int bodyIndex = abc.findMethodBodyByName(clsIndex, "run");
+
         assertTrue(bodyIndex > -1);
         HighlightedTextWriter writer;
         try {
             List<Traits> ts = new ArrayList<>();
             ts.add(abc.instance_info.get(clsIndex).instance_traits);
-            abc.bodies.get(bodyIndex).convert(new ConvertData(), methodName, ScriptExportMode.AS, isStatic, -1/*FIX?*/, -1/*FIX?*/, clsIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true);
+            abc.bodies.get(bodyIndex).convert(new ConvertData(), "run", ScriptExportMode.AS, isStatic, abc.bodies.get(bodyIndex).method_info, scriptIndex, clsIndex, abc, null, new ScopeStack(scriptIndex), 0, new NulWriter(), new ArrayList<>(), ts, true);
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            abc.bodies.get(bodyIndex).toString(methodName, ScriptExportMode.AS, abc, null, writer, new ArrayList<>());
+            abc.bodies.get(bodyIndex).toString("run", ScriptExportMode.AS, abc, null, writer, new ArrayList<>());
         } catch (InterruptedException ex) {
             fail();
             return;
@@ -96,12 +117,24 @@ public class ActionScript3Test extends ActionScriptTestBase {
     }
 
     private void decompileScriptPack(String path, String expectedResult) {
-        ScriptPack scriptPack = abc.findScriptPackByPath(path, Arrays.asList(abc));
-        assertTrue(scriptPack != null);
+
+        DoABC2Tag tag = null;
+        ABC abc = null;
+        ScriptPack scriptPack = null;
+        for (Tag t : swf.getTags()) {
+            if (t instanceof DoABC2Tag) {
+                tag = (DoABC2Tag) t;
+                abc = tag.getABC();
+                scriptPack = abc.findScriptPackByPath(path, Arrays.asList(abc));
+                if (scriptPack != null) {
+                    break;
+                }
+            }
+        }
+        assertNotNull(abc);
+        assertNotNull(scriptPack);
         HighlightedTextWriter writer = null;
         try {
-            List<Traits> ts = new ArrayList<>();
-            ts.add(abc.instance_info.get(clsIndex).instance_traits);
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
             scriptPack.toSource(writer, abc.script_info.get(scriptPack.scriptIndex).traits.traits, new ConvertData(), ScriptExportMode.AS, false);
         } catch (InterruptedException ex) {
@@ -967,9 +1000,9 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testMyPackage1TestClass() {
-        decompileScriptPack("classes.mypackage1.TestClass", "package classes.mypackage1\n"
+        decompileScriptPack("tests_classes.mypackage1.TestClass", "package tests_classes.mypackage1\n"
                 + "{\n"
-                + "   public class TestClass implements classes.mypackage1.TestInterface\n"
+                + "   public class TestClass implements tests_classes.mypackage1.TestInterface\n"
                 + "   {\n"
                 + "       \n"
                 + "      public function TestClass()\n"
@@ -985,18 +1018,18 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "      \n"
                 + "      public function testMethod1() : void\n"
                 + "      {\n"
-                + "         var a:classes.mypackage1.TestInterface = this;\n"
+                + "         var a:tests_classes.mypackage1.TestInterface = this;\n"
                 + "         a.testMethod1();\n"
-                + "         var b:classes.mypackage2.TestInterface = this;\n"
-                + "         b = new classes.mypackage2.TestClass();\n"
+                + "         var b:tests_classes.mypackage2.TestInterface = this;\n"
+                + "         b = new tests_classes.mypackage2.TestClass();\n"
                 + "      }\n"
                 + "      \n"
                 + "      public function testMethod2() : void\n"
                 + "      {\n"
-                + "         var a:classes.mypackage1.TestInterface = this;\n"
+                + "         var a:tests_classes.mypackage1.TestInterface = this;\n"
                 + "         a.testMethod1();\n"
-                + "         var b:classes.mypackage2.TestInterface = this;\n"
-                + "         b = new classes.mypackage2.TestClass();\n"
+                + "         var b:tests_classes.mypackage2.TestInterface = this;\n"
+                + "         b = new tests_classes.mypackage2.TestClass();\n"
                 + "      }\n"
                 + "   }\n"
                 + "}");
@@ -1004,7 +1037,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testMyPackage1TestClass2() {
-        decompileScriptPack("classes.mypackage1.TestClass2", "package classes.mypackage1\n"
+        decompileScriptPack("tests_classes.mypackage1.TestClass2", "package tests_classes.mypackage1\n"
                 + "{\n"
                 + "   public class TestClass2\n"
                 + "   {\n"
@@ -1014,14 +1047,14 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "         super();\n"
                 + "      }\n"
                 + "      \n"
-                + "      public function testCall() : *\n"
+                + "      public function testCall() : String\n"
                 + "      {\n"
-                + "         var a:classes.mypackage1.TestClass = null;\n"
-                + "         var b:classes.mypackage2.TestClass = null;\n"
-                + "         var c:classes.mypackage3.TestClass = null;\n"
-                + "         a = new classes.mypackage1.TestClass();\n"
-                + "         b = new classes.mypackage2.TestClass();\n"
-                + "         c = new classes.mypackage3.TestClass();\n"
+                + "         var a:tests_classes.mypackage1.TestClass = null;\n"
+                + "         var b:tests_classes.mypackage2.TestClass = null;\n"
+                + "         var c:tests_classes.mypackage3.TestClass = null;\n"
+                + "         a = new tests_classes.mypackage1.TestClass();\n"
+                + "         b = new tests_classes.mypackage2.TestClass();\n"
+                + "         c = new tests_classes.mypackage3.TestClass();\n"
                 + "         var res:String = a.testCall() + b.testCall() + c.testCall() + this.testCall2() + myNamespace::testCall3();\n"
                 + "         trace(res);\n"
                 + "         return res;\n"
@@ -1047,9 +1080,9 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testMyPackage1TestInterface() {
-        decompileScriptPack("classes.mypackage1.TestInterface", "package classes.mypackage1\n"
+        decompileScriptPack("tests_classes.mypackage1.TestInterface", "package tests_classes.mypackage1\n"
                 + "{\n"
-                + "   public interface TestInterface extends classes.mypackage2.TestInterface\n"
+                + "   public interface TestInterface extends tests_classes.mypackage2.TestInterface\n"
                 + "   {\n"
                 + "       \n"
                 + "      function testMethod1() : void;\n"
@@ -1059,7 +1092,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testMyPackage1MyNamespace() {
-        decompileScriptPack("classes.mypackage1.myNamespace", "package classes.mypackage1\n"
+        decompileScriptPack("tests_classes.mypackage1.myNamespace", "package tests_classes.mypackage1\n"
                 + "{\n"
                 + "   public namespace myNamespace = \"https://www.free-decompiler.com/flash/test/namespace\";\n"
                 + "}");
@@ -1067,7 +1100,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testMyPackage2TestClass() {
-        decompileScriptPack("classes.mypackage2.TestClass", "package classes.mypackage2\n"
+        decompileScriptPack("tests_classes.mypackage2.TestClass", "package tests_classes.mypackage2\n"
                 + "{\n"
                 + "   public class TestClass implements TestInterface\n"
                 + "   {\n"
@@ -1092,7 +1125,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testMyPackage2TestInterface() {
-        decompileScriptPack("classes.mypackage2.TestInterface", "package classes.mypackage2\n"
+        decompileScriptPack("tests_classes.mypackage2.TestInterface", "package tests_classes.mypackage2\n"
                 + "{\n"
                 + "   public interface TestInterface\n"
                 + "   {\n"
@@ -1104,7 +1137,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testMyPackage3TestClass() {
-        decompileScriptPack("classes.mypackage3.TestClass", "package classes.mypackage3\n"
+        decompileScriptPack("tests_classes.mypackage3.TestClass", "package tests_classes.mypackage3\n"
                 + "{\n"
                 + "   public class TestClass\n"
                 + "   {\n"
@@ -1126,8 +1159,25 @@ public class ActionScript3Test extends ActionScriptTestBase {
     @Test
     public void testOptionalParameters() {
         String methodName = "testOptionalParameters";
-        int methodInfo = abc.findMethodInfoByName(clsIndex, methodName);
-        int bodyIndex = abc.findMethodBodyByName(clsIndex, methodName);
+        String className = methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
+
+        int clsIndex = -1;
+        DoABC2Tag tag = null;
+        ABC abc = null;
+        for (Tag t : swf.getTags()) {
+            if (t instanceof DoABC2Tag) {
+                tag = (DoABC2Tag) t;
+                abc = tag.getABC();
+                clsIndex = abc.findClassByName(new DottedChain(new String[]{"tests", className}, ""));
+                if (clsIndex > -1) {
+                    break;
+                }
+            }
+        }
+        assertTrue(clsIndex > -1);
+
+        int methodInfo = abc.findMethodInfoByName(clsIndex, "run");
+        int bodyIndex = abc.findMethodBodyByName(clsIndex, "run");
         assertTrue(methodInfo > -1);
         assertTrue(bodyIndex > -1);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);

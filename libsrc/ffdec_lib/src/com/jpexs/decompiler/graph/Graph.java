@@ -724,6 +724,7 @@ public class Graph {
                 lastUsage.get(labelName).labelName = null;
             }
         }
+        expandGotos(ret);
         processIfs(ret);
         finalProcessStack(stack, ret, path);
         finalProcessAll(ret, 0, new FinalProcessLocalData(loops), path);
@@ -1203,16 +1204,6 @@ public class Graph {
     }
 
     protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
-        if (!list.isEmpty() && (list.get(list.size() - 1) instanceof GotoItem)) {
-            GotoItem gi = (GotoItem) list.get(list.size() - 1);
-            if (gi.targetCommands != null) {
-                list.remove(gi);
-                if (gi.labelName != null) {
-                    list.add(new LabelItem(null, gi.lineStartItem, gi.labelName));
-                }
-                list.addAll(gi.targetCommands);
-            }
-        }
         if (list.size() >= 2) {
             if (list.get(list.size() - 1) instanceof ExitItem) {
                 ExitItem e = (ExitItem) list.get(list.size() - 1);
@@ -1302,6 +1293,28 @@ public class Graph {
         for (int i = toDelete.length - 1; i >= 0; i--) {
             if (toDelete[i]) {
                 list.remove(i);
+            }
+        }
+    }
+
+    private void expandGotos(List<GraphTargetItem> list) {
+        if (!list.isEmpty() && (list.get(list.size() - 1) instanceof GotoItem)) {
+            GotoItem gi = (GotoItem) list.get(list.size() - 1);
+            if (gi.targetCommands != null) {
+                list.remove(gi);
+                if (gi.labelName != null) {
+                    list.add(new LabelItem(null, gi.lineStartItem, gi.labelName));
+                }
+                list.addAll(gi.targetCommands);
+            }
+        }
+        for (int i = 0; i < list.size(); i++) {
+            GraphTargetItem item = list.get(i);
+            if (item instanceof Block) {
+                List<List<GraphTargetItem>> subs = ((Block) item).getSubs();
+                for (List<GraphTargetItem> sub : subs) {
+                    expandGotos(sub);
+                }
             }
         }
     }

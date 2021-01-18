@@ -12,8 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph;
+
+import com.jpexs.decompiler.flash.abc.avm2.model.ScriptAVM2Item;
 
 /**
  *
@@ -27,5 +30,10 @@ public class ScopeStack extends TranslateStack {
 
     public ScopeStack() {
         this(true);
+    }
+
+    public ScopeStack(int scriptIndex) {
+        this(true);
+        //push(new ScriptAVM2Item(scriptIndex));
     }
 }

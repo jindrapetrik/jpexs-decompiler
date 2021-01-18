@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -223,7 +224,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.mark();
             List<Traits> ts = new ArrayList<>();
             ts.add(classInfo.static_traits);
-            abc.bodies.get(bodyIndex).convert(convertData, path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, ts, true);
+            abc.bodies.get(bodyIndex).convert(convertData, path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, new ScopeStack(scriptIndex), GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, ts, true);
             classInitializerIsEmpty = !writer.getMark();
         }
 
@@ -233,7 +234,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             if (bodyIndex != -1) {
                 List<Traits> ts = new ArrayList<>();
                 ts.add(instanceInfo.instance_traits);
-                abc.bodies.get(bodyIndex).convert(convertData, path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, ts, true);
+                abc.bodies.get(bodyIndex).convert(convertData, path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(scriptIndex), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, ts, true);
             }
         }
 

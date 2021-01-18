@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -115,7 +116,7 @@ public class TraitMethodGetterSetter extends Trait {
         if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
             if (!(classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1)) {
                 if (bodyIndex != -1) {
-                    abc.bodies.get(bodyIndex).convert(convertData, path, exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
+                    abc.bodies.get(bodyIndex).convert(convertData, path, exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(scriptIndex), 0, writer, fullyQualifiedNames, null, true);
                 }
             }
         }

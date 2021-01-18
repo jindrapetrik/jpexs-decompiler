@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -104,7 +105,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         convertHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            abc.bodies.get(bodyIndex).convert(convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true);
+            abc.bodies.get(bodyIndex).convert(convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(classIndex), 0, writer, fullyQualifiedNames, null, true);
         }
         writer.endMethod();
     }
