@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -45,11 +46,13 @@ public class GetGlobalScopeIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         if (localData.scopeStack.isEmpty()) {
-            if (localData.classIndex == -1) {
-                stack.push(new ScriptAVM2Item(localData.scriptIndex));
+            /*if (localData.classIndex == -1) {
+                
             } else {
                 stack.push(new ClassAVM2Item(localData.getInstanceInfo().get(localData.classIndex).getName(localData.getConstants())));
-            }
+            }*/
+            //FIXME??
+            stack.push(new ScriptAVM2Item(localData.scriptIndex));
             return;
         }
         stack.push(localData.scopeStack.get(0));

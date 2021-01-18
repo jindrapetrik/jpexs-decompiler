@@ -39,6 +39,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NextValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnVoidAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ScriptAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
@@ -338,7 +339,7 @@ public class AVM2Graph extends Graph {
                     st2.clear();
                     st2.add(new ExceptionAVM2Item(catchedExceptions.get(e)));
                     AVM2LocalData localData2 = new AVM2LocalData(aLocalData);
-                    localData2.scopeStack = new ScopeStack();
+                    localData2.scopeStack = new ScopeStack(localData2.scriptIndex);
                     List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                     stopPart2.add(nepart);
                     if (retPart != null) {

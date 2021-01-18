@@ -3636,7 +3636,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
                                 int mi = ((TraitMethodGetterSetter) t).method_info;
                                 try {
-                                    documentPack.abc.findBody(mi).convert(new ConvertData(), "??", ScriptExportMode.AS, true, mi, documentPack.scriptIndex, cindex, documentPack.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
+                                    documentPack.abc.findBody(mi).convert(new ConvertData(), "??", ScriptExportMode.AS, true, mi, documentPack.scriptIndex, cindex, documentPack.abc, t, new ScopeStack(documentPack.scriptIndex), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
                                     List<GraphTargetItem> infos = documentPack.abc.findBody(mi).convertedItems;
                                     if (!infos.isEmpty()) {
                                         if (infos.get(0) instanceof IfItem) {
@@ -3712,7 +3712,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                                                                         if (tr instanceof TraitClass) {
                                                                             int ci = ((TraitClass) tr).class_info;
                                                                             int cinit = p.abc.class_info.get(ci).cinit_index;
-                                                                            p.abc.findBody(cinit).convert(new ConvertData(), "??", ScriptExportMode.AS, true, cinit, p.scriptIndex, cindex, p.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
+                                                                            p.abc.findBody(cinit).convert(new ConvertData(), "??", ScriptExportMode.AS, true, cinit, p.scriptIndex, cindex, p.abc, t, new ScopeStack(p.scriptIndex), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
                                                                             List<GraphTargetItem> cinitBody = p.abc.findBody(cinit).convertedItems;
                                                                             for (GraphTargetItem cit : cinitBody) {
                                                                                 if (cit instanceof SetPropertyAVM2Item) {

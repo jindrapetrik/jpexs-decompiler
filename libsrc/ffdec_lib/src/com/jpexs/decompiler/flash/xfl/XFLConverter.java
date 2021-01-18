@@ -2455,7 +2455,7 @@ public class XFLConverter {
             MethodBody constructorBody = abc.findBody(constructorMethodIndex);
             try {
                 if (constructorBody.convertedItems == null) {
-                    constructorBody.convert(new ConvertData(), "??", ScriptExportMode.AS, true, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
+                    constructorBody.convert(new ConvertData(), "??", ScriptExportMode.AS, true, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(pack.scriptIndex), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
                 }
 
                 Map<Integer, Integer> frameToTraitMultiname = new HashMap<>();
@@ -2518,7 +2518,7 @@ public class XFLConverter {
                         MethodBody frameBody = abc.findBody(methodIndex);
 
                         StringBuilder scriptBuilder = new StringBuilder();
-                        frameBody.convert(new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
+                        frameBody.convert(new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(pack.scriptIndex), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
                         StringBuilderTextWriter writer = new StringBuilderTextWriter(Configuration.getCodeFormatting(), scriptBuilder);
                         frameBody.toString("??", ScriptExportMode.AS, abc, methodTrait, writer, new ArrayList<>());
 

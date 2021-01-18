@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -83,7 +84,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
         abc.method_info.get(methodIndex).getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);
         writer.startBlock();
         if (body != null) {
-            body.convert(new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), fullyQualifiedNames, null, false);
+            body.convert(new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, new ScopeStack(scriptIndex), 0, new NulWriter(), fullyQualifiedNames, null, false);
             body.toString(path + "/inner", ScriptExportMode.AS, abc, null, writer, fullyQualifiedNames);
         }
         writer.endBlock();
