@@ -37,6 +37,8 @@ import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
@@ -53,7 +55,12 @@ public class AS3Generator {
         List<ScriptPack> scriptPacks = swf.getAS3Packs();
 
         StringBuilder s = new StringBuilder();
+        Map<String, ScriptPack> sortedPacks = new TreeMap<>();
         for (ScriptPack pack : scriptPacks) {
+            sortedPacks.put(pack.getClassPath().toRawString(), pack);
+        }
+        for (String packClassName : sortedPacks.keySet()) {
+            ScriptPack pack = sortedPacks.get(packClassName);
             ABC abc = pack.abc;
             if (pack.getClassPath().packageStr.toRawString().equals("tests")) {
                 abc.findClassByName(pack.getClassPath().toRawString());
@@ -67,7 +74,7 @@ public class AS3Generator {
                         String lower = clsName.substring(0, 1).toLowerCase() + clsName.substring(1);
                         if (name.equals("run")) {
                             s.append("@Test\r\npublic void ");
-                            s.append(name);
+                            s.append(lower);
                             s.append("(){\r\ndecompileMethod(\"");
                             s.append(lower);
                             s.append("\", ");
