@@ -691,18 +691,13 @@ public class Graph {
 
         //TODO: Make getPrecontinues faster
         getBackEdges(localData, loops, new ArrayList<>());
-        //getPrecontinues(path, localData, null, heads.get(0), allParts, loops, null);
+        getPrecontinues(path, localData, null, heads.get(0), allParts, loops, null);
         //getPrecontinues2(path, localData, null, heads.get(0), allParts, loops, null);
         List<GraphPartEdge> gotoTargets = new ArrayList<>();
-        findGotoTargets(path, heads.get(0), loops, gotoTargets);
-        /*for (Loop l : loops) {
-            if (l.loopBreak != null) {
-                if (gotoTargets.contains(l.loopBreak)) {
-                    gotoTargets.remove(l.loopBreak);
-                }
-            }
-        }*/
-        //System.err.println("gotoTargets.SIZE=" + gotoTargets.size());
+
+        //TODO: implement and fix this:
+        //findGotoTargets(path, heads.get(0), loops, gotoTargets);
+
         /*System.err.println("<loopspre>");
          for (Loop el : loops) {
          System.err.println(el);
@@ -1452,6 +1447,223 @@ public class Graph {
             }
         }
         return null;
+    }
+
+    //TODO: Make this faster!!!
+    private void getPrecontinues(String path, BaseLocalData localData, GraphPart parent, GraphPart part, Set<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart) throws InterruptedException {
+        try {
+            markLevels(path, localData, part, allParts, loops);
+        } catch (ThreadDeath | InterruptedException ex) {
+            throw ex;
+        } catch (Throwable ex) {
+            //It is unusual code so markLevels failed, nevermind, it can still work
+        }
+        //Note: this also marks part as precontinue when there is if
+        /*
+         while(k<10){
+         if(k==7){
+         trace(a);
+         }else{
+         trace(b);
+         }
+         //precontinue
+         k++;
+         }
+         */
+        looploops:
+        for (Loop l : loops) {
+            if (l.loopContinue != null) {
+                Set<GraphPart> uniqueRefs = new HashSet<>();
+                uniqueRefs.addAll(l.loopContinue.refs);
+                if (uniqueRefs.size() == 2) { //only one path - from precontinue
+                    List<GraphPart> uniqueRefsList = new ArrayList<>(uniqueRefs);
+                    if (uniqueRefsList.get(0).discoveredTime > uniqueRefsList.get(1).discoveredTime) { //latch node is discovered later
+                        part = uniqueRefsList.get(0);
+                    } else {
+                        part = uniqueRefsList.get(1);
+                    }
+                    if (part == l.loopContinue) {
+                        continue looploops;
+                    }
+
+                    while (part.refs.size() == 1) {
+                        if (part.refs.get(0).nextParts.size() != 1) {
+                            continue looploops;
+                        }
+
+                        part = part.refs.get(0);
+                        if (part == l.loopContinue) {
+                            break;
+                        }
+                    }
+                    if (part.level == 0 && part != l.loopContinue) {
+                        l.loopPreContinue = part;
+                    }
+                }
+            }
+        }
+        /*clearLoops(loops);
+         getPrecontinues(parent, part, loops, stopPart, 0, new ArrayList<GraphPart>());
+         clearLoops(loops);*/
+    }
+
+    private void markLevels(String path, BaseLocalData localData, GraphPart part, Set<GraphPart> allParts, List<Loop> loops) throws InterruptedException {
+        clearLoops(loops);
+        markLevels(path, localData, part, allParts, loops, new ArrayList<>(), 1, new HashSet<>(), 0);
+        clearLoops(loops);
+    }
+
+    private void markLevels(String path, BaseLocalData localData, GraphPart part, Set<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart, int level, Set<GraphPart> visited, int recursionLevel) throws InterruptedException {
+        if (stopPart == null) {
+            stopPart = new ArrayList<>();
+        }
+        if (recursionLevel > allParts.size() + 1) {
+            throw new RuntimeException(path + ": markLevels max recursion level reached");
+        }
+
+        if (stopPart.contains(part)) {
+            //System.err.println("/stopped part " + part);
+            return;
+        }
+        for (Loop el : loops) {
+            if ((el.phase == 2) && (el.loopContinue == part)) {
+                return;
+            }
+            if (el.phase != 1) {
+                continue;
+            }
+            if (el.loopContinue == part) {
+                return;
+            }
+            if (el.loopPreContinue == part) {
+                return;
+            }
+            if (el.loopBreak == part) {
+                return;
+            }
+        }
+
+        if (visited.contains(part)) {
+            part.level = 0;
+            //System.err.println("set level " + part + " to zero");
+        } else {
+            visited.add(part);
+            part.level = level;
+            //System.err.println("set level " + part + " to " + level);
+        }
+
+        boolean isLoop = false;
+        Loop currentLoop = null;
+        for (Loop el : loops) {
+            if ((el.phase == 0) && (el.loopContinue == part)) {
+                isLoop = true;
+                currentLoop = el;
+                el.phase = 1;
+                break;
+            }
+        }
+
+        List<GraphPart> nextParts = checkPrecoNextParts(part);
+        if (nextParts == null) {
+            nextParts = part.nextParts;
+        }
+        nextParts = new ArrayList<>(nextParts);
+
+        if (nextParts.size() == 2 && stopPart.contains(nextParts.get(1))) {
+            nextParts.remove(1);
+        }
+        if (nextParts.size() >= 1 && stopPart.contains(nextParts.get(0))) {
+            nextParts.remove(0);
+        }
+
+        if (nextParts.size() == 2) {
+            GraphPart next = getCommonPart(localData, nextParts, loops, new ArrayList<>());//part.getNextPartPath(new ArrayList<GraphPart>());
+            //System.err.println("- common part of " + nextParts.get(0) + " and " + nextParts.get(1) + " is " + next);
+            List<GraphPart> stopParts2 = new ArrayList<>();  //stopPart);
+            if (next != null) {
+                stopParts2.add(next);
+            } else if (!stopPart.isEmpty()) {
+                stopParts2.add(stopPart.get(stopPart.size() - 1));
+            }
+            if (next != nextParts.get(0)) {
+                // System.err.println("- going to branch 0 nextpart from " + part + " to " + nextParts.get(0));
+                markLevels(path, localData, nextParts.get(0), allParts, loops, next == null ? stopPart : stopParts2, level + 1, visited, recursionLevel + 1);
+            } else {
+                //System.err.println("- branch 0 of " + part + " is skipped (=next)");
+            }
+
+            if (next != nextParts.get(1)) {
+                //System.err.println("- going to branch 1 nextpart from " + part + " to " + nextParts.get(1));
+                markLevels(path, localData, nextParts.get(1), allParts, loops, next == null ? stopPart : stopParts2, level + 1, visited, recursionLevel + 1);
+            } else {
+                //System.err.println("- branch 1 of " + part + " is skipped (=next)");
+            }
+            if (next != null) {
+                //System.err.println("- going to next from " + part + " to " + next);
+                markLevels(path, localData, next, allParts, loops, stopPart, level, visited, recursionLevel + 1);
+            }
+        }
+
+        if (nextParts.size() > 2) {
+            GraphPart next = getMostCommonPart(localData, nextParts, loops, new ArrayList<>());
+            List<GraphPart> vis = new ArrayList<>();
+            for (GraphPart p : nextParts) {
+                if (vis.contains(p)) {
+                    continue;
+                }
+                List<GraphPart> stopPart2 = new ArrayList<>(); //(stopPart);
+                if (next != null) {
+                    stopPart2.add(next);
+                } else if (!stopPart.isEmpty()) {
+                    stopPart2.add(stopPart.get(stopPart.size() - 1));
+                }
+                for (GraphPart p2 : nextParts) {
+                    if (p2 == p) {
+                        continue;
+                    }
+                    if (!stopPart2.contains(p2)) {
+                        stopPart2.add(p2);
+                    }
+                }
+                if (next != p) {
+                    markLevels(path, localData, p, allParts, loops, stopPart2, level + 1, visited, recursionLevel + 1);
+                    vis.add(p);
+                }
+            }
+            if (next != null) {
+                markLevels(path, localData, next, allParts, loops, stopPart, level, visited, recursionLevel + 1);
+            }
+        }
+
+        if (nextParts.size() == 1) {
+            //System.err.println("going to one nexpart from " + part + " to " + nextParts.get(0));
+            markLevels(path, localData, nextParts.get(0), allParts, loops, stopPart, level, visited, recursionLevel + 1);
+        }
+
+        for (GraphPart t : part.throwParts) {
+            if (!visited.contains(t)) {
+                List<GraphPart> stopPart2 = new ArrayList<>();
+                List<GraphPart> cmn = new ArrayList<>();
+                cmn.add(part);
+                cmn.add(t);
+                GraphPart next = getCommonPart(localData, cmn, loops, new ArrayList<>());
+                if (next != null) {
+                    stopPart2.add(next);
+                } else {
+                    stopPart2 = stopPart;
+                }
+
+                markLevels(path, localData, t, allParts, loops, stopPart2, level, visited, recursionLevel + 1);
+            }
+        }
+
+        if (isLoop) {
+            if (currentLoop != null && currentLoop.loopBreak != null) {
+                currentLoop.phase = 2;
+                //System.err.println("- going to break of loop " + currentLoop.loopBreak);
+                markLevels(path, localData, currentLoop.loopBreak, allParts, loops, stopPart, level, visited, recursionLevel + 1);
+            }
+        }
     }
 
     private void checkContinueAtTheEnd(List<GraphTargetItem> commands, Loop loop) {
@@ -2502,7 +2714,9 @@ public class Graph {
                         commands.addAll(loopItem.commands);
                         checkContinueAtTheEnd(commands, currentLoop);
                         List<GraphTargetItem> finalComm = new ArrayList<>();
-                        /*if (currentLoop.loopPreContinue != null) {
+
+                        //findGotoTargets - comment this out:
+                        if (currentLoop.loopPreContinue != null) {
                             GraphPart backup = currentLoop.loopPreContinue;
                             currentLoop.loopPreContinue = null;
                             List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
@@ -2510,7 +2724,7 @@ public class Graph {
                             finalComm = printGraph(foundGotos, gotoTargets, partCodes, partCodePos, visited, localData, new TranslateStack(path), allParts, null, backup, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
                             currentLoop.loopPreContinue = backup;
                             checkContinueAtTheEnd(finalComm, currentLoop);
-                        }*/
+                        }
                         if (currentLoop.precontinueCommands != null) {
                             finalComm.addAll(currentLoop.precontinueCommands);
                         }
