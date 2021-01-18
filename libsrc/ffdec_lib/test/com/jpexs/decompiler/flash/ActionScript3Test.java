@@ -911,6 +911,16 @@ public class ActionScript3Test extends ActionScriptTestBase {
     }
 
     @Test
+    public void testStrictEquals() {
+        decompileMethod("testStrictEquals", "var k:int = 6;\r\n"
+                + "if(this.f() !== this.f())\r\n"
+                + "{\r\n"
+                + "trace(\"is eight\");\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
     public void testStringConcat() {
         decompileMethod("testStringConcat", "var k:int = 8;\r\n"
                 + "this.traceIt(\"hello\" + 5 * 6);\r\n"

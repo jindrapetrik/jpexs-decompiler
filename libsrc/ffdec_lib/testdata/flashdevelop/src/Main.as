@@ -59,6 +59,7 @@ package
 		TestProperty;
 		TestRegExp;
 		TestRest;
+		TestStrictEquals;
 		TestStringConcat;
 		TestStrings;
 		TestSwitch;

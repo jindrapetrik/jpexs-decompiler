@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - Using new FFDec icon on Mac
 - AS3: get/set slot for global scope
 - Better continue in for / goto detection
+- AS3: Incorrect handling of strict equals operator in if vs switch resulting in §§pop
 
 ### Changed
 - AS3 test methods separated to classes

@@ -537,9 +537,7 @@ public class AVM2Graph extends Graph {
                 switchedObject = new LocalRegAVM2Item(null, null, rightReg, null);                
             }
             
-            if(leftReg < 0 && rightReg < 0){
-                
-            } else if (cnt == 1) {
+            if ((leftReg < 0 && rightReg < 0) || (cnt == 1)) {
                 stack.push(set);
             } else {
                 part = part.nextParts.get(1);
