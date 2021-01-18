@@ -53,10 +53,11 @@ public class GraphVizGraphPanel extends AbstractGraphPanel {
         StringBuilderTextWriter sbWriter = new StringBuilderTextWriter(null, sb);
         ex.export(graph, sbWriter);
         String original = sb.toString();
-        CodeStructureModifyOperation structureModify = new CodeStructureModifyOperation();
-        String structured = structureModify.execute(original, null);
+        /*CodeStructureModifyOperation structureModify = new CodeStructureModifyOperation();
+        String structured = structureModify.execute(original, null);*/
+        //CodeStructureModifyOperation is buggy - it does not properly handle gotos
         try {
-            image = new GraphVizDotCommands().dotToImage(structured);
+            image = new GraphVizDotCommands().dotToImage(original);
         } catch (IOException ex1) {
             logger.log(Level.SEVERE, "Exporting image failed", ex1);
             image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
