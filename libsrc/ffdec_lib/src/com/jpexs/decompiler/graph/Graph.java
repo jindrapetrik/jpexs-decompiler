@@ -1326,6 +1326,25 @@ public class Graph {
                 List<GraphTargetItem> onTrue = ifi.onTrue;
                 List<GraphTargetItem> onFalse = ifi.onFalse;
                 if ((!onTrue.isEmpty()) && (!onFalse.isEmpty())) {
+                    if (onTrue.get(onTrue.size() - 1) instanceof GotoItem) {
+                        if (onFalse.get(onFalse.size() - 1) instanceof GotoItem) {
+                            GotoItem gotoOnTrue = (GotoItem) onTrue.get(onTrue.size() - 1);
+                            GotoItem gotoOnFalse = (GotoItem) onFalse.get(onFalse.size() - 1);
+                            String labelOnTrue = gotoOnTrue.labelName;
+                            String labelOnFalse = gotoOnFalse.labelName;
+                            if (labelOnTrue != null && labelOnFalse != null) {
+                                if (labelOnTrue.equals(labelOnFalse)) {
+                                    GotoItem gotoMerged = gotoOnTrue.targetCommands != null ? gotoOnTrue : gotoOnFalse;
+
+                                    onTrue.remove(onTrue.size() - 1);
+                                    onFalse.remove(onFalse.size() - 1);
+                                    list.add(i + 1, gotoMerged);
+                                }
+                            }
+                        }
+                    }
+                }
+                if ((!onTrue.isEmpty()) && (!onFalse.isEmpty())) {
                     if (onTrue.get(onTrue.size() - 1) instanceof ContinueItem) {
                         if (onFalse.get(onFalse.size() - 1) instanceof ContinueItem) {
                             if (((ContinueItem) onTrue.get(onTrue.size() - 1)).loopId == ((ContinueItem) onFalse.get(onFalse.size() - 1)).loopId) {
@@ -1965,16 +1984,6 @@ public class Graph {
                 //System.err.println("Already visited part " + part + ", adding goto");
             }
             String labelName = "addr" + part.start;
-            /*List<GraphTargetItem> firstCode = partCodes.get(part);
-            int firstCodePos = partCodePos.get(part);
-            if (firstCodePos > firstCode.size()) {
-                firstCodePos = firstCode.size();
-            }
-            if (firstCode.size() > firstCodePos && (firstCode.get(firstCodePos) instanceof LabelItem)) {
-                labelName = ((LabelItem) firstCode.get(firstCodePos)).labelName;
-            } else {
-                firstCode.add(firstCodePos, new LabelItem(null, localData.lineStartInstruction, labelName));
-            }*/
             GotoItem gi = new GotoItem(null, localData.lineStartInstruction, labelName);
             boolean targetCommandsFound = false;
             for (int r = foundGotos.size() - 1; r >= 0; r--) {
@@ -1986,6 +1995,7 @@ public class Graph {
                     break;
                 }
             }
+            makeAllCommands(ret, stack);
             if (!targetCommandsFound) {
                 List<GraphPartEdge> newGotoTargets = new ArrayList<>(gotoTargets);
                 removeEdgeToFromList(newGotoTargets, part);
@@ -1994,11 +2004,11 @@ public class Graph {
                 if (!gi.targetCommands.isEmpty() && (gi.targetCommands.get(gi.targetCommands.size() - 1) instanceof ContinueItem)) {
                     ContinueItem cnt = (ContinueItem) gi.targetCommands.get(gi.targetCommands.size() - 1);
                     for (Loop l : loops) {
-                        if (l.id == cnt.loopId) {
+                        if (l.id == cnt.loopId && l.backEdges.size() == 1) {
                             gi.targetCommands.remove(cnt);
                             l.precontinueCommands = gi.targetCommands;
                             l.loopPreContinue = part;
-                            gotoTargets.remove(part);
+                            removeEdgeToFromList(gotoTargets, part);
                             ret.add(cnt);
                             return ret;
                         }
@@ -2008,6 +2018,20 @@ public class Graph {
             foundGotos.add(gi);
             ret.add(gi);
 
+            return ret;
+        } else if (visited.contains(part)) {
+            String labelName = "addr" + part.start;
+            List<GraphTargetItem> firstCode = partCodes.get(part);
+            int firstCodePos = partCodePos.get(part);
+            if (firstCodePos > firstCode.size()) {
+                firstCodePos = firstCode.size();
+            }
+            if (firstCode.size() > firstCodePos && (firstCode.get(firstCodePos) instanceof LabelItem)) {
+                labelName = ((LabelItem) firstCode.get(firstCodePos)).labelName;
+            } else {
+                firstCode.add(firstCodePos, new LabelItem(null, localData.lineStartInstruction, labelName));
+            }
+            ret.add(new GotoItem(null, localData.lineStartInstruction, labelName));
             return ret;
         } else {
             visited.add(part);
