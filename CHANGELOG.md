@@ -10,6 +10,9 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - AS3 test methods separated to classes
 
+### Removed
+- Code structure detection in Graphviz graphs as it was usually wrong
+
 ## [12.0.1] - 2021-01-14
 ### Fixed
 - Critical fix - application GUI did not start on OSes without flashplayer (Linux, MacOS, even Windows)
