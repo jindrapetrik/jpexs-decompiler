@@ -53,6 +53,7 @@ import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.UniversalLoopItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -76,7 +77,7 @@ public class Graph {
 
     protected GraphSource code;
 
-    private final List<Integer> alternateEntries;
+    private final List<GraphException> exceptions;
 
     public static final int SOP_USE_STATIC = 0;
 
@@ -244,9 +245,9 @@ public class Graph {
         return b0.iloop_header;
     }
 
-    public Graph(GraphSource code, List<Integer> alternateEntries) {
+    public Graph(GraphSource code, List<GraphException> exceptions) {
         this.code = code;
-        this.alternateEntries = alternateEntries;
+        this.exceptions = exceptions;
 
     }
 
@@ -254,7 +255,7 @@ public class Graph {
         if (heads != null) {
             return;
         }
-        heads = makeGraph(code, new ArrayList<>(), alternateEntries);
+        heads = makeGraph(code, new ArrayList<>(), exceptions);
         int time = 1;
         List<GraphPart> ordered = new ArrayList<>();
         List<GraphPart> visited = new ArrayList<>();
@@ -617,8 +618,8 @@ public class Graph {
         return part;
     }
 
-    public static List<GraphTargetItem> translateViaGraph(BaseLocalData localData, String path, GraphSource code, List<Integer> alternateEntries, int staticOperation) throws InterruptedException {
-        Graph g = new Graph(code, alternateEntries);
+    public static List<GraphTargetItem> translateViaGraph(BaseLocalData localData, String path, GraphSource code, List<GraphException> exceptions, int staticOperation) throws InterruptedException {
+        Graph g = new Graph(code, exceptions);
         g.init(localData);
         return g.translate(localData, staticOperation, path);
     }
@@ -691,12 +692,11 @@ public class Graph {
 
         //TODO: Make getPrecontinues faster
         getBackEdges(localData, loops, new ArrayList<>());
-        getPrecontinues(path, localData, null, heads.get(0), allParts, loops, null);
+        //getPrecontinues(path, localData, null, heads.get(0), allParts, loops, null);
         //getPrecontinues2(path, localData, null, heads.get(0), allParts, loops, null);
         List<GraphPartEdge> gotoTargets = new ArrayList<>();
 
-        //TODO: implement and fix this:
-        //findGotoTargets(path, heads.get(0), loops, gotoTargets);
+        findGotoTargets(path, heads.get(0), allParts, loops, gotoTargets);
 
         /*System.err.println("<loopspre>");
          for (Loop el : loops) {
@@ -812,16 +812,341 @@ public class Graph {
         }
     }
 
-    private void findGotoTargets(String path, GraphPart startPart, List<Loop> loops, List<GraphPartEdge> gotoTargets) {
-        if (!path.equals("classes.tests/ForTest1.test")) {
+    private void findGotoTargetsWalk(Map<GraphPart, List<GraphPart>> partToNext, Map<GraphPart, List<GraphPart>> partToPrev, Reference<Integer> currentVirtualNum, List<GraphExceptionParts> openedExceptions, GraphPartEdge e,
+            Set<GraphPart> opened,
+            Set<GraphPart> closed,
+            Set<GraphPart> closedBranches,
+            Set<GraphPartEdge> exitEdges,
+            Set<GraphPartEdge> backEdges,
+            Set<GraphPartEdge> throwEdges,
+            Set<GraphPartEdge> allowedThrowEdges,
+            List<GraphExceptionParts> exceptionParts,
+            Map<GraphPartEdge, List<GraphPart>> edgeToBranches,
+            GraphPart start,
+            List<GraphPartEdge> gotoTargets) {
+        GraphPart p = e.to;
+        if (closed.contains(p)) {
+            logger.fine("part " + p + " is already closed, skipping");
+            return;
+        }
+        logger.fine("processing " + p);
+        if (!edgeToBranches.containsKey(e)) {
+            edgeToBranches.put(e, new ArrayList<>());
+        }
+        List<GraphPart> branches = edgeToBranches.get(e);
+        if (p != start) {
+            List<GraphPart> refs = getUnicatePartList(partToPrev.get(p));
+
+            List<List<GraphPart>> comparedPaths = new ArrayList<>();
+            List<GraphPartEdge> comparedPathsEdges = new ArrayList<>();
+            for (GraphPart r : refs) {
+                GraphPartEdge re = new GraphPartEdge(r, p);
+                /*if (throwEdges.contains(re) && !allowedThrowEdges.contains(re)) {
+                    logger.fine("ref edge " + re + " is throwedge, ignored");
+                    continue;
+                }*/
+                if (backEdges.contains(re)) {
+                    logger.fine("ref edge " + re + " is backedge, ignored");
+                    continue;
+                }
+                if (r.start == -1) {
+                    logger.fine("ref edge " + re + " is alternatestart, ignored");
+                    continue;
+                }
+                if (!edgeToBranches.containsKey(re)) {
+                    //edge not yet processed
+                    logger.fine("ref edge " + re + " NOT yet processed");
+                    return;
+                } else {
+                    logger.fine("ref edge " + re + " already processed");
+                }
+                comparedPaths.add(edgeToBranches.get(re));
+                comparedPathsEdges.add(re);
+
+            }
+
+            boolean isEndOfBlock = false;
+
+            loopi:
+            for (int i = 0; i < comparedPaths.size(); i++) {
+                for (int j = 0; j < comparedPaths.size(); j++) {
+                    if (i == j) {
+                        continue;
+                    }
+                    if (comparedPaths.get(i).equals(comparedPaths.get(j))) {
+                        //logger.info("paths match: " + comparedPaths.get(i));
+                        if (comparedPaths.get(i).isEmpty()) {
+                            //logger.info("path isempty, removing it ");
+                            comparedPaths.remove(i);
+                            comparedPathsEdges.remove(i);
+                            i--;
+                            continue loopi;
+                        }
+                        logger.fine("merged paths:" + pathToString(comparedPaths.get(i)) + " of edge " + comparedPathsEdges.get(i));
+
+                        GraphPart decision = comparedPaths.get(i).get(comparedPaths.get(i).size() - 1);
+                        if (partToNext.get(decision).size() > 2) {
+                            int removedCount = 0;
+                            for (int k = comparedPaths.size() - 1; k >= 0; k--) {
+                                if (k == i) {
+                                    continue;
+                                }
+                                if (comparedPaths.get(i).equals(comparedPaths.get(k))) {
+                                    comparedPaths.remove(k);
+                                    comparedPathsEdges.remove(k);
+                                    removedCount++;
+                                }
+                                if (removedCount == partToNext.get(decision).size() - 1) {
+                                    break;
+                                }
+                            }
+                            comparedPaths.get(i).remove(comparedPaths.get(i).size() - 1);
+                        } else {
+                            //remove last path component
+                            int last = i > j ? i : j;
+                            int first = i < j ? i : j;
+                            comparedPaths.get(first).remove(comparedPaths.get(first).size() - 1);
+                            comparedPaths.remove(last);
+                            comparedPathsEdges.remove(last);
+                        }
+                        //logger.fine("normal closing " + decision);
+
+                        if (!closedBranches.contains(decision)) {
+                            logger.fine("on part " + p);
+                            logger.fine("normal closing branch " + decision);
+                            closedBranches.add(decision);
+                        } else {
+                            logger.fine("branch already closed: " + decision);
+                            isEndOfBlock = true;
+                        }
+                        closedBranches.add(decision);
+                        i = -1;
+                        continue loopi;
+                    }
+                }
+            }
+            for (List<GraphPart> cp : comparedPaths) {
+                logger.fine("- branches:" + pathToString(cp));
+            }
+
+            if (comparedPaths.size() > 1) {
+                logger.fine("not a single path");
+                for (int i = 0; i < comparedPaths.size(); i++) {
+
+                }
+                List<GraphPart> prefix = getCommonPrefix(comparedPaths);
+                Set<GraphPart> partsToClose = new HashSet<>();
+                GraphPart decision = prefix.isEmpty() ? null : prefix.get(prefix.size() - 1);
+
+                for (int i = 0; i < comparedPaths.size(); i++) {
+                    for (int j = prefix.size() - 1; j < comparedPaths.get(i).size(); j++) {
+                        if (j < 0) {
+                            continue;
+                        }
+                        GraphPart partToClose = comparedPaths.get(i).get(j);
+                        GraphPartEdge edgeToClose = comparedPathsEdges.get(i);
+                        if (!closedBranches.contains(partToClose)) {
+                            logger.fine("on part " + p);
+                            logger.fine("closing branch " + partToClose);
+                            partsToClose.add(partToClose);
+                        } else {
+                            logger.fine("branch already closed: " + partToClose);
+                            logger.fine("probably break edge: " + edgeToClose);
+                            isEndOfBlock = true;
+                        }
+                    }
+                }
+                /*if (decision != null) {
+                    logger.fine("closing branch 2: " + decision);
+                    closedBranches.add(decision);
+                }*/
+                closedBranches.addAll(partsToClose);
+                branches = prefix;
+                if (!branches.isEmpty()) {
+                    branches.remove(branches.size() - 1);
+                }
+
+            }
+
+            if (isEndOfBlock) {
+                //GraphPart blockStartPart = getDominator(startPart, p, loops);
+                //logger.info("found breaks to  to " + p);
+                //System.err.println("found breaks to  to " + p);
+                for (GraphPart r : p.refs) {
+                    gotoTargets.add(new GraphPartEdge(r, p));
+                }
+                //gotoTargets.add(new GraphPartEdge(e.from, e.to));
+            }
+
+        }
+
+        List<GraphPart> nexts = new ArrayList<>();
+
+        boolean isExceptionStart = false;
+        GraphExceptionParts nearestEx = null;
+        List<GraphExceptionParts> currentExceptions = new ArrayList<>();
+        List<GraphPart> currentExceptionTargets = new ArrayList<>();
+
+        for (GraphExceptionParts ex : exceptionParts) {
+            if (openedExceptions.contains(ex)) {
+                continue;
+            }
+            if (p.equals(ex.start)) {
+                if (nearestEx != null && !ex.end.equals(nearestEx.end)) {
+                    continue;
+                }
+                isExceptionStart = true;
+                currentExceptions.add(ex);
+                nearestEx = ex;
+                currentExceptionTargets.add(ex.target);
+            }
+        }
+
+        if (!currentExceptionTargets.isEmpty()) {
+            //openedExceptions = new ArrayList<>();
+            openedExceptions.addAll(currentExceptions);
+            List<GraphPart> virtualNexts = new ArrayList<>();
+            virtualNexts.add(p);
+            virtualNexts.addAll(currentExceptionTargets);
+            virtualNexts.add(nearestEx.end);
+            currentVirtualNum.setVal(currentVirtualNum.getVal() - 1);
+            GraphPart virtualPart = new GraphPart(currentVirtualNum.getVal(), currentVirtualNum.getVal());
+            partToNext.put(virtualPart, virtualNexts);
+            partToPrev.put(virtualPart, new ArrayList<>());
+
+            // connection from prevs of p to virtualPart
+            for (int k = 0; k < partToPrev.get(p).size(); k++) {
+                GraphPart pr = partToPrev.get(p).get(k);
+                List<GraphPart> prevNexts = partToNext.get(pr);
+                for (int j = 0; j < prevNexts.size(); j++) {
+                    if (prevNexts.get(j).equals(p)) {
+                        prevNexts.set(j, virtualPart);
+                    }
+                }
+                partToPrev.get(virtualPart).add(pr);
+            }
+            for (GraphPart t : virtualNexts) {
+                if (t == nearestEx.end) {
+                    partToPrev.get(t).add(virtualPart);
+                } else {
+                    partToPrev.get(t).clear();
+                    partToPrev.get(t).add(virtualPart);
+                }
+            }
+            p = virtualPart;
+        }
+
+        //filter out backedges           
+        for (GraphPart n : partToNext.get(p)) {
+            GraphPartEdge ne = new GraphPartEdge(p, n);
+            if (!backEdges.contains(ne)) {
+                nexts.add(n);
+            } else {
+                logger.fine("next edge " + ne + " is backedge, ignored");
+            }
+        }
+
+
+        int sizeNextsNoThrow = nexts.size();
+
+        closed.add(p);
+
+        Stack<GraphPartEdge> walkStack = new Stack<>();
+        logger.fine("processing nextparts of " + p);
+        for (GraphPart n : nexts) {
+            GraphPartEdge ne = new GraphPartEdge(p, n);
+            List<GraphPart> subBranches = branches;
+            if (nexts.size() > 1) {
+                subBranches = new ArrayList<>(branches);
+                subBranches.add(p);
+            }
+            edgeToBranches.put(ne, subBranches);
+            walkStack.push(ne);
+        }
+
+        /*if (isTryBegin(p)) {
+            for (GraphPart t : p.throwParts) {
+                GraphPartEdge te = new GraphPartEdge(p, t);
+                if (backEdges.contains(te)) {
+                    continue;
+                }
+                edgeToBranches.put(te, branches);
+                walkStack.push(te);
+            }
+        }*/
+
+ /*logger.fine("processing throwparts of " + p);
+            for (GraphPart n : p.throwParts) {
+                GraphPartEdge ne = new GraphPartEdge(p, n);
+                List<GraphPart> subBranches = new ArrayList<>(branches);
+                if (p.throwParts.size() > 1) {
+                    subBranches = new ArrayList<>(branches);
+                    subBranches.add(p);
+                }
+                edgeToBranches.put(ne, subBranches);
+                walkStack.push(ne);
+            }*/
+        while (!walkStack.isEmpty()) {
+            findGotoTargetsWalk(partToNext, partToPrev, currentVirtualNum, openedExceptions, walkStack.pop(), opened, closed, closedBranches, exitEdges, backEdges, throwEdges, allowedThrowEdges, exceptionParts, edgeToBranches, start, gotoTargets);
+        }
+    }
+
+    private void findGotoTargets(String path, GraphPart startPart, Set<GraphPart> allParts, List<Loop> loops, List<GraphPartEdge> gotoTargets) {
+        if (!path.endsWith(".run")) {
             //return;
         }
+        //logger.info("------ " + path);
         //logger.info("GETTING precontinues of " + path + " =================");
         Set<GraphPart> opened = new HashSet<>();
         Set<GraphPart> closed = new HashSet<>();
         Set<GraphPart> closedBranches = new HashSet<>();
         Set<GraphPartEdge> exitEdges = new HashSet<>();
         Set<GraphPartEdge> backEdges = new HashSet<>();
+        Set<GraphPartEdge> throwEdges = new HashSet<>();
+        Set<GraphPartEdge> allowedThrowEdges = new HashSet<>();
+        List<GraphExceptionParts> exceptionParts = new ArrayList<>();
+        Map<Integer, GraphPart> partByIp = new HashMap<>();
+        Map<GraphPart, List<GraphPart>> partToNext = new HashMap<>();
+        Map<GraphPart, List<GraphPart>> partToPrev = new HashMap<>();
+        for (GraphPart p : allParts) {
+            if (p.start == -1) {
+                continue;
+            }
+            //if (p.start >= 0) {
+                partByIp.put(p.start, p);
+            //}
+            partToNext.put(p, new ArrayList<>());
+            partToNext.get(p).addAll(p.nextParts);
+            partToPrev.put(p, new ArrayList<>());
+
+            for (GraphPart r : p.refs) {
+                if (r.start != -1) {
+                    partToPrev.get(p).add(r);
+                }
+            }
+        }
+
+        for (GraphException ex : exceptions) {
+            exceptionParts.add(new GraphExceptionParts(
+                    partByIp.containsKey(ex.start) ? partByIp.get(ex.start) : null,
+                    partByIp.containsKey(ex.end) ? partByIp.get(ex.end) : null,
+                    partByIp.containsKey(ex.target) ? partByIp.get(ex.target) : null
+            ));
+        }
+
+        for (GraphPart p : allParts) {
+            for (GraphPart tp : p.throwParts) {
+                GraphPartEdge e = new GraphPartEdge(p, tp);
+                if (!throwEdges.contains(e)) {
+                    throwEdges.add(e);
+                    logger.fine("throwpart " + e);
+                    if (isTryBegin(p)) {
+                        allowedThrowEdges.add(e);
+                    }
+                }
+            }
+        }
+
         for (Loop el : loops) {
             for (GraphPart g : el.backEdges) {
                 backEdges.add(new GraphPartEdge(g, el.loopContinue));
@@ -830,172 +1155,16 @@ public class Graph {
         Map<GraphPartEdge, List<GraphPart>> edgeToBranches = new HashMap<>();
         opened.add(startPart);
         GraphPart start = startPart;
-        Stack<GraphPartEdge> walkStack = new Stack<>();
-        walkStack.push(new GraphPartEdge(startPart, startPart));
-        loopwalk:
-        while (!walkStack.isEmpty()) {
-            GraphPartEdge e = walkStack.pop();
-            GraphPart p = e.to;
-            if (closed.contains(p)) {
-                logger.fine("part " + p + " is already closed, skipping");
-                continue;
+        findGotoTargetsWalk(partToNext, partToPrev, new Reference<>(-2), new ArrayList<>(), new GraphPartEdge(startPart, startPart), opened, closed, closedBranches, exitEdges, backEdges, throwEdges, allowedThrowEdges, exceptionParts, edgeToBranches, start, gotoTargets);
+    }
+
+    private boolean isTryBegin(GraphPart part) {
+        for (GraphPart r : part.refs) {
+            if (r.start == -1) {
+                return true;
             }
-            logger.fine("processing " + p);
-            if (!edgeToBranches.containsKey(e)) {
-                edgeToBranches.put(e, new ArrayList<>());
-            }
-            List<GraphPart> branches = edgeToBranches.get(e);
-            if (p != start) {
-                List<GraphPart> refs = getUnicatePartList(p.refs);
-
-                List<List<GraphPart>> comparedPaths = new ArrayList<>();
-                List<GraphPartEdge> comparedPathsEdges = new ArrayList<>();
-                for (GraphPart r : refs) {
-                    GraphPartEdge re = new GraphPartEdge(r, p);
-                    if (backEdges.contains(re)) {
-                        logger.fine("ref edge " + re + " is backedge, ignored");
-                        continue;
-                    }
-                    if (r.start == -1) {
-                        logger.fine("ref edge " + re + " is alternatestart, ignored");
-                        continue;
-                    }
-                    if (!edgeToBranches.containsKey(re)) {
-                        //edge not yet processed
-                        logger.fine("ref edge " + re + " NOT yet processed");
-                        continue loopwalk;
-                    } else {
-                        logger.fine("ref edge " + re + " already processed");
-                    }
-                    comparedPaths.add(edgeToBranches.get(re));
-                    comparedPathsEdges.add(re);
-
-                }
-                loopi:
-                for (int i = 0; i < comparedPaths.size(); i++) {
-                    for (int j = 0; j < comparedPaths.size(); j++) {
-                        if (i == j) {
-                            continue;
-                        }
-                        if (comparedPaths.get(i).equals(comparedPaths.get(j))) {
-                            //logger.info("paths match: " + comparedPaths.get(i));
-                            if (comparedPaths.get(i).isEmpty()) {
-                                //logger.info("path isempty, removing it ");
-                                comparedPaths.remove(i);
-                                comparedPathsEdges.remove(i);
-                                i--;
-                                continue loopi;
-                            }
-                            logger.fine("merged paths:" + pathToString(comparedPaths.get(i)));
-
-
-                            GraphPart decision = comparedPaths.get(i).get(comparedPaths.get(i).size() - 1);
-                            if (decision.nextParts.size() > 2) {
-                                int removedCount = 0;
-                                for (int k = comparedPaths.size() - 1; k >= 0; k--) {
-                                    if (k == i) {
-                                        continue;
-                                    }
-                                    if (comparedPaths.get(i).equals(comparedPaths.get(k))) {
-                                        comparedPaths.remove(k);
-                                        comparedPathsEdges.remove(k);
-                                        removedCount++;
-                                    }
-                                    if (removedCount == decision.nextParts.size() - 1) {
-                                        break;
-                                    }
-                                }
-                                comparedPaths.get(i).remove(comparedPaths.get(i).size() - 1);
-                            } else {
-                                //remove last path component
-                                int last = i > j ? i : j;
-                                int first = i < j ? i : j;
-                                comparedPaths.get(first).remove(comparedPaths.get(first).size() - 1);
-                                comparedPaths.remove(last);
-                                comparedPathsEdges.remove(last);
-                            }
-                            i = -1;
-                            continue loopi;
-                        }
-                    }
-                }
-                for (List<GraphPart> cp : comparedPaths) {
-                    logger.fine("- branches:" + pathToString(cp));
-                }
-                if (comparedPaths.size() > 1) {
-                    logger.fine("not a single path");
-                    List<GraphPart> prefix = getCommonPrefix(comparedPaths);
-                    Set<GraphPart> partsToClose = new HashSet<>();
-                    boolean isEndOfBlock = false;
-                    for (int i = 0; i < comparedPaths.size(); i++) {
-                        for (int j = prefix.size(); j < comparedPaths.get(i).size(); j++) {
-                            GraphPart partToClose = comparedPaths.get(i).get(j);
-                            GraphPartEdge edgeToClose = comparedPathsEdges.get(i);
-                            if (!closedBranches.contains(partToClose)) {
-                                logger.fine("on part " + p);
-                                logger.fine("closing branch " + partToClose);
-                                partsToClose.add(partToClose);
-                            } else {
-                                logger.fine("probably break edge: " + edgeToClose);
-                                isEndOfBlock = true;
-                            }
-                        }
-                    }
-                    closedBranches.addAll(partsToClose);
-                    branches = prefix;
-                    if (!branches.isEmpty()) {
-                        branches.remove(branches.size() - 1);
-                    }
-
-                    if (isEndOfBlock) {
-                        //GraphPart blockStartPart = getDominator(startPart, p, loops);
-                        logger.fine("found breaks to  to " + p);
-                        for (GraphPart r : p.refs) {
-                            gotoTargets.add(new GraphPartEdge(r, p));
-                        }
-                        //gotoTargets.add(new GraphPartEdge(e.from, e.to));
-                    }
-
-                }
-
-            }
-
-            //filter out backedges           
-            List<GraphPart> nexts = new ArrayList<>();
-            for (GraphPart n : p.nextParts) {
-                GraphPartEdge ne = new GraphPartEdge(p, n);
-                if (!backEdges.contains(ne)) {
-                    nexts.add(n);
-                } else {
-                    logger.fine("next edge " + ne + " is backedge, ignored");
-                }
-            }
-
-            int sizeNextsNoThrow = nexts.size();
-            for (GraphPart t : p.throwParts) {
-                GraphPartEdge te = new GraphPartEdge(p, t);
-                if (!backEdges.contains(te)) {
-                    nexts.add(t);
-                } else {
-                    logger.fine("throw edge " + te + " is backedge, ignored");
-                }
-            }
-
-            closed.add(p);
-
-            logger.fine("processing nextparts of " + p);
-            for (GraphPart n : nexts) {
-                GraphPartEdge ne = new GraphPartEdge(p, n);
-                List<GraphPart> subBranches = branches;
-                if (sizeNextsNoThrow > 1) {
-                    subBranches = new ArrayList<>(branches);
-                    subBranches.add(p);
-                }
-                edgeToBranches.put(ne, subBranches);
-                walkStack.push(ne);
-            }
-
         }
+        return false;
     }
 
     private void getPrecontinues2(String path, BaseLocalData localData, GraphPart parent, GraphPart part, Set<GraphPart> allParts, List<Loop> loops, List<GraphPart> stopPart) throws InterruptedException {
@@ -1034,6 +1203,18 @@ public class Graph {
             }
         }
         return result;
+    }
+
+    private List<GraphPart> getUnicateRefsNoThrow(GraphPart part, Set<GraphPartEdge> throwEdges) {
+        List<GraphPart> result = new ArrayList<>();
+        for (GraphPart r : part.refs) {
+            GraphPartEdge edge = new GraphPartEdge(r, part);
+            if (!throwEdges.contains(edge)) {
+                result.add(r);
+            }
+        }
+
+        return getUnicatePartList(result);
     }
 
     private List<GraphPart> getUsableRefs(GraphPart g, List<Loop> loops) {
@@ -2716,7 +2897,7 @@ public class Graph {
                         List<GraphTargetItem> finalComm = new ArrayList<>();
 
                         //findGotoTargets - comment this out:
-                        if (currentLoop.loopPreContinue != null) {
+                        /*if (currentLoop.loopPreContinue != null) {
                             GraphPart backup = currentLoop.loopPreContinue;
                             currentLoop.loopPreContinue = null;
                             List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
@@ -2724,7 +2905,7 @@ public class Graph {
                             finalComm = printGraph(foundGotos, gotoTargets, partCodes, partCodePos, visited, localData, new TranslateStack(path), allParts, null, backup, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
                             currentLoop.loopPreContinue = backup;
                             checkContinueAtTheEnd(finalComm, currentLoop);
-                        }
+                        }*/
                         if (currentLoop.precontinueCommands != null) {
                             finalComm.addAll(currentLoop.precontinueCommands);
                         }
@@ -2857,7 +3038,13 @@ public class Graph {
     protected void checkGraph(List<GraphPart> allBlocks) {
     }
 
-    public List<GraphPart> makeGraph(GraphSource code, List<GraphPart> allBlocks, List<Integer> alternateEntries) throws InterruptedException {
+    public List<GraphPart> makeGraph(GraphSource code, List<GraphPart> allBlocks, List<GraphException> exceptions) throws InterruptedException {
+        List<Integer> alternateEntries = new ArrayList<>();
+        for (GraphException ex : exceptions) {
+            alternateEntries.add(ex.start);
+            alternateEntries.add(ex.end);
+            alternateEntries.add(ex.target);
+        }
         HashMap<Integer, List<Integer>> refs = code.visitCode(alternateEntries);
         List<GraphPart> ret = new ArrayList<>();
         boolean[] visited = new boolean[code.size()];

@@ -55,6 +55,7 @@ import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphException;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphPartEdge;
 import com.jpexs.decompiler.graph.GraphSource;
@@ -72,6 +73,7 @@ import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LoopItem;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.PopItem;
+import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import java.util.ArrayList;
@@ -100,8 +102,17 @@ public class AVM2Graph extends Graph {
         return avm2code;
     }
 
+    private static List<GraphException> getExceptionEntries(MethodBody body) {
+        List<GraphException> ret = new ArrayList<>();
+        AVM2Code code = body.getCode();
+        for (ABCException e : body.exceptions) {
+            ret.add(new GraphException(code.adr2pos(e.start, true), code.adr2pos(e.end, true), code.adr2pos(e.target)));
+        }
+        return ret;
+    }
+
     public AVM2Graph(AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) {
-        super(new AVM2GraphSource(code, isStatic, scriptIndex, classIndex, localRegs, scopeStack, abc, body, localRegNames, fullyQualifiedNames, localRegAssigmentIps, refs), body.getExceptionEntries());
+        super(new AVM2GraphSource(code, isStatic, scriptIndex, classIndex, localRegs, scopeStack, abc, body, localRegNames, fullyQualifiedNames, localRegAssigmentIps, refs), getExceptionEntries(body));
         this.avm2code = code;
         this.abc = abc;
         this.body = body;
@@ -347,6 +358,28 @@ public class AVM2Graph extends Graph {
                     }
 
                     List<GraphTargetItem> ncatchedCommands = printGraph(foundGotos, gotoTargets, partCodes, partCodePos, localData2, st2, allParts, parent, npart, stopPart2, loops, staticOperation, path);
+                    //hack for findGotos - FIXME
+                    if (hasFinally && !ncatchedCommands.isEmpty()) {
+                        for (int k = 0; k < ncatchedCommands.size(); k++) {
+                            if (ncatchedCommands.get(k) instanceof GotoItem) {
+                                GotoItem gi = (GotoItem) ncatchedCommands.get(k);
+                                for (GotoItem g : foundGotos) {
+                                    if (gi.labelName.equals(g.labelName) && g.targetCommands != null) {
+                                        if (!g.targetCommands.isEmpty()) {
+                                            if (g.targetCommands.get(0) instanceof PushItem) {
+                                                if (g.targetCommands.get(0).value instanceof IntegerValueAVM2Item) {
+                                                    if (((IntegerValueAVM2Item) g.targetCommands.get(0).value).value == -1) {
+                                                        ncatchedCommands.remove(gi);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
                     if (catchedExceptions.get(e).isFinally() && (catchedExceptions.size() > 1 || hasFinally)) {
                         catchedExceptions.remove(e);
                         e--;
