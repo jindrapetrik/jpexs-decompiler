@@ -37,9 +37,11 @@ package
 		TestForIn;
 		TestForXml;
 		TestGotos;
+		TestGotos2;
 		TestHello;
 		TestIf;
 		TestIfElse;
+		TestIfInIf;
 		TestInc2;
 		TestIncDec;
 		TestInlineFunctions;
