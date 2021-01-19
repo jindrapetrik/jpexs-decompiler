@@ -865,8 +865,17 @@ public class Graph {
 
             }
 
+            logger.fine("COMPARED PATHS:");
+            for (int i = 0; i < comparedPaths.size(); i++) {
+                logger.fine("- " + (System.identityHashCode(comparedPaths.get(i))) + ": " + pathToString(comparedPaths.get(i)));
+            }
+            logger.fine("curren path: " + System.identityHashCode(branches));
+
             boolean isEndOfBlock = false;
 
+            Set<GraphPart> partsToClose = new HashSet<>();
+
+            Map<GraphPart, Integer> decisionToRemovedCount = new HashMap<>();
             loopi:
             for (int i = 0; i < comparedPaths.size(); i++) {
                 for (int j = 0; j < comparedPaths.size(); j++) {
@@ -900,12 +909,14 @@ public class Graph {
                                     break;
                                 }
                             }
+                            decisionToRemovedCount.put(decision, removedCount);
                             comparedPaths.get(i).remove(comparedPaths.get(i).size() - 1);
                         } else {
                             //remove last path component
                             int last = i > j ? i : j;
                             int first = i < j ? i : j;
-                            comparedPaths.get(first).remove(comparedPaths.get(first).size() - 1);
+                            comparedPaths.get(i).remove(comparedPaths.get(i).size() - 1);
+                            comparedPaths.get(j).remove(comparedPaths.get(j).size() - 1);
                             comparedPaths.remove(last);
                             comparedPathsEdges.remove(last);
                         }
@@ -914,35 +925,31 @@ public class Graph {
                         if (!closedBranches.contains(decision)) {
                             logger.fine("on part " + p);
                             logger.fine("normal closing branch " + decision);
-                            closedBranches.add(decision);
+                            partsToClose.add(decision);
                         } else {
                             logger.fine("branch already closed: " + decision);
                             isEndOfBlock = true;
                         }
-                        closedBranches.add(decision);
+                        partsToClose.add(decision);
                         i = -1;
                         continue loopi;
                     }
                 }
             }
             for (List<GraphPart> cp : comparedPaths) {
-                logger.fine("- branches:" + pathToString(cp));
+                logger.fine("- branches: " + System.identityHashCode(cp) + ": " + pathToString(cp));
             }
+            logger.fine("current branches: " + System.identityHashCode(branches) + ": " + pathToString(branches));
 
             if (comparedPaths.size() > 1) {
-                logger.fine("not a single path");
-                for (int i = 0; i < comparedPaths.size(); i++) {
-
-                }
+                logger.fine("not a single path - paths left: " + comparedPaths.size());
                 List<GraphPart> prefix = getCommonPrefix(comparedPaths);
-                Set<GraphPart> partsToClose = new HashSet<>();
+
                 GraphPart decision = prefix.isEmpty() ? null : prefix.get(prefix.size() - 1);
+                int removedCount = decisionToRemovedCount.containsKey(decision) ? decisionToRemovedCount.get(decision) : 0;
 
                 for (int i = 0; i < comparedPaths.size(); i++) {
-                    for (int j = prefix.size() - 1; j < comparedPaths.get(i).size(); j++) {
-                        if (j < 0) {
-                            continue;
-                        }
+                    for (int j = prefix.size(); j < comparedPaths.get(i).size(); j++) {
                         GraphPart partToClose = comparedPaths.get(i).get(j);
                         GraphPartEdge edgeToClose = comparedPathsEdges.get(i);
                         if (!closedBranches.contains(partToClose)) {
@@ -956,21 +963,29 @@ public class Graph {
                         }
                     }
                 }
+
                 /*if (decision != null) {
                     logger.fine("closing branch 2: " + decision);
                     closedBranches.add(decision);
                 }*/
-                closedBranches.addAll(partsToClose);
                 branches = prefix;
                 if (!branches.isEmpty()) {
-                    branches.remove(branches.size() - 1);
+                    logger.fine("removedCount before: " + removedCount);
+                    removedCount += comparedPaths.size();
+                    if (partToNext.get(decision).size() > 2 && removedCount < partToNext.get(decision).size() - 1) {
+                        //ignore
+                    } else {
+                        branches.remove(branches.size() - 1);
+                    }
                 }
-
+            } else {
+                branches = comparedPaths.get(0);
             }
+            closedBranches.addAll(partsToClose);
 
             if (isEndOfBlock) {
                 //GraphPart blockStartPart = getDominator(startPart, p, loops);
-                //logger.info("found breaks to  to " + p);
+                logger.info("found breaks to " + p);
                 //System.err.println("found breaks to  to " + p);
                 for (GraphPart r : p.refs) {
                     gotoTargets.add(new GraphPartEdge(r, p));
@@ -1095,7 +1110,7 @@ public class Graph {
         if (!path.endsWith(".run")) {
             //return;
         }
-        //logger.info("------ " + path);
+        logger.info("------ " + path);
         //logger.info("GETTING precontinues of " + path + " =================");
         Set<GraphPart> opened = new HashSet<>();
         Set<GraphPart> closed = new HashSet<>();
