@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphException;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -155,17 +156,6 @@ public final class MethodBody implements Cloneable {
     public void setCode(AVM2Code code) {
         this.code = code;
         this.codeBytes = null;
-    }
-
-    public List<Integer> getExceptionEntries() {
-        List<Integer> ret = new ArrayList<>();
-        AVM2Code code = getCode();
-        for (ABCException e : exceptions) {
-            ret.add(code.adr2pos(e.start, true));
-            ret.add(code.adr2pos(e.end, true));
-            ret.add(code.adr2pos(e.target));
-        }
-        return ret;
     }
 
     public void markOffsets() {

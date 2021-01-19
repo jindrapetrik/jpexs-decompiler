@@ -36,6 +36,7 @@ package
 		TestForGoto;
 		TestForIn;
 		TestForXml;
+		TestGotos;
 		TestHello;
 		TestIf;
 		TestIfElse;

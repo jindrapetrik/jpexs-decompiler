@@ -266,7 +266,11 @@ public class GraphPart implements Serializable {
         if (end < start) {
             return "<-> " + (start + 1) + "-" + (end + 1);
         }
-        return "" + (start + 1) + "-" + (end + 1) + (instanceCount > 1 ? "(" + instanceCount + " links)" : "");// + "  p" + path;
+        int printStart = start + 1;
+        int printEnd = end + 1;
+
+        return "" + (printStart < 0 ? "(" : "") + printStart + (printStart < 0 ? ")" : "")
+                + "-" + (printEnd < 0 ? "(" : "") + printEnd + (printEnd < 0 ? ")" : "") + (instanceCount > 1 ? "(" + instanceCount + " links)" : "");// + "  p" + path;
     }
 
     public boolean containsIP(int ip) {
