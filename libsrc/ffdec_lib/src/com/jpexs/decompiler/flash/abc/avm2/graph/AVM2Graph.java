@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugLineIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictEqIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
@@ -830,6 +831,24 @@ public class AVM2Graph extends Graph {
 
         return next;
     }
+
+    @Override
+    protected boolean isPartEmpty(GraphPart part) {
+        if (part.nextParts.size() > 1) {
+            return false;
+        }
+        if (part.start < 0) {
+            return false;
+        }
+        for (int ip = part.start; ip <= part.end; ip++) {
+            if (!(avm2code.code.get(ip).definition instanceof DebugLineIns)
+                    && !(avm2code.code.get(ip).definition instanceof JumpIns)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     @Override
     protected GraphTargetItem checkLoop(LoopItem loopItem, BaseLocalData localData, List<Loop> loops) {
