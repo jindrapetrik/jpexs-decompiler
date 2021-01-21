@@ -33,6 +33,7 @@ package tests
 				{
 					trace("z");
 				}
+				trace("after");
 			}
 			
 			return 89;
