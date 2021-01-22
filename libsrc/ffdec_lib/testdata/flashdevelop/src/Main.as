@@ -38,6 +38,9 @@ package
 		TestForXml;
 		TestGotos;
 		TestGotos2;
+		TestGotos3;
+		TestGotos4;
+		TestGotos5;
 		TestHello;
 		TestIf;
 		TestIfElse;
