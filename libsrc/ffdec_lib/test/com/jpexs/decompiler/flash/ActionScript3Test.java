@@ -599,6 +599,135 @@ public class ActionScript3Test extends ActionScriptTestBase {
     }
 
     @Test
+    public void testGotos() {
+        decompileMethod("testGotos", "var _loc2_:Boolean = true;\r\n"
+                + "var _loc3_:Boolean = false;\r\n"
+                + "var _loc4_:Boolean = false;\r\n"
+                + "if(_loc2_)\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "}\r\n"
+                + "else if(_loc3_)\r\n"
+                + "{\r\n"
+                + "trace(\"B\");\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "if(_loc2_)\r\n"
+                + "{\r\n"
+                + "return 7;\r\n"
+                + "}\r\n"
+                + "trace(\"x\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"z\");\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n"
+                + "}\r\n"
+                + "return 89;\r\n",
+                false);
+    }
+
+    @Test
+    public void testGotos2() {
+        decompileMethod("testGotos2", "var a:Boolean = true;\r\n"
+                + "var b:Boolean = false;\r\n"
+                + "var c:Boolean = true;\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "if(c)\r\n"
+                + "{\r\n"
+                + "trace(\"B\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"E\");\r\n"
+                + "}\r\n"
+                + "return 5;\r\n",
+                false);
+    }
+
+    @Test
+    public void testGotos3() {
+        decompileMethod("testGotos3", "var i:int = 0;\r\n"
+                + "var a:int = 5;\r\n"
+                + "if(a > 5)\r\n"
+                + "{\r\n"
+                + "for(i = 0; i < 5; i++)\r\n"
+                + "{\r\n"
+                + "if(i > 3)\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "if(i == 4)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"B\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"C\");\r\n"
+                + "}\r\n"
+                + "trace(\"return\");\r\n",
+                false);
+    }
+
+    @Test
+    public void testGotos4() {
+        decompileMethod("testGotos4", "var a:int = 5;\r\n"
+                + "if(a > 3)\r\n"
+                + "{\r\n"
+                + "if(a < 7)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "}\r\n"
+                + "catch(error:Error)\r\n"
+                + "{\r\n"
+                + "}\r\n"
+                + "trace(\"B\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"return\");\r\n",
+                false);
+    }
+
+    @Test
+    public void testGotos5() {
+        decompileMethod("testGotos5", "var j:int = 0;\r\n"
+                + "var s:String = \"A\";\r\n"
+                + "for(var i:int = 0; i < 10; i++)\r\n"
+                + "{\r\n"
+                + "if(s == \"B\")\r\n"
+                + "{\r\n"
+                + "if(s == \"C\")\r\n"
+                + "{\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"D\");\r\n"
+                + "j = 0;\r\n"
+                + "while(j < 29)\r\n"
+                + "{\r\n"
+                + "trace(\"E\");\r\n"
+                + "j++;\r\n"
+                + "}\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
     public void testHello() {
         decompileMethod("testHello", "trace(\"hello\");\r\n",
                 false);
@@ -625,6 +754,30 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"onFalse\");\r\n"
                 + "}\r\n",
+                false);
+    }
+
+    @Test
+    public void testIfInIf() {
+        decompileMethod("testIfInIf", "var k:int = 5;\r\n"
+                + "if(k > 5 && k < 20)\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "if(k < 4)\r\n"
+                + "{\r\n"
+                + "return 1;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "else if(k > 4 && k < 10)\r\n"
+                + "{\r\n"
+                + "trace(\"B\");\r\n"
+                + "if(k < 7)\r\n"
+                + "{\r\n"
+                + "return 2;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"C\");\r\n"
+                + "return 7;\r\n",
                 false);
     }
 
@@ -1176,5 +1329,163 @@ public class ActionScript3Test extends ActionScriptTestBase {
         String expectedResult = "p1:Event=null,p2:Number=1,p3:Number=-1,p4:Number=-1.1,p5:Number=-1.1,p6:String=\"a\"";
         expectedResult = expectedResult.replaceAll("[ \r\n]", "");
         assertEquals(actualResult, expectedResult);
+    }
+
+    @Test
+    public void testMyPackage1TestClass() {
+        decompileScriptPack("tests_classes.mypackage1.TestClass", "package tests_classes.mypackage1\n"
+                + "{\n"
+                + "   public class TestClass implements tests_classes.mypackage1.TestInterface\n"
+                + "   {\n"
+                + "       \n"
+                + "      public function TestClass()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testCall() : String\n"
+                + "      {\n"
+                + "         trace(\"pkg1hello\");\n"
+                + "         return \"pkg1hello\";\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testMethod1() : void\n"
+                + "      {\n"
+                + "         var a:tests_classes.mypackage1.TestInterface = this;\n"
+                + "         a.testMethod1();\n"
+                + "         var b:tests_classes.mypackage2.TestInterface = this;\n"
+                + "         b = new tests_classes.mypackage2.TestClass();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testMethod2() : void\n"
+                + "      {\n"
+                + "         var a:tests_classes.mypackage1.TestInterface = this;\n"
+                + "         a.testMethod1();\n"
+                + "         var b:tests_classes.mypackage2.TestInterface = this;\n"
+                + "         b = new tests_classes.mypackage2.TestClass();\n"
+                + "      }\n"
+                + "   }\n"
+                + "}");
+    }
+
+    @Test
+    public void testMyPackage1TestClass2() {
+        decompileScriptPack("tests_classes.mypackage1.TestClass2", "package tests_classes.mypackage1\n"
+                + "{\n"
+                + "   public class TestClass2\n"
+                + "   {\n"
+                + "       \n"
+                + "      public function TestClass2()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testCall() : String\n"
+                + "      {\n"
+                + "         var a:tests_classes.mypackage1.TestClass = null;\n"
+                + "         var b:tests_classes.mypackage2.TestClass = null;\n"
+                + "         var c:tests_classes.mypackage3.TestClass = null;\n"
+                + "         a = new tests_classes.mypackage1.TestClass();\n"
+                + "         b = new tests_classes.mypackage2.TestClass();\n"
+                + "         c = new tests_classes.mypackage3.TestClass();\n"
+                + "         var res:String = a.testCall() + b.testCall() + c.testCall() + this.testCall2() + myNamespace::testCall3();\n"
+                + "         trace(res);\n"
+                + "         return res;\n"
+                + "      }\n"
+                + "      \n"
+                + "      myNamespace function testCall2() : String\n"
+                + "      {\n"
+                + "         return \"1\";\n"
+                + "      }\n"
+                + "      \n"
+                + "      myNamespace function testCall3() : String\n"
+                + "      {\n"
+                + "         return myNamespace::testCall2();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testCall2() : String\n"
+                + "      {\n"
+                + "         return \"2\";\n"
+                + "      }\n"
+                + "   }\n"
+                + "}");
+    }
+
+    @Test
+    public void testMyPackage1TestInterface() {
+        decompileScriptPack("tests_classes.mypackage1.TestInterface", "package tests_classes.mypackage1\n"
+                + "{\n"
+                + "   public interface TestInterface extends tests_classes.mypackage2.TestInterface\n"
+                + "   {\n"
+                + "       \n"
+                + "      function testMethod1() : void;\n"
+                + "   }\n"
+                + "}");
+    }
+
+    @Test
+    public void testMyPackage1MyNamespace() {
+        decompileScriptPack("tests_classes.mypackage1.myNamespace", "package tests_classes.mypackage1\n"
+                + "{\n"
+                + "   public namespace myNamespace = \"https://www.free-decompiler.com/flash/test/namespace\";\n"
+                + "}");
+    }
+
+    @Test
+    public void testMyPackage2TestClass() {
+        decompileScriptPack("tests_classes.mypackage2.TestClass", "package tests_classes.mypackage2\n"
+                + "{\n"
+                + "   public class TestClass implements TestInterface\n"
+                + "   {\n"
+                + "       \n"
+                + "      public function TestClass()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testCall() : String\n"
+                + "      {\n"
+                + "         trace(\"pkg2hello\");\n"
+                + "         return \"pkg2hello\";\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testMethod2() : void\n"
+                + "      {\n"
+                + "      }\n"
+                + "   }\n"
+                + "}");
+    }
+
+    @Test
+    public void testMyPackage2TestInterface() {
+        decompileScriptPack("tests_classes.mypackage2.TestInterface", "package tests_classes.mypackage2\n"
+                + "{\n"
+                + "   public interface TestInterface\n"
+                + "   {\n"
+                + "       \n"
+                + "      function testMethod2() : void;\n"
+                + "   }\n"
+                + "}");
+    }
+
+    @Test
+    public void testMyPackage3TestClass() {
+        decompileScriptPack("tests_classes.mypackage3.TestClass", "package tests_classes.mypackage3\n"
+                + "{\n"
+                + "   public class TestClass\n"
+                + "   {\n"
+                + "       \n"
+                + "      public function TestClass()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function testCall() : String\n"
+                + "      {\n"
+                + "         trace(\"pkg3hello\");\n"
+                + "         return \"pkg3hello\";\n"
+                + "      }\n"
+                + "   }\n"
+                + "}");
     }
 }
