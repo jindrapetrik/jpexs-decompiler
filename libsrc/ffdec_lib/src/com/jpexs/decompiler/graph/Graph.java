@@ -778,7 +778,7 @@ public class Graph {
                         closedBranches.add(decision);*/
                     //}
                 }
-            } else {
+            } else if (!comparedPaths.isEmpty()) {
                 branches = comparedPaths.get(0);
             }
             closedBranches.addAll(partsToClose);
