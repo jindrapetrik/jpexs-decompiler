@@ -659,7 +659,7 @@ public class AVM2Graph extends Graph {
                 }
 
                 GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops, new ArrayList<>());
-                removeEdgeToFromList(gotoTargets, breakPart);
+                //removeEdgeToFromList(gotoTargets, breakPart);
 
                 List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
                 GraphPart next = breakPart;
