@@ -9,6 +9,9 @@ All notable changes to this project will be documented in this file.
 - Better goto detection/for continue
 - Support for comma operator in switch case statements
 - AS3: Losing script tree focus on script selection (disallowed walking tree with keyboard up/down)
+- Proper window screen centering
+- Graph dialog proper window size
+- Graph dialog scroll speed increased
 
 ### Changed
 - AS3 test methods separated to classes
