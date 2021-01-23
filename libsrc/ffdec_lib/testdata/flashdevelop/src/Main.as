@@ -69,8 +69,9 @@ package
 		TestRest;
 		TestStrictEquals;
 		TestStringConcat;
-		TestStrings;
+		TestStrings;		
 		TestSwitch;
+		TestSwitchComma;
 		TestSwitchDefault;
 		TestTernarOperator;
 		TestTry;

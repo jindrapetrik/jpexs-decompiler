@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.AndItem;
 import com.jpexs.decompiler.graph.model.BranchStackResistant;
 import com.jpexs.decompiler.graph.model.BreakItem;
+import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
@@ -99,7 +100,6 @@ public class Graph {
     public LinkedHashMap<String, Graph> getSubGraphs() {
         return new LinkedHashMap<>();
     }
-
 
     protected List<GraphTargetItem> filter(List<GraphTargetItem> list) {
         return new ArrayList<>(list);
@@ -747,7 +747,6 @@ public class Graph {
 
                 //GraphPartDecision decision = prefix.isEmpty() ? null : prefix.get(prefix.size() - 1);
                 //int removedCount = decisionToRemovedCount.containsKey(decision) ? decisionToRemovedCount.get(decision) : 0;
-
                 for (int i = 0; i < comparedPaths.size(); i++) {
                     for (int j = prefix.size(); j < comparedPaths.get(i).size(); j++) {
                         GraphPart partToClose = comparedPaths.get(i).get(j).part;
@@ -877,7 +876,6 @@ public class Graph {
         }
         return null;
     }*/
-
     protected boolean isPartEmpty(GraphPart part) {
         return false;
     }
@@ -2346,8 +2344,12 @@ public class Graph {
             if (part.nextParts.size() > 2) {
                 GraphPart next = getMostCommonPart(localData, part.nextParts, loops, new ArrayList<>());
                 List<GraphPart> vis = new ArrayList<>();
-                GraphTargetItem switchedItem = stack.pop();
+                GraphTargetItem originalSwitchedItem = stack.pop();
                 makeAllCommands(currentRet, stack);
+                GraphTargetItem switchedItem = originalSwitchedItem;
+                if ((switchedItem instanceof PopItem) && !currentRet.isEmpty() && (currentRet.get(currentRet.size() - 1) instanceof IfItem)) {
+                    switchedItem = currentRet.get(currentRet.size() - 1);
+                }
 
                 List<GraphTargetItem> caseValues = new ArrayList<>();
                 List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
@@ -2365,26 +2367,68 @@ public class Graph {
                 GraphTargetItem it = switchedItem;
                 int defaultBranch = 0;
                 boolean hasExpr = false;
+                List<GraphTargetItem> commaCommands = new ArrayList<>();
+                Map<Integer, List<GraphTargetItem>> caseCommaCommands = new HashMap<>();
 
-                while (it instanceof TernarOpItem) {
-                    TernarOpItem to = (TernarOpItem) it;
-                    if (to.expression instanceof EqualsTypeItem) {
-                        if (to.onTrue instanceof IntegerValueTypeItem) {
-                            int cpos = ((IntegerValueTypeItem) to.onTrue).intValue();
-                            caseExpressionLeftSides.put(cpos, ((EqualsTypeItem) to.expression).getLeftSide());
-                            caseExpressionRightSides.put(cpos, ((EqualsTypeItem) to.expression).getRightSide());
-                            it = to.onFalse;
+                while ((it instanceof TernarOpItem) || (it instanceof IfItem)) {
+
+                    if (it instanceof IfItem) {
+                        IfItem ii = (IfItem) it;
+                        if (ii.expression instanceof EqualsTypeItem) {
+                            if (!ii.onFalse.isEmpty() && !ii.onTrue.isEmpty()
+                                    && ii.onTrue.get(ii.onTrue.size() - 1) instanceof PushItem
+                                    && ii.onTrue.get(ii.onTrue.size() - 1).value instanceof IntegerValueTypeItem) {
+                                int cpos = ((IntegerValueTypeItem) ii.onTrue.get(ii.onTrue.size() - 1).value).intValue();
+                                caseCommaCommands.put(cpos, commaCommands);
+                                caseExpressionLeftSides.put(cpos, ((EqualsTypeItem) ii.expression).getLeftSide());
+                                caseExpressionRightSides.put(cpos, ((EqualsTypeItem) ii.expression).getRightSide());
+                                commaCommands = new ArrayList<>();
+                                for (int f = 0; f < ii.onFalse.size() - 1; f++) {
+                                    commaCommands.add(ii.onFalse.get(f));
+                                }
+                                it = ii.onFalse.get(ii.onFalse.size() - 1);
+                                if (it instanceof PushItem) {
+                                    it = it.value;
+                                }
+                            } else {
+                                break;
+                            }
+                        } else if (ii.expression instanceof FalseItem && !ii.onFalse.isEmpty()) {
+                            it = ii.onFalse.get(ii.onFalse.size() - 1);
+                        } else if (ii.expression instanceof TrueItem && !ii.onTrue.isEmpty()) {
+                            it = ii.onTrue.get(ii.onTrue.size() - 1);
                         } else {
                             break;
                         }
-                    } else if (to.expression instanceof FalseItem) {
-                        it = to.onFalse;
-                    } else if (to.expression instanceof TrueItem) {
-                        it = to.onTrue;
-                    } else {
-                        break;
+                    } else if (it instanceof TernarOpItem) {
+                        TernarOpItem to = (TernarOpItem) it;
+                        if (to.expression instanceof EqualsTypeItem) {
+                            if (to.onTrue instanceof IntegerValueTypeItem) {
+                                int cpos = ((IntegerValueTypeItem) to.onTrue).intValue();
+                                caseExpressionLeftSides.put(cpos, ((EqualsTypeItem) to.expression).getLeftSide());
+                                caseExpressionRightSides.put(cpos, ((EqualsTypeItem) to.expression).getRightSide());
+                                caseCommaCommands.put(cpos, commaCommands);
+                                commaCommands = new ArrayList<>();
+                                it = to.onFalse;
+                            } else {
+                                break;
+                            }
+                        } else if (to.expression instanceof FalseItem) {
+                            it = to.onFalse;
+                        } else if (to.expression instanceof TrueItem) {
+                            it = to.onTrue;
+                        } else {
+                            break;
+                        }
                     }
                 }
+
+                if (switchedItem != originalSwitchedItem && !caseExpressionRightSides.isEmpty()) {
+                    currentRet.remove(currentRet.size() - 1);
+                } else {
+                    switchedItem = originalSwitchedItem;
+                }
+
                 //int ignoredBranch = -1;
                 if (it instanceof IntegerValueTypeItem) {
                     defaultBranch = ((IntegerValueTypeItem) it).intValue();
@@ -2432,7 +2476,13 @@ public class Graph {
 
                 for (int i = 1; i < part.nextParts.size(); i++) {
                     if (caseExpressions.containsKey(pos)) {
-                        caseValues.add(caseExpressions.get(pos));
+                        GraphTargetItem expr = caseExpressions.get(pos);
+                        if (caseCommaCommands.get(pos).size() > 0) {
+                            List<GraphTargetItem> exprCommaCommands = new ArrayList<>(caseCommaCommands.get(pos));
+                            exprCommaCommands.add(expr);
+                            expr = new CommaExpressionItem(null, expr.lineStartItem, exprCommaCommands);
+                        }
+                        caseValues.add(expr);
                     } else if (part.nextParts.get(i) == defaultPart) {
                         caseValues.add(new DefaultItem());
                     } else {

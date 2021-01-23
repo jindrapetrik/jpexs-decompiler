@@ -1163,6 +1163,22 @@ public class ActionScript3Test extends ActionScriptTestBase {
     }
 
     @Test
+    public void testSwitchComma() {
+        decompileMethod("testSwitchComma", "var a:String = \"A\";\r\n"
+                + "switch(a)\r\n"
+                + "{\r\n"
+                + "case \"A\":\r\n"
+                + "trace(\"is A\");\r\n"
+                + "break;\r\n"
+                + "case \"B\":\r\n"
+                + "trace(\"is B\");\r\n"
+                + "case TestSwitchComma.X, \"C\":\r\n"
+                + "trace(\"is C\");\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
     public void testSwitchDefault() {
         decompileMethod("testSwitchDefault", "var a:* = 5;\r\n"
                 + "switch(a)\r\n"
