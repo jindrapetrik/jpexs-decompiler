@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.exporters.script.graphviz.TokenType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphException;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.ScopeStack;
@@ -98,16 +99,41 @@ public class PcodeGraphVizExporter {
         for (GraphPart h : heads) {
             populateParts(h, allBlocks);
         }
+        List<GraphException> exceptions = graph.getExceptions();
 
         Set<Long> knownAddresses = graphSource.getImportantAddresses();
         int h = 0;
+        List<Integer> exPassedStarts = new ArrayList<>();
+        List<Integer> exPassedEnds = new ArrayList<>();
+
         for (GraphPart head : heads) {
             String headName = "start";
-            if (heads.size() > 1) {
+            if (heads.size() > 1 && head.start != 0) {
                 h++;
                 headName = "start" + h;
             }
-            writer.append(headName + " [shape=\"circle\"]\r\n");
+            String headLabel = "";
+            List<String> headLabels = new ArrayList<>();
+            for (int e = 0; e < exceptions.size(); e++) {
+                GraphException ex = exceptions.get(e);
+                if (head.start == ex.start && !exPassedStarts.contains(e)) {
+                    headLabels.add("try " + e + " begin");
+                    exPassedStarts.add(e);
+                    break;
+                }
+                if (head.start == ex.end && !exPassedEnds.contains(e)) {
+                    headLabels.add("try " + e + " end");
+                    exPassedEnds.add(e);
+                    break;
+                }
+                if (head.start == ex.target) {
+                    headLabels.add("try " + e + " target");
+                }
+            }
+            if (!headLabels.isEmpty()) {
+                headLabel = String.join("\\n", headLabels);
+            }
+            writer.append(headName + " [shape=\"circle\"" + (headLabel.isEmpty() ? "" : " label=\"" + headLabel + "\"") + "]\r\n");
             writer.append(headName + ":s -> " + getBlockName(graphSource, head) + ":n;\r\n");
         }
         for (GraphPart part : allBlocks) {
