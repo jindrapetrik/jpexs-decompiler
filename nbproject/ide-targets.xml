@@ -14,6 +14,7 @@
             <jvmarg value="-Xdebug"/>
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
             <jvmarg value="-Xmx8192m"/>
+            <jvmarg value="-Dsun.java2d.uiScale=1.0"/>            
             <arg line="${run.params}"/>
         </java>
     </target>
