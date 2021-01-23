@@ -467,7 +467,7 @@ public class ActionGraph extends Graph {
                 }
 
                 GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops, new ArrayList<>());
-                removeEdgeToFromList(gotoTargets, breakPart);
+                //removeEdgeToFromList(gotoTargets, breakPart);
                 List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
                 GraphPart next = breakPart;
 
@@ -482,7 +482,7 @@ public class ActionGraph extends Graph {
                 for (int i = 0; i < caseValuesMap.size(); i++) {
                     GraphPart cur = caseBodyParts.get(i);
                     if (!caseBodies.contains(cur)) {
-                        removeEdgeToFromList(gotoTargets, cur);
+                        //removeEdgeToFromList(gotoTargets, cur);
                         caseBodies.add(cur);
                     }
                     valuesMapping.add(caseBodies.indexOf(cur));

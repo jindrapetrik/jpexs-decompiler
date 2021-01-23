@@ -542,6 +542,9 @@ public class Graph {
          System.err.println("</loopspre>");//*/
         List<GotoItem> gotos = new ArrayList<>();
         List<GraphTargetItem> ret = printGraph(gotos, gotoTargets, new HashMap<>(), new HashMap<>(), localData, stack, allParts, null, heads.get(0), null, loops, staticOperation, path);
+
+        processIfGotos(gotos, ret);
+
         Map<String, Integer> usages = new HashMap<>();
         Map<String, GotoItem> lastUsage = new HashMap<>();
         for (GotoItem gi : gotos) {
@@ -552,10 +555,12 @@ public class Graph {
             lastUsage.put(gi.labelName, gi);
         }
         for (String labelName : usages.keySet()) {
+            logger.fine("usage - " + labelName + ": " + usages.get(labelName));
             if (usages.get(labelName) == 1) {
                 lastUsage.get(labelName).labelName = null;
             }
         }
+
         expandGotos(ret);
         processIfs(ret);
         finalProcessStack(stack, ret, path);
@@ -735,6 +740,7 @@ public class Graph {
             }
             logger.fine("current branches: " + System.identityHashCode(branches) + ": " + pathToString(branches));
 
+            List<GraphPartEdge> foundBreakEdges = new ArrayList<>();
             if (comparedPaths.size() > 1) {
                 logger.fine("not a single path - paths left: " + comparedPaths.size());
                 List<GraphPartDecision> prefix = getCommonPrefix(comparedPaths);
@@ -754,6 +760,7 @@ public class Graph {
                             logger.fine("branch already closed: " + partToClose);
                             logger.fine("probably break edge: " + edgeToClose);
                             if (ignoredBreakEdges.contains(edgeToClose)) {
+                                foundBreakEdges.add(edgeToClose);
                                 logger.fine("NOT a break edge, it is standard break");
                                 continue;
                             }
@@ -788,6 +795,10 @@ public class Graph {
                 for (GraphPart r : p.refs) {
                     gotoTargets.add(new GraphPartEdge(r, p));
                 }
+                /*for (GraphPartEdge be : foundBreakEdges) {
+                    GraphPartEdge re = findGotoRestoreOrigEdge(be);
+                    gotoTargets.add(re);
+                }*/
             }
         }
 
@@ -848,6 +859,24 @@ public class Graph {
             findGotoWalkNexts(ignoredBreakEdges, partReplacements, partToNext, partToPrev, currentVirtualNum, openedExceptions, opened, closed, closedBranches, exitEdges, backEdges, throwEdges, allowedThrowEdges, exceptionParts, edgeToBranches, start, gotoTargets, p, branches);
         }
     }
+
+    /*private GraphPartEdge findGotoRestoreOrigEdge(GraphPartEdge e) {
+        for (GraphPart r : e.to.refs) {
+            if (r.equals(e.from)) {
+                return e;
+            }
+        }
+        for (GraphPart r : e.to.refs) {
+            GraphPart rr = r;
+            while (isPartEmpty(rr) && rr.refs.size() == 1) {
+                rr = rr.refs.get(0);
+            }
+            if (rr.equals(e.from)) {
+                return new GraphPartEdge(r, e.to);
+            }
+        }
+        return null;
+    }*/
 
     protected boolean isPartEmpty(GraphPart part) {
         return false;
@@ -1278,6 +1307,58 @@ public class Graph {
         }
     }
 
+    /**
+     * if (xxx) { y ; goto a } else { z ; goto a }
+     *
+     * =>
+     *
+     * if (xxx) { y } else { z } goto a
+     *
+     */
+    private void processIfGotos(List<GotoItem> allGotos, List<GraphTargetItem> list) {
+        for (int i = 0; i < list.size(); i++) {
+            GraphTargetItem item = list.get(i);
+            if (item instanceof Block) {
+                List<List<GraphTargetItem>> subs = ((Block) item).getSubs();
+                for (List<GraphTargetItem> sub : subs) {
+                    processIfGotos(allGotos, sub);
+                }
+            }
+            if (item instanceof IfItem) {
+                IfItem ii = (IfItem) item;
+                if (!ii.onTrue.isEmpty() && !ii.onFalse.isEmpty()) {
+                    if (ii.onTrue.get(ii.onTrue.size() - 1) instanceof GotoItem) {
+                        if (ii.onFalse.get(ii.onFalse.size() - 1) instanceof GotoItem) {
+                            GotoItem gotoOnTrue = (GotoItem) ii.onTrue.get(ii.onTrue.size() - 1);
+                            GotoItem gotoOnFalse = (GotoItem) ii.onFalse.get(ii.onFalse.size() - 1);
+                            if (gotoOnTrue.labelName.equals(gotoOnFalse.labelName)) {
+                                String labelOnTrue = gotoOnTrue.labelName;
+                                String labelOnFalse = gotoOnFalse.labelName;
+                                if (labelOnTrue != null && labelOnFalse != null) {
+                                    if (labelOnTrue.equals(labelOnFalse)) {
+                                        GotoItem gotoMerged;
+                                        GotoItem gotoRemoved;
+                                        if (gotoOnTrue.targetCommands != null) {
+                                            gotoMerged = gotoOnTrue;
+                                            gotoRemoved = gotoOnFalse;
+                                        } else {
+                                            gotoMerged = gotoOnFalse;
+                                            gotoRemoved = gotoOnTrue;
+                                        }
+                                        ii.onTrue.remove(ii.onTrue.size() - 1);
+                                        ii.onFalse.remove(ii.onFalse.size() - 1);
+                                        list.add(i + 1, gotoMerged);
+                                        allGotos.remove(gotoRemoved);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private void processIfs(List<GraphTargetItem> list) {
         for (int i = 0; i < list.size(); i++) {
             GraphTargetItem item = list.get(i);
@@ -1297,25 +1378,6 @@ public class Graph {
                 IfItem ifi = (IfItem) item;
                 List<GraphTargetItem> onTrue = ifi.onTrue;
                 List<GraphTargetItem> onFalse = ifi.onFalse;
-                if ((!onTrue.isEmpty()) && (!onFalse.isEmpty())) {
-                    if (onTrue.get(onTrue.size() - 1) instanceof GotoItem) {
-                        if (onFalse.get(onFalse.size() - 1) instanceof GotoItem) {
-                            GotoItem gotoOnTrue = (GotoItem) onTrue.get(onTrue.size() - 1);
-                            GotoItem gotoOnFalse = (GotoItem) onFalse.get(onFalse.size() - 1);
-                            String labelOnTrue = gotoOnTrue.labelName;
-                            String labelOnFalse = gotoOnFalse.labelName;
-                            if (labelOnTrue != null && labelOnFalse != null) {
-                                if (labelOnTrue.equals(labelOnFalse)) {
-                                    GotoItem gotoMerged = gotoOnTrue.targetCommands != null ? gotoOnTrue : gotoOnFalse;
-
-                                    onTrue.remove(onTrue.size() - 1);
-                                    onFalse.remove(onFalse.size() - 1);
-                                    list.add(i + 1, gotoMerged);
-                                }
-                            }
-                        }
-                    }
-                }
                 if ((!onTrue.isEmpty()) && (!onFalse.isEmpty())) {
                     if (onTrue.get(onTrue.size() - 1) instanceof ContinueItem) {
                         if (onFalse.get(onFalse.size() - 1) instanceof ContinueItem) {
@@ -2195,7 +2257,7 @@ public class Graph {
                             gi.targetCommands.remove(cnt);
                             l.precontinueCommands = gi.targetCommands;
                             l.loopPreContinue = part;
-                            removeEdgeToFromList(gotoTargets, part);
+                            //removeEdgeToFromList(gotoTargets, part);
                             ret.add(cnt);
                             return ret;
                         }
@@ -2291,7 +2353,7 @@ public class Graph {
                 List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
                 List<Integer> valueMappings = new ArrayList<>();
                 Loop swLoop = new Loop(loops.size(), null, next);
-                gotoTargets.remove(next);
+                //removeEdgeToFromList(gotoTargets, next);
                 swLoop.phase = 1;
                 loops.add(swLoop);
                 boolean first = false;
@@ -2383,7 +2445,7 @@ public class Graph {
                 pos = 0;
                 List<GraphTargetItem> nextCommands = new ArrayList<>();
                 for (int i = 1; i < part.nextParts.size(); i++) {
-                    gotoTargets.remove(part.nextParts.get(i));
+                    //gotoTargets.remove(new GraphPartEdge(next, part.nextParts.get(i)));
                 }
                 for (int i = 1; i < part.nextParts.size(); i++) {
                     GraphPart p = part.nextParts.get(i);
@@ -3099,6 +3161,10 @@ public class Graph {
             if (edges.get(i).to.equals(to)) {
                 edges.remove(i);
             }
+        }
+        while (isPartEmpty(to) && !to.nextParts.isEmpty()) {
+            to = to.nextParts.get(0);
+            removeEdgeToFromList(edges, to);
         }
     }
 }

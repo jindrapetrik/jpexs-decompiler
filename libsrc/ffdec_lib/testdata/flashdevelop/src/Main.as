@@ -41,6 +41,8 @@ package
 		TestGotos3;
 		TestGotos4;
 		TestGotos5;
+		TestGotos6;
+		TestGotos7;
 		TestHello;
 		TestIf;
 		TestIfElse;

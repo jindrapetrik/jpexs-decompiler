@@ -31,16 +31,11 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -725,6 +720,60 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"E\");\r\n"
                 + "j++;\r\n"
                 + "}\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
+    public void testGotos6() {
+        decompileMethod("testGotos6", "var a:Boolean = true;\r\n"
+                + "var s:String = \"a\";\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "switch(s)\r\n"
+                + "{\r\n"
+                + "case \"a\":\r\n"
+                + "trace(\"is A\");\r\n"
+                + "break;\r\n"
+                + "case \"b\":\r\n"
+                + "trace(\"is B\");\r\n"
+                + "case \"c\":\r\n"
+                + "trace(\"is BC\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"D\");\r\n"
+                + "}\r\n"
+                + "trace(\"finish\");\r\n",
+                false);
+    }
+
+    @Test
+    public void testGotos7() {
+        decompileMethod("testGotos7", "for(var i:int = 0; i < 10; i++)\r\n"
+                + "{\r\n"
+                + "switch(i)\r\n"
+                + "{\r\n"
+                + "case 0:\r\n"
+                + "trace(\"zero\");\r\n"
+                + "continue;\r\n"
+                + "case 5:\r\n"
+                + "trace(\"five\");\r\n"
+                + "break;\r\n"
+                + "case 10:\r\n"
+                + "trace(\"ten\");\r\n"
+                + "break;\r\n"
+                + "case 1:\r\n"
+                + "if(i == 7)\r\n"
+                + "{\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "trace(\"one\");\r\n"
+                + "default:\r\n"
+                + "trace(\"def\");\r\n"
+                + "}\r\n"
+                + "trace(\"before loop end\");\r\n"
                 + "}\r\n",
                 false);
     }
