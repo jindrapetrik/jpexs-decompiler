@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 - AS3: Incorrect handling of strict equals operator in if vs switch resulting in §§pop
 - Better goto detection/for continue
 - Support for comma operator in switch case statements
-- AS3: Losing script tree focus on script selection (disallowed walking tree with keyboard up/down)
+- Losing script tree focus on script selection (disallowed walking tree with keyboard up/down)
 - Proper window screen centering
 - Graph dialog proper window size
 - Graph dialog scroll speed increased

@@ -1393,8 +1393,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         detailPanel.setVisible(!val);
 
         decompiledTextArea.ignoreCarret = val;
-        //This prevents walking script tree with up and down:
-        //decompiledTextArea.requestFocusInWindow();
+        if (val) {
+            decompiledTextArea.requestFocusInWindow();
+        }
     }
 
     private void editDecompiledButtonActionPerformed(ActionEvent evt) {
