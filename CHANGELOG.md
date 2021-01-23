@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Graphviz graphs colorized
+
 ### Fixed
 - Using new FFDec icon on Mac
 - AS3: get/set slot for global scope

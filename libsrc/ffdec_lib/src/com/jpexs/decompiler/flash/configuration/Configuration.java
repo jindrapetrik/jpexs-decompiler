@@ -649,6 +649,10 @@ public final class Configuration {
     @ConfigurationFile
     public static ConfigurationItem<String> graphVizDotLocation = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationInternal
+    public static ConfigurationItem<Boolean> showLineNumbersInPCodeGraphvizGraph = null;
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
