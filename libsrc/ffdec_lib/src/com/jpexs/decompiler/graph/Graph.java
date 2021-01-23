@@ -124,6 +124,10 @@ public class Graph {
         }
     }
 
+    public List<GraphException> getExceptions() {
+        return exceptions;
+    }
+
     protected static void populateParts(GraphPart part, Set<GraphPart> allParts) {
         if (allParts.contains(part)) {
             return;
