@@ -933,7 +933,9 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         asmLabel.setIcon(val ? View.getIcon("editing16") : null); // this line is not working
         topButtonsPan.setVisible(!val);
         editMode = val;
-        editor.requestFocusInWindow();
+        if (val) {
+            editor.requestFocusInWindow();
+        }
     }
 
     public void setDecompiledEditMode(boolean val) {
@@ -968,7 +970,9 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         decompiledEditor.getCaret().setVisible(true);
         decLabel.setIcon(val ? View.getIcon("editing16") : null);
         editDecompiledMode = val;
-        decompiledEditor.requestFocusInWindow();
+        if (val) {
+            decompiledEditor.requestFocusInWindow();
+        }
     }
 
     private void graphButtonActionPerformed(ActionEvent evt) {
