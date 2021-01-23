@@ -270,11 +270,11 @@ public class Graph {
     }
 
     public GraphPart getNextCommonPart(BaseLocalData localData, GraphPart part, List<Loop> loops, List<GraphPartEdge> gotoParts) throws InterruptedException {
-        return getCommonPart(localData, part.nextParts, loops, gotoParts);
+        return getCommonPart(localData, part, part.nextParts, loops, gotoParts);
     }
 
     //TODO: Make this faster!
-    public GraphPart getCommonPart(BaseLocalData localData, List<GraphPart> parts, List<Loop> loops, List<GraphPartEdge> gotoParts) throws InterruptedException {
+    public GraphPart getCommonPart(BaseLocalData localData, GraphPart prev, List<GraphPart> parts, List<Loop> loops, List<GraphPartEdge> gotoParts) throws InterruptedException {
         if (parts.isEmpty()) {
             return null;
         }
@@ -290,7 +290,7 @@ public class Graph {
             if (loopContinues.contains(p)) {
                 break;
             }
-            if (gotoParts.contains(p)) {
+            if (gotoParts.contains(new GraphPartEdge(prev, p))) {
                 break;
             }
             boolean common = true;
@@ -1541,7 +1541,7 @@ public class Graph {
         }
 
         if (nextParts.size() == 2) {
-            GraphPart next = getCommonPart(localData, nextParts, loops, new ArrayList<>());//part.getNextPartPath(new ArrayList<GraphPart>());
+            GraphPart next = getCommonPart(localData, part, nextParts, loops, new ArrayList<>());//part.getNextPartPath(new ArrayList<GraphPart>());
             //System.err.println("- common part of " + nextParts.get(0) + " and " + nextParts.get(1) + " is " + next);
             List<GraphPart> stopParts2 = new ArrayList<>();  //stopPart);
             if (next != null) {
@@ -1610,7 +1610,7 @@ public class Graph {
                 List<GraphPart> cmn = new ArrayList<>();
                 cmn.add(part);
                 cmn.add(t);
-                GraphPart next = getCommonPart(localData, cmn, loops, new ArrayList<>());
+                GraphPart next = getCommonPart(localData, part, cmn, loops, new ArrayList<>());
                 if (next != null) {
                     stopPart2.add(next);
                 } else {
@@ -1850,7 +1850,7 @@ public class Graph {
              }*/
 
             nps = part.nextParts;
-            GraphPart next = getCommonPart(localData, nps, loops, new ArrayList<>());
+            GraphPart next = getCommonPart(localData, part, nps, loops, new ArrayList<>());
             List<GraphPart> stopPart2 = stopPart == null ? new ArrayList<>() : new ArrayList<>(stopPart);
             if (next != null) {
                 stopPart2.add(next);
@@ -2490,7 +2490,7 @@ public class Graph {
                     nps = part.nextParts;
                     boolean isEmpty = nps.get(0) == nps.get(1);
 
-                    GraphPart next = getCommonPart(localData, nps, loops, gotoTargets);
+                    GraphPart next = getCommonPart(localData, part, nps, loops, gotoTargets);
                     //System.err.println("on part " + part + ", next: " + next);
                     TranslateStack trueStack = (TranslateStack) stack.clone();
                     TranslateStack falseStack = (TranslateStack) stack.clone();
