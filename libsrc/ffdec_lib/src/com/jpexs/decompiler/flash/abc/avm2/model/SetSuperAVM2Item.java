@@ -16,23 +16,44 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Stack;
 
 /**
  *
  * @author JPEXS
  */
-public class SetSuperAVM2Item extends AVM2Item {
+public class SetSuperAVM2Item extends AVM2Item implements SetTypeAVM2Item {
 
     public GraphTargetItem object;
 
     public FullMultinameAVM2Item propertyName;
+
+    public DeclarationAVM2Item declaration;
+
+    @Override
+    public DeclarationAVM2Item getDeclaration() {
+        return declaration;
+    }
+
+    @Override
+    public void setDeclaration(DeclarationAVM2Item declaration) {
+        this.declaration = declaration;
+    }
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
@@ -79,5 +100,15 @@ public class SetSuperAVM2Item extends AVM2Item {
     @Override
     public boolean hasReturnValue() {
         return false;
+    }
+
+    @Override
+    public GraphTargetItem getObject() {
+        return new GetSuperAVM2Item(getInstruction(), getLineStartIns(), object, propertyName);
+    }
+
+    @Override
+    public GraphTargetItem getValue() {
+        return value;
     }
 }
