@@ -17,8 +17,11 @@
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.graph.Loop;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -28,9 +31,11 @@ public class FinalProcessLocalData {
 
     public final HashSet<Integer> temporaryRegisters;
     public final List<Loop> loops;
+    public Map<Integer, Set<Integer>> registerUsage;
 
     public FinalProcessLocalData(List<Loop> loops) {
         temporaryRegisters = new HashSet<>();
+        registerUsage = new HashMap<>();
         this.loops = loops;
     }
 }
