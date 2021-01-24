@@ -501,6 +501,14 @@ public class AVM2Graph extends Graph {
                                     finCatchName = AVM2Item.localRegName(new HashMap<>(), sl.regIndex);
                                 }
                             }
+                        } else {
+                            //No kill ins
+                            if (!ncatchedCommands.isEmpty() && (ncatchedCommands.get(0) instanceof SetLocalAVM2Item)) {
+                                SetLocalAVM2Item sl = (SetLocalAVM2Item) ncatchedCommands.get(0);
+                                if (sl.value.getThroughDuplicate().getNotCoerced() instanceof ExceptionAVM2Item) {
+                                    ncatchedCommands.remove(0);
+                                }
+                            }
                         }
                     }
                 }
@@ -1175,5 +1183,30 @@ public class AVM2Graph extends Graph {
     @Override
     protected List<GraphTargetItem> filter(List<GraphTargetItem> list) {
         return avm2code.clearTemporaryRegisters(list);
+    }
+
+    @Override
+    protected void checkSwitch(BaseLocalData localData, SwitchItem switchItem, Map<Integer, GraphTargetItem> otherSides, List<GraphTargetItem> output) {
+        if (output.isEmpty()) {
+            return;
+        }
+        if (!(output.get(output.size() - 1) instanceof SetLocalAVM2Item)) {
+            return;
+        }
+        AVM2LocalData avm2LocalData = (AVM2LocalData) localData;
+        SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(output.size() - 1);
+        int setLocalIp = avm2LocalData.code.code.indexOf(setLocal.getSrc());
+        Set<Integer> allUsages = new HashSet<>(avm2LocalData.setLocalPosToGetLocalPos.get(setLocalIp));
+        for (GraphTargetItem otherSide : otherSides.values()) {
+            if (otherSide instanceof LocalRegAVM2Item) {
+                LocalRegAVM2Item otherLog = (LocalRegAVM2Item) otherSide;
+                int getLocalIp = avm2LocalData.code.code.indexOf(otherLog.getSrc());
+                allUsages.remove((Integer) getLocalIp);
+            }
+        }
+        if (allUsages.isEmpty()) {
+            output.remove(output.size() - 1);
+            switchItem.switchedObject = setLocal.value;
+        }
     }
 }
