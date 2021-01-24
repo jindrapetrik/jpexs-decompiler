@@ -570,8 +570,12 @@ public class Graph {
         expandGotos(ret);
         processIfs(ret);
         finalProcessStack(stack, ret, path);
-        finalProcessAll(ret, 0, new FinalProcessLocalData(loops), path);
+        finalProcessAll(ret, 0, getFinalData(localData, loops), path);
         return ret;
+    }
+
+    protected FinalProcessLocalData getFinalData(BaseLocalData localData, List<Loop> loops) {
+        return new FinalProcessLocalData(loops);
     }
 
     protected void beforePrintGraph(BaseLocalData localData, String path, Set<GraphPart> allParts, List<Loop> loops) {
