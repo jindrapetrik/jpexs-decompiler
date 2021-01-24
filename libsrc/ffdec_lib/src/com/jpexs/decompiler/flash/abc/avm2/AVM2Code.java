@@ -1646,6 +1646,21 @@ public class AVM2Code implements Cloneable {
                     ip++;
                     continue iploop;
                 }
+            } else if (!USE_KILL_INS && (ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end)) { // set_local_x,get_local_x.. no other local_x get
+                AVM2Instruction insAfter = code.get(ip + 1);
+                Set<Integer> usages = setLocalPosToGetLocalPos.get(ip);
+
+                if (usages.size() == 1 && (usages.iterator().next().equals(ip + 1)) && (insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
+                    /*GraphTargetItem before = stack.peek();
+                    ins.definition.translate(setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this, thisHasDefaultToPrimitive);
+                    stack.push(before);*/
+                    ip += 2;
+                    continue iploop;
+                } else {
+                    ins.definition.translate(setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this, thisHasDefaultToPrimitive);
+                    ip++;
+                    continue iploop;
+                }
             } else if (ins.definition instanceof DupIns) {
                 int nextPos;
                 do {
