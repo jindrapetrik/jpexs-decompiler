@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.executing;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -23,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -72,6 +74,11 @@ public class CallIns extends InstructionDefinition {
             args.add(0, stack.pop());
         }
         GraphTargetItem receiver = stack.pop();
+        if (receiver instanceof LocalRegAVM2Item) {
+            List<LocalRegAVM2Item> localRegs = new ArrayList<>();
+            localRegs.add((LocalRegAVM2Item) receiver);
+            cleanTempRegisters(localData, output, localRegs);
+        }
         GraphTargetItem function = stack.pop();
         stack.push(new CallAVM2Item(ins, localData.lineStartInstruction, receiver, function, args));
     }
