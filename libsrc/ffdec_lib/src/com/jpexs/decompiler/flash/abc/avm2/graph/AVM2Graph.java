@@ -466,7 +466,7 @@ public class AVM2Graph extends Graph {
         if (part.nextParts.isEmpty()) {
             if (avm2code.code.get(part.end).definition instanceof ReturnValueIns) {  //returns in finally clause
                 if (part.getHeight() >= 3) {
-                    if (avm2code.code.get(part.getPosAt(part.getHeight() - 2)).definition instanceof KillIns) {
+                    if (AVM2Code.USE_KILL_INS && avm2code.code.get(part.getPosAt(part.getHeight() - 2)).definition instanceof KillIns) {
                         if (avm2code.code.get(part.getPosAt(part.getHeight() - 3)).definition instanceof GetLocalTypeIns) {
                             if (output.size() >= 2) {
                                 if (output.get(output.size() - 2) instanceof SetLocalAVM2Item) {
@@ -951,7 +951,7 @@ public class AVM2Graph extends Graph {
                         continue;
                     }
                 }
-                if (avm2code.isKilled(ri.regIndex, 0, Integer.MAX_VALUE)) {
+                if (AVM2Code.USE_KILL_INS && avm2code.isKilled(ri.regIndex, 0, Integer.MAX_VALUE)) {
                     if (i + 1 < list.size()) {
                         if (list.get(i + 1) instanceof SwitchItem) {
                             SwitchItem si = (SwitchItem) list.get(i + 1);
@@ -1049,7 +1049,7 @@ public class AVM2Graph extends Graph {
         }
         for (GraphTargetItem i : output) {
             if (i instanceof SetLocalAVM2Item) {
-                if (avm2code.isKilled(((SetLocalAVM2Item) i).regIndex, 0, avm2code.code.size() - 1)) {
+                if (AVM2Code.USE_KILL_INS && avm2code.isKilled(((SetLocalAVM2Item) i).regIndex, 0, avm2code.code.size() - 1)) {
                     continue;
                 }
             }

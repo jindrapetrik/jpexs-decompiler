@@ -324,6 +324,8 @@ public class AVM2Code implements Cloneable {
 
     private static final boolean DEBUG_MODE = false;
 
+    public static final boolean USE_KILL_INS = false;
+
     public static int toSourceLimit = -1;
 
     public List<AVM2Instruction> code;
@@ -1490,7 +1492,7 @@ public class AVM2Code implements Cloneable {
         List<GraphTargetItem> output = new ArrayList<>(input);
         for (int i = 0; i < output.size(); i++) {
             if (output.get(i) instanceof SetLocalAVM2Item) {
-                if (isKilled(((SetLocalAVM2Item) output.get(i)).regIndex, 0, code.size() - 1)) {
+                if (USE_KILL_INS && isKilled(((SetLocalAVM2Item) output.get(i)).regIndex, 0, code.size() - 1)) {
                     SetLocalAVM2Item lsi = (SetLocalAVM2Item) output.get(i);
                     if (i + 1 < output.size()) {
                         if (output.get(i + 1) instanceof ExitItem) {
@@ -1627,11 +1629,11 @@ public class AVM2Code implements Cloneable {
              }
              }
              }*/
-            if ((ins.definition instanceof GetLocalTypeIns) && (!output.isEmpty()) && (output.get(output.size() - 1) instanceof SetLocalAVM2Item) && (((SetLocalAVM2Item) output.get(output.size() - 1)).regIndex == ((GetLocalTypeIns) ins.definition).getRegisterId(ins)) && isKilled(((SetLocalAVM2Item) output.get(output.size() - 1)).regIndex, start, end)) {
+            if (USE_KILL_INS && (ins.definition instanceof GetLocalTypeIns) && (!output.isEmpty()) && (output.get(output.size() - 1) instanceof SetLocalAVM2Item) && (((SetLocalAVM2Item) output.get(output.size() - 1)).regIndex == ((GetLocalTypeIns) ins.definition).getRegisterId(ins)) && isKilled(((SetLocalAVM2Item) output.get(output.size() - 1)).regIndex, start, end)) {
                 SetLocalAVM2Item slt = (SetLocalAVM2Item) output.remove(output.size() - 1);
                 stack.push(slt.getValue());
                 ip++;
-            } else if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end) && (isKilled(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ip, end))) { // set_local_x,get_local_x..kill x
+            } else if (USE_KILL_INS && (ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end) && (isKilled(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ip, end))) { // set_local_x,get_local_x..kill x
                 AVM2Instruction insAfter = code.get(ip + 1);
                 if ((insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
                     GraphTargetItem before = stack.peek();
@@ -1670,7 +1672,7 @@ public class AVM2Code implements Cloneable {
                     } else if (processJumps && (insAfter.definition instanceof IfTrueIns)) {
                         //stack.add("(" + stack.pop() + ")||");
                         isAnd = false;
-                    } else if (insAfter.definition instanceof SetLocalTypeIns) {
+                    } else if (USE_KILL_INS && insAfter.definition instanceof SetLocalTypeIns) {
                         // chained assignments
                         int reg = (((SetLocalTypeIns) insAfter.definition).getRegisterId(insAfter));
                         for (int t = ip + 1; t <= end - 1; t++) {
@@ -1697,7 +1699,7 @@ public class AVM2Code implements Cloneable {
                                 }
                             }
                         }
-                        if (!isKilled(reg, 0, end)) {
+                        if (USE_KILL_INS && !isKilled(reg, 0, end)) {
                             GraphTargetItem vx = stack.pop().getThroughDuplicate();
                             int dupCnt = 1;
                             for (int i = ip - 1; i >= start; i--) {
