@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import java.util.HashMap;
 import java.util.List;
@@ -128,6 +129,9 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
             }
         }
 
+        if (localData.getSetLocalUsages(localData.code.adr2pos(ins.getAddress())).isEmpty() && (value instanceof DuplicateItem)) {
+            return;
+        }
         GraphTargetItem result = new SetLocalAVM2Item(ins, localData.lineStartInstruction, regId, value);
         output.add(result);
     }

@@ -29,6 +29,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -79,6 +80,16 @@ public class AVM2LocalData extends BaseLocalData {
 
     public AVM2LocalData() {
 
+    }
+
+    public Set<Integer> getSetLocalUsages(int setLocalPos) {
+        if (setLocalPosToGetLocalPos == null) {
+            return new HashSet<>();
+        }
+        if (!setLocalPosToGetLocalPos.containsKey(setLocalPos)) {
+            return new HashSet<>();
+        }
+        return setLocalPosToGetLocalPos.get(setLocalPos);
     }
 
     public AVM2LocalData(AVM2LocalData localData) {
