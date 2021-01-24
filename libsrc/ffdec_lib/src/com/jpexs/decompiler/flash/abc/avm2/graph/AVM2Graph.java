@@ -604,26 +604,6 @@ public class AVM2Graph extends Graph {
             return ret;
         }
 
-        if (part.nextParts.isEmpty()) {
-            if (avm2code.code.get(part.end).definition instanceof ReturnValueIns) {  //returns in finally clause
-                if (part.getHeight() >= 3) {
-                    if (AVM2Code.USE_KILL_INS && avm2code.code.get(part.getPosAt(part.getHeight() - 2)).definition instanceof KillIns) {
-                        if (avm2code.code.get(part.getPosAt(part.getHeight() - 3)).definition instanceof GetLocalTypeIns) {
-                            if (output.size() >= 2) {
-                                if (output.get(output.size() - 2) instanceof SetLocalAVM2Item) {
-                                    ret = new ArrayList<>();
-                                    ret.addAll(output);
-                                    ret.remove(ret.size() - 1);
-                                    GraphTargetItem v = ((SetLocalAVM2Item) output.get(output.size() - 2)).value;
-                                    ret.add(new ReturnValueAVM2Item(avm2code.code.get(part.end), (AVM2Instruction) v.getLineStartItem(), v));
-                                    return ret;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
         if ((avm2code.code.get(part.end).definition instanceof LookupSwitchIns) && (ignoredSwitches.containsValue(part.end) || ignoredSwitches2.contains(part.end))) {
             ret = new ArrayList<>();
             ret.addAll(output);
@@ -1211,7 +1191,7 @@ public class AVM2Graph extends Graph {
                         continue;
                     }
                 }
-                if (!AVM2Code.USE_KILL_INS && usages.size() <= 1) {
+                if (usages.size() <= 1) {
                     if (i + 2 < list.size()) {
                         if ((list.get(i + 1) instanceof IntegerValueAVM2Item) && (list.get(i + 2) instanceof ReturnValueAVM2Item)
                                 && (list.get(i + 2).value instanceof LocalRegAVM2Item)
@@ -1239,44 +1219,10 @@ public class AVM2Graph extends Graph {
                         }
                     }
                 }
-                if (AVM2Code.USE_KILL_INS && avm2code.isKilled(ri.regIndex, 0, Integer.MAX_VALUE)) {
-                    if (i + 1 < list.size()) {
-                        if (list.get(i + 1) instanceof SwitchItem) {
-                            SwitchItem si = (SwitchItem) list.get(i + 1);
-                            if (si.switchedObject instanceof LocalRegAVM2Item) {
-                                if (((LocalRegAVM2Item) si.switchedObject).regIndex == ri.regIndex) {
-                                    si.switchedObject = ri.value;
-                                }
-                            }
-                        }
-                    }
-                    if (i + 2 < list.size()) {
-                        if ((list.get(i + 1) instanceof IntegerValueAVM2Item) && (list.get(i + 2) instanceof ReturnValueAVM2Item)) {
-                            ReturnValueAVM2Item r = (ReturnValueAVM2Item) list.get(i + 2);
-                            r.value = ri.value;
-                            list.remove(i + 1);
-                            continue;
-                        }
-                        if ((list.get(i + 1) instanceof IntegerValueAVM2Item) && (list.get(i + 2) instanceof ThrowAVM2Item)) {
-                            ThrowAVM2Item t = (ThrowAVM2Item) list.get(i + 2);
-                            t.value = ri.value;
-                            list.remove(i + 1);
-                            //continue;
-                        }
-                    } else if (i + 1 < list.size()) {
-                        if (list.get(i + 1) instanceof IntegerValueAVM2Item) {
-                            list.remove(i + 1);
-                        }
-                    }
-                }
             }
         }
 
-        List<GraphTargetItem> ret = avm2code.clearTemporaryRegisters(list);
-        if (ret != list) {
-            list.clear();
-            list.addAll(ret);
-        }
+        List<GraphTargetItem> ret = list;
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i) instanceof SetTypeAVM2Item) {
                 if (((SetTypeAVM2Item) list.get(i)).getValue() instanceof ExceptionAVM2Item) {
@@ -1338,22 +1284,6 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected boolean isEmpty(List<GraphTargetItem> output) {
-        if (super.isEmpty(output)) {
-            return true;
-        }
-        for (GraphTargetItem i : output) {
-            if (i instanceof SetLocalAVM2Item) {
-                if (AVM2Code.USE_KILL_INS && avm2code.isKilled(((SetLocalAVM2Item) i).regIndex, 0, avm2code.code.size() - 1)) {
-                    continue;
-                }
-            }
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     public AVM2LocalData prepareBranchLocalData(BaseLocalData localData) {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         AVM2LocalData ret = new AVM2LocalData(aLocalData);
@@ -1361,11 +1291,6 @@ public class AVM2Graph extends Graph {
         copyScopeStack.addAll(ret.scopeStack);
         ret.scopeStack = copyScopeStack;
         return ret;
-    }
-
-    @Override
-    protected List<GraphTargetItem> filter(List<GraphTargetItem> list) {
-        return avm2code.clearTemporaryRegisters(list);
     }
 
     @Override

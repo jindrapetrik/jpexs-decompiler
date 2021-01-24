@@ -324,8 +324,6 @@ public class AVM2Code implements Cloneable {
 
     private static final boolean DEBUG_MODE = false;
 
-    public static final boolean USE_KILL_INS = false;
-
     public static int toSourceLimit = -1;
 
     public List<AVM2Instruction> code;
@@ -1488,33 +1486,6 @@ public class AVM2Code implements Cloneable {
         }
     }
 
-    public List<GraphTargetItem> clearTemporaryRegisters(List<GraphTargetItem> input) {
-        List<GraphTargetItem> output = new ArrayList<>(input);
-        for (int i = 0; i < output.size(); i++) {
-            if (output.get(i) instanceof SetLocalAVM2Item) {
-                if (USE_KILL_INS && isKilled(((SetLocalAVM2Item) output.get(i)).regIndex, 0, code.size() - 1)) {
-                    SetLocalAVM2Item lsi = (SetLocalAVM2Item) output.get(i);
-                    if (i + 1 < output.size()) {
-                        if (output.get(i + 1) instanceof ExitItem) {
-                            GraphTargetItem rv = output.get(i + 1);
-                            if (rv.value instanceof LocalRegAVM2Item) {
-                                LocalRegAVM2Item lr = (LocalRegAVM2Item) rv.value;
-                                if (lr.regIndex == lsi.regIndex) {
-                                    rv.value = lsi.value;
-                                }
-                            }
-                        }
-                    }
-                    output.remove(i);
-                    i--;
-                }
-            } else if (output.get(i) instanceof WithAVM2Item) {
-                clearTemporaryRegisters(((WithAVM2Item) output.get(i)).items);
-            }
-        }
-        return output;
-    }
-
     public int fixIPAfterDebugLine(int ip) {
         if (code.isEmpty()) {
             return ip;
@@ -1629,24 +1600,7 @@ public class AVM2Code implements Cloneable {
              }
              }
              }*/
-            if (USE_KILL_INS && (ins.definition instanceof GetLocalTypeIns) && (!output.isEmpty()) && (output.get(output.size() - 1) instanceof SetLocalAVM2Item) && (((SetLocalAVM2Item) output.get(output.size() - 1)).regIndex == ((GetLocalTypeIns) ins.definition).getRegisterId(ins)) && isKilled(((SetLocalAVM2Item) output.get(output.size() - 1)).regIndex, start, end)) {
-                SetLocalAVM2Item slt = (SetLocalAVM2Item) output.remove(output.size() - 1);
-                stack.push(slt.getValue());
-                ip++;
-            } else if (USE_KILL_INS && (ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end) && (isKilled(((SetLocalTypeIns) ins.definition).getRegisterId(ins), ip, end))) { // set_local_x,get_local_x..kill x
-                AVM2Instruction insAfter = code.get(ip + 1);
-                if ((insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
-                    GraphTargetItem before = stack.peek();
-                    ins.definition.translate(setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this, thisHasDefaultToPrimitive);
-                    stack.push(before);
-                    ip += 2;
-                    continue iploop;
-                } else {
-                    ins.definition.translate(setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this, thisHasDefaultToPrimitive);
-                    ip++;
-                    continue iploop;
-                }
-            } else if (!USE_KILL_INS && (ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end)) { // set_local_x,get_local_x.. no other local_x get
+            if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end)) { // set_local_x,get_local_x.. no other local_x get
                 AVM2Instruction insAfter = code.get(ip + 1);
                 Set<Integer> usages = setLocalPosToGetLocalPos.get(ip);
 
@@ -1684,59 +1638,6 @@ public class AVM2Code implements Cloneable {
                     } else if (processJumps && (insAfter.definition instanceof IfTrueIns)) {
                         //stack.add("(" + stack.pop() + ")||");
                         isAnd = false;
-                    } else if (USE_KILL_INS && insAfter.definition instanceof SetLocalTypeIns) {
-                        // chained assignments
-                        int reg = (((SetLocalTypeIns) insAfter.definition).getRegisterId(insAfter));
-                        for (int t = ip + 1; t <= end - 1; t++) {
-                            if (code.get(t).definition instanceof KillIns) {
-                                if (code.get(t).operands[0] == reg) {
-                                    break;
-                                }
-                            }
-                            if (code.get(t).definition instanceof GetLocalTypeIns) {
-                                if (((GetLocalTypeIns) code.get(t).definition).getRegisterId(code.get(t)) == reg) {
-                                    if (code.get(t + 1).definition instanceof KillIns) {
-                                        if (code.get(t + 1).operands[0] == reg) {
-                                            ConvertOutput assignment = toSourceOutput(setLocalPosToGetLocalPos, thisHasDefaultToPrimitive, lineStartItem, path, part, processJumps, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, abc, body, ip + 2, t - 1, localRegNames, fullyQualifiedNames, visited, localRegAssigmentIps, refs);
-                                            if (!assignment.output.isEmpty()) {
-                                                GraphTargetItem tar = assignment.output.remove(assignment.output.size() - 1);
-                                                tar.firstPart = part;
-                                                stack.push(tar);
-                                                ip = t + 2;
-
-                                                continue iploop;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (USE_KILL_INS && !isKilled(reg, 0, end)) {
-                            GraphTargetItem vx = stack.pop().getThroughDuplicate();
-                            int dupCnt = 1;
-                            for (int i = ip - 1; i >= start; i--) {
-                                if (code.get(i).definition instanceof DupIns) {
-                                    if (stack.isEmpty()) {
-                                        break; // FIXME?o
-                                    }
-                                    stack.pop();
-                                    dupCnt++;
-                                    //stack.push(v);
-                                } else {
-                                    break;
-                                }
-                            }
-                            for (int i = 0; i < dupCnt; i++) {
-                                stack.push(new LocalRegAVM2Item(ins, (AVM2Instruction) lineStartItem.getVal(), reg, vx));
-                            }
-                            stack.push(vx);
-                        } else {
-                            ins.definition.translate(setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this, thisHasDefaultToPrimitive);
-                        }
-                        ip++;
-                        break;
-                        //}
-
                     } else {
                         ins.definition.translate(setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this, thisHasDefaultToPrimitive);
                         ip++;
