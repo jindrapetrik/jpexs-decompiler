@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -73,6 +75,8 @@ public class AVM2LocalData extends BaseLocalData {
 
     public boolean thisHasDefaultToPrimitive;
 
+    public Map<Integer, Set<Integer>> setLocalPosToGetLocalPos;
+
     public AVM2LocalData() {
 
     }
@@ -96,6 +100,7 @@ public class AVM2LocalData extends BaseLocalData {
         refs = localData.refs;
         code = localData.code;
         thisHasDefaultToPrimitive = localData.thisHasDefaultToPrimitive;
+        setLocalPosToGetLocalPos = localData.setLocalPosToGetLocalPos;
     }
 
     public AVM2ConstantPool getConstants() {
