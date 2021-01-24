@@ -6,15 +6,14 @@ package tests
 		
 		public final function run(param1:Object):int
 		{
-			var _loc2_:Boolean = true;
-			var _loc3_:Boolean = false;
-			var _loc4_:Boolean = false;
+			var a:Boolean = true;
+			var b:Boolean = false;
 			
-			if (_loc2_)
+			if (a)
 			{
 				trace("A");
 			}
-			else if (_loc3_)
+			else if (b)
 			{
 				trace("B");
 				
@@ -23,7 +22,7 @@ package tests
 			{
 				try
 				{
-					if (_loc2_)
+					if (a)
 					{
 						return 7;
 					}

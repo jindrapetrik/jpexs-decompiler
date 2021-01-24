@@ -77,11 +77,12 @@ package
 		TestTry;
 		TestTryReturn;
 		TestVector;
-		TestVector2;
+		TestVector2;		
 		TestWhileAnd;
 		TestWhileContinue;
 		TestWhileTry;
 		TestWhileTry2;		
+		TestXml;
 		
 		SetupMyPackage1;
 		SetupMyPackage2;
