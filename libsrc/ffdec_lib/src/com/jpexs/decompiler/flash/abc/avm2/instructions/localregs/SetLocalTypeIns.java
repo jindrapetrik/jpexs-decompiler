@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -61,6 +62,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int regId = getRegisterId(ins);
         GraphTargetItem value = stack.pop();
+
         /*if (localRegs.containsKey(regId)) {
          localRegs.put(regId, new NotCompileTimeAVM2Item(ins, localData.lineStartInstruction, value));
          } else {
@@ -126,9 +128,8 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
             }
         }
 
-        //if(val.startsWith("catchscope ")) return;
-        //if(val.startsWith("newactivation()")) return;
-        output.add(new SetLocalAVM2Item(ins, localData.lineStartInstruction, regId, value));
+        GraphTargetItem result = new SetLocalAVM2Item(ins, localData.lineStartInstruction, regId, value);
+        output.add(result);
     }
 
     @Override

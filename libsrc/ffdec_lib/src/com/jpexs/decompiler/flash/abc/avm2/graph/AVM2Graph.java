@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugLineIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictEqIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
@@ -1195,12 +1196,12 @@ public class AVM2Graph extends Graph {
         }
         AVM2LocalData avm2LocalData = (AVM2LocalData) localData;
         SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(output.size() - 1);
-        int setLocalIp = avm2LocalData.code.code.indexOf(setLocal.getSrc());
+        int setLocalIp = InstructionDefinition.getItemIp(avm2LocalData, setLocal);;
         Set<Integer> allUsages = new HashSet<>(avm2LocalData.setLocalPosToGetLocalPos.get(setLocalIp));
         for (GraphTargetItem otherSide : otherSides.values()) {
             if (otherSide instanceof LocalRegAVM2Item) {
                 LocalRegAVM2Item otherLog = (LocalRegAVM2Item) otherSide;
-                int getLocalIp = avm2LocalData.code.code.indexOf(otherLog.getSrc());
+                int getLocalIp = InstructionDefinition.getItemIp(avm2LocalData, otherLog);
                 allUsages.remove((Integer) getLocalIp);
             }
         }

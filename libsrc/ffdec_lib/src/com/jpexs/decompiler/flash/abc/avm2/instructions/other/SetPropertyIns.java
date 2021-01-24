@@ -166,8 +166,8 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
             }
         }
 
-        output.add(new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value));
-
+        GraphTargetItem result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value);
+        output.add(result);
     }
 
     @Override

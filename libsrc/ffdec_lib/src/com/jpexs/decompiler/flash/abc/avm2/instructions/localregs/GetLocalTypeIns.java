@@ -25,6 +25,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ScriptAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -32,7 +34,9 @@ import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -81,6 +85,28 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
         if (assignCount > 5) { //Do not allow change register more than 5 - for deobfuscation
             //computedValue = new NotCompileTimeItem(ins, localData.lineStartInstruction, computedValue);
         }
+
+        if (output.size() >= 2) {
+            if ((output.get(output.size() - 1) instanceof SetTypeAVM2Item) && (output.get(output.size() - 2) instanceof SetLocalAVM2Item)) {
+                SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(output.size() - 2);
+                GraphTargetItem setItem = output.get(output.size() - 1);
+                if (setLocal.regIndex == regId
+                        && (setLocal.value instanceof DuplicateItem)
+                        && (setLocal.value.value == setItem.value.getNotCoerced())) {
+
+                    int setLocalIp = getItemIp(localData, setLocal);
+                    int getLocalIp = localData.code.adr2pos(ins.getAddress());
+                    Set<Integer> usages = localData.setLocalPosToGetLocalPos.get(setLocalIp);
+                    if (usages.size() == 1 && usages.iterator().next().equals(getLocalIp)) {
+                        output.remove(output.size() - 1);
+                        output.remove(output.size() - 1);
+                        stack.push(setItem);
+                        return;
+                    }
+                }
+            }
+        }
+
         stack.push(new LocalRegAVM2Item(ins, localData.lineStartInstruction, regId, computedValue));
     }
 
