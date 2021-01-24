@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -50,9 +51,11 @@ public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
         int multinameIndex = ins.operands[0];
 
         GraphTargetItem value = stack.pop();
+
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
-        output.add(new SetSuperAVM2Item(ins, localData.lineStartInstruction, value, obj, multiname));
+        GraphTargetItem result = new SetSuperAVM2Item(ins, localData.lineStartInstruction, value, obj, multiname);
+        output.add(result);
     }
 
     @Override

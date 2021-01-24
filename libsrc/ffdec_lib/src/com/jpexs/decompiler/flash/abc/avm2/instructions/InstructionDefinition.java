@@ -41,6 +41,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -312,15 +313,23 @@ public abstract class InstructionDefinition implements Serializable {
         return false;
     }
 
+    public static int getItemIp(AVM2LocalData localData, GraphTargetItem item) {
+        GraphSourceItem src = item.getSrc();
+        if (src == null) {
+            return -1;
+        }
+        return localData.code.adr2pos(src.getAddress());
+    }
+
     public void cleanTempRegisters(AVM2LocalData localData, List<GraphTargetItem> output, List<LocalRegAVM2Item> usedLocalRegs) {
         for (LocalRegAVM2Item reg : usedLocalRegs) {
             for (int i = output.size() - 1; i >= 0; i--) {
                 if (output.get(i) instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(i);
                     if (setLocal.regIndex == reg.regIndex) {
-                        int setLocalIp = localData.code.code.indexOf(setLocal.getSrc());
+                        int setLocalIp = getItemIp(localData, setLocal);
                         Set<Integer> usages = localData.setLocalPosToGetLocalPos.get(setLocalIp);
-                        int usageIp = localData.code.code.indexOf(reg.getSrc());
+                        int usageIp = getItemIp(localData, reg);
                         if (usages.size() == 1 && usages.iterator().next().equals(usageIp)) {
                             output.remove(i);
                         }
