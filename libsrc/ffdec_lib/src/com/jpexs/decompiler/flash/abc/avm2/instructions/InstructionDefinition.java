@@ -30,6 +30,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.helpers.Reference;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -44,6 +46,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -160,7 +163,7 @@ public abstract class InstructionDefinition implements Serializable {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {
     }
 
-    public void translate(Reference<GraphSourceItem> lineStartItem, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2Instruction ins, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code, boolean thisHasDefaultToPrimitive) throws InterruptedException {
+    public void translate(Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, Reference<GraphSourceItem> lineStartItem, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2Instruction ins, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code, boolean thisHasDefaultToPrimitive) throws InterruptedException {
         AVM2LocalData localData = new AVM2LocalData();
         localData.isStatic = isStatic;
         localData.scriptIndex = scriptIndex;
@@ -177,6 +180,7 @@ public abstract class InstructionDefinition implements Serializable {
         localData.refs = refs;
         localData.code = code;
         localData.thisHasDefaultToPrimitive = thisHasDefaultToPrimitive;
+        localData.setLocalPosToGetLocalPos = setLocalPosToGetLocalPos;
         translate(localData, stack, ins, output, path);
         lineStartItem.setVal(localData.lineStartInstruction);
     }
@@ -306,5 +310,26 @@ public abstract class InstructionDefinition implements Serializable {
 
     public boolean isExitInstruction() {
         return false;
+    }
+
+    public void cleanTempRegisters(AVM2LocalData localData, List<GraphTargetItem> output, List<LocalRegAVM2Item> usedLocalRegs) {
+        for (LocalRegAVM2Item reg : usedLocalRegs) {
+            System.err.println(reg.regIndex);
+            for (int i = output.size() - 1; i >= 0; i--) {
+                if (output.get(i) instanceof SetLocalAVM2Item) {
+                    SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(i);
+                    if (setLocal.regIndex == reg.regIndex) {
+                        int setLocalIp = localData.code.code.indexOf(setLocal.getSrc());
+                        Set<Integer> usages = localData.setLocalPosToGetLocalPos.get(setLocalIp);
+                        int usageIp = localData.code.code.indexOf(reg.getSrc());
+                        if (usages.size() == 1 && usages.iterator().next().equals(usageIp)) {
+                            output.remove(i);
+                        }
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
     }
 }

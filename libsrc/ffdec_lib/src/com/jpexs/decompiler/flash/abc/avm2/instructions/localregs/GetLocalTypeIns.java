@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -78,16 +79,8 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
             assignCount = localData.localRegAssignmentIps.get(regId);
         }
         if (assignCount > 5) { //Do not allow change register more than 5 - for deobfuscation
-            computedValue = new NotCompileTimeItem(ins, localData.lineStartInstruction, computedValue);
+            //computedValue = new NotCompileTimeItem(ins, localData.lineStartInstruction, computedValue);
         }
-        /*if (!isRegisterCompileTime(regId, ip, refs, code)) {
-         computedValue = new NotCompileTimeAVM2Item(ins, localData.lineStartInstruction, computedValue);
-         }
-         if (computedValue == null) {
-         if (!localRegNames.containsKey(regId)) {
-         computedValue = new UndefinedAVM2Item(null); //In some obfuscated code there seems to be reading of undefined registers
-         }
-         }*/
         stack.push(new LocalRegAVM2Item(ins, localData.lineStartInstruction, regId, computedValue));
     }
 

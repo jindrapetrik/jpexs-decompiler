@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -61,17 +62,29 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
         if (value.getThroughDuplicate().getThroughRegister().getThroughDuplicate() instanceof IncrementAVM2Item) {
+            List<LocalRegAVM2Item> localRegs = new ArrayList<>();
+            if (value.getThroughDuplicate() instanceof LocalRegAVM2Item) {
+                localRegs.add((LocalRegAVM2Item) value.getThroughDuplicate());
+            }
             GraphTargetItem inside = ((IncrementAVM2Item) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).value.getThroughRegister().getNotCoerced().getThroughDuplicate();
             if (inside instanceof GetPropertyAVM2Item) {
                 GetPropertyAVM2Item insideProp = ((GetPropertyAVM2Item) inside);
                 if (((FullMultinameAVM2Item) insideProp.propertyName).compareSame(multiname)) {
                     GraphTargetItem insideObj = obj.getThroughDuplicate();
                     if (insideObj instanceof LocalRegAVM2Item) {
+                        localRegs.add((LocalRegAVM2Item) insideObj);
                         if (((LocalRegAVM2Item) insideObj).computedValue != null) {
                             insideObj = ((LocalRegAVM2Item) insideObj).computedValue.getThroughNotCompilable().getThroughDuplicate();
                         }
                     }
+                    if (multiname.name instanceof LocalRegAVM2Item) {
+                        localRegs.add((LocalRegAVM2Item) multiname.name);
+                    }
+                    if (multiname.namespace instanceof LocalRegAVM2Item) {
+                        localRegs.add((LocalRegAVM2Item) multiname.namespace);
+                    }
                     if (insideProp.object.getThroughDuplicate() == insideObj) {
+                        cleanTempRegisters(localData, output, localRegs);
                         if (stack.size() > 0) {
                             GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                             if (top == insideProp) {
@@ -93,17 +106,30 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         }
 
         if (value.getThroughDuplicate().getThroughRegister().getThroughDuplicate() instanceof DecrementAVM2Item) {
+            List<LocalRegAVM2Item> localRegs = new ArrayList<>();
+            if (value.getThroughDuplicate() instanceof LocalRegAVM2Item) {
+                localRegs.add((LocalRegAVM2Item) value.getThroughDuplicate());
+            }
+
             GraphTargetItem inside = ((DecrementAVM2Item) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).value.getThroughRegister().getNotCoerced().getThroughDuplicate();
             if (inside instanceof GetPropertyAVM2Item) {
                 GetPropertyAVM2Item insideProp = ((GetPropertyAVM2Item) inside);
                 if (((FullMultinameAVM2Item) insideProp.propertyName).compareSame(multiname)) {
                     GraphTargetItem insideObj = obj.getThroughDuplicate();
                     if (insideObj instanceof LocalRegAVM2Item) {
+                        localRegs.add((LocalRegAVM2Item) insideObj);
                         if (((LocalRegAVM2Item) insideObj).computedValue != null) {
                             insideObj = ((LocalRegAVM2Item) insideObj).computedValue.getThroughNotCompilable().getThroughDuplicate();
                         }
                     }
+                    if (multiname.name instanceof LocalRegAVM2Item) {
+                        localRegs.add((LocalRegAVM2Item) multiname.name);
+                    }
+                    if (multiname.namespace instanceof LocalRegAVM2Item) {
+                        localRegs.add((LocalRegAVM2Item) multiname.namespace);
+                    }
                     if (insideProp.object.getThroughDuplicate() == insideObj) {
+                        cleanTempRegisters(localData, output, localRegs);
                         if (stack.size() > 0) {
                             GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
                             if (top == insideProp) {

@@ -545,6 +545,8 @@ public class Graph {
          }
          System.err.println("</loopspre>");//*/
         List<GotoItem> gotos = new ArrayList<>();
+
+        beforePrintGraph(localData, path, allParts, loops);
         List<GraphTargetItem> ret = printGraph(gotos, gotoTargets, new HashMap<>(), new HashMap<>(), localData, stack, allParts, null, heads.get(0), null, loops, staticOperation, path);
 
         processIfGotos(gotos, ret);
@@ -570,6 +572,10 @@ public class Graph {
         finalProcessStack(stack, ret, path);
         finalProcessAll(ret, 0, new FinalProcessLocalData(loops), path);
         return ret;
+    }
+
+    protected void beforePrintGraph(BaseLocalData localData, String path, Set<GraphPart> allParts, List<Loop> loops) {
+
     }
 
     private List<GraphPartDecision> getCommonPrefix(List<List<GraphPartDecision>> listOfLists) {
