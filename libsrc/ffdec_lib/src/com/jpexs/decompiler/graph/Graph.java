@@ -2374,6 +2374,7 @@ public class Graph {
                 Map<Integer, GraphTargetItem> caseExpressions = new HashMap<>();
                 Map<Integer, GraphTargetItem> caseExpressionLeftSides = new HashMap<>();
                 Map<Integer, GraphTargetItem> caseExpressionRightSides = new HashMap<>();
+
                 GraphTargetItem it = switchedItem;
                 int defaultBranch = 0;
                 boolean hasExpr = false;
@@ -2444,6 +2445,7 @@ public class Graph {
                     defaultBranch = ((IntegerValueTypeItem) it).intValue();
                 }
 
+                Map<Integer, GraphTargetItem> caseExpressionOtherSides = caseExpressions;
                 if (!caseExpressionRightSides.isEmpty()) {
                     GraphTargetItem firstItem;
                     firstItem = (GraphTargetItem) caseExpressionRightSides.values().toArray()[0];
@@ -2457,6 +2459,7 @@ public class Graph {
 
                     if (sameRight) {
                         caseExpressions = caseExpressionLeftSides;
+                        caseExpressionOtherSides = caseExpressionRightSides;
                         switchedItem = firstItem;
                         hasExpr = true;
                     } else {
@@ -2471,6 +2474,7 @@ public class Graph {
                         }
                         if (sameLeft) {
                             caseExpressions = caseExpressionRightSides;
+                            caseExpressionOtherSides = caseExpressionLeftSides;
                             switchedItem = firstItem;
                             hasExpr = true;
                         }
@@ -2591,7 +2595,9 @@ public class Graph {
                     }
                 }
                 SwitchItem sw = new SwitchItem(null, localData.lineStartInstruction, swLoop, switchedItem, caseValues, caseCommands, valueMappings);
+                checkSwitch(localData, sw, caseExpressionOtherSides, currentRet);
                 currentRet.add(sw);
+                //TADY
                 swLoop.phase = 2;
                 if (next != null) {
                     currentRet.addAll(printGraph(foundGotos, gotoTargets, partCodes, partCodePos, visited, localData, stack, allParts, part, next, stopPart, loops, null, staticOperation, path, recursionLevel + 1));
@@ -2936,6 +2942,10 @@ public class Graph {
         }
 
         return ret;
+    }
+
+    protected void checkSwitch(BaseLocalData localData, SwitchItem switchItem, Map<Integer, GraphTargetItem> otherSides, List<GraphTargetItem> output) {
+
     }
 
     protected void checkGraph(List<GraphPart> allBlocks) {
