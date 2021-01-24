@@ -34,9 +34,9 @@ import java.util.List;
  */
 public class NextNameAVM2Item extends AVM2Item {
 
-    GraphTargetItem index;
+    public GraphTargetItem index;
 
-    GraphTargetItem obj;
+    public GraphTargetItem obj;
 
     public NextNameAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem index, GraphTargetItem obj) {
         super(instruction, lineStartIns, NOPRECEDENCE);

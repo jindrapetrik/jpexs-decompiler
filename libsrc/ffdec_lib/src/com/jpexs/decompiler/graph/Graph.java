@@ -1460,7 +1460,7 @@ public class Graph {
         return ret;
     }
 
-    protected GraphTargetItem checkLoop(GraphPart part, List<GraphPart> stopPart, List<Loop> loops) {
+    protected GraphTargetItem checkLoop(List<GraphTargetItem> output, GraphPart part, List<GraphPart> stopPart, List<Loop> loops) {
         if (stopPart.contains(part)) {
             return null;
         }
@@ -1817,7 +1817,7 @@ public class Graph {
         return printGraph(foundGotos, gotoTargets, partCodes, partCodePos, new HashSet<>(), localData, stack, allParts, parent, part, stopPart, loops, null, staticOperation, path, 0);
     }
 
-    protected GraphTargetItem checkLoop(LoopItem loopItem, BaseLocalData localData, List<Loop> loops) {
+    protected GraphTargetItem checkLoop(List<GraphTargetItem> output, LoopItem loopItem, BaseLocalData localData, List<Loop> loops) {
         return loopItem;
     }
 
@@ -2927,7 +2927,7 @@ public class Graph {
             }
             currentLoop.phase = 2;
 
-            GraphTargetItem replaced = checkLoop(li, localData, loops);
+            GraphTargetItem replaced = checkLoop(ret, li, localData, loops);
             if (replaced != li) {
                 int index = ret.indexOf(li);
                 ret.remove(index);

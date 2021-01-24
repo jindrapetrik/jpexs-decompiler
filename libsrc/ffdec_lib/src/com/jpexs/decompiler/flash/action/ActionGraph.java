@@ -471,7 +471,7 @@ public class ActionGraph extends Graph {
                 List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
                 GraphPart next = breakPart;
 
-                GraphTargetItem ti = checkLoop(next, stopPart, loops);
+                GraphTargetItem ti = checkLoop(new ArrayList<GraphTargetItem>(), next, stopPart, loops);
 
                 //create switch as new loop break command detection to work
                 currentLoop = new Loop(loops.size(), null, next);

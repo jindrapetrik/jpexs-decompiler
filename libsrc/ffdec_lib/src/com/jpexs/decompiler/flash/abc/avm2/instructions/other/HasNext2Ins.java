@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -41,7 +42,10 @@ public class HasNext2Ins extends InstructionDefinition {
         int objectReg = ins.operands[0];
         int indexReg = ins.operands[1];
         //stack.push("_loc_" + objectReg + ".hasNext(cnt=_loc_" + indexReg + ")");
-        stack.push(new HasNextAVM2Item(ins, localData.lineStartInstruction, new LocalRegAVM2Item(ins, localData.lineStartInstruction, indexReg, localData.localRegs.get(indexReg)), localData.localRegNames.containsKey(objectReg) ? new LocalRegAVM2Item(ins, localData.lineStartInstruction, objectReg, localData.localRegs.get(objectReg)) : localData.localRegs.get(objectReg)));
+        stack.push(new HasNextAVM2Item(ins, localData.lineStartInstruction,
+                new LocalRegAVM2Item(ins, localData.lineStartInstruction, indexReg, localData.localRegs.get(indexReg)),
+                new LocalRegAVM2Item(ins, localData.lineStartInstruction, objectReg, localData.localRegs.get(objectReg))
+        ));
     }
 
     @Override
