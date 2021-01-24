@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Graphviz graphs colorized
 - AS3: Show try graph heads in Graphviz distinguished
+- AS3: Support for scripts not using kill instruction
 
 ### Fixed
 - Using new FFDec icon on Mac
