@@ -314,7 +314,6 @@ public abstract class InstructionDefinition implements Serializable {
 
     public void cleanTempRegisters(AVM2LocalData localData, List<GraphTargetItem> output, List<LocalRegAVM2Item> usedLocalRegs) {
         for (LocalRegAVM2Item reg : usedLocalRegs) {
-            System.err.println(reg.regIndex);
             for (int i = output.size() - 1; i >= 0; i--) {
                 if (output.get(i) instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(i);
