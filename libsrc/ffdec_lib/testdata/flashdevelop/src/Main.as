@@ -76,6 +76,7 @@ package
 		TestTernarOperator;
 		TestTry;
 		TestTryReturn;
+		TestTryReturn2;
 		TestVector;
 		TestVector2;		
 		TestWhileAnd;

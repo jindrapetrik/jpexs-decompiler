@@ -328,7 +328,7 @@ public abstract class InstructionDefinition implements Serializable {
                     SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(i);
                     if (setLocal.regIndex == reg.regIndex) {
                         int setLocalIp = getItemIp(localData, setLocal);
-                        Set<Integer> usages = localData.setLocalPosToGetLocalPos.get(setLocalIp);
+                        Set<Integer> usages = localData.getSetLocalUsages(setLocalIp);
                         int usageIp = getItemIp(localData, reg);
                         if (usages.size() == 1 && usages.iterator().next().equals(usageIp)) {
                             output.remove(i);

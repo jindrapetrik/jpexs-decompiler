@@ -1055,7 +1055,7 @@ public class AVM2Graph extends Graph {
                                         SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(i);
                                         if (setLocal.regIndex == objRegIndex) {
                                             int setLocalIp = aLocalData.code.adr2pos(setLocal.getSrc().getAddress());
-                                            Set<Integer> objUsages = new HashSet<>(aLocalData.setLocalPosToGetLocalPos.get(setLocalIp));
+                                            Set<Integer> objUsages = new HashSet<>(aLocalData.getSetLocalUsages(setLocalIp));
                                             int hnUsageIp = aLocalData.code.adr2pos(hn.getSrc().getAddress());
                                             objUsages.remove(hnUsageIp);
 
@@ -1097,7 +1097,7 @@ public class AVM2Graph extends Graph {
                                         SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(i);
                                         if (setLocal.regIndex == indexRegIndex) {
                                             int setLocalIp = aLocalData.code.adr2pos(setLocal.getSrc().getAddress());
-                                            Set<Integer> objUsages = new HashSet<>(aLocalData.setLocalPosToGetLocalPos.get(setLocalIp));
+                                            Set<Integer> objUsages = new HashSet<>(aLocalData.getSetLocalUsages(setLocalIp));
                                             int hnUsageIp = aLocalData.code.adr2pos(hn.getSrc().getAddress());
                                             objUsages.remove(hnUsageIp);
 
@@ -1191,7 +1191,29 @@ public class AVM2Graph extends Graph {
                         continue;
                     }
                 }
-                if (usages.size() <= 1) {
+                //if (usages.size() <= 1) 
+                {
+                    if (i + 1 < list.size()) {
+                        if ((list.get(i + 1) instanceof ReturnValueAVM2Item)
+                                && (list.get(i + 1).value instanceof LocalRegAVM2Item)
+                                && (((LocalRegAVM2Item) list.get(i + 1).value).regIndex == ri.regIndex)) {
+                            ReturnValueAVM2Item r = (ReturnValueAVM2Item) list.get(i + 1);
+                            r.value = ri.value;
+                            list.remove(i);
+                            i--;
+                            continue;
+                        }
+                        if ((list.get(i + 1) instanceof ThrowAVM2Item)
+                                && (list.get(i + 1).value instanceof LocalRegAVM2Item)
+                                && (((LocalRegAVM2Item) list.get(i + 1).value).regIndex == ri.regIndex)) {
+                            ThrowAVM2Item t = (ThrowAVM2Item) list.get(i + 2);
+                            t.value = ri.value;
+                            list.remove(i);
+                            i--;
+                            continue;
+                        }
+                    }
+
                     if (i + 2 < list.size()) {
                         if ((list.get(i + 1) instanceof IntegerValueAVM2Item) && (list.get(i + 2) instanceof ReturnValueAVM2Item)
                                 && (list.get(i + 2).value instanceof LocalRegAVM2Item)
@@ -1211,7 +1233,7 @@ public class AVM2Graph extends Graph {
                             list.remove(i + 1);
                             list.remove(i);
                             i--;
-                            //continue;
+                            continue;
                         }
                     } else if (i + 1 < list.size() && usages.isEmpty()) {
                         if (list.get(i + 1) instanceof IntegerValueAVM2Item) {
@@ -1304,7 +1326,7 @@ public class AVM2Graph extends Graph {
         AVM2LocalData avm2LocalData = (AVM2LocalData) localData;
         SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(output.size() - 1);
         int setLocalIp = InstructionDefinition.getItemIp(avm2LocalData, setLocal);;
-        Set<Integer> allUsages = new HashSet<>(avm2LocalData.setLocalPosToGetLocalPos.get(setLocalIp));
+        Set<Integer> allUsages = new HashSet<>(avm2LocalData.getSetLocalUsages(setLocalIp));
         for (GraphTargetItem otherSide : otherSides.values()) {
             if (otherSide instanceof LocalRegAVM2Item) {
                 LocalRegAVM2Item otherLog = (LocalRegAVM2Item) otherSide;

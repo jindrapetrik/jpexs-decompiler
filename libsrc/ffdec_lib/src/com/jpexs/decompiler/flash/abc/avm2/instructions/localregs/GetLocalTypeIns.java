@@ -96,7 +96,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
 
                     int setLocalIp = getItemIp(localData, setLocal);
                     int getLocalIp = localData.code.adr2pos(ins.getAddress());
-                    Set<Integer> usages = localData.setLocalPosToGetLocalPos.get(setLocalIp);
+                    Set<Integer> usages = localData.getSetLocalUsages(setLocalIp);
                     if (usages.size() == 1 && usages.iterator().next().equals(getLocalIp)) {
                         output.remove(output.size() - 1);
                         output.remove(output.size() - 1);

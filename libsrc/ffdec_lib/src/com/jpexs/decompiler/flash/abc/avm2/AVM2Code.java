@@ -1602,7 +1602,7 @@ public class AVM2Code implements Cloneable {
              }*/
             if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end)) { // set_local_x,get_local_x.. no other local_x get
                 AVM2Instruction insAfter = code.get(ip + 1);
-                Set<Integer> usages = setLocalPosToGetLocalPos.get(ip);
+                Set<Integer> usages = setLocalPosToGetLocalPos.containsKey(ip) ? setLocalPosToGetLocalPos.get(ip) : new HashSet<>();
 
                 if (usages.size() == 1 && (usages.iterator().next().equals(ip + 1)) && (insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
                     ip += 2;
