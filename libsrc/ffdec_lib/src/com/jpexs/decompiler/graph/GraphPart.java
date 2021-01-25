@@ -125,17 +125,17 @@ public class GraphPart implements Serializable {
         return time;
     }
 
-    private boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops) throws InterruptedException {
+    private boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
 
-        GraphPart tpart = gr.checkPart(null, localData, this, null);
+        GraphPart tpart = gr.checkPart(null, localData, prev, this, null);
         if (tpart == null) {
             return false;
         }
         if (tpart != this) {
-            return tpart.leadsTo(localData, gr, code, part, visited, loops);
+            return tpart.leadsTo(localData, gr, code, null, part, visited, loops);
         }
         Loop currentLoop = null;
         for (Loop l : loops) {
@@ -172,14 +172,14 @@ public class GraphPart implements Serializable {
         for (GraphPart p : nextParts) {
             if (p == part) {
                 return true;
-            } else if (p.leadsTo(localData, gr, code, part, visited, loops)) {
+            } else if (p.leadsTo(localData, gr, code, this, part, visited, loops)) {
                 return true;
             }
         }
         for (GraphPart p : throwParts) {
             if (p == part) {
                 return true;
-            } else if (p.leadsTo(localData, gr, code, part, visited, loops)) {
+            } else if (p.leadsTo(localData, gr, code, this, part, visited, loops)) {
                 return true;
             }
         }
@@ -193,7 +193,7 @@ public class GraphPart implements Serializable {
         for (Loop l : loops) {
             l.leadsToMark = 0;
         }
-        return leadsTo(localData, gr, code, part, new HashSet<>(), loops);
+        return leadsTo(localData, gr, code, null /*???*/, part, new HashSet<>(), loops);
     }
 
     public GraphPart(int start, int end) {
