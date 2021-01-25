@@ -336,13 +336,17 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                     s.append(Helper.formatAddress(address + operands[i]));
                     break;
                 case AVM2Code.OPT_CASE_OFFSETS:
-                    s.append(" ");
-                    s.append(operands[i]);
+                    s.append(" [");
+                    boolean first = true;
                     for (int j = i + 1; j < operands.length; j++) {
-                        s.append(" ");
+                        if (!first) {
+                            s.append(", ");
+                        }
+                        first = false;
                         s.append("ofs");
                         s.append(Helper.formatAddress(address + operands[j]));
                     }
+                    s.append("]");
                     break;
                 default:
                     s.append(" ");

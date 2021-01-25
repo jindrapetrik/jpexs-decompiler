@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - AS3 test methods separated to classes
 - AS3 p-code more RAbcDasm like: parenthesis after True/False/Undefined/Null trait kinds
 - AS3 p-code more RAbcDasm like: commas in parameters list (WARNING: Breaks backward compatibility)
+- AS3 p-code more RAbcDasm like: lookupswitch caseoffsets in brackets
 
 ### Removed
 - Code structure detection in Graphviz graphs as it was usually wrong
