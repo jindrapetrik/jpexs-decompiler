@@ -161,7 +161,7 @@ public class PcodeGraphVizExporter {
                 labelStr = "FINISH";
             }
 
-            writer.append(partBlockName + " [" + blkStyle + " label=<<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\"><TR><TD BALIGN=\"LEFT\">" + labelStr + "</TD></TR></TABLE>>];\r\n");
+            writer.append(partBlockName + " [" + blkStyle + " fontname=\"Courier New\" label=<<TABLE BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\"><TR><TD BALIGN=\"LEFT\">" + labelStr + "</TD></TR></TABLE>>];\r\n");
             for (int n = 0; n < part.nextParts.size(); n++) {
                 GraphPart next = part.nextParts.get(n);
                 String orientation = ":s";
@@ -198,12 +198,15 @@ public class PcodeGraphVizExporter {
                     continue;
                 }
                 String color = null;
+                boolean bold = false;
                 switch (t.type) {
                     case KEYWORD:
                         color = "#0000ff";
+                        bold = true;
                         break;
                     case KEYWORD2:
                         color = "#007f7f";
+                        bold = true;
                         break;
                     case OPERATOR:
                         color = "#7f007f";
@@ -230,6 +233,9 @@ public class PcodeGraphVizExporter {
                 if (color != null && tlen > 0) {
                     sb.append("<FONT color=\"" + color + "\">");
                 }
+                if (bold && tlen > 0) {
+                    sb.append("<B>");
+                }
 
                 rawLen += tlen;
                 String s = code.substring(t.start, t.start + tlen);
@@ -239,6 +245,9 @@ public class PcodeGraphVizExporter {
                 //s = s.replace("\"", "&quot;");
                 s = s.replace("\r\n", "<BR />");
                 sb.append(s);
+                if (bold && tlen > 0) {
+                    sb.append("</B>");
+                }
                 if (color != null && tlen > 0) {
                     sb.append("</FONT>");
                 }
