@@ -464,7 +464,9 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             ParsedSymbol.TYPE_KEYWORD_MAXSCOPEDEPTH,
             ParsedSymbol.TYPE_KEYWORD_TRY,
             ParsedSymbol.TYPE_KEYWORD_DISPID,
-            ParsedSymbol.TYPE_KEYWORD_SLOTID,};
+            ParsedSymbol.TYPE_KEYWORD_SLOTID,
+            ParsedSymbol.TYPE_KEYWORD_TYPE,
+            ParsedSymbol.TYPE_KEYWORD_VALUE,};
         final Integer parameters[] = new Integer[]{
             ParsedSymbol.TYPE_KEYWORD_FROM,
             ParsedSymbol.TYPE_KEYWORD_TO,
@@ -507,6 +509,14 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                 lastLevel = levels.peek();
             }
 
+            if (line != lastLine && !levels.isEmpty()) {
+                while (types.peek() == TYPE_LINE_BLOCK || types.peek() == TYPE_PARAMETER) {
+                    levels.pop();
+                    types.pop();
+                    lines.pop();
+                }
+            }
+
             int type = TYPE_IGNORED;
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_METHOD && "trait".equals(lastLevel)) {
                 type = TYPE_PARAMETER;
@@ -536,13 +546,6 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                 aboutToBreak = true;
             }
 
-            if (line != lastLine && !levels.isEmpty()) {
-                while (types.peek() == TYPE_LINE_BLOCK || types.peek() == TYPE_PARAMETER) {
-                    levels.pop();
-                    types.pop();
-                    lines.pop();
-                }
-            }
 
             if (type != TYPE_IGNORED) {
                 if (!levels.isEmpty()) {
