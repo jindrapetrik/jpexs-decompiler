@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -88,7 +89,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         b.setCode(code);
         new AVM2DeobfuscatorJumps().avm2CodeRemoveTraps("test", 0, true, 0, abc, null, 0, b);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-        code.toASMSource(abc.constants, new MethodInfo(), new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]), ScriptExportMode.PCODE, writer);
+        code.toASMSource(abc, abc.constants, new MethodInfo(), new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]), ScriptExportMode.PCODE, writer);
         String ret = writer.toString();
         return ret.substring(ret.lastIndexOf("\r\ncode\r\n") + 8, ret.lastIndexOf("end ; code"));
     }

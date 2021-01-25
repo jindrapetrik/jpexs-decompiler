@@ -224,6 +224,9 @@ public class TraitMethodGetterSetter extends Trait {
         writer.appendNoHilight("dispid ");
         writer.hilightSpecial("" + disp_id, HighlightSpecialType.DISP_ID);
         writer.newLine();
+        /*writer.appendNoHilight("method_info ");//Not in RAbcDasm
+        writer.appendNoHilight("" + method_info);
+        writer.newLine();*/
         return writer;
     }
 

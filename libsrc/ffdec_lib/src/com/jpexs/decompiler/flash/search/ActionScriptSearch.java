@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.search;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -155,7 +156,7 @@ public class ActionScriptSearch {
                             if (bodyIndex != -1) {
                                 MethodBody body = abc.bodies.get(bodyIndex);
                                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-                                abc.bodies.get(bodyIndex).getCode().toASMSource(abc.constants, abc.method_info.get(body.method_info), body, ScriptExportMode.PCODE, writer);
+                                abc.bodies.get(bodyIndex).getCode().toASMSource(abc, abc.constants, abc.method_info.get(body.method_info), body, ScriptExportMode.PCODE, writer);
                                 String text = writer.toString();
                                 if (pat.matcher(text).find()) {
                                     ABCSearchResult searchResult = new ABCSearchResult(pack, methodInfo.getClassIndex(), methodInfo.getTraitId());

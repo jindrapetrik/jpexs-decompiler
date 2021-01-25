@@ -169,7 +169,7 @@ public class FlashPlayerTest {
                         System.out.println("Flash result (" + task.description + "): " + task.flashResult);
                         System.out.println("FFDec execte result: " + task.ffdecResult);
                         if (!task.ffdecResult.equals(task.flashResult)) {
-                            System.out.println(code.toASMSource(testAbc.constants));
+                            System.out.println(code.toASMSource(testAbc, testAbc.constants));
                         }
 
                         assertEquals(task.ffdecResult, task.flashResult);

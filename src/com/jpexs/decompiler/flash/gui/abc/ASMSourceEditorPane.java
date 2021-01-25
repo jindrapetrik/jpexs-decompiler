@@ -122,9 +122,9 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             trait.convertTraitHeader(abc, writer);
         }
         MethodBody body = abc.bodies.get(bodyIndex);
-        abc.bodies.get(bodyIndex).getCode().toASMSource(abc.constants, abc.method_info.get(body.method_info), body, exportMode, writer);
+        abc.bodies.get(bodyIndex).getCode().toASMSource(abc, abc.constants, abc.method_info.get(body.method_info), body, exportMode, writer);
         if (trait != null) {
-            writer.appendNoHilight("end ; trait").newLine();
+            writer.unindent().appendNoHilight("end ; trait").newLine();
         }
         return new HighlightedText(writer);
     }
