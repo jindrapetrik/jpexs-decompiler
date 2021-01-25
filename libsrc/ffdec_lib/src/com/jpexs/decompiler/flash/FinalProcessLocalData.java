@@ -33,6 +33,16 @@ public class FinalProcessLocalData {
     public final List<Loop> loops;
     public Map<Integer, Set<Integer>> registerUsage;
 
+    public Set<Integer> getRegisterUsage(int regIndex) {
+        if (registerUsage == null) {
+            return new HashSet<>();
+        }
+        if (!registerUsage.containsKey(regIndex)) {
+            return new HashSet<>();
+        }
+        return registerUsage.get(regIndex);
+    }
+
     public FinalProcessLocalData(List<Loop> loops) {
         temporaryRegisters = new HashSet<>();
         registerUsage = new HashMap<>();
