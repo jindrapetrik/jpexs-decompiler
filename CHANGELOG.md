@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 - AS3: Show try graph heads in Graphviz distinguished
 - #341, #1379 AS3: Support for scripts not using kill instruction
 - AS3 method trait p-code indentation, instruction name padding
-- AS3 editation of body traits (slot/const only)
+- AS3 editation of method body traits (slot/const only)
 
 ### Fixed
 - Using new FFDec icon on Mac
