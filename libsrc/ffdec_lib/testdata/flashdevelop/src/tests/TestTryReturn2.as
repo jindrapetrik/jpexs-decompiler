@@ -6,10 +6,12 @@ package tests
 		public function run() : String
 		{
 			trace("before");
+			
 			var a:Boolean = true;
 			var b:Boolean = false;
 			var c:Boolean = true;
 			var d:Boolean = false;
+			var e:Boolean = true;
 			try
 			{
 				if (a)
@@ -23,14 +25,17 @@ package tests
 			}
 			catch (e:Error)
 			{
-				if (d){
-					return "D";
+				if (c){
+					return "C";
 				}
 			}
 			finally
-			{
-				if (c) {
-					return "C";
+			{				
+				if (d) {
+					return "D";
+				}
+				if (e) {
+					return "E";
 				}
 			}
 			trace("after");

@@ -1265,6 +1265,83 @@ public class ActionScript3Test extends ActionScriptTestBase {
     }
 
     @Test
+    public void testTryReturn2() {
+        decompileMethod("testTryReturn2", "var c:Boolean = false;\r\n"
+                + "trace(\"before\");\r\n"
+                + "var a:Boolean = true;\r\n"
+                + "var b:Boolean = false;\r\n"
+                + "c = true;\r\n"
+                + "var d:Boolean = false;\r\n"
+                + "var e:Boolean = true;\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "return \"A\";\r\n"
+                + "}\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "return \"B\";\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "if(c)\r\n"
+                + "{\r\n"
+                + "return \"C\";\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "finally\r\n"
+                + "{\r\n"
+                + "if(d)\r\n"
+                + "{\r\n"
+                + "return \"D\";\r\n"
+                + "}\r\n"
+                + "if(e)\r\n"
+                + "{\r\n"
+                + "return \"E\";\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n"
+                + "return \"X\";\r\n",
+                false);
+    }
+
+    @Test
+    public void testUsagesTry() {
+        decompileMethod("testUsagesTry", "var k:int = 5;\r\n"
+                + "switch(k)\r\n"
+                + "{\r\n"
+                + "case 0:\r\n"
+                + "trace(\"1\");\r\n"
+                + "break;\r\n"
+                + "case 1:\r\n"
+                + "trace(\"2\");\r\n"
+                + "}\r\n"
+                + "var a:Boolean = true;\r\n"
+                + "var b:Boolean = true;\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "return \"B\";\r\n"
+                + "}\r\n"
+                + "trace(\"A\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"E\");\r\n"
+                + "}\r\n"
+                + "finally\r\n"
+                + "{\r\n"
+                + "trace(\"finally\");\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n"
+                + "return \"X\";\r\n",
+                false);
+    }
+
+    @Test
     public void testVector() {
         decompileMethod("testVector", "var v:Vector.<String> = new Vector.<String>();\r\n"
                 + "v.push(\"hello\");\r\n"

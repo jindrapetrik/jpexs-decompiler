@@ -284,7 +284,7 @@ public class AVM2Graph extends Graph {
             return;
         }
         if (ignoredSwitches.contains(q.end)) {
-            if (!next.equals(q.nextParts.get(0))) { //first is after finally
+            if (q.nextParts.isEmpty() || !next.equals(q.nextParts.get(0))) { //first is after finally
                 return;
             }
         }
@@ -616,6 +616,7 @@ public class AVM2Graph extends Graph {
                 }
                 output.clear();
                 stack.clear();
+                makeAllCommands(tryCommands, st);
                 output.add(new TryAVM2Item(tryCommands, catchedExceptions, catchedCommands, finallyCommands, finCatchName));
                 for (int fin_e : catchedFinallys) {
                     if (finallyJumps.containsKey(fin_e)) {
@@ -940,7 +941,7 @@ public class AVM2Graph extends Graph {
                 if (next.start == fip) {
                     if (stack != null && swip != -1) {
                         AVM2Instruction swIns = avm2code.code.get(swip);
-                        GraphTargetItem t = stack.pop();
+                        GraphTargetItem t = stack.peek();
                         Double dval = t.getResultAsNumber();
                         int val = (int) (double) dval;
                         if (swIns.definition instanceof LookupSwitchIns) {
@@ -1194,7 +1195,7 @@ public class AVM2Graph extends Graph {
     @Override
     protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
         super.finalProcessAfter(list, level, localData, path);
-        for (int i = 0; i < list.size(); i++) {
+        /*for (int i = 0; i < list.size(); i++) {
             if (list.get(i) instanceof SetLocalAVM2Item) {
                 SetLocalAVM2Item ri = (SetLocalAVM2Item) list.get(i);
                 if (localData.temporaryRegisters.contains(ri.regIndex)) {
@@ -1202,9 +1203,18 @@ public class AVM2Graph extends Graph {
                     i--;
                 }
             }
-        }
+        }*/
     }
 
+    private boolean isIntegerOrPopInteger(GraphTargetItem item) {
+        if (item instanceof IntegerValueAVM2Item) {
+            return true;
+        }
+        if ((item instanceof PushItem) && (item.value instanceof IntegerValueAVM2Item)) {
+            return true;
+        }
+        return false;
+    }
     @Override
     protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
 
@@ -1227,7 +1237,7 @@ public class AVM2Graph extends Graph {
             if (list.get(i) instanceof SetLocalAVM2Item) {
                 SetLocalAVM2Item ri = (SetLocalAVM2Item) list.get(i);
                 int setLocalIp = avm2code.adr2pos(ri.getSrc().getAddress());
-                Set<Integer> usages = localData.registerUsage.get(setLocalIp);
+                Set<Integer> usages = localData.getRegisterUsage(setLocalIp);
                 if (ri.value.getNotCoerced() instanceof ExceptionAVM2Item) {
                     ExceptionAVM2Item ea = (ExceptionAVM2Item) ri.value.getNotCoerced();
                     if (ea.exception.isFinally()) {
@@ -1261,7 +1271,7 @@ public class AVM2Graph extends Graph {
                     }
 
                     if (i + 2 < list.size()) {
-                        if ((list.get(i + 1) instanceof IntegerValueAVM2Item) && (list.get(i + 2) instanceof ReturnValueAVM2Item)
+                        if (isIntegerOrPopInteger(list.get(i + 1)) && (list.get(i + 2) instanceof ReturnValueAVM2Item)
                                 && (list.get(i + 2).value instanceof LocalRegAVM2Item)
                                 && (((LocalRegAVM2Item) list.get(i + 2).value).regIndex == ri.regIndex)) {
                             ReturnValueAVM2Item r = (ReturnValueAVM2Item) list.get(i + 2);
@@ -1271,7 +1281,7 @@ public class AVM2Graph extends Graph {
                             i--;
                             continue;
                         }
-                        if ((list.get(i + 1) instanceof IntegerValueAVM2Item) && (list.get(i + 2) instanceof ThrowAVM2Item)
+                        if (isIntegerOrPopInteger(list.get(i + 1)) && (list.get(i + 2) instanceof ThrowAVM2Item)
                                 && (list.get(i + 2).value instanceof LocalRegAVM2Item)
                                 && (((LocalRegAVM2Item) list.get(i + 2).value).regIndex == ri.regIndex)) {
                             ThrowAVM2Item t = (ThrowAVM2Item) list.get(i + 2);
@@ -1282,8 +1292,11 @@ public class AVM2Graph extends Graph {
                             continue;
                         }
                     } else if (i + 1 < list.size() && usages.isEmpty()) {
-                        if (list.get(i + 1) instanceof IntegerValueAVM2Item) {
+                        if (isIntegerOrPopInteger(list.get(i + 1))) {
                             list.remove(i + 1);
+                            list.remove(i);
+                            i--;
+                            continue;
                         }
                     }
                 }

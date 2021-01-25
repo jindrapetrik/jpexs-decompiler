@@ -76,7 +76,7 @@ public class AVM2LocalData extends BaseLocalData {
 
     public boolean thisHasDefaultToPrimitive;
 
-    public Map<Integer, Set<Integer>> setLocalPosToGetLocalPos;
+    public Map<Integer, Set<Integer>> setLocalPosToGetLocalPos = new HashMap<>();
 
     public AVM2LocalData() {
 

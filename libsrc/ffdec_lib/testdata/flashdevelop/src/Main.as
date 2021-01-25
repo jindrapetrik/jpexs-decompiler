@@ -77,6 +77,7 @@ package
 		TestTry;
 		TestTryReturn;
 		TestTryReturn2;
+		TestUsagesTry;
 		TestVector;
 		TestVector2;		
 		TestWhileAnd;
