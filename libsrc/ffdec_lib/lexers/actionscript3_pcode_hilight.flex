@@ -100,7 +100,7 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
                                 }
 
 
-  {Label}                        {return token(TokenType.IDENTIFIER,yychar,yylength()); }
+  {Label}                        {return token(TokenType.IDENTIFIER); }
   ":"                            {return token(TokenType.OPERATOR);}
    
 
@@ -127,6 +127,7 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   /* identifiers */ 
   {InstructionName}                   { yybegin(PARAMETERS);
                                         return token(TokenType.KEYWORD); }
+  {LineTerminator}               {return token(TokenType.NEWLINE);}
   {Comment}                      {return token(TokenType.COMMENT);}                                        
 }
 
