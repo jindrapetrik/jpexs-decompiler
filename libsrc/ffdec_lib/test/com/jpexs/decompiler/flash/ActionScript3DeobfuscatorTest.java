@@ -91,7 +91,10 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         code.toASMSource(abc, abc.constants, new MethodInfo(), new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]), ScriptExportMode.PCODE, writer);
         String ret = writer.toString();
-        return ret.substring(ret.lastIndexOf("\r\ncode\r\n") + 8, ret.lastIndexOf("end ; code"));
+        ret = ret.replaceAll("\r\n +", "\r\n");
+        String prefix = "\r\ncode\r\n";
+        String suffix = "end ; code";
+        return ret.substring(ret.lastIndexOf(prefix) + prefix.length(), ret.lastIndexOf(suffix));
     }
 
     private String recompile(String str) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
@@ -241,8 +244,10 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "pushbyte 4\r\n"
                 + "ifeq ofs000e\r\n"
                 + "jump ofs0010\r\n"
-                + "ofs000e:pushbyte 4\r\n"
-                + "ofs0010:pushbyte 3\r\n"
+                + "ofs000e:\r\n"
+                + "pushbyte 4\r\n"
+                + "ofs0010:\r\n"
+                + "pushbyte 3\r\n"
                 + "returnvoid\r\n");
     }
 
