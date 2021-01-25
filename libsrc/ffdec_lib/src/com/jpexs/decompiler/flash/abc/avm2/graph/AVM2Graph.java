@@ -150,7 +150,6 @@ public class AVM2Graph extends Graph {
         avm2LocalData.setLocalPosToGetLocalPos = setLocalPosToGetLocalPos;
     }
 
-
     public Map<Integer, Set<Integer>> calculateLocalRegsUsage(String path, Set<GraphPart> allParts) {
         logger.fine("--- " + path + " ---");
         Map<Integer, Set<Integer>> setLocalPosToGetLocalPos = new TreeMap<>();
@@ -252,7 +251,6 @@ public class AVM2Graph extends Graph {
         if (unresolvedRegisterToGetLocalPos.isEmpty()) {
             return;
         }
-
 
         visited.add(q);
 
@@ -609,8 +607,7 @@ public class AVM2Graph extends Graph {
             ret.addAll(output);
             return ret;
         }
-        
-        
+
         if ((part.nextParts.size() == 2) && (!stack.isEmpty()) && (stack.peek() instanceof StrictEqAVM2Item)) {
             GraphSourceItem switchStartItem = code.get(part.start);
 
@@ -634,7 +631,7 @@ public class AVM2Graph extends Graph {
             int cnt = 1;
             while (part.nextParts.size() > 1
                     && part.nextParts.get(1).getHeight() > 1
-                    && ((AVM2Instruction)code.get(part.nextParts.get(1).end >= code.size() ? code.size() - 1 : part.nextParts.get(1).end)).definition instanceof IfStrictEqIns
+                    && ((AVM2Instruction) code.get(part.nextParts.get(1).end >= code.size() ? code.size() - 1 : part.nextParts.get(1).end)).definition instanceof IfStrictEqIns
                     && ((top = translatePartGetStack(localData, part.nextParts.get(1), stack, staticOperation)) instanceof StrictEqAVM2Item)) {
                 cnt++;
                 part = part.nextParts.get(1);
@@ -645,59 +642,49 @@ public class AVM2Graph extends Graph {
                 caseValuesMapRight.add(set.rightSide);
             }
             List<GraphTargetItem> caseValuesMap = caseValuesMapLeft;
-            
-            
+
             //determine whether local register are on left or on right side of === operator
             // -1 = there's no register, 
             // -2 = there are mixed registers, 
             // N = there is always register number N
             int leftReg = -1;
             int rightReg = -1;
-            for(int cv=0;cv<caseValuesMapLeft.size();cv++){
-                if(caseValuesMapLeft.get(cv) instanceof LocalRegAVM2Item)
-                {
-                    int reg = ((LocalRegAVM2Item)caseValuesMapLeft.get(cv)).regIndex;
-                    if(leftReg == -1)
-                    {
+            for (int cv = 0; cv < caseValuesMapLeft.size(); cv++) {
+                if (caseValuesMapLeft.get(cv) instanceof LocalRegAVM2Item) {
+                    int reg = ((LocalRegAVM2Item) caseValuesMapLeft.get(cv)).regIndex;
+                    if (leftReg == -1) {
                         leftReg = reg;
-                    }else{
-                        if(leftReg != reg)
-                        {
+                    } else {
+                        if (leftReg != reg) {
                             leftReg = -2;
                         }
                     }
                 }
-                if(caseValuesMapRight.get(cv) instanceof LocalRegAVM2Item)
-                {
-                    int reg = ((LocalRegAVM2Item)caseValuesMapRight.get(cv)).regIndex;
-                    if(rightReg == -1)
-                    {
+                if (caseValuesMapRight.get(cv) instanceof LocalRegAVM2Item) {
+                    int reg = ((LocalRegAVM2Item) caseValuesMapRight.get(cv)).regIndex;
+                    if (rightReg == -1) {
                         rightReg = reg;
-                    }else{
-                        if(rightReg != reg)
-                        {
+                    } else {
+                        if (rightReg != reg) {
                             rightReg = -2;
                         }
                     }
                 }
             }
-            
-            
-            if(leftReg > 0) {
+
+            if (leftReg > 0) {
                 switchedObject = new LocalRegAVM2Item(null, null, leftReg, null);
                 caseValuesMap = caseValuesMapRight;
+            } else if (rightReg > 0) {
+                switchedObject = new LocalRegAVM2Item(null, null, rightReg, null);
             }
-            else if(rightReg > 0)
-            {
-                switchedObject = new LocalRegAVM2Item(null, null, rightReg, null);                
-            }
-            
+
             if ((leftReg < 0 && rightReg < 0) || (cnt == 1)) {
                 stack.push(set);
             } else {
                 part = part.nextParts.get(1);
                 GraphPart defaultPart = part;
-                if (code.size() > defaultPart.start && ((AVM2Instruction)code.get(defaultPart.start)).definition instanceof JumpIns) {
+                if (code.size() > defaultPart.start && ((AVM2Instruction) code.get(defaultPart.start)).definition instanceof JumpIns) {
                     defaultPart = defaultPart.nextParts.get(0);
                 }
 
@@ -880,12 +867,12 @@ public class AVM2Graph extends Graph {
                 }
             }
         }
-        
+
         return ret;
     }
 
     @Override
-    protected GraphPart checkPart(TranslateStack stack, BaseLocalData localData, GraphPart next, Set<GraphPart> allParts) {
+    protected GraphPart checkPart(TranslateStack stack, BaseLocalData localData, GraphPart prev, GraphPart next, Set<GraphPart> allParts) {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         if (aLocalData.finallyJumps == null) {
             aLocalData.finallyJumps = new HashMap<>();
@@ -950,6 +937,16 @@ public class AVM2Graph extends Graph {
             }
         }
 
+        if (prev != null) {
+            for (int swip : ignoredSwitches.values()) {
+                if (swip > -1) {
+                    if (prev.end == swip) {
+                        return null;
+                    }
+                }
+            }
+        }
+
         return next;
     }
 
@@ -969,7 +966,6 @@ public class AVM2Graph extends Graph {
         }
         return true;
     }
-
 
     @Override
     protected GraphTargetItem checkLoop(List<GraphTargetItem> output, LoopItem loopItem, BaseLocalData localData, List<Loop> loops) {
@@ -1130,7 +1126,6 @@ public class AVM2Graph extends Graph {
                                     }
                                 }
                             }
-
 
                             if (gti instanceof NextValueAVM2Item) {
                                 return new ForEachInAVM2Item(w.getSrc(), w.getLineStartItem(), w.loop, new InAVM2Item(hn.getInstruction(), hn.getLineStartIns(), varName, collection), w.commands);

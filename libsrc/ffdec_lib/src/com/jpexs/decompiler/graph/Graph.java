@@ -180,12 +180,12 @@ public class Graph {
         }
     }
 
-    private void getReachableParts(GraphPart part, LinkedHashSet<GraphPart> ret, List<Loop> loops, List<GraphPartEdge> gotoParts) {
+    private void getReachableParts(BaseLocalData localData, GraphPart part, LinkedHashSet<GraphPart> ret, List<Loop> loops, List<GraphPartEdge> gotoParts) {
         // use LinkedHashSet to preserve order
-        getReachableParts(part, ret, loops, true, gotoParts);
+        getReachableParts(localData, part, ret, loops, true, gotoParts);
     }
 
-    private void getReachableParts(GraphPart part, LinkedHashSet<GraphPart> ret, List<Loop> loops, boolean first, List<GraphPartEdge> gotoParts) {
+    private void getReachableParts(BaseLocalData localData, GraphPart part, LinkedHashSet<GraphPart> ret, List<Loop> loops, boolean first, List<GraphPartEdge> gotoParts) {
         // todo: honfika: why call with first = true parameter always?
         Stack<GraphPartQueue> stack = new Stack<>();
         GraphPartQueue queue = new GraphPartQueue();
@@ -239,7 +239,13 @@ public class Graph {
 
             GraphPartQueue newParts = new GraphPartQueue();
             loopnext:
-            for (GraphPart next : part.nextParts) {
+            for (GraphPart nextRaw : part.nextParts) {
+
+                GraphPart next = checkPart(null, localData, part, nextRaw, null);
+                if (next == null) {
+                    continue;
+                }
+
                 if (gotoParts.contains(new GraphPartEdge(part, next))) {
                     continue;
                 }
@@ -314,19 +320,12 @@ public class Graph {
         List<Set<GraphPart>> reachable = new ArrayList<>();
         for (GraphPart p : parts) {
             LinkedHashSet<GraphPart> r1 = new LinkedHashSet<>();
-            getReachableParts(p, r1, loops, gotoParts);
+            getReachableParts(localData, p, r1, loops, gotoParts);
             r1.add(p);
             reachable.add(r1);
         }
         Set<GraphPart> first = reachable.get(0);
         for (GraphPart p : first) {
-            /*if (ignored.contains(p)) {
-             continue;
-             }*/
-            p = checkPart(null, localData, p, null);
-            if (p == null) {
-                continue;
-            }
             boolean common = true;
             for (Set<GraphPart> r : reachable) {
                 if (!r.contains(p)) {
@@ -392,7 +391,7 @@ public class Graph {
         List<Set<GraphPart>> reachable = new ArrayList<>();
         for (GraphPart p : parts) {
             LinkedHashSet<GraphPart> r1 = new LinkedHashSet<>();
-            getReachableParts(p, r1, loops, gotoParts);
+            getReachableParts(localData, p, r1, loops, gotoParts);
             Set<GraphPart> r2 = new LinkedHashSet<>();
             r2.add(p);
             r2.addAll(r1);
@@ -1745,7 +1744,7 @@ public class Graph {
         return null;
     }
 
-    protected GraphPart checkPart(TranslateStack stack, BaseLocalData localData, GraphPart part, Set<GraphPart> allParts) {
+    protected GraphPart checkPart(TranslateStack stack, BaseLocalData localData, GraphPart prev, GraphPart part, Set<GraphPart> allParts) {
         return part;
     }
 
@@ -1847,7 +1846,7 @@ public class Graph {
             return;
         }
 
-        part = checkPart(null, localData, part, null);
+        part = checkPart(null, localData, null, part, null);
         if (part == null) {
             return;
         }
@@ -1984,7 +1983,7 @@ public class Graph {
             do {
                 found = null;
                 for (int i = 0; i < currentLoop.breakCandidates.size(); i++) {
-                    GraphPart ch = checkPart(null, localData, currentLoop.breakCandidates.get(i), null);
+                    GraphPart ch = checkPart(null, localData, null, currentLoop.breakCandidates.get(i), null);
                     if (ch == null) {
                         currentLoop.breakCandidates.remove(i);
                         i--;
@@ -2150,7 +2149,7 @@ public class Graph {
         if (part == null) {
             return ret;
         }
-        part = checkPart(stack, localData, part, allParts);
+        part = checkPart(stack, localData, parent, part, allParts);
         if (part == null) {
             return ret;
         }

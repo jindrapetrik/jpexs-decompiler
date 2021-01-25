@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - Proper window screen centering
 - Graph dialog proper window size
 - Graph dialog scroll speed increased
+- AS3: return in finally
 
 ### Changed
 - AS3 test methods separated to classes
