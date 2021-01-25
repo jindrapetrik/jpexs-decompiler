@@ -230,6 +230,9 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     public String getParams(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         StringBuilder s = new StringBuilder();
         for (int i = 0; i < definition.operands.length; i++) {
+            if (i > 0) {
+                s.append(",");
+            }
             switch (definition.operands[i]) {
                 case AVM2Code.DAT_NAMESPACE_INDEX:
                     if (operands[i] == 0) {
@@ -373,8 +376,11 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     public String toStringNoAddress(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         String s = definition.instructionName;
+        for (int i = s.length(); i < 19; i++) {
+            s += " ";
+        }
         s += getParams(constants, fullyQualifiedNames) + getComment();
-        return s;
+        return s.trim();
     }
 
     @Override

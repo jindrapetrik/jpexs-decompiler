@@ -854,6 +854,12 @@ public class ASM3Parser {
 
                         for (int i = 0; i < def.operands.length; i++) {
                             ParsedSymbol parsedOperand = lexer.lex();
+                            if (i > 0) {
+                                if (parsedOperand.type != ParsedSymbol.TYPE_COMMA) {
+                                    throw new AVM2ParseException("Comma (,) expected", lexer.yyline());
+                                }
+                                parsedOperand = lexer.lex();
+                            }
                             switch (def.operands[i]) {
                                 case AVM2Code.DAT_MULTINAME_INDEX:
                                     lexer.pushback(parsedOperand);
