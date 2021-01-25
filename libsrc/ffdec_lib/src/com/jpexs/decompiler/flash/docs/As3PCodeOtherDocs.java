@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.docs;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
@@ -76,6 +77,9 @@ public class As3PCodeOtherDocs extends AbstractDocs {
             String curPath = String.join(".", Arrays.copyOf(pathParts, i + 1));
             if (curPath.startsWith("trait.method")) {
                 curPath = path.substring("trait.".length());
+            }
+            if (curPath.startsWith("method.body.trait.")) {
+                curPath = path.substring("method.body.".length());
             }
             if (prop.containsKey(curPath)) {
                 String docStr = prop.getString(curPath);

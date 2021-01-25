@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - Graph dialog proper window size
 - Graph dialog scroll speed increased
 - AS3: return in finally
+- AS3 docs not correctly displayed under p-code when metadata present
 
 ### Changed
 - AS3 test methods separated to classes
