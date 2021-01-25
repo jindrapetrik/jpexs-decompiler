@@ -274,6 +274,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
         writer.appendNoHilight(" slotid ");
         writer.hilightSpecial(Integer.toString(slot_id), HighlightSpecialType.SLOT_ID);
         writer.newLine();
+        /*writer.appendNoHilight("class_info "); //not in RAbcDasm
+        writer.appendNoHilight("" + class_info);
+        writer.newLine();*/
         return writer;
     }
 

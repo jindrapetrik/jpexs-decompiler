@@ -143,6 +143,10 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         writer.newLine();
         writer.appendNoHilight("slotid ");
         writer.hilightSpecial(Integer.toString(slot_id), HighlightSpecialType.SLOT_ID);
+        writer.newLine();
+        /*writer.appendNoHilight("method_info ");//Not in RAbcDasm
+        writer.appendNoHilight("" + method_info);
+        writer.newLine();*/
         return writer;
     }
 

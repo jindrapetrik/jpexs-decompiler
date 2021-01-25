@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
@@ -391,7 +392,7 @@ public abstract class Trait implements Cloneable, Serializable {
         writer.hilightSpecial(traitType, HighlightSpecialType.TRAIT_TYPE);
         writer.appendNoHilight(" ");
         writer.hilightSpecial(abc.constants.multinameToString(name_index), HighlightSpecialType.TRAIT_NAME);
-
+        writer.indent();
         if ((kindFlags & ATTR_Final) > 0) {
             writer.newLine();
             writer.append("flag ");
@@ -419,6 +420,7 @@ public abstract class Trait implements Cloneable, Serializable {
                 writer.append("\"");
                 writer.append(Helper.escapeActionScriptString(abc.constants.getString(abc.metadata_info.get(m).name_index)));
                 writer.append("\"");
+                writer.indent();
                 writer.newLine();
                 if (m >= 0 && m < abc.metadata_info.size()) {
                     for (int i = 0; i < abc.metadata_info.get(m).keys.length; i++) {
@@ -438,6 +440,7 @@ public abstract class Trait implements Cloneable, Serializable {
                         writer.newLine();
                     }
                 }
+                writer.unindent();
                 writer.append("end ; metadata");
             }
         }

@@ -284,7 +284,7 @@ public final class MethodBody implements Cloneable {
             System.err.println("Decompiling " + path);
         }
         if (exportMode != ScriptExportMode.AS) {
-            getCode().toASMSource(abc.constants, abc.method_info.get(this.method_info), this, exportMode, writer);
+            getCode().toASMSource(abc, abc.constants, abc.method_info.get(this.method_info), this, exportMode, writer);
         } else {
             if ((DEBUG_FIXED != null && !path.endsWith(DEBUG_FIXED)) || (!Configuration.decompile.get())) {
                 writer.appendNoHilight(Helper.getDecompilationSkippedComment()).newLine();
@@ -337,7 +337,7 @@ public final class MethodBody implements Cloneable {
 
     public GraphTextWriter toString(final String path, ScriptExportMode exportMode, final ABC abc, final Trait trait, final GraphTextWriter writer, final List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (exportMode != ScriptExportMode.AS) {
-            getCode().toASMSource(abc.constants, abc.method_info.get(this.method_info), this, exportMode, writer);
+            getCode().toASMSource(abc, abc.constants, abc.method_info.get(this.method_info), this, exportMode, writer);
         } else {
             if ((DEBUG_FIXED != null && !path.endsWith(DEBUG_FIXED)) || (!Configuration.decompile.get())) {
                 //writer.startMethod(this.method_info);

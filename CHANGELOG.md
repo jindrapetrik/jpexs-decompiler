@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 - Graphviz graphs colorized
 - AS3: Show try graph heads in Graphviz distinguished
 - #341, #1379 AS3: Support for scripts not using kill instruction
+- AS3 method trait p-code indentation
+- AS3 editation of body traits (slot/const only)
 
 ### Fixed
 - Using new FFDec icon on Mac
@@ -21,6 +23,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - AS3 test methods separated to classes
+- AS3 p-code more RAbcDasm like (parenthesis after True/False/Undefined/Null trait kinds)
 
 ### Removed
 - Code structure detection in Graphviz graphs as it was usually wrong

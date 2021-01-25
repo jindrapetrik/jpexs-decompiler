@@ -1146,24 +1146,24 @@ public class AVM2Code implements Cloneable {
         return s.toString();
     }
 
-    public String toASMSource() {
-        return toASMSource(new AVM2ConstantPool());
+    public String toASMSource(ABC abc) {
+        return toASMSource(abc, abc.constants);
     }
 
-    public String toASMSource(AVM2ConstantPool constants) {
+    public String toASMSource(ABC abc, AVM2ConstantPool constants) {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-        toASMSource(constants, null, null, new ArrayList<>(), ScriptExportMode.PCODE, writer);
+        toASMSource(abc, constants, null, null, new ArrayList<>(), ScriptExportMode.PCODE, writer);
         return writer.toString();
     }
 
-    public GraphTextWriter toASMSource(AVM2ConstantPool constants, MethodInfo info, MethodBody body, ScriptExportMode exportMode, GraphTextWriter writer) {
-        return toASMSource(constants, info, body, new ArrayList<>(), exportMode, writer);
+    public GraphTextWriter toASMSource(ABC abc, AVM2ConstantPool constants, MethodInfo info, MethodBody body, ScriptExportMode exportMode, GraphTextWriter writer) {
+        return toASMSource(abc, constants, info, body, new ArrayList<>(), exportMode, writer);
     }
 
-    public GraphTextWriter toASMSource(AVM2ConstantPool constants, MethodInfo info, MethodBody body, List<Integer> outputMap, ScriptExportMode exportMode, GraphTextWriter writer) {
+    public GraphTextWriter toASMSource(ABC abc, AVM2ConstantPool constants, MethodInfo info, MethodBody body, List<Integer> outputMap, ScriptExportMode exportMode, GraphTextWriter writer) {
 
         if (info != null) {
-            writer.appendNoHilight("method").newLine();
+            writer.appendNoHilight("method").indent().newLine();
             writer.appendNoHilight("name ");
             writer.hilightSpecial(info.name_index == 0 ? "null" : "\"" + Helper.escapeActionScriptString(info.getName(constants)) + "\"", HighlightSpecialType.METHOD_NAME);
             writer.newLine();
@@ -1229,7 +1229,7 @@ public class AVM2Code implements Cloneable {
                 for (int i = 0; i < info.optional.length; i++) {
                     ValueKind vk = info.optional[i];
                     writer.appendNoHilight("optional ");
-                    writer.hilightSpecial(vk.toString(constants), HighlightSpecialType.OPTIONAL, i);
+                    writer.hilightSpecial(vk.toASMString(constants), HighlightSpecialType.OPTIONAL, i);
                     writer.newLine();
                 }
             }
@@ -1241,7 +1241,7 @@ public class AVM2Code implements Cloneable {
 
         Set<Long> importantOffsets = getImportantOffsets(body, true);
         if (body != null) {
-            writer.appendNoHilight("body").newLine();
+            writer.appendNoHilight("body").indent().newLine();
 
             writer.appendNoHilight("maxstack ");
             writer.appendNoHilight(body.max_stack);
@@ -1282,10 +1282,14 @@ public class AVM2Code implements Cloneable {
                 writer.hilightSpecial(exception.name_index == 0 ? "null" : constants.getMultiname(exception.name_index).toString(constants, new ArrayList<>()), HighlightSpecialType.TRY_NAME, e);
                 writer.newLine();
             }
+            for (Trait t : body.traits.traits) {
+                t.convertTraitHeader(abc, writer);
+                writer.unindent().appendNoHilight("end ; trait").newLine();
+            }
         }
 
         writer.newLine();
-        writer.appendNoHilight("code").newLine();
+        writer.appendNoHilight("code").indent().newLine();
         int ip = 0;
         int largeLimit = 20000;
         boolean markOffsets = code.size() <= largeLimit;
@@ -1301,7 +1305,11 @@ public class AVM2Code implements Cloneable {
                     writer.newLine();
                 }
                 if (Configuration.showAllAddresses.get() || importantOffsets.contains(addr)) {
-                    writer.appendNoHilight("ofs" + Helper.formatAddress(addr) + ":");
+                    String label = "ofs" + Helper.formatAddress(addr) + ":";
+                    writer.unindent().unindent().unindent();
+                    writer.appendNoHilight(label);
+                    writer.newLine();
+                    writer.indent().indent().indent();
                 }
                 /*for (int e = 0; e < body.exceptions.length; e++) {
                  if (body.exceptions[e].start == ofs) {
@@ -1330,12 +1338,12 @@ public class AVM2Code implements Cloneable {
         } else if (exportMode == ScriptExportMode.CONSTANTS) {
             writer.appendNoHilight("Constant export mode is not supported.").newLine();
         }
-        writer.appendNoHilight("end ; code").newLine();
+        writer.unindent().appendNoHilight("end ; code").newLine();
         if (body != null) {
-            writer.appendNoHilight("end ; body").newLine();
+            writer.unindent().appendNoHilight("end ; body").newLine();
         }
         if (info != null) {
-            writer.appendNoHilight("end ; method").newLine();
+            writer.unindent().appendNoHilight("end ; method").newLine();
         }
 
         return writer;
