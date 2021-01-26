@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
@@ -172,4 +173,33 @@ public abstract class AVM2Item extends GraphTargetItem {
         AVM2SourceGenerator g = (AVM2SourceGenerator) generator;
         g.killRegister(localData, regNumber);
     }
+
+    @Override
+    public boolean isIdentical(GraphTargetItem other) {
+        GraphTargetItem tiName = this;
+        while (tiName instanceof LocalRegAVM2Item) {
+            if (((LocalRegAVM2Item) tiName).computedValue != null) {
+                tiName = ((LocalRegAVM2Item) tiName).computedValue.getThroughNotCompilable().getThroughDuplicate();
+            } else {
+                break;
+            }
+        }
+
+        GraphTargetItem tiName2 = other;
+        if (tiName2 != null) {
+            tiName2 = tiName2.getThroughDuplicate();
+        }
+        while (tiName2 instanceof LocalRegAVM2Item) {
+            if (((LocalRegAVM2Item) tiName2).computedValue != null) {
+                tiName2 = ((LocalRegAVM2Item) tiName2).computedValue.getThroughNotCompilable().getThroughDuplicate();
+            } else {
+                break;
+            }
+        }
+        if (tiName != tiName2) {
+            return false;
+        }
+        return true;
+    }
+
 }

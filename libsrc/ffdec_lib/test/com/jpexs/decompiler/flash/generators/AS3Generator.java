@@ -33,7 +33,10 @@ import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.ScopeStack;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +51,10 @@ import java.util.TreeMap;
  */
 public class AS3Generator {
 
-    public static void main(String[] args) throws Exception {
-        Configuration.autoDeobfuscate.set(false);
-        SWF swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/flashdevelop/bin/flashdevelop.swf")), false);
+    private static void useFile(StringBuilder s, File f, String identifier) throws FileNotFoundException, IOException, InterruptedException {
+        SWF swf = new SWF(new BufferedInputStream(new FileInputStream(f)), false);
         DoABC2Tag tag = null;
         List<ScriptPack> scriptPacks = swf.getAS3Packs();
-
-        StringBuilder s = new StringBuilder();
         Map<String, ScriptPack> sortedPacks = new TreeMap<>();
         for (ScriptPack pack : scriptPacks) {
             sortedPacks.put(pack.getClassPath().toRawString(), pack);
@@ -72,10 +72,15 @@ public class AS3Generator {
                         String name = t.getName(abc).getName(abc.constants, null, true, true);
                         String clsName = pack.getClassPath().className;
                         String lower = clsName.substring(0, 1).toLowerCase() + clsName.substring(1);
+                        if (lower.equals("testOptionalParameters")) { //SPECIAL: ignored
+                            continue;
+                        }
                         if (name.equals("run")) {
                             s.append("@Test\r\npublic void ");
                             s.append(lower);
                             s.append("(){\r\ndecompileMethod(\"");
+                            s.append(identifier);
+                            s.append("\",\"");
                             s.append(lower);
                             s.append("\", ");
                             HighlightedTextWriter src = new HighlightedTextWriter(new CodeFormatting(), false);
@@ -102,6 +107,16 @@ public class AS3Generator {
                 }
             }
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+        Configuration.autoDeobfuscate.set(false);
+
+
+        StringBuilder s = new StringBuilder();
+
+        useFile(s, new File("testdata/flashdevelop/bin/flashdevelop.swf"), "standard");
+        useFile(s, new File("testdata/custom/bin/custom.swf"), "assembled");
 
         try (PrintWriter pw = new PrintWriter("as3_teststub.java")) {
             pw.println(s.toString());

@@ -64,7 +64,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
 
     private String recompilePCode(String str) throws IOException, AVM2ParseException, InterruptedException {
         str = "code\r\n"
-                + "getlocal_0\r\n"
+                + "getlocal0\r\n"
                 + "pushscope\r\n"
                 + str
                 + "returnvoid\r\n";
@@ -238,7 +238,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "a:jump c\r\n"
                 + "c:pushbyte 4\r\n"
                 + "b:pushbyte 3\r\n");
-        Assert.assertEquals(res, "getlocal_0\r\n"
+        Assert.assertEquals(res, "getlocal0\r\n"
                 + "pushscope\r\n"
                 + "pushbyte            3\r\n"
                 + "pushbyte            4\r\n"

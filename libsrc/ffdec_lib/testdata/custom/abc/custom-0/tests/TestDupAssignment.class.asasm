@@ -1,0 +1,77 @@
+class
+ refid "tests:TestDupAssignment"
+ instance QName(PackageNamespace("tests"), "TestDupAssignment")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestDupAssignment")
+  iinit
+   refid "tests:TestDupAssignment/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestDupAssignment/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+      getlocal0
+      pushscope
+
+      pushbyte            0
+      setlocal1
+
+      pushbyte            10
+      setlocal2
+            
+      getlocal2
+      dup      
+      convert_i
+      setlocal1
+      iffalse             L15
+
+      findpropstrict      Multiname("trace", [PrivateNamespace(null, "tests:TestDupAssignment/instance/run"), PrivateNamespace(null, "tests:TestDupAssignment"), PackageNamespace(""), PackageNamespace("tests"), PackageInternalNs("tests"), Namespace("http://adobe.com/AS3/2006/builtin"), ProtectedNamespace("tests:TestDupAssignment"), StaticProtectedNs("tests:TestDupAssignment")])
+      getlocal2
+      callpropvoid        Multiname("trace", [PrivateNamespace(null, "tests:TestDupAssignment/instance/run"), PrivateNamespace(null, "tests:TestDupAssignment"), PackageNamespace(""), PackageNamespace("tests"), PackageInternalNs("tests"), Namespace("http://adobe.com/AS3/2006/builtin"), ProtectedNamespace("tests:TestDupAssignment"), StaticProtectedNs("tests:TestDupAssignment")]), 1
+
+L15:
+      returnvoid
+     end ; code
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestDupAssignment/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

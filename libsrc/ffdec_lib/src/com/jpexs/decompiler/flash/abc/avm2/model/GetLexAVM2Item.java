@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
@@ -21,6 +22,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 
@@ -28,7 +30,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
  *
  * @author JPEXS
  */
-public class GetLexAVM2Item extends AVM2Item {
+public class GetLexAVM2Item extends AVM2Item implements SimpleValue {
 
     public Multiname propertyName;
 
@@ -58,6 +60,11 @@ public class GetLexAVM2Item extends AVM2Item {
 
     @Override
     public boolean hasReturnValue() {
+        return true;
+    }
+
+    @Override
+    public boolean isSimpleValue() {
         return true;
     }
 }

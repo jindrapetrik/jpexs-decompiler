@@ -1,0 +1,10 @@
+#version 4
+program
+ minorversion 16
+ majorversion 46
+
+ #include "Main.script.asasm"
+ #include "tests/TestDupAssignment.script.asasm"
+ #include "tests/TestIncrement.script.asasm"
+
+end ; program

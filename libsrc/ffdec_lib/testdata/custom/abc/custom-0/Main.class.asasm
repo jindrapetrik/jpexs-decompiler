@@ -1,0 +1,87 @@
+class
+ refid "Main"
+ instance QName(PackageNamespace(""), "Main")
+  extends QName(PackageNamespace("flash.display"), "Sprite")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("Main")
+  iinit
+   refid "Main/instance/init"
+   body
+    maxstack 3
+    localcount 1
+    initscopedepth 9
+    maxscopedepth 10
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     getlex              Multiname("stage", [PrivateNamespace(null, "Main/instance"), PrivateNamespace(null, "Main"), PackageNamespace(""), PackageInternalNs(""), Namespace("http://adobe.com/AS3/2006/builtin"), PackageNamespace("tests"), ProtectedNamespace("Main"), StaticProtectedNs("Main"), StaticProtectedNs("flash.display:Sprite"), StaticProtectedNs("flash.display:DisplayObjectContainer"), StaticProtectedNs("flash.display:InteractiveObject"), StaticProtectedNs("flash.display:DisplayObject"), StaticProtectedNs("flash.events:EventDispatcher")])
+     iffalse             L9
+
+     getlocal0
+     callpropvoid        Multiname("init", [PrivateNamespace(null, "Main/instance"), PrivateNamespace(null, "Main"), PackageNamespace(""), PackageInternalNs(""), Namespace("http://adobe.com/AS3/2006/builtin"), PackageNamespace("tests"), ProtectedNamespace("Main"), StaticProtectedNs("Main"), StaticProtectedNs("flash.display:Sprite"), StaticProtectedNs("flash.display:DisplayObjectContainer"), StaticProtectedNs("flash.display:InteractiveObject"), StaticProtectedNs("flash.display:DisplayObject"), StaticProtectedNs("flash.events:EventDispatcher")]), 0
+
+     jump                L15
+
+L9:
+     findpropstrict      Multiname("addEventListener", [PrivateNamespace(null, "Main/instance"), PrivateNamespace(null, "Main"), PackageNamespace(""), PackageInternalNs(""), Namespace("http://adobe.com/AS3/2006/builtin"), PackageNamespace("tests"), ProtectedNamespace("Main"), StaticProtectedNs("Main"), StaticProtectedNs("flash.display:Sprite"), StaticProtectedNs("flash.display:DisplayObjectContainer"), StaticProtectedNs("flash.display:InteractiveObject"), StaticProtectedNs("flash.display:DisplayObject"), StaticProtectedNs("flash.events:EventDispatcher")])
+     getlex              Multiname("Event", [PrivateNamespace(null, "Main/instance"), PrivateNamespace(null, "Main"), PackageNamespace(""), PackageInternalNs(""), Namespace("http://adobe.com/AS3/2006/builtin"), PackageNamespace("tests"), ProtectedNamespace("Main"), StaticProtectedNs("Main"), StaticProtectedNs("flash.display:Sprite"), StaticProtectedNs("flash.display:DisplayObjectContainer"), StaticProtectedNs("flash.display:InteractiveObject"), StaticProtectedNs("flash.display:DisplayObject"), StaticProtectedNs("flash.events:EventDispatcher"), PackageNamespace("flash.events")])
+     getproperty         Multiname("ADDED_TO_STAGE", [PrivateNamespace(null, "Main/instance"), PrivateNamespace(null, "Main"), PackageNamespace(""), PackageInternalNs(""), Namespace("http://adobe.com/AS3/2006/builtin"), PackageNamespace("tests"), ProtectedNamespace("Main"), StaticProtectedNs("Main"), StaticProtectedNs("flash.display:Sprite"), StaticProtectedNs("flash.display:DisplayObjectContainer"), StaticProtectedNs("flash.display:InteractiveObject"), StaticProtectedNs("flash.display:DisplayObject"), StaticProtectedNs("flash.events:EventDispatcher")])
+     getlocal0
+     getproperty         Multiname("init", [PrivateNamespace(null, "Main/instance"), PrivateNamespace(null, "Main"), PackageNamespace(""), PackageInternalNs(""), Namespace("http://adobe.com/AS3/2006/builtin"), PackageNamespace("tests"), ProtectedNamespace("Main"), StaticProtectedNs("Main"), StaticProtectedNs("flash.display:Sprite"), StaticProtectedNs("flash.display:DisplayObjectContainer"), StaticProtectedNs("flash.display:InteractiveObject"), StaticProtectedNs("flash.display:DisplayObject"), StaticProtectedNs("flash.events:EventDispatcher")])
+     callpropvoid        Multiname("addEventListener", [PrivateNamespace(null, "Main/instance"), PrivateNamespace(null, "Main"), PackageNamespace(""), PackageInternalNs(""), Namespace("http://adobe.com/AS3/2006/builtin"), PackageNamespace("tests"), ProtectedNamespace("Main"), StaticProtectedNs("Main"), StaticProtectedNs("flash.display:Sprite"), StaticProtectedNs("flash.display:DisplayObjectContainer"), StaticProtectedNs("flash.display:InteractiveObject"), StaticProtectedNs("flash.display:DisplayObject"), StaticProtectedNs("flash.events:EventDispatcher")]), 2
+
+L15:
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PrivateNamespace(null, "Main/instance"), "init")
+   method
+    refid "Main/instance/Main/instance/init"
+    param QName(PackageNamespace("flash.events"), "Event")
+    returns QName(PackageNamespace(""), "void")
+    flag HAS_OPTIONAL
+    optional Null()
+    body
+     maxstack 3
+     localcount 2
+     initscopedepth 9
+     maxscopedepth 10
+     code
+      getlocal0
+      pushscope
+
+      findpropstrict      Multiname("removeEventListener", [PrivateNamespace(null, "Main/instance"), PrivateNamespace(null, "Main"), PackageNamespace(""), PackageInternalNs(""), Namespace("http://adobe.com/AS3/2006/builtin"), PackageNamespace("tests"), ProtectedNamespace("Main"), StaticProtectedNs("Main"), StaticProtectedNs("flash.display:Sprite"), StaticProtectedNs("flash.display:DisplayObjectContainer"), StaticProtectedNs("flash.display:InteractiveObject"), StaticProtectedNs("flash.display:DisplayObject"), StaticProtectedNs("flash.events:EventDispatcher")])
+      getlex              Multiname("Event", [PrivateNamespace(null, "Main/instance"), PrivateNamespace(null, "Main"), PackageNamespace(""), PackageInternalNs(""), Namespace("http://adobe.com/AS3/2006/builtin"), PackageNamespace("tests"), ProtectedNamespace("Main"), StaticProtectedNs("Main"), StaticProtectedNs("flash.display:Sprite"), StaticProtectedNs("flash.display:DisplayObjectContainer"), StaticProtectedNs("flash.display:InteractiveObject"), StaticProtectedNs("flash.display:DisplayObject"), StaticProtectedNs("flash.events:EventDispatcher"), PackageNamespace("flash.events")])
+      getproperty         Multiname("ADDED_TO_STAGE", [PrivateNamespace(null, "Main/instance"), PrivateNamespace(null, "Main"), PackageNamespace(""), PackageInternalNs(""), Namespace("http://adobe.com/AS3/2006/builtin"), PackageNamespace("tests"), ProtectedNamespace("Main"), StaticProtectedNs("Main"), StaticProtectedNs("flash.display:Sprite"), StaticProtectedNs("flash.display:DisplayObjectContainer"), StaticProtectedNs("flash.display:InteractiveObject"), StaticProtectedNs("flash.display:DisplayObject"), StaticProtectedNs("flash.events:EventDispatcher")])
+      getlocal0
+      getproperty         Multiname("init", [PrivateNamespace(null, "Main/instance"), PrivateNamespace(null, "Main"), PackageNamespace(""), PackageInternalNs(""), Namespace("http://adobe.com/AS3/2006/builtin"), PackageNamespace("tests"), ProtectedNamespace("Main"), StaticProtectedNs("Main"), StaticProtectedNs("flash.display:Sprite"), StaticProtectedNs("flash.display:DisplayObjectContainer"), StaticProtectedNs("flash.display:InteractiveObject"), StaticProtectedNs("flash.display:DisplayObject"), StaticProtectedNs("flash.events:EventDispatcher")])
+      callpropvoid        Multiname("removeEventListener", [PrivateNamespace(null, "Main/instance"), PrivateNamespace(null, "Main"), PackageNamespace(""), PackageInternalNs(""), Namespace("http://adobe.com/AS3/2006/builtin"), PackageNamespace("tests"), ProtectedNamespace("Main"), StaticProtectedNs("Main"), StaticProtectedNs("flash.display:Sprite"), StaticProtectedNs("flash.display:DisplayObjectContainer"), StaticProtectedNs("flash.display:InteractiveObject"), StaticProtectedNs("flash.display:DisplayObject"), StaticProtectedNs("flash.events:EventDispatcher")]), 2
+
+      returnvoid
+     end ; code
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "Main/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 8
+   maxscopedepth 9
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

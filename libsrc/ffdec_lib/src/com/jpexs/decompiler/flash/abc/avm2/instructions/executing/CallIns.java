@@ -24,7 +24,9 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -74,12 +76,21 @@ public class CallIns extends InstructionDefinition {
             args.add(0, stack.pop());
         }
         GraphTargetItem receiver = stack.pop();
-        if (receiver instanceof LocalRegAVM2Item) {
-            List<LocalRegAVM2Item> localRegs = new ArrayList<>();
-            localRegs.add((LocalRegAVM2Item) receiver);
-            cleanTempRegisters(localData, output, localRegs);
-        }
         GraphTargetItem function = stack.pop();
+
+        if (function instanceof GetPropertyAVM2Item) {
+            GetPropertyAVM2Item getProperty = (GetPropertyAVM2Item) function;
+            if (getProperty.object instanceof SetLocalAVM2Item) {
+                SetLocalAVM2Item setLocal = (SetLocalAVM2Item) getProperty.object;
+                if (receiver instanceof LocalRegAVM2Item) {
+                    LocalRegAVM2Item getLocal = (LocalRegAVM2Item) receiver;
+                    if (getLocal.regIndex == setLocal.regIndex) {
+                        getProperty.object = getProperty.object.value;
+                        receiver = getProperty.object;
+                    }
+                }
+            }
+        }
         stack.push(new CallAVM2Item(ins, localData.lineStartInstruction, receiver, function, args));
     }
 
