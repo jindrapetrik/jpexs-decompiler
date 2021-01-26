@@ -35,7 +35,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -49,13 +51,13 @@ import org.testng.annotations.Test;
  */
 public class ActionScript3Test extends ActionScriptTestBase {
 
-    private SWF swf;
+    private Map<String, SWF> swfMap = new HashMap<>();
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {
         //Main.initLogging(false);
-        swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/flashdevelop/bin/flashdevelop.swf")), false);
-
+        swfMap.put("standard", new SWF(new BufferedInputStream(new FileInputStream("testdata/flashdevelop/bin/flashdevelop.swf")), false));
+        swfMap.put("assembled", new SWF(new BufferedInputStream(new FileInputStream("testdata/custom/bin/custom.swf")), false));
         Configuration.autoDeobfuscate.set(false);
         Configuration.simplifyExpressions.set(false);
 
@@ -64,13 +66,14 @@ public class ActionScript3Test extends ActionScriptTestBase {
         Configuration.showMethodBodyId.set(false);
     }
 
-    private void decompileMethod(String methodName, String expectedResult, boolean isStatic) {
+    private void decompileMethod(String swfIdentifier, String methodName, String expectedResult, boolean isStatic) {
         String className = methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
 
         int clsIndex = -1;
         int scriptIndex = -1;
 
         ABC abc = null;
+        SWF swf = swfMap.get(swfIdentifier);
         List<ABC> abcs = new ArrayList<>();
         for (ABCContainerTag abcTag : swf.getAbcList()) {
             abcs.add(abcTag.getABC());
@@ -115,7 +118,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
         DoABC2Tag tag = null;
         ABC abc = null;
         ScriptPack scriptPack = null;
-        for (Tag t : swf.getTags()) {
+        for (Tag t : swfMap.get("standard").getTags()) {
             if (t instanceof DoABC2Tag) {
                 tag = (DoABC2Tag) t;
                 abc = tag.getABC();
@@ -141,13 +144,13 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testArguments() {
-        decompileMethod("testArguments", "return arguments[0];\r\n",
+        decompileMethod("standard", "testArguments", "return arguments[0];\r\n",
                 false);
     }
 
     @Test
     public void testCatchFinally() {
-        decompileMethod("testCatchFinally", "var a:* = 5;\r\n"
+        decompileMethod("standard", "testCatchFinally", "var a:* = 5;\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "a = 9;\r\n"
@@ -166,7 +169,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testChain2() {
-        decompileMethod("testChain2", "var g:Array = null;\r\n"
+        decompileMethod("standard", "testChain2", "var g:Array = null;\r\n"
                 + "var h:Boolean = false;\r\n"
                 + "var extraLine:Boolean = false;\r\n"
                 + "var r:int = 7;\r\n"
@@ -186,7 +189,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testChainedAssignments() {
-        decompileMethod("testChainedAssignments", "var a:int = 0;\r\n"
+        decompileMethod("standard", "testChainedAssignments", "var a:int = 0;\r\n"
                 + "var b:int = 0;\r\n"
                 + "var c:int = 0;\r\n"
                 + "var d:int = 0;\r\n"
@@ -199,7 +202,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testComplexExpressions() {
-        decompileMethod("testComplexExpressions", "var i:int = 0;\r\n"
+        decompileMethod("standard", "testComplexExpressions", "var i:int = 0;\r\n"
                 + "var j:int = 0;\r\n"
                 + "j = i = i + (i = i + i++);\r\n",
                 false);
@@ -207,7 +210,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testContinueLevels() {
-        decompileMethod("testContinueLevels", "var b:* = undefined;\r\n"
+        decompileMethod("standard", "testContinueLevels", "var b:* = undefined;\r\n"
                 + "var c:* = undefined;\r\n"
                 + "var d:* = undefined;\r\n"
                 + "var e:* = undefined;\r\n"
@@ -273,7 +276,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testDecl2() {
-        decompileMethod("testDecl2", "var k:int = 0;\r\n"
+        decompileMethod("standard", "testDecl2", "var k:int = 0;\r\n"
                 + "var i:int = 5;\r\n"
                 + "i = i + 7;\r\n"
                 + "if(i == 5)\r\n"
@@ -289,7 +292,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testDeclarations() {
-        decompileMethod("testDeclarations", "var vall:* = undefined;\r\n"
+        decompileMethod("standard", "testDeclarations", "var vall:* = undefined;\r\n"
                 + "var vstr:String = null;\r\n"
                 + "var vint:int = 0;\r\n"
                 + "var vuint:uint = 0;\r\n"
@@ -309,7 +312,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testDefaultNotLastGrouped() {
-        decompileMethod("testDefaultNotLastGrouped", "var k:* = 10;\r\n"
+        decompileMethod("standard", "testDefaultNotLastGrouped", "var k:* = 10;\r\n"
                 + "switch(k)\r\n"
                 + "{\r\n"
                 + "default:\r\n"
@@ -327,7 +330,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testDoWhile() {
-        decompileMethod("testDoWhile", "var a:* = 8;\r\n"
+        decompileMethod("standard", "testDoWhile", "var a:* = 8;\r\n"
                 + "do\r\n"
                 + "{\r\n"
                 + "trace(\"a=\" + a);\r\n"
@@ -339,7 +342,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testDoWhile2() {
-        decompileMethod("testDoWhile2", "var k:int = 5;\r\n"
+        decompileMethod("standard", "testDoWhile2", "var k:int = 5;\r\n"
                 + "do\r\n"
                 + "{\r\n"
                 + "k++;\r\n"
@@ -359,8 +362,19 @@ public class ActionScript3Test extends ActionScriptTestBase {
     }
 
     @Test
+    public void testDup() {
+        decompileMethod("standard", "testDup", "var a:Boolean = false;\r\n"
+                + "var b:Boolean = false;\r\n"
+                + "if(a = b)\r\n"
+                + "{\r\n"
+                + "trace(a);\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
     public void testExpressions() {
-        decompileMethod("testExpressions", "var arr:Array = null;\r\n"
+        decompileMethod("standard", "testExpressions", "var arr:Array = null;\r\n"
                 + "var i:int = 5;\r\n"
                 + "var j:int = 5;\r\n"
                 + "if((i = i = i / 2) == 1 || i == 2)\r\n"
@@ -381,7 +395,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testFinallyZeroJump() {
-        decompileMethod("testFinallyZeroJump", "var str:String = param1;\r\n"
+        decompileMethod("standard", "testFinallyZeroJump", "var str:String = param1;\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "}\r\n"
@@ -403,7 +417,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testFor() {
-        decompileMethod("testFor", "for(var a:* = 0; a < 10; a++)\r\n"
+        decompileMethod("standard", "testFor", "for(var a:* = 0; a < 10; a++)\r\n"
                 + "{\r\n"
                 + "trace(\"a=\" + a);\r\n"
                 + "}\r\n",
@@ -412,7 +426,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testForAnd() {
-        decompileMethod("testForAnd", "var x:Boolean = false;\r\n"
+        decompileMethod("standard", "testForAnd", "var x:Boolean = false;\r\n"
                 + "var len:int = 5;\r\n"
                 + "var a:int = 4;\r\n"
                 + "var b:int = 7;\r\n"
@@ -437,7 +451,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testForBreak() {
-        decompileMethod("testForBreak", "for(var a:* = 0; a < 10; a++)\r\n"
+        decompileMethod("standard", "testForBreak", "for(var a:* = 0; a < 10; a++)\r\n"
                 + "{\r\n"
                 + "if(a == 5)\r\n"
                 + "{\r\n"
@@ -450,7 +464,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testForContinue() {
-        decompileMethod("testForContinue", "for(var a:* = 0; a < 10; a = a + 1)\r\n"
+        decompileMethod("standard", "testForContinue", "for(var a:* = 0; a < 10; a = a + 1)\r\n"
                 + "{\r\n"
                 + "if(a == 9)\r\n"
                 + "{\r\n"
@@ -478,7 +492,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testForEach() {
-        decompileMethod("testForEach", "var list:Array = null;\r\n"
+        decompileMethod("standard", "testForEach", "var list:Array = null;\r\n"
                 + "var item:* = undefined;\r\n"
                 + "list = new Array();\r\n"
                 + "list[0] = \"first\";\r\n"
@@ -493,7 +507,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testForEachObjectArray() {
-        decompileMethod("testForEachObjectArray", "var list:Array = null;\r\n"
+        decompileMethod("standard", "testForEachObjectArray", "var list:Array = null;\r\n"
                 + "var test:Array = null;\r\n"
                 + "list = new Array();\r\n"
                 + "list[0] = \"first\";\r\n"
@@ -510,7 +524,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testForEachObjectAttribute() {
-        decompileMethod("testForEachObjectAttribute", "var list:Array = null;\r\n"
+        decompileMethod("standard", "testForEachObjectAttribute", "var list:Array = null;\r\n"
                 + "list = new Array();\r\n"
                 + "list[0] = \"first\";\r\n"
                 + "list[1] = \"second\";\r\n"
@@ -524,7 +538,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testForGoto() {
-        decompileMethod("testForGoto", "var c:int = 0;\r\n"
+        decompileMethod("standard", "testForGoto", "var c:int = 0;\r\n"
                 + "var len:int = 5;\r\n"
                 + "for(var i:uint = 0; i < len; i++)\r\n"
                 + "{\r\n"
@@ -549,7 +563,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testForIn() {
-        decompileMethod("testForIn", "var dic:Dictionary = null;\r\n"
+        decompileMethod("standard", "testForIn", "var dic:Dictionary = null;\r\n"
                 + "var item:* = null;\r\n"
                 + "for(item in dic)\r\n"
                 + "{\r\n"
@@ -564,7 +578,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testForXml() {
-        decompileMethod("testForXml", "var c:int = 0;\r\n"
+        decompileMethod("standard", "testForXml", "var c:int = 0;\r\n"
                 + "var name:String = \"ahoj\";\r\n"
                 + "var myXML:XML = <order id=\"604\">\r\n"
                 + "<book isbn=\"12345\">\r\n"
@@ -597,7 +611,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testGotos() {
-        decompileMethod("testGotos", "var a:Boolean = true;\r\n"
+        decompileMethod("standard", "testGotos", "var a:Boolean = true;\r\n"
                 + "var b:Boolean = false;\r\n"
                 + "if(a)\r\n"
                 + "{\r\n"
@@ -629,7 +643,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testGotos2() {
-        decompileMethod("testGotos2", "var a:Boolean = true;\r\n"
+        decompileMethod("standard", "testGotos2", "var a:Boolean = true;\r\n"
                 + "var b:Boolean = false;\r\n"
                 + "var c:Boolean = true;\r\n"
                 + "if(a)\r\n"
@@ -653,7 +667,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testGotos3() {
-        decompileMethod("testGotos3", "var i:int = 0;\r\n"
+        decompileMethod("standard", "testGotos3", "var i:int = 0;\r\n"
                 + "var a:int = 5;\r\n"
                 + "if(a > 5)\r\n"
                 + "{\r\n"
@@ -680,7 +694,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testGotos4() {
-        decompileMethod("testGotos4", "var a:int = 5;\r\n"
+        decompileMethod("standard", "testGotos4", "var a:int = 5;\r\n"
                 + "if(a > 3)\r\n"
                 + "{\r\n"
                 + "if(a < 7)\r\n"
@@ -701,7 +715,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testGotos5() {
-        decompileMethod("testGotos5", "var j:int = 0;\r\n"
+        decompileMethod("standard", "testGotos5", "var j:int = 0;\r\n"
                 + "var s:String = \"A\";\r\n"
                 + "for(var i:int = 0; i < 10; i++)\r\n"
                 + "{\r\n"
@@ -725,7 +739,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testGotos6() {
-        decompileMethod("testGotos6", "var a:Boolean = true;\r\n"
+        decompileMethod("standard", "testGotos6", "var a:Boolean = true;\r\n"
                 + "var s:String = \"a\";\r\n"
                 + "if(a)\r\n"
                 + "{\r\n"
@@ -750,7 +764,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testGotos7() {
-        decompileMethod("testGotos7", "for(var i:int = 0; i < 10; i++)\r\n"
+        decompileMethod("standard", "testGotos7", "for(var i:int = 0; i < 10; i++)\r\n"
                 + "{\r\n"
                 + "switch(i)\r\n"
                 + "{\r\n"
@@ -779,13 +793,13 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testHello() {
-        decompileMethod("testHello", "trace(\"hello\");\r\n",
+        decompileMethod("standard", "testHello", "trace(\"hello\");\r\n",
                 false);
     }
 
     @Test
     public void testIf() {
-        decompileMethod("testIf", "var a:* = 5;\r\n"
+        decompileMethod("standard", "testIf", "var a:* = 5;\r\n"
                 + "if(a == 7)\r\n"
                 + "{\r\n"
                 + "trace(\"onTrue\");\r\n"
@@ -795,7 +809,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testIfElse() {
-        decompileMethod("testIfElse", "var a:* = 5;\r\n"
+        decompileMethod("standard", "testIfElse", "var a:* = 5;\r\n"
                 + "if(a == 7)\r\n"
                 + "{\r\n"
                 + "trace(\"onTrue\");\r\n"
@@ -809,7 +823,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testIfInIf() {
-        decompileMethod("testIfInIf", "var k:int = 5;\r\n"
+        decompileMethod("standard", "testIfInIf", "var k:int = 5;\r\n"
                 + "if(k > 5 && k < 20)\r\n"
                 + "{\r\n"
                 + "trace(\"A\");\r\n"
@@ -833,7 +847,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testInc2() {
-        decompileMethod("testInc2", "var a:* = [1];\r\n"
+        decompileMethod("standard", "testInc2", "var a:* = [1];\r\n"
                 + "a[this.getInt()]++;\r\n"
                 + "var d:* = a[this.getInt()]++;\r\n"
                 + "var e:* = ++a[this.getInt()];\r\n"
@@ -846,7 +860,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testIncDec() {
-        decompileMethod("testIncDec", "var a:* = 5;\r\n"
+        decompileMethod("standard", "testIncDec", "var a:* = 5;\r\n"
                 + "var b:* = 0;\r\n"
                 + "trace(\"++var\");\r\n"
                 + "b = ++a;\r\n"
@@ -885,7 +899,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testInlineFunctions() {
-        decompileMethod("testInlineFunctions", "var first:String = null;\r\n"
+        decompileMethod("standard", "testInlineFunctions", "var first:String = null;\r\n"
                 + "first = \"value1\";\r\n"
                 + "var traceParameter:Function = function(aParam:String):String\r\n"
                 + "{\r\n"
@@ -907,7 +921,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testInnerFunctions() {
-        decompileMethod("testInnerFunctions", "var s:int = 0;\r\n"
+        decompileMethod("standard", "testInnerFunctions", "var s:int = 0;\r\n"
                 + "var innerFunc:Function = function(b:String):*\r\n"
                 + "{\r\n"
                 + "trace(b);\r\n"
@@ -923,7 +937,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testInnerIf() {
-        decompileMethod("testInnerIf", "var a:* = 5;\r\n"
+        decompileMethod("standard", "testInnerIf", "var a:* = 5;\r\n"
                 + "var b:* = 4;\r\n"
                 + "if(a == 5)\r\n"
                 + "{\r\n"
@@ -950,7 +964,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testInnerTry() {
-        decompileMethod("testInnerTry", "try\r\n"
+        decompileMethod("standard", "testInnerTry", "try\r\n"
                 + "{\r\n"
                 + "try\r\n"
                 + "{\r\n"
@@ -975,7 +989,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testLogicalComputing() {
-        decompileMethod("testLogicalComputing", "var b:Boolean = false;\r\n"
+        decompileMethod("standard", "testLogicalComputing", "var b:Boolean = false;\r\n"
                 + "var i:* = 5;\r\n"
                 + "var j:* = 7;\r\n"
                 + "if(i > j)\r\n"
@@ -989,14 +1003,14 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testManualConvert() {
-        decompileMethod("testManualConvert", "trace(\"String(this).length\");\r\n"
+        decompileMethod("standard", "testManualConvert", "trace(\"String(this).length\");\r\n"
                 + "trace(String(this).length);\r\n",
                 false);
     }
 
     @Test
     public void testMissingDefault() {
-        decompileMethod("testMissingDefault", "var jj:int = 1;\r\n"
+        decompileMethod("standard", "testMissingDefault", "var jj:int = 1;\r\n"
                 + "switch(jj)\r\n"
                 + "{\r\n"
                 + "case 1:\r\n"
@@ -1013,7 +1027,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testMultipleCondition() {
-        decompileMethod("testMultipleCondition", "var a:* = 5;\r\n"
+        decompileMethod("standard", "testMultipleCondition", "var a:* = 5;\r\n"
                 + "var b:* = 8;\r\n"
                 + "var c:* = 9;\r\n"
                 + "if((a <= 4 || b <= 8) && c == 7)\r\n"
@@ -1029,7 +1043,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testNamedAnonFunctions() {
-        decompileMethod("testNamedAnonFunctions", "var test:* = new function testFunc(param1:*, param2:int, param3:Array):Boolean\r\n"
+        decompileMethod("standard", "testNamedAnonFunctions", "var test:* = new function testFunc(param1:*, param2:int, param3:Array):Boolean\r\n"
                 + "{\r\n"
                 + "return (param1 as TestClass2).attrib1 == 5;\r\n"
                 + "};\r\n",
@@ -1038,7 +1052,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testNames() {
-        decompileMethod("testNames", "var ns:* = this.getNamespace();\r\n"
+        decompileMethod("standard", "testNames", "var ns:* = this.getNamespace();\r\n"
                 + "var name:* = this.getName();\r\n"
                 + "var a:* = ns::unnamespacedFunc();\r\n"
                 + "var b:* = ns::[name];\r\n"
@@ -1049,19 +1063,19 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testParamNames() {
-        decompileMethod("testParamNames", "return firstp + secondp + thirdp;\r\n",
+        decompileMethod("standard", "testParamNames", "return firstp + secondp + thirdp;\r\n",
                 false);
     }
 
     @Test
     public void testParamsCount() {
-        decompileMethod("testParamsCount", "return firstp;\r\n",
+        decompileMethod("standard", "testParamsCount", "return firstp;\r\n",
                 false);
     }
 
     @Test
     public void testPrecedence() {
-        decompileMethod("testPrecedence", "var a:* = 0;\r\n"
+        decompileMethod("standard", "testPrecedence", "var a:* = 0;\r\n"
                 + "a = (5 + 6) * 7;\r\n"
                 + "a = 5 * (2 + 3);\r\n"
                 + "a = 5 + 6 * 7;\r\n"
@@ -1078,7 +1092,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testPrecedenceX() {
-        decompileMethod("testPrecedenceX", "var a:* = 5;\r\n"
+        decompileMethod("standard", "testPrecedenceX", "var a:* = 5;\r\n"
                 + "var b:* = 2;\r\n"
                 + "var c:* = 3;\r\n"
                 + "var d:* = a << (b >>> c);\r\n"
@@ -1088,7 +1102,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testProperty() {
-        decompileMethod("testProperty", "var d:* = new TestClass1();\r\n"
+        decompileMethod("standard", "testProperty", "var d:* = new TestClass1();\r\n"
                 + "var k:* = 7 + 8;\r\n"
                 + "if(k == 15)\r\n"
                 + "{\r\n"
@@ -1099,7 +1113,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testRegExp() {
-        decompileMethod("testRegExp", "var a1:* = /[a-z\\r\\n0-9\\\\]+/i;\r\n"
+        decompileMethod("standard", "testRegExp", "var a1:* = /[a-z\\r\\n0-9\\\\]+/i;\r\n"
                 + "var a2:* = /[a-z\\r\\n0-9\\\\]+/i;\r\n"
                 + "var b1:* = /[0-9AB]+/;\r\n"
                 + "var b2:* = /[0-9AB]+/;\r\n",
@@ -1108,14 +1122,14 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testRest() {
-        decompileMethod("testRest", "trace(\"firstRest:\" + restval[0]);\r\n"
+        decompileMethod("standard", "testRest", "trace(\"firstRest:\" + restval[0]);\r\n"
                 + "return firstp;\r\n",
                 false);
     }
 
     @Test
     public void testStrictEquals() {
-        decompileMethod("testStrictEquals", "var k:int = 6;\r\n"
+        decompileMethod("standard", "testStrictEquals", "var k:int = 6;\r\n"
                 + "if(this.f() !== this.f())\r\n"
                 + "{\r\n"
                 + "trace(\"is eight\");\r\n"
@@ -1125,7 +1139,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testStringConcat() {
-        decompileMethod("testStringConcat", "var k:int = 8;\r\n"
+        decompileMethod("standard", "testStringConcat", "var k:int = 8;\r\n"
                 + "this.traceIt(\"hello\" + 5 * 6);\r\n"
                 + "this.traceIt(\"hello\" + (k - 1));\r\n"
                 + "this.traceIt(\"hello\" + 5 + 6);\r\n",
@@ -1134,7 +1148,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testStrings() {
-        decompileMethod("testStrings", "trace(\"hello\");\r\n"
+        decompileMethod("standard", "testStrings", "trace(\"hello\");\r\n"
                 + "trace(\"quotes:\\\"hello!\\\"\");\r\n"
                 + "trace(\"backslash: \\\\ \");\r\n"
                 + "trace(\"single quotes: \\'hello!\\'\");\r\n"
@@ -1144,7 +1158,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testSwitch() {
-        decompileMethod("testSwitch", "var a:* = 5;\r\n"
+        decompileMethod("standard", "testSwitch", "var a:* = 5;\r\n"
                 + "switch(a)\r\n"
                 + "{\r\n"
                 + "case 57 * a:\r\n"
@@ -1163,7 +1177,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testSwitchComma() {
-        decompileMethod("testSwitchComma", "var b:int = 5;\r\n"
+        decompileMethod("standard", "testSwitchComma", "var b:int = 5;\r\n"
                 + "var a:String = \"A\";\r\n"
                 + "switch(a)\r\n"
                 + "{\r\n"
@@ -1180,7 +1194,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testSwitchDefault() {
-        decompileMethod("testSwitchDefault", "var a:* = 5;\r\n"
+        decompileMethod("standard", "testSwitchDefault", "var a:* = 5;\r\n"
                 + "switch(a)\r\n"
                 + "{\r\n"
                 + "case 57 * a:\r\n"
@@ -1202,7 +1216,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testTernarOperator() {
-        decompileMethod("testTernarOperator", "var a:* = 5;\r\n"
+        decompileMethod("standard", "testTernarOperator", "var a:* = 5;\r\n"
                 + "var b:* = 4;\r\n"
                 + "var c:* = 4;\r\n"
                 + "var d:* = 78;\r\n"
@@ -1213,7 +1227,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testTry() {
-        decompileMethod("testTry", "var i:int = 0;\r\n"
+        decompileMethod("standard", "testTry", "var i:int = 0;\r\n"
                 + "i = 7;\r\n"
                 + "try\r\n"
                 + "{\r\n"
@@ -1238,7 +1252,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testTryReturn() {
-        decompileMethod("testTryReturn", "var i:int = 0;\r\n"
+        decompileMethod("standard", "testTryReturn", "var i:int = 0;\r\n"
                 + "var b:Boolean = false;\r\n"
                 + "try\r\n"
                 + "{\r\n"
@@ -1266,7 +1280,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testTryReturn2() {
-        decompileMethod("testTryReturn2", "var c:Boolean = false;\r\n"
+        decompileMethod("standard", "testTryReturn2", "var c:Boolean = false;\r\n"
                 + "trace(\"before\");\r\n"
                 + "var a:Boolean = true;\r\n"
                 + "var b:Boolean = false;\r\n"
@@ -1309,7 +1323,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testUsagesTry() {
-        decompileMethod("testUsagesTry", "var k:int = 5;\r\n"
+        decompileMethod("standard", "testUsagesTry", "var k:int = 5;\r\n"
                 + "switch(k)\r\n"
                 + "{\r\n"
                 + "case 0:\r\n"
@@ -1343,7 +1357,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testVector() {
-        decompileMethod("testVector", "var v:Vector.<String> = new Vector.<String>();\r\n"
+        decompileMethod("standard", "testVector", "var v:Vector.<String> = new Vector.<String>();\r\n"
                 + "v.push(\"hello\");\r\n"
                 + "v[0] = \"hi\";\r\n"
                 + "v[5 * 8 - 39] = \"hi2\";\r\n"
@@ -1353,14 +1367,14 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testVector2() {
-        decompileMethod("testVector2", "var a:Vector.<Vector.<int>> = new Vector.<Vector.<int>>();\r\n"
+        decompileMethod("standard", "testVector2", "var a:Vector.<Vector.<int>> = new Vector.<Vector.<int>>();\r\n"
                 + "var b:Vector.<int> = new <int>[10,20,30];\r\n",
                 false);
     }
 
     @Test
     public void testWhileAnd() {
-        decompileMethod("testWhileAnd", "var a:int = 5;\r\n"
+        decompileMethod("standard", "testWhileAnd", "var a:int = 5;\r\n"
                 + "var b:int = 10;\r\n"
                 + "while(a < 10 && b > 1)\r\n"
                 + "{\r\n"
@@ -1374,7 +1388,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testWhileContinue() {
-        decompileMethod("testWhileContinue", "var a:* = 5;\r\n"
+        decompileMethod("standard", "testWhileContinue", "var a:* = 5;\r\n"
                 + "while(true)\r\n"
                 + "{\r\n"
                 + "if(a == 9)\r\n"
@@ -1396,7 +1410,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testWhileTry() {
-        decompileMethod("testWhileTry", "while(true)\r\n"
+        decompileMethod("standard", "testWhileTry", "while(true)\r\n"
                 + "{\r\n"
                 + "try\r\n"
                 + "{\r\n"
@@ -1419,7 +1433,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testWhileTry2() {
-        decompileMethod("testWhileTry2", "var j:* = undefined;\r\n"
+        decompileMethod("standard", "testWhileTry2", "var j:* = undefined;\r\n"
                 + "for(var i:* = 0; i < 100; i++)\r\n"
                 + "{\r\n"
                 + "try\r\n"
@@ -1445,7 +1459,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
 
     @Test
     public void testXml() {
-        decompileMethod("testXml", "var g:XML = null;\r\n"
+        decompileMethod("standard", "testXml", "var g:XML = null;\r\n"
                 + "var name:String = \"ahoj\";\r\n"
                 + "var myXML:XML = <order id=\"604\">\r\n"
                 + "<book isbn=\"12345\">\r\n"
@@ -1560,6 +1574,24 @@ public class ActionScript3Test extends ActionScriptTestBase {
     }
 
     @Test
+    public void testDupAssignment() {
+        decompileMethod("assembled", "testDupAssignment", "var _loc1_:int = 0;\r\n"
+                + "var _loc2_:int = 10;\r\n"
+                + "if(_loc1_ = _loc2_)\r\n"
+                + "{\r\n"
+                + "trace(_loc2_);\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
+    public void testIncrement() {
+        decompileMethod("assembled", "testIncrement", "super();\r\n"
+                + "b = a++;\r\n",
+                false);
+    }
+
+    @Test
     public void testOptionalParameters() {
         String methodName = "testOptionalParameters";
         String className = methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
@@ -1567,7 +1599,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
         int clsIndex = -1;
         DoABC2Tag tag = null;
         ABC abc = null;
-        for (Tag t : swf.getTags()) {
+        for (Tag t : swfMap.get("standard").getTags()) {
             if (t instanceof DoABC2Tag) {
                 tag = (DoABC2Tag) t;
                 abc = tag.getABC();

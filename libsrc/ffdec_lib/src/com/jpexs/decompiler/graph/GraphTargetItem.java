@@ -601,4 +601,8 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
         return 0;
     }
+
+    public boolean isIdentical(GraphTargetItem other) {
+        return this == other;
+    }
 }

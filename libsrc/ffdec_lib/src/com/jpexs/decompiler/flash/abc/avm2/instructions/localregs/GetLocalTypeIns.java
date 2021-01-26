@@ -23,6 +23,8 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ScriptAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
@@ -86,7 +88,27 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
             //computedValue = new NotCompileTimeItem(ins, localData.lineStartInstruction, computedValue);
         }
 
-        if (output.size() >= 2) {
+        //chained assignments
+        if (!output.isEmpty()) {
+            if ((output.get(output.size() - 1) instanceof SetTypeAVM2Item)) {
+                GraphTargetItem setItem = output.get(output.size() - 1);
+                if (setItem.value.getNotCoerced() instanceof SetLocalAVM2Item) {
+                    SetLocalAVM2Item setLocal = (SetLocalAVM2Item) setItem.value.getNotCoerced();
+                    if (setLocal.regIndex == regId) {
+                        if ((setItem.value instanceof CoerceAVM2Item) || (setItem.value instanceof ConvertAVM2Item)) {
+                            setItem.value.value = setLocal.value;
+                        } else {
+                            setItem.value = setLocal.value;
+                        }
+
+                        output.remove(output.size() - 1);
+                        stack.add(setItem);
+                        return;
+                    }
+                }
+            }
+        }
+        /*if (output.size() >= 2) {
             if ((output.get(output.size() - 1) instanceof SetTypeAVM2Item) && (output.get(output.size() - 2) instanceof SetLocalAVM2Item)) {
                 SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(output.size() - 2);
                 GraphTargetItem setItem = output.get(output.size() - 1);
@@ -105,7 +127,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                     }
                 }
             }
-        }
+        }*/
 
         stack.push(new LocalRegAVM2Item(ins, localData.lineStartInstruction, regId, computedValue));
     }

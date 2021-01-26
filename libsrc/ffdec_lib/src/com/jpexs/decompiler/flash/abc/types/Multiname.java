@@ -56,7 +56,7 @@ public class Multiname {
 
     private static final int[] multinameKinds = new int[]{QNAME, QNAMEA, MULTINAME, MULTINAMEA, RTQNAME, RTQNAMEA, MULTINAMEL, RTQNAMEL, RTQNAMELA, MULTINAMELA, TYPENAME};
 
-    private static final String[] multinameKindNames = new String[]{"Qname", "QnameA", "Multiname", "MultinameA", "RTQname", "RTQnameA", "MultinameL", "RTQnameL", "RTQnameLA", "MultinameLA", "TypeName"};
+    private static final String[] multinameKindNames = new String[]{"QName", "QNameA", "Multiname", "MultinameA", "RTQName", "RTQNameA", "MultinameL", "RTQNameL", "RTQNameLA", "MultinameLA", "TypeName"};
 
     public int kind;
 

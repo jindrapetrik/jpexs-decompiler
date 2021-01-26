@@ -319,7 +319,7 @@ public final class MethodBody implements Cloneable {
             } catch (InterruptedException ex) {
                 throw ex;
             } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
-
+                ex.printStackTrace();
                 convertException = ex;
                 Throwable cause = ex.getCause();
                 if (ex instanceof ExecutionException && cause instanceof Exception) {
@@ -384,6 +384,7 @@ public final class MethodBody implements Cloneable {
             } catch (ThreadDeath | InterruptedException ex) {
                 throw ex;
             } catch (Throwable ex) {
+                ex.printStackTrace();
                 //ignore
                 logger.log(Level.SEVERE, "Deobfuscation failed in: " + path, ex);
                 body = clone();

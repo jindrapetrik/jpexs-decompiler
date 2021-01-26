@@ -8,11 +8,11 @@
   <compiler>
     <define append="true">
       <name>CONFIG::debug</name>
-      <value>true</value>
+      <value>false</value>
     </define>
     <define append="true">
       <name>CONFIG::release</name>
-      <value>false</value>
+      <value>true</value>
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
@@ -30,14 +30,16 @@
       <name>CONFIG::desktop</name>
       <value>false</value>
     </define>
-    <verbose-stacktraces>true</verbose-stacktraces>
+    <strict>false</strict>
+    <omit-trace-statements>true</omit-trace-statements>
+    <verbose-stacktraces>false</verbose-stacktraces>
     <source-path append="true">
-      <path-element>C:\Dropbox\Programovani\JavaSE\FFDec\libsrc\ffdec_lib\testdata\flashdevelop\src</path-element>
+      <path-element>C:\Dropbox\Programovani\JavaSE\FFDec\libsrc\ffdec_lib\testdata\custom\src</path-element>
       <path-element>C:\Program Files (x86)\FlashDevelop\Library\AS3\classes</path-element>
     </source-path>
   </compiler>
   <file-specs>
-    <path-element>C:\Dropbox\Programovani\JavaSE\FFDec\libsrc\ffdec_lib\testdata\flashdevelop\src\Main.as</path-element>
+    <path-element>C:\Dropbox\Programovani\JavaSE\FFDec\libsrc\ffdec_lib\testdata\custom\src\Main.as</path-element>
   </file-specs>
   <default-background-color>#FFFFFF</default-background-color>
   <default-frame-rate>30</default-frame-rate>

@@ -21,8 +21,11 @@ import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import static com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition.getItemIp;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
@@ -31,6 +34,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -41,6 +45,7 @@ import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -131,6 +136,27 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
 
         if (localData.getSetLocalUsages(localData.code.adr2pos(ins.getAddress())).isEmpty() && (value instanceof DuplicateItem)) {
             return;
+        }
+
+        GraphTargetItem notCoercedValue = value;
+        if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
+            notCoercedValue = value.value;
+        }
+
+        if (notCoercedValue instanceof DuplicateItem) {
+            GraphTargetItem insideDup = notCoercedValue.value;
+            if (!stack.isEmpty() && stack.peek() == insideDup) {
+                stack.pop();
+                if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
+                    value.value = insideDup;
+                } else {
+                    value = insideDup;
+                }
+
+                GraphTargetItem result = new SetLocalAVM2Item(ins, localData.lineStartInstruction, regId, value);
+                stack.push(result);
+                return;
+            }
         }
         GraphTargetItem result = new SetLocalAVM2Item(ins, localData.lineStartInstruction, regId, value);
         output.add(result);

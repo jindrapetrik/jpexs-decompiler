@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
@@ -24,7 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 public class GetLocal3Ins extends GetLocalTypeIns {
 
     public GetLocal3Ins() {
-        super(0xd3, "getlocal_3", new int[]{}, false);
+        super(0xd3, "getlocal3", new int[]{}, false);
     }
 
     @Override

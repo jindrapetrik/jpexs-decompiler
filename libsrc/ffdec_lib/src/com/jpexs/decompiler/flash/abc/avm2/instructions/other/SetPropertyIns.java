@@ -27,12 +27,14 @@ import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConstructAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
@@ -40,6 +42,7 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,98 +58,156 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         super(0x61, "setproperty", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }
 
+    private GraphTargetItem checkIncDec(boolean standalone, int multinameIndex, AVM2Instruction ins, AVM2LocalData localData, GraphTargetItem item,
+            LocalRegAVM2Item valueLocalReg, LocalRegAVM2Item nameLocalReg, LocalRegAVM2Item objLocalReg) {
+        if (item instanceof SetLocalAVM2Item) {
+            SetLocalAVM2Item valueSetLocalReg = (SetLocalAVM2Item) item;
+            if ((valueSetLocalReg.value instanceof IncrementAVM2Item) || (valueSetLocalReg.value instanceof DecrementAVM2Item)) {
+                boolean isIncrement = (valueSetLocalReg.value instanceof IncrementAVM2Item);
+                if (valueSetLocalReg.value.value instanceof GetPropertyAVM2Item) {
+                    GetPropertyAVM2Item getProperty = (GetPropertyAVM2Item) valueSetLocalReg.value.value;
+                    FullMultinameAVM2Item propertyName = ((FullMultinameAVM2Item) getProperty.propertyName);
+                    SetLocalAVM2Item nameSetLocalReg = null;
+                    if (propertyName.name instanceof SetLocalAVM2Item) {
+                        nameSetLocalReg = (SetLocalAVM2Item) propertyName.name;
+                    }
+                    if (getProperty.object instanceof SetLocalAVM2Item) {
+                        SetLocalAVM2Item objSetLocalReg = (SetLocalAVM2Item) getProperty.object;
+
+                        if ((valueLocalReg.regIndex == valueSetLocalReg.regIndex)
+                                && (propertyName.multinameIndex == multinameIndex)
+                                && ((nameLocalReg == null && nameSetLocalReg == null) || (nameLocalReg.regIndex == nameSetLocalReg.regIndex))
+                                && (objLocalReg.regIndex == objSetLocalReg.regIndex)) {
+                            if (nameSetLocalReg != null) {
+                                propertyName.name = nameSetLocalReg.value;
+                            }
+                            getProperty.object = objSetLocalReg.value;
+
+                            if (standalone) {
+                                if (isIncrement) {
+                                    return new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
+                                } else {
+                                    return new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
+                                }
+                            } else {
+                                if (isIncrement) {
+                                    return new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
+                                } else {
+                                    return new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int multinameIndex = ins.operands[0];
         GraphTargetItem value = stack.pop();
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
-        if (value.getThroughDuplicate().getThroughRegister().getThroughDuplicate() instanceof IncrementAVM2Item) {
-            List<LocalRegAVM2Item> localRegs = new ArrayList<>();
-            if (value.getThroughDuplicate() instanceof LocalRegAVM2Item) {
-                localRegs.add((LocalRegAVM2Item) value.getThroughDuplicate());
-            }
-            GraphTargetItem inside = ((IncrementAVM2Item) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).value.getThroughRegister().getNotCoerced().getThroughDuplicate();
-            if (inside instanceof GetPropertyAVM2Item) {
-                GetPropertyAVM2Item insideProp = ((GetPropertyAVM2Item) inside);
-                if (((FullMultinameAVM2Item) insideProp.propertyName).compareSame(multiname)) {
-                    GraphTargetItem insideObj = obj.getThroughDuplicate();
-                    if (insideObj instanceof LocalRegAVM2Item) {
-                        localRegs.add((LocalRegAVM2Item) insideObj);
-                        if (((LocalRegAVM2Item) insideObj).computedValue != null) {
-                            insideObj = ((LocalRegAVM2Item) insideObj).computedValue.getThroughNotCompilable().getThroughDuplicate();
-                        }
-                    }
-                    if (multiname.name instanceof LocalRegAVM2Item) {
-                        localRegs.add((LocalRegAVM2Item) multiname.name);
-                    }
-                    if (multiname.namespace instanceof LocalRegAVM2Item) {
-                        localRegs.add((LocalRegAVM2Item) multiname.namespace);
-                    }
-                    if (insideProp.object.getThroughDuplicate() == insideObj) {
-                        cleanTempRegisters(localData, output, localRegs);
-                        if (stack.size() > 0) {
-                            GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
-                            if (top == insideProp) {
+
+        if ((value instanceof IncrementAVM2Item) || (value instanceof DecrementAVM2Item)) {
+            boolean isIncrement = (value instanceof IncrementAVM2Item);
+            if (value.value instanceof DuplicateItem) {
+                GraphTargetItem duplicated = value.value.value;
+                if (!stack.isEmpty()) {
+                    if (stack.peek() == duplicated) {
+                        GraphTargetItem notCoerced = duplicated.getNotCoerced();
+                        if (notCoerced instanceof GetLexAVM2Item) {
+                            GetLexAVM2Item getLex = (GetLexAVM2Item) notCoerced;
+                            if (localData.abc.constants.getMultiname(multinameIndex).equals(getLex.propertyName)) {
                                 stack.pop();
-                                stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
-                            } else if ((top instanceof IncrementAVM2Item) && (((IncrementAVM2Item) top).value == inside)) {
-                                stack.pop();
-                                stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
-                            } else {
-                                output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
+                                if (isIncrement) {
+                                    stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getLex));
+                                } else {
+                                    stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getLex));
+                                }
+                                return;
                             }
-                        } else {
-                            output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
                         }
-                        return;
+
                     }
                 }
             }
+
         }
 
-        if (value.getThroughDuplicate().getThroughRegister().getThroughDuplicate() instanceof DecrementAVM2Item) {
-            List<LocalRegAVM2Item> localRegs = new ArrayList<>();
-            if (value.getThroughDuplicate() instanceof LocalRegAVM2Item) {
-                localRegs.add((LocalRegAVM2Item) value.getThroughDuplicate());
+        if (value instanceof LocalRegAVM2Item) {
+            LocalRegAVM2Item valueLocalReg = (LocalRegAVM2Item) value;
+            LocalRegAVM2Item nameLocalReg = null;
+            if (multiname.name instanceof LocalRegAVM2Item) {
+                nameLocalReg = (LocalRegAVM2Item) multiname.name;;
             }
+            if (obj instanceof LocalRegAVM2Item) {
+                LocalRegAVM2Item objLocalReg = (LocalRegAVM2Item) obj;
 
-            GraphTargetItem inside = ((DecrementAVM2Item) value.getThroughDuplicate().getThroughRegister().getThroughDuplicate()).value.getThroughRegister().getNotCoerced().getThroughDuplicate();
-            if (inside instanceof GetPropertyAVM2Item) {
-                GetPropertyAVM2Item insideProp = ((GetPropertyAVM2Item) inside);
-                if (((FullMultinameAVM2Item) insideProp.propertyName).compareSame(multiname)) {
-                    GraphTargetItem insideObj = obj.getThroughDuplicate();
-                    if (insideObj instanceof LocalRegAVM2Item) {
-                        localRegs.add((LocalRegAVM2Item) insideObj);
-                        if (((LocalRegAVM2Item) insideObj).computedValue != null) {
-                            insideObj = ((LocalRegAVM2Item) insideObj).computedValue.getThroughNotCompilable().getThroughDuplicate();
-                        }
-                    }
-                    if (multiname.name instanceof LocalRegAVM2Item) {
-                        localRegs.add((LocalRegAVM2Item) multiname.name);
-                    }
-                    if (multiname.namespace instanceof LocalRegAVM2Item) {
-                        localRegs.add((LocalRegAVM2Item) multiname.namespace);
-                    }
-                    if (insideProp.object.getThroughDuplicate() == insideObj) {
-                        cleanTempRegisters(localData, output, localRegs);
-                        if (stack.size() > 0) {
-                            GraphTargetItem top = stack.peek().getNotCoerced().getThroughDuplicate();
-                            if (top == insideProp) {
-                                stack.pop();
-                                stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
-                            } else if ((top instanceof DecrementAVM2Item) && (((DecrementAVM2Item) top).value == inside)) {
-                                stack.pop();
-                                stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
-                            } else {
-                                output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
+                if (!output.isEmpty() && !stack.isEmpty()) {
+                    if (output.get(output.size() - 1) instanceof SetLocalAVM2Item) {
+                        SetLocalAVM2Item valueSetLocalReg = (SetLocalAVM2Item) output.get(output.size() - 1);
+                        if ((valueSetLocalReg.value instanceof IncrementAVM2Item)
+                                || (valueSetLocalReg.value instanceof DecrementAVM2Item)) {
+                            boolean isIncrement = (valueSetLocalReg.value instanceof IncrementAVM2Item);
+                            if (valueSetLocalReg.value.value instanceof DuplicateItem) {
+                                GraphTargetItem duplicated = valueSetLocalReg.value.value.value;
+                                if (stack.peek() == duplicated) {
+                                    GraphTargetItem notCoerced = duplicated.getNotCoerced();
+                                    if (notCoerced instanceof GetPropertyAVM2Item) {
+                                        GetPropertyAVM2Item getProperty = (GetPropertyAVM2Item) notCoerced;
+                                        FullMultinameAVM2Item propertyName = ((FullMultinameAVM2Item) getProperty.propertyName);
+                                        SetLocalAVM2Item nameSetLocalReg = null;
+                                        if (propertyName.name instanceof SetLocalAVM2Item) {
+                                            nameSetLocalReg = (SetLocalAVM2Item) propertyName.name;
+                                        }
+                                        if (getProperty.object instanceof SetLocalAVM2Item) {
+                                            SetLocalAVM2Item objSetLocalReg = (SetLocalAVM2Item) getProperty.object;
+
+                                            if ((valueLocalReg.regIndex == valueSetLocalReg.regIndex)
+                                                    && (propertyName.multinameIndex == multinameIndex)
+                                                    && ((nameLocalReg == null && nameSetLocalReg == null) || (nameLocalReg.regIndex == nameSetLocalReg.regIndex))
+                                                    && (objLocalReg.regIndex == objSetLocalReg.regIndex)) {
+                                                if (nameSetLocalReg != null) {
+                                                    propertyName.name = nameSetLocalReg.value;
+                                                }
+                                                getProperty.object = objSetLocalReg.value;
+                                                output.remove(output.size() - 1);
+                                                stack.pop();
+                                                if (isIncrement) {
+                                                    stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProperty));
+                                                } else {
+                                                    stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProperty));
+                                                }
+                                                return;
+                                            }
+                                        }
+                                    }
+                                }
                             }
-                        } else {
-                            output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, insideProp));
                         }
+                    }
+                }
+
+                if (!stack.isEmpty()) {
+                    GraphTargetItem checked = checkIncDec(false, multinameIndex, ins, localData, stack.peek(), valueLocalReg, nameLocalReg, objLocalReg);
+                    if (checked != null) {
+                        stack.pop();
+                        stack.push(checked);
                         return;
                     }
                 }
+                if (!output.isEmpty()) {
+                    GraphTargetItem checked = checkIncDec(true, multinameIndex, ins, localData, output.get(output.size() - 1), valueLocalReg, nameLocalReg, objLocalReg);
+                    if (checked != null) {
+                        output.remove(output.size() - 1);
+                        output.add(checked);
+                        return;
+                    }
+                }
+
             }
         }
 
