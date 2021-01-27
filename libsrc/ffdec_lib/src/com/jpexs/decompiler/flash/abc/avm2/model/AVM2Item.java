@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -72,7 +73,7 @@ public abstract class AVM2Item extends GraphTargetItem {
     }
 
     protected GraphTextWriter formatProperty(GraphTextWriter writer, GraphTargetItem object, GraphTargetItem propertyName, LocalData localData) throws InterruptedException {
-        boolean empty = object instanceof FindPropertyAVM2Item;
+        boolean empty = object.getThroughDuplicate() instanceof FindPropertyAVM2Item;
         if (object instanceof LocalRegAVM2Item) {
             if (((LocalRegAVM2Item) object).computedValue != null) {
                 if (((LocalRegAVM2Item) object).computedValue.getThroughNotCompilable() instanceof FindPropertyAVM2Item) {
@@ -81,8 +82,8 @@ public abstract class AVM2Item extends GraphTargetItem {
             }
         }
 
-        if (object instanceof FindPropertyAVM2Item) {
-            FindPropertyAVM2Item fp = (FindPropertyAVM2Item) object;
+        if (object.getThroughDuplicate() instanceof FindPropertyAVM2Item) {
+            FindPropertyAVM2Item fp = (FindPropertyAVM2Item) object.getThroughDuplicate();
             if (fp.propertyName instanceof FullMultinameAVM2Item) {
                 propertyName = fp.propertyName;
             }
@@ -202,4 +203,22 @@ public abstract class AVM2Item extends GraphTargetItem {
         return true;
     }
 
+    public static boolean mustStayIntact1(GraphTargetItem target) {
+        target = target.getNotCoerced();
+        if (target instanceof ExceptionAVM2Item) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean mustStayIntact2(GraphTargetItem target) {
+        target = target.getNotCoerced();
+        if (target instanceof NextValueAVM2Item) {
+            return true;
+        }
+        if (target instanceof NextNameAVM2Item) {
+            return true;
+        }
+        return false;
+    }
 }

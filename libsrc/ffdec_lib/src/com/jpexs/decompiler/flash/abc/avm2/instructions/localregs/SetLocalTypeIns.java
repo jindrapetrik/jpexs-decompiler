@@ -31,10 +31,13 @@ import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NextNameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NextValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -134,41 +137,26 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
             }
         }
 
-        if (localData.getSetLocalUsages(localData.code.adr2pos(ins.getAddress())).isEmpty() && (value instanceof DuplicateItem)) {
+        /*if (localData.getSetLocalUsages(localData.code.adr2pos(ins.getAddress())).isEmpty() && (value instanceof DuplicateItem)) {
             return;
-        }
-
-        GraphTargetItem notCoercedValue = value;
-        if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
-            notCoercedValue = value.value;
-        }
-
-        if (notCoercedValue instanceof DuplicateItem) {
-            GraphTargetItem insideDup = notCoercedValue.value;
-            if (!stack.isEmpty() && stack.peek() == insideDup) {
-                stack.pop();
-                if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
-                    value.value = insideDup;
-                } else {
-                    value = insideDup;
-                }
-
-                GraphTargetItem result = new SetLocalAVM2Item(ins, localData.lineStartInstruction, regId, value);
-                stack.push(result);
-                return;
-            }
-        }
+        }*/
         GraphTargetItem result = new SetLocalAVM2Item(ins, localData.lineStartInstruction, regId, value);
-        output.add(result);
+
+        SetTypeIns.handleResult(value, stack, output, localData, result, regId);
     }
 
     @Override
-    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
+    public int getStackPopCount(AVM2Instruction ins, ABC abc
+    ) {
         return 1;
     }
 
     @Override
-    public String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) {
+    public String getObject(Stack<AVM2Item> stack, ABC abc,
+            AVM2Instruction ins, List<AVM2Item> output,
+            MethodBody body, HashMap<Integer, String> localRegNames,
+            List<DottedChain> fullyQualifiedNames
+    ) {
         return AVM2Item.localRegName(localRegNames, getRegisterId(ins));
     }
 

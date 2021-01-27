@@ -1,0 +1,29 @@
+script
+ sinit
+  refid "tests:TestForEach/init"
+  body
+   maxstack 2
+   localcount 1
+   initscopedepth 1
+   maxscopedepth 3
+   code
+    getlocal0
+    pushscope
+
+    findpropstrict      Multiname("TestForEach", [PackageNamespace("tests")])
+    getlex              QName(PackageNamespace(""), "Object")
+    pushscope
+
+    getlex              Multiname("Object", [PrivateNamespace(null, "tests:TestForEach"), PackageNamespace(""), PackageNamespace("tests"), PackageInternalNs("tests"), Namespace("http://adobe.com/AS3/2006/builtin")])
+    newclass            "tests:TestForEach"
+    popscope
+    initproperty        QName(PackageNamespace("tests"), "TestForEach")
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+ trait class QName(PackageNamespace("tests"), "TestForEach")
+  #include "TestForEach.class.asasm"
+ end ; trait
+end ; script

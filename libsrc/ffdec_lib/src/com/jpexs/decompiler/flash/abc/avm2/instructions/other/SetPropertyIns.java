@@ -111,6 +111,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
 
+        //assembled/TestIncrement
         if ((value instanceof IncrementAVM2Item) || (value instanceof DecrementAVM2Item)) {
             boolean isIncrement = (value instanceof IncrementAVM2Item);
             if (value.value instanceof DuplicateItem) {
@@ -134,7 +135,31 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                     }
                 }
             }
+        }
 
+        //assembled/TestIncrement2
+        if (value instanceof DuplicateItem) {
+            GraphTargetItem duplicated = value.value;
+            if ((duplicated instanceof IncrementAVM2Item) || (duplicated instanceof DecrementAVM2Item)) {
+                boolean isIncrement = (duplicated instanceof IncrementAVM2Item);
+                if (!stack.isEmpty()) {
+                    if (stack.peek() == duplicated) {
+                        GraphTargetItem incrementedProp = duplicated.value;
+                        if (incrementedProp instanceof GetLexAVM2Item) {
+                            GetLexAVM2Item getLex = (GetLexAVM2Item) incrementedProp;
+                            if (localData.abc.constants.getMultiname(multinameIndex).equals(getLex.propertyName)) {
+                                stack.pop();
+                                if (isIncrement) {
+                                    stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getLex));
+                                } else {
+                                    stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getLex));
+                                }
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         if (value instanceof LocalRegAVM2Item) {
@@ -228,7 +253,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         }
 
         GraphTargetItem result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value);
-        output.add(result);
+        SetTypeIns.handleResult(value, stack, output, localData, result, -1);
     }
 
     @Override

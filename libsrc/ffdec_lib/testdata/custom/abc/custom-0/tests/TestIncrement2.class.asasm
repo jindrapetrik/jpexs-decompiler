@@ -1,0 +1,75 @@
+class
+ refid "tests:TestIncrement2"
+ instance QName(PackageNamespace("tests"), "TestIncrement2")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestIncrement2")
+  iinit
+   refid "tests:TestIncrement2/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestIncrement2/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+      getlocal0
+      pushscope
+
+      getlocal0
+      pushscope
+      getlex              QName(PrivateNamespace("somens"),"loadCount")
+      increment
+      dup
+      findpropstrict      QName(PrivateNamespace("somens"),"loadCount")
+      swap
+      setproperty         QName(PrivateNamespace("somens"),"loadCount")
+      pushbyte            2
+      ifne                ofs001b
+      findpropstrict      QName(ProtectedNamespace("somens"),"somemethod")
+      callpropvoid        QName(ProtectedNamespace("somens"),"somemethod"), 0
+ofs001b:
+      returnvoid
+      
+      returnvoid
+     end ; code
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestIncrement2/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

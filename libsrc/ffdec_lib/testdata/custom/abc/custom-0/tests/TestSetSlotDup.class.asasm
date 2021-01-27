@@ -1,0 +1,83 @@
+class
+ refid "tests:TestSetSlotDup"
+ instance QName(PackageNamespace("tests"), "TestSetSlotDup")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestSetSlotDup")
+  iinit
+   refid "tests:TestSetSlotDup/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestSetSlotDup/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+            getlocal0
+            pushscope
+            newactivation
+            dup
+            setlocal1
+            pushscope 
+            pushbyte 5
+            setlocal 5           
+            getlex              QName(PackageInternalNs("myns"),"myname")
+            pushstring          "okay"
+            getlocal 5
+            dup
+            coerce              QName(PackageNamespace(""),"int")
+            getlocal1
+            swap
+            setslot             1
+            callpropvoid        QName(PackageNamespace(""),"somemethod"), 2
+            getlex              QName(PackageInternalNs("myns"),"myname")
+            callpropvoid        QName(PackageNamespace(""),"start"), 0
+            returnvoid
+     end ; code
+     
+     trait slot QName(PackageInternalNs("myns"),"myslot")
+            slotid 1
+            type QName(PackageNamespace(""),"int")
+            ;value Undefined()
+         end ; trait
+         
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestSetSlotDup/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

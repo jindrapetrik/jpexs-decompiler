@@ -160,7 +160,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         }
 
         GraphTargetItem result = new SetSlotAVM2Item(ins, localData.lineStartInstruction, obj, objnoreg, slotIndex, slotname, value);
-        output.add(result);
+        SetTypeIns.handleResult(value, stack, output, localData, result, -1);
     }
 
     @Override
