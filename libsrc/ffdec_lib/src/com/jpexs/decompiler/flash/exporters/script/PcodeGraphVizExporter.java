@@ -240,6 +240,8 @@ public class PcodeGraphVizExporter {
                 rawLen += tlen;
                 String s = code.substring(t.start, t.start + tlen);
                 s = s.replace("&", "&amp;");
+                s = s.replace("[", "&#x5B;");
+                s = s.replace("]", "&#x5D;"); //ends graphviz parameters block!
                 s = s.replace("<", "&lt;");
                 s = s.replace(">", "&gt;");
                 //s = s.replace("\"", "&quot;");
