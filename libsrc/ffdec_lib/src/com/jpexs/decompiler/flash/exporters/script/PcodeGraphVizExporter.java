@@ -244,7 +244,7 @@ public class PcodeGraphVizExporter {
                 s = s.replace("]", "&#x5D;"); //ends graphviz parameters block!
                 s = s.replace("<", "&lt;");
                 s = s.replace(">", "&gt;");
-                //s = s.replace("\"", "&quot;");
+                s = s.replace("\\", "\\\\");
                 s = s.replace("\r\n", "<BR />");
                 sb.append(s);
                 if (bold && tlen > 0) {
