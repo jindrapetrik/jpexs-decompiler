@@ -48,26 +48,47 @@ public interface SetTypeIns {
 
         if (notCoercedValue instanceof DuplicateItem) {
             GraphTargetItem insideDup = notCoercedValue.value;
-            if (!AVM2Item.mustStayIntact1(insideDup.getNotCoerced())) {
+            if (!AVM2Item.mustStayIntact1(insideDup.getNotCoercedNoDup())) {
                 if (!stack.isEmpty() && stack.peek() == insideDup) {
                     stack.pop();
-                    if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
-                        value.value = insideDup;
-                    } else {
-                        value = insideDup;
-                    }
 
-                    result.value = value;
-                    //GraphTargetItem result = new SetLocalAVM2Item(ins, localData.lineStartInstruction, regId, value);
-
-                    if (regId > -1 && AVM2Item.mustStayIntact2(insideDup.getNotCoerced())) { //hack
+                    if ((insideDup instanceof DuplicateItem) && regId > -1) {
+                        int numDups = 1;
+                        while ((insideDup instanceof DuplicateItem) && !stack.isEmpty() && stack.peek() == insideDup.value) {
+                            insideDup = insideDup.value;
+                            stack.pop();
+                            numDups++;
+                        }
+                        if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
+                            value.value = insideDup;
+                        } else {
+                            value = insideDup;
+                        }
+                        result.value = value;
                         output.add(result);
-                        stack.push(new LocalRegAVM2Item(null, localData.lineStartInstruction, regId, value));
+                        for (int i = 0; i < numDups; i++) {
+                            stack.push(new LocalRegAVM2Item(null, localData.lineStartInstruction, regId, value));
+                        }
+                        return;
+                    } else {
+
+                        if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
+                            value.value = insideDup;
+                        } else {
+                            value = insideDup;
+                        }
+
+                        result.value = value;
+
+                        if (regId > -1 && AVM2Item.mustStayIntact2(insideDup.getNotCoerced())) { //hack
+                            output.add(result);
+                            stack.push(new LocalRegAVM2Item(null, localData.lineStartInstruction, regId, value));
+                            return;
+                        }
+
+                        stack.push(result);
                         return;
                     }
-
-                    stack.push(result);
-                    return;
                 }
             }
         }

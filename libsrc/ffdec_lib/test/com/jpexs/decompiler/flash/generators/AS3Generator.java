@@ -38,6 +38,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -120,7 +121,7 @@ public class AS3Generator {
         useFile(s, new File("testdata/flashdevelop/bin/flashdevelop.swf"), "standard");
         useFile(s, new File("testdata/custom/bin/custom.swf"), "assembled");
 
-        try (PrintWriter pw = new PrintWriter("as3_teststub.java")) {
+        try (PrintWriter pw = new PrintWriter("as3_teststub.java", Charset.forName("UTF-8"))) {
             pw.println(s.toString());
         }
         System.exit(0);

@@ -25,6 +25,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
@@ -66,36 +68,10 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         GraphTargetItem obj = stack.pop(); //scopeId
         GraphTargetItem objnoreg = obj;
         obj = obj.getThroughRegister();
-        Multiname slotname = null;
         if (obj instanceof NewActivationAVM2Item) {
             ((NewActivationAVM2Item) obj).slots.put(slotIndex, value);
         }
-
-        if (obj instanceof ExceptionAVM2Item) {
-            slotname = localData.getConstants().getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
-        } else if ((obj instanceof ThisAVM2Item) || (obj instanceof ClassAVM2Item) || (obj instanceof ScriptAVM2Item)) {
-            List<Trait> traits = localData.getScriptInfo().get(localData.scriptIndex).traits.traits;
-            for (int t = 0; t < traits.size(); t++) {
-                Trait tr = traits.get(t);
-                if (tr instanceof TraitWithSlot) {
-                    if (((TraitWithSlot) tr).getSlotIndex() == slotIndex) {
-                        slotname = tr.getName(localData.abc);
-                    }
-                }
-            }
-        } else if (obj instanceof NewActivationAVM2Item) {
-            MethodBody body = localData.methodBody;
-            List<Trait> traits = body.traits.traits;
-            for (int t = 0; t < traits.size(); t++) {
-                Trait trait = traits.get(t);
-                if (trait instanceof TraitWithSlot) {
-                    if (((TraitWithSlot) trait).getSlotIndex() == slotIndex) {
-                        slotname = trait.getName(localData.abc);
-                    }
-                }
-
-            }
-        }
+        Multiname slotname = searchSlotName(slotIndex, localData, obj);
 
         if (slotname != null) {
             if (value instanceof LocalRegAVM2Item) {

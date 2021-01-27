@@ -1574,6 +1574,19 @@ public class ActionScript3Test extends ActionScriptTestBase {
     }
 
     @Test
+    public void testAssembledDoubleDup() {
+        decompileMethod("assembled", "testDoubleDup", "var _loc10_:Rectangle = myprop(_loc5_);\r\n"
+                + "_loc10_.mymethod(-_loc10_.width,-_loc10_.height);\r\n",
+                false);
+    }
+
+    @Test
+    public void testAssembledDup() {
+        decompileMethod("assembled", "testDup", "return 1 - (var _loc1_:Number = 1 - _loc1_ / _loc4_) * _loc1_;\r\n",
+                false);
+    }
+
+    @Test
     public void testAssembledDupAssignment() {
         decompileMethod("assembled", "testDupAssignment", "var _loc1_:int = 0;\r\n"
                 + "var _loc2_:int = 10;\r\n"
@@ -1626,10 +1639,22 @@ public class ActionScript3Test extends ActionScriptTestBase {
     }
 
     @Test
+    public void testAssembledIncrement3() {
+        decompileMethod("assembled", "testIncrement3", "_loc1_.length--;\r\n",
+                false);
+    }
+
+    @Test
     public void testAssembledSetSlotDup() {
         decompileMethod("assembled", "testSetSlotDup", "var _loc5_:int = 5;\r\n"
                 + "myname.somemethod(\"okay\",myslot = _loc5_);\r\n"
                 + "myname.start();\r\n",
+                false);
+    }
+
+    @Test
+    public void testAssembledSetSlotFindProperty() {
+        decompileMethod("assembled", "testSetSlotFindProperty", "return var myprop:int = 50;\r\n",
                 false);
     }
 

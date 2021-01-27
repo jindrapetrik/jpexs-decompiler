@@ -10,5 +10,10 @@ program
  #include "tests/TestForEachCoerced.script.asasm"
  #include "tests/TestIncrement2.script.asasm"
  #include "tests/TestSetSlotDup.script.asasm"
+ #include "tests/TestSetSlotFindProperty.script.asasm"
+ #include "tests/TestDoubleDup.script.asasm"
+ #include "tests/TestIncrement3.script.asasm"
+ #include "tests/TestDup.script.asasm"
+ #include "tests/TestDup2.script.asasm"
  ; place to add next
 end ; program

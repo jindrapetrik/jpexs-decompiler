@@ -161,6 +161,24 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                 }
             }
         }
+        //assembled/TestIncrement3
+        if ((value instanceof IncrementAVM2Item) || (value instanceof DecrementAVM2Item)) {
+            boolean isIncrement = (value instanceof IncrementAVM2Item);
+            if (value.value.getNotCoerced() instanceof GetPropertyAVM2Item) {
+                GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) value.value.getNotCoerced();
+                if (getProp.object instanceof DuplicateItem) {
+                    if (getProp.object.value == obj) {
+                        getProp.object = obj;
+                        if (isIncrement) {
+                            output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                        } else {
+                            output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                        }
+                        return;
+                    }
+                }
+            }
+        }
 
         if (value instanceof LocalRegAVM2Item) {
             LocalRegAVM2Item valueLocalReg = (LocalRegAVM2Item) value;

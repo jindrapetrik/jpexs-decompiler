@@ -1,0 +1,70 @@
+class
+ refid "tests:TestSetSlotFindProperty"
+ instance QName(PackageNamespace("tests"), "TestSetSlotFindProperty")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestSetSlotFindProperty")
+  iinit
+   refid "tests:TestSetSlotFindProperty/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestSetSlotFindProperty/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+      newactivation
+      pushscope
+      pushbyte 50
+      dup
+      findproperty        QName(PackageInternalNs("myns"),"myprop")
+      swap
+      setslot             1
+      returnvalue
+     end ; code
+     
+     trait const QName(PackageInternalNs("myns"),"myprop")
+         slotid 1
+         type QName(PackageNamespace(""),"int")         
+      end ; trait
+      
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestSetSlotFindProperty/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class
