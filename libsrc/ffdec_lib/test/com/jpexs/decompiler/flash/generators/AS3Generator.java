@@ -72,12 +72,14 @@ public class AS3Generator {
                         String name = t.getName(abc).getName(abc.constants, null, true, true);
                         String clsName = pack.getClassPath().className;
                         String lower = clsName.substring(0, 1).toLowerCase() + clsName.substring(1);
+                        String idUpper = identifier.substring(0, 1).toUpperCase() + identifier.substring(1);
+                        String testMethodName = lower.replaceAll("^test", "test" + idUpper);
                         if (lower.equals("testOptionalParameters")) { //SPECIAL: ignored
                             continue;
                         }
                         if (name.equals("run")) {
                             s.append("@Test\r\npublic void ");
-                            s.append(lower);
+                            s.append(testMethodName);
                             s.append("(){\r\ndecompileMethod(\"");
                             s.append(identifier);
                             s.append("\",\"");
