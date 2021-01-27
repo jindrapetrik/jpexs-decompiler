@@ -48,7 +48,7 @@ public class GetSuperAVM2Item extends AVM2Item {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (!object.toString().equals("this")) {
-            if (!(object instanceof FindPropertyAVM2Item)) {
+            if (!(object.getThroughDuplicate() instanceof FindPropertyAVM2Item)) {
                 object.toString(writer, localData);
                 writer.append(".");
             }

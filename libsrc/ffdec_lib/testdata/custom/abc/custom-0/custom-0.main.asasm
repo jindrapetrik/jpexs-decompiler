@@ -6,5 +6,9 @@ program
  #include "Main.script.asasm"
  #include "tests/TestDupAssignment.script.asasm"
  #include "tests/TestIncrement.script.asasm"
+ #include "tests/TestForEach.script.asasm"
+ #include "tests/TestForEachCoerced.script.asasm"
+ #include "tests/TestIncrement2.script.asasm"
+ #include "tests/TestSetSlotDup.script.asasm"
  ; place to add next
 end ; program

@@ -55,7 +55,7 @@ public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
         GraphTargetItem result = new SetSuperAVM2Item(ins, localData.lineStartInstruction, value, obj, multiname);
-        output.add(result);
+        SetTypeIns.handleResult(value, stack, output, localData, result, -1);
     }
 
     @Override

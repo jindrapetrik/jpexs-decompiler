@@ -247,6 +247,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.DXNSIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.DXNSLateIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXAttrIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXElemIns;
+import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
@@ -1609,10 +1610,11 @@ public class AVM2Code implements Cloneable {
              }
              }*/
             if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end)) { // set_local_x,get_local_x.. no other local_x get
+
                 AVM2Instruction insAfter = code.get(ip + 1);
                 Set<Integer> usages = setLocalPosToGetLocalPos.containsKey(ip) ? setLocalPosToGetLocalPos.get(ip) : new HashSet<>();
 
-                if (usages.size() == 1 && (usages.iterator().next().equals(ip + 1)) && (insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
+                if (!AVM2Item.mustStayIntact2(stack.peek()) && usages.size() == 1 && (usages.iterator().next().equals(ip + 1)) && (insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
                     ip += 2;
                     continue iploop;
                 } else {

@@ -1,0 +1,80 @@
+class
+ refid "tests:TestForEachCoerced"
+ instance QName(PackageNamespace("tests"), "TestForEachCoerced")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestForEachCoerced")
+  iinit
+   refid "tests:TestForEachCoerced/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestForEachCoerced/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+      getlocal0
+      pushscope
+      pushbyte            0
+      setlocal            8
+      getlex              QName(PrivateNamespace("somens"),"someprop")
+      setlocal            7
+      jump                ofs0054
+ofs0042:
+      label
+      getlocal            7
+      getlocal            8
+      nextvalue
+      coerce              QName(PackageNamespace("somens"),"SomeClass")
+      dup
+      setlocal            6
+      getlocal1
+      getlocal2
+      getlocal            5
+      callpropvoid        QName(Namespace("somens"),"methodname"), 3
+ofs0054:
+      hasnext2            7, 8
+      iftrue              ofs0042
+
+      returnvoid
+     end ; code
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestForEachCoerced/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class
