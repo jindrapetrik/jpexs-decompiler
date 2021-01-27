@@ -50,32 +50,7 @@ public class GetSlotIns extends InstructionDefinition {
         int slotIndex = ins.operands[0];
         GraphTargetItem objinreg = stack.pop(); //scope
         GraphTargetItem obj = objinreg.getThroughRegister();
-        Multiname slotname = null;
-        if (obj instanceof ExceptionAVM2Item) {
-            slotname = localData.getConstants().getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
-        } else if ((obj instanceof ThisAVM2Item) || (obj instanceof ClassAVM2Item) || (obj instanceof ScriptAVM2Item)) {
-            List<Trait> traits = localData.getScriptInfo().get(localData.scriptIndex).traits.traits;
-            for (int t = 0; t < traits.size(); t++) {
-                Trait tr = traits.get(t);
-                if (tr instanceof TraitWithSlot) {
-                    if (((TraitWithSlot) tr).getSlotIndex() == slotIndex) {
-                        slotname = tr.getName(localData.abc);
-                    }
-                }
-            }
-        } else if (obj instanceof NewActivationAVM2Item) {
-            MethodBody body = localData.methodBody;
-            List<Trait> traits = body.traits.traits;
-            for (int t = 0; t < traits.size(); t++) {
-                Trait trait = traits.get(t);
-                if (trait instanceof TraitWithSlot) {
-                    if (((TraitWithSlot) trait).getSlotIndex() == slotIndex) {
-                        slotname = trait.getName(localData.abc);
-                    }
-                }
-
-            }
-        }
+        Multiname slotname = searchSlotName(slotIndex, localData, obj);
         stack.push(new GetSlotAVM2Item(ins, localData.lineStartInstruction, obj, objinreg, slotIndex, slotname));
     }
 

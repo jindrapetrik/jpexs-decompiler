@@ -295,6 +295,7 @@ import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
@@ -1614,7 +1615,7 @@ public class AVM2Code implements Cloneable {
                 AVM2Instruction insAfter = code.get(ip + 1);
                 Set<Integer> usages = setLocalPosToGetLocalPos.containsKey(ip) ? setLocalPosToGetLocalPos.get(ip) : new HashSet<>();
 
-                if (!AVM2Item.mustStayIntact2(stack.peek()) && usages.size() == 1 && (usages.iterator().next().equals(ip + 1)) && (insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
+                if (!(stack.peek().getNotCoercedNoDup() instanceof DuplicateItem) && !AVM2Item.mustStayIntact2(stack.peek()) && usages.size() == 1 && (usages.iterator().next().equals(ip + 1)) && (insAfter.definition instanceof GetLocalTypeIns) && (((GetLocalTypeIns) insAfter.definition).getRegisterId(insAfter) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins))) {
                     ip += 2;
                     continue iploop;
                 } else {
@@ -2097,14 +2098,14 @@ public class AVM2Code implements Cloneable {
              ins.operands[j] = updater.updateOperandOffset(target, ins.operands[j]);
              }
              }*/ //Faster, but not so universal
-             if (ins.definition instanceof IfTypeIns) {
-                    long target = ins.getTargetAddress();
-                    try {
-                        ins.operands[0] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[0]);
-                    } catch (ConvertException cex) {
-                        throw new ConvertException("Invalid offset (" + ins + ")", i);
-                    }
+            if (ins.definition instanceof IfTypeIns) {
+                long target = ins.getTargetAddress();
+                try {
+                    ins.operands[0] = updater.updateOperandOffset(ins.getAddress(), target, ins.operands[0]);
+                } catch (ConvertException cex) {
+                    throw new ConvertException("Invalid offset (" + ins + ")", i);
                 }
+            }
             ins.setAddress(updater.updateInstructionOffset(ins.getAddress()));
             //Note: changing operands here does not change instruction byte length as offsets are always S24 (not variable length)
         }
