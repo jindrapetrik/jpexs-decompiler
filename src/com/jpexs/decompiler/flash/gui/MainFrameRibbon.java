@@ -53,10 +53,13 @@ public final class MainFrameRibbon extends AppRibbonFrame {
         FlashPlayerPanel flashPanel = null;
         FlashPlayerPanel flashPanel2 = null;
 
-        try {
-            flashPanel = new FlashPlayerPanel(this);
-            flashPanel2 = new FlashPlayerPanel(this);
-        } catch (FlashUnsupportedException fue) {
+        if (Configuration.useAdobeFlashPlayerForPreviews.get()) {
+            try {
+                flashPanel = new FlashPlayerPanel(this);
+                flashPanel2 = new FlashPlayerPanel(this);
+            } catch (FlashUnsupportedException fue) {
+                //ignored
+            }
         }
 
         Container cnt = getContentPane();
