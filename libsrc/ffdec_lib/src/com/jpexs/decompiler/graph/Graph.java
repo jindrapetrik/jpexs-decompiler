@@ -57,6 +57,7 @@ import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -66,6 +67,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -2367,10 +2369,6 @@ public class Graph {
                 List<GraphTargetItem> caseValues = new ArrayList<>();
                 List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
                 List<Integer> valueMappings = new ArrayList<>();
-                Loop swLoop = new Loop(loops.size(), null, next);
-                //removeEdgeToFromList(gotoTargets, next);
-                swLoop.phase = 1;
-                loops.add(swLoop);
                 boolean first = false;
                 int pos;
 
@@ -2444,7 +2442,7 @@ public class Graph {
                 }
 
                 //int ignoredBranch = -1;
-                if (it instanceof IntegerValueTypeItem) {
+                if ((it instanceof IntegerValueTypeItem) && !(switchedItem instanceof IntegerValueTypeItem)) {
                     defaultBranch = ((IntegerValueTypeItem) it).intValue();
                 }
 
@@ -2489,10 +2487,15 @@ public class Graph {
                 //This is tied to AS3 switch implementation which has nextparts switched from index 1. TODO: Make more universal
 
                 GraphPart defaultPart = hasExpr ? part.nextParts.get(1 + defaultBranch) : part.nextParts.get(0);
-                //int defaultNum = hasExpr ? 1 + defaultBranch : 0;
-
+                List<GraphPart> caseBodyParts = new ArrayList<>();
                 for (int i = 1; i < part.nextParts.size(); i++) {
-                    if (caseExpressions.containsKey(pos)) {
+                    if (!hasExpr) {
+                        if (part.nextParts.get(i) == defaultPart) {
+                            pos++;
+                            continue;
+                        }
+                        caseValues.add(new IntegerValueItem(null, localData.lineStartInstruction, pos));
+                    } else if (caseExpressions.containsKey(pos)) {
                         GraphTargetItem expr = caseExpressions.get(pos);
                         if (caseCommaCommands.get(pos).size() > 0) {
                             List<GraphTargetItem> exprCommaCommands = new ArrayList<>(caseCommaCommands.get(pos));
@@ -2500,110 +2503,26 @@ public class Graph {
                             expr = new CommaExpressionItem(null, expr.lineStartItem, exprCommaCommands);
                         }
                         caseValues.add(expr);
-                    } else if (part.nextParts.get(i) == defaultPart) {
-                        caseValues.add(new DefaultItem());
                     } else {
-                        caseValues.add(new IntegerValueItem(null, localData.lineStartInstruction, pos));
+                        pos++;
+                        continue;
                     }
+                    caseBodyParts.add(part.nextParts.get(i));
                     pos++;
                 }
-
-                first = true;
-                pos = 0;
-                List<GraphTargetItem> nextCommands = new ArrayList<>();
-                for (int i = 1; i < part.nextParts.size(); i++) {
-                    //gotoTargets.remove(new GraphPartEdge(next, part.nextParts.get(i)));
-                }
-                for (int i = 1; i < part.nextParts.size(); i++) {
-                    GraphPart p = part.nextParts.get(i);
-
-                    /*if (pos == ignoredBranch) {
-                     pos++;
-                     continue;
-                     }*/
-                    //if (p != defaultPart)
-                    {
-                        if (vis.contains(p)) {
-                            valueMappings.add(caseCommands.size() - 1);
-                            continue;
-                        }
-                        valueMappings.add(caseCommands.size());
-                    }
-                    List<GraphPart> stopPart2 = new ArrayList<>();
-                    if (next != null) {
-                        stopPart2.add(next);
-                    } else if (!stopPart.isEmpty()) {
-                        stopPart2.add(stopPart.get(stopPart.size() - 1));
-                    }
-                    for (GraphPart p2 : part.nextParts) {
-                        if (p2 == p) {
-                            continue;
-                        }
-                        if (!stopPart2.contains(p2)) {
-                            stopPart2.add(p2);
-                        }
-                    }
-                    if (next != p) {
-                        //if (p == defaultPart && !defaultCommands.isEmpty()) {
-                        //ignore
-                        //} else
-                        {
-                            TranslateStack s2 = (TranslateStack) stack.clone();
-                            s2.clear();
-                            nextCommands = printGraph(foundGotos, gotoTargets, partCodes, partCodePos, visited, prepareBranchLocalData(localData), s2, allParts, part, p, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
-                            makeAllCommands(nextCommands, s2);
-                            caseCommands.add(nextCommands);
-                            vis.add(p);
-                        }
-                    } else {
-                        caseCommands.add(nextCommands);
-                    }
-                    first = false;
-                    pos++;
-                }
-
-                //If the lastone is default empty and alone, remove it
-                if (!caseCommands.isEmpty()) {
-                    List<GraphTargetItem> lastc = caseCommands.get(caseCommands.size() - 1);
-                    if (!lastc.isEmpty() && (lastc.get(lastc.size() - 1) instanceof BreakItem)) {
-                        BreakItem bi = (BreakItem) lastc.get(lastc.size() - 1);
-                        if (bi.loopId == swLoop.id) {
-                            lastc.remove(lastc.size() - 1);
-                        }
-                    }
-                    if (lastc.isEmpty()) {
-                        int cnt = 0;
-                        if (caseValues.get(caseValues.size() - 1) instanceof DefaultItem) {
-                            for (int i = valueMappings.size() - 1; i >= 0; i--) {
-                                if (valueMappings.get(i) == caseCommands.size() - 1) {
-                                    cnt++;
-                                }
-                            }
-                            if (cnt == 1) {
-                                caseValues.remove(caseValues.size() - 1);
-                                valueMappings.remove(valueMappings.size() - 1);
-                                caseCommands.remove(lastc);
-                            }
-                        }
-                    }
-                }
-                //remove last break from last section
-                if (!caseCommands.isEmpty()) {
-                    List<GraphTargetItem> lastc = caseCommands.get(caseCommands.size() - 1);
-                    if (!lastc.isEmpty() && (lastc.get(lastc.size() - 1) instanceof BreakItem)) {
-                        BreakItem bi = (BreakItem) lastc.get(lastc.size() - 1);
-                        if (bi.loopId == swLoop.id) {
-                            lastc.remove(lastc.size() - 1);
-                        }
-                    }
-                }
-                SwitchItem sw = new SwitchItem(null, localData.lineStartInstruction, swLoop, switchedItem, caseValues, caseCommands, valueMappings);
+                Reference<GraphPart> nextRef = new Reference<>(null);
+                Reference<GraphTargetItem> tiRef = new Reference<>(null);
+                SwitchItem sw = handleSwitch(switchedItem, originalSwitchedItem.getSrc(), foundGotos, gotoTargets, partCodes, partCodePos, allParts, stack, stopPart, loops, localData, staticOperation, path,
+                        caseValues, defaultPart, caseBodyParts, nextRef, tiRef);
+                next = nextRef.getVal();
                 checkSwitch(localData, sw, caseExpressionOtherSides, currentRet);
                 currentRet.add(sw);
-                //TADY
-                swLoop.phase = 2;
                 if (next != null) {
-                    currentRet.addAll(printGraph(foundGotos, gotoTargets, partCodes, partCodePos, visited, localData, stack, allParts, part, next, stopPart, loops, null, staticOperation, path, recursionLevel + 1));
+                    if (tiRef.getVal() != null) {
+                        ret.add(tiRef.getVal());
+                    } else {
+                        currentRet.addAll(printGraph(foundGotos, gotoTargets, partCodes, partCodePos, visited, localData, stack, allParts, part, next, stopPart, loops, null, staticOperation, path, recursionLevel + 1));
+                    }
                 }
                 pos++;
             } //else
@@ -3239,5 +3158,205 @@ public class Graph {
             to = to.nextParts.get(0);
             removeEdgeToFromList(edges, to);
         }
+    }
+
+    protected SwitchItem handleSwitch(GraphTargetItem switchedObject,
+            GraphSourceItem switchStartItem, List<GotoItem> foundGotos, List<GraphPartEdge> gotoTargets, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> allParts, TranslateStack stack, List<GraphPart> stopPart, List<Loop> loops, BaseLocalData localData, int staticOperation, String path,
+            List<GraphTargetItem> caseValuesMap, GraphPart defaultPart, List<GraphPart> caseBodyParts, Reference<GraphPart> nextRef, Reference<GraphTargetItem> tiRef) throws InterruptedException {
+        boolean hasDefault = false;
+        /*
+                case 4:
+                case 5:
+                default: 
+                    trace("5 & def");
+                    ...
+                case 6:
+                
+         */
+        //must go backwards to hit case 5, not case 4
+        for (int i = caseBodyParts.size() - 1; i >= 0; i--) {
+            if (caseBodyParts.get(i) == defaultPart) {
+                DefaultItem di = new DefaultItem();
+                caseValuesMap.add(i + 1, di);
+                caseBodyParts.add(i + 1, defaultPart);
+                hasDefault = true;
+                break;
+            }
+        }
+
+        if (!hasDefault) {
+            /*
+                    case 1:
+                        trace("1");
+                    case 2:
+                        trace("2"); //no break
+                    default:
+                        trace("def");
+                        ...
+                    case 3:  
+             */
+            //must go backwards to hit case 2, not case 1
+            for (int i = caseBodyParts.size() - 1; i >= 0; i--) {
+                if (caseBodyParts.get(i).leadsTo(localData, this, code, defaultPart, loops, new ArrayList<>())) {
+                    DefaultItem di = new DefaultItem();
+                    caseValuesMap.add(i + 1, di);
+                    caseBodyParts.add(i + 1, defaultPart);
+                    hasDefault = true;
+                    break;
+                }
+            }
+        }
+
+        if (!hasDefault) {
+            /*
+                    case 1:
+                        trace("1");
+                        break;
+                    default:
+                        trace("def"); //no break
+                    case 2:
+                        trace("2");                    
+             */
+            for (int i = 0; i < caseBodyParts.size(); i++) {
+                if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops, new ArrayList<>())) {
+                    DefaultItem di = new DefaultItem();
+                    caseValuesMap.add(i, di);
+                    caseBodyParts.add(i, defaultPart);
+                    hasDefault = true;
+                    break;
+                }
+            }
+        }
+
+        if (!hasDefault) {
+            /*
+                        case 1:
+                        ...
+                        case 2:
+                        ...
+                        default:
+                            trace("def");                        
+             */
+            caseValuesMap.add(new DefaultItem());
+            caseBodyParts.add(defaultPart);
+        }
+
+        GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops, new ArrayList<>());
+        //removeEdgeToFromList(gotoTargets, breakPart);
+
+        List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
+        GraphPart next = breakPart;
+
+        GraphTargetItem ti = checkLoop(new ArrayList<GraphTargetItem>() /*??*/, next, stopPart, loops);
+
+        //create switch as new loop break command detection to work
+        Loop currentLoop = new Loop(loops.size(), null, next);
+        currentLoop.phase = 1;
+        loops.add(currentLoop);
+        List<Integer> valuesMapping = new ArrayList<>();
+        List<GraphPart> caseBodies = new ArrayList<>();
+
+        for (int i = 0; i < caseValuesMap.size(); i++) {
+            GraphPart cur = caseBodyParts.get(i);
+            if (!caseBodies.contains(cur)) {
+                caseBodies.add(cur);
+            }
+        }
+
+        //Sort bodies by leadsto to proper handle clauses without a break statement
+        loopi:
+        for (int i = 0; i < caseBodies.size(); i++) {
+            GraphPart b = caseBodies.get(i);
+            for (int j = i + 1; j < caseBodies.size(); j++) {
+                GraphPart b2 = caseBodies.get(j);
+                if (b2.leadsTo(localData, this, code, b, loops, new ArrayList<>())) {
+                    caseBodies.remove(j);
+                    caseBodies.add(i, b2);
+                    i--;
+                    continue loopi;
+                } else if (j > i + 1) {
+                    if (b.leadsTo(localData, this, code, b2, loops, new ArrayList<>())) {
+                        caseBodies.remove(j);
+                        caseBodies.add(i + 1, b2);
+                        continue loopi;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < caseValuesMap.size(); i++) {
+            GraphPart cur = caseBodyParts.get(i);
+            valuesMapping.add(caseBodies.indexOf(cur));
+        }
+
+        for (int i = 0; i < caseBodies.size(); i++) {
+            List<GraphTargetItem> currentCaseCommands = new ArrayList<>();
+            GraphPart nextCase = next;
+            if (next != null) {
+                if (i < caseBodies.size() - 1) {
+                    if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops, new ArrayList<>())) {
+                        currentCaseCommands.add(new BreakItem(null, localData.lineStartInstruction, currentLoop.id));
+                    } else {
+                        nextCase = caseBodies.get(i + 1);
+                    }
+                }
+            }
+            List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
+            for (GraphPart b : caseBodies) {
+                if (b != caseBodies.get(i)) {
+                    stopPart2x.add(b);
+                }
+            }
+            if (breakPart != null) {
+                stopPart2x.add(breakPart);
+            }
+            currentCaseCommands.addAll(0, printGraph(foundGotos, gotoTargets, partCodes, partCodePos, localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops, staticOperation, path));
+            if (currentCaseCommands.size() >= 2) {
+                if (currentCaseCommands.get(currentCaseCommands.size() - 1) instanceof BreakItem) {
+                    if ((currentCaseCommands.get(currentCaseCommands.size() - 2) instanceof ContinueItem) || (currentCaseCommands.get(currentCaseCommands.size() - 2) instanceof BreakItem)) {
+                        currentCaseCommands.remove(currentCaseCommands.size() - 1);
+                    }
+                }
+            }
+            caseCommands.add(currentCaseCommands);
+        }
+
+        //If the lastone is default empty and alone, remove it
+        if (!caseCommands.isEmpty()) {
+            List<GraphTargetItem> lastc = caseCommands.get(caseCommands.size() - 1);
+            if (!lastc.isEmpty() && (lastc.get(lastc.size() - 1) instanceof BreakItem)) {
+                BreakItem bi = (BreakItem) lastc.get(lastc.size() - 1);
+                lastc.remove(lastc.size() - 1);
+            }
+            if (lastc.isEmpty()) {
+                int cnt2 = 0;
+                if (caseValuesMap.get(caseValuesMap.size() - 1) instanceof DefaultItem) {
+                    for (int i = valuesMapping.size() - 1; i >= 0; i--) {
+                        if (valuesMapping.get(i) == caseCommands.size() - 1) {
+                            cnt2++;
+                        }
+                    }
+
+                    caseValuesMap.remove(caseValuesMap.size() - 1);
+                    valuesMapping.remove(valuesMapping.size() - 1);
+                    if (cnt2 == 1) {
+                        caseCommands.remove(lastc);
+                    }
+                }
+            }
+        }
+        //remove last break from last section                
+        if (!caseCommands.isEmpty()) {
+            List<GraphTargetItem> lastc = caseCommands.get(caseCommands.size() - 1);
+            if (!lastc.isEmpty() && (lastc.get(lastc.size() - 1) instanceof BreakItem)) {
+                BreakItem bi = (BreakItem) lastc.get(lastc.size() - 1);
+                lastc.remove(lastc.size() - 1);
+            }
+        }
+        nextRef.setVal(next);
+        tiRef.setVal(ti);
+        currentLoop.phase = 2;
+        return new SwitchItem(null, switchStartItem, currentLoop, switchedObject, caseValuesMap, caseCommands, valuesMapping);
+
     }
 }

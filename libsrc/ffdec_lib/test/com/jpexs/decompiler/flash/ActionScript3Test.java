@@ -315,8 +315,8 @@ public class ActionScript3Test extends ActionScriptTestBase {
         decompileMethod("standard", "testDefaultNotLastGrouped", "var k:* = 10;\r\n"
                 + "switch(k)\r\n"
                 + "{\r\n"
-                + "default:\r\n"
                 + "case \"six\":\r\n"
+                + "default:\r\n"
                 + "trace(\"def and 6\");\r\n"
                 + "case \"five\":\r\n"
                 + "trace(\"def and 6 and 5\");\r\n"
@@ -1655,6 +1655,29 @@ public class ActionScript3Test extends ActionScriptTestBase {
     @Test
     public void testAssembledSetSlotFindProperty() {
         decompileMethod("assembled", "testSetSlotFindProperty", "return var myprop:int = 50;\r\n",
+                false);
+    }
+
+    @Test
+    public void testAssembledSwitchDefault() {
+        decompileMethod("assembled", "testSwitchDefault", "switch(5)\r\n"
+                + "{\r\n"
+                + "case 6:\r\n"
+                + "var _loc2_:int = 6;\r\n"
+                + "case 0:\r\n"
+                + "_loc2_ = 0;\r\n"
+                + "break;\r\n"
+                + "case 1:\r\n"
+                + "_loc2_ = 1;\r\n"
+                + "case 5:\r\n"
+                + "_loc2_ = 5;\r\n"
+                + "break;\r\n"
+                + "case 3:\r\n"
+                + "_loc2_ = 3;\r\n"
+                + "break;\r\n"
+                + "default:\r\n"
+                + "_loc2_ = 100;\r\n"
+                + "}\r\n",
                 false);
     }
 
