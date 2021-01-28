@@ -59,6 +59,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         Configuration.autoDeobfuscate.set(true);
         Configuration.decimalAddress.set(false);
         Configuration.decompilationTimeoutSingleMethod.set(Integer.MAX_VALUE);
+        Configuration.padAs3PCodeInstructionName.set(false);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")), false);
     }
 
@@ -240,14 +241,14 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "b:pushbyte 3\r\n");
         Assert.assertEquals(res, "getlocal0\r\n"
                 + "pushscope\r\n"
-                + "pushbyte            3\r\n"
-                + "pushbyte            4\r\n"
-                + "ifeq                ofs000e\r\n"
-                + "jump                ofs0010\r\n"
+                + "pushbyte 3\r\n"
+                + "pushbyte 4\r\n"
+                + "ifeq ofs000e\r\n"
+                + "jump ofs0010\r\n"
                 + "ofs000e:\r\n"
-                + "pushbyte            4\r\n"
+                + "pushbyte 4\r\n"
                 + "ofs0010:\r\n"
-                + "pushbyte            3\r\n"
+                + "pushbyte 3\r\n"
                 + "returnvoid\r\n");
     }
 

@@ -190,6 +190,10 @@ public final class Configuration {
     @ConfigurationInternal
     public static ConfigurationItem<Boolean> showOriginalBytesInPcodeHex = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> padAs3PCodeInstructionName = null;
+
     /**
      * Limit of code subs (for obfuscated code)
      */
