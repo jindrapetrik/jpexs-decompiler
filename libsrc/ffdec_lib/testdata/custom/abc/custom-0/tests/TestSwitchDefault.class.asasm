@@ -1,12 +1,12 @@
 class
- refid "tests:TestDup2"
- instance QName(PackageNamespace("tests"), "TestDup2")
+ refid "tests:TestSwitchDefault"
+ instance QName(PackageNamespace("tests"), "TestSwitchDefault")
   extends QName(PackageNamespace(""), "Object")
   flag SEALED
   flag PROTECTEDNS
-  protectedns ProtectedNamespace("tests:TestDup2")
+  protectedns ProtectedNamespace("tests:TestSwitchDefault")
   iinit
-   refid "tests:TestDup2/instance/init"
+   refid "tests:TestSwitchDefault/instance/init"
    body
     maxstack 1
     localcount 1
@@ -25,7 +25,7 @@ class
   end ; method
   trait method QName(PackageNamespace(""), "run")
    method
-    refid "tests:TestDup2/instance/run"
+    refid "tests:TestSwitchDefault/instance/run"
     returns QName(PackageNamespace(""), "void")
     body
      maxstack 2
@@ -35,14 +35,34 @@ class
      code
       getlocal0
       pushscope
-      getlocal3
-      getproperty         QName(PackageNamespace(""),"myprop")
-      dup
-      getlocal1
-      getproperty         MultinameL([PrivateNamespace("somens")])
-      swap
-      call                0
-      pop      
+
+      pushbyte 5
+      lookupswitch Ldef, [L0,L1,Ldef,L3,Ldef,L5,L6]    
+      Ldef:
+    pushbyte 100
+    setlocal2
+    jump Lbr
+L0:
+    pushbyte 0
+    setlocal2
+    jump Lbr
+L1:
+    pushbyte 1
+    setlocal2
+    jump L5
+L3:
+    pushbyte 3
+    setlocal2
+    jump Lbr
+L5:
+    pushbyte 5
+    setlocal2
+    jump Lbr
+L6:
+    pushbyte 6
+    setlocal2
+    jump L0
+Lbr:  
       returnvoid
      end ; code
     end ; body
@@ -50,7 +70,7 @@ class
   end ; trait
  end ; instance
  cinit
-  refid "tests:TestDup2/class/init"
+  refid "tests:TestSwitchDefault/class/init"
   body
    maxstack 1
    localcount 1

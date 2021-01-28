@@ -14,6 +14,6 @@ program
  #include "tests/TestDoubleDup.script.asasm"
  #include "tests/TestIncrement3.script.asasm"
  #include "tests/TestDup.script.asasm"
- #include "tests/TestDup2.script.asasm"
+ #include "tests/TestSwitchDefault.script.asasm"
  ; place to add next
 end ; program
