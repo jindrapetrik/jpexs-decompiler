@@ -451,6 +451,49 @@ public class Graph {
             }
         }
         return null;
+        /*
+       s
+        List<Set<GraphPart>> reachable = new ArrayList<>();
+        Set<GraphPart> allReachable = new LinkedHashSet<>();
+        for (GraphPart p : parts) {
+            LinkedHashSet<GraphPart> r1 = new LinkedHashSet<>();
+            getReachableParts(localData, p, r1, loops, gotoParts);
+            Set<GraphPart> r2 = new LinkedHashSet<>();
+            r2.add(p);
+            r2.addAll(r1);
+            reachable.add(r2);
+            allReachable.add(p);
+            allReachable.addAll(r1);
+        }
+        int maxCommonLevel = 0;
+        GraphPart maxCommonLevelPart = null;
+        Set<GraphPart> visited = new HashSet<>();
+        for (GraphPart p : allReachable) {
+            if (loopContinues.contains(p)) {
+                break;
+            }
+            if (visited.contains(p)) {
+                continue;
+            }
+            visited.add(p);
+            int commonLevel = 1;
+            for (Set<GraphPart> r : reachable) {
+                if (r.contains(p)) {
+                    commonLevel++;
+                }
+            }
+            //System.err.println("commonlevel of " + p + " is " + commonLevel);
+            if (commonLevel <= maxCommonLevel) {
+                continue;
+            }
+            maxCommonLevel = commonLevel;
+            maxCommonLevelPart = p;
+        }
+        //System.err.println("maxclevel = " + maxCommonLevel);
+        //System.err.println("maxclevelpart = " + maxCommonLevelPart);
+
+        return maxCommonLevelPart;
+         */
     }
 
     public GraphPart getNextNoJump(GraphPart part, BaseLocalData localData) {
@@ -2357,8 +2400,6 @@ public class Graph {
         if (parseNext) {
 
             if (part.nextParts.size() > 2) {
-                GraphPart next = getMostCommonPart(localData, part.nextParts, loops, new ArrayList<>());
-                List<GraphPart> vis = new ArrayList<>();
                 GraphTargetItem originalSwitchedItem = stack.pop();
                 makeAllCommands(currentRet, stack);
                 GraphTargetItem switchedItem = originalSwitchedItem;
@@ -2514,7 +2555,7 @@ public class Graph {
                 Reference<GraphTargetItem> tiRef = new Reference<>(null);
                 SwitchItem sw = handleSwitch(switchedItem, originalSwitchedItem.getSrc(), foundGotos, gotoTargets, partCodes, partCodePos, allParts, stack, stopPart, loops, localData, staticOperation, path,
                         caseValues, defaultPart, caseBodyParts, nextRef, tiRef);
-                next = nextRef.getVal();
+                GraphPart next = nextRef.getVal();
                 checkSwitch(localData, sw, caseExpressionOtherSides, currentRet);
                 currentRet.add(sw);
                 if (next != null) {
@@ -3241,6 +3282,7 @@ public class Graph {
             caseBodyParts.add(defaultPart);
         }
 
+        //gotoTargets
         GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops, new ArrayList<>());
         //removeEdgeToFromList(gotoTargets, breakPart);
 
