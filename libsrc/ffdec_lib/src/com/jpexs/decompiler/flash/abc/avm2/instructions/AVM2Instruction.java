@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
 import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSource;
@@ -380,8 +381,10 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
 
     public String toStringNoAddress(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         String s = definition.instructionName;
-        for (int i = s.length(); i < 19; i++) {
-            s += " ";
+        if (Configuration.padAs3PCodeInstructionName.get()) {
+            for (int i = s.length(); i < 19; i++) {
+                s += " ";
+            }
         }
         s += getParams(constants, fullyQualifiedNames) + getComment();
         return s.trim();
