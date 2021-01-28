@@ -54,6 +54,7 @@ import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.UniversalLoopItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
+import com.jpexs.decompiler.graph.precontinues.GraphPrecontinueDetector;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -577,11 +578,14 @@ public class Graph {
 
         //TODO: Make getPrecontinues faster
         getBackEdges(localData, loops, new ArrayList<>());
+
+        new GraphPrecontinueDetector().detectPrecontinues(heads, allParts, loops);
+
         //getPrecontinues(path, localData, null, heads.get(0), allParts, loops, null);
         //getPrecontinues2(path, localData, null, heads.get(0), allParts, loops, null);
         List<GraphPartEdge> gotoTargets = new ArrayList<>();
 
-        findGotoTargets(localData, path, heads.get(0), allParts, loops, gotoTargets);
+        //findGotoTargets(localData, path, heads.get(0), allParts, loops, gotoTargets);
 
         /*System.err.println("<loopspre>");
          for (Loop el : loops) {
@@ -2769,7 +2773,7 @@ public class Graph {
                         List<GraphTargetItem> finalComm = new ArrayList<>();
 
                         //findGotoTargets - comment this out:
-                        /*if (currentLoop.loopPreContinue != null) {
+                        if (currentLoop.loopPreContinue != null) {
                             GraphPart backup = currentLoop.loopPreContinue;
                             currentLoop.loopPreContinue = null;
                             List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
@@ -2777,7 +2781,7 @@ public class Graph {
                             finalComm = printGraph(foundGotos, gotoTargets, partCodes, partCodePos, visited, localData, new TranslateStack(path), allParts, null, backup, stopPart2, loops, null, staticOperation, path, recursionLevel + 1);
                             currentLoop.loopPreContinue = backup;
                             checkContinueAtTheEnd(finalComm, currentLoop);
-                        }*/
+                        }
                         if (currentLoop.precontinueCommands != null) {
                             finalComm.addAll(currentLoop.precontinueCommands);
                         }
