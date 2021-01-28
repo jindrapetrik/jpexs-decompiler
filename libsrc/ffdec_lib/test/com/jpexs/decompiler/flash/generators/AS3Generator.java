@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.ScopeStack;
+import com.jpexs.helpers.Helper;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -121,9 +122,7 @@ public class AS3Generator {
         useFile(s, new File("testdata/flashdevelop/bin/flashdevelop.swf"), "standard");
         useFile(s, new File("testdata/custom/bin/custom.swf"), "assembled");
 
-        try (PrintWriter pw = new PrintWriter("as3_teststub.java", Charset.forName("UTF-8"))) {
-            pw.println(s.toString());
-        }
+        Helper.writeFile("as3_teststub.java", s.toString().getBytes("UTF-8"));
         System.exit(0);
     }
 }
