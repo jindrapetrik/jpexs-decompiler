@@ -12,7 +12,6 @@
     <movie minorVersion="0" />
     <movie platform="Flash Player" />
     <movie background="#FFFFFF" />
-    <movie preferredSDK="AIR 33.1.1;33.1.1;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
@@ -28,7 +27,7 @@
     <option inline="False" />
     <option locale="" />
     <option loadConfig="" />
-    <option optimize="True" />
+    <option optimize="False" />
     <option omitTraces="False" />
     <option showActionScriptWarnings="True" />
     <option showBindingWarnings="True" />

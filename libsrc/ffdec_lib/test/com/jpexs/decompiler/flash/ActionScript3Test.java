@@ -147,15 +147,14 @@ public class ActionScript3Test extends ActionScriptTestBase {
     @DataProvider
     private Object[][] standardSwfNamesProvider() {
         return new Object[][]{
-            {"standard"},
- //{"standard_asc2"}
+            {"standard"}, //{"standard_asc2"}
         };
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
     public void testStandardArguments(String swfUsed) {
         decompileMethod(swfUsed, "testArguments", "return arguments[0];\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -174,7 +173,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"infinally\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -194,7 +193,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"ch\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -207,7 +206,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "var e:TestClass2 = TestClass2.createMe(\"test\");\r\n"
                 + "e.attrib1 = e.attrib2 = e.attrib3 = this.getCounter();\r\n"
                 + "this.traceIt(e.toString());\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -215,7 +214,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
         decompileMethod(swfUsed, "testComplexExpressions", "var i:int = 0;\r\n"
                 + "var j:int = 0;\r\n"
                 + "j = i = i + (i = i + i++);\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -271,16 +270,15 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "continue loop1;\r\n"
                 + "}\r\n"
-                + "if(e == 8)\r\n"
+                + "if(e != 8)\r\n"
                 + "{\r\n"
-                + "continue;\r\n"
-                + "}\r\n"
                 + "break loop1;\r\n"
+                + "}\r\n"
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"hello\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -296,7 +294,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "}\r\n"
                 + "k = 7;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -316,7 +314,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "vnumber = 0.5;\r\n"
                 + "vnumber = 6;\r\n"
                 + "vobject = vclass;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -334,7 +332,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"4\");\r\n"
                 + "}\r\n"
                 + "trace(\"after switch\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -346,7 +344,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "a++;\r\n"
                 + "}\r\n"
                 + "while(a < 20);\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -367,7 +365,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "while(k < 9);\r\n"
                 + "return 2;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -388,7 +386,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "arr[0]();\r\n"
                 + "}\r\n"
                 + "return i == 0;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -410,7 +408,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "return \"hu\" + str;\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -419,7 +417,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"a=\" + a);\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -444,7 +442,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"D\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -457,7 +455,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"hello:\" + a);\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -485,7 +483,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"part5\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -500,7 +498,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"item #\" + item);\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -517,7 +515,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"item #\" + test[0]);\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -531,7 +529,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"item #\" + this.testPriv);\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -556,7 +554,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"C\");\r\n"
                 + "}\r\n"
                 + "trace(\"exit\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -571,7 +569,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(item);\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -604,7 +602,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"C\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -636,7 +634,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"after\");\r\n"
                 + "}\r\n"
                 + "return 89;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -660,7 +658,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"E\");\r\n"
                 + "}\r\n"
                 + "return 5;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -687,7 +685,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"C\");\r\n"
                 + "}\r\n"
                 + "trace(\"return\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -708,7 +706,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"return\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -732,7 +730,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "j++;\r\n"
                 + "}\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -757,7 +755,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"D\");\r\n"
                 + "}\r\n"
                 + "trace(\"finish\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -786,13 +784,13 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"before loop end\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
     public void testStandardHello(String swfUsed) {
         decompileMethod(swfUsed, "testHello", "trace(\"hello\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -802,7 +800,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"onTrue\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -816,7 +814,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"onFalse\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -840,7 +838,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"C\");\r\n"
                 + "return 7;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -853,7 +851,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "b++;\r\n"
                 + "var c:* = 1;\r\n"
                 + "b = c++;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -892,7 +890,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "chars[index++] = 5;\r\n"
                 + "trace(\"arr[++e]\");\r\n"
                 + "chars[++index] = 5;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -914,7 +912,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "return first;\r\n"
                 + "};\r\n"
                 + "traceParameter(\"hello\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -930,7 +928,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "s = 8;\r\n"
                 + "}\r\n"
                 + "innerFunc(a);\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -957,7 +955,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"b!=7\");\r\n"
                 + "}\r\n"
                 + "trace(\"end\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -982,7 +980,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"finally block\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -996,14 +994,14 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "b = true;\r\n"
                 + "}\r\n"
                 + "b = (i == 0 || i == 1) && j == 0;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
     public void testStandardManualConvert(String swfUsed) {
         decompileMethod(swfUsed, "testManualConvert", "trace(\"String(this).length\");\r\n"
                 + "trace(String(this).length);\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1020,7 +1018,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "default:\r\n"
                 + "jj = 3;\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1036,7 +1034,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"onFalse\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1045,7 +1043,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "return (param1 as TestClass2).attrib1 == 5;\r\n"
                 + "};\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1056,19 +1054,19 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "var b:* = ns::[name];\r\n"
                 + "trace(b.c);\r\n"
                 + "var c:* = myInternal::neco;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
     public void testStandardParamNames(String swfUsed) {
         decompileMethod(swfUsed, "testParamNames", "return firstp + secondp + thirdp;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
     public void testStandardParamsCount(String swfUsed) {
         decompileMethod(swfUsed, "testParamsCount", "return firstp;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1085,7 +1083,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "a = 1 * 2 * 3;\r\n"
                 + "a = 1 * 2 / 3;\r\n"
                 + "trace(\"a=\" + a);\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1095,7 +1093,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "var c:* = 3;\r\n"
                 + "var d:* = a << (b >>> c);\r\n"
                 + "var e:* = a << b >>> c;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1106,7 +1104,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "d.method(d.attrib * 5);\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1115,14 +1113,14 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "var a2:* = /[a-z\\r\\n0-9\\\\]+/i;\r\n"
                 + "var b1:* = /[0-9AB]+/;\r\n"
                 + "var b2:* = /[0-9AB]+/;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
     public void testStandardRest(String swfUsed) {
         decompileMethod(swfUsed, "testRest", "trace(\"firstRest:\" + restval[0]);\r\n"
                 + "return firstp;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1132,7 +1130,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"is eight\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1141,7 +1139,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "this.traceIt(\"hello\" + 5 * 6);\r\n"
                 + "this.traceIt(\"hello\" + (k - 1));\r\n"
                 + "this.traceIt(\"hello\" + 5 + 6);\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1151,7 +1149,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"backslash: \\\\ \");\r\n"
                 + "trace(\"single quotes: \\'hello!\\'\");\r\n"
                 + "trace(\"new line \\r\\n hello!\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1170,7 +1168,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "case 89:\r\n"
                 + "trace(\"eightynine\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1187,7 +1185,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "case TestSwitchComma.X, \"C\":\r\n"
                 + "trace(\"is C\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1209,7 +1207,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "default:\r\n"
                 + "trace(\"default clause\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1220,7 +1218,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "var d:* = 78;\r\n"
                 + "var e:* = a == b?c == d?1:7:3;\r\n"
                 + "trace(\"e=\" + e);\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1245,7 +1243,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"Finally part\");\r\n"
                 + "}\r\n"
                 + "trace(\"end\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1273,7 +1271,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "}\r\n"
                 + "return 4;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1316,7 +1314,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"after\");\r\n"
                 + "return \"X\";\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1350,7 +1348,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"after\");\r\n"
                 + "return \"X\";\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1361,14 +1359,14 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "var a:int = 5;\r\n"
                 + "v[a * 8 - 39] = \"hi2\";\r\n"
                 + "trace(v[0]);\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
     public void testStandardVector2(String swfUsed) {
         decompileMethod(swfUsed, "testVector2", "var a:Vector.<Vector.<int>> = new Vector.<Vector.<int>>();\r\n"
                 + "var b:Vector.<int> = new <int>[10,20,30];\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1382,7 +1380,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "a = 7;\r\n"
                 + "b = 9;\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1404,7 +1402,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"hello2\");\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1427,7 +1425,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "continue;\r\n"
                 + "}\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1453,7 +1451,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"after_try\");\r\n"
                 + "}\r\n"
                 + "trace(\"end\");\r\n",
-                 false);
+                false);
     }
 
     @Test(dataProvider = "standardSwfNamesProvider")
@@ -1569,20 +1567,20 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "]]>\r\n"
                 + "</script>;\r\n",
-                 false);
+                false);
     }
 
     @Test
     public void testAssembledDoubleDup() {
         decompileMethod("assembled", "testDoubleDup", "var _loc10_:Rectangle = myprop(_loc5_);\r\n"
                 + "_loc10_.mymethod(-_loc10_.width,-_loc10_.height);\r\n",
-                 false);
+                false);
     }
 
     @Test
     public void testAssembledDup() {
         decompileMethod("assembled", "testDup", "return 1 - (var _loc1_:Number = 1 - _loc1_ / _loc4_) * _loc1_;\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -1593,7 +1591,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(_loc2_);\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -1609,7 +1607,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "}\r\n"
                 + "_loc3_ = 0;\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -1618,14 +1616,14 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "_loc6_.methodname(_loc1_,_loc2_,_loc5_);\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test
     public void testAssembledIncrement() {
         decompileMethod("assembled", "testIncrement", "super();\r\n"
                 + "b = a++;\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -1634,13 +1632,13 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "somemethod();\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test
     public void testAssembledIncrement3() {
         decompileMethod("assembled", "testIncrement3", "_loc1_.length--;\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -1648,13 +1646,13 @@ public class ActionScript3Test extends ActionScriptTestBase {
         decompileMethod("assembled", "testSetSlotDup", "var _loc5_:int = 5;\r\n"
                 + "myname.somemethod(\"okay\",myslot = _loc5_);\r\n"
                 + "myname.start();\r\n",
-                 false);
+                false);
     }
 
     @Test
     public void testAssembledSetSlotFindProperty() {
         decompileMethod("assembled", "testSetSlotFindProperty", "return var myprop:int = 50;\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -1675,7 +1673,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "_loc2_ = \"C\";\r\n"
                 + "}\r\n"
                 + "_loc2_ = \"after\";\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -1698,7 +1696,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "default:\r\n"
                 + "_loc2_ = 100;\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test

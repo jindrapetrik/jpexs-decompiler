@@ -289,6 +289,9 @@ public class Graph {
         for (Loop l : loops) {
             if (l.phase == 1) {
                 loopContinues.add(l.loopContinue);
+                if (l.loopPreContinue != null) {
+                    loopContinues.add(l.loopPreContinue);
+                }
             }
         }
 
@@ -327,6 +330,9 @@ public class Graph {
                 }
             }
             if (common) {
+                if (loopContinues.contains(p)) {
+                    return null;
+                }
                 return p;
             }
         }
@@ -889,9 +895,20 @@ public class Graph {
                 }
 
                 if ((!onTrue.isEmpty()) && (!onFalse.isEmpty())) {
-                    if (onFalse.get(onFalse.size() - 1) instanceof ExitItem) {
+                    if ((onFalse.get(onFalse.size() - 1) instanceof ExitItem) || (onFalse.get(onFalse.size() - 1) instanceof BreakItem)) {
                         if (onTrue.get(onTrue.size() - 1) instanceof ContinueItem) {
                             list.add(i + 1, onTrue.remove(onTrue.size() - 1));
+                        }
+                    }
+                }
+
+                if (i < list.size() - 1) {
+                    if ((list.get(i + 1) instanceof BreakItem) && onFalse.isEmpty()) {
+                        if (!onTrue.isEmpty() && (onTrue.get(onTrue.size() - 1) instanceof ContinueItem)) {
+                            ifi.expression = ifi.expression.invert(null);
+                            list.addAll(i + 2, ifi.onTrue);
+                            ifi.onTrue.clear();
+                            ifi.onTrue.add(list.remove(i + 1));
                         }
                     }
                 }
