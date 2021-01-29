@@ -276,64 +276,7 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    protected List<GraphPart> checkPrecoNextParts(GraphPart part) {
-        List<GraphSourceItem> items = getPartItems(part);
-        part = makeMultiPart(part);
-        if (items.size() > 1) {
-            if (items.get(items.size() - 1) instanceof ActionIf) {
-                if (items.get(items.size() - 2) instanceof ActionStrictEquals) {
-                    List<Integer> storeRegisters = new ArrayList<>();
-                    for (GraphSourceItem s : items) {
-                        if (s instanceof ActionStoreRegister) {
-                            ActionStoreRegister sr = (ActionStoreRegister) s;
-                            storeRegisters.add(sr.registerNumber);
-                        }
-                    }
-                    if (!storeRegisters.isEmpty()) {
-                        List<GraphPart> caseBodies = new ArrayList<>();
-                        boolean proceed;
-                        do {
-                            proceed = false;
-                            caseBodies.add(part.nextParts.get(0)); //jump
-                            part = part.nextParts.get(1); //nojump
-                            items = getPartItems(part);
-                            part = makeMultiPart(part);
-                            if (!items.isEmpty()) {
-                                if (items.get(0) instanceof ActionPush) {
-                                    ActionPush pu = (ActionPush) items.get(0);
-                                    if (!pu.values.isEmpty()) {
-                                        if (pu.values.get(0) instanceof RegisterNumber) {
-                                            RegisterNumber rn = (RegisterNumber) pu.values.get(0);
-                                            if (storeRegisters.contains(rn.number)) {
-                                                storeRegisters.clear();
-                                                storeRegisters.add(rn.number);
-                                                if (items.get(items.size() - 1) instanceof ActionIf) {
-                                                    if (items.size() > 1) {
-                                                        if (items.get(items.size() - 2) instanceof ActionStrictEquals) {
-                                                            proceed = true;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        } while (proceed);
-
-                        if (caseBodies.size() > 1) {
-                            caseBodies.add(part); //TODO: properly detect default clause (?)
-                            return caseBodies;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    protected List<GraphTargetItem> check(List<GotoItem> foundGotos, List<GraphPartEdge> gotoTargets, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> check(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         if (!output.isEmpty()) {
             if (output.get(output.size() - 1) instanceof StoreRegisterActionItem) {
                 StoreRegisterActionItem str = (StoreRegisterActionItem) output.get(output.size() - 1);
@@ -422,7 +365,7 @@ public class ActionGraph extends Graph {
                      */
                     //must go backwards to hit case 2, not case 1
                     for (int i = caseBodyParts.size() - 1; i >= 0; i--) {
-                        if (caseBodyParts.get(i).leadsTo(localData, this, code, defaultPart, loops, new ArrayList<>())) {
+                        if (caseBodyParts.get(i).leadsTo(localData, this, code, defaultPart, loops)) {
                             DefaultItem di = new DefaultItem();
                             caseValuesMap.add(i + 1, di);
                             caseBodyParts.add(i + 1, defaultPart);
@@ -443,7 +386,7 @@ public class ActionGraph extends Graph {
                         trace("2");                    
                      */
                     for (int i = 0; i < caseBodyParts.size(); i++) {
-                        if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops, new ArrayList<>())) {
+                        if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops)) {
                             DefaultItem di = new DefaultItem();
                             caseValuesMap.add(i, di);
                             caseBodyParts.add(i, defaultPart);
@@ -466,7 +409,7 @@ public class ActionGraph extends Graph {
                     caseBodyParts.add(defaultPart);
                 }
 
-                GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops, new ArrayList<>());
+                GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops);
                 //removeEdgeToFromList(gotoTargets, breakPart);
                 List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
                 GraphPart next = breakPart;
@@ -493,7 +436,7 @@ public class ActionGraph extends Graph {
                     GraphPart nextCase = next;
                     if (next != null) {
                         if (i < caseBodies.size() - 1) {
-                            if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops, new ArrayList<>())) {
+                            if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops)) {
                                 currentCaseCommands.add(new BreakItem(null, localData.lineStartInstruction, currentLoop.id));
                             } else {
                                 nextCase = caseBodies.get(i + 1);
@@ -509,7 +452,7 @@ public class ActionGraph extends Graph {
                     if (breakPart != null) {
                         stopPart2x.add(breakPart);
                     }
-                    currentCaseCommands.addAll(0, printGraph(foundGotos, gotoTargets, partCodes, partCodePos, localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops, staticOperation, path));
+                    currentCaseCommands.addAll(0, printGraph(foundGotos, partCodes, partCodePos, localData, stack, allParts, null, caseBodies.get(i), stopPart2x, loops, staticOperation, path));
                     if (currentCaseCommands.size() >= 2) {
                         if (currentCaseCommands.get(currentCaseCommands.size() - 1) instanceof BreakItem) {
                             if ((currentCaseCommands.get(currentCaseCommands.size() - 2) instanceof ContinueItem) || (currentCaseCommands.get(currentCaseCommands.size() - 2) instanceof BreakItem)) {
@@ -562,7 +505,7 @@ public class ActionGraph extends Graph {
                     if (ti != null) {
                         ret.add(ti);
                     } else {
-                        ret.addAll(printGraph(foundGotos, gotoTargets, partCodes, partCodePos, localData, stack, allParts, null, next, stopPart, loops, staticOperation, path));
+                        ret.addAll(printGraph(foundGotos, partCodes, partCodePos, localData, stack, allParts, null, next, stopPart, loops, staticOperation, path));
                     }
                 }
             }
