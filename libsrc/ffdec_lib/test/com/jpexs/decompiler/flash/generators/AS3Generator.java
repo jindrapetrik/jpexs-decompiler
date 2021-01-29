@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.generators;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -76,11 +77,21 @@ public class AS3Generator {
                             continue;
                         }
                         if (name.equals("run")) {
-                            s.append("@Test\r\npublic void ");
+                            if (identifier.equals("standard")) {
+                                s.append("@Test(dataProvider = \"standardSwfNamesProvider\")\r\n");
+                            } else {
+                                s.append("@Test\r\n");
+                            }
+                            s.append("public void ");
                             s.append(testMethodName);
-                            s.append("(){\r\ndecompileMethod(\"");
-                            s.append(identifier);
-                            s.append("\",\"");
+                            if (identifier.equals("standard")) {
+                                s.append("(String swfUsed){\r\ndecompileMethod(swfUsed");
+                            } else {
+                                s.append("(){\r\ndecompileMethod(\"");
+                                s.append(identifier);
+                                s.append("\"");
+                            }
+                            s.append(",\"");
                             s.append(lower);
                             s.append("\", ");
                             HighlightedTextWriter src = new HighlightedTextWriter(new CodeFormatting(), false);
