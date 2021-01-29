@@ -28,7 +28,7 @@
     <option inline="False" />
     <option locale="" />
     <option loadConfig="" />
-    <option optimize="False" />
+    <option optimize="True" />
     <option omitTraces="False" />
     <option showActionScriptWarnings="True" />
     <option showBindingWarnings="True" />
