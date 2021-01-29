@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -80,6 +81,7 @@ import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -716,11 +718,14 @@ public class AVM2Graph extends Graph {
                 }
             }
 
+            List<GraphTargetItem> otherSide = new ArrayList<>();
             if (leftReg > 0) {
                 switchedObject = new LocalRegAVM2Item(null, null, leftReg, null);
                 caseValuesMap = caseValuesMapRight;
+                otherSide = caseValuesMapLeft;
             } else if (rightReg > 0) {
                 switchedObject = new LocalRegAVM2Item(null, null, rightReg, null);
+                otherSide = caseValuesMapRight;
             }
 
             if ((leftReg < 0 && rightReg < 0) || (cnt == 1)) {
@@ -737,7 +742,9 @@ public class AVM2Graph extends Graph {
                 ret.addAll(output);
                 Reference<GraphPart> nextRef = new Reference<>(null);
                 Reference<GraphTargetItem> tiRef = new Reference<>(null);
-                ret.add(handleSwitch(switchedObject, switchStartItem, foundGotos, partCodes, partCodePos, allParts, stack, stopPart, loops, localData, staticOperation, path, caseValuesMap, defaultPart, caseBodyParts, nextRef, tiRef));
+                SwitchItem sw = handleSwitch(switchedObject, switchStartItem, foundGotos, partCodes, partCodePos, allParts, stack, stopPart, loops, localData, staticOperation, path, caseValuesMap, defaultPart, caseBodyParts, nextRef, tiRef);
+                checkSwitch(localData, sw, otherSide, ret);
+                ret.add(sw);
                 if (nextRef.getVal() != null) {
                     if (tiRef.getVal() != null) {
                         ret.add(tiRef.getVal());
@@ -1203,7 +1210,7 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected void checkSwitch(BaseLocalData localData, SwitchItem switchItem, Map<Integer, GraphTargetItem> otherSides, List<GraphTargetItem> output) {
+    protected void checkSwitch(BaseLocalData localData, SwitchItem switchItem, Collection<? extends GraphTargetItem> otherSides, List<GraphTargetItem> output) {
         if (output.isEmpty()) {
             return;
         }
@@ -1215,7 +1222,7 @@ public class AVM2Graph extends Graph {
         int setLocalIp = InstructionDefinition.getItemIp(avm2LocalData, setLocal);;
         Set<Integer> allUsages = new HashSet<>(avm2LocalData.getSetLocalUsages(setLocalIp));
         boolean isOtherSideReg = false;
-        for (GraphTargetItem otherSide : otherSides.values()) {
+        for (GraphTargetItem otherSide : otherSides) {
             if (otherSide instanceof LocalRegAVM2Item) {
                 LocalRegAVM2Item otherLog = (LocalRegAVM2Item) otherSide;
                 if (otherLog.regIndex != setLocal.regIndex) {

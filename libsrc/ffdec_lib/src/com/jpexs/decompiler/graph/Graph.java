@@ -1567,6 +1567,10 @@ public class Graph {
             parts = ((GraphPartMulti) part).parts;
         } else {
             parts.add(part);
+            while (part.nextParts.size() == 1 && part.nextParts.get(0).refs.size() == 1) {
+                part = part.nextParts.get(0);
+                parts.add(part);
+            }
         }
         for (GraphPart p : parts) {
             int end = p.end;
@@ -1750,7 +1754,7 @@ public class Graph {
                 SwitchItem sw = handleSwitch(switchedItem, originalSwitchedItem.getSrc(), foundGotos, partCodes, partCodePos, allParts, stack, stopPart, loops, localData, staticOperation, path,
                         caseValues, defaultPart, caseBodyParts, nextRef, tiRef);
                 GraphPart next = nextRef.getVal();
-                checkSwitch(localData, sw, caseExpressionOtherSides, currentRet);
+                checkSwitch(localData, sw, caseExpressionOtherSides.values(), currentRet);
                 currentRet.add(sw);
                 if (next != null) {
                     if (tiRef.getVal() != null) {
@@ -2119,7 +2123,7 @@ public class Graph {
         return ret;
     }
 
-    protected void checkSwitch(BaseLocalData localData, SwitchItem switchItem, Map<Integer, GraphTargetItem> otherSides, List<GraphTargetItem> output) {
+    protected void checkSwitch(BaseLocalData localData, SwitchItem switchItem, Collection<? extends GraphTargetItem> otherSides, List<GraphTargetItem> output) {
 
     }
 
