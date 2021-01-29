@@ -26,8 +26,8 @@ import java.util.List;
  * @author JPEXS
  */
 public class Node {
-    public List<Node> next = new NonNullList<>();
-    public List<Node> prev = new NonNullList<Node>();
+    public List<Node> next = new ArrayList<>();
+    public List<Node> prev = new ArrayList<Node>();
     public GraphPart graphPart;
     private static int CURRENT_ID = 0;
     private int id;

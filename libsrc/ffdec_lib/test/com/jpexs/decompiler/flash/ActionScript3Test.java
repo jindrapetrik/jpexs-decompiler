@@ -251,10 +251,8 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "for(d = 0; d < 25; d++)\r\n"
                 + "{\r\n"
                 + "e = 0;\r\n"
-                + "if(e >= 50)\r\n"
+                + "if(e < 50)\r\n"
                 + "{\r\n"
-                + "continue;\r\n"
-                + "}\r\n"
                 + "if(e == 9)\r\n"
                 + "{\r\n"
                 + "break;\r\n"
@@ -268,6 +266,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "continue;\r\n"
                 + "}\r\n"
                 + "break loop1;\r\n"
+                + "}\r\n"
                 + "}\r\n"
                 + "trace(\"hello\");\r\n"
                 + "}\r\n",
@@ -1655,6 +1654,27 @@ public class ActionScript3Test extends ActionScriptTestBase {
     @Test
     public void testAssembledSetSlotFindProperty() {
         decompileMethod("assembled", "testSetSlotFindProperty", "return var myprop:int = 50;\r\n",
+                false);
+    }
+
+    @Test
+    public void testAssembledSwitch() {
+        decompileMethod("assembled", "testSwitch", "switch(int(somevar))\r\n"
+                + "{\r\n"
+                + "case 0:\r\n"
+                + "var _loc2_:String = \"X\";\r\n"
+                + "return;\r\n"
+                + "break;\r\n"
+                + "case 1:\r\n"
+                + "_loc2_ = \"A\";\r\n"
+                + "break;\r\n"
+                + "case 3:\r\n"
+                + "_loc2_ = \"B\";\r\n"
+                + "break;\r\n"
+                + "case 4:\r\n"
+                + "_loc2_ = \"C\";\r\n"
+                + "}\r\n"
+                + "_loc2_ = \"after\";\r\n",
                 false);
     }
 

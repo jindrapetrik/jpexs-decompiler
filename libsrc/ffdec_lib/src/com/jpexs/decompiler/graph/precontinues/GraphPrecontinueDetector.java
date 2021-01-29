@@ -29,9 +29,17 @@ import java.util.Set;
 
 /**
  *
+ * Detects "precontinues" in Graph. A precontinue is target of continue
+ * statement in a for loop. For loop in this case has single backedge.
+ * Precontinue is predeccessor of loops backedge. Precontinue can have branches
+ * in it (and in some special cases like xml .() operator a while too). This
+ * class tries to simplify graph up to the level that precontinue is a single
+ * node.
+ *
  * @author JPEXS
  */
 public class GraphPrecontinueDetector {
+
     public void detectPrecontinues(List<GraphPart> heads, Set<GraphPart> allParts, List<Loop> loops) {
         boolean isSomethingTodo = false;
         for (Loop el : loops) {
@@ -106,7 +114,12 @@ public class GraphPrecontinueDetector {
         //printGraph(headNodes);
     }
 
-    private void printGraph(List<Node> headNodes) {
+    /**
+     * Converts node graph to graphviz for easily display.
+     *
+     * @param headNodes
+     */
+    public void printGraph(List<Node> headNodes) {
         Set<Node> allNodes = new LinkedHashSet<>();
         for (Node headNode : headNodes) {
             populateNodes(headNode, allNodes);
@@ -196,7 +209,7 @@ public class GraphPrecontinueDetector {
             whileNode.graphPart = node.graphPart;
             whileNode.body = bodyNode;
             whileNode.body.removeFromGraph();
-            whileNode.prev = new NonNullList<>(node.prev);
+            whileNode.prev = new ArrayList<>(node.prev);
             node.replacePrevs(whileNode);
             node.replaceNexts(whileNode);
             whileNode.next.add(breakNode);
@@ -204,7 +217,8 @@ public class GraphPrecontinueDetector {
             numWhile.setVal(numWhile.getVal() + 1);
         }
 
-        for (Node n : result.next) {
+        List<Node> nexts = new ArrayList<>(result.next);
+        for (Node n : nexts) {
             handleWhile(n, visited, numWhile);
         }
         return result;
@@ -231,8 +245,8 @@ public class GraphPrecontinueDetector {
             JoinedNode joinedNode = new JoinedNode();
             joinedNode.graphPart = node.graphPart;
             joinedNode.nodes = nodeList;
-            joinedNode.next = new NonNullList<>(currentNode.next);
-            joinedNode.prev = new NonNullList<>(node.prev);
+            joinedNode.next = new ArrayList<>(currentNode.next);
+            joinedNode.prev = new ArrayList<>(node.prev);
             node.replacePrevs(joinedNode);
             currentNode.replaceNexts(joinedNode);
             for (Node n : nodeList) {
@@ -243,7 +257,8 @@ public class GraphPrecontinueDetector {
             numJoined.setVal(numJoined.getVal() + 1);
         }
 
-        for (Node n : result.next) {
+        List<Node> nexts = new ArrayList<>(result.next);
+        for (Node n : nexts) {
             joinNodes(n, visited, numJoined);
         }
 
@@ -270,7 +285,7 @@ public class GraphPrecontinueDetector {
             ifNode.onTrue.removeFromGraph();
             ifNode.onFalse = null;
             ifNode.graphPart = node.graphPart;
-            ifNode.prev = new NonNullList<>(node.prev);
+            ifNode.prev = new ArrayList<>(node.prev);
             node.replacePrevs(ifNode);
             Node after = node.next.get(1);
             node.removeFromGraph();
@@ -300,7 +315,7 @@ public class GraphPrecontinueDetector {
             ifNode.onFalse.parentNode = ifNode;
             ifNode.onFalse.removeFromGraph();
             ifNode.graphPart = node.graphPart;
-            ifNode.prev = new NonNullList<>(node.prev);
+            ifNode.prev = new ArrayList<>(node.prev);
             node.replacePrevs(ifNode);
             Node after = node.next.get(0);
             node.removeFromGraph();
@@ -331,7 +346,7 @@ public class GraphPrecontinueDetector {
             ifNode.onFalse.parentNode = ifNode;
             ifNode.onFalse.removeFromGraph();
             ifNode.graphPart = node.graphPart;
-            ifNode.prev = new NonNullList<>(node.prev);
+            ifNode.prev = new ArrayList<>(node.prev);
             node.replacePrevs(ifNode);
             Node after = node.next.get(0).next.get(0);
             node.removeFromGraph();
