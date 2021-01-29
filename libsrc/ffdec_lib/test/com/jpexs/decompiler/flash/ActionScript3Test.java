@@ -43,6 +43,7 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -56,7 +57,8 @@ public class ActionScript3Test extends ActionScriptTestBase {
     @BeforeClass
     public void init() throws IOException, InterruptedException {
         //Main.initLogging(false);
-        swfMap.put("standard", new SWF(new BufferedInputStream(new FileInputStream("testdata/flashdevelop/bin/flashdevelop.swf")), false));
+        swfMap.put("standard", new SWF(new BufferedInputStream(new FileInputStream("testdata/flashdevelop/bin/flashdevelop_flex.swf")), false));
+        swfMap.put("standard_asc2", new SWF(new BufferedInputStream(new FileInputStream("testdata/flashdevelop/bin/flashdevelop_asc2.swf")), false));
         swfMap.put("assembled", new SWF(new BufferedInputStream(new FileInputStream("testdata/custom/bin/custom.swf")), false));
         Configuration.autoDeobfuscate.set(false);
         Configuration.simplifyExpressions.set(false);
@@ -142,15 +144,23 @@ public class ActionScript3Test extends ActionScriptTestBase {
         assertEquals(actualResult, expectedResult);
     }
 
-    @Test
-    public void testStandardArguments() {
-        decompileMethod("standard", "testArguments", "return arguments[0];\r\n",
-                false);
+    @DataProvider
+    private Object[][] standardSwfNamesProvider() {
+        return new Object[][]{
+            {"standard"},
+            {"standard_asc2"}
+        };
     }
 
-    @Test
-    public void testStandardCatchFinally() {
-        decompileMethod("standard", "testCatchFinally", "var a:* = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardArguments(String swfUsed) {
+        decompileMethod(swfUsed, "testArguments", "return arguments[0];\r\n",
+                 false);
+    }
+
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardCatchFinally(String swfUsed) {
+        decompileMethod(swfUsed, "testCatchFinally", "var a:* = 5;\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "a = 9;\r\n"
@@ -164,12 +174,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"infinally\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardChain2() {
-        decompileMethod("standard", "testChain2", "var g:Array = null;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardChain2(String swfUsed) {
+        decompileMethod(swfUsed, "testChain2", "var g:Array = null;\r\n"
                 + "var h:Boolean = false;\r\n"
                 + "var extraLine:Boolean = false;\r\n"
                 + "var r:int = 7;\r\n"
@@ -184,12 +194,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"ch\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardChainedAssignments() {
-        decompileMethod("standard", "testChainedAssignments", "var a:int = 0;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardChainedAssignments(String swfUsed) {
+        decompileMethod(swfUsed, "testChainedAssignments", "var a:int = 0;\r\n"
                 + "var b:int = 0;\r\n"
                 + "var c:int = 0;\r\n"
                 + "var d:int = 0;\r\n"
@@ -197,20 +207,20 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "var e:TestClass2 = TestClass2.createMe(\"test\");\r\n"
                 + "e.attrib1 = e.attrib2 = e.attrib3 = this.getCounter();\r\n"
                 + "this.traceIt(e.toString());\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardComplexExpressions() {
-        decompileMethod("standard", "testComplexExpressions", "var i:int = 0;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardComplexExpressions(String swfUsed) {
+        decompileMethod(swfUsed, "testComplexExpressions", "var i:int = 0;\r\n"
                 + "var j:int = 0;\r\n"
                 + "j = i = i + (i = i + i++);\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardContinueLevels() {
-        decompileMethod("standard", "testContinueLevels", "var b:* = undefined;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardContinueLevels(String swfUsed) {
+        decompileMethod(swfUsed, "testContinueLevels", "var b:* = undefined;\r\n"
                 + "var c:* = undefined;\r\n"
                 + "var d:* = undefined;\r\n"
                 + "var e:* = undefined;\r\n"
@@ -270,12 +280,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"hello\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardDecl2() {
-        decompileMethod("standard", "testDecl2", "var k:int = 0;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardDecl2(String swfUsed) {
+        decompileMethod(swfUsed, "testDecl2", "var k:int = 0;\r\n"
                 + "var i:int = 5;\r\n"
                 + "i = i + 7;\r\n"
                 + "if(i == 5)\r\n"
@@ -286,12 +296,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "}\r\n"
                 + "k = 7;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardDeclarations() {
-        decompileMethod("standard", "testDeclarations", "var vall:* = undefined;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardDeclarations(String swfUsed) {
+        decompileMethod(swfUsed, "testDeclarations", "var vall:* = undefined;\r\n"
                 + "var vstr:String = null;\r\n"
                 + "var vint:int = 0;\r\n"
                 + "var vuint:uint = 0;\r\n"
@@ -306,12 +316,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "vnumber = 0.5;\r\n"
                 + "vnumber = 6;\r\n"
                 + "vobject = vclass;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardDefaultNotLastGrouped() {
-        decompileMethod("standard", "testDefaultNotLastGrouped", "var k:* = 10;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardDefaultNotLastGrouped(String swfUsed) {
+        decompileMethod(swfUsed, "testDefaultNotLastGrouped", "var k:* = 10;\r\n"
                 + "switch(k)\r\n"
                 + "{\r\n"
                 + "case \"six\":\r\n"
@@ -324,24 +334,24 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"4\");\r\n"
                 + "}\r\n"
                 + "trace(\"after switch\");\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardDoWhile() {
-        decompileMethod("standard", "testDoWhile", "var a:* = 8;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardDoWhile(String swfUsed) {
+        decompileMethod(swfUsed, "testDoWhile", "var a:* = 8;\r\n"
                 + "do\r\n"
                 + "{\r\n"
                 + "trace(\"a=\" + a);\r\n"
                 + "a++;\r\n"
                 + "}\r\n"
                 + "while(a < 20);\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardDoWhile2() {
-        decompileMethod("standard", "testDoWhile2", "var k:int = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardDoWhile2(String swfUsed) {
+        decompileMethod(swfUsed, "testDoWhile2", "var k:int = 5;\r\n"
                 + "do\r\n"
                 + "{\r\n"
                 + "k++;\r\n"
@@ -357,12 +367,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "while(k < 9);\r\n"
                 + "return 2;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardExpressions() {
-        decompileMethod("standard", "testExpressions", "var arr:Array = null;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardExpressions(String swfUsed) {
+        decompileMethod(swfUsed, "testExpressions", "var arr:Array = null;\r\n"
                 + "var i:int = 5;\r\n"
                 + "var j:int = 5;\r\n"
                 + "if((i = i = i / 2) == 1 || i == 2)\r\n"
@@ -378,12 +388,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "arr[0]();\r\n"
                 + "}\r\n"
                 + "return i == 0;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardFinallyZeroJump() {
-        decompileMethod("standard", "testFinallyZeroJump", "var str:String = param1;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardFinallyZeroJump(String swfUsed) {
+        decompileMethod(swfUsed, "testFinallyZeroJump", "var str:String = param1;\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "}\r\n"
@@ -400,21 +410,21 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "return \"hu\" + str;\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardFor() {
-        decompileMethod("standard", "testFor", "for(var a:* = 0; a < 10; a++)\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardFor(String swfUsed) {
+        decompileMethod(swfUsed, "testFor", "for(var a:* = 0; a < 10; a++)\r\n"
                 + "{\r\n"
                 + "trace(\"a=\" + a);\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardForAnd() {
-        decompileMethod("standard", "testForAnd", "var x:Boolean = false;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardForAnd(String swfUsed) {
+        decompileMethod(swfUsed, "testForAnd", "var x:Boolean = false;\r\n"
                 + "var len:int = 5;\r\n"
                 + "var a:int = 4;\r\n"
                 + "var b:int = 7;\r\n"
@@ -434,12 +444,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"D\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardForBreak() {
-        decompileMethod("standard", "testForBreak", "for(var a:* = 0; a < 10; a++)\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardForBreak(String swfUsed) {
+        decompileMethod(swfUsed, "testForBreak", "for(var a:* = 0; a < 10; a++)\r\n"
                 + "{\r\n"
                 + "if(a == 5)\r\n"
                 + "{\r\n"
@@ -447,12 +457,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"hello:\" + a);\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardForContinue() {
-        decompileMethod("standard", "testForContinue", "for(var a:* = 0; a < 10; a = a + 1)\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardForContinue(String swfUsed) {
+        decompileMethod(swfUsed, "testForContinue", "for(var a:* = 0; a < 10; a = a + 1)\r\n"
                 + "{\r\n"
                 + "if(a == 9)\r\n"
                 + "{\r\n"
@@ -475,12 +485,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"part5\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardForEach() {
-        decompileMethod("standard", "testForEach", "var list:Array = null;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardForEach(String swfUsed) {
+        decompileMethod(swfUsed, "testForEach", "var list:Array = null;\r\n"
                 + "var item:* = undefined;\r\n"
                 + "list = new Array();\r\n"
                 + "list[0] = \"first\";\r\n"
@@ -490,12 +500,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"item #\" + item);\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardForEachObjectArray() {
-        decompileMethod("standard", "testForEachObjectArray", "var list:Array = null;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardForEachObjectArray(String swfUsed) {
+        decompileMethod(swfUsed, "testForEachObjectArray", "var list:Array = null;\r\n"
                 + "var test:Array = null;\r\n"
                 + "list = new Array();\r\n"
                 + "list[0] = \"first\";\r\n"
@@ -507,12 +517,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"item #\" + test[0]);\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardForEachObjectAttribute() {
-        decompileMethod("standard", "testForEachObjectAttribute", "var list:Array = null;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardForEachObjectAttribute(String swfUsed) {
+        decompileMethod(swfUsed, "testForEachObjectAttribute", "var list:Array = null;\r\n"
                 + "list = new Array();\r\n"
                 + "list[0] = \"first\";\r\n"
                 + "list[1] = \"second\";\r\n"
@@ -521,12 +531,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"item #\" + this.testPriv);\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardForGoto() {
-        decompileMethod("standard", "testForGoto", "var c:int = 0;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardForGoto(String swfUsed) {
+        decompileMethod(swfUsed, "testForGoto", "var c:int = 0;\r\n"
                 + "var len:int = 5;\r\n"
                 + "for(var i:uint = 0; i < len; i++)\r\n"
                 + "{\r\n"
@@ -546,12 +556,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"C\");\r\n"
                 + "}\r\n"
                 + "trace(\"exit\");\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardForIn() {
-        decompileMethod("standard", "testForIn", "var dic:Dictionary = null;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardForIn(String swfUsed) {
+        decompileMethod(swfUsed, "testForIn", "var dic:Dictionary = null;\r\n"
                 + "var item:* = null;\r\n"
                 + "for(item in dic)\r\n"
                 + "{\r\n"
@@ -561,12 +571,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(item);\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardForXml() {
-        decompileMethod("standard", "testForXml", "var c:int = 0;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardForXml(String swfUsed) {
+        decompileMethod(swfUsed, "testForXml", "var c:int = 0;\r\n"
                 + "var name:String = \"ahoj\";\r\n"
                 + "var myXML:XML = <order id=\"604\">\r\n"
                 + "<book isbn=\"12345\">\r\n"
@@ -594,12 +604,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"C\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardGotos() {
-        decompileMethod("standard", "testGotos", "var a:Boolean = true;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardGotos(String swfUsed) {
+        decompileMethod(swfUsed, "testGotos", "var a:Boolean = true;\r\n"
                 + "var b:Boolean = false;\r\n"
                 + "if(a)\r\n"
                 + "{\r\n"
@@ -626,12 +636,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"after\");\r\n"
                 + "}\r\n"
                 + "return 89;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardGotos2() {
-        decompileMethod("standard", "testGotos2", "var a:Boolean = true;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardGotos2(String swfUsed) {
+        decompileMethod(swfUsed, "testGotos2", "var a:Boolean = true;\r\n"
                 + "var b:Boolean = false;\r\n"
                 + "var c:Boolean = true;\r\n"
                 + "if(a)\r\n"
@@ -650,12 +660,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"E\");\r\n"
                 + "}\r\n"
                 + "return 5;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardGotos3() {
-        decompileMethod("standard", "testGotos3", "var i:int = 0;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardGotos3(String swfUsed) {
+        decompileMethod(swfUsed, "testGotos3", "var i:int = 0;\r\n"
                 + "var a:int = 5;\r\n"
                 + "if(a > 5)\r\n"
                 + "{\r\n"
@@ -677,12 +687,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"C\");\r\n"
                 + "}\r\n"
                 + "trace(\"return\");\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardGotos4() {
-        decompileMethod("standard", "testGotos4", "var a:int = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardGotos4(String swfUsed) {
+        decompileMethod(swfUsed, "testGotos4", "var a:int = 5;\r\n"
                 + "if(a > 3)\r\n"
                 + "{\r\n"
                 + "if(a < 7)\r\n"
@@ -698,12 +708,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"return\");\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardGotos5() {
-        decompileMethod("standard", "testGotos5", "var j:int = 0;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardGotos5(String swfUsed) {
+        decompileMethod(swfUsed, "testGotos5", "var j:int = 0;\r\n"
                 + "var s:String = \"A\";\r\n"
                 + "for(var i:int = 0; i < 10; i++)\r\n"
                 + "{\r\n"
@@ -722,12 +732,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "j++;\r\n"
                 + "}\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardGotos6() {
-        decompileMethod("standard", "testGotos6", "var a:Boolean = true;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardGotos6(String swfUsed) {
+        decompileMethod(swfUsed, "testGotos6", "var a:Boolean = true;\r\n"
                 + "var s:String = \"a\";\r\n"
                 + "if(a)\r\n"
                 + "{\r\n"
@@ -747,12 +757,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"D\");\r\n"
                 + "}\r\n"
                 + "trace(\"finish\");\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardGotos7() {
-        decompileMethod("standard", "testGotos7", "for(var i:int = 0; i < 10; i++)\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardGotos7(String swfUsed) {
+        decompileMethod(swfUsed, "testGotos7", "for(var i:int = 0; i < 10; i++)\r\n"
                 + "{\r\n"
                 + "switch(i)\r\n"
                 + "{\r\n"
@@ -776,28 +786,28 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"before loop end\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardHello() {
-        decompileMethod("standard", "testHello", "trace(\"hello\");\r\n",
-                false);
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardHello(String swfUsed) {
+        decompileMethod(swfUsed, "testHello", "trace(\"hello\");\r\n",
+                 false);
     }
 
-    @Test
-    public void testStandardIf() {
-        decompileMethod("standard", "testIf", "var a:* = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardIf(String swfUsed) {
+        decompileMethod(swfUsed, "testIf", "var a:* = 5;\r\n"
                 + "if(a == 7)\r\n"
                 + "{\r\n"
                 + "trace(\"onTrue\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardIfElse() {
-        decompileMethod("standard", "testIfElse", "var a:* = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardIfElse(String swfUsed) {
+        decompileMethod(swfUsed, "testIfElse", "var a:* = 5;\r\n"
                 + "if(a == 7)\r\n"
                 + "{\r\n"
                 + "trace(\"onTrue\");\r\n"
@@ -806,12 +816,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"onFalse\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardIfInIf() {
-        decompileMethod("standard", "testIfInIf", "var k:int = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardIfInIf(String swfUsed) {
+        decompileMethod(swfUsed, "testIfInIf", "var k:int = 5;\r\n"
                 + "if(k > 5 && k < 20)\r\n"
                 + "{\r\n"
                 + "trace(\"A\");\r\n"
@@ -830,12 +840,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"C\");\r\n"
                 + "return 7;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardInc2() {
-        decompileMethod("standard", "testInc2", "var a:* = [1];\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardInc2(String swfUsed) {
+        decompileMethod(swfUsed, "testInc2", "var a:* = [1];\r\n"
                 + "a[this.getInt()]++;\r\n"
                 + "var d:* = a[this.getInt()]++;\r\n"
                 + "var e:* = ++a[this.getInt()];\r\n"
@@ -843,12 +853,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "b++;\r\n"
                 + "var c:* = 1;\r\n"
                 + "b = c++;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardIncDec() {
-        decompileMethod("standard", "testIncDec", "var a:* = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardIncDec(String swfUsed) {
+        decompileMethod(swfUsed, "testIncDec", "var a:* = 5;\r\n"
                 + "var b:* = 0;\r\n"
                 + "trace(\"++var\");\r\n"
                 + "b = ++a;\r\n"
@@ -882,12 +892,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "chars[index++] = 5;\r\n"
                 + "trace(\"arr[++e]\");\r\n"
                 + "chars[++index] = 5;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardInlineFunctions() {
-        decompileMethod("standard", "testInlineFunctions", "var first:String = null;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardInlineFunctions(String swfUsed) {
+        decompileMethod(swfUsed, "testInlineFunctions", "var first:String = null;\r\n"
                 + "first = \"value1\";\r\n"
                 + "var traceParameter:Function = function(aParam:String):String\r\n"
                 + "{\r\n"
@@ -904,12 +914,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "return first;\r\n"
                 + "};\r\n"
                 + "traceParameter(\"hello\");\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardInnerFunctions() {
-        decompileMethod("standard", "testInnerFunctions", "var s:int = 0;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardInnerFunctions(String swfUsed) {
+        decompileMethod(swfUsed, "testInnerFunctions", "var s:int = 0;\r\n"
                 + "var innerFunc:Function = function(b:String):*\r\n"
                 + "{\r\n"
                 + "trace(b);\r\n"
@@ -920,12 +930,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "s = 8;\r\n"
                 + "}\r\n"
                 + "innerFunc(a);\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardInnerIf() {
-        decompileMethod("standard", "testInnerIf", "var a:* = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardInnerIf(String swfUsed) {
+        decompileMethod(swfUsed, "testInnerIf", "var a:* = 5;\r\n"
                 + "var b:* = 4;\r\n"
                 + "if(a == 5)\r\n"
                 + "{\r\n"
@@ -947,12 +957,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"b!=7\");\r\n"
                 + "}\r\n"
                 + "trace(\"end\");\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardInnerTry() {
-        decompileMethod("standard", "testInnerTry", "try\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardInnerTry(String swfUsed) {
+        decompileMethod(swfUsed, "testInnerTry", "try\r\n"
                 + "{\r\n"
                 + "try\r\n"
                 + "{\r\n"
@@ -972,12 +982,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"finally block\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardLogicalComputing() {
-        decompileMethod("standard", "testLogicalComputing", "var b:Boolean = false;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardLogicalComputing(String swfUsed) {
+        decompileMethod(swfUsed, "testLogicalComputing", "var b:Boolean = false;\r\n"
                 + "var i:* = 5;\r\n"
                 + "var j:* = 7;\r\n"
                 + "if(i > j)\r\n"
@@ -986,19 +996,19 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "b = true;\r\n"
                 + "}\r\n"
                 + "b = (i == 0 || i == 1) && j == 0;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardManualConvert() {
-        decompileMethod("standard", "testManualConvert", "trace(\"String(this).length\");\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardManualConvert(String swfUsed) {
+        decompileMethod(swfUsed, "testManualConvert", "trace(\"String(this).length\");\r\n"
                 + "trace(String(this).length);\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardMissingDefault() {
-        decompileMethod("standard", "testMissingDefault", "var jj:int = 1;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardMissingDefault(String swfUsed) {
+        decompileMethod(swfUsed, "testMissingDefault", "var jj:int = 1;\r\n"
                 + "switch(jj)\r\n"
                 + "{\r\n"
                 + "case 1:\r\n"
@@ -1010,12 +1020,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "default:\r\n"
                 + "jj = 3;\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardMultipleCondition() {
-        decompileMethod("standard", "testMultipleCondition", "var a:* = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardMultipleCondition(String swfUsed) {
+        decompileMethod(swfUsed, "testMultipleCondition", "var a:* = 5;\r\n"
                 + "var b:* = 8;\r\n"
                 + "var c:* = 9;\r\n"
                 + "if((a <= 4 || b <= 8) && c == 7)\r\n"
@@ -1026,44 +1036,44 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"onFalse\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardNamedAnonFunctions() {
-        decompileMethod("standard", "testNamedAnonFunctions", "var test:* = new function testFunc(param1:*, param2:int, param3:Array):Boolean\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardNamedAnonFunctions(String swfUsed) {
+        decompileMethod(swfUsed, "testNamedAnonFunctions", "var test:* = new function testFunc(param1:*, param2:int, param3:Array):Boolean\r\n"
                 + "{\r\n"
                 + "return (param1 as TestClass2).attrib1 == 5;\r\n"
                 + "};\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardNames() {
-        decompileMethod("standard", "testNames", "var ns:* = this.getNamespace();\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardNames(String swfUsed) {
+        decompileMethod(swfUsed, "testNames", "var ns:* = this.getNamespace();\r\n"
                 + "var name:* = this.getName();\r\n"
                 + "var a:* = ns::unnamespacedFunc();\r\n"
                 + "var b:* = ns::[name];\r\n"
                 + "trace(b.c);\r\n"
                 + "var c:* = myInternal::neco;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardParamNames() {
-        decompileMethod("standard", "testParamNames", "return firstp + secondp + thirdp;\r\n",
-                false);
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardParamNames(String swfUsed) {
+        decompileMethod(swfUsed, "testParamNames", "return firstp + secondp + thirdp;\r\n",
+                 false);
     }
 
-    @Test
-    public void testStandardParamsCount() {
-        decompileMethod("standard", "testParamsCount", "return firstp;\r\n",
-                false);
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardParamsCount(String swfUsed) {
+        decompileMethod(swfUsed, "testParamsCount", "return firstp;\r\n",
+                 false);
     }
 
-    @Test
-    public void testStandardPrecedence() {
-        decompileMethod("standard", "testPrecedence", "var a:* = 0;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardPrecedence(String swfUsed) {
+        decompileMethod(swfUsed, "testPrecedence", "var a:* = 0;\r\n"
                 + "a = (5 + 6) * 7;\r\n"
                 + "a = 5 * (2 + 3);\r\n"
                 + "a = 5 + 6 * 7;\r\n"
@@ -1075,78 +1085,78 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "a = 1 * 2 * 3;\r\n"
                 + "a = 1 * 2 / 3;\r\n"
                 + "trace(\"a=\" + a);\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardPrecedenceX() {
-        decompileMethod("standard", "testPrecedenceX", "var a:* = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardPrecedenceX(String swfUsed) {
+        decompileMethod(swfUsed, "testPrecedenceX", "var a:* = 5;\r\n"
                 + "var b:* = 2;\r\n"
                 + "var c:* = 3;\r\n"
                 + "var d:* = a << (b >>> c);\r\n"
                 + "var e:* = a << b >>> c;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardProperty() {
-        decompileMethod("standard", "testProperty", "var d:* = new TestClass1();\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardProperty(String swfUsed) {
+        decompileMethod(swfUsed, "testProperty", "var d:* = new TestClass1();\r\n"
                 + "var k:* = 7 + 8;\r\n"
                 + "if(k == 15)\r\n"
                 + "{\r\n"
                 + "d.method(d.attrib * 5);\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardRegExp() {
-        decompileMethod("standard", "testRegExp", "var a1:* = /[a-z\\r\\n0-9\\\\]+/i;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardRegExp(String swfUsed) {
+        decompileMethod(swfUsed, "testRegExp", "var a1:* = /[a-z\\r\\n0-9\\\\]+/i;\r\n"
                 + "var a2:* = /[a-z\\r\\n0-9\\\\]+/i;\r\n"
                 + "var b1:* = /[0-9AB]+/;\r\n"
                 + "var b2:* = /[0-9AB]+/;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardRest() {
-        decompileMethod("standard", "testRest", "trace(\"firstRest:\" + restval[0]);\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardRest(String swfUsed) {
+        decompileMethod(swfUsed, "testRest", "trace(\"firstRest:\" + restval[0]);\r\n"
                 + "return firstp;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardStrictEquals() {
-        decompileMethod("standard", "testStrictEquals", "var k:int = 6;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardStrictEquals(String swfUsed) {
+        decompileMethod(swfUsed, "testStrictEquals", "var k:int = 6;\r\n"
                 + "if(this.f() !== this.f())\r\n"
                 + "{\r\n"
                 + "trace(\"is eight\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardStringConcat() {
-        decompileMethod("standard", "testStringConcat", "var k:int = 8;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardStringConcat(String swfUsed) {
+        decompileMethod(swfUsed, "testStringConcat", "var k:int = 8;\r\n"
                 + "this.traceIt(\"hello\" + 5 * 6);\r\n"
                 + "this.traceIt(\"hello\" + (k - 1));\r\n"
                 + "this.traceIt(\"hello\" + 5 + 6);\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardStrings() {
-        decompileMethod("standard", "testStrings", "trace(\"hello\");\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardStrings(String swfUsed) {
+        decompileMethod(swfUsed, "testStrings", "trace(\"hello\");\r\n"
                 + "trace(\"quotes:\\\"hello!\\\"\");\r\n"
                 + "trace(\"backslash: \\\\ \");\r\n"
                 + "trace(\"single quotes: \\'hello!\\'\");\r\n"
                 + "trace(\"new line \\r\\n hello!\");\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardSwitch() {
-        decompileMethod("standard", "testSwitch", "var a:* = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardSwitch(String swfUsed) {
+        decompileMethod(swfUsed, "testSwitch", "var a:* = 5;\r\n"
                 + "switch(a)\r\n"
                 + "{\r\n"
                 + "case 57 * a:\r\n"
@@ -1160,12 +1170,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "case 89:\r\n"
                 + "trace(\"eightynine\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardSwitchComma() {
-        decompileMethod("standard", "testSwitchComma", "var b:int = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardSwitchComma(String swfUsed) {
+        decompileMethod(swfUsed, "testSwitchComma", "var b:int = 5;\r\n"
                 + "var a:String = \"A\";\r\n"
                 + "switch(a)\r\n"
                 + "{\r\n"
@@ -1177,12 +1187,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "case TestSwitchComma.X, \"C\":\r\n"
                 + "trace(\"is C\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardSwitchDefault() {
-        decompileMethod("standard", "testSwitchDefault", "var a:* = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardSwitchDefault(String swfUsed) {
+        decompileMethod(swfUsed, "testSwitchDefault", "var a:* = 5;\r\n"
                 + "switch(a)\r\n"
                 + "{\r\n"
                 + "case 57 * a:\r\n"
@@ -1199,23 +1209,23 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "default:\r\n"
                 + "trace(\"default clause\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardTernarOperator() {
-        decompileMethod("standard", "testTernarOperator", "var a:* = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardTernarOperator(String swfUsed) {
+        decompileMethod(swfUsed, "testTernarOperator", "var a:* = 5;\r\n"
                 + "var b:* = 4;\r\n"
                 + "var c:* = 4;\r\n"
                 + "var d:* = 78;\r\n"
                 + "var e:* = a == b?c == d?1:7:3;\r\n"
                 + "trace(\"e=\" + e);\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardTry() {
-        decompileMethod("standard", "testTry", "var i:int = 0;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardTry(String swfUsed) {
+        decompileMethod(swfUsed, "testTry", "var i:int = 0;\r\n"
                 + "i = 7;\r\n"
                 + "try\r\n"
                 + "{\r\n"
@@ -1235,12 +1245,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"Finally part\");\r\n"
                 + "}\r\n"
                 + "trace(\"end\");\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardTryReturn() {
-        decompileMethod("standard", "testTryReturn", "var i:int = 0;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardTryReturn(String swfUsed) {
+        decompileMethod(swfUsed, "testTryReturn", "var i:int = 0;\r\n"
                 + "var b:Boolean = false;\r\n"
                 + "try\r\n"
                 + "{\r\n"
@@ -1263,12 +1273,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "}\r\n"
                 + "return 4;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardTryReturn2() {
-        decompileMethod("standard", "testTryReturn2", "var c:Boolean = false;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardTryReturn2(String swfUsed) {
+        decompileMethod(swfUsed, "testTryReturn2", "var c:Boolean = false;\r\n"
                 + "trace(\"before\");\r\n"
                 + "var a:Boolean = true;\r\n"
                 + "var b:Boolean = false;\r\n"
@@ -1306,12 +1316,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"after\");\r\n"
                 + "return \"X\";\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardUsagesTry() {
-        decompileMethod("standard", "testUsagesTry", "var k:int = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardUsagesTry(String swfUsed) {
+        decompileMethod(swfUsed, "testUsagesTry", "var k:int = 5;\r\n"
                 + "switch(k)\r\n"
                 + "{\r\n"
                 + "case 0:\r\n"
@@ -1340,29 +1350,30 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"after\");\r\n"
                 + "return \"X\";\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardVector() {
-        decompileMethod("standard", "testVector", "var v:Vector.<String> = new Vector.<String>();\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardVector(String swfUsed) {
+        decompileMethod(swfUsed, "testVector", "var v:Vector.<String> = new Vector.<String>();\r\n"
                 + "v.push(\"hello\");\r\n"
                 + "v[0] = \"hi\";\r\n"
-                + "v[5 * 8 - 39] = \"hi2\";\r\n"
+                + "var a:int = 5;\r\n"
+                + "v[a * 8 - 39] = \"hi2\";\r\n"
                 + "trace(v[0]);\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardVector2() {
-        decompileMethod("standard", "testVector2", "var a:Vector.<Vector.<int>> = new Vector.<Vector.<int>>();\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardVector2(String swfUsed) {
+        decompileMethod(swfUsed, "testVector2", "var a:Vector.<Vector.<int>> = new Vector.<Vector.<int>>();\r\n"
                 + "var b:Vector.<int> = new <int>[10,20,30];\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardWhileAnd() {
-        decompileMethod("standard", "testWhileAnd", "var a:int = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardWhileAnd(String swfUsed) {
+        decompileMethod(swfUsed, "testWhileAnd", "var a:int = 5;\r\n"
                 + "var b:int = 10;\r\n"
                 + "while(a < 10 && b > 1)\r\n"
                 + "{\r\n"
@@ -1371,12 +1382,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "a = 7;\r\n"
                 + "b = 9;\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardWhileContinue() {
-        decompileMethod("standard", "testWhileContinue", "var a:* = 5;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardWhileContinue(String swfUsed) {
+        decompileMethod(swfUsed, "testWhileContinue", "var a:* = 5;\r\n"
                 + "while(true)\r\n"
                 + "{\r\n"
                 + "if(a == 9)\r\n"
@@ -1393,12 +1404,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "trace(\"hello2\");\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardWhileTry() {
-        decompileMethod("standard", "testWhileTry", "while(true)\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardWhileTry(String swfUsed) {
+        decompileMethod(swfUsed, "testWhileTry", "while(true)\r\n"
                 + "{\r\n"
                 + "try\r\n"
                 + "{\r\n"
@@ -1416,12 +1427,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "continue;\r\n"
                 + "}\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardWhileTry2() {
-        decompileMethod("standard", "testWhileTry2", "var j:* = undefined;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardWhileTry2(String swfUsed) {
+        decompileMethod(swfUsed, "testWhileTry2", "var j:* = undefined;\r\n"
                 + "for(var i:* = 0; i < 100; i++)\r\n"
                 + "{\r\n"
                 + "try\r\n"
@@ -1442,12 +1453,12 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "trace(\"after_try\");\r\n"
                 + "}\r\n"
                 + "trace(\"end\");\r\n",
-                false);
+                 false);
     }
 
-    @Test
-    public void testStandardXml() {
-        decompileMethod("standard", "testXml", "var g:XML = null;\r\n"
+    @Test(dataProvider = "standardSwfNamesProvider")
+    public void testStandardXml(String swfUsed) {
+        decompileMethod(swfUsed, "testXml", "var g:XML = null;\r\n"
                 + "var name:String = \"ahoj\";\r\n"
                 + "var myXML:XML = <order id=\"604\">\r\n"
                 + "<book isbn=\"12345\">\r\n"
@@ -1558,20 +1569,20 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "]]>\r\n"
                 + "</script>;\r\n",
-                false);
+                 false);
     }
 
     @Test
     public void testAssembledDoubleDup() {
         decompileMethod("assembled", "testDoubleDup", "var _loc10_:Rectangle = myprop(_loc5_);\r\n"
                 + "_loc10_.mymethod(-_loc10_.width,-_loc10_.height);\r\n",
-                false);
+                 false);
     }
 
     @Test
     public void testAssembledDup() {
         decompileMethod("assembled", "testDup", "return 1 - (var _loc1_:Number = 1 - _loc1_ / _loc4_) * _loc1_;\r\n",
-                false);
+                 false);
     }
 
     @Test
@@ -1582,7 +1593,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(_loc2_);\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
     @Test
@@ -1598,7 +1609,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "}\r\n"
                 + "}\r\n"
                 + "_loc3_ = 0;\r\n",
-                false);
+                 false);
     }
 
     @Test
@@ -1607,14 +1618,14 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "_loc6_.methodname(_loc1_,_loc2_,_loc5_);\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
     @Test
     public void testAssembledIncrement() {
         decompileMethod("assembled", "testIncrement", "super();\r\n"
                 + "b = a++;\r\n",
-                false);
+                 false);
     }
 
     @Test
@@ -1623,13 +1634,13 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "somemethod();\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
     @Test
     public void testAssembledIncrement3() {
         decompileMethod("assembled", "testIncrement3", "_loc1_.length--;\r\n",
-                false);
+                 false);
     }
 
     @Test
@@ -1637,13 +1648,13 @@ public class ActionScript3Test extends ActionScriptTestBase {
         decompileMethod("assembled", "testSetSlotDup", "var _loc5_:int = 5;\r\n"
                 + "myname.somemethod(\"okay\",myslot = _loc5_);\r\n"
                 + "myname.start();\r\n",
-                false);
+                 false);
     }
 
     @Test
     public void testAssembledSetSlotFindProperty() {
         decompileMethod("assembled", "testSetSlotFindProperty", "return var myprop:int = 50;\r\n",
-                false);
+                 false);
     }
 
     @Test
@@ -1664,7 +1675,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "_loc2_ = \"C\";\r\n"
                 + "}\r\n"
                 + "_loc2_ = \"after\";\r\n",
-                false);
+                 false);
     }
 
     @Test
@@ -1687,7 +1698,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "default:\r\n"
                 + "_loc2_ = 100;\r\n"
                 + "}\r\n",
-                false);
+                 false);
     }
 
     @Test
