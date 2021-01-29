@@ -186,10 +186,7 @@ public class GraphPart implements Serializable {
         return false;
     }
 
-    public boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart part, List<Loop> loops, List<GraphPartEdge> gotoParts) throws InterruptedException {
-        if (gotoParts.contains(new GraphPartEdge(this, part))) {
-            return false;
-        }
+    public boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart part, List<Loop> loops) throws InterruptedException {
         for (Loop l : loops) {
             l.leadsToMark = 0;
         }
