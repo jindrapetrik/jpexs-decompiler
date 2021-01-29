@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -267,7 +267,7 @@ public abstract class TextTag extends DrawableTag {
                 }
                 textHeight = rec.textHeight;
                 if (font == null) {
-                    Logger.getLogger(TextTag.class.getName()).log(Level.SEVERE, "Font with id=" + rec.fontId + " was not found.");
+                    Logger.getLogger(TextTag.class.getName()).log(Level.SEVERE, "Font with id={0} was not found.", rec.fontId);
                     continue;
                 }
 

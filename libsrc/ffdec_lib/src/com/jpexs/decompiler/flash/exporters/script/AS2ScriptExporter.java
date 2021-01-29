@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.exporters.script;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -117,7 +117,7 @@ public class AS2ScriptExporter {
             try {
                 executor.shutdown();
                 if (!executor.awaitTermination(Configuration.exportTimeout.get(), TimeUnit.SECONDS)) {
-                    logger.log(Level.SEVERE, Helper.formatTimeToText(Configuration.exportTimeout.get()) + " ActionScript export limit reached");
+                    logger.log(Level.SEVERE, "{0} ActionScript export limit reached", Helper.formatTimeToText(Configuration.exportTimeout.get()));
                 }
             } catch (InterruptedException ex) {
             } finally {

@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -125,7 +125,7 @@ public class ActionJump extends Action {
         if (ofs == -1) {
             int length = getBytesLength();
             ofs = code.adr2pos(getAddress() + length);
-            Logger.getLogger(ActionJump.class.getName()).log(Level.SEVERE, "Invalid jump to ofs" + Helper.formatAddress(targetAddress) + " from ofs" + Helper.formatAddress(getAddress()));
+            Logger.getLogger(ActionJump.class.getName()).log(Level.SEVERE, "Invalid jump to ofs{0} from ofs{1}", new Object[]{Helper.formatAddress(targetAddress), Helper.formatAddress(getAddress())});
         }
         ret.add(ofs);
         return ret;

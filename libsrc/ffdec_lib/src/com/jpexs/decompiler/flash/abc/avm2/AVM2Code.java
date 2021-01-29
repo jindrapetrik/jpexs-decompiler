@@ -2147,7 +2147,7 @@ public class AVM2Code implements Cloneable {
             }
         }
         if (someIgnored) {
-            logger.log(Level.WARNING, path + ": One or more invalid jump offsets found in the code. Those instructions were ignored.");
+            logger.log(Level.WARNING, "{0}: One or more invalid jump offsets found in the code. Those instructions were ignored.", path);
         }
         removeIgnored(body);
     }

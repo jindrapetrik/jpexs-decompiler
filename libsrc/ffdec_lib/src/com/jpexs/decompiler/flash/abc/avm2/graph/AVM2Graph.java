@@ -90,6 +90,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -189,7 +190,7 @@ public class AVM2Graph extends Graph {
     }
 
     public Map<Integer, Set<Integer>> calculateLocalRegsUsage(Set<Integer> ignoredSwitches, String path, Set<GraphPart> allParts) {
-        logger.fine("--- " + path + " ---");
+        logger.log(Level.FINE, "--- {0} ---", path);
         Map<Integer, Set<Integer>> setLocalPosToGetLocalPos = new TreeMap<>();
         Map<GraphPart, Map<Integer, List<Integer>>> partUnresolvedRegisterToGetLocalPos = new HashMap<>();
         Map<GraphPart, Map<Integer, Integer>> partRegisterToLastSetLocalPos = new HashMap<>();
@@ -258,10 +259,10 @@ public class AVM2Graph extends Graph {
         for (int setLocalPos : setLocalPosToGetLocalPos.keySet()) {
             AVM2Instruction ins = avm2code.code.get(setLocalPos);
             int regId = ((SetLocalTypeIns) ins.definition).getRegisterId(ins);
-            logger.fine("set local reg " + regId + " at pos " + (setLocalPos + 1));
+            logger.log(Level.FINE, "set local reg {0} at pos {1}{2}", new Object[]{regId, setLocalPos, 1});
 
             for (int getLocalPos : setLocalPosToGetLocalPos.get(setLocalPos)) {
-                logger.fine("- usage at pos " + (getLocalPos + 1));
+                logger.log(Level.FINE, "- usage at pos {0}{1}", new Object[]{getLocalPos, 1});
             }
         }
         return setLocalPosToGetLocalPos;
