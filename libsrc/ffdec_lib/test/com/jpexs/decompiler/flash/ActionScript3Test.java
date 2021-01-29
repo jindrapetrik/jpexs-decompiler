@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -360,17 +361,6 @@ public class ActionScript3Test extends ActionScriptTestBase {
     }
 
     @Test
-    public void testStandardDup() {
-        decompileMethod("standard", "testDup", "var a:Boolean = false;\r\n"
-                + "var b:Boolean = false;\r\n"
-                + "if(a = b)\r\n"
-                + "{\r\n"
-                + "trace(a);\r\n"
-                + "}\r\n",
-                false);
-    }
-
-    @Test
     public void testStandardExpressions() {
         decompileMethod("standard", "testExpressions", "var arr:Array = null;\r\n"
                 + "var i:int = 5;\r\n"
@@ -587,7 +577,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "var len:int = 5;\r\n"
                 + "var a:int = 5;\r\n"
                 + "var b:int = 6;\r\n"
-                + "for(var i:int = 0; i < len; k = myXML.book.(@isbn = \"12345\"))\r\n"
+                + "for(var i:int = 0; i < len; k = myXML.book.(@isbn == \"12345\"))\r\n"
                 + "{\r\n"
                 + "c = 1;\r\n"
                 + "if(c == 2)\r\n"
@@ -1467,7 +1457,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "var k:* = myXML.@id;\r\n"
                 + "var all:String = myXML.@*.toXMLString();\r\n"
                 + "k = myXML.book;\r\n"
-                + "k = myXML.book.(@isbn = \"12345\");\r\n"
+                + "k = myXML.book.(@isbn == \"12345\");\r\n"
                 + "g = <script>\r\n"
                 + "<![CDATA[\r\n"
                 + "function() {\r\n"

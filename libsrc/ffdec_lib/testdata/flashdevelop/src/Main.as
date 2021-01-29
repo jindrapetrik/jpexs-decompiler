@@ -24,7 +24,6 @@ package
 		TestDefaultNotLastGrouped;
 		TestDoWhile;
 		TestDoWhile2;
-		TestDup;
 		TestExpressions;
 		TestFinallyZeroJump;
 		TestFor;
