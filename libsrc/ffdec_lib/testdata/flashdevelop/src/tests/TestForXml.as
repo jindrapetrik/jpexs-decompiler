@@ -19,7 +19,7 @@ package tests
             var a:int = 5;
             var b:int = 6;
             
-            for (var i:int = 0; i < len; k=myXML.book.(@isbn="12345"))
+            for (var i:int = 0; i < len; k=myXML.book.(@isbn =="12345"))
             {
                 var c:int = 1;
     

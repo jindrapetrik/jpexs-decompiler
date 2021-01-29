@@ -4,6 +4,8 @@ package tests
 	
 	public class TestNames
 	{
+		myInternal var neco:int;
+		
 		public function run():*
 		{
 			var ns:* = this.getNamespace();
