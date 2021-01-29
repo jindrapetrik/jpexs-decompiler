@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2018 JPEXS
+ *  Copyright (C) 2010-2021 JPEXS
  * 
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -37,6 +37,10 @@ import java.util.regex.Pattern;
  */
 public class LicenseUpdater {
 
+    public static void main(String[] args) {
+        updateLicense();
+    }
+
     public static void updateLicense() {
         updateLicenseInDir(new File(".\\src\\"), false);
         updateLicenseInDir(new File(".\\test\\"), false);
@@ -71,7 +75,7 @@ public class LicenseUpdater {
 
          */
         int defaultStartYear = 2010;
-        int defaultFinalYear = 2018;
+        int defaultFinalYear = 2021;
         String defaultAuthor = "JPEXS";
         String defaultYearStr = Integer.toString(defaultStartYear);
         if (defaultFinalYear != defaultStartYear) {
