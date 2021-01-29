@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - AS3 docs not correctly displayed under p-code when metadata present
 - Improper initialization of ActiveX component when Flash not available causing FFDec not start
 - #1206 Switch with multiple default clauses
+- ASC2 §§push of function calls before returning from a method
 
 ### Changed
 - AS3 test methods separated to classes

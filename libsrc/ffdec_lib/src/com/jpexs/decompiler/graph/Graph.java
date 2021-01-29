@@ -2362,13 +2362,16 @@ public class Graph {
 
     protected static void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
         int clen = commands.size();
+        boolean isExit = false;
         if (clen > 0) {
             if (commands.get(clen - 1) instanceof ScriptEndItem) {
                 clen--;
+                isExit = true;
             }
         }
         if (clen > 0) {
             if (commands.get(clen - 1) instanceof ExitItem) {
+                isExit = true;
                 clen--;
             }
         }
@@ -2391,7 +2394,12 @@ public class Graph {
                 if (p instanceof FunctionActionItem) {
                     commands.add(clen, p);
                 } else {
-                    commands.add(clen, new PushItem(p));
+                    if (isExit) {
+                        //ASC2 leaves some function calls unpopped on stack before returning from a method
+                        commands.add(clen, p);
+                    } else {
+                        commands.add(clen, new PushItem(p));
+                    }
                 }
             }
         }

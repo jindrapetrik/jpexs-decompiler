@@ -3,8 +3,6 @@
 <!--Any modifications you make may be lost.-->
 <flex-config>
   <target-player>25.0</target-player>
-  <benchmark>false</benchmark>
-  <static-link-runtime-shared-libraries>true</static-link-runtime-shared-libraries>
   <compiler>
     <define append="true">
       <name>CONFIG::debug</name>
