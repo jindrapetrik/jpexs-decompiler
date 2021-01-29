@@ -265,7 +265,7 @@ public class DebuggerHandler implements DebugConnectionListener {
     public boolean addBreakPoint(String scriptName, int line) {
         synchronized (this) {
             Logger.getLogger(DebuggerHandler.class
-                    .getName()).log(Level.FINE, "adding bp " + scriptName + ":" + line);
+                    .getName()).log(Level.FINE, "adding bp {0}:{1}", new Object[]{scriptName, line});
             if (isBreakpointToRemove(scriptName, line)) {
                 toRemoveBPointMap.get(scriptName).remove(line);
                 if (toRemoveBPointMap.get(scriptName).isEmpty()) {
@@ -275,12 +275,12 @@ public class DebuggerHandler implements DebugConnectionListener {
             }
 
             if (isBreakpointConfirmed(scriptName, line)) {
-                Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "bp " + scriptName + ":" + line + " already confirmed");
+                Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "bp {0}:{1} already confirmed", new Object[]{scriptName, line});
                 return true;
 
             }
             if (isBreakpointInvalid(scriptName, line)) {
-                Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "bp " + scriptName + ":" + line + " already invalid");
+                Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "bp {0}:{1} already invalid", new Object[]{scriptName, line});
                 return false;
             }
             if (!toAddBPointMap.containsKey(scriptName)) {
@@ -289,7 +289,7 @@ public class DebuggerHandler implements DebugConnectionListener {
             toAddBPointMap.get(scriptName).add(line);
             Logger
                     .getLogger(DebuggerHandler.class
-                            .getName()).log(Level.FINE, "bp " + scriptName + ":" + line + " added to todo");
+                            .getName()).log(Level.FINE, "bp {0}:{1} added to todo", new Object[]{scriptName, line});
         }
         try {
             sendBreakPoints(false);

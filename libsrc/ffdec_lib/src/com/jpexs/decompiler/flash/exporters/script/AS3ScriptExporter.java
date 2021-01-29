@@ -430,7 +430,7 @@ public class AS3ScriptExporter {
             try {
                 executor.shutdown();
                 if (!executor.awaitTermination(Configuration.exportTimeout.get(), TimeUnit.SECONDS)) {
-                    logger.log(Level.SEVERE, Helper.formatTimeToText(Configuration.exportTimeout.get()) + " ActionScript export limit reached");
+                    logger.log(Level.SEVERE, "{0} ActionScript export limit reached", Helper.formatTimeToText(Configuration.exportTimeout.get()));
                 }
             } catch (InterruptedException ex) {
             } finally {

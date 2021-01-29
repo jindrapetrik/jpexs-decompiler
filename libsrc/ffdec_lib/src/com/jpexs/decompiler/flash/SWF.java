@@ -1621,7 +1621,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         for (ScriptPack item : packs) {
             ClassPath key = item.getClassPath();
             if (classPaths.contains(key)) {
-                logger.log(Level.SEVERE, "Duplicate pack path found (" + key + ")!");
+                logger.log(Level.SEVERE, "Duplicate pack path found ({0})!", key);
             } else {
                 classPaths.add(key);
                 ret.add(item);

@@ -507,7 +507,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                     continue;
                 }
                 addedLines.add(line);
-                logger.log(Level.FINE, "Script " + path + ": Insert debugline(" + line + ") at pos " + i + " to body " + bodyIndex);
+                logger.log(Level.FINE, "Script {0}: Insert debugline({1}) at pos {2} to body {3}", new Object[]{path, line, i, bodyIndex});
                 b.insertInstruction(i + dpos, new AVM2Instruction(0, AVM2Instructions.DebugLine, new int[]{line}));
             }
             //remove old debug instructions

@@ -2224,14 +2224,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 @Override
                 public boolean handle(TextTag textTag) {
                     String msg = translate("error.text.import");
-                    logger.log(Level.SEVERE, msg + getTextTagInfo(textTag));
+                    logger.log(Level.SEVERE, "{0}{1}", new Object[]{msg, getTextTagInfo(textTag)});
                     return View.showConfirmDialog(MainPanel.this, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainImportError, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION;
                 }
 
                 @Override
                 public boolean handle(TextTag textTag, String message, long line) {
                     String msg = translate("error.text.invalid.continue").replace("%text%", message).replace("%line%", Long.toString(line));
-                    logger.log(Level.SEVERE, msg + getTextTagInfo(textTag));
+                    logger.log(Level.SEVERE, "{0}{1}", new Object[]{msg, getTextTagInfo(textTag)});
                     return View.showConfirmDialog(MainPanel.this, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainInvalidText, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION;
                 }
             });
