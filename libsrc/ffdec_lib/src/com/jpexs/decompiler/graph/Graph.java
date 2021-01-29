@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -533,10 +534,10 @@ public class Graph {
                 lastUsage.get(labelName).labelName = null;
             }
         }
-
         expandGotos(ret);
         processIfs(ret);
         finalProcessStack(stack, ret, path);
+        makeAllCommands(ret, stack);
         finalProcessAll(ret, 0, getFinalData(localData, loops), path);
         return ret;
     }
