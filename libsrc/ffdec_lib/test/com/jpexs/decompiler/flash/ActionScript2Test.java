@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
@@ -603,13 +604,12 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "{\r\n"
                 + "a++;\r\n"
                 + "b = b + 2;\r\n"
-                + "if(c < 10)\r\n"
+                + "if(c >= 10)\r\n"
                 + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
                 + "trace(c);\r\n"
                 + "c++;\r\n"
-                + "continue;\r\n"
-                + "}\r\n"
-                + "break;\r\n"
                 + "}\r\n"
                 + "trace(\"konec\");\r\n"
         );
@@ -676,13 +676,12 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "while(true)\r\n"
                 + "{\r\n"
                 + "k++;\r\n"
-                + "if(k < 10)\r\n"
+                + "if(k >= 10)\r\n"
                 + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
                 + "k = k * 5;\r\n"
                 + "trace(k);\r\n"
-                + "continue;\r\n"
-                + "}\r\n"
-                + "break;\r\n"
                 + "}\r\n"
                 + "trace(\"end\");\r\n"
         );
