@@ -108,6 +108,7 @@ public class GraphPrecontinueDetector {
                 }
                 if (!wholeLoop) {
                     el.loopPreContinue = node.graphPart;
+                    //System.err.println("found precontinue:" + node.graphPart);
                 }
             }
         }
@@ -278,7 +279,8 @@ public class GraphPrecontinueDetector {
          */
         if (node.next.size() == 2
                 && node.next.get(0).next.size() == 1
-                && node.next.get(0).next.get(0) == node.next.get(1)) {
+                && node.next.get(0).next.get(0) == node.next.get(1)
+                && node.next.get(0).prev.size() == 1) {
             IfNode ifNode = new IfNode();
             ifNode.onTrue = node.next.get(0);
             ifNode.onTrue.parentNode = ifNode;
@@ -308,7 +310,8 @@ public class GraphPrecontinueDetector {
          */
         if (node.next.size() == 2
                 && node.next.get(1).next.size() == 1
-                && node.next.get(1).next.get(0) == node.next.get(0)) {
+                && node.next.get(1).next.get(0) == node.next.get(0)
+                && node.next.get(1).prev.size() == 1) {
             IfNode ifNode = new IfNode();
             ifNode.onTrue = null;
             ifNode.onFalse = node.next.get(1);
@@ -338,17 +341,20 @@ public class GraphPrecontinueDetector {
         if (node.next.size() == 2
                 && node.next.get(0).next.size() == 1
                 && node.next.get(1).next.size() == 1
-                && node.next.get(0).next.get(0) == node.next.get(1).next.get(0)) {
+                && node.next.get(0).next.get(0) == node.next.get(1).next.get(0)
+                && node.next.get(0).prev.size() == 1
+                && node.next.get(1).prev.size() == 1) {
             IfNode ifNode = new IfNode();
+            Node after = node.next.get(0).next.get(0);
             ifNode.onTrue = node.next.get(0);
             ifNode.onTrue.parentNode = ifNode;
             ifNode.onFalse = node.next.get(1);
             ifNode.onFalse.parentNode = ifNode;
+            ifNode.onTrue.removeFromGraph();
             ifNode.onFalse.removeFromGraph();
             ifNode.graphPart = node.graphPart;
             ifNode.prev = new ArrayList<>(node.prev);
             node.replacePrevs(ifNode);
-            Node after = node.next.get(0).next.get(0);
             node.removeFromGraph();
             ifNode.next.add(after);
             after.prev.add(ifNode);
@@ -357,7 +363,8 @@ public class GraphPrecontinueDetector {
             return ifNode;
         }
 
-        for (Node n : node.next) {
+        List<Node> nexts = new ArrayList<>(node.next);
+        for (Node n : nexts) {
             checkIfs(n, visited, numIfs);
         }
         return node;
