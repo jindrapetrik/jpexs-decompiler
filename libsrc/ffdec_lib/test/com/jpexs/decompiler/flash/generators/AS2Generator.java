@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.generators;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -90,12 +91,10 @@ public class AS2Generator {
                 s.append("}");
                 doa = null;
             }
-            /*try (PrintWriter pw = new PrintWriter("as2_teststub.java")) {
-             pw.println(s.toString());
-             }*/
-            try (FileOutputStream fos = new FileOutputStream("as2_teststub.java")) {
-                fos.write(Utf8Helper.getBytes(s.toString()));
-            }
         }
+        try (FileOutputStream fos = new FileOutputStream("as2_teststub.java")) {
+            fos.write(Utf8Helper.getBytes(s.toString()));
+        }
+        System.exit(0);
     }
 }

@@ -1,0 +1,29 @@
+script
+ sinit
+  refid "tests:TestSwitch/init"
+  body
+   maxstack 2
+   localcount 1
+   initscopedepth 1
+   maxscopedepth 3
+   code
+    getlocal0
+    pushscope
+
+    findpropstrict      Multiname("TestSwitch", [PackageNamespace("tests")])
+    getlex              QName(PackageNamespace(""), "Object")
+    pushscope
+
+    getlex              Multiname("Object", [PrivateNamespace(null, "tests:TestSwitch"), PackageNamespace(""), PackageNamespace("tests"), PackageInternalNs("tests"), Namespace("http://adobe.com/AS3/2006/builtin")])
+    newclass            "tests:TestSwitch"
+    popscope
+    initproperty        QName(PackageNamespace("tests"), "TestSwitch")
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+ trait class QName(PackageNamespace("tests"), "TestSwitch")
+  #include "TestSwitch.class.asasm"
+ end ; trait
+end ; script
