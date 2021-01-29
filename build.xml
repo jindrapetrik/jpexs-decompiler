@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="FFDec" basedir="." default="all"> <!-- xmlns:jacoco="antlib:org.jacoco.ant" -->
+<project name="FFDec" basedir="." default="all" xmlns:jacoco="antlib:org.jacoco.ant">
     <description>Builds project FFDec</description>    
                              
     <loadproperties srcfile="build.properties" />
@@ -14,7 +14,7 @@
     
     <taskdef name="mkbom" classname="com.jpexs.jbomutils.ant.MkBomTask" classpathref="ant.lib.classpath" />
     <taskdef name="xar" classname="com.jpexs.xar.ant.XarTask" classpathref="ant.lib.classpath" />
-    <!--<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="ant.lib.classpath" />-->
+    <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="ant.lib.classpath" />
     <taskdef name="cpio" classname="org.apache.ant.compress.taskdefs.Cpio" classpathref="ant.lib.classpath" />       
     <taskdef name="deb" classname="com.googlecode.ant_deb_task.Deb" classpathref="ant.lib.classpath" />
     <taskdef name="desktopentry" classname="com.googlecode.ant_deb_task.DesktopEntry" classpathref="ant.lib.classpath" />
@@ -131,7 +131,7 @@
          
         
         <mkdir dir="${coverage.dir}" />
-        <!--<jacoco:coverage destfile="${coverage.dir}/jacoco.exec">-->
+        <jacoco:coverage destfile="${coverage.dir}/jacoco.exec">
             <testng 
                 outputDir="${test.result.dir}"
                 haltOnFailure="${test.halt.failure}" verbose="2" workingDir="${basedir}">
@@ -144,10 +144,10 @@
                 </classpath>
                 <jvmarg value="-noverify" />
                 <classfileset dir="${compile.test.dir}" includes="**/*.class" />                                    
-            </testng>  
-        <!--</jacoco:coverage>-->
+            </testng>
+        </jacoco:coverage>
                   
-        <!-- Coverage report 
+        <!-- Coverage report -->
         <mkdir dir="${coverage.result.dir}"/>
         <jacoco:report>
             <executiondata>
@@ -162,7 +162,7 @@
                 </sourcefiles>
             </structure>
             <html destdir="${coverage.result.dir}" />
-        </jacoco:report> -->
+        </jacoco:report>
     </target>
     
     <condition property="is_windows">

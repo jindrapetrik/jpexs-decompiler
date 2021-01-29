@@ -11,7 +11,7 @@
         <fileset dir="${ant.lib.dir}" includes="**/*.jar"/>
     </path>
     <taskdef name="testng" classname="org.testng.TestNGAntTask" classpathref="ant.lib.classpath"  />
-    <!--<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="ant.lib.classpath" />-->
+    <taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpathref="ant.lib.classpath" />
     <taskdef name="jflex" classname="jflex.anttask.JFlexTask" classpathref="ant.lib.classpath" />
         
     
@@ -84,7 +84,7 @@
         <mkdir dir="${test.result.dir}/raw/"/>
         
          <mkdir dir="${coverage.dir}" />
-        <!--<jacoco:coverage destfile="${coverage.dir}/jacoco.exec">-->
+        <jacoco:coverage destfile="${coverage.dir}/jacoco.exec">
         <testng 
             outputDir="${test.result.dir}"
             haltOnFailure="${test.halt}" verbose="2" workingDir="${basedir}" >
@@ -99,11 +99,11 @@
             <classfileset dir="${compile.test.dir}" includes="**/*.class" />                        
             
         </testng>      
-        <!--</jacoco:coverage>-->
+        </jacoco:coverage>
         <!-- Coverage report -->
         <mkdir dir="${coverage.result.dir}"/>
         
-        <!--<jacoco:report>
+        <jacoco:report>
             <executiondata>
                 <file file="${coverage.dir}/jacoco.exec" />
             </executiondata>
@@ -117,7 +117,7 @@
             </structure>
             <html destdir="${coverage.result.dir}" />
         </jacoco:report>        
-    -->
+    
     </target>
     
    
