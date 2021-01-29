@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.executing;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -29,6 +30,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +81,12 @@ public class CallIns extends InstructionDefinition {
 
         if (function instanceof GetPropertyAVM2Item) {
             GetPropertyAVM2Item getProperty = (GetPropertyAVM2Item) function;
-            if (getProperty.object instanceof SetLocalAVM2Item) {
+            if (getProperty.object instanceof DuplicateItem) {
+                if (getProperty.object.value == receiver) {
+                    getProperty.object = receiver;
+                }
+            }
+            else if (getProperty.object instanceof SetLocalAVM2Item) {
                 SetLocalAVM2Item setLocal = (SetLocalAVM2Item) getProperty.object;
                 if (receiver instanceof LocalRegAVM2Item) {
                     LocalRegAVM2Item getLocal = (LocalRegAVM2Item) receiver;
