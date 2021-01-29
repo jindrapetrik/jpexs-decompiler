@@ -16,8 +16,6 @@
  */
 package com.jpexs.decompiler.graph;
 
-import com.jpexs.decompiler.flash.abc.avm2.model.ScriptAVM2Item;
-
 /**
  *
  * @author JPEXS

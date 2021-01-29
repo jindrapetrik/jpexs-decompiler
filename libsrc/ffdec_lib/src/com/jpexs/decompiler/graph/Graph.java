@@ -20,9 +20,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
-import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
-import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.AndItem;
@@ -58,14 +56,12 @@ import com.jpexs.decompiler.graph.precontinues.GraphPrecontinueDetector;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -94,7 +90,7 @@ public class Graph {
     private boolean debugGetLoops = false;
     private boolean debugPrintGraph = false;
 
-    private static Logger logger = Logger.getLogger(Graph.class.getName());
+    private static final Logger logger = Logger.getLogger(Graph.class.getName());
 
     public GraphSource getGraphCode() {
         return code;
@@ -511,12 +507,6 @@ public class Graph {
 
         new GraphPrecontinueDetector().detectPrecontinues(heads, allParts, loops);
 
-        //getPrecontinues(path, localData, null, heads.get(0), allParts, loops, null);
-        //getPrecontinues2(path, localData, null, heads.get(0), allParts, loops, null);
-        List<GraphPartEdge> gotoTargets = new ArrayList<>();
-
-        //findGotoTargets(localData, path, heads.get(0), allParts, loops);
-
         /*System.err.println("<loopspre>");
          for (Loop el : loops) {
          System.err.println(el);
@@ -539,7 +529,7 @@ public class Graph {
             lastUsage.put(gi.labelName, gi);
         }
         for (String labelName : usages.keySet()) {
-            logger.fine("usage - " + labelName + ": " + usages.get(labelName));
+            logger.log(Level.FINE, "usage - {0}: {1}", new Object[]{labelName, usages.get(labelName)});
             if (usages.get(labelName) == 1) {
                 lastUsage.get(labelName).labelName = null;
             }
@@ -561,15 +551,6 @@ public class Graph {
     }
 
     protected boolean isPartEmpty(GraphPart part) {
-        return false;
-    }
-
-    private boolean isTryBegin(GraphPart part) {
-        for (GraphPart r : part.refs) {
-            if (r.start == -1) {
-                return true;
-            }
-        }
         return false;
     }
 
@@ -2516,7 +2497,7 @@ public class Graph {
         List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
         GraphPart next = breakPart;
 
-        GraphTargetItem ti = checkLoop(new ArrayList<GraphTargetItem>() /*??*/, next, stopPart, loops);
+        GraphTargetItem ti = checkLoop(new ArrayList<>() /*??*/, next, stopPart, loops);
 
         //create switch as new loop break command detection to work
         Loop currentLoop = new Loop(loops.size(), null, next);

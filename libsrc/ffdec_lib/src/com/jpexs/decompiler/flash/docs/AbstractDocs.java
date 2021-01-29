@@ -12,10 +12,9 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.docs;
 
-import com.jpexs.decompiler.flash.ApplicationInfo;
 import static com.jpexs.decompiler.flash.docs.As3PCodeOtherDocs.NEWLINE;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
@@ -25,7 +24,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;

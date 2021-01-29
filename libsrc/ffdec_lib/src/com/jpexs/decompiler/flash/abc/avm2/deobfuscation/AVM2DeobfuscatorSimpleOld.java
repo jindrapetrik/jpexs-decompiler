@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library. */
 package com.jpexs.decompiler.flash.abc.avm2.deobfuscation;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -67,7 +67,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushDoubleIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushFalseIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushIntegerTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushIntIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushNanIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushNullIns;

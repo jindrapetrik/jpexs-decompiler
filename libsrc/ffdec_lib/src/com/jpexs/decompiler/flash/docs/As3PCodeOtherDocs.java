@@ -17,20 +17,10 @@
 package com.jpexs.decompiler.flash.docs;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
-import static com.jpexs.decompiler.flash.docs.As3PCodeDocs.NEWLINE;
-import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
-import com.jpexs.helpers.utf8.Utf8Helper;
-import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.TimeZone;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class As3PCodeOtherDocs extends AbstractDocs {
 

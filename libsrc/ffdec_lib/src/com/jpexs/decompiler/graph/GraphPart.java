@@ -19,7 +19,6 @@ package com.jpexs.decompiler.graph;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 

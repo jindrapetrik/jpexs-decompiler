@@ -18,7 +18,6 @@ package com.jpexs.decompiler.graph.precontinues;
 
 import com.jpexs.decompiler.graph.GraphPart;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
