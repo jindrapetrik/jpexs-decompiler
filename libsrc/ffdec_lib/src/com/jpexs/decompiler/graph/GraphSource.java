@@ -18,7 +18,6 @@ package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
-import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;

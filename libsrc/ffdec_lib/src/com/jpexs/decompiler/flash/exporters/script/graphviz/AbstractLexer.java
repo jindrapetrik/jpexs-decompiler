@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.exporters.script.graphviz;
 
 import java.io.Reader;
-import java.io.StringReader;
 
 /**
  *

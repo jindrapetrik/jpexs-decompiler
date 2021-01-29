@@ -22,7 +22,6 @@ import com.sun.jna.platform.win32.WinDef.DWORD;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
-import java.util.Locale;
 import java.util.Map;
 
 /**
