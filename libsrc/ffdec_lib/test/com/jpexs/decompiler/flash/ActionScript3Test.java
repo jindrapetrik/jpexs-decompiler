@@ -148,7 +148,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
     private Object[][] standardSwfNamesProvider() {
         return new Object[][]{
             {"standard"},
-            {"standard_asc2"}
+ //{"standard_asc2"}
         };
     }
 
