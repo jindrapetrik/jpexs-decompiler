@@ -249,6 +249,10 @@
                         <label>core.lexers</label>
                         <location>libsrc/ffdec_lib/lexers</location>
                     </source-folder>
+                    <source-folder style="packages">
+                        <label>core.graphviz</label>
+                        <location>libsrc/ffdec_lib/graphviz</location>
+                    </source-folder>
                     <source-file>
                         <location>build.xml</location>
                     </source-file>

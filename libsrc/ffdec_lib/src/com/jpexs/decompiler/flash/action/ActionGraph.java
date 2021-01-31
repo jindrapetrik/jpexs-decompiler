@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -53,6 +54,7 @@ import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
 import com.jpexs.decompiler.graph.model.IfItem;
+import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Helper;
@@ -158,6 +160,21 @@ public class ActionGraph extends Graph {
 
     @Override
     protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
+
+        if (level == 0) {
+            List<GraphTargetItem> removed = new ArrayList<>();
+            for (int i = list.size() - 1; i >= 0; i--) {
+                if (list.get(i) instanceof ScriptEndItem) {
+                    continue;
+                }
+                if (list.get(i) instanceof FunctionActionItem) {
+                    removed.add(0, list.remove(i));
+                } else {
+                    break;
+                }
+            }
+            list.addAll(0, removed);
+        }
 
         if (insideDoInitAction) {
             ActionScript2ClassDetector detector = new ActionScript2ClassDetector();

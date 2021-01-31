@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -445,7 +446,7 @@ public final class MethodBody implements Cloneable {
 
     public boolean autoFillStats(ABC abc, int initScope, boolean hasThis) {
         //System.out.println("--------------");
-        CodeStats stats = getCode().getStats(abc, this, initScope);
+        CodeStats stats = getCode().getStats(abc, this, initScope, true);
         if (stats == null) {
             return false;
         }

@@ -12,18 +12,21 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import java.util.ArrayList;
@@ -57,11 +60,17 @@ public class AVM2LocalData extends BaseLocalData {
 
     public ArrayList<ABCException> parsedExceptions;
 
-    public Map<Integer, List<Integer>> finallyJumps;
+    //public Map<Integer, List<Integer>> finallyJumps;
+    /**
+     * Mapped jumps from pushbyte xx part to apropriate lookupswitch branch
+     */
+    public Map<GraphPart, GraphPart> finallyJumps = new HashMap<>();
 
-    public Map<Integer, Integer> ignoredSwitches;
+    //public Map<Integer, Integer> ignoredSwitches;
+    //exception index => switchPart
+    public Map<Integer, GraphPart> ignoredSwitches;
 
-    public List<Integer> ignoredSwitches2;
+    //public List<Integer> ignoredSwitches2;
 
     public Integer scriptIndex;
 
@@ -76,6 +85,8 @@ public class AVM2LocalData extends BaseLocalData {
     public boolean thisHasDefaultToPrimitive;
 
     public Map<Integer, Set<Integer>> setLocalPosToGetLocalPos = new HashMap<>();
+
+    public CodeStats codeStats;
 
     public AVM2LocalData() {
 
@@ -103,7 +114,7 @@ public class AVM2LocalData extends BaseLocalData {
         parsedExceptions = localData.parsedExceptions;
         finallyJumps = localData.finallyJumps;
         ignoredSwitches = localData.ignoredSwitches;
-        ignoredSwitches2 = localData.ignoredSwitches2;
+        //ignoredSwitches2 = localData.ignoredSwitches2;
         scriptIndex = localData.scriptIndex;
         localRegAssignmentIps = localData.localRegAssignmentIps;
         ip = localData.ip;
@@ -111,6 +122,7 @@ public class AVM2LocalData extends BaseLocalData {
         code = localData.code;
         thisHasDefaultToPrimitive = localData.thisHasDefaultToPrimitive;
         setLocalPosToGetLocalPos = localData.setLocalPosToGetLocalPos;
+        codeStats = localData.codeStats;
     }
 
     public AVM2ConstantPool getConstants() {

@@ -1,0 +1,3 @@
+Loading configuration: c:\air\frameworks\flex-config.xml
+
+2753 bytes written to C:\Dropbox\Programovani\JavaSE\FFDec\libsrc\ffdec_lib\testdata\cross_compile\bin\Main.air.swf in 0,459 seconds
