@@ -66,11 +66,13 @@ public class AVM2LocalData extends BaseLocalData {
      */
     public Map<GraphPart, GraphPart> finallyJumps = new HashMap<>();
 
-    //public Map<Integer, Integer> ignoredSwitches;
     //exception index => switchPart
     public Map<Integer, GraphPart> ignoredSwitches;
 
-    //public List<Integer> ignoredSwitches2;
+    public Map<Integer, Integer> switchedRegs = new HashMap<>();
+
+    //switchedPart -> index of nextpart
+    public Map<GraphPart, Integer> defaultWays = new HashMap<>();
 
     public Integer scriptIndex;
 
@@ -123,6 +125,8 @@ public class AVM2LocalData extends BaseLocalData {
         thisHasDefaultToPrimitive = localData.thisHasDefaultToPrimitive;
         setLocalPosToGetLocalPos = localData.setLocalPosToGetLocalPos;
         codeStats = localData.codeStats;
+        defaultWays = localData.defaultWays;
+        switchedRegs = localData.switchedRegs;
     }
 
     public AVM2ConstantPool getConstants() {

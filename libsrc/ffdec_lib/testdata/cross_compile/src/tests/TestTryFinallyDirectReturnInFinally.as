@@ -21,7 +21,7 @@ package tests
 			finally
 			{
 				trace("hi ");
-				if (5 == 4)
+				if (str == "check")
 				{
 					return str;
 				}
