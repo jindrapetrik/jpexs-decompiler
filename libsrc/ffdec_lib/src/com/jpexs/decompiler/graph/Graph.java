@@ -1023,8 +1023,12 @@ public class Graph {
         return false;
     }
 
-    protected List<GraphTargetItem> check(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> check(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         return null;
+    }
+
+    protected GraphPart checkPartWithOutput(List<GraphTargetItem> output, TranslateStack stack, BaseLocalData localData, GraphPart prev, GraphPart part, Set<GraphPart> allParts) {
+        return checkPart(stack, localData, prev, part, allParts);
     }
 
     protected GraphPart checkPart(TranslateStack stack, BaseLocalData localData, GraphPart prev, GraphPart part, Set<GraphPart> allParts) {
@@ -1453,7 +1457,7 @@ public class Graph {
         if (part == null) {
             return ret;
         }
-        part = checkPart(stack, localData, parent, part, allParts);
+        part = checkPartWithOutput(ret, stack, localData, parent, part, allParts);
         if (part == null) {
             return ret;
         }
@@ -1610,7 +1614,7 @@ public class Graph {
         }
 
         if (parseNext) {
-            List<GraphTargetItem> retCheck = check(foundGotos, partCodes, partCodePos, code, localData, allParts, stack, parent, part, stopPart, loops, output, currentLoop, staticOperation, path);
+            List<GraphTargetItem> retCheck = check(currentRet, foundGotos, partCodes, partCodePos, code, localData, allParts, stack, parent, part, stopPart, loops, output, currentLoop, staticOperation, path);
             if (retCheck != null) {
                 if (!retCheck.isEmpty()) {
                     currentRet.addAll(retCheck);
@@ -2430,12 +2434,12 @@ public class Graph {
                 if (p instanceof FunctionActionItem) {
                     commands.add(clen, p);
                 } else {
-                    /*if (isExit) {
+                    if (isExit) {
                         //ASC2 leaves some function calls unpopped on stack before returning from a method
                         commands.add(clen, p);
-                    } else {*/
+                    } else {
                         commands.add(clen, new PushItem(p));
-                    //}
+                    }
                 }
             }
         }
