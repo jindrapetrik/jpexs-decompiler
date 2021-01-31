@@ -9,13 +9,13 @@ package tests
 		
 		public function run() : String
 		{
+			var a:int = Math.random() * 5;
 			try
 			{
 				trace("before try2");
 				try
 				{
 					trace("in try2");
-					var a:int = 5;
 					if (a > 4)
 					{
 						return "RET";

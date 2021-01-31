@@ -9,7 +9,8 @@ package tests
 		
 		public function run() : void
 		{
-			for (var i:int = 0; i < 10; i++)
+			var i:int = 0;
+			while (i < 10)
 			{
 				trace("before try");
 				try
@@ -24,12 +25,14 @@ package tests
 				{
 					if (i == 5)
 					{
-						trace("continue for");
+						i += 7;
+						trace("continue while");
 						continue;
 					}
 					trace("in finally");
 				}
 				trace("after");
+				i++
 			}
 		}
 		
