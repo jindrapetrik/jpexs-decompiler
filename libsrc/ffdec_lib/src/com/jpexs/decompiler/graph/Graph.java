@@ -1595,13 +1595,13 @@ public class Graph {
             parts = ((GraphPartMulti) part).parts;
         } else {
             parts.add(part);
-            while (getNextParts(localData, part).size() == 1 && getNextParts(localData, part).get(0).refs.size() == 1) {
+            /*while (getNextParts(localData, part).size() == 1 && getNextParts(localData, part).get(0).refs.size() == 1) {
                 if (stopPart.contains(getNextParts(localData, part).get(0))) { //it might be referenced with try statement
                     break;
                 }
                 part = getNextParts(localData, part).get(0);
                 parts.add(part);
-            }
+            }*/
         }
         for (GraphPart p : parts) {
             int end = p.end;

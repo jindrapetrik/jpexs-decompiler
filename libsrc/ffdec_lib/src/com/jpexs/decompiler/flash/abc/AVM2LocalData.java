@@ -66,6 +66,13 @@ public class AVM2LocalData extends BaseLocalData {
      */
     public Map<GraphPart, GraphPart> finallyJumps = new HashMap<>();
 
+    /**
+     * Mapping from source part (as in finallyJumps) to finally exception index
+     */
+    public Map<GraphPart, Integer> finallyJumpsToFinallyIndex = new HashMap<>();
+
+    public Map<Integer, GraphPart> finallyIndexToDefaultGraphPart = new HashMap<>();
+
     //exception index => switchPart
     public Map<Integer, GraphPart> ignoredSwitches;
 
@@ -89,6 +96,8 @@ public class AVM2LocalData extends BaseLocalData {
     public Map<Integer, Set<Integer>> setLocalPosToGetLocalPos = new HashMap<>();
 
     public CodeStats codeStats;
+
+    public Set<Integer> finallyIndicesWithDoublePush = new HashSet<>();
 
     public AVM2LocalData() {
 
@@ -127,6 +136,9 @@ public class AVM2LocalData extends BaseLocalData {
         codeStats = localData.codeStats;
         defaultWays = localData.defaultWays;
         switchedRegs = localData.switchedRegs;
+        finallyIndicesWithDoublePush = localData.finallyIndicesWithDoublePush;
+        finallyJumpsToFinallyIndex = localData.finallyJumpsToFinallyIndex;
+        finallyIndexToDefaultGraphPart = localData.finallyIndexToDefaultGraphPart;
     }
 
     public AVM2ConstantPool getConstants() {

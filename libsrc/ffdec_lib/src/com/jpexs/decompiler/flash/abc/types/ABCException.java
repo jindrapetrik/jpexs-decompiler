@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
@@ -39,6 +40,8 @@ public class ABCException implements Serializable, Cloneable {
 
     public int name_index;
 
+    public static final String DEFAULT_EXCEPTION_NAME = "_loc_e_";
+
     @Override
     public String toString() {
         return "Exception: startServer=" + Helper.formatAddress(start) + " end=" + Helper.formatAddress(end) + " target=" + target + " type_index=" + type_index + " name_index=" + name_index;
@@ -62,7 +65,7 @@ public class ABCException implements Serializable, Cloneable {
 
     public String getVarName(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
         if (name_index == 0) {
-            return "";
+            return DEFAULT_EXCEPTION_NAME;
         }
         return constants.getMultiname(name_index).getName(constants, fullyQualifiedNames, false, true);
     }
