@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph.precontinues;
 
 import com.jpexs.decompiler.graph.GraphPart;
@@ -282,13 +283,13 @@ public class GraphPrecontinueDetector {
                 && node.next.get(0).prev.size() == 1) {
             IfNode ifNode = new IfNode();
             ifNode.onTrue = node.next.get(0);
+            Node after = node.next.get(1);
             ifNode.onTrue.parentNode = ifNode;
             ifNode.onTrue.removeFromGraph();
             ifNode.onFalse = null;
             ifNode.graphPart = node.graphPart;
             ifNode.prev = new ArrayList<>(node.prev);
             node.replacePrevs(ifNode);
-            Node after = node.next.get(1);
             node.removeFromGraph();
             ifNode.next.add(after);
             after.prev.add(ifNode);
@@ -314,12 +315,12 @@ public class GraphPrecontinueDetector {
             IfNode ifNode = new IfNode();
             ifNode.onTrue = null;
             ifNode.onFalse = node.next.get(1);
+            Node after = node.next.get(0);
             ifNode.onFalse.parentNode = ifNode;
             ifNode.onFalse.removeFromGraph();
             ifNode.graphPart = node.graphPart;
             ifNode.prev = new ArrayList<>(node.prev);
             node.replacePrevs(ifNode);
-            Node after = node.next.get(0);
             node.removeFromGraph();
             ifNode.next.add(after);
             after.prev.add(ifNode);
