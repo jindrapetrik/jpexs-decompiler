@@ -1121,11 +1121,7 @@ public class AVM2Graph extends Graph {
         }*/
     }
 
-    //FIXME: remove this with better alternative
     private boolean isIntegerOrPopInteger(GraphTargetItem item) {
-        if (true) {
-            return false;
-        }
         if (item instanceof IntegerValueAVM2Item) {
             return true;
         }
