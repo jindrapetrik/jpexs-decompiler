@@ -8,6 +8,7 @@
 *.identcache
 *.recompiled.swf
 *(Selective Sync Conflict*
+buildlog.*.txt
 run_test_*.swf
 Thumbs.db
 /build/
