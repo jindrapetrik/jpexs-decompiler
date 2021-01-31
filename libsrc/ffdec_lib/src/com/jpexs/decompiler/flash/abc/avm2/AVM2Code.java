@@ -2447,6 +2447,9 @@ public class AVM2Code implements Cloneable {
                 // check stack=0
                 return true;
             }
+            if (ins.definition instanceof ThrowIns) {
+                return true;
+            }
             if (ins.definition instanceof JumpIns) {
                 try {
                     pos = adr2pos(ins.getTargetAddress());
@@ -2518,7 +2521,7 @@ public class AVM2Code implements Cloneable {
                 if (code.get(maxIp).definition instanceof JumpIns) {
                     nextIp = adr2pos(pos2adr(nextIp) + code.get(maxIp).operands[0]);
                 }
-                if (nextIp < stats.instructionStats.length) {
+                /*if (nextIp < stats.instructionStats.length) {
                     InstructionStats nextIpStat = stats.instructionStats[nextIp];
                     int origScopePos = nextIpStat.scopepos;
                     int origStackPos = nextIpStat.stackpos;
@@ -2528,12 +2531,12 @@ public class AVM2Code implements Cloneable {
                             stats.instructionStats[i].seen = false;
                         }
                         // Rerun rest with new scopePos, stackPos
-                        if (!walkCode(stats, nextIp, origStackPos + 1/*magic!*/, scopePos - 1 /*magic!*/, abc, autoFill)) {
+                        if (!walkCode(stats, nextIp, origStackPos + 1, scopePos - 1, abc, autoFill)) {
                             return null;
                         }
                         scopePos--;
                     }
-                }
+                }*/
                 prevStart = ex.start;
             } catch (ConvertException ex1) {
                 // ignore

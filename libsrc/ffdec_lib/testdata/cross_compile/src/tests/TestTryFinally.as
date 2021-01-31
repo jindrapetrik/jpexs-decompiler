@@ -16,7 +16,7 @@ package tests
 			}
 			catch (e:Error)
 			{
-				trace("in catch");
+				trace("in catch");				
 			}
 			finally
 			{
