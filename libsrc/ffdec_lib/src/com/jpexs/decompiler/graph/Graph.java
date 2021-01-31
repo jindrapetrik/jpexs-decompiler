@@ -238,7 +238,7 @@ public class Graph {
 
             GraphPartQueue newParts = new GraphPartQueue();
             loopnext:
-            for (GraphPart nextRaw : part.nextParts) {
+            for (GraphPart nextRaw : getNextParts(localData, part)) {
 
                 GraphPart next = checkPart(null, localData, part, nextRaw, null);
                 if (next == null) {
@@ -276,7 +276,7 @@ public class Graph {
     }
 
     public GraphPart getNextCommonPart(BaseLocalData localData, GraphPart part, List<Loop> loops) throws InterruptedException {
-        return getCommonPart(localData, part, part.nextParts, loops);
+        return getCommonPart(localData, part, getNextParts(localData, part), loops);
     }
 
     //TODO: Make this faster!
@@ -374,7 +374,7 @@ public class Graph {
             }
         }
 
-        loopi:
+        /*loopi:
         for (int i = 0; i < parts.size(); i++) {
             for (int j = 0; j < parts.size(); j++) {
                 if (j == i) {
@@ -386,7 +386,7 @@ public class Graph {
                     continue loopi;
                 }
             }
-        }
+        }*/
         List<Set<GraphPart>> reachable = new ArrayList<>();
         Set<GraphPart> allReachable = new LinkedHashSet<>();
         for (GraphPart p : parts) {
@@ -410,7 +410,7 @@ public class Graph {
                 continue;
             }
             visited.add(p);
-            int commonLevel = 1;
+            int commonLevel = 0;
             for (Set<GraphPart> r : reachable) {
                 if (r.contains(p)) {
                     commonLevel++;
@@ -426,6 +426,9 @@ public class Graph {
         //System.err.println("maxclevel = " + maxCommonLevel);
         //System.err.println("maxclevelpart = " + maxCommonLevelPart);
 
+        if (maxCommonLevel <= 1) {
+            return null;
+        }
         return maxCommonLevelPart;
     }
 
@@ -440,7 +443,7 @@ public class Graph {
          for (int i = part.start; i <= part.end; i++) {
          GraphSourceItem src = code.get(i);
          if (src.isJump()) {
-         part = part.nextParts.get(0);
+         part = getNextParts(localData, part).get(0);
          if(st.isEmpty()){
          startPart = part;
          }
@@ -480,11 +483,11 @@ public class Graph {
             System.err.println("parts:");
             for (GraphPart p : allParts) {
                 System.err.print(p);
-                if (!p.nextParts.isEmpty()) {
+                if (!getNextParts(localData, p).isEmpty()) {
                     System.err.print(", next: ");
                 }
                 boolean first = true;
-                for (GraphPart n : p.nextParts) {
+                for (GraphPart n : getNextParts(localData, p)) {
                     if (!first) {
                         System.err.print(",");
                     }
@@ -552,7 +555,7 @@ public class Graph {
         return new FinalProcessLocalData(loops);
     }
 
-    protected void beforePrintGraph(BaseLocalData localData, String path, Set<GraphPart> allParts, List<Loop> loops) {
+    protected void beforePrintGraph(BaseLocalData localData, String path, Set<GraphPart> allParts, List<Loop> loops) throws InterruptedException {
 
     }
 
@@ -604,7 +607,7 @@ public class Graph {
 
 
     /**/
-    //if (ref.nextParts)
+    //if (getNextParts(localData, ref))
     private void getBackEdges(BaseLocalData localData, List<Loop> loops) throws InterruptedException {
         clearLoops(loops);
         for (Loop el : loops) {
@@ -843,7 +846,7 @@ public class Graph {
         }
     }
 
-    private void processIfs(List<GraphTargetItem> list) {
+    protected void processIfs(List<GraphTargetItem> list) {
         for (int i = 0; i < list.size(); i++) {
             GraphTargetItem item = list.get(i);
             if ((item instanceof LoopItem) && (item instanceof Block)) {
@@ -1192,7 +1195,7 @@ public class Graph {
             //loopContinues.add(part);
         }
 
-        if (part.nextParts.size() == 2) {
+        if (part.nextParts.size() == 2 && !partIsSwitch(part)) {
 
             List<GraphPart> nps;/* = new ArrayList<>(part.nextParts);
              for(int i=0;i<nps.size();i++){
@@ -1217,7 +1220,7 @@ public class Graph {
             if (next != null) {
                 getLoops(localData, next, loops, stopPart, false, level, visited);
             }
-        } else if (part.nextParts.size() > 2) {
+        } else if (part.nextParts.size() > 2 || partIsSwitch(part)) {
             GraphPart next = getNextCommonPart(localData, part, loops);
 
             for (GraphPart p : part.nextParts) {
@@ -1411,6 +1414,10 @@ public class Graph {
         }
     }
 
+    protected List<GraphPart> getNextParts(BaseLocalData localData, GraphPart part) {
+        return part.nextParts;
+    }
+
     protected List<GraphTargetItem> printGraph(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
@@ -1428,7 +1435,7 @@ public class Graph {
         //try {
 
         if (debugPrintGraph) {
-            System.err.println("PART " + part + " nextsize:" + part.nextParts.size());
+            System.err.println("PART " + part + " nextsize:" + getNextParts(localData, part).size());
         }
 
         /*while (((part != null) && (part.getHeight() == 1)) && (code.size() > part.start) && (code.get(part.start).isJump())) {  //Parts with only jump in it gets ignored
@@ -1436,9 +1443,9 @@ public class Graph {
          if (part == stopPart) {
          return ret;
          }
-         GraphTargetItem lop = checkLoop(part.nextParts.get(0), stopPart, loops);
+         GraphTargetItem lop = checkLoop(getNextParts(localData, part).get(0), stopPart, loops);
          if (lop == null) {
-         part = part.nextParts.get(0);
+         part = getNextParts(localData, part).get(0);
          } else {
          break;
          }
@@ -1584,8 +1591,11 @@ public class Graph {
             parts = ((GraphPartMulti) part).parts;
         } else {
             parts.add(part);
-            while (part.nextParts.size() == 1 && part.nextParts.get(0).refs.size() == 1) {
-                part = part.nextParts.get(0);
+            while (getNextParts(localData, part).size() == 1 && getNextParts(localData, part).get(0).refs.size() == 1) {
+                if (stopPart.contains(getNextParts(localData, part).get(0))) { //it might be referenced with try statement
+                    break;
+                }
+                part = getNextParts(localData, part).get(0);
                 parts.add(part);
             }
         }
@@ -1594,7 +1604,7 @@ public class Graph {
             int start = p.start;
 
             output.addAll(code.translatePart(p, localData, stack, start, end, staticOperation, path));
-            if ((end >= code.size() - 1) && p.nextParts.isEmpty()) {
+            if ((end >= code.size() - 1) && getNextParts(localData, p).isEmpty()) {
                 output.add(new ScriptEndItem());
             }
         }
@@ -1614,7 +1624,7 @@ public class Graph {
 //********************************END PART DECOMPILING
         if (parseNext) {
 
-            if (part.nextParts.size() > 2) {
+            if (getNextParts(localData, part).size() > 2 || partIsSwitch(part)) {
                 GraphTargetItem originalSwitchedItem = stack.pop();
                 makeAllCommands(currentRet, stack);
                 GraphTargetItem switchedItem = originalSwitchedItem;
@@ -1742,11 +1752,11 @@ public class Graph {
                 pos = 0;
                 //This is tied to AS3 switch implementation which has nextparts switched from index 1. TODO: Make more universal
 
-                GraphPart defaultPart = hasExpr ? part.nextParts.get(1 + defaultBranch) : part.nextParts.get(0);
+                GraphPart defaultPart = hasExpr ? getNextParts(localData, part).get(1 + defaultBranch) : getNextParts(localData, part).get(0);
                 List<GraphPart> caseBodyParts = new ArrayList<>();
-                for (int i = 1; i < part.nextParts.size(); i++) {
+                for (int i = 1; i < getNextParts(localData, part).size(); i++) {
                     if (!hasExpr) {
-                        if (part.nextParts.get(i) == defaultPart) {
+                        if (getNextParts(localData, part).get(i) == defaultPart) {
                             pos++;
                             continue;
                         }
@@ -1763,7 +1773,7 @@ public class Graph {
                         pos++;
                         continue;
                     }
-                    caseBodyParts.add(part.nextParts.get(i));
+                    caseBodyParts.add(getNextParts(localData, part).get(i));
                     pos++;
                 }
                 Reference<GraphPart> nextRef = new Reference<>(null);
@@ -1783,7 +1793,7 @@ public class Graph {
                 pos++;
             } //else
             GraphPart nextOnePart = null;
-            if (part.nextParts.size() == 2) {
+            if (getNextParts(localData, part).size() == 2 && !partIsSwitch(part)) {
                 GraphTargetItem expr = stack.pop();
                 /*if (expr instanceof LogicalOpItem) {
                  expr = ((LogicalOpItem) expr).invert();
@@ -1793,7 +1803,7 @@ public class Graph {
                 if (nextOnePart == null) {
 
                     List<GraphPart> nps;
-                    nps = part.nextParts;
+                    nps = getNextParts(localData, part);
                     boolean isEmpty = nps.get(0) == nps.get(1);
 
                     GraphPart next = getCommonPart(localData, part, nps, loops);
@@ -1896,11 +1906,16 @@ public class Graph {
                     }
                 }
             }  //else
-            if (part.nextParts.size() == 1) {
-                nextOnePart = part.nextParts.get(0);
+            if (getNextParts(localData, part).size() == 1) {
+                nextOnePart = getNextParts(localData, part).get(0);
             }
+
+            if (getNextParts(localData, part).isEmpty()) {
+                makeAllCommands(currentRet, stack);
+            }
+
             if (nextOnePart != null) {
-                printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, part, part.nextParts.get(0), stopPart, loops, currentRet, staticOperation, path, recursionLevel + 1);
+                printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, part, getNextParts(localData, part).get(0), stopPart, loops, currentRet, staticOperation, path, recursionLevel + 1);
             }
 
         }
@@ -2415,26 +2430,14 @@ public class Graph {
                 if (p instanceof FunctionActionItem) {
                     commands.add(clen, p);
                 } else {
-                    if (isExit) {
+                    /*if (isExit) {
                         //ASC2 leaves some function calls unpopped on stack before returning from a method
                         commands.add(clen, p);
-                    } else {
+                    } else {*/
                         commands.add(clen, new PushItem(p));
-                    }
+                    //}
                 }
             }
-        }
-    }
-
-    protected void removeEdgeToFromList(List<GraphPartEdge> edges, GraphPart to) {
-        for (int i = edges.size() - 1; i >= 0; i--) {
-            if (edges.get(i).to.equals(to)) {
-                edges.remove(i);
-            }
-        }
-        while (isPartEmpty(to) && !to.nextParts.isEmpty()) {
-            to = to.nextParts.get(0);
-            removeEdgeToFromList(edges, to);
         }
     }
 
@@ -2570,16 +2573,12 @@ public class Graph {
 
         for (int i = 0; i < caseBodies.size(); i++) {
             List<GraphTargetItem> currentCaseCommands = new ArrayList<>();
-            GraphPart nextCase = next;
-            if (next != null) {
-                if (i < caseBodies.size() - 1) {
-                    if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops)) {
-                        currentCaseCommands.add(new BreakItem(null, localData.lineStartInstruction, currentLoop.id));
-                    } else {
-                        nextCase = caseBodies.get(i + 1);
-                    }
+            if (i < caseBodies.size() - 1) {
+                if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops)) {
+                    currentCaseCommands.add(new BreakItem(null, localData.lineStartInstruction, currentLoop.id));
                 }
             }
+
             List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
             for (GraphPart b : caseBodies) {
                 if (b != caseBodies.get(i)) {
@@ -2637,5 +2636,9 @@ public class Graph {
         currentLoop.phase = 2;
         return new SwitchItem(null, switchStartItem, currentLoop, switchedObject, caseValuesMap, caseCommands, valuesMapping);
 
+    }
+
+    protected boolean partIsSwitch(GraphPart part) {
+        return false;
     }
 }

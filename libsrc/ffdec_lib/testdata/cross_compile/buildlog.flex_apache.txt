@@ -1,0 +1,2 @@
+Loading configuration file C:\flex_apache\frameworks\flex-config.xml
+C:\Dropbox\Programovani\JavaSE\FFDec\libsrc\ffdec_lib\testdata\cross_compile\bin\Main.flex_apache.swf (3617 bytes)

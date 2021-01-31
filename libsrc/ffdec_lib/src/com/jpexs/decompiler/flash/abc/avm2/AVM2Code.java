@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.EndOfStreamException;
@@ -1493,21 +1494,30 @@ public class AVM2Code implements Cloneable {
         }
     }
 
-    public int fixIPAfterDebugLine(int ip) {
+    public int getIpThroughJumpAndDebugLine(int ip) {
         if (code.isEmpty()) {
             return ip;
         }
         if (ip >= code.size()) {
             return code.size() - 1;
         }
-        while (code.get(ip).definition instanceof DebugLineIns) {
-            ip++;
+        while (ip < code.size()) {
+            if (code.get(ip).definition instanceof DebugLineIns) {
+                ip++;
+            } else if (code.get(ip).definition instanceof JumpIns) {
+                ip = adr2pos(pos2adr(ip + 1) + code.get(ip).operands[0]);
+            } else {
+                break;
+            }
+        }
+        if (ip >= code.size()) {
+            return code.size() - 1;
         }
         return ip;
     }
 
-    public long fixAddrAfterDebugLine(long addr) throws ConvertException {
-        return pos2adr(fixIPAfterDebugLine(adr2pos(addr, true)));
+    public long getAddrThroughJumpAndDebugLine(long addr) throws ConvertException {
+        return pos2adr(getIpThroughJumpAndDebugLine(adr2pos(addr, true)));
     }
 
     public ConvertOutput toSourceOutput(Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, boolean thisHasDefaultToPrimitive, Reference<GraphSourceItem> lineStartItem, String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ABC abc, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws ConvertException, InterruptedException {
@@ -2373,7 +2383,7 @@ public class AVM2Code implements Cloneable {
         }
     }
 
-    private boolean walkCode(CodeStats stats, int pos, int stack, int scope, ABC abc) {
+    private boolean walkCode(CodeStats stats, int pos, int stack, int scope, ABC abc, boolean autoFill) {
         while (pos < code.size()) {
             AVM2Instruction ins = code.get(pos);
             if (stats.instructionStats[pos].seen) {
@@ -2383,7 +2393,9 @@ public class AVM2Code implements Cloneable {
 
             if (ins.definition instanceof NewFunctionIns) {
                 MethodBody innerBody = abc.findBody(ins.operands[0]);
-                innerBody.autoFillStats(abc, stats.initscope + (stats.has_activation ? 1 : 0), false);
+                if (autoFill) {
+                    innerBody.autoFillStats(abc, stats.initscope + (stats.has_activation ? 1 : 0), false);
+                }
             }
 
             stats.instructionStats[pos].seen = true;
@@ -2445,7 +2457,7 @@ public class AVM2Code implements Cloneable {
             } else if (ins.definition instanceof IfTypeIns) {
                 try {
                     int newpos = adr2pos(ins.getTargetAddress());
-                    walkCode(stats, newpos, stack, scope, abc);
+                    walkCode(stats, newpos, stack, scope, abc, autoFill);
                 } catch (ConvertException ex) {
                     return false;
                 }
@@ -2457,7 +2469,7 @@ public class AVM2Code implements Cloneable {
                     }
                     try {
                         int newpos = adr2pos(pos2adr(pos) + ins.operands[i]);
-                        if (!walkCode(stats, newpos, stack, scope, abc)) {
+                        if (!walkCode(stats, newpos, stack, scope, abc, autoFill)) {
                             return false;
                         }
                     } catch (ConvertException ex) {
@@ -2470,10 +2482,10 @@ public class AVM2Code implements Cloneable {
         return true;
     }
 
-    public CodeStats getStats(ABC abc, MethodBody body, int initScope) {
+    public CodeStats getStats(ABC abc, MethodBody body, int initScope, boolean autoFill) {
         CodeStats stats = new CodeStats(this);
         stats.initscope = initScope;
-        if (!walkCode(stats, 0, 0, initScope, abc)) {
+        if (!walkCode(stats, 0, 0, initScope, abc, autoFill)) {
             return null;
         }
         int scopePos = -1;
@@ -2490,7 +2502,7 @@ public class AVM2Code implements Cloneable {
                         visited.add(i);
                     }
                 }
-                if (!walkCode(stats, adr2pos(ex.target), 1 + (ex.isFinally() ? 1 : 0), scopePos, abc)) {
+                if (!walkCode(stats, adr2pos(ex.target), 1, scopePos, abc, autoFill)) {
                     return null;
                 }
                 int maxIp = 0;
@@ -2516,7 +2528,7 @@ public class AVM2Code implements Cloneable {
                             stats.instructionStats[i].seen = false;
                         }
                         // Rerun rest with new scopePos, stackPos
-                        if (!walkCode(stats, nextIp, origStackPos + 1/*magic!*/, scopePos - 1 /*magic!*/, abc)) {
+                        if (!walkCode(stats, nextIp, origStackPos + 1/*magic!*/, scopePos - 1 /*magic!*/, abc, autoFill)) {
                             return null;
                         }
                         scopePos--;

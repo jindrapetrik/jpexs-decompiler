@@ -1,0 +1,60 @@
+digraph try_finally_flex {
+  label = "Try..Finally clause in Adobe Flex";
+  node[shape=rect];
+  
+  start->before;
+  before->in_try;
+  try_f_begin->in_try;
+  try_c_begin->in_try;
+  in_try->pushbyteminusone;
+  try_c_end->pushbyteminusone;
+  in_catch->pushbyteminusone;
+  pushbyteminusone->finally;
+  try_c_target->in_catch;
+  try_f_end->finally;
+  try_f_target->catch_f->finally:ne;
+  
+  finally->lookupswitch;
+  
+  lookupswitch->after;
+  lookupswitch->finally_throw[label="X"];
+  
+  after->end;
+  
+  pushbyteminusone[label="pushbyte -1"];
+  catch_f[label="loc_E = exception;\lpushbyte X;\l"];
+  finally_throw[label="throw loc_E;"];
+  
+  try_c_target[shape=ellipse];
+  try_c_begin[shape=ellipse];
+  try_c_end[shape=ellipse];
+  
+  try_f_target[shape=ellipse];
+  try_f_begin[shape=ellipse];
+  try_f_end[shape=ellipse];
+  
+  start[shape=ellipse];
+  end[shape=ellipse];
+  
+  lookupswitch[label="lookupswitch(§§pop())"]
+  
+  in_try->in_try_ret[label=return];
+  in_try_ret[label="loc_R = returnedValue;\lpushbyte Y;\l"]
+  in_try_ret->finally;
+  lookupswitch->finally_return[label="Y"];
+  finally_return[label="return loc_R;"];
+  
+  in_try->in_try_continue[label=continue];
+  in_try_continue[label="pushbyte Z;"]
+  in_try_continue->finally;
+  lookupswitch->finally_continue[label="Z"];
+  finally_continue[label="continue label;"];
+  
+  /*
+  All ways go through finally clause. There is also lookupswitch which uses value on stack..
+  Value -1 is pushed on stack after in_try and after catch bodys.
+  For every return/continue, there is also specific value pushed to stack.
+  Lookupswitch then decides what will happen.
+  */
+    
+}

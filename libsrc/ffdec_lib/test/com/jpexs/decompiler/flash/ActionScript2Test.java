@@ -2006,6 +2006,8 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "case \"C\":\r\n"
                 + "trace(\"Ret 5\");\r\n"
                 + "return 5;\r\n"
+                + "default:\r\n"
+                + "continue;\r\n"
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"Final\");\r\n"

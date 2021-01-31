@@ -1,0 +1,60 @@
+
+digraph try_finally_asc2 {
+  label = "Try..Finally clause in ASC2";
+  node[shape=rect];
+  
+  start->before;
+  before->finally_init->in_try;
+  try_f_begin->in_try;
+  try_c_begin->in_try;
+  in_try->finally;
+  try_c_end->finally;
+  in_catch->finally;
+  try_c_target->in_catch;
+  try_f_end->finally;
+  try_f_target->catch_f->finally:ne;
+  
+  finally->lookupswitch;
+  
+  lookupswitch->after;
+  lookupswitch->finally_throw[label="X"];
+  
+  after->end;
+  
+  finally_init[label="loc_N=0;"];
+  catch_f[label="loc_E = exception;\lloc_N = X;\l"];
+  finally_throw[label="throw loc_E;"];
+  
+  try_c_target[shape=ellipse];
+  try_c_begin[shape=ellipse];
+  try_c_end[shape=ellipse];
+  
+  try_f_target[shape=ellipse];
+  try_f_begin[shape=ellipse];
+  try_f_end[shape=ellipse];
+  
+  start[shape=ellipse];
+  end[shape=ellipse];
+  
+  lookupswitch[label="lookupswitch(loc_N)"]
+  
+  in_try->in_try_ret[label=return];
+  in_try_ret[label="loc_R = returnedValue;\lloc_N = Y;\l"]
+  in_try_ret->finally;
+  lookupswitch->finally_return[label="Y"];
+  finally_return[label="return loc_R;"];
+  
+  in_try->in_try_continue[label=continue];
+  in_try_continue[label="loc_N = Z;"]
+  in_try_continue->finally;
+  lookupswitch->finally_continue[label="Z"];
+  finally_continue[label="continue label;"];
+  
+  /*
+  All ways go through finally clause. There is also lookupswitch with getlocal.
+  Local register is set before entering in_try block.
+  For every return/continue, there is local register set to specific value.
+  Lookupswitch then decides what will happen.
+  */
+  
+}

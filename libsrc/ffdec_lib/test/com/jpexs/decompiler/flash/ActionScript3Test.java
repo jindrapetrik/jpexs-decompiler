@@ -1415,6 +1415,7 @@ public class ActionScript3Test extends ActionScriptTestBase {
                 + "{\r\n"
                 + "trace(\"a\");\r\n"
                 + "}\r\n"
+                + "continue;\r\n"
                 + "}\r\n"
                 + "catch(e:EOFError)\r\n"
                 + "{\r\n"

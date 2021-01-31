@@ -1,0 +1,44 @@
+digraph try_finally_swftools {
+  label = "Try..Finally clause in swftools";
+  node[shape=rect];
+  
+  start->before;
+  before->in_try;
+  try_f_begin->in_try;
+  try_c_begin->in_try;
+  in_try->finally;
+  try_c_end->finally;
+  in_catch->finally;
+  try_c_target->in_catch;
+  try_f_end->finally;
+  try_f_target->catch_f;
+  
+  finally->after;
+  
+
+  
+  after->end;
+  
+  catch_f[label="finally;\lthrow exception;\l"];
+  try_c_target[shape=ellipse];
+  try_c_begin[shape=ellipse];
+  try_c_end[shape=ellipse];
+  
+  try_f_target[shape=ellipse];
+  try_f_begin[shape=ellipse];
+  try_f_end[shape=ellipse];
+  
+  start[shape=ellipse];
+  end[shape=ellipse];
+  
+  in_try->in_try_ret[label=return];
+  in_try_ret[label="§§push(returnedValue);\lfinally;\lreturn §§pop();\l"]
+  
+  in_try->in_try_continue[label=continue];
+  in_try_continue[label="finally;\lcontinue label;\l"];
+  
+  /*
+  Finally is inlined in every its usage.
+  In try_f_target there is finnally alone with throw - we can take it from there.
+  */
+}
