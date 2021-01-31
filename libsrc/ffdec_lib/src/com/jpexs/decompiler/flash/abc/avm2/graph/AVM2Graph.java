@@ -55,6 +55,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.ReturnValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnVoidAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThrowAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.WithAVM2Item;
@@ -79,6 +80,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.AnyItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
 import com.jpexs.decompiler.graph.model.IfItem;
@@ -155,7 +157,7 @@ public class AVM2Graph extends Graph {
         for (GraphPart p : ((AVM2LocalData) localData).ignoredSwitches.values()) {
             integerSwitchesIps.add(p.end);
         }
-        Map<Integer, Set<Integer>> setLocalPosToGetLocalPos = calculateLocalRegsUsage(integerSwitchesIps, path, allParts);
+        Map<Integer, Set<Integer>> setLocalPosToGetLocalPos = calculateLocalRegsUsage(avm2LocalData, integerSwitchesIps, path, allParts);
         avm2LocalData.setLocalPosToGetLocalPos = setLocalPosToGetLocalPos;
     }
 
@@ -353,11 +355,16 @@ public class AVM2Graph extends Graph {
         }
     }
 
-    public Map<Integer, Set<Integer>> calculateLocalRegsUsage(Set<Integer> ignoredSwitches, String path, Set<GraphPart> allParts) {
+    public Map<Integer, Set<Integer>> calculateLocalRegsUsage(AVM2LocalData localData, Set<Integer> ignoredSwitches, String path, Set<GraphPart> allParts) {
         logger.log(Level.FINE, "--- {0} ---", path);
         Map<Integer, Set<Integer>> setLocalPosToGetLocalPos = new TreeMap<>();
         Map<GraphPart, Map<Integer, List<Integer>>> partUnresolvedRegisterToGetLocalPos = new HashMap<>();
         Map<GraphPart, Map<Integer, Integer>> partRegisterToLastSetLocalPos = new HashMap<>();
+
+        Map<GraphPart, GraphPart> reverseFinallyJumps = new HashMap<>();
+        for (GraphPart p : localData.finallyJumps.keySet()) {
+            reverseFinallyJumps.put(localData.finallyJumps.get(p), p);
+        }
 
         for (GraphPart p : allParts) {
             if (p.start < 0) {
@@ -415,8 +422,13 @@ public class AVM2Graph extends Graph {
             Map<Integer, List<Integer>> unresolvedRegisterToGetLocalPos = partUnresolvedRegisterToGetLocalPos.get(p);
             Set<GraphPart> visited = new HashSet<>();
             visited.add(p);
-            for (GraphPart q : p.refs) {
-                calculateLocalRegsUsageWalk(ignoredSwitches, q, unresolvedRegisterToGetLocalPos, visited, partRegisterToLastSetLocalPos, setLocalPosToGetLocalPos, p);
+            if (reverseFinallyJumps.containsKey(p)) {
+                GraphPart q = reverseFinallyJumps.get(p);
+                calculateLocalRegsUsageWalk(reverseFinallyJumps, ignoredSwitches, q, unresolvedRegisterToGetLocalPos, visited, partRegisterToLastSetLocalPos, setLocalPosToGetLocalPos, p);
+            } else {
+                for (GraphPart q : p.refs) {
+                    calculateLocalRegsUsageWalk(reverseFinallyJumps, ignoredSwitches, q, unresolvedRegisterToGetLocalPos, visited, partRegisterToLastSetLocalPos, setLocalPosToGetLocalPos, p);
+                }
             }
         }
 
@@ -432,7 +444,7 @@ public class AVM2Graph extends Graph {
         return setLocalPosToGetLocalPos;
     }
 
-    public void calculateLocalRegsUsageWalk(Set<Integer> ignoredSwitches, GraphPart q,
+    public void calculateLocalRegsUsageWalk(Map<GraphPart, GraphPart> reverseFinallyJumps, Set<Integer> ignoredSwitches, GraphPart q,
             Map<Integer, List<Integer>> unresolvedRegisterToGetLocalPos,
             Set<GraphPart> visited,
             Map<GraphPart, Map<Integer, Integer>> partRegisterToLastSetLocalPos,
@@ -462,8 +474,13 @@ public class AVM2Graph extends Graph {
 
         visited.add(q);
 
-        for (GraphPart r : q.refs) {
-            calculateLocalRegsUsageWalk(ignoredSwitches, r, unresolvedRegisterToGetLocalPos, visited, partRegisterToLastSetLocalPos, setLocalPosToGetLocalPos, q);
+        if (reverseFinallyJumps.containsKey(q)) {
+            GraphPart r = reverseFinallyJumps.get(q);
+            calculateLocalRegsUsageWalk(reverseFinallyJumps, ignoredSwitches, r, unresolvedRegisterToGetLocalPos, visited, partRegisterToLastSetLocalPos, setLocalPosToGetLocalPos, q);
+        } else {
+            for (GraphPart r : q.refs) {
+                calculateLocalRegsUsageWalk(reverseFinallyJumps, ignoredSwitches, r, unresolvedRegisterToGetLocalPos, visited, partRegisterToLastSetLocalPos, setLocalPosToGetLocalPos, q);
+            }
         }
     }
 
@@ -924,11 +941,11 @@ public class AVM2Graph extends Graph {
                 }
 
                 List<GraphTargetItem> currentCatchCommands = printGraph(foundGotos, partCodes, partCodePos, localData2, st2, allParts, null, catchPart, stopPart2, loops, staticOperation, path);
-                if (!currentCatchCommands.isEmpty() && (currentCatchCommands.get(0) instanceof SetLocalAVM2Item)) {
+                /*if (!currentCatchCommands.isEmpty() && (currentCatchCommands.get(0) instanceof SetLocalAVM2Item)) {
                     if (currentCatchCommands.get(0).value.getNotCoerced() instanceof ExceptionAVM2Item) {
                         currentCatchCommands.remove(0);
                     }
-                }
+                }*/
                 if (!currentCatchCommands.isEmpty() && (currentCatchCommands.get(currentCatchCommands.size() - 1) instanceof SetLocalAVM2Item)) {
                     SetLocalAVM2Item setLocal = (SetLocalAVM2Item) currentCatchCommands.get(currentCatchCommands.size() - 1);
                     if (setLocal.regIndex == switchedReg) {
@@ -1499,10 +1516,24 @@ public class AVM2Graph extends Graph {
         List<GraphTargetItem> ret = list;
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i) instanceof SetTypeAVM2Item) {
-                if (((SetTypeAVM2Item) list.get(i)).getValue() instanceof ExceptionAVM2Item) {
-                    list.remove(i);
-                    i--;
-                    continue;
+                if (((SetTypeAVM2Item) list.get(i)).getValue().getThroughDuplicate() instanceof ExceptionAVM2Item) {
+
+                    boolean doRemove = false;
+                    if (list.get(i) instanceof SetSlotAVM2Item) {
+                        doRemove = true;
+                    }
+                    if (list.get(i) instanceof SetLocalAVM2Item) {
+                        int setLocalIp = avm2code.adr2pos(list.get(i).getSrc().getAddress());
+                        Set<Integer> usages = localData.getRegisterUsage(setLocalIp);
+                        if (usages.isEmpty()) {
+                            doRemove = true;
+                        }
+                    }
+                    if (doRemove) {
+                        list.remove(i);
+                        i--;
+                        continue;
+                    }
                 }
             }
             if (list.get(i) instanceof IfItem) {
