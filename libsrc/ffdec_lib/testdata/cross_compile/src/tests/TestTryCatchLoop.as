@@ -11,14 +11,16 @@ package tests
 		
 		public function run() : void
 		{
-			var j:* = undefined;
-			for (var i:* = 0; i < 100; i++)
+			var i:int = 0;
+			while (i < 100)
 			{
 				try
 				{
-					for (j = 0; j < 20; j++)
+					var j:int = 0;
+					while (j < 20)
 					{
 						trace("a");
+						j++;
 					}
 				}
 				catch (e:EOFError)
@@ -30,6 +32,7 @@ package tests
 					continue;
 				}
 				trace("after_try");
+				i++;
 			}
 			trace("end");
 		}

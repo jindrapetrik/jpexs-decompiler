@@ -50,7 +50,9 @@ import java.util.TreeMap;
  */
 public class AS3Generator {
 
-    private static void useFile(StringBuilder s, File f, String identifier) throws FileNotFoundException, IOException, InterruptedException {
+    private static void useFile(String testClassName, String[][] swfAndIdentifierList, boolean multipleProviders) throws FileNotFoundException, IOException, InterruptedException {
+        StringBuilder s = new StringBuilder();
+        File f = new File(swfAndIdentifierList[0][0]);
         SWF swf = new SWF(new BufferedInputStream(new FileInputStream(f)), false);
         DoABC2Tag tag = null;
         List<ScriptPack> scriptPacks = swf.getAS3Packs();
@@ -58,6 +60,46 @@ public class AS3Generator {
         for (ScriptPack pack : scriptPacks) {
             sortedPacks.put(pack.getClassPath().toRawString(), pack);
         }
+        s.append("package com.jpexs.decompiler.flash;\r\n");
+        s.append("\r\n");
+        s.append("import java.io.IOException;\r\n");
+        s.append("import org.testng.annotations.BeforeClass;\r\n");
+        if (multipleProviders) {
+            s.append("import org.testng.annotations.DataProvider;\r\n");
+        }
+        s.append("import org.testng.annotations.Test;\r\n");
+
+        s.append("/**\r\n");
+        s.append(" *\r\n");
+        s.append(" * @author JPEXS\r\n");
+        s.append(" */\r\n");
+        s.append("public class ").append(testClassName).append(" extends ActionScript3DecompileTestBase {\r\n");
+
+        s.append("@BeforeClass\r\n");
+        s.append("public void init() throws IOException, InterruptedException {\r\n");
+        for (int i = 0; i < swfAndIdentifierList.length; i++) {
+            s.append("addSwf(\"").append(swfAndIdentifierList[i][1]).append("\", \"").append(swfAndIdentifierList[i][0].replace("\\", "\\\\")).append("\");\r\n");
+        }
+        s.append("}\r\n");
+
+        if (multipleProviders) {
+            s.append("@DataProvider\r\n");
+            s.append("public Object[][] swfNamesProvider() {\r\n");
+            s.append("return new Object[][]{\r\n");
+
+            for (int i = 0; i < swfAndIdentifierList.length; i++) {
+                s.append("{\"");
+                s.append(swfAndIdentifierList[i][1]);
+                s.append("\"}");
+                if (i < swfAndIdentifierList.length - 1) {
+                    s.append(",");
+                }
+                s.append("\r\n");
+            }
+            s.append("};\r\n");
+            s.append("}\r\n");
+        }
+
         for (String packClassName : sortedPacks.keySet()) {
             ScriptPack pack = sortedPacks.get(packClassName);
             ABC abc = pack.abc;
@@ -71,20 +113,20 @@ public class AS3Generator {
                         String name = t.getName(abc).getName(abc.constants, null, true, true);
                         String clsName = pack.getClassPath().className;
                         String lower = clsName.substring(0, 1).toLowerCase() + clsName.substring(1);
-                        String idUpper = identifier.substring(0, 1).toUpperCase() + identifier.substring(1);
-                        String testMethodName = lower.replaceAll("^test", "test" + idUpper);
+                        String identifier = swfAndIdentifierList[0][1];
+                        String testMethodName = lower; //lower.replaceAll("^test", "test" + idUpper);
                         if (lower.equals("testOptionalParameters")) { //SPECIAL: ignored
                             continue;
                         }
                         if (name.equals("run")) {
-                            if (identifier.equals("standard")) {
-                                s.append("@Test(dataProvider = \"standardSwfNamesProvider\")\r\n");
+                            if (multipleProviders) {
+                                s.append("@Test(dataProvider = \"swfNamesProvider\")\r\n");
                             } else {
                                 s.append("@Test\r\n");
                             }
                             s.append("public void ");
                             s.append(testMethodName);
-                            if (identifier.equals("standard")) {
+                            if (multipleProviders) {
                                 s.append("(String swfUsed){\r\ndecompileMethod(swfUsed");
                             } else {
                                 s.append("(){\r\ndecompileMethod(\"");
@@ -118,18 +160,23 @@ public class AS3Generator {
                 }
             }
         }
+
+        s.append("}\r\n");
+        String testPath = "test/com/jpexs/decompiler/flash/";
+        Helper.writeFile(testPath + testClassName + ".java", s.toString().getBytes("UTF-8"));
     }
 
     public static void main(String[] args) throws Exception {
         Configuration.autoDeobfuscate.set(false);
 
 
-        StringBuilder s = new StringBuilder();
+        useFile("ActionScript3ClassicDecompileTest", new String[][]{{"testdata/flashdevelop/bin/flashdevelop.swf", "classic"}}, false);
+        useFile("ActionScript3CrossCompileDecompileTest", new String[][]{
+            {"testdata/cross_compile/bin/Main.flex.swf", "flex"},
+            {"testdata/cross_compile/bin/Main.air.swf", "air"}
+        }, true);
+        useFile("ActionScript3AssembledDecompileTest", new String[][]{{"testdata/custom/bin/custom.swf", "assembled"}}, false);
 
-        useFile(s, new File("testdata/flashdevelop/bin/flashdevelop.swf"), "standard");
-        useFile(s, new File("testdata/custom/bin/custom.swf"), "assembled");
-
-        Helper.writeFile("as3_teststub.java", s.toString().getBytes("UTF-8"));
         System.exit(0);
     }
 }

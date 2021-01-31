@@ -14,11 +14,12 @@ package
 		TestTryCatchIfInTry;
 		TestTryCatchLoop;
 		TestTryCatchExceptionUsage
-		TestTryFinally;
+		TestTryFinally;		
 		TestTryFinallyDirectReturnInFinally;
 		TestTryFinallyLoop;
 		TestTryFinallyLoopInFinally;
 		TestTryFinallyMultipleCatch;
+		TestTryFinallyNoCatch;
 		TestTryFinallyReturn;
 		TestTryFinallyReturnInFinally;
 		TestTryFinallyReturnNested;
