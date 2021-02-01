@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -24,16 +25,24 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ScriptAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
 import java.util.List;
 
 /**
@@ -84,7 +93,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
             //computedValue = new NotCompileTimeItem(ins, localData.lineStartInstruction, computedValue);
         }
 
-        //chained assignments
+        //chained assignments FIXME!!!
         if (!output.isEmpty()) {
             if ((output.get(output.size() - 1) instanceof SetTypeAVM2Item)) {
                 GraphTargetItem setItem = output.get(output.size() - 1);
@@ -98,32 +107,35 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                         }
 
                         output.remove(output.size() - 1);
+
+                        if (setItem instanceof SetPropertyAVM2Item) {
+                            if ((setItem.value instanceof IncrementAVM2Item) || (setItem.value instanceof DecrementAVM2Item)) {
+                                boolean isIncrement = (setItem.value instanceof IncrementAVM2Item);
+                                if (setItem.value.value instanceof GetPropertyAVM2Item) {
+                                    SetPropertyAVM2Item setProp = (SetPropertyAVM2Item) setItem;
+                                    GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setItem.value.value;
+                                    if (getProp.object.getThroughDuplicate() == setProp.object) {
+                                        if (((FullMultinameAVM2Item) setProp.propertyName).compareSame((FullMultinameAVM2Item) getProp.propertyName)) {
+                                            if (getProp.object instanceof DuplicateItem) {
+                                                getProp.object = getProp.object.value;
+                                            }
+                                            if (isIncrement) {
+                                                setItem = new PreIncrementAVM2Item(null, localData.lineStartInstruction, getProp);
+                                            } else {
+                                                setItem = new PreDecrementAVM2Item(null, localData.lineStartInstruction, getProp);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         stack.add(setItem);
                         return;
                     }
                 }
             }
         }
-        /*if (output.size() >= 2) {
-            if ((output.get(output.size() - 1) instanceof SetTypeAVM2Item) && (output.get(output.size() - 2) instanceof SetLocalAVM2Item)) {
-                SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(output.size() - 2);
-                GraphTargetItem setItem = output.get(output.size() - 1);
-                if (setLocal.regIndex == regId
-                        && (setLocal.value instanceof DuplicateItem)
-                        && (setLocal.value.value == setItem.value.getNotCoerced())) {
-
-                    int setLocalIp = getItemIp(localData, setLocal);
-                    int getLocalIp = localData.code.adr2pos(ins.getAddress());
-                    Set<Integer> usages = localData.getSetLocalUsages(setLocalIp);
-                    if (usages.size() == 1 && usages.iterator().next().equals(getLocalIp)) {
-                        output.remove(output.size() - 1);
-                        output.remove(output.size() - 1);
-                        stack.push(setItem);
-                        return;
-                    }
-                }
-            }
-        }*/
 
         stack.push(new LocalRegAVM2Item(ins, localData.lineStartInstruction, regId, computedValue));
     }
