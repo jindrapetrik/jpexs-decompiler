@@ -12,7 +12,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {
-        addSwf("classic", "testdata/flashdevelop/bin/flashdevelop.swf");
+        addSwf("classic", "testdata/flashdevelop/bin/Main.flex.swf");
     }
 
     @Test
