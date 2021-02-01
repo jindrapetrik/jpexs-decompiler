@@ -233,6 +233,30 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testDoWhile3() {
+        decompileMethod("classic", "testDoWhile3", "do\r\n"
+                + "{\r\n"
+                + "this.nextChar();\r\n"
+                + "}\r\n"
+                + "while(this.ch != \"\\n\" && this.ch != \"\");\r\n",
+                false);
+    }
+
+    @Test
+    public void testDotParent() {
+        decompileMethod("classic", "testDotParent", "var d:* = undefined;\r\n"
+                + "var k:* = undefined;\r\n"
+                + "var g:* = undefined;\r\n"
+                + "d = new TestClass1();\r\n"
+                + "k = null;\r\n"
+                + "k.(d.attrib++, 0);\r\n"
+                + "trace(\"between\");\r\n"
+                + "g = k.(d.attrib++, 0);\r\n"
+                + "trace(\"end\");\r\n",
+                false);
+    }
+
+    @Test
     public void testExpressions() {
         decompileMethod("classic", "testExpressions", "var arr:Array = null;\r\n"
                 + "var i:int = 5;\r\n"

@@ -43,8 +43,10 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConstructAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FilteredCheckAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.HasNextAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
@@ -59,6 +61,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThrowAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.WithAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.WithEndAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.FilterAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForEachInAVM2Item;
@@ -79,9 +82,11 @@ import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.AnyItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
+import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
+import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LoopItem;
@@ -625,7 +630,6 @@ public class AVM2Graph extends Graph {
         }
         return ret;
     }
-
 
     private List<GraphTargetItem> checkTry(List<GraphTargetItem> currentRet, List<GraphTargetItem> output, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, AVM2LocalData localData, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, Set<GraphPart> allParts, TranslateStack stack, int staticOperation, String path) throws InterruptedException {
         if (localData.parsedExceptions == null) {
@@ -1210,62 +1214,133 @@ public class AVM2Graph extends Graph {
                     if (hn.obj.getNotCoerced().getThroughRegister().getNotCoerced() instanceof FilteredCheckAVM2Item) {
                         if (w.commands.size() >= 3) {
                             int pos = 0;
+                            Set<Integer> localRegsToKill = new HashSet<>();
+
                             while (w.commands.get(pos) instanceof SetLocalAVM2Item) {
+                                if (w.commands.get(pos).value instanceof NextValueAVM2Item) {
+                                    NextValueAVM2Item nextValueItem = (NextValueAVM2Item) w.commands.get(pos).value;
+                                    if (nextValueItem.index instanceof LocalRegAVM2Item) {
+                                        localRegsToKill.add(((LocalRegAVM2Item) nextValueItem.index).regIndex);
+                                    }
+                                    if (nextValueItem.obj instanceof LocalRegAVM2Item) {
+                                        localRegsToKill.add(((LocalRegAVM2Item) nextValueItem.obj).regIndex);
+                                    }
+                                }
                                 pos++;
                             }
                             GraphTargetItem ft = w.commands.get(pos);
                             if (ft instanceof WithAVM2Item) {
                                 pos++;
-                                while (w.commands.get(pos) instanceof SetTypeAVM2Item) {
+                                List<GraphTargetItem> withCommands = new ArrayList<>();
+                                while (!(w.commands.get(pos) instanceof WithEndAVM2Item)) {
+                                    withCommands.add(w.commands.get(pos));
                                     pos++;
                                 }
-                                ft = w.commands.get(pos);
-                                if (ft instanceof IfItem) {
-                                    IfItem ift = (IfItem) ft;
-                                    if (ift.onTrue.size() > 0) {
-                                        ft = ift.onTrue.get(0);
-                                        if (ft instanceof SetPropertyAVM2Item) {
-                                            SetPropertyAVM2Item spt = (SetPropertyAVM2Item) ft;
-                                            if (spt.object instanceof LocalRegAVM2Item) {
-                                                int regIndex = ((LocalRegAVM2Item) spt.object).regIndex;
-                                                HashMap<Integer, GraphTargetItem> localRegs = aLocalData.localRegs;
-                                                localRegs.put(regIndex, new FilterAVM2Item(null, null, hn.obj.getThroughRegister(), ift.expression));
 
-                                                Set<Integer> localRegsToKill = new HashSet<>();
-                                                localRegsToKill.add(regIndex);
+                                GraphTargetItem expr = null;
+                                int getLocalObjectIp = -1;
+                                int regIndex = -1;
+                                HashMap<Integer, GraphTargetItem> localRegs = aLocalData.localRegs;
 
-                                                if (hn.obj instanceof LocalRegAVM2Item) {
-                                                    localRegsToKill.add(((LocalRegAVM2Item) hn.obj).regIndex);
-                                                }
-                                                if (spt.value instanceof LocalRegAVM2Item) {
-                                                    localRegsToKill.add(((LocalRegAVM2Item) spt.value).regIndex);
-                                                }
-                                                if (spt.propertyName instanceof FullMultinameAVM2Item) {
-                                                    if (((FullMultinameAVM2Item) spt.propertyName).name instanceof LocalRegAVM2Item) {
-                                                        localRegsToKill.add(((LocalRegAVM2Item) ((FullMultinameAVM2Item) spt.propertyName).name).regIndex);
+                                if (!withCommands.isEmpty()) {
+                                    if (withCommands.get(withCommands.size() - 1) instanceof IfItem) {
+                                        IfItem ift = (IfItem) withCommands.get(withCommands.size() - 1);
+                                        if (ift.onTrue.size() > 0) {
+                                            ft = ift.onTrue.get(0);
+                                            if (ft instanceof SetPropertyAVM2Item) {
+                                                SetPropertyAVM2Item spt = (SetPropertyAVM2Item) ft;
+                                                if (spt.object instanceof LocalRegAVM2Item) {
+                                                    getLocalObjectIp = avm2code.adr2pos(spt.object.getSrc().getAddress());
+                                                    regIndex = ((LocalRegAVM2Item) spt.object).regIndex;
+                                                    expr = ift.expression.getNotCoerced();
+                                                    if (withCommands.size() > 1) {
+                                                        withCommands.remove(withCommands.size() - 1);
+                                                        withCommands.add(expr);
+                                                        expr = new CommaExpressionItem(null, localData.lineStartInstruction, withCommands);
                                                     }
                                                 }
-
-                                                //TODO: maybe check its single usage
-                                                for (int i = output.size() - 2 /*last is loop*/; i >= 0; i--) {
-                                                    if (localRegsToKill.isEmpty()) {
-                                                        break;
-                                                    }
-                                                    if (output.get(i) instanceof SetLocalAVM2Item) {
-                                                        SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(i);
-                                                        if (localRegsToKill.contains(setLocal.regIndex)) {
-                                                            output.remove(i);
-                                                        }
-                                                    } else {
-                                                        break;
-                                                    }
-                                                }
-
-                                                return null;
                                             }
+                                        }
+                                    } else {
+                                        //There is no if - this means there was something that
+                                        // can be evaluated on compiletime and compiler removed the whole if
+                                        // ASC2 does this
+                                        withCommands.add(new FalseItem(null, localData.lineStartInstruction));
+                                        expr = new CommaExpressionItem(null, localData.lineStartInstruction, withCommands);
+                                    }
+                                } else {
+                                    expr = new FalseItem(null, localData.lineStartInstruction);
+                                }
+                                FilteredCheckAVM2Item filteredCheck = (FilteredCheckAVM2Item) hn.obj.getThroughRegister().getNotCoerced();
+                                FilterAVM2Item filter = new FilterAVM2Item(null, null, filteredCheck.object, expr);
+
+                                if (regIndex == -1) {
+                                    for (int i = output.size() - 2 /*last is loop*/; i >= 0; i--) {
+                                        if (output.get(i) instanceof SetLocalAVM2Item) {
+                                            SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(i);
+                                            if (setLocal.value instanceof ConstructAVM2Item) {
+                                                if ((((ConstructAVM2Item) setLocal.value).object instanceof GetLexAVM2Item)) {
+                                                    GetLexAVM2Item lex = (GetLexAVM2Item) ((ConstructAVM2Item) setLocal.value).object;
+                                                    if ("XMLList".equals(lex.getRawPropertyName())) {
+                                                        regIndex = setLocal.regIndex;
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            break;
                                         }
                                     }
                                 }
+
+                                localRegsToKill.add(regIndex);
+
+                                if (hn.obj instanceof LocalRegAVM2Item) {
+                                    localRegsToKill.add(((LocalRegAVM2Item) hn.obj).regIndex);
+                                }
+
+                                int setLocalIp = -1;
+                                for (int i = output.size() - 2 /*last is loop*/; i >= 0; i--) {
+                                    if (output.get(i) instanceof SetLocalAVM2Item) {
+                                        SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(i);
+                                        if (setLocal.regIndex == regIndex) {
+                                            setLocalIp = avm2code.adr2pos(setLocal.getSrc().getAddress());
+                                            break;
+                                        }
+                                    } else {
+                                        break;
+                                    }
+                                }
+                                Set<Integer> usages = new HashSet<>();
+                                if (setLocalIp > -1) {
+                                    usages = new HashSet<>(aLocalData.getSetLocalUsages(setLocalIp));
+                                    usages.remove(getLocalObjectIp);
+
+                                }
+
+                                for (int i = output.size() - 2 /*last is loop*/; i >= 0; i--) {
+                                    if (localRegsToKill.isEmpty()) {
+                                        break;
+                                    }
+                                    if (output.get(i) instanceof SetLocalAVM2Item) {
+                                        SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(i);
+                                        if (localRegsToKill.contains(setLocal.regIndex)) {
+                                            output.remove(i);
+                                        }
+                                        if (setLocal.regIndex == regIndex) {
+                                            setLocal.value = filter;
+                                        }
+                                    } else {
+                                        break;
+                                    }
+                                }
+
+                                if (usages.isEmpty()) {
+                                    output.add(filter);
+                                } else {
+                                    localRegs.put(regIndex, filter);
+                                }
+                                return null;
+
                             }
                         }
                     } else if (!w.commands.isEmpty()) {
