@@ -626,17 +626,6 @@ public class AVM2Graph extends Graph {
         return ret;
     }
 
-    private GraphPart searchPart(int ip, Set<GraphPart> allParts) {
-        if (ip < 0) {
-            return null;
-        }
-        for (GraphPart p : allParts) {
-            if (ip >= p.start && ip <= p.end) {
-                return p;
-            }
-        }
-        return null;
-    }
 
     private List<GraphTargetItem> checkTry(List<GraphTargetItem> currentRet, List<GraphTargetItem> output, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, AVM2LocalData localData, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, Set<GraphPart> allParts, TranslateStack stack, int staticOperation, String path) throws InterruptedException {
         if (localData.parsedExceptions == null) {

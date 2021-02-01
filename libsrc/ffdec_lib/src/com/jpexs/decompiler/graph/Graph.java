@@ -2034,7 +2034,7 @@ public class Graph {
                             if (continueCommands.isEmpty()) {
                                 commands.addAll(precoCommands);
                                 precoCommands = new ArrayList<>();
-                            }                            //Single continue and there is break/continue/return/throw at end of the commands
+                            } //Single continue and there is break/continue/return/throw at end of the commands
                             else if (!commands.isEmpty() && continueCommands.size() == 1) {
                                 GraphTargetItem lastItem = commands.get(commands.size() - 1);
                                 if ((lastItem instanceof BreakItem) || (lastItem instanceof ContinueItem) || (lastItem instanceof ExitItem)) {
@@ -2205,36 +2205,47 @@ public class Graph {
         return ip;
     }
 
-    private GraphPart makeGraph(GraphPart parent, GraphPath path, GraphSource code, int startip, int lastIp, List<GraphPart> allBlocks, HashMap<Integer, List<Integer>> refs, boolean[] visited2) throws InterruptedException {
+    protected GraphPart searchPart(int ip, Collection<GraphPart> allParts) {
+        if (ip < 0) {
+            return null;
+        }
+        for (GraphPart p : allParts) {
+            if (ip >= p.start && ip <= p.end) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    private GraphPart makeGraph(GraphPart parent, GraphPath path, GraphSource code, int startip, int lastIp, List<GraphPart> allBlocks, HashMap<Integer, List<Integer>> refs, boolean[] visited) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
 
         int ip = startip;
-        for (GraphPart p : allBlocks) {
-            if (p.start == ip) {
-                p.refs.add(parent);
-                return p;
+        GraphPart existingPart = searchPart(ip, allBlocks);
+        if (existingPart != null) {
+            if (parent != null) {
+                existingPart.refs.add(parent);
+                parent.nextParts.add(existingPart);
             }
+            return existingPart;
         }
-        GraphPart g;
         GraphPart ret = new GraphPart(ip, -1);
         ret.path = path;
         GraphPart part = ret;
+        if (parent != null) {
+            ret.refs.add(parent);
+            parent.nextParts.add(ret);
+        }
         while (ip < code.size()) {
             ip = checkIp(ip);
             if (ip >= code.size()) {
                 break;
             }
-            if (visited2[ip] || ((ip != startip) && (refs.get(ip).size() > 1))) {
+            if (visited[ip] || ((ip != startip) && (refs.get(ip).size() > 1))) {
                 part.end = lastIp;
-                GraphPart found = null;
-                for (GraphPart p : allBlocks) {
-                    if (p.start == ip) {
-                        found = p;
-                        break;
-                    }
-                }
+                GraphPart found = searchPart(ip, allBlocks);
 
                 allBlocks.add(part);
 
@@ -2243,13 +2254,14 @@ public class Graph {
                     found.refs.add(part);
                     break;
                 } else {
-                    GraphPart gp = new GraphPart(ip, -1);
-                    gp.path = path;
-                    part.nextParts.add(gp);
-                    gp.refs.add(part);
-                    part = gp;
+                    GraphPart nextPart = new GraphPart(ip, -1);
+                    nextPart.path = path;
+                    part.nextParts.add(nextPart);
+                    nextPart.refs.add(part);
+                    part = nextPart;
                 }
             }
+            visited[ip] = true;
             lastIp = ip;
             GraphSourceItem ins = code.get(ip);
             if (ins.isIgnored()) {
@@ -2268,11 +2280,11 @@ public class Graph {
                     if ((ins instanceof ActionDefineFunction) || (ins instanceof ActionDefineFunction2)) {
                         part.end = lastIp;
                         allBlocks.add(part);
-                        GraphPart gp = new GraphPart(ip, -1);
-                        gp.path = path;
-                        part.nextParts.add(gp);
-                        gp.refs.add(part);
-                        part = gp;
+                        GraphPart nextGraphPart = new GraphPart(ip, -1);
+                        nextGraphPart.path = path;
+                        part.nextParts.add(nextGraphPart);
+                        nextGraphPart.refs.add(part);
+                        part = nextGraphPart;
                     }
                 }
 
@@ -2285,8 +2297,7 @@ public class Graph {
                 part.end = ip;
                 allBlocks.add(part);
                 ip = ins.getBranches(code).get(0);
-                part.nextParts.add(g = makeGraph(part, path, code, ip, lastIp, allBlocks, refs, visited2));
-                g.refs.add(part);
+                makeGraph(part, path, code, ip, lastIp, allBlocks, refs, visited);
                 break;
             } else if (ins.isBranch()) {
                 part.end = ip;
@@ -2294,8 +2305,7 @@ public class Graph {
                 allBlocks.add(part);
                 List<Integer> branches = ins.getBranches(code);
                 for (int i = 0; i < branches.size(); i++) {
-                    part.nextParts.add(g = makeGraph(part, path.sub(i, ip), code, branches.get(i), ip, allBlocks, refs, visited2));
-                    g.refs.add(part);
+                    makeGraph(part, path.sub(i, ip), code, branches.get(i), ip, allBlocks, refs, visited);
                 }
                 break;
             }
