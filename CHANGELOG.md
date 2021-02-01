@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - #1206 Switch with multiple default clauses
 - ASC2 §§push of function calls before returning from a method
 - Support for ASC2 and swftools try..catch..finally block
+- Dot parent operator not detected in some cases
 
 ### Changed
 - AS3 test methods separated to classes

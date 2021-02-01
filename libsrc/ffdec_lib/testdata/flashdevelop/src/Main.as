@@ -22,6 +22,7 @@ package
 		TestDecl2;
 		TestDeclarations;
 		TestDefaultNotLastGrouped;
+		TestDotParent;
 		TestDoWhile;
 		TestDoWhile2;
 		TestDoWhile3;
