@@ -1848,6 +1848,18 @@ public class Graph {
                     //makeAllCommands(out2, stack);
                     makeAllCommands(onTrue, trueStack);
                     makeAllCommands(onFalse, falseStack);
+                    GraphTargetItem addAfterIf = null;
+                    if (!onTrue.isEmpty() && !onFalse.isEmpty()
+                            && (onTrue.get(onTrue.size() - 1) instanceof ContinueItem)
+                            && (onFalse.get(onFalse.size() - 1) instanceof ContinueItem)) {
+                        ContinueItem contTrue = (ContinueItem) onTrue.get(onTrue.size() - 1);
+                        ContinueItem contFalse = (ContinueItem) onFalse.get(onFalse.size() - 1);
+                        if (contTrue.loopId == contFalse.loopId) {
+                            onTrue.remove(onTrue.size() - 1);
+                            onFalse.remove(onFalse.size() - 1);
+                            addAfterIf = contTrue;
+                        }
+                    }
 
                     List<GraphTargetItem> filteredOnTrue = filter(onTrue);
                     List<GraphTargetItem> filteredOnFalse = filter(onFalse);
@@ -1903,6 +1915,9 @@ public class Graph {
                             }
                         }
                     }
+                    if (addAfterIf != null) {
+                        currentRet.add(addAfterIf);
+                    }
                     //currentRet.addAll(out2);
                     if (next != null) {
                         printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, part, next, stopPart, loops, currentRet, staticOperation, path, recursionLevel + 1);
@@ -1944,7 +1959,7 @@ public class Graph {
                     stopContPart.add(currentLoop.loopContinue);
                     GraphPart precoBackup = currentLoop.loopPreContinue;
                     currentLoop.loopPreContinue = null;
-                    loopItem.commands.addAll(printGraph(foundGotos, partCodes, partCodePos, visited, localData, new TranslateStack(path), allParts, null, precoBackup, stopContPart, loops, null, staticOperation, path, recursionLevel + 1));
+                    loopItem.commands.addAll(printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, precoBackup, stopContPart, loops, null, staticOperation, path, recursionLevel + 1));
                     checkContinueAtTheEnd(loopItem.commands, currentLoop);
                 }
             }

@@ -24,7 +24,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {
-        addSwf("standard", "testdata/flashdevelop/bin/flashdevelop.swf");
+        addSwf("standard", "testdata/flashdevelop/bin/Main.flex.swf");
     }
 
     private void decompileScriptPack(String path, String expectedResult) {

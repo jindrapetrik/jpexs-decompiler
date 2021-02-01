@@ -170,7 +170,7 @@ public class AS3Generator {
         Configuration.autoDeobfuscate.set(false);
 
 
-        useFile("ActionScript3ClassicDecompileTest", new String[][]{{"testdata/flashdevelop/bin/flashdevelop.swf", "classic"}}, false);
+        useFile("ActionScript3ClassicDecompileTest", new String[][]{{"testdata/flashdevelop/bin/Main.flex.swf", "classic"}}, false);
         useFile("ActionScript3CrossCompileDecompileTest", new String[][]{
             {"testdata/cross_compile/bin/Main.flex.swf", "flex"},
             {"testdata/cross_compile/bin/Main.air.swf", "air"}
