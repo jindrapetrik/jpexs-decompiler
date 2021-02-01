@@ -76,7 +76,6 @@ public class GraphPrecontinueDetector {
             headNodes.add(partToNode.get(head));
         }
 
-
         boolean changed = true;
         while (changed) {
             changed = false;
@@ -129,7 +128,14 @@ public class GraphPrecontinueDetector {
         StringBuilder sb = new StringBuilder();
         sb.append("digraph mygraph {\r\n");
         for (Node node : allNodes) {
-            sb.append("node" + node.getId() + "[label=\"" + node.toString() + "\"];\r\n");
+            String label = node.toString();
+            for (Node n : node.next) {
+                label += " next " + n.toString();
+            }
+            for (Node p : node.prev) {
+                label += " prev " + p.toString();
+            }
+            sb.append("node" + node.getId() + "[label=\"" + label + "\"];\r\n");
             for (Node n : node.next) {
                 sb.append("node" + node.getId() + "->node" + n.getId() + ";\r\n");
             }
@@ -189,33 +195,62 @@ public class GraphPrecontinueDetector {
 
         Node result = node;
 
-        Node bodyNode = null;
-        Node breakNode = null;
-        if (node.next.size() == 2
-                && node.next.get(0).next.size() == 1
-                && node.next.get(0).next.get(0) == node) {
-            breakNode = node.next.get(1);
-            bodyNode = node.next.get(0);
-        } else if (node.next.size() == 2
-                && node.next.get(1).next.size() == 1
-                && node.next.get(1).next.get(0) == node) {
-            breakNode = node.next.get(0);
-            bodyNode = node.next.get(1);
-        }
-
-        if (bodyNode != null) {
-
-            WhileNode whileNode = new WhileNode();
-            bodyNode.parentNode = whileNode;
-            whileNode.graphPart = node.graphPart;
-            whileNode.body = bodyNode;
-            whileNode.body.removeFromGraph();
-            whileNode.prev = new ArrayList<>(node.prev);
-            node.replacePrevs(whileNode);
-            node.replaceNexts(whileNode);
-            whileNode.next.add(breakNode);
-            result = whileNode;
+        //do..while
+        if (node.prev.contains(node) && node.next.contains(node) && node.next.size() == 2) {
+            DoWhileNode doWhileNode = new DoWhileNode();
+            doWhileNode.body = node;
+            doWhileNode.graphPart = node.graphPart;
+            doWhileNode.prev = new ArrayList<>(node.prev);
+            for (int i = doWhileNode.prev.size() - 1; i >= 0; i--) {
+                if (doWhileNode.prev.get(i) == node) {
+                    doWhileNode.prev.remove(i);
+                }
+            }
+            doWhileNode.next = new ArrayList<>(node.next);
+            for (int i = doWhileNode.next.size() - 1; i >= 0; i--) {
+                if (doWhileNode.next.get(i) == node) {
+                    doWhileNode.next.remove(i);
+                }
+            }
+            node.replacePrevs(doWhileNode);
+            node.replaceNexts(doWhileNode);
+            node.removeFromGraph();
+            node.parentNode = doWhileNode;
+            result = doWhileNode;
             numWhile.setVal(numWhile.getVal() + 1);
+
+        } else { //while
+
+            Node bodyNode = null;
+            Node breakNode = null;
+            if (node.next.size() == 2
+                    && node.next.get(0).next.size() == 1
+                    && node.next.get(0).next.get(0) == node
+                    && node.next.get(0).prev.size() == 1) {
+                breakNode = node.next.get(1);
+                bodyNode = node.next.get(0);
+            } else if (node.next.size() == 2
+                    && node.next.get(1).next.size() == 1
+                    && node.next.get(1).next.get(0) == node
+                    && node.next.get(1).prev.size() == 1) {
+                breakNode = node.next.get(0);
+                bodyNode = node.next.get(1);
+            }
+
+            if (bodyNode != null) {
+
+                WhileNode whileNode = new WhileNode();
+                bodyNode.parentNode = whileNode;
+                whileNode.graphPart = node.graphPart;
+                whileNode.body = bodyNode;
+                whileNode.body.removeFromGraph();
+                whileNode.prev = new ArrayList<>(node.prev);
+                node.replacePrevs(whileNode);
+                node.replaceNexts(whileNode);
+                whileNode.next.add(breakNode);
+                result = whileNode;
+                numWhile.setVal(numWhile.getVal() + 1);
+            }
         }
 
         List<Node> nexts = new ArrayList<>(result.next);
@@ -247,7 +282,19 @@ public class GraphPrecontinueDetector {
             joinedNode.graphPart = node.graphPart;
             joinedNode.nodes = nodeList;
             joinedNode.next = new ArrayList<>(currentNode.next);
+            for (int i = 0; i < joinedNode.next.size(); i++) {
+                Node n = joinedNode.next.get(i);
+                if (n == node) {
+                    joinedNode.next.set(i, joinedNode);
+                }
+            }
             joinedNode.prev = new ArrayList<>(node.prev);
+            for (int i = 0; i < joinedNode.prev.size(); i++) {
+                Node n = joinedNode.prev.get(i);
+                if (n == currentNode) {
+                    joinedNode.prev.set(i, joinedNode);
+                }
+            }
             node.replacePrevs(joinedNode);
             currentNode.replaceNexts(joinedNode);
             for (Node n : nodeList) {
