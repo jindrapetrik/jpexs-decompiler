@@ -30,6 +30,8 @@ import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ScriptAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
@@ -93,11 +95,42 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
             //computedValue = new NotCompileTimeItem(ins, localData.lineStartInstruction, computedValue);
         }
 
-        //chained assignments FIXME!!!
+        //chained assignments and/or ASC post/pre increment
         if (!output.isEmpty()) {
             if ((output.get(output.size() - 1) instanceof SetTypeAVM2Item)) {
                 GraphTargetItem setItem = output.get(output.size() - 1);
-                if (setItem.value.getNotCoerced() instanceof SetLocalAVM2Item) {
+                if ((setItem instanceof SetPropertyAVM2Item)
+                        && ((setItem.value.getNotCoerced() instanceof DecrementAVM2Item)
+                        || (setItem.value.getNotCoerced() instanceof IncrementAVM2Item))) {
+                    boolean isIncrement = (setItem.value.getNotCoerced() instanceof IncrementAVM2Item);
+                    GraphTargetItem val = setItem.value.getNotCoerced();
+                    if (val.value instanceof SetLocalAVM2Item) {
+                        SetLocalAVM2Item setLocal = (SetLocalAVM2Item) val.value;
+                        if (setLocal.regIndex == regId) {
+                            if (setLocal.value.getNotCoerced() instanceof GetPropertyAVM2Item) {
+                                SetPropertyAVM2Item setProp = (SetPropertyAVM2Item) setItem;
+                                GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setLocal.value.getNotCoerced();
+                                if (getProp.object.getThroughDuplicate() == setProp.object) {
+                                    if (((FullMultinameAVM2Item) setProp.propertyName).compareSame((FullMultinameAVM2Item) getProp.propertyName)) {
+                                        if (getProp.object instanceof DuplicateItem) {
+                                            getProp.object = getProp.object.value;
+                                        }
+                                        GraphTargetItem result;
+                                        if (isIncrement) {
+                                            result = new PostIncrementAVM2Item(setProp.getSrc(), localData.lineStartInstruction, getProp);
+                                        } else {
+                                            result = new PostDecrementAVM2Item(setProp.getSrc(), localData.lineStartInstruction, getProp);
+                                        }
+                                        output.remove(output.size() - 1);
+                                        stack.add(result);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (setItem.value.getNotCoerced() instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocal = (SetLocalAVM2Item) setItem.value.getNotCoerced();
                     if (setLocal.regIndex == regId) {
                         if ((setItem.value instanceof CoerceAVM2Item) || (setItem.value instanceof ConvertAVM2Item)) {
@@ -120,9 +153,9 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                                                 getProp.object = getProp.object.value;
                                             }
                                             if (isIncrement) {
-                                                setItem = new PreIncrementAVM2Item(null, localData.lineStartInstruction, getProp);
+                                                setItem = new PreIncrementAVM2Item(setProp.getSrc(), localData.lineStartInstruction, getProp);
                                             } else {
-                                                setItem = new PreDecrementAVM2Item(null, localData.lineStartInstruction, getProp);
+                                                setItem = new PreDecrementAVM2Item(setProp.getSrc(), localData.lineStartInstruction, getProp);
                                             }
                                         }
                                     }
