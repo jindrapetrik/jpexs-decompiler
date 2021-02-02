@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf7;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -35,6 +36,9 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.BreakItem;
+import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
@@ -300,43 +304,51 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
                                     catchExceptionTypes.add(co.constructor);
                                     if (body.get(pos + 1) instanceof IfItem) {
                                         IfItem ifi = (IfItem) body.get(pos + 1);
-                                        if (!ifi.onTrue.isEmpty()) {
-                                            if (ifi.onTrue.get(0) instanceof DefineLocalActionItem) {
-                                                DefineLocalActionItem dl = (DefineLocalActionItem) ifi.onTrue.get(0);
-                                                catchExceptionNames.add(dl.name);
-                                                List<GraphTargetItem> catchBody = new ArrayList<>(ifi.onTrue);
-                                                catchBody.remove(0);
-                                                catchCommands.add(catchBody);
-                                                if (!ifi.onFalse.isEmpty()) {
-                                                    if (ifi.onFalse.get(0) instanceof PopItem) {
-                                                        pos = 1;
-                                                        body = ifi.onFalse;
-                                                        continue loopex;
-                                                    } else {
-                                                        break;
-                                                    }
+                                        List<GraphTargetItem> onFalse = ifi.onFalse;
+                                        int onFalsePos = 0;
+                                        if (ifi.onFalse.isEmpty() && !ifi.onTrue.isEmpty() && ((ifi.onTrue.get(ifi.onTrue.size() - 1) instanceof ExitItem)
+                                                || (ifi.onTrue.get(ifi.onTrue.size() - 1) instanceof BreakItem)
+                                                || (ifi.onTrue.get(ifi.onTrue.size() - 1) instanceof ContinueItem))) {
+                                            onFalse = body;
+                                            onFalsePos = pos + 2;
+                                        }
+
+                                        if (!ifi.onTrue.isEmpty() && (ifi.onTrue.get(0) instanceof DefineLocalActionItem)) {
+                                            DefineLocalActionItem dl = (DefineLocalActionItem) ifi.onTrue.get(0);
+                                            catchExceptionNames.add(dl.name);
+                                            List<GraphTargetItem> catchBody = new ArrayList<>(ifi.onTrue);
+                                            catchBody.remove(0);
+                                            catchCommands.add(catchBody);
+                                            if (onFalse.size() > onFalsePos) {
+                                                if (onFalse.get(onFalsePos) instanceof PopItem) {
+                                                    pos = onFalsePos + 1;
+                                                    body = onFalse;
+                                                    continue loopex;
                                                 } else {
                                                     break;
                                                 }
-                                                /*if (body.size() == pos + 4) {
-                                                    if (body.get(pos + 2) instanceof PopItem) {
-                                                        if (body.get(pos + 3) instanceof ThrowActionItem) {
-                                                            ThrowActionItem ta = (ThrowActionItem) body.get(pos + 3);
-                                                            if (ta.value instanceof DirectValueActionItem) {
-                                                                if (((DirectValueActionItem) ta.value).value instanceof RegisterNumber) {
-                                                                    RegisterNumber rn2 = (RegisterNumber) ((DirectValueActionItem) ta.value).value;
-                                                                    if (rn2.number == catchRegister) {
-                                                                        break;
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }else{
-                                                    
-                                                }*/
+                                            } else {
+                                                break;
+                                            }
+                                        } else if (onFalse.size() > onFalsePos && (onFalse.get(onFalsePos) instanceof DefineLocalActionItem)) {
+                                            DefineLocalActionItem dl = (DefineLocalActionItem) onFalse.get(onFalsePos);
+                                            catchExceptionNames.add(dl.name);
+
+                                            List<GraphTargetItem> catchBody = new ArrayList<>();
+                                            for (int i = onFalsePos; i < onFalse.size(); i++) {
+                                                catchBody.add(onFalse.get(i));
+                                            }
+                                            catchBody.remove(0);
+                                            catchCommands.add(catchBody);
+                                            if (!ifi.onTrue.isEmpty()) {
+                                                if (ifi.onTrue.get(0) instanceof PopItem) {
+                                                    pos = 1;
+                                                    body = ifi.onTrue;
+                                                    continue loopex;
+                                                }
                                             }
                                         }
+
                                     }
                                 }
                             }

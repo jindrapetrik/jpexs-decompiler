@@ -175,6 +175,8 @@ public class AS3Generator {
             {"testdata/cross_compile/bin/Main.flex.swf", "flex"},
             {"testdata/cross_compile/bin/Main.air.swf", "air"}
         }, true);
+        useFile("ActionScript3CrossCompileSwfToolsDecompileTest", new String[][]{
+            {"testdata/cross_compile/bin/Main.swftools.swf", "swftools"},}, false);
         useFile("ActionScript3AssembledDecompileTest", new String[][]{{"testdata/custom/bin/custom.swf", "assembled"}}, false);
 
         System.exit(0);

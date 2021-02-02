@@ -377,7 +377,7 @@ public class ActionGraph extends Graph {
                      */
                     //must go backwards to hit case 2, not case 1
                     for (int i = caseBodyParts.size() - 1; i >= 0; i--) {
-                        if (caseBodyParts.get(i).leadsTo(localData, this, code, defaultPart, loops)) {
+                        if (caseBodyParts.get(i).leadsTo(localData, this, code, defaultPart, loops, false)) {
                             DefaultItem di = new DefaultItem();
                             caseValuesMap.add(i + 1, di);
                             caseBodyParts.add(i + 1, defaultPart);
@@ -398,7 +398,7 @@ public class ActionGraph extends Graph {
                         trace("2");                    
                      */
                     for (int i = 0; i < caseBodyParts.size(); i++) {
-                        if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops)) {
+                        if (defaultPart.leadsTo(localData, this, code, caseBodyParts.get(i), loops, false)) {
                             DefaultItem di = new DefaultItem();
                             caseValuesMap.add(i, di);
                             caseBodyParts.add(i, defaultPart);
@@ -448,7 +448,7 @@ public class ActionGraph extends Graph {
                     GraphPart nextCase = next;
                     if (next != null) {
                         if (i < caseBodies.size() - 1) {
-                            if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops)) {
+                            if (!caseBodies.get(i).leadsTo(localData, this, code, caseBodies.get(i + 1), loops, false)) {
                                 currentCaseCommands.add(new BreakItem(null, localData.lineStartInstruction, currentLoop.id));
                             } else {
                                 nextCase = caseBodies.get(i + 1);
