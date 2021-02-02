@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - ASC2 §§push of function calls before returning from a method
 - Support for ASC2 and swftools try..catch..finally block
 - Dot parent operator not detected in some cases
+- Namespaces handling
 
 ### Changed
 - AS3 test methods separated to classes
