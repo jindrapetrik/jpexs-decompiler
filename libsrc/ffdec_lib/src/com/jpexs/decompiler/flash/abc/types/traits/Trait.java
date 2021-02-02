@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
@@ -304,37 +305,13 @@ public abstract class Trait implements Cloneable, Serializable {
         return writer;
     }
 
-    protected final DottedChain findCustomNs(int link_ns_index, ABC abc) {
-        String nsname;
-        if (link_ns_index <= 0) {
-            return null;
-        }
-        Namespace ns = abc.constants.getNamespace(link_ns_index);
-        if (ns.kind != Namespace.KIND_NAMESPACE) {
-            return null;
-        }
-        String name = abc.constants.getString(ns.name_index);
-        for (ABCContainerTag abcTag : abc.getAbcTags()) {
-            DottedChain dc = abcTag.getABC().nsValueToName(name);
-            nsname = dc.getLast();
-
-            if (nsname == null) {
-                continue;
-            }
-            if (!nsname.isEmpty()) {
-                return dc;
-            }
-        }
-        return null;
-    }
-
     public final GraphTextWriter getModifiers(ABC abc, boolean isStatic, GraphTextWriter writer) {
         if ((kindFlags & ATTR_Override) > 0) {
             writer.appendNoHilight("override ");
         }
         Multiname m = getName(abc);
         if (m != null) {
-            DottedChain dc = findCustomNs(m.namespace_index, abc);
+            DottedChain dc = abc.findCustomNs(m.namespace_index);
             String nsname = dc != null ? dc.getLast() : null;
 
             Namespace ns = m.getNamespace(abc.constants);

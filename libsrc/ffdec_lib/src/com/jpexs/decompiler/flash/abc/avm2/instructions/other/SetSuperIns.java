@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -68,7 +69,7 @@ public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
         int multinameIndex = ins.operands[0];
         String multiname = resolveMultinameNoPop(1, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-        stack.get(1 + resolvedCount(abc.constants, multinameIndex)).toString(writer, LocalData.create(abc.constants, localRegNames, fullyQualifiedNames));
+        stack.get(1 + resolvedCount(abc.constants, multinameIndex)).toString(writer, LocalData.create(abc, localRegNames, fullyQualifiedNames));
         String obj = writer.toString();
         return obj + ".super." + multiname;
     }

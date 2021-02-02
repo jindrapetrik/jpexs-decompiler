@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -85,27 +87,27 @@ public class FullMultinameAVM2Item extends AVM2Item {
         return (name != null) || (namespace != null);
     }
 
-    public boolean isTopLevel(String tname, AVM2ConstantPool constants, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public boolean isTopLevel(String tname, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         String cname;
         if (name != null) {
-            cname = name.toString(LocalData.create(constants, localRegNames, fullyQualifiedNames));
+            cname = name.toString(LocalData.create(abc, localRegNames, fullyQualifiedNames));
         } else {
-            cname = (constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames, true, true));
+            cname = (abc.constants.getMultiname(multinameIndex).getName(abc.constants, fullyQualifiedNames, true, true));
         }
         String cns = "";
         if (namespace != null) {
-            cns = namespace.toString(LocalData.create(constants, localRegNames, fullyQualifiedNames));
+            cns = namespace.toString(LocalData.create(abc, localRegNames, fullyQualifiedNames));
         } else {
-            Namespace ns = constants.getMultiname(multinameIndex).getNamespace(constants);
+            Namespace ns = abc.constants.getMultiname(multinameIndex).getNamespace(abc.constants);
             if ((ns != null) && (ns.name_index != 0)) {
-                cns = ns.getName(constants).toPrintableString(true);
+                cns = ns.getName(abc.constants).toPrintableString(true);
             }
         }
         return cname.equals(tname) && cns.isEmpty();
     }
 
-    public boolean isXML(AVM2ConstantPool constants, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
-        return isTopLevel("XML", constants, localRegNames, fullyQualifiedNames);
+    public boolean isXML(ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+        return isTopLevel("XML", abc, localRegNames, fullyQualifiedNames);
     }
 
     @Override

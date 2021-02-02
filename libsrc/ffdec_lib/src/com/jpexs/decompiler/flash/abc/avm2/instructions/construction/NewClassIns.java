@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.construction;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -42,7 +43,7 @@ public class NewClassIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {
         int clsIndex = ins.operands[0];
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-        stack.pop().toString(writer, LocalData.create(localData.getConstants(), localData.localRegNames, localData.fullyQualifiedNames));
+        stack.pop().toString(writer, LocalData.create(localData.abc, localData.localRegNames, localData.fullyQualifiedNames));
         String baseType = writer.toString();
         ABC abc = localData.abc;
         stack.push(new UnparsedAVM2Item(ins, localData.lineStartInstruction, "new " + abc.constants.getMultiname(abc.instance_info.get(clsIndex).name_index).getName(localData.getConstants(), localData.fullyQualifiedNames, false, true) + ".class extends " + baseType));

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
@@ -47,9 +48,9 @@ public class GetLexAVM2Item extends AVM2Item implements SimpleValue {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
-        String localName = propertyName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true);
+        String localName = propertyName.getNameWithCustomNamespace(localData.abc, localData.fullyQualifiedNames, false, true);
         getSrcData().localName = localName;
-        return writer.append(propertyName.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true));
+        return writer.append(propertyName.getNameWithCustomNamespace(localData.abc, localData.fullyQualifiedNames, false, true));
     }
 
     @Override

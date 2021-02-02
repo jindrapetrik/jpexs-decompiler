@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.EndOfStreamException;
@@ -2069,5 +2070,29 @@ public class ABC {
             newTrait.metadata[m] = mergeMetaDataMap.get(secondTrait.metadata[m]);
         }
         return newTrait;
+    }
+
+    public DottedChain findCustomNs(int link_ns_index) {
+        String nsname;
+        if (link_ns_index <= 0) {
+            return null;
+        }
+        Namespace ns = constants.getNamespace(link_ns_index);
+        if (ns.kind != Namespace.KIND_NAMESPACE) {
+            return null;
+        }
+        String name = constants.getString(ns.name_index);
+        for (ABCContainerTag abcTag : getAbcTags()) {
+            DottedChain dc = abcTag.getABC().nsValueToName(name);
+            nsname = dc.getLast();
+
+            if (nsname == null) {
+                continue;
+            }
+            if (!nsname.isEmpty()) {
+                return dc;
+            }
+        }
+        return null;
     }
 }
