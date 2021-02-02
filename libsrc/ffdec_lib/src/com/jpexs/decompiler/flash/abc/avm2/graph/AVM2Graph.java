@@ -328,16 +328,25 @@ public class AVM2Graph extends Graph {
                     if (tryPartRefs.size() == 1) {
                         GraphPart beforeTryPart = tryPartRefs.get(0);
                         if (beforeTryPart.getHeight() > 2) {
-                            if (avm2code.code.get(beforeTryPart.end).definition instanceof SetLocalTypeIns) {
-                                int setLocalRegister = ((SetLocalTypeIns) avm2code.code.get(beforeTryPart.end).definition).getRegisterId(avm2code.code.get(beforeTryPart.end));
-                                if (setLocalRegister == switchedReg) {
-                                    if (avm2code.code.get(beforeTryPart.end - 1).definition instanceof PushByteIns) {
-                                        if (switchPart != null) {
-                                            defaultPushByte = avm2code.code.get(beforeTryPart.end - 1).operands[0];
+                            int pos = beforeTryPart.end;
+                            while (beforeTryPart.start <= pos) {
+                                if (avm2code.code.get(pos).definition instanceof SetLocalTypeIns) {
+                                    int setLocalRegister = ((SetLocalTypeIns) avm2code.code.get(pos).definition).getRegisterId(avm2code.code.get(beforeTryPart.end));
+                                    if (setLocalRegister == switchedReg) {
+                                        if (avm2code.code.get(pos - 1).definition instanceof PushByteIns) {
+                                            if (switchPart != null) {
+                                                defaultPushByte = avm2code.code.get(pos - 1).operands[0];
+                                            }
                                         }
                                     }
+                                    break;
+                                } else if (avm2code.code.get(pos).definition instanceof DebugLineIns) {
+                                    pos--;
+                                } else {
+                                    break;
                                 }
                             }
+
                         }
                     }
                 }
