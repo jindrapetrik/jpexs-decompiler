@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.usages;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -44,7 +45,7 @@ public abstract class TraitMultinameUsage extends MultinameUsage implements Insi
     protected final int parentTraitIndex;
 
     public TraitMultinameUsage(ABC abc, int multinameIndex, int scriptIndex, int classIndex, int traitIndex, int traitsType, Traits traits, int parentTraitIndex) {
-        super(abc, multinameIndex);
+        super(abc, multinameIndex, scriptIndex);
         this.scriptIndex = scriptIndex;
         this.classIndex = classIndex;
         this.traitIndex = traitIndex;

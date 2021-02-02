@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.usages;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -25,8 +26,8 @@ public class ClassNameMultinameUsage extends MultinameUsage implements Definitio
 
     private final int classIndex;
 
-    public ClassNameMultinameUsage(ABC abc, int multinameIndex, int classIndex) {
-        super(abc, multinameIndex);
+    public ClassNameMultinameUsage(ABC abc, int multinameIndex, int classIndex, int scriptIndex) {
+        super(abc, multinameIndex, scriptIndex);
         this.classIndex = classIndex;
     }
 
@@ -37,13 +38,13 @@ public class ClassNameMultinameUsage extends MultinameUsage implements Definitio
 
     @Override
     public String toString() {
-        return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants, true).toPrintableString(true);
+        return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants, true).toPrintableString(true) + " trait name";
     }
 
     @Override
     public int hashCode() {
         int hash = super.hashCode();
-        hash = 59 * hash + this.classIndex;
+        hash = 67 * hash + this.classIndex;
         return hash;
     }
 
@@ -75,7 +76,7 @@ public class ClassNameMultinameUsage extends MultinameUsage implements Definitio
                 return false;
             }
         }
-        if ((other instanceof ClassNameInTraitMultinameUsage) || (other instanceof ClassNameMultinameUsage)) {
+        if (other instanceof ClassNameMultinameUsage) {
             return sameMultinameName(other);
         }
         return false;
