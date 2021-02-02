@@ -19,6 +19,7 @@ package tests
 			{
 				trace("infinally");
 			}
+			trace("after");
 		}
 	}
 }
