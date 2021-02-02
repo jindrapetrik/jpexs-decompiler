@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -123,6 +124,14 @@ public class Namespace {
         }
 
         return constants.getDottedChain(name_index);
+    }
+
+    public String getRawName(AVM2ConstantPool constants) {
+        if (name_index == 0 || name_index == -1) {
+            return ""; //??
+        }
+
+        return constants.getString(name_index);
     }
 
     public boolean hasName(String name, AVM2ConstantPool constants) {

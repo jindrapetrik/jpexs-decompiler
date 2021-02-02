@@ -303,7 +303,7 @@ public final class MethodBody implements Cloneable {
                                 convertedItems1 = converted.getCode().toGraphTargetItems(convertData.thisHasDefaultToPrimitive, convertData, path, methodIndex, isStatic, scriptIndex, classIndex, abc, converted, localRegNames, scopeStack, initializerType, fullyQualifiedNames, initTraits, Graph.SOP_USE_STATIC, new HashMap<>(), converted.getCode().visitCode(converted));
                             }
                             try (Statistics s = new Statistics("Graph.graphToString")) {
-                                Graph.graphToString(convertedItems1, writer, LocalData.create(abc.constants, localRegNames, fullyQualifiedNames));
+                                Graph.graphToString(convertedItems1, writer, LocalData.create(abc, localRegNames, fullyQualifiedNames));
                             }
                             convertedItems = convertedItems1;
                         }
@@ -357,7 +357,7 @@ public final class MethodBody implements Cloneable {
                         writer.appendNoHilight(this.method_info);
                         writer.newLine();
                     }
-                    Graph.graphToString(convertedItems, writer, LocalData.create(abc.constants, localRegNames, fullyQualifiedNames));
+                    Graph.graphToString(convertedItems, writer, LocalData.create(abc, localRegNames, fullyQualifiedNames));
                     //writer.endMethod();
                 } else if (convertException instanceof TimeoutException) {
                     // exception was logged in convert method

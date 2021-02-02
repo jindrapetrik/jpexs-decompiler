@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.construction;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -73,7 +74,7 @@ public class ConstructPropIns extends InstructionDefinition {
             multiname.property = false;  //can be type
         }
 
-        if (multiname.isXML(localData.getConstants(), localData.localRegNames, localData.fullyQualifiedNames)) {
+        if (multiname.isXML(localData.abc, localData.localRegNames, localData.fullyQualifiedNames)) {
             if (args.size() == 1) {
                 GraphTargetItem arg = args.get(0);
                 List<GraphTargetItem> xmlLines = new ArrayList<>();
@@ -84,7 +85,7 @@ public class ConstructPropIns extends InstructionDefinition {
             }
         }//
         boolean isRegExp = false;
-        if (multiname.isTopLevel("RegExp", localData.getConstants(), localData.localRegNames, localData.fullyQualifiedNames)) {
+        if (multiname.isTopLevel("RegExp", localData.abc, localData.localRegNames, localData.fullyQualifiedNames)) {
             isRegExp = true;
         }
         if (isRegExp && (args.size() >= 1) && (args.get(0) instanceof StringAVM2Item) && (args.size() == 1 || (args.size() == 2 && args.get(1) instanceof StringAVM2Item))) {

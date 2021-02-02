@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -120,7 +121,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                 writer.newLine();
             }
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
-                assignment.value.toString(writer, LocalData.create(abc.constants, new HashMap<>(), fullyQualifiedNames));
+                assignment.value.toString(writer, LocalData.create(abc, new HashMap<>(), fullyQualifiedNames));
             }
             writer.endMethod();
             writer.endTrait();
@@ -160,7 +161,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (convertData.assignedValues.containsKey(this)) {
             GraphTargetItem val = convertData.assignedValues.get(this).value;
             if (val instanceof NewFunctionAVM2Item) {
-                return val.toString(writer, LocalData.create(abc.constants, new HashMap<>(), fullyQualifiedNames));
+                return val.toString(writer, LocalData.create(abc, new HashMap<>(), fullyQualifiedNames));
             }
         }
         getNameStr(writer, abc, fullyQualifiedNames);
