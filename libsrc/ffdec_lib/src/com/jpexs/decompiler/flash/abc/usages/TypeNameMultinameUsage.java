@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.usages;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -26,8 +27,8 @@ public class TypeNameMultinameUsage extends MultinameUsage {
 
     protected int typename_index;
 
-    public TypeNameMultinameUsage(ABC abc, int multinameIndex, int typename_index) {
-        super(abc, multinameIndex);
+    public TypeNameMultinameUsage(ABC abc, int multinameIndex, int typename_index, int scriptIndex) {
+        super(abc, multinameIndex, scriptIndex);
         this.typename_index = typename_index;
     }
 

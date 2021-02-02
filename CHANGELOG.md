@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - Support for ASC2 and swftools try..catch..finally block
 - Dot parent operator not detected in some cases
 - Namespaces handling
+- Incorrectly colliding class names detection on script private classes
 
 ### Changed
 - AS3 test methods separated to classes

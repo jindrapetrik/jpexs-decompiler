@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.usages;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -31,9 +32,13 @@ public abstract class MultinameUsage {
 
     private final int multinameIndex;
 
-    public MultinameUsage(ABC abc, int multinameIndex) {
+    protected int scriptIndex;
+
+    public MultinameUsage(ABC abc, int multinameIndex, int scriptIndex) {
         this.abc = abc;
         this.multinameIndex = multinameIndex;
+        this.scriptIndex = scriptIndex;
+
     }
 
     public int getMultinameIndex() {
@@ -76,6 +81,10 @@ public abstract class MultinameUsage {
             if ((thisNs.kind == Namespace.KIND_PACKAGE || thisNs.kind == Namespace.KIND_PACKAGE_INTERNAL)
                     && (otherNs.kind == Namespace.KIND_PACKAGE || otherNs.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
                 return Objects.equals(thisNs.getName(abc.constants), otherNs.getName(other.abc.constants));
+            }
+
+            if (other.scriptIndex != scriptIndex) {
+                return false;
             }
 
             //one of them is private/protected
