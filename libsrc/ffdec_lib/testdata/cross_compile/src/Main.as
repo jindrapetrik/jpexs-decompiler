@@ -12,6 +12,8 @@ package
 	{
 		TestTryCatch;
 		TestTryCatchIfInTry;
+		TestTryCatchInWhile;
+		TestTryCatchInWhile2;
 		TestTryCatchLoop;
 		TestTryCatchExceptionUsage
 		TestTryFinally;		

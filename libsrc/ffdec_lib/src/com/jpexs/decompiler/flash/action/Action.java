@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.AppResources;
@@ -867,6 +868,7 @@ public abstract class Action implements GraphSourceItem {
             throw ex;
         } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
 
+            ex.printStackTrace();
             convertException = ex;
             Throwable cause = ex.getCause();
             if (ex instanceof ExecutionException && cause instanceof Exception) {
