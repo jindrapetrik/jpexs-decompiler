@@ -1576,47 +1576,6 @@ public class AVM2Code implements Cloneable {
                     }
                 }
             }
-            /*if ((ip + 8 < code.size())) { //return in finally clause
-             if (ins.definition instanceof SetLocalTypeIns) {
-             if (code.get(ip + 1).definition instanceof PushByteIns) {
-             AVM2Instruction jmp = code.get(ip + 2);
-             if (jmp.definition instanceof JumpIns) {
-             if (jmp.operands[0] == 0) {
-             if (code.get(ip + 3).definition instanceof LabelIns) {
-             if (code.get(ip + 4).definition instanceof PopIns) {
-             if (code.get(ip + 5).definition instanceof LabelIns) {
-             AVM2Instruction gl = code.get(ip + 6);
-             if (gl.definition instanceof GetLocalTypeIns) {
-             if (((GetLocalTypeIns) gl.definition).getRegisterId(gl) == ((SetLocalTypeIns) ins.definition).getRegisterId(ins)) {
-             AVM2Instruction ki = code.get(ip + 7);
-             if (ki.definition instanceof KillIns) {
-             if (ki.operands[0] == ((SetLocalTypeIns) ins.definition).getRegisterId(ins)) {
-             if (code.get(ip + 8).definition instanceof ReturnValueIns) {
-             ip = ip + 8;
-             continue;
-             }
-             }
-             }
-             }
-             }
-             }
-             }
-             }
-             }
-             }
-             }
-             }
-             }//*/
-
- /*if ((ip + 2 < code.size()) && (ins.definition instanceof NewCatchIns)) { // Filling local register in catch clause
-             if (code.get(ip + 1).definition instanceof DupIns) {
-             if (code.get(ip + 2).definition instanceof SetLocalTypeIns) {
-             ins.definition.translate(isStatic, classIndex, localRegs, stack, scopeStack, constants, ins, method_info, output, body, abc, localRegNames, fullyQualifiedNames);
-             ip += 3;
-             continue;
-             }
-             }
-             }*/
             if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end)) { // set_local_x,get_local_x.. no other local_x get
 
                 AVM2Instruction insAfter = code.get(ip + 1);

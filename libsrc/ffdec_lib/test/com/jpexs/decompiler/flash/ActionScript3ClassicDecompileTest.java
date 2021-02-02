@@ -36,7 +36,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "finally\r\n"
                 + "{\r\n"
                 + "trace(\"infinally\");\r\n"
-                + "}\r\n",
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
                 false);
     }
 
