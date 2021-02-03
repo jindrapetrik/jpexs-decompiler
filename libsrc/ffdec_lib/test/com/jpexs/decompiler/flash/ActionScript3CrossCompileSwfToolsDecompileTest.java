@@ -12,7 +12,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {
-        addSwf("swftools", "testdata/cross_compile/bin/Main.swftools.swf");
+        addSwf("swftools", "testdata/as3_cross_compile/bin/as3_cross_compile.swftools.swf");
     }
 
     @Test

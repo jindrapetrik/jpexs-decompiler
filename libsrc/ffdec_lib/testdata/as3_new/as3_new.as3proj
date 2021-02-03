@@ -4,7 +4,7 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\Main.flex.swf" />
+    <movie path="bin\as3_new.flex.swf" />
     <movie fps="30" />
     <movie width="800" />
     <movie height="600" />
