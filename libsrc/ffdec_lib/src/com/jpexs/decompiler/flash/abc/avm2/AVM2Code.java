@@ -894,8 +894,7 @@ public class AVM2Code implements Cloneable {
         addresses.add(startPos);
         if (body != null) {
             for (ABCException e : body.exceptions) {
-                addresses.add((long) e.start);
-                addresses.add((long) e.end);
+                //do not process e.start and e.end - they can be not on an instruction boundary
                 addresses.add((long) e.target);
             }
         }
@@ -1263,13 +1262,14 @@ public class AVM2Code implements Cloneable {
                 ABCException exception = body.exceptions[e];
                 writer.appendNoHilight("try");
 
+                //Note: start and end address can be not on instruction boundary - call adr2pos( nearest=true) to make them legal
                 writer.appendNoHilight(" from ");
                 writer.appendNoHilight("ofs");
-                writer.appendNoHilight(Helper.formatAddress(exception.start));
+                writer.appendNoHilight(Helper.formatAddress(pos2adr(adr2pos(exception.start, true))));
 
                 writer.appendNoHilight(" to ");
                 writer.appendNoHilight("ofs");
-                writer.appendNoHilight(Helper.formatAddress(exception.end));
+                writer.appendNoHilight(Helper.formatAddress(pos2adr(adr2pos(exception.end, true))));
 
                 writer.appendNoHilight(" target ");
                 writer.appendNoHilight("ofs");
@@ -1353,9 +1353,9 @@ public class AVM2Code implements Cloneable {
         Set<Long> ret = new HashSet<>();
         if (body != null) {
             for (ABCException exception : body.exceptions) {
-                ret.add((long) exception.start);
+                ret.add((long) pos2adr(adr2pos(exception.start, true)));
                 if (tryEnds) {
-                    ret.add((long) exception.end);
+                    ret.add((long) pos2adr(adr2pos(exception.end, true)));
                 }
                 ret.add((long) exception.target);
             }
@@ -2451,7 +2451,6 @@ public class AVM2Code implements Cloneable {
             return null;
         }
         int scopePos = -1;
-        int prevStart = 0;
         for (int e = 0; e < body.exceptions.length; e++) {
             ABCException ex = body.exceptions[e];
             try {
@@ -2475,28 +2474,10 @@ public class AVM2Code implements Cloneable {
                     }
                 }
                 scopePos = stats.instructionStats[maxIp].scopepos_after;
-                int stackPos = stats.instructionStats[maxIp].stackpos_after;
                 int nextIp = maxIp + 1;
                 if (code.get(maxIp).definition instanceof JumpIns) {
                     nextIp = adr2pos(pos2adr(nextIp) + code.get(maxIp).operands[0]);
                 }
-                /*if (nextIp < stats.instructionStats.length) {
-                    InstructionStats nextIpStat = stats.instructionStats[nextIp];
-                    int origScopePos = nextIpStat.scopepos;
-                    int origStackPos = nextIpStat.stackpos;
-
-                    if (prevStart == ex.start && ex.isFinally() && !code.get(nextIp).isExit() && nextIpStat.seen) {
-                        for (int i = 0; i < stats.instructionStats.length; i++) {
-                            stats.instructionStats[i].seen = false;
-                        }
-                        // Rerun rest with new scopePos, stackPos
-                        if (!walkCode(stats, nextIp, origStackPos + 1, scopePos - 1, abc, autoFill)) {
-                            return null;
-                        }
-                        scopePos--;
-                    }
-                }*/
-                prevStart = ex.start;
             } catch (ConvertException ex1) {
                 // ignore
             }
@@ -2593,14 +2574,9 @@ public class AVM2Code implements Cloneable {
             refs.put(i, new ArrayList<>());
         }
         visitCode(0, 0, refs);
-        int pos = 0;
         for (ABCException e : body.exceptions) {
-            pos++;
             try {
-                visitCode(adr2pos(e.start, true), adr2pos(e.start, true) - 1, refs);
-                visitCode(adr2pos(e.start, true), -1, refs);
-                visitCode(adr2pos(e.target), adr2pos(e.end, true), refs);
-                visitCode(adr2pos(e.end, true), -pos, refs);
+                visitCode(adr2pos(e.target), -1, refs);
             } catch (ConvertException ex) {
                 logger.log(Level.SEVERE, "Visitcode error", ex);
             }

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -132,5 +133,10 @@ public class AVM2GraphSource extends GraphSource {
     @Override
     public long pos2adr(int pos) {
         return code.pos2adr(pos);
+    }
+
+    @Override
+    public int adr2pos(long adr, boolean nearest) {
+        return code.adr2pos(adr, true);
     }
 }

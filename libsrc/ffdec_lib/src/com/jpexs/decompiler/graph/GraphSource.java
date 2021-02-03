@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -111,6 +112,8 @@ public abstract class GraphSource implements Serializable {
     }
 
     public abstract int adr2pos(long adr);
+
+    public abstract int adr2pos(long adr, boolean nearest);
 
     public abstract long pos2adr(int pos);
 

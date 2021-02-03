@@ -168,6 +168,7 @@ public class AS3Generator {
 
     public static void main(String[] args) throws Exception {
         Configuration.autoDeobfuscate.set(false);
+        Configuration.showMethodBodyId.set(false);
 
 
         useFile("ActionScript3ClassicDecompileTest", new String[][]{{"testdata/as3_new/bin/as3_new.flex.swf", "classic"}}, false);
