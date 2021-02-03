@@ -36,6 +36,9 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.HasNext2Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.LabelIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.NopIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.DecLocalPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.IncLocalPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
@@ -280,7 +283,7 @@ public class AVM2Graph extends Graph {
                     }
                 }
 
-                int finEndIp = avm2code.adr2pos(ex.end);
+                int finEndIp = avm2code.adr2pos(ex.end, true);
                 GraphPart finallyEndPart = searchPart(finEndIp, allParts);
                 List<GraphPart> refs = getRealRefs(finallyEndPart);
 
@@ -315,7 +318,7 @@ public class AVM2Graph extends Graph {
                 }
             } else if (finallyKind == FINALLY_KIND_REGISTER_BASED) {
                 switchPart = findLookupSwitchWithGetLocal(switchedReg, finallyPart);
-                int startIp = code.adr2pos(ex.start);
+                int startIp = code.adr2pos(ex.start, true);
                 GraphPart tryPart = null;
                 for (GraphPart p : allParts) {
                     if (startIp >= p.start && startIp <= p.end) {
@@ -724,18 +727,21 @@ public class AVM2Graph extends Graph {
         List<Integer> finnalysIndicesToBe = new ArrayList<>();
         int realIp = -1;
         for (int e = 0; e < body.exceptions.length; e++) {
-            if (addr == avm2code.getAddrThroughJumpAndDebugLine(body.exceptions[e].start)) {
+            long fixedExStart = avm2code.pos2adr(avm2code.adr2pos(body.exceptions[e].start, true));
+            long fixedExEnd = avm2code.pos2adr(avm2code.adr2pos(body.exceptions[e].end, true));
+
+            if (addr == avm2code.getAddrThroughJumpAndDebugLine(fixedExStart)) {
                 ABCException ex = body.exceptions[e];
                 if (!parsedExceptions.contains(ex)) {
                     if (ex.isFinally()) {
                         finnalysIndicesToBe.add(e);
                     } else {
-                        long endAddr = avm2code.getAddrThroughJumpAndDebugLine(body.exceptions[e].end);
+                        long endAddr = avm2code.getAddrThroughJumpAndDebugLine(fixedExEnd);
                         if (endAddr > maxEndAddr) {
                             catchedExceptions.clear();
-                            maxEndAddr = avm2code.getAddrThroughJumpAndDebugLine(body.exceptions[e].end);
+                            maxEndAddr = avm2code.getAddrThroughJumpAndDebugLine(fixedExEnd);
                             endIp = avm2code.adr2pos(maxEndAddr);
-                            realIp = avm2code.adr2pos(body.exceptions[e].end);
+                            realIp = avm2code.adr2pos(fixedExEnd);
                             catchedExceptions.add(body.exceptions[e]);
                         } else if (endAddr == maxEndAddr) {
                             catchedExceptions.add(body.exceptions[e]);
@@ -757,7 +763,7 @@ public class AVM2Graph extends Graph {
                 finallyException = finallyExceptionToBe;
                 break;
             }
-            int finEndIp = avm2code.getIpThroughJumpAndDebugLine(avm2code.adr2pos(finallyExceptionToBe.end));
+            int finEndIp = avm2code.getIpThroughJumpAndDebugLine(avm2code.adr2pos(finallyExceptionToBe.end, true));
             if (finEndIp == endIp) {
                 finallyIndex = e;
                 finallyException = finallyExceptionToBe;
@@ -800,18 +806,58 @@ public class AVM2Graph extends Graph {
             GraphPart afterPart = null;
 
             GraphPart endIpPart = searchPart(endIp, allParts);
-            if (endIpPart != null && getRealRefs(endIpPart).isEmpty()) { //swftools - there is jump on previous ip
-                if (avm2code.code.get(endIpPart.start - 1).definition instanceof JumpIns) {
-                    GraphPart prevPart = searchPart(endIpPart.start - 1, allParts);
-                    endIpPart = prevPart.nextParts.get(0);
+            if (endIpPart != null && getRealRefs(endIpPart).isEmpty()) {
+                int pos = endIpPart.start - 1;
+                if (avm2code.code.get(pos).definition instanceof DebugLineIns) {
+                    pos--;
+                }
+                if (avm2code.code.get(pos).definition instanceof JumpIns) {
+                    GraphPart prevPart = searchPart(pos, allParts);
+                    if (prevPart.nextParts.get(0).start >= realIp) {
+                        endIpPart = prevPart.nextParts.get(0);
+                    } else {
+                        endIpPart = null;
+                    }
+                }
+                else if (avm2code.code.get(pos).definition instanceof ReturnVoidIns) {
+                    endIpPart = null;
+                }
+                else if (avm2code.code.get(pos).definition instanceof ReturnValueIns) {
+                    endIpPart = null;
+                }
+                else if (avm2code.code.get(pos).definition instanceof ThrowIns) {
+                    endIpPart = null;
                 }
             }
 
             GraphPart realEndIpPart = searchPart(realIp, allParts);
-            if (realEndIpPart != null && getRealRefs(realEndIpPart).isEmpty()) { //swftools - there is jump on previous ip
-                if (avm2code.code.get(realEndIpPart.start - 1).definition instanceof JumpIns) {
-                    GraphPart prevPart = searchPart(realEndIpPart.start - 1, allParts);
-                    realEndIpPart = prevPart.nextParts.get(0);
+            if (realEndIpPart != null && getRealRefs(realEndIpPart).isEmpty()) {
+                int pos = realEndIpPart.start - 1;
+                if (avm2code.code.get(pos).definition instanceof DebugLineIns) {
+                    pos--;
+                }
+                if (avm2code.code.get(pos).definition instanceof JumpIns) {
+                    GraphPart prevPart = searchPart(pos, allParts);
+
+                    if (prevPart.nextParts.get(0).start >= realIp) {
+                        realEndIpPart = prevPart.nextParts.get(0);
+                        endIpPart = prevPart.nextParts.get(0);
+                    } else {
+                        realEndIpPart = null;
+                        endIpPart = null;
+                    }
+                }
+                else if (avm2code.code.get(pos).definition instanceof ReturnVoidIns) {
+                    realEndIpPart = null;
+                    endIpPart = null;
+                }
+                else if (avm2code.code.get(pos).definition instanceof ReturnValueIns) {
+                    realEndIpPart = null;
+                    endIpPart = null;
+                }
+                else if (avm2code.code.get(pos).definition instanceof ThrowIns) {
+                    realEndIpPart = null;
+                    endIpPart = null;
                 }
             }
             afterPart = realEndIpPart;
@@ -1284,14 +1330,14 @@ public class AVM2Graph extends Graph {
                                                 if (spt.object instanceof LocalRegAVM2Item) {
                                                     getLocalObjectIp = avm2code.adr2pos(spt.object.getSrc().getAddress());
                                                     regIndex = ((LocalRegAVM2Item) spt.object).regIndex;
-                                                    expr = ift.expression.getNotCoerced();
-                                                    if (withCommands.size() > 1) {
-                                                        withCommands.remove(withCommands.size() - 1);
-                                                        withCommands.add(expr);
-                                                        expr = new CommaExpressionItem(null, localData.lineStartInstruction, withCommands);
-                                                    }
                                                 }
                                             }
+                                        }
+                                        expr = ift.expression.getNotCoerced();
+                                        if (withCommands.size() > 1) {
+                                            withCommands.remove(withCommands.size() - 1);
+                                            withCommands.add(expr);
+                                            expr = new CommaExpressionItem(null, localData.lineStartInstruction, withCommands);
                                         }
                                     } else {
                                         //There is no if - this means there was something that

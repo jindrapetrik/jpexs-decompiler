@@ -187,7 +187,7 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
 
         Map<Integer, List<ExceptionTargetIpPair>> exceptionStartToTargets = new HashMap<>();
         for (ABCException ex : body.exceptions) {
-            int startIp = code.adr2pos(ex.start);
+            int startIp = code.adr2pos(ex.start, true);
             int targetIp = code.adr2pos(ex.target);
             if (!exceptionStartToTargets.containsKey(startIp)) {
                 exceptionStartToTargets.put(startIp, new ArrayList<>());
@@ -228,11 +228,6 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
                         TranslateStack targetStack = (TranslateStack) stack.clone();
                         targetStack.push(new ExceptionAVM2Item(pair.exception));
                         toVisitStacks.add(targetStack);
-                    }
-                }
-                for (ABCException ex : body.exceptions) {
-                    if (code.pos2adr(idx) == ex.start) {
-
                     }
                 }
 
@@ -316,6 +311,12 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
                         public long pos2adr(int pos) {
                             return code.pos2adr(pos);
                         }
+
+                        @Override
+                        public int adr2pos(long adr, boolean nearest) {
+                            return code.adr2pos(adr, nearest);
+                        }
+
 
                         @Override
                         public Set<Long> getImportantAddresses() {
