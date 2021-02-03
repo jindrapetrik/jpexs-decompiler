@@ -24,7 +24,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {
-        addSwf("standard", "testdata/flashdevelop/bin/Main.flex.swf");
+        addSwf("standard", "testdata/as3_new/bin/as3_new.flex.swf");
     }
 
     private void decompileScriptPack(String path, String expectedResult) {
@@ -55,6 +55,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
         expectedResult = cleanPCode(expectedResult);
         assertEquals(actualResult, expectedResult);
     }
+
     @Test
     public void testMyPackage1TestClass() {
         decompileScriptPack("tests_classes.mypackage1.TestClass", "package tests_classes.mypackage1\n"

@@ -13,8 +13,8 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {
-        addSwf("flex", "testdata/cross_compile/bin/Main.flex.swf");
-        addSwf("air", "testdata/cross_compile/bin/Main.air.swf");
+        addSwf("flex", "testdata/as3_cross_compile/bin/as3_cross_compile.flex.swf");
+        addSwf("air", "testdata/as3_cross_compile/bin/as3_cross_compile.air.swf");
     }
 
     @DataProvider

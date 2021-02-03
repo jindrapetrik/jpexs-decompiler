@@ -12,7 +12,7 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {
-        addSwf("assembled", "testdata/custom/bin/custom.swf");
+        addSwf("assembled", "testdata/as3_assembled/bin/as3_assembled.swf");
     }
 
     @Test
