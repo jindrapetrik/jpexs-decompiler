@@ -537,17 +537,26 @@ public class AVM2Graph extends Graph {
 
         Map<Integer, Integer> setLocalPosToRegisterId = new HashMap<>();
 
-        for (int ip = 0; ip < avm2code.code.size(); ip++) {
-            AVM2Instruction ins = avm2code.code.get(ip);
-            if (ins.definition instanceof SetLocalTypeIns) {
-                int regId = ((SetLocalTypeIns) ins.definition).getRegisterId(ins);
-                setLocalPosToGetLocalPos.put(ip, new TreeSet<>());
-                setLocalPosToRegisterId.put(ip, regId);
+        for (GraphPart p : allParts) {
+            if (p.start < 0) {
+                continue;
+            }
+            for (int ip = p.start; ip <= p.end; ip++) {
+                AVM2Instruction ins = avm2code.code.get(ip);
+                if (ins.definition instanceof SetLocalTypeIns) {
+                    int regId = ((SetLocalTypeIns) ins.definition).getRegisterId(ins);
+                    setLocalPosToGetLocalPos.put(ip, new TreeSet<>());
+                    setLocalPosToRegisterId.put(ip, regId);
+                }
             }
         }
 
         for (int ip : setLocalPosToGetLocalPos.keySet()) {
             GraphPart part = searchPart(ip + 1, allParts);
+
+            if (part == null) { //might be last part of script (?)
+                continue;
+            }
             walkLocalRegsUsage(localData, setLocalPosToGetLocalPos.get(ip), part, part, new HashSet<>(), ip + 1, setLocalPosToRegisterId.get(ip));
         }
 
