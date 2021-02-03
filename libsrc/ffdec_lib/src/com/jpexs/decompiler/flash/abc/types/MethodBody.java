@@ -45,6 +45,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import com.jpexs.helpers.stat.Statistics;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
