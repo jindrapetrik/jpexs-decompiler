@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
 - Dot parent operator not detected in some cases
 - Namespaces handling
 - Incorrectly colliding class names detection on script private classes
+- AS3 deobfuscator of registers parsing of exception targets
 
 ### Changed
 - AS3 test methods separated to classes

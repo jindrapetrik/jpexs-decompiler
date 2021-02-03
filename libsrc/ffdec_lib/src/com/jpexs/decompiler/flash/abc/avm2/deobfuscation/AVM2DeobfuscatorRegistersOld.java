@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.deobfuscation;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -30,6 +31,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ThrowIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
+import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.helpers.Reference;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -42,8 +45,10 @@ import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -154,10 +159,42 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
             return -1;
         }
 
-        return visitCode(assignment, new HashSet<>(), new TranslateStack("deo"), classIndex, isStatic, body, scriptIndex, abc, code, 0, code.code.size() - 1, ignoredRegisters, ignoredGets);
+        Set<Integer> visited = new HashSet<>();
+        return visitCode(assignment, visited, new TranslateStack("deo"), classIndex, isStatic, body, scriptIndex, abc, code, 0, code.code.size() - 1, ignoredRegisters, ignoredGets);
+    }
+
+    private class ExceptionTargetIpPair {
+
+        private final ABCException exception;
+        private final int targetIp;
+
+        public ExceptionTargetIpPair(ABCException exception, int targetIp) {
+            this.exception = exception;
+            this.targetIp = targetIp;
+        }
+
+        public ABCException getException() {
+            return exception;
+        }
+
+        public int getTargetIp() {
+            return targetIp;
+        }
+
     }
 
     private int visitCode(Reference<AVM2Instruction> assignment, Set<Integer> visited, TranslateStack stack, int classIndex, boolean isStatic, MethodBody body, int scriptIndex, ABC abc, AVM2Code code, int idx, int endIdx, Set<Integer> ignored, Set<Integer> ignoredGets) throws InterruptedException {
+
+        Map<Integer, List<ExceptionTargetIpPair>> exceptionStartToTargets = new HashMap<>();
+        for (ABCException ex : body.exceptions) {
+            int startIp = code.adr2pos(ex.start);
+            int targetIp = code.adr2pos(ex.target);
+            if (!exceptionStartToTargets.containsKey(startIp)) {
+                exceptionStartToTargets.put(startIp, new ArrayList<>());
+            }
+            exceptionStartToTargets.get(startIp).add(new ExceptionTargetIpPair(ex, targetIp));
+        }
+
         List<GraphTargetItem> output = new ArrayList<>();
         AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
         initLocalRegs(localData, body.getLocalReservedCount(), body.max_regs);
@@ -184,6 +221,20 @@ public class AVM2DeobfuscatorRegistersOld extends AVM2DeobfuscatorSimpleOld {
                     break;
                 }
                 visited.add(idx);
+
+                if (exceptionStartToTargets.containsKey(idx)) {
+                    for (ExceptionTargetIpPair pair : exceptionStartToTargets.get(idx)) {
+                        toVisit.add(pair.targetIp);
+                        TranslateStack targetStack = (TranslateStack) stack.clone();
+                        targetStack.push(new ExceptionAVM2Item(pair.exception));
+                        toVisitStacks.add(targetStack);
+                    }
+                }
+                for (ABCException ex : body.exceptions) {
+                    if (code.pos2adr(idx) == ex.start) {
+
+                    }
+                }
 
                 AVM2Instruction ins = code.code.get(idx);
                 InstructionDefinition def = ins.definition;
