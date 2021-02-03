@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 - Incorrectly colliding class names detection on script private classes
 - AS3 deobfuscator of registers parsing of exception targets
 - AS3 code with exception start/end not matching instruction boundary
+- AS3 deobfuscator in some cases
 
 ### Changed
 - AS3 test methods separated to classes

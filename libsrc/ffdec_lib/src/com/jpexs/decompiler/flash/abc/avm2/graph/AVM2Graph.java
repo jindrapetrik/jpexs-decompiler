@@ -864,7 +864,9 @@ public class AVM2Graph extends Graph {
 
             GraphPart exAfterPart = endIpPart;
 
-            stack.clear(); //If the original code (before check()) had "if" in it, there would be something on stack
+            if (part.nextParts.size() > 1 && !stack.isEmpty()) { //If the original code (before check()) had "if" in it, there would be something on stack
+                stack.pop();
+            }
 
             if (finallyException == null) {
                 List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
