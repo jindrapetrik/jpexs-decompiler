@@ -1,5 +1,6 @@
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.as3decompile;
 
+import com.jpexs.decompiler.flash.ActionScript3DecompileTestBase;
 import java.io.IOException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

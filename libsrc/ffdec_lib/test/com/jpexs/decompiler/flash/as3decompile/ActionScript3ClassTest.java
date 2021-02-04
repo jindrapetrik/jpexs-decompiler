@@ -1,5 +1,6 @@
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.as3decompile;
 
+import com.jpexs.decompiler.flash.ActionScript3DecompileTestBase;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
