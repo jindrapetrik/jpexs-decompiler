@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.localregs;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -136,8 +137,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
     }
 
     @Override
-    public int getStackPopCount(AVM2Instruction ins, ABC abc
-    ) {
+    public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 1;
     }
 

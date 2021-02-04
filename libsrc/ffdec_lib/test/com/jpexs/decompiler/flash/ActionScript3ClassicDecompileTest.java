@@ -250,9 +250,9 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "var g:* = undefined;\r\n"
                 + "d = new TestClass1();\r\n"
                 + "k = null;\r\n"
-                + "k.(d.attrib++, 0);\r\n"
+                + "k.(++d.attrib, 0);\r\n"
                 + "trace(\"between\");\r\n"
-                + "g = k.(d.attrib++, 0);\r\n"
+                + "g = k.(++d.attrib, 0);\r\n"
                 + "trace(\"end\");\r\n",
                 false);
     }
@@ -733,9 +733,11 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     @Test
     public void testInc2() {
         decompileMethod("classic", "testInc2", "var a:* = [1];\r\n"
-                + "a[this.getInt()]++;\r\n"
+                + "++a[this.getInt()];\r\n"
                 + "var d:* = a[this.getInt()]++;\r\n"
                 + "var e:* = ++a[this.getInt()];\r\n"
+                + "++a[this.getInt()];\r\n"
+                + "++a[this.getInt()];\r\n"
                 + "var b:* = 1;\r\n"
                 + "b++;\r\n"
                 + "var c:* = 1;\r\n"
@@ -776,9 +778,11 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "trace(\"arr[e++]\");\r\n"
                 + "var chars:Array = new Array(36);\r\n"
                 + "var index:uint = 0;\r\n"
-                + "chars[index++] = 5;\r\n"
+                + "var _loc7_:* = index++;\r\n"
+                + "chars[_loc7_] = 5;\r\n"
                 + "trace(\"arr[++e]\");\r\n"
-                + "chars[++index] = 5;\r\n",
+                + "var _loc8_:* = ++index;\r\n"
+                + "chars[_loc8_] = 5;\r\n",
                 false);
     }
 

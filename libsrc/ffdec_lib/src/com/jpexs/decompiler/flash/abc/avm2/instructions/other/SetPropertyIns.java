@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -24,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConstructAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
@@ -63,8 +65,10 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
             SetLocalAVM2Item valueSetLocalReg = (SetLocalAVM2Item) item;
             if ((valueSetLocalReg.value instanceof IncrementAVM2Item) || (valueSetLocalReg.value instanceof DecrementAVM2Item)) {
                 boolean isIncrement = (valueSetLocalReg.value instanceof IncrementAVM2Item);
-                if (valueSetLocalReg.value.value instanceof GetPropertyAVM2Item) {
-                    GetPropertyAVM2Item getProperty = (GetPropertyAVM2Item) valueSetLocalReg.value.value;
+                boolean hasConvert = valueSetLocalReg.value.value instanceof ConvertAVM2Item; //in air there is convert added when postincrement
+
+                if (valueSetLocalReg.value.value.getNotCoercedNoDup() instanceof GetPropertyAVM2Item) {
+                    GetPropertyAVM2Item getProperty = (GetPropertyAVM2Item) valueSetLocalReg.value.value.getNotCoercedNoDup();
                     FullMultinameAVM2Item propertyName = ((FullMultinameAVM2Item) getProperty.propertyName);
                     SetLocalAVM2Item nameSetLocalReg = null;
                     if (propertyName.name instanceof SetLocalAVM2Item) {
@@ -82,18 +86,16 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                             }
                             getProperty.object = objSetLocalReg.value;
 
-                            if (standalone) {
-                                if (isIncrement) {
+                            if (isIncrement) {
+                                if (hasConvert && standalone) {
                                     return new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
-                                } else {
+                                }
+                                return new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
+                            } else {
+                                if (hasConvert && standalone) {
                                     return new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
                                 }
-                            } else {
-                                if (isIncrement) {
-                                    return new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
-                                } else {
-                                    return new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
-                                }
+                                return new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getProperty);
                             }
                         }
                     }
@@ -169,9 +171,9 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                     if (getProp.object.value == obj) {
                         getProp.object = obj;
                         if (isIncrement) {
-                            output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                            output.add(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
                         } else {
-                            output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                            output.add(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
                         }
                         return;
                     }
@@ -188,7 +190,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
             if (obj instanceof LocalRegAVM2Item) {
                 LocalRegAVM2Item objLocalReg = (LocalRegAVM2Item) obj;
 
-                if (!output.isEmpty() && !stack.isEmpty()) {
+                if (!output.isEmpty()) {
                     if (output.get(output.size() - 1) instanceof SetLocalAVM2Item) {
                         SetLocalAVM2Item valueSetLocalReg = (SetLocalAVM2Item) output.get(output.size() - 1);
                         if ((valueSetLocalReg.value instanceof IncrementAVM2Item)
@@ -196,7 +198,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                             boolean isIncrement = (valueSetLocalReg.value instanceof IncrementAVM2Item);
                             if (valueSetLocalReg.value.value instanceof DuplicateItem) {
                                 GraphTargetItem duplicated = valueSetLocalReg.value.value.value;
-                                if (stack.peek() == duplicated) {
+                                if (!stack.isEmpty() && stack.peek() == duplicated) {
                                     GraphTargetItem notCoerced = duplicated.getNotCoerced();
                                     if (notCoerced instanceof GetPropertyAVM2Item) {
                                         GetPropertyAVM2Item getProperty = (GetPropertyAVM2Item) notCoerced;
@@ -249,7 +251,6 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                         return;
                     }
                 }
-
             }
         }
 
