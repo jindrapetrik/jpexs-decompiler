@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.generators;
 
 import com.jpexs.helpers.Helper;
@@ -26,12 +27,13 @@ import java.util.Scanner;
 public class AS3NewAssemblyGenerator {
     public static void main(String[] args) throws UnsupportedEncodingException {
         Scanner sc = new Scanner(System.in);
+        String swfName = "as3_assembled";
         System.out.print("Enter test class name:");
-        final String DIR = "testdata/custom/abc/custom-0/";
+        final String DIR = "testdata/" + swfName + "/abc/" + swfName + "-0/";
         String className = sc.nextLine();
         String templateClassData = Helper.readTextFile(DIR + "tests/Template.class.asasm");
         String templateScriptData = Helper.readTextFile(DIR + "tests/Template.script.asasm");
-        String mainData = Helper.readTextFile(DIR + "custom-0.main.asasm");
+        String mainData = Helper.readTextFile(DIR + swfName + "-0.main.asasm");
 
         String classData = templateClassData.replace("Template", className);;
         String scriptData = templateScriptData.replace("Template", className);
@@ -41,7 +43,7 @@ public class AS3NewAssemblyGenerator {
 
         Helper.writeFile(DIR + "tests/" + className + ".class.asasm", classData.getBytes("UTF-8"));
         Helper.writeFile(DIR + "tests/" + className + ".script.asasm", scriptData.getBytes("UTF-8"));
-        Helper.writeFile(DIR + "custom-0.main.asasm", mainDataUpdated.getBytes("UTF-8"));
+        Helper.writeFile(DIR + swfName + "-0.main.asasm", mainDataUpdated.getBytes("UTF-8"));
 
     }
 }
