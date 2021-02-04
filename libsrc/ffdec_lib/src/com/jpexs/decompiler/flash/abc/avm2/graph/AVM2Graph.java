@@ -48,8 +48,10 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConstructAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FilteredCheckAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.HasNextAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
@@ -1359,11 +1361,32 @@ public class AVM2Graph extends Graph {
                                         if (output.get(i) instanceof SetLocalAVM2Item) {
                                             SetLocalAVM2Item setLocal = (SetLocalAVM2Item) output.get(i);
                                             if (setLocal.value instanceof ConstructAVM2Item) {
-                                                if ((((ConstructAVM2Item) setLocal.value).object instanceof GetLexAVM2Item)) {
-                                                    GetLexAVM2Item lex = (GetLexAVM2Item) ((ConstructAVM2Item) setLocal.value).object;
-                                                    if ("XMLList".equals(lex.getRawPropertyName())) {
-                                                        regIndex = setLocal.regIndex;
+                                                ConstructAVM2Item construct = (ConstructAVM2Item) setLocal.value;
+
+                                                boolean isXMLList = false;
+
+                                                if (construct.object instanceof GetPropertyAVM2Item) {
+                                                    GetPropertyAVM2Item gpt = (GetPropertyAVM2Item) construct.object;
+                                                    if (gpt.object instanceof FindPropertyAVM2Item) {
+                                                        FindPropertyAVM2Item fpt = (FindPropertyAVM2Item) gpt.object;
+                                                        FullMultinameAVM2Item fptXmlMult = (FullMultinameAVM2Item) fpt.propertyName;
+                                                        FullMultinameAVM2Item gptXmlMult = (FullMultinameAVM2Item) gpt.propertyName;
+
+                                                        try {
+                                                            isXMLList = fptXmlMult.isTopLevel("XMLList", aLocalData.abc, aLocalData.localRegNames, aLocalData.fullyQualifiedNames)
+                                                                    && gptXmlMult.isTopLevel("XMLList", aLocalData.abc, aLocalData.localRegNames, aLocalData.fullyQualifiedNames);
+                                                        } catch (InterruptedException ex) {
+                                                            //ignore
+                                                        }
                                                     }
+                                                }
+                                                if (construct.object instanceof GetLexAVM2Item) {
+                                                    GetLexAVM2Item glt = (GetLexAVM2Item) construct.object;
+                                                    isXMLList = glt.propertyName.getName(aLocalData.getConstants(), aLocalData.fullyQualifiedNames, true, true).equals("XMLList");
+                                                }
+
+                                                if (isXMLList) {
+                                                    regIndex = setLocal.regIndex;
                                                 }
                                             }
                                         } else {
