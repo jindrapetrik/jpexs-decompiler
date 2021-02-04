@@ -1,0 +1,76 @@
+class
+ refid "tests:TestDeclareReg"
+ instance QName(PackageNamespace("tests"), "TestDeclareReg")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestDeclareReg")
+  iinit
+   refid "tests:TestDeclareReg/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestDeclareReg/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+      getlocal0
+      pushscope
+      newactivation
+      dup
+      setlocal2
+      pushscope            
+      getscopeobject 1
+      getslot 1
+      dup
+      setlocal3
+      pushwith
+      findpropstrict QName(PackageNamespace(""),"trace")
+      pushstring "hey"
+      callpropvoid QName(PackageNamespace(""),"trace"), 1
+      popscope            
+      returnvoid
+     end ; code
+     trait slot QName(PackageInternalNs("something"),"other")
+        slotid 1
+        type QName(PackageNamespace(""),"XML")
+     end ; trait
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestDeclareReg/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

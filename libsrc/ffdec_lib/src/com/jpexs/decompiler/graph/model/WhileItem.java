@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -63,6 +64,14 @@ public class WhileItem extends LoopItem implements Block {
             visitor.visitAll(commands);
         }
     }
+
+    @Override
+    public void visitNoBlock(GraphTargetVisitorInterface visitor) {
+        if (expression != null) {
+            visitor.visitAll(expression);
+        }
+    }
+
 
     public WhileItem(GraphSourceItem src, GraphSourceItem lineStartIns, Loop loop, List<GraphTargetItem> expression, List<GraphTargetItem> commands) {
         super(src, lineStartIns, loop);

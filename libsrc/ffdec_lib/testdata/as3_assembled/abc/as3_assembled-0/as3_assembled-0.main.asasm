@@ -16,5 +16,6 @@ program
  #include "tests/TestDup.script.asasm"
  #include "tests/TestSwitchDefault.script.asasm"
  #include "tests/TestSwitch.script.asasm"
+ #include "tests/TestDeclareReg.script.asasm"
  ; place to add next
 end ; program

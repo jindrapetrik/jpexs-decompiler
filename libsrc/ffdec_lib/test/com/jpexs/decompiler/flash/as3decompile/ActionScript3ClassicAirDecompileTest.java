@@ -743,7 +743,6 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     @Test
     public void testInc2() {
         decompileMethod("classic_air", "testInc2", "var a:* = [1];\r\n"
-                + "a[this.getInt()]++;\r\n"
                 + "var d:* = a[this.getInt()]++;\r\n"
                 + "var e:* = ++a[this.getInt()];\r\n"
                 + "a[this.getInt()]++;\r\n"
@@ -942,7 +941,8 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     public void testNamedAnonFunctions() {
         decompileMethod("classic_air", "testNamedAnonFunctions", "var test:* = new function():*\r\n"
                 + "{\r\n"
-                + "return var testFunc:Function = function(param1:*, param2:int, param3:Array):Boolean\r\n"
+                + "var testFunc:Function;\r\n"
+                + "return testFunc = function(param1:*, param2:int, param3:Array):Boolean\r\n"
                 + "{\r\n"
                 + "return (param1 as TestClass2).attrib1 == 5;\r\n"
                 + "};\r\n"

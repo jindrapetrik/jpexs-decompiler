@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -61,6 +62,13 @@ public class SwitchItem extends LoopItem implements Block {
             visitor.visitAll(c);
         }
     }
+
+    @Override
+    public void visitNoBlock(GraphTargetVisitorInterface visitor) {
+        visitor.visit(switchedObject);
+        visitor.visitAll(caseValues);
+    }
+
 
     public SwitchItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, GraphTargetItem switchedObject, List<GraphTargetItem> caseValues, List<List<GraphTargetItem>> caseCommands, List<Integer> valuesMapping) {
         super(instruction, lineStartIns, loop);

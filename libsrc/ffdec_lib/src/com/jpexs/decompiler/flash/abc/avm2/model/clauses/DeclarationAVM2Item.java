@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
@@ -39,6 +40,8 @@ public class DeclarationAVM2Item extends AVM2Item {
     public GraphTargetItem assignment;
 
     public GraphTargetItem type;
+
+    public boolean showValue = true;
 
     public DeclarationAVM2Item(GraphTargetItem assignment, GraphTargetItem type) {
         super(assignment.getSrc(), assignment.getLineStartItem(), assignment.getPrecedence());
@@ -108,8 +111,11 @@ public class DeclarationAVM2Item extends AVM2Item {
             writer.append(localName);
             writer.append(":");
             type.appendTry(writer, localData);
-            writer.append(" = ");
-            return val.toString(writer, localData);
+            if (showValue) {
+                writer.append(" = ");
+                val.toString(writer, localData);
+            }
+            return writer;
         }
         if (assignment instanceof SetSlotAVM2Item) {
             SetSlotAVM2Item ssti = (SetSlotAVM2Item) assignment;
@@ -136,8 +142,11 @@ public class DeclarationAVM2Item extends AVM2Item {
             writer.append(":");
 
             type.appendTry(writer, localData);
-            writer.append(" = ");
-            return val.toString(writer, localData);
+            if (showValue) {
+                writer.append(" = ");
+                val.toString(writer, localData);
+            }
+            return writer;
         }
         writer.append("var ");
         return assignment.toString(writer, localData);

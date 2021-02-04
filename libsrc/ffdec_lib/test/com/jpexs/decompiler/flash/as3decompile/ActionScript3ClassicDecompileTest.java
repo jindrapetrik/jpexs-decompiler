@@ -734,7 +734,6 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     @Test
     public void testInc2() {
         decompileMethod("classic", "testInc2", "var a:* = [1];\r\n"
-                + "++a[this.getInt()];\r\n"
                 + "var d:* = a[this.getInt()]++;\r\n"
                 + "var e:* = ++a[this.getInt()];\r\n"
                 + "++a[this.getInt()];\r\n"
