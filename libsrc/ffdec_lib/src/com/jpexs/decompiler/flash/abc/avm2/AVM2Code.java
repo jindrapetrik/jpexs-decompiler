@@ -1577,7 +1577,7 @@ public class AVM2Code implements Cloneable {
                     }
                 }
             }
-            if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end)) { // set_local_x,get_local_x.. no other local_x get
+            /*if ((ins.definition instanceof SetLocalTypeIns) && (ip + 1 <= end)) { // set_local_x,get_local_x.. no other local_x get
 
                 AVM2Instruction insAfter = code.get(ip + 1);
                 Set<Integer> usages = setLocalPosToGetLocalPos.containsKey(ip) ? setLocalPosToGetLocalPos.get(ip) : new HashSet<>();
@@ -1590,7 +1590,8 @@ public class AVM2Code implements Cloneable {
                     ip++;
                     continue iploop;
                 }
-            } else if (ins.definition instanceof DupIns) {
+            } else*/
+            if (ins.definition instanceof DupIns) {
                 int nextPos;
                 do {
                     AVM2Instruction insAfter = ip + 1 < code.size() ? code.get(ip + 1) : null;

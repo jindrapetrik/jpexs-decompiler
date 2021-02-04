@@ -694,6 +694,7 @@ public class ABC {
             SWFDecompilerPlugin.fireMethodBodyParsed(this, mb, swf);
         }
 
+        //this will read all method body codes. TODO: make this ondemand
         refreshMultinameNamespaceSuffixes();
         getMethodIndexing();
 

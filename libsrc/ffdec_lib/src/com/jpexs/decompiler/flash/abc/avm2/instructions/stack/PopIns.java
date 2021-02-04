@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.MarkItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -51,6 +52,10 @@ public class PopIns extends InstructionDefinition {
             return;
         }
         if (top instanceof MarkItem) {
+            return;
+        }
+
+        if (top instanceof FindPropertyAVM2Item) {
             return;
         }
 
