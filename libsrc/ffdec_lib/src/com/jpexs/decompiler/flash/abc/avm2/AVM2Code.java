@@ -285,11 +285,13 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
+import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -306,6 +308,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1804,93 +1807,89 @@ public class AVM2Code implements Cloneable {
         return assignment;
     }
 
-    private GraphTargetItem injectDeclarations(int minreg, GraphTargetItem ti, DeclarationAVM2Item[] declaredRegisters, List<Slot> declaredSlots, List<DeclarationAVM2Item> declaredSlotsDec, ABC abc, MethodBody body) {
-        if (ti.value != null) {
-            ti.value = injectDeclarations(minreg, ti.value, declaredRegisters, declaredSlots, declaredSlotsDec, abc, body);
-        }
-        //TODO: walk whole tree... some walker?
-        if (ti instanceof IfItem) {
-            ((IfItem) ti).expression = injectDeclarations(minreg, ((IfItem) ti).expression, declaredRegisters, declaredSlots, declaredSlotsDec, abc, body);
-        }
-        if (ti instanceof BinaryOpItem) {
-            ((BinaryOpItem) ti).leftSide = injectDeclarations(minreg, ((BinaryOpItem) ti).leftSide, declaredRegisters, declaredSlots, declaredSlotsDec, abc, body);
-            ((BinaryOpItem) ti).rightSide = injectDeclarations(minreg, ((BinaryOpItem) ti).rightSide, declaredRegisters, declaredSlots, declaredSlotsDec, abc, body);
-        }
-        if (ti instanceof ForEachInAVM2Item) {
-            ForEachInAVM2Item fei = (ForEachInAVM2Item) ti;
-            if (fei.expression.object instanceof LocalRegAVM2Item) {
-                int reg = ((LocalRegAVM2Item) fei.expression.object).regIndex;
-                if (declaredRegisters[reg] == null) {
-                    fei.expression.object = handleDeclareReg(minreg, fei.expression.object, declaredRegisters, declaredSlots, reg);
+    private void injectDeclarations(List<GraphTargetItem> items, int minreg, DeclarationAVM2Item[] declaredRegisters, List<Slot> declaredSlots, List<DeclarationAVM2Item> declaredSlotsDec, ABC abc, MethodBody body) {
+        for (int i = 0; i < items.size(); i++) {
+            GraphTargetItem currentItem = items.get(i);
+            List<GraphTargetItem> itemsOnLine = new ArrayList<>();
+            itemsOnLine.add(currentItem);
+            currentItem.visitRecursivelyNoBlock(new AbstractGraphTargetVisitor() {
+                @Override
+                public void visit(GraphTargetItem item) {
+                    itemsOnLine.add(item);
+                }
+            });
+
+            if (currentItem instanceof ForEachInAVM2Item) {
+                ForEachInAVM2Item fei = (ForEachInAVM2Item) currentItem;
+                if (fei.expression.object instanceof LocalRegAVM2Item) {
+                    int reg = ((LocalRegAVM2Item) fei.expression.object).regIndex;
+                    if (declaredRegisters[reg] == null) {
+                        fei.expression.object = handleDeclareReg(minreg, fei.expression.object, declaredRegisters, declaredSlots, reg);
+                    }
                 }
             }
-        }
-        if (ti instanceof ForInAVM2Item) {
-            ForInAVM2Item fi = (ForInAVM2Item) ti;
-            if (fi.expression.object instanceof LocalRegAVM2Item) {
-                int reg = ((LocalRegAVM2Item) fi.expression.object).regIndex;
-                fi.expression.object = handleDeclareReg(minreg, fi.expression.object, declaredRegisters, declaredSlots, reg);
-                //nowdeclaredRegs.add(reg);
+            if (currentItem instanceof ForInAVM2Item) {
+                ForInAVM2Item fi = (ForInAVM2Item) currentItem;
+                if (fi.expression.object instanceof LocalRegAVM2Item) {
+                    int reg = ((LocalRegAVM2Item) fi.expression.object).regIndex;
+                    fi.expression.object = handleDeclareReg(minreg, fi.expression.object, declaredRegisters, declaredSlots, reg);
+                }
+            }
 
-            }
-        }
-        if (ti instanceof Block) {
-            Block bl = (Block) ti;
-            for (List<GraphTargetItem> s : bl.getSubs()) {
-                injectDeclarations(minreg, s, declaredRegisters, declaredSlots, declaredSlotsDec, abc, body);
-            }
-        }
-        if (ti instanceof SetLocalAVM2Item) {
-            int reg = ((SetLocalAVM2Item) ti).regIndex;
-            ti = handleDeclareReg(minreg, ti, declaredRegisters, declaredSlots, reg);
-            return ti;
-        }
-        if (ti instanceof SetSlotAVM2Item) {
-            SetSlotAVM2Item ssti = (SetSlotAVM2Item) ti;
-            Slot sl = new Slot(ssti.scope, ssti.slotName);
-            if (!declaredSlots.contains(sl)) {
-                GraphTargetItem type = TypeItem.UNBOUNDED;
-                for (int t = 0; t < body.traits.traits.size(); t++) {
-                    if (body.traits.traits.get(t).getName(abc) == sl.multiname) {
-                        if (body.traits.traits.get(t) instanceof TraitSlotConst) {
-                            type = PropertyAVM2Item.multinameToType(((TraitSlotConst) body.traits.traits.get(t)).type_index, abc.constants);
+            for (GraphTargetItem subItem : itemsOnLine) {
+                if (subItem instanceof SetLocalAVM2Item) {
+                    SetLocalAVM2Item setLocal = (SetLocalAVM2Item) subItem;
+                    int reg = setLocal.regIndex;
+                    GraphTargetItem dec = handleDeclareReg(minreg, subItem, declaredRegisters, declaredSlots, reg);
+                    if (dec != subItem) { //declared right now
+                        if (subItem == currentItem) {
+                            items.set(i, dec);
+                        } else {
+                            ((DeclarationAVM2Item) dec).showValue = false;
+                            items.add(i, dec);
+                            i++;
                         }
                     }
                 }
-                DeclarationAVM2Item d = new DeclarationAVM2Item(ti, type);
-                ssti.setDeclaration(d);
-                declaredSlotsDec.add(d);
-                declaredSlots.add(sl);
-                return d;
-                //nowdeclaredSlots.add(sl);
-            } else {
-                int idx = declaredSlots.indexOf(sl);
-                ssti.setDeclaration(declaredSlotsDec.get(idx));
+                if (subItem instanceof SetSlotAVM2Item) {
+                    SetSlotAVM2Item ssti = (SetSlotAVM2Item) subItem;
+                    Slot sl = new Slot(ssti.scope, ssti.slotName);
+                    if (!declaredSlots.contains(sl)) {
+                        GraphTargetItem type = TypeItem.UNBOUNDED;
+                        for (int t = 0; t < body.traits.traits.size(); t++) {
+                            if (body.traits.traits.get(t).getName(abc) == sl.multiname) {
+                                if (body.traits.traits.get(t) instanceof TraitSlotConst) {
+                                    type = PropertyAVM2Item.multinameToType(((TraitSlotConst) body.traits.traits.get(t)).type_index, abc.constants);
+                                }
+                            }
+                        }
+                        DeclarationAVM2Item d = new DeclarationAVM2Item(subItem, type);
+                        ssti.setDeclaration(d);
+                        declaredSlotsDec.add(d);
+                        declaredSlots.add(sl);
+
+                        if (subItem == currentItem) {
+                            items.set(i, d);
+                        } else {
+                            d.showValue = false;
+                            items.add(i, d);
+                            i++;
+                        }
+
+                    } else {
+                        int idx = declaredSlots.indexOf(sl);
+                        ssti.setDeclaration(declaredSlotsDec.get(idx));
+                    }
+                }
+            }
+
+            if (currentItem instanceof Block) {
+                Block blk = (Block) currentItem;
+                for (List<GraphTargetItem> sub : blk.getSubs()) {
+                    injectDeclarations(sub, minreg, declaredRegisters, declaredSlots, declaredSlotsDec, abc, body);
+                }
             }
         }
-        return ti;
-    }
-
-    private void injectDeclarations(int minreg, List<GraphTargetItem> list, DeclarationAVM2Item[] declaredRegisters, List<Slot> declaredSlots, List<DeclarationAVM2Item> declaredSlotsDec, ABC abc, MethodBody body) {
-        //List<Integer> nowdeclaredRegs=new ArrayList<>();
-        //List<Slot> nowdeclaredSlots=new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
-            GraphTargetItem ti = list.get(i);
-            GraphTargetItem ti2 = injectDeclarations(minreg, ti, declaredRegisters, declaredSlots, declaredSlotsDec, abc, body);
-            if (ti != ti2) {
-                list.set(i, ti2);
-            }
-        }
-
-        /*
-         //undeclare registers at the end of the block?
-         for(int reg:nowdeclaredRegs){
-         declaredRegisters[reg] = false;
-         }
-
-         for(Slot s:nowdeclaredSlots){
-         declaredSlots.remove(s);
-         }*/
     }
 
     public List<GraphTargetItem> toGraphTargetItems(boolean thisHasDefaultToPrimitive, ConvertData convertData, String path, int methodIndex, boolean isStatic, int scriptIndex, int classIndex, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, int initializerType, List<DottedChain> fullyQualifiedNames, List<Traits> initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
@@ -2000,7 +1999,7 @@ public class AVM2Code implements Cloneable {
         //
 
         //int minreg = abc.method_info.get(body.method_info).getMaxReservedReg() + 1;
-        injectDeclarations(1, list, d, new ArrayList<>(), new ArrayList<>(), abc, body);
+        injectDeclarations(list, 1, d, new ArrayList<>(), new ArrayList<>(), abc, body);
 
         int lastPos = list.size() - 1;
         if (lastPos < 0) {

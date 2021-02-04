@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model.clauses;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -39,6 +40,7 @@ import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -75,6 +77,26 @@ public class TryActionItem extends ActionItem implements Block {
         }
         return ret;
     }
+
+    @Override
+    public void visit(GraphTargetVisitorInterface visitor) {
+        if (tryCommands != null) {
+            visitor.visitAll(tryCommands);
+        }
+        for (List<GraphTargetItem> cc : catchCommands) {
+            visitor.visitAll(cc);
+        }
+        if (finallyCommands != null) {
+            visitor.visitAll(finallyCommands);
+        }
+    }
+
+    @Override
+    public void visitNoBlock(GraphTargetVisitorInterface visitor) {
+
+    }
+
+
 
     public TryActionItem(List<GraphTargetItem> tryCommands, List<GraphTargetItem> catchExceptionNames, List<GraphTargetItem> catchExceptionTypes, List<List<GraphTargetItem>> catchCommands, List<GraphTargetItem> finallyCommands) {
         super(null, null, NOPRECEDENCE);

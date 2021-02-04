@@ -31,6 +31,7 @@ All notable changes to this project will be documented in this file.
 - AS3 deobfuscator of registers parsing of exception targets
 - AS3 code with exception start/end not matching instruction boundary
 - AS3 deobfuscator in some cases
+- #349 AS3 - better handling of declarations
 
 ### Changed
 - AS3 test methods separated to classes

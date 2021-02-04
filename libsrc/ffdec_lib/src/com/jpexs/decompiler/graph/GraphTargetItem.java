@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -534,10 +535,28 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         });
     }
 
+    public final void visitRecursivelyNoBlock(GraphTargetVisitorInterface visitor) {
+        Set<GraphTargetItem> visitedItems = new HashSet<>();
+        visitNoBlock(new AbstractGraphTargetVisitor() {
+            @Override
+            public void visit(GraphTargetItem item) {
+                if (item != null && !visitedItems.contains(item)) {
+                    visitedItems.add(item);
+                    visitor.visit(item);
+                    item.visitNoBlock(this);
+                }
+            }
+        });
+    }
+
     public void visit(GraphTargetVisitorInterface visitor) {
         if (value != null) {
             visitor.visit(value);
         }
+    }
+
+    public void visitNoBlock(GraphTargetVisitorInterface visitor) {
+        visit(visitor);
     }
 
     public abstract GraphTargetItem returnType();
