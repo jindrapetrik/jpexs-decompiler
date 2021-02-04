@@ -1,23 +1,34 @@
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.as3decompile;
 
+import com.jpexs.decompiler.flash.ActionScript3DecompileTestBase;
 import java.io.IOException;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
  *
  * @author JPEXS
  */
-public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript3DecompileTestBase {
+public class ActionScript3CrossCompileDecompileTest extends ActionScript3DecompileTestBase {
 
     @BeforeClass
     public void init() throws IOException, InterruptedException {
-        addSwf("swftools", "testdata/as3_cross_compile/bin/as3_cross_compile.swftools.swf");
+        addSwf("flex", "testdata/as3_cross_compile/bin/as3_cross_compile.flex.swf");
+        addSwf("air", "testdata/as3_cross_compile/bin/as3_cross_compile.air.swf");
     }
 
-    @Test
-    public void testTryCatch() {
-        decompileMethod("swftools", "testTryCatch", "trace(\"before try\");\r\n"
+    @DataProvider
+    public Object[][] swfNamesProvider() {
+        return new Object[][]{
+            {"flex"},
+            {"air"}
+        };
+    }
+
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryCatch(String swfUsed) {
+        decompileMethod(swfUsed, "testTryCatch", "trace(\"before try\");\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "trace(\"in try\");\r\n"
@@ -30,29 +41,28 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 false);
     }
 
-    @Test
-    public void testTryCatchExceptionUsage() {
-        decompileMethod("swftools", "testTryCatchExceptionUsage", "trace(\"before try\");\r\n"
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryCatchExceptionUsage(String swfUsed) {
+        decompileMethod(swfUsed, "testTryCatchExceptionUsage", "trace(\"before try\");\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "trace(\"in try\");\r\n"
                 + "}\r\n"
                 + "catch(e:Error)\r\n"
                 + "{\r\n"
-                + "var _loc1_:* = e;\r\n"
-                + "trace(\"catched exception: \" + _loc1_.message);\r\n"
+                + "trace(\"catched exception: \" + e.message);\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
                 false);
     }
 
-    @Test
-    public void testTryCatchIfInTry() {
-        decompileMethod("swftools", "testTryCatchIfInTry", "var _loc1_:Boolean = true;\r\n"
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryCatchIfInTry(String swfUsed) {
+        decompileMethod(swfUsed, "testTryCatchIfInTry", "var a:Boolean = true;\r\n"
                 + "trace(\"before\");\r\n"
                 + "try\r\n"
                 + "{\r\n"
-                + "if(_loc1_)\r\n"
+                + "if(a)\r\n"
                 + "{\r\n"
                 + "trace(\"ret\");\r\n"
                 + "return;\r\n"
@@ -67,9 +77,9 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 false);
     }
 
-    @Test
-    public void testTryCatchInWhile() {
-        decompileMethod("swftools", "testTryCatchInWhile", "trace(\"before loop\");\r\n"
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryCatchInWhile(String swfUsed) {
+        decompileMethod(swfUsed, "testTryCatchInWhile", "trace(\"before loop\");\r\n"
                 + "while(true)\r\n"
                 + "{\r\n"
                 + "try\r\n"
@@ -92,21 +102,21 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 false);
     }
 
-    @Test
-    public void testTryCatchInWhile2() {
-        decompileMethod("swftools", "testTryCatchInWhile2", "var _loc1_:int = 0;\r\n"
-                + "_loc1_ = 0;\r\n"
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryCatchInWhile2(String swfUsed) {
+        decompileMethod(swfUsed, "testTryCatchInWhile2", "var a:int = 0;\r\n"
+                + "a = 0;\r\n"
                 + "trace(\"before loop\");\r\n"
-                + "while(_loc1_ > 5)\r\n"
+                + "while(a > 5)\r\n"
                 + "{\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "trace(\"in try\");\r\n"
-                + "if(_loc1_ == 6)\r\n"
+                + "if(a == 6)\r\n"
                 + "{\r\n"
                 + "continue;\r\n"
                 + "}\r\n"
-                + "if(_loc1_ == 7)\r\n"
+                + "if(a == 7)\r\n"
                 + "{\r\n"
                 + "break;\r\n"
                 + "}\r\n"
@@ -118,29 +128,30 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "catch(e:Error)\r\n"
                 + "{\r\n"
-                + "if(_loc1_ == 8)\r\n"
+                + "if(a == 8)\r\n"
                 + "{\r\n"
                 + "break;\r\n"
                 + "}\r\n"
                 + "continue;\r\n"
                 + "}\r\n"
-                + "_loc1_++;\r\n"
+                + "a++;\r\n"
                 + "}\r\n",
                 false);
     }
 
-    @Test
-    public void testTryCatchLoop() {
-        decompileMethod("swftools", "testTryCatchLoop", "var _loc1_:int = 0;\r\n"
-                + "while(_loc1_ < 100)\r\n"
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryCatchLoop(String swfUsed) {
+        decompileMethod(swfUsed, "testTryCatchLoop", "var j:int = 0;\r\n"
+                + "var i:int = 0;\r\n"
+                + "while(i < 100)\r\n"
                 + "{\r\n"
                 + "try\r\n"
                 + "{\r\n"
-                + "var _loc2_:int = 0;\r\n"
-                + "while(_loc2_ < 20)\r\n"
+                + "j = 0;\r\n"
+                + "while(j < 20)\r\n"
                 + "{\r\n"
                 + "trace(\"a\");\r\n"
-                + "_loc2_++;\r\n"
+                + "j++;\r\n"
                 + "}\r\n"
                 + "}\r\n"
                 + "catch(e:EOFError)\r\n"
@@ -152,17 +163,15 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "continue;\r\n"
                 + "}\r\n"
                 + "trace(\"after_try\");\r\n"
-                + "_loc1_++;\r\n"
+                + "i++;\r\n"
                 + "}\r\n"
                 + "trace(\"end\");\r\n",
                 false);
     }
 
-    @Test
-    public void testTryFinally() {
-        decompileMethod("swftools", "testTryFinally", "trace(\"before try\");\r\n"
-                + "try\r\n"
-                + "{\r\n"
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryFinally(String swfUsed) {
+        decompileMethod(swfUsed, "testTryFinally", "trace(\"before try\");\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "trace(\"in try\");\r\n"
@@ -171,20 +180,17 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "{\r\n"
                 + "trace(\"in catch\");\r\n"
                 + "}\r\n"
-                + "}\r\n"
-                + "catch(_loc_e_:*)\r\n"
+                + "finally\r\n"
                 + "{\r\n"
                 + "trace(\"in finally\");\r\n"
-                + "throw _loc_e_;\r\n"
                 + "}\r\n"
-                + "trace(\"in finally\");\r\n"
                 + "trace(\"after\");\r\n",
                 false);
     }
 
-    @Test
-    public void testTryFinallyDirectReturnInFinally() {
-        decompileMethod("swftools", "testTryFinallyDirectReturnInFinally", "var _loc1_:String = \"xxx\";\r\n"
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryFinallyDirectReturnInFinally(String swfUsed) {
+        decompileMethod(swfUsed, "testTryFinallyDirectReturnInFinally", "var str:String = \"xxx\";\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "}\r\n"
@@ -195,31 +201,28 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "finally\r\n"
                 + "{\r\n"
                 + "trace(\"hi \");\r\n"
-                + "if(_loc1_ == \"check\")\r\n"
+                + "if(str == \"check\")\r\n"
                 + "{\r\n"
-                + "return _loc1_;\r\n"
+                + "return str;\r\n"
                 + "}\r\n"
-                + "return \"hu\" + _loc1_;\r\n"
+                + "return \"hu\" + str;\r\n"
                 + "}\r\n",
                 false);
     }
 
-    @Test
-    public void testTryFinallyLoop() {
-        decompileMethod("swftools", "testTryFinallyLoop", "var _loc1_:* = 0;\r\n"
-                + "while(_loc1_ < 10)\r\n"
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryFinallyLoop(String swfUsed) {
+        decompileMethod(swfUsed, "testTryFinallyLoop", "var i:int = 0;\r\n"
+                + "while(i < 10)\r\n"
                 + "{\r\n"
                 + "trace(\"before try\");\r\n"
                 + "try\r\n"
                 + "{\r\n"
-                + "try\r\n"
-                + "{\r\n"
                 + "trace(\"in try\");\r\n"
-                + "if(_loc1_ == 5)\r\n"
+                + "if(i == 5)\r\n"
                 + "{\r\n"
-                + "_loc1_ = _loc1_ + 5;\r\n"
+                + "i = i + 5;\r\n"
                 + "trace(\"continue while\");\r\n"
-                + "trace(\"in finally\");\r\n"
                 + "continue;\r\n"
                 + "}\r\n"
                 + "}\r\n"
@@ -227,23 +230,20 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "{\r\n"
                 + "trace(\"in catch\");\r\n"
                 + "}\r\n"
-                + "}\r\n"
-                + "catch(_loc_e_:*)\r\n"
+                + "finally\r\n"
                 + "{\r\n"
                 + "trace(\"in finally\");\r\n"
-                + "throw _loc_e_;\r\n"
                 + "}\r\n"
-                + "trace(\"in finally\");\r\n"
                 + "trace(\"after\");\r\n"
-                + "_loc1_++;\r\n"
+                + "i++;\r\n"
                 + "}\r\n",
                 false);
     }
 
-    @Test
-    public void testTryFinallyLoopInFinally() {
-        decompileMethod("swftools", "testTryFinallyLoopInFinally", "var _loc1_:* = 0;\r\n"
-                + "while(_loc1_ < 10)\r\n"
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryFinallyLoopInFinally(String swfUsed) {
+        decompileMethod(swfUsed, "testTryFinallyLoopInFinally", "var i:int = 0;\r\n"
+                + "while(i < 10)\r\n"
                 + "{\r\n"
                 + "trace(\"before try\");\r\n"
                 + "try\r\n"
@@ -256,25 +256,23 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "finally\r\n"
                 + "{\r\n"
-                + "if(_loc1_ == 5)\r\n"
+                + "if(i == 5)\r\n"
                 + "{\r\n"
-                + "_loc1_ = _loc1_ + 7;\r\n"
+                + "i = i + 7;\r\n"
                 + "trace(\"continue while\");\r\n"
                 + "continue;\r\n"
                 + "}\r\n"
                 + "trace(\"in finally\");\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n"
-                + "_loc1_++;\r\n"
+                + "i++;\r\n"
                 + "}\r\n",
                 false);
     }
 
-    @Test
-    public void testTryFinallyMultipleCatch() {
-        decompileMethod("swftools", "testTryFinallyMultipleCatch", "trace(\"before try\");\r\n"
-                + "try\r\n"
-                + "{\r\n"
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryFinallyMultipleCatch(String swfUsed) {
+        decompileMethod(swfUsed, "testTryFinallyMultipleCatch", "trace(\"before try\");\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "trace(\"in try\");\r\n"
@@ -287,53 +285,44 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "{\r\n"
                 + "trace(\"in catch EOFError\");\r\n"
                 + "}\r\n"
-                + "}\r\n"
-                + "catch(_loc_e_:*)\r\n"
+                + "finally\r\n"
                 + "{\r\n"
                 + "trace(\"in finally\");\r\n"
-                + "throw _loc_e_;\r\n"
                 + "}\r\n"
-                + "trace(\"in finally\");\r\n"
                 + "trace(\"after\");\r\n",
                 false);
     }
 
-    @Test
-    public void testTryFinallyNoCatch() {
-        decompileMethod("swftools", "testTryFinallyNoCatch", "trace(\"before try\");\r\n"
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryFinallyNoCatch(String swfUsed) {
+        decompileMethod(swfUsed, "testTryFinallyNoCatch", "trace(\"before try\");\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "trace(\"in try\");\r\n"
-                + "trace(\"in finally\");\r\n"
-                + "trace(\"after\");\r\n"
-                + "return;\r\n"
                 + "}\r\n"
-                + "catch(_loc_e_:*)\r\n"
+                + "finally\r\n"
                 + "{\r\n"
                 + "trace(\"in finally\");\r\n"
-                + "throw _loc_e_;\r\n"
-                + "}\r\n",
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
                 false);
     }
 
-    @Test
-    public void testTryFinallyReturn() {
-        decompileMethod("swftools", "testTryFinallyReturn", "trace(\"before try\");\r\n"
-                + "try\r\n"
-                + "{\r\n"
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryFinallyReturn(String swfUsed) {
+        decompileMethod(swfUsed, "testTryFinallyReturn", "var a:int = 0;\r\n"
+                + "trace(\"before try\");\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "trace(\"in try\");\r\n"
-                + "var _loc1_:int = 5;\r\n"
-                + "if(_loc1_ > 4)\r\n"
+                + "a = 5;\r\n"
+                + "if(a > 4)\r\n"
                 + "{\r\n"
-                + "trace(\"in finally\");\r\n"
                 + "return \"RET\";\r\n"
                 + "}\r\n"
                 + "trace(\"between\");\r\n"
-                + "if(_loc1_ < 3)\r\n"
+                + "if(a < 3)\r\n"
                 + "{\r\n"
-                + "trace(\"in finally\");\r\n"
                 + "return \"RE2\";\r\n"
                 + "}\r\n"
                 + "trace(\"in try2\");\r\n"
@@ -342,26 +331,24 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "{\r\n"
                 + "trace(\"in catch\");\r\n"
                 + "}\r\n"
-                + "}\r\n"
-                + "catch(_loc_e_:*)\r\n"
+                + "finally\r\n"
                 + "{\r\n"
                 + "trace(\"in finally\");\r\n"
-                + "throw _loc_e_;\r\n"
                 + "}\r\n"
-                + "trace(\"in finally\");\r\n"
                 + "trace(\"after\");\r\n"
                 + "return \"RETFINAL\";\r\n",
                 false);
     }
 
-    @Test
-    public void testTryFinallyReturnInFinally() {
-        decompileMethod("swftools", "testTryFinallyReturnInFinally", "trace(\"before try\");\r\n"
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryFinallyReturnInFinally(String swfUsed) {
+        decompileMethod(swfUsed, "testTryFinallyReturnInFinally", "var a:int = 0;\r\n"
+                + "trace(\"before try\");\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "trace(\"in try\");\r\n"
-                + "var _loc1_:int = 5;\r\n"
-                + "if(_loc1_ > 4)\r\n"
+                + "a = 5;\r\n"
+                + "if(a > 4)\r\n"
                 + "{\r\n"
                 + "return \"RET\";\r\n"
                 + "}\r\n"
@@ -373,12 +360,12 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "finally\r\n"
                 + "{\r\n"
                 + "trace(\"in finally\");\r\n"
-                + "if(_loc1_ > 6)\r\n"
+                + "if(a > 6)\r\n"
                 + "{\r\n"
                 + "return \"FINRET1\";\r\n"
                 + "}\r\n"
                 + "trace(\"xx\");\r\n"
-                + "if(_loc1_ > 5)\r\n"
+                + "if(a > 5)\r\n"
                 + "{\r\n"
                 + "return \"FINRET2\";\r\n"
                 + "}\r\n"
@@ -389,21 +376,17 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 false);
     }
 
-    @Test
-    public void testTryFinallyReturnNested() {
-        decompileMethod("swftools", "testTryFinallyReturnNested", "var _loc1_:int = Math.random() * 5;\r\n"
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryFinallyReturnNested(String swfUsed) {
+        decompileMethod(swfUsed, "testTryFinallyReturnNested", "var a:int = Math.random() * 5;\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "trace(\"before try2\");\r\n"
                 + "try\r\n"
                 + "{\r\n"
-                + "try\r\n"
-                + "{\r\n"
                 + "trace(\"in try2\");\r\n"
-                + "if(_loc1_ > 4)\r\n"
+                + "if(a > 4)\r\n"
                 + "{\r\n"
-                + "trace(\"in finally2\");\r\n"
-                + "trace(\"in finally1\");\r\n"
                 + "return \"RET\";\r\n"
                 + "}\r\n"
                 + "}\r\n"
@@ -411,37 +394,29 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "{\r\n"
                 + "trace(\"in catch\");\r\n"
                 + "}\r\n"
-                + "}\r\n"
-                + "catch(_loc_e_:*)\r\n"
+                + "finally\r\n"
                 + "{\r\n"
                 + "trace(\"in finally2\");\r\n"
-                + "throw _loc_e_;\r\n"
                 + "}\r\n"
-                + "trace(\"in finally2\");\r\n"
                 + "trace(\"after\");\r\n"
-                + "trace(\"in finally1\");\r\n"
-                + "return \"RETFINAL\";\r\n"
                 + "}\r\n"
-                + "catch(_loc_e_:*)\r\n"
+                + "finally\r\n"
                 + "{\r\n"
                 + "trace(\"in finally1\");\r\n"
-                + "throw _loc_e_;\r\n"
-                + "}\r\n",
+                + "}\r\n"
+                + "return \"RETFINAL\";\r\n",
                 false);
     }
 
-    @Test
-    public void testTryFinallyReturnVoid() {
-        decompileMethod("swftools", "testTryFinallyReturnVoid", "var _loc1_:int = Math.random() * 5;\r\n"
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryFinallyReturnVoid(String swfUsed) {
+        decompileMethod(swfUsed, "testTryFinallyReturnVoid", "var a:int = Math.random() * 5;\r\n"
                 + "trace(\"before try\");\r\n"
                 + "try\r\n"
                 + "{\r\n"
-                + "try\r\n"
-                + "{\r\n"
                 + "trace(\"in try\");\r\n"
-                + "if(_loc1_ > 4)\r\n"
+                + "if(a > 4)\r\n"
                 + "{\r\n"
-                + "trace(\"in finally\");\r\n"
                 + "return;\r\n"
                 + "}\r\n"
                 + "trace(\"in try2\");\r\n"
@@ -450,13 +425,10 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "{\r\n"
                 + "trace(\"in catch\");\r\n"
                 + "}\r\n"
-                + "}\r\n"
-                + "catch(_loc_e_:*)\r\n"
+                + "finally\r\n"
                 + "{\r\n"
                 + "trace(\"in finally\");\r\n"
-                + "throw _loc_e_;\r\n"
                 + "}\r\n"
-                + "trace(\"in finally\");\r\n"
                 + "trace(\"after\");\r\n",
                 false);
     }

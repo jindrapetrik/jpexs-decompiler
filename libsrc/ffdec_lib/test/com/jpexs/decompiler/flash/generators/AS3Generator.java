@@ -60,8 +60,9 @@ public class AS3Generator {
         for (ScriptPack pack : scriptPacks) {
             sortedPacks.put(pack.getClassPath().toRawString(), pack);
         }
-        s.append("package com.jpexs.decompiler.flash;\r\n");
+        s.append("package com.jpexs.decompiler.flash.as3decompile;\r\n");
         s.append("\r\n");
+        s.append("import com.jpexs.decompiler.flash.ActionScript3DecompileTestBase;\r\n");
         s.append("import java.io.IOException;\r\n");
         s.append("import org.testng.annotations.BeforeClass;\r\n");
         if (multipleProviders) {
@@ -162,7 +163,7 @@ public class AS3Generator {
         }
 
         s.append("}\r\n");
-        String testPath = "test/com/jpexs/decompiler/flash/";
+        String testPath = "test/com/jpexs/decompiler/flash/as3decompile/";
         Helper.writeFile(testPath + testClassName + ".java", s.toString().getBytes("UTF-8"));
     }
 
@@ -172,6 +173,8 @@ public class AS3Generator {
 
 
         useFile("ActionScript3ClassicDecompileTest", new String[][]{{"testdata/as3_new/bin/as3_new.flex.swf", "classic"}}, false);
+        useFile("ActionScript3ClassicAirDecompileTest", new String[][]{{"testdata/as3_new/bin/as3_new.air.swf", "classic_air"}}, false);
+
         useFile("ActionScript3CrossCompileDecompileTest", new String[][]{
             {"testdata/as3_cross_compile/bin/as3_cross_compile.flex.swf", "flex"},
             {"testdata/as3_cross_compile/bin/as3_cross_compile.air.swf", "air"}
