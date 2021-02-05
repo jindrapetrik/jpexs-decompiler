@@ -83,8 +83,11 @@ public class AVM2DeobfuscatorZeroJumpsNullPushes extends SWFDecompilerAdapter {
         boolean result = false;
         Set<Long> offsets = code.getImportantOffsets(body, true);
 
-        // Deliberately skip over instruction zero
-        for (int i = 1; i < code.code.size(); i++) {
+        for (int i = 0; i < code.code.size(); i++) {
+            if (i == 0) {
+                // Deliberately skip over instruction zero
+                continue;
+            }
             AVM2Instruction ins1 = code.code.get(i - 1);
             AVM2Instruction ins2 = code.code.get(i);
             if (ins2.definition instanceof PopIns

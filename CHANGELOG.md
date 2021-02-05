@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - AS3 code with exception start/end not matching instruction boundary
 - AS3 deobfuscator in some cases
 - #349 AS3 - better handling of declarations
+- #735 AS3 - index out of bounds in deobfuscator 
 
 ### Changed
 - AS3 test methods separated to classes
