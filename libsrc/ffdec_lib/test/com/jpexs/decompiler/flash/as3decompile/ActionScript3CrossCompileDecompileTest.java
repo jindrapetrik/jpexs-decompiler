@@ -409,6 +409,58 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
     }
 
     @Test(dataProvider = "swfNamesProvider")
+    public void testTryFinallyReturnNested2(String swfUsed) {
+        decompileMethod(swfUsed, "testTryFinallyReturnNested2", "var a:int = Math.random() * 5;\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try2\");\r\n"
+                + "if(a > 4)\r\n"
+                + "{\r\n"
+                + "return \"RET\";\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "catch(e2:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch2:e\");\r\n"
+                + "}\r\n"
+                + "catch(e2:EOFError)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch2:eof\");\r\n"
+                + "}\r\n"
+                + "finally\r\n"
+                + "{\r\n"
+                + "trace(\"in finally2\");\r\n"
+                + "}\r\n"
+                + "trace(\"after2\");\r\n"
+                + "}\r\n"
+                + "catch(e1:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch1:e\");\r\n"
+                + "}\r\n"
+                + "catch(e1:EOFError)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch1:eof\");\r\n"
+                + "}\r\n"
+                + "finally\r\n"
+                + "{\r\n"
+                + "trace(\"in finally1\");\r\n"
+                + "}\r\n"
+                + "trace(\"after1\");\r\n"
+                + "}\r\n"
+                + "finally\r\n"
+                + "{\r\n"
+                + "trace(\"in finally0\");\r\n"
+                + "}\r\n"
+                + "trace(\"after0\");\r\n"
+                + "return \"RETFINAL\";\r\n",
+                false);
+    }
+
+    @Test(dataProvider = "swfNamesProvider")
     public void testTryFinallyReturnVoid(String swfUsed) {
         decompileMethod(swfUsed, "testTryFinallyReturnVoid", "var a:int = Math.random() * 5;\r\n"
                 + "trace(\"before try\");\r\n"

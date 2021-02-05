@@ -179,7 +179,7 @@ public class Graph {
         }
     }
 
-    private void getReachableParts(BaseLocalData localData, GraphPart part, LinkedHashSet<GraphPart> ret, List<Loop> loops) {
+    protected void getReachableParts(BaseLocalData localData, GraphPart part, LinkedHashSet<GraphPart> ret, List<Loop> loops) {
         // use LinkedHashSet to preserve order
         getReachableParts(localData, part, ret, loops, true);
     }
@@ -2227,7 +2227,7 @@ public class Graph {
         return ip;
     }
 
-    protected GraphPart searchPart(int ip, Collection<GraphPart> allParts) {
+    public GraphPart searchPart(int ip, Collection<? extends GraphPart> allParts) {
         if (ip < 0) {
             return null;
         }
