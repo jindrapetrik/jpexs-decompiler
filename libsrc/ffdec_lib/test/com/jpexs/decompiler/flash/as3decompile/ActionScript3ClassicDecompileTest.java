@@ -1140,6 +1140,24 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testTryIf() {
+        decompileMethod("classic", "testTryIf", "var a:int = Math.random();\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "if(a > 5 && a < 50)\r\n"
+                + "{\r\n"
+                + "trace(\"in limits\");\r\n"
+                + "}\r\n"
+                + "trace(\"next\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch\");\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
     public void testTryReturn() {
         decompileMethod("classic", "testTryReturn", "var i:int = 0;\r\n"
                 + "var b:Boolean = false;\r\n"

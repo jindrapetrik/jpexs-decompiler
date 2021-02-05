@@ -914,7 +914,7 @@ public class Graph {
                 if (!onFalse.isEmpty()
                         && ((onFalse.get(onFalse.size() - 1) instanceof BreakItem)
                         || (onFalse.get(onFalse.size() - 1) instanceof ExitItem)
-                        || (onFalse.get(onFalse.size() - 1) instanceof ContinueItem)                        )
+                        || (onFalse.get(onFalse.size() - 1) instanceof ContinueItem))
                         && !(onFalse.get(onFalse.size() - 1) instanceof ScriptEndItem)
                         && (onTrue.isEmpty() || !((onTrue.get(onTrue.size() - 1) instanceof BreakItem)
                         || (onTrue.get(onTrue.size() - 1) instanceof ExitItem)
@@ -1444,6 +1444,10 @@ public class Graph {
         return part.nextParts;
     }
 
+    protected boolean checkPartOutput(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
+        return false;
+    }
+
     protected List<GraphTargetItem> printGraph(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
@@ -1612,25 +1616,11 @@ public class Graph {
         //****************************DECOMPILING PART*************
         List<GraphTargetItem> output = new ArrayList<>();
 
-        List<GraphPart> parts = new ArrayList<>();
-        if (part instanceof GraphPartMulti) {
-            parts = ((GraphPartMulti) part).parts;
+        if (checkPartOutput(currentRet, foundGotos, partCodes, partCodePos, code, localData, allParts, stack, parent, part, stopPart, loops, currentLoop, staticOperation, path)) {
+            parseNext = false;
         } else {
-            parts.add(part);
-            /*while (getNextParts(localData, part).size() == 1 && getNextParts(localData, part).get(0).refs.size() == 1) {
-                if (stopPart.contains(getNextParts(localData, part).get(0))) { //it might be referenced with try statement
-                    break;
-                }
-                part = getNextParts(localData, part).get(0);
-                parts.add(part);
-            }*/
-        }
-        for (GraphPart p : parts) {
-            int end = p.end;
-            int start = p.start;
-
-            output.addAll(code.translatePart(p, localData, stack, start, end, staticOperation, path));
-            if ((end >= code.size() - 1) && getNextParts(localData, p).isEmpty()) {
+            output.addAll(code.translatePart(part, localData, stack, part.start, part.end, staticOperation, path));
+            if ((part.end >= code.size() - 1) && getNextParts(localData, part).isEmpty()) {
                 output.add(new ScriptEndItem());
             }
         }
@@ -2387,26 +2377,6 @@ public class Graph {
 
     public BaseLocalData prepareBranchLocalData(BaseLocalData localData) {
         return localData;
-    }
-
-    protected GraphPart makeMultiPart(GraphPart part) {
-        List<GraphPart> parts = new ArrayList<>();
-        do {
-            parts.add(part);
-            if (part.nextParts.size() == 1 && part.nextParts.get(0).refs.size() == 1) {
-                part = part.nextParts.get(0);
-            } else {
-                part = null;
-            }
-        } while (part != null);
-        if (parts.size() > 1) {
-            GraphPartMulti ret = new GraphPartMulti(parts);
-            ret.refs.addAll(parts.get(0).refs);
-            ret.nextParts.addAll(parts.get(parts.size() - 1).nextParts);
-            return ret;
-        } else {
-            return parts.get(0);
-        }
     }
 
     protected List<GraphSourceItem> getPartItems(GraphPart part) {

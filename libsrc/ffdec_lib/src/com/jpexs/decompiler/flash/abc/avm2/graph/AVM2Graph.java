@@ -739,7 +739,7 @@ public class AVM2Graph extends Graph {
         return part;
     }
 
-    private List<GraphTargetItem> checkTry(List<GraphTargetItem> currentRet, List<GraphTargetItem> output, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, AVM2LocalData localData, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, Set<GraphPart> allParts, TranslateStack stack, int staticOperation, String path) throws InterruptedException {
+    private boolean checkTry(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, AVM2LocalData localData, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, Set<GraphPart> allParts, TranslateStack stack, int staticOperation, String path) throws InterruptedException {
         if (localData.parsedExceptions == null) {
             localData.parsedExceptions = new ArrayList<>();
         }
@@ -1036,7 +1036,7 @@ public class AVM2Graph extends Graph {
             }
 
             if (!inlinedFinally && catchCommands.isEmpty() && finallyCommands.isEmpty() && tryCommands.isEmpty()) {
-                return null;
+                return false;
             }
 
             //remove default assignment to switched register
@@ -1046,10 +1046,9 @@ public class AVM2Graph extends Graph {
                 currentRet.remove(currentRet.size() - 1);
             }
 
-            List<GraphTargetItem> ret = new ArrayList<>();
             if (!inlinedFinally && catchedExceptions.isEmpty() && finallyCommands.isEmpty()) {
-                ret.addAll(tryCommands);
-                return ret;
+                currentRet.addAll(tryCommands);
+                return true;
             }
 
 
@@ -1077,29 +1076,33 @@ public class AVM2Graph extends Graph {
                 tryItem = new TryAVM2Item(subTry.tryCommands, subTry.catchExceptions, subTry.catchCommands, tryItem.finallyCommands, "");
             }
 
-            ret.add(tryItem);
+            currentRet.add(tryItem);
 
             if (afterPart != null) {
 
                 if (finallyIndex > -1 && localData.finallyIndicesWithDoublePush.contains(finallyIndex)) {
                     stack.push(new AnyItem());
                 }
-                ret.addAll(printGraph(foundGotos, partCodes, partCodePos, localData, stack, allParts, null, afterPart, stopPart, loops, staticOperation, path));
+                currentRet.addAll(printGraph(foundGotos, partCodes, partCodePos, localData, stack, allParts, null, afterPart, stopPart, loops, staticOperation, path));
             }
-            return ret;
+            return true;
         }
-        return null;
+        return false;
+    }
+
+    @Override
+    protected boolean checkPartOutput(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
+        AVM2LocalData aLocalData = (AVM2LocalData) localData;
+        return checkTry(currentRet, foundGotos, partCodes, partCodePos, aLocalData, part, stopPart, loops, allParts, stack, staticOperation, path);
     }
 
     @Override
     protected List<GraphTargetItem> check(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         List<GraphTargetItem> ret = null;
 
-        AVM2LocalData aLocalData = (AVM2LocalData) localData;
-        ret = checkTry(currentRet, output, foundGotos, partCodes, partCodePos, aLocalData, part, stopPart, loops, allParts, stack, staticOperation, path);
-        if (ret != null) {
+        /*if (ret != null) {
             return ret;
-        }
+        }*/
         //Detect switch
         if ((part.nextParts.size() == 2) && (!stack.isEmpty()) && (stack.peek() instanceof StrictEqAVM2Item)) {
             GraphSourceItem switchStartItem = code.get(part.start);

@@ -77,6 +77,7 @@ package
 		TestSwitchDefault;
 		TestTernarOperator;
 		TestTry;
+		TestTryIf;
 		TestTryReturn;
 		TestTryReturn2;
 		TestUsagesTry;

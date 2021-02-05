@@ -1151,6 +1151,24 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testTryIf() {
+        decompileMethod("classic_air", "testTryIf", "var a:int = Math.random();\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "if(a > 5 && a < 50)\r\n"
+                + "{\r\n"
+                + "trace(\"in limits\");\r\n"
+                + "}\r\n"
+                + "trace(\"next\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch\");\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
     public void testTryReturn() {
         decompileMethod("classic_air", "testTryReturn", "var i:int = 0;\r\n"
                 + "var b:Boolean = false;\r\n"
