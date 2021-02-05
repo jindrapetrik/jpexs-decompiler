@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.deobfuscation;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -89,7 +90,7 @@ import java.util.Stack;
  *
  * @author JPEXS
  */
-public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
+public class AVM2DeobfuscatorSimple extends AVM2DeobfuscatorZeroJumpsNullPushes {
 
     private final int executionLimit = 30000;
 
@@ -130,60 +131,6 @@ public class AVM2DeobfuscatorSimple extends SWFDecompilerAdapter {
         return false;
     }
 
-    protected boolean removeZeroJumps(AVM2Code code, MethodBody body) throws InterruptedException {
-        boolean result = false;
-        for (int i = 0; i < code.code.size(); i++) {
-            AVM2Instruction ins = code.code.get(i);
-            if (ins.definition instanceof JumpIns) {
-                if (ins.operands[0] == 0) {
-                    if (Thread.currentThread().isInterrupted()) {
-                        throw new InterruptedException();
-                    }
-
-                    code.removeInstruction(i, body);
-                    i--;
-                    result = true;
-                }
-            }
-        }
-        return result;
-    }
-
-    protected boolean removeNullPushes(AVM2Code code, MethodBody body) throws InterruptedException {
-        boolean result = false;
-        Set<Long> offsets = code.getImportantOffsets(body, true);
-
-        // Deliberately skip over instruction zero
-        for (int i = 1; i < code.code.size(); i++) {
-            AVM2Instruction ins1 = code.code.get(i - 1);
-            AVM2Instruction ins2 = code.code.get(i);
-            if (ins2.definition instanceof PopIns
-                    && !offsets.contains(ins2.getAddress())
-                    && (ins1.definition instanceof PushByteIns
-                    || ins1.definition instanceof PushDoubleIns
-                    || ins1.definition instanceof PushFalseIns
-                    || ins1.definition instanceof PushIntIns
-                    || ins1.definition instanceof PushNanIns
-                    || ins1.definition instanceof PushNullIns
-                    || ins1.definition instanceof PushShortIns
-                    || ins1.definition instanceof PushStringIns
-                    || ins1.definition instanceof PushTrueIns
-                    || ins1.definition instanceof PushUIntIns
-                    || ins1.definition instanceof PushUndefinedIns)) {
-                if (Thread.currentThread().isInterrupted()) {
-                    throw new InterruptedException();
-                }
-
-                code.removeInstruction(i - 1, body);
-                i--;
-                code.removeInstruction(i, body);
-                i--;
-                offsets = code.getImportantOffsets(body, true); //update offsets, they changed because of removing instruction
-                result = true;
-            }
-        }
-        return result;
-    }
 
     protected void initLocalRegs(LocalDataArea localData, int localReservedCount, int maxRegs, boolean executeFromFirst) {
         for (int i = 0; i < localReservedCount; i++) {
