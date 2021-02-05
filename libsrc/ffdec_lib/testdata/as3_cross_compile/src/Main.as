@@ -25,6 +25,7 @@ package
 		TestTryFinallyReturn;
 		TestTryFinallyReturnInFinally;
 		TestTryFinallyReturnNested;
+		TestTryFinallyReturnNested2;
 		TestTryFinallyReturnVoid;
 		
 		public function Main() 
