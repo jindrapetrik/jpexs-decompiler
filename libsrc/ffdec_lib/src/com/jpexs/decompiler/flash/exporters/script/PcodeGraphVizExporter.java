@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.script;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -103,6 +104,8 @@ public class PcodeGraphVizExporter {
         List<Integer> exPassedStarts = new ArrayList<>();
         List<Integer> exPassedEnds = new ArrayList<>();
 
+        StringBuilder ends = new StringBuilder();
+        loopheads:
         for (GraphPart head : heads) {
             String headName = "start";
             if (heads.size() > 1 && head.start != 0) {
@@ -111,27 +114,46 @@ public class PcodeGraphVizExporter {
             }
             String headLabel = "";
             List<String> headLabels = new ArrayList<>();
+            boolean isExEnd = false;
+            boolean isExTarget = false;
+            boolean isExStart = false;
             for (int e = 0; e < exceptions.size(); e++) {
                 GraphException ex = exceptions.get(e);
                 if (head.start == ex.start && !exPassedStarts.contains(e)) {
                     headLabels.add("try " + e + " begin");
                     exPassedStarts.add(e);
+                    isExStart = true;
                     break;
                 }
                 if (head.start == ex.end && !exPassedEnds.contains(e)) {
                     headLabels.add("try " + e + " end");
                     exPassedEnds.add(e);
+                    isExEnd = true;
                     break;
                 }
                 if (head.start == ex.target) {
                     headLabels.add("try " + e + " target");
+                    isExTarget = true;
                 }
             }
             if (!headLabels.isEmpty()) {
                 headLabel = String.join("\\n", headLabels);
             }
-            writer.append(headName + " [shape=\"circle\"" + (headLabel.isEmpty() ? "" : " label=\"" + headLabel + "\"") + "]\r\n");
-            writer.append(headName + ":s -> " + getBlockName(graphSource, head) + ":n;\r\n");
+            String headDef = headName + " [shape=\"circle\"" + (headLabel.isEmpty() ? "" : " label=\"" + headLabel + "\"") + "]\r\n";
+
+            if (isExEnd) {
+                for (int i = head.start - 1; i >= 0; i--) {
+                    GraphPart endPrev = graph.searchPart(i, allBlocks);
+                    if (endPrev != null) {
+                        ends.append(getBlockName(graphSource, endPrev) + ":se -> " + headName + ":nw[dir=back arrowtail=none style=dashed];\r\n");
+                        ends.append(headDef);
+                        continue loopheads;
+                    }
+                }
+            }
+            writer.append(headDef);
+
+            writer.append(headName + ":" + (isExStart ? "se" : "s") + " -> " + getBlockName(graphSource, head) + ":" + (isExStart ? "nw[arrowhead=none style=dashed]" : "n") + ";\r\n");
         }
         for (GraphPart part : allBlocks) {
             StringBuilder blkCodeBuilder = new StringBuilder();
@@ -175,6 +197,7 @@ public class PcodeGraphVizExporter {
                 writer.append(partBlockName + orientation + " -> " + nextBlockName + ":n" + (color != null ? "[color=\"" + color + "\"]" : "") + ";\r\n");
             }
         }
+        writer.append(ends.toString());
     }
 
     private static String hilight(AbstractLexer lexer, String code) {
@@ -216,7 +239,6 @@ public class PcodeGraphVizExporter {
                         color = "#339933";
                         break;
                 }
-
 
                 int tlen = t.length;
                 boolean tooLong = false;
