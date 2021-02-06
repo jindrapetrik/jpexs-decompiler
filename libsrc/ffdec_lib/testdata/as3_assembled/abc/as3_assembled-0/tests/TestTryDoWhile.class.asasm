@@ -1,0 +1,93 @@
+class
+ refid "tests:TestTryDoWhile"
+ instance QName(PackageNamespace("tests"), "TestTryDoWhile")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestTryDoWhile")
+  iinit
+   refid "tests:TestTryDoWhile/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestTryDoWhile/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5                     
+         code
+            getlocal0
+            pushscope
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "first"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+            findproperty QName(PackageNamespace(""),"rnd")
+            callproperty QName(PackageNamespace(""),"rnd"), 0
+            setlocal 5
+   ofs0010:
+            jump ofs0029
+   ofs0014:
+            label
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "second"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+            getlocal 5
+            pushbyte 100
+            ifngt ofs0029
+            jump ofs002d
+   ofs0029:
+            jump ofs0014
+   ofs002d:
+            jump ofs0035
+   ofs0031:
+            getlocal0
+            pushscope
+            setlocal 6
+            findproperty QName(PackageNamespace(""),"trace")            
+            pushstring "in catch"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+   ofs0035:
+            findproperty QName(PackageNamespace(""),"trace")            
+            pushstring "after"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+            returnvoid
+        end ; code
+        try from ofs0010 to ofs002d target ofs0031 type QName(PackageNamespace(""),"Error") name QName(PackageNamespace(""),"e") end 
+        
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestTryDoWhile/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

@@ -1087,6 +1087,45 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
+    protected boolean canHandleLoop(BaseLocalData localData, GraphPart part, List<Loop> loops) {
+        Loop toBeLoop = null;
+        for (Loop el : loops) {
+            if ((el.loopContinue == part) && (el.phase == 0)) {
+                toBeLoop = el;
+                break;
+            }
+        }
+        if (toBeLoop == null) {
+            return true;
+        }
+        AVM2LocalData aLocalData = (AVM2LocalData) localData;
+
+        boolean inTry = false;
+        for (ABCException ex : body.exceptions) {
+            if (aLocalData.parsedExceptions.contains(ex)) {
+                continue;
+            }
+            int fixStart = avm2code.adr2pos(ex.start, true);
+            int fixEnd = avm2code.adr2pos(ex.end, true);
+            if (part.start == fixStart) {
+                inTry = true;
+                for (GraphPart be : toBeLoop.backEdges) {
+                    if (be.start < fixStart || be.start >= fixEnd) {
+                        //exists a backedge that is outside of try..catch
+                        return true;
+                    }
+                }
+            }
+        }
+        if (inTry) {
+            //it is in try and there's no backedge that's outside try
+            return false;
+        }
+        return true;
+    }
+
+
+    @Override
     protected boolean checkPartOutput(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         return checkTry(currentRet, foundGotos, partCodes, partCodePos, aLocalData, part, stopPart, loops, allParts, stack, staticOperation, path);
@@ -1338,7 +1377,7 @@ public class AVM2Graph extends Graph {
                             if (ft instanceof WithAVM2Item) {
                                 pos++;
                                 List<GraphTargetItem> withCommands = new ArrayList<>();
-                                while (!(w.commands.get(pos) instanceof WithEndAVM2Item)) {
+                                while (pos < w.commands.size() && !(w.commands.get(pos) instanceof WithEndAVM2Item)) {
                                     withCommands.add(w.commands.get(pos));
                                     pos++;
                                 }

@@ -158,4 +158,46 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "}\r\n",
                 false);
     }
+
+    @Test
+    public void testTryDoWhile() {
+        decompileMethod("assembled", "testTryDoWhile", "trace(\"first\");\r\n"
+                + "var _loc5_:* = rnd();\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "do\r\n"
+                + "{\r\n"
+                + "trace(\"second\");\r\n"
+                + "}\r\n"
+                + "while(_loc5_ <= 100);\r\n"
+                + "\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch\");\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
+
+    @Test
+    public void testTryDoWhile2() {
+        decompileMethod("assembled", "testTryDoWhile2", "trace(\"hello\");\r\n"
+                + "var _loc5_:* = Math.random();\r\n"
+                + "do\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch\");\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "while(_loc5_ <= 100);\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
 }
