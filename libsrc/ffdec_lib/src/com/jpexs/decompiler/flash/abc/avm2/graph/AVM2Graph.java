@@ -811,7 +811,7 @@ public class AVM2Graph extends Graph {
 
         for (int e : finnalysIndicesToBe) {
             ABCException finallyExceptionToBe = body.exceptions[e];
-            if (catchedExceptions.isEmpty()) {
+            if (catchedExceptions.isEmpty() || outSideExceptionPart == null) {
                 //there's no exception, finally only
                 finallyIndex = e;
                 finallyException = finallyExceptionToBe;
