@@ -12,9 +12,12 @@ package
 	{
 		TestTryCatch;
 		TestTryCatchIfInTry;
+		TestTryCatchInIf;
 		TestTryCatchInWhile;
 		TestTryCatchInWhile2;
+		TestTryCatchInWhile3;
 		TestTryCatchLoop;
+		TestTryCatchLoopBreak;
 		TestTryCatchExceptionUsage
 		TestTryFinally;		
 		TestTryFinallyDirectReturnInFinally;

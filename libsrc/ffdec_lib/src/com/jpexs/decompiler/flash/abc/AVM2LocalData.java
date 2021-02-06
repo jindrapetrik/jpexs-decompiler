@@ -59,6 +59,7 @@ public class AVM2LocalData extends BaseLocalData {
     public List<DottedChain> fullyQualifiedNames;
 
     public List<ABCException> parsedExceptions = new ArrayList<>();
+    public List<Integer> parsedExceptionIds = new ArrayList<>();
 
     //public Map<Integer, List<Integer>> finallyJumps;
     /**
@@ -154,6 +155,7 @@ public class AVM2LocalData extends BaseLocalData {
         defaultParts = localData.defaultParts;
         finallyThrowParts = localData.finallyThrowParts;
         inGetLoops = localData.inGetLoops;
+        parsedExceptionIds = localData.parsedExceptionIds;
     }
 
     public AVM2ConstantPool getConstants() {

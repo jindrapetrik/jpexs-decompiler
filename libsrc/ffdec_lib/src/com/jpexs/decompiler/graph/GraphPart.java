@@ -74,7 +74,7 @@ public class GraphPart implements Serializable {
 
     public int order;
 
-    public List<GraphPart> throwParts = new ArrayList<>();
+    //public List<GraphPart> throwParts = new ArrayList<>();
 
     public enum StopPartType {
 
@@ -124,7 +124,7 @@ public class GraphPart implements Serializable {
         return time;
     }
 
-    private boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops, boolean useThrow) throws InterruptedException {
+    private boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops, List<ThrowState> throwStates, boolean useThrow) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
@@ -134,7 +134,7 @@ public class GraphPart implements Serializable {
             return false;
         }
         if (tpart != this) {
-            return tpart.leadsTo(localData, gr, code, null, part, visited, loops, useThrow);
+            return tpart.leadsTo(localData, gr, code, null, part, visited, loops, throwStates, useThrow);
         }
         Loop currentLoop = null;
         for (Loop l : loops) {
@@ -171,27 +171,40 @@ public class GraphPart implements Serializable {
         for (GraphPart p : nextParts) {
             if (p == part) {
                 return true;
-            } else if (p.leadsTo(localData, gr, code, this, part, visited, loops, useThrow)) {
+            } else if (p.leadsTo(localData, gr, code, this, part, visited, loops, throwStates, useThrow)) {
                 return true;
             }
         }
-        if (useThrow) {
-            for (GraphPart p : throwParts) {
-                if (p == part) {
-                    return true;
-                } else if (p.leadsTo(localData, gr, code, this, part, visited, loops, useThrow)) {
-                    return true;
+        if (useThrow)
+        for (ThrowState ts : throwStates) {
+            if (ts.state != 1) {
+                if (ts.throwingParts.contains(this)) {
+                    GraphPart p = ts.targetPart;
+                    if (p == part) {
+                        return true;
+                    } else if (p.leadsTo(localData, gr, code, this, part, visited, loops, throwStates, useThrow)) {
+                        return true;
+                    }
                 }
             }
         }
+        /*if (useThrow) {
+            for (GraphPart p : throwParts) {
+                if (p == part) {
+                    return true;
+                } else if (p.leadsTo(localData, gr, code, this, part, visited, loops, throwStates, useThrow)) {
+                    return true;
+                }
+            }
+        }*/
         return false;
     }
 
-    public boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart part, List<Loop> loops, boolean useThrow) throws InterruptedException {
+    public boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart part, List<Loop> loops, List<ThrowState> throwStates, boolean useThrow) throws InterruptedException {
         for (Loop l : loops) {
             l.leadsToMark = 0;
         }
-        return leadsTo(localData, gr, code, null /*???*/, part, new HashSet<>(), loops, useThrow);
+        return leadsTo(localData, gr, code, null /*???*/, part, new HashSet<>(), loops, throwStates, useThrow);
     }
 
     public GraphPart(int start, int end) {
