@@ -122,7 +122,7 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "case 0:\r\n"
                 + "var _loc2_:String = \"X\";\r\n"
                 + "return;\r\n"
-                + "break;\r\n"
+                //+ "break;\r\n"
                 + "case 1:\r\n"
                 + "_loc2_ = \"A\";\r\n"
                 + "break;\r\n"
