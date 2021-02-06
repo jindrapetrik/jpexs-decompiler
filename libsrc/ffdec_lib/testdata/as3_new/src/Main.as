@@ -50,6 +50,7 @@ package
 		TestIf;
 		TestIfElse;
 		TestIfInIf;
+		TestIgnoreAndOr;
 		TestInc2;
 		TestIncDec;
 		TestInlineFunctions;
