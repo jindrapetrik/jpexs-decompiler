@@ -58,7 +58,7 @@ public class AVM2LocalData extends BaseLocalData {
 
     public List<DottedChain> fullyQualifiedNames;
 
-    public ArrayList<ABCException> parsedExceptions;
+    public List<ABCException> parsedExceptions = new ArrayList<>();
 
     //public Map<Integer, List<Integer>> finallyJumps;
     /**
