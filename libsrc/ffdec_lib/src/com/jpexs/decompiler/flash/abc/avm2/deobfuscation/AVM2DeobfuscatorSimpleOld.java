@@ -403,7 +403,9 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                 }
             }
             boolean ifed = false;
-            if (def instanceof JumpIns) {
+            if (def instanceof PopIns) {
+                code.replaceInstruction(idx, new AVM2Instruction(ins.getAddress(), DeobfuscatePopIns.getInstance(), null), body);
+            } else if (def instanceof JumpIns) {
                 long address = ins.getTargetAddress();
                 idx = code.adr2pos(address);
                 if (idx == -1) {
