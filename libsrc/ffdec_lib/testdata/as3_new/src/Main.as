@@ -21,6 +21,7 @@ package
 		TestContinueLevels;
 		TestDecl2;
 		TestDeclarations;
+		TestDeobfuscation;
 		TestDefaultNotLastGrouped;
 		TestDotParent;
 		TestDoWhile;

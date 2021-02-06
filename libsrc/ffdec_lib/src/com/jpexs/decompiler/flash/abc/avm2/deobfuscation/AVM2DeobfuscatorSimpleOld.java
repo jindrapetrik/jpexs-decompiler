@@ -170,6 +170,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
 
         AVM2LocalData localData = newLocalData(scriptIndex, abc, abc.constants, body, isStatic, classIndex);
         int localReservedCount = body.getLocalReservedCount();
+        Set<Long> importantOffsets = code.getImportantOffsets(body, isStatic);
         for (int i = 0; i < code.code.size(); i++) {
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
@@ -181,7 +182,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
             localData.localRegs.clear();
             initLocalRegs(localData, localReservedCount, body.max_regs);
 
-            executeInstructions(staticRegs, body, abc, code, localData, i, code.code.size() - 1, null, inlineIns, jumpTargets);
+            executeInstructions(importantOffsets, staticRegs, body, abc, code, localData, i, code.code.size() - 1, null, inlineIns, jumpTargets);
         }
 
         return false;
@@ -213,7 +214,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
         }
     }
 
-    private void executeInstructions(Map<Integer, GraphTargetItem> staticRegs, MethodBody body, ABC abc, AVM2Code code, AVM2LocalData localData, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns, List<Integer> jumpTargets) throws InterruptedException {
+    private void executeInstructions(Set<Long> importantOffsets, Map<Integer, GraphTargetItem> staticRegs, MethodBody body, ABC abc, AVM2Code code, AVM2LocalData localData, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns, List<Integer> jumpTargets) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
 
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
@@ -269,6 +270,8 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                             } else {
                                 idx = code.code.indexOf(nins);
                             }
+                            importantOffsets.clear();
+                            importantOffsets.addAll(code.getImportantOffsets(body, false));
                             continue;
                         }
                     }
@@ -284,6 +287,9 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                         int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
                         staticRegs.put(regId, localData.localRegs.get(regId).getNotCoerced());
                         code.replaceInstruction(idx, new AVM2Instruction(0, DeobfuscatePopIns.getInstance(), null), body);
+
+                        importantOffsets.clear();
+                        importantOffsets.addAll(code.getImportantOffsets(body, false));
                     }
                 }
             }
@@ -304,6 +310,9 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                     stack.push(staticRegs.get(regId));
                     ins = pushins;
                     def = ins.definition;
+
+                    importantOffsets.clear();
+                    importantOffsets.addAll(code.getImportantOffsets(body, false));
                 }
             }
 
@@ -401,6 +410,12 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                     throw new TranslateException("Jump target not found: " + address);
                 }
             } else if (def instanceof IfTypeIns) {
+
+                long ifAddress = code.pos2adr(idx);
+                if (importantOffsets.contains(ifAddress)) {
+                    //There is jump directly to ifTypeIns like in &&, || operator
+                    return;
+                }
                 if (stack.isEmpty()) {
                     return;
                 }
@@ -433,6 +448,9 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                     //ins.definition = DeobfuscatePopIns.getInstance();
                     idx++;
                 }
+
+                importantOffsets.clear();
+                importantOffsets.addAll(code.getImportantOffsets(body, false));
                 ifed = true;
                 //break;
             } else {
