@@ -1915,17 +1915,42 @@ public class Graph {
 
                                 if (leftSide instanceof DuplicateItem) {
                                     isIf = false;
-                                    stack.push(new OrItem(null, localData.lineStartInstruction, prevExpr, rightSide));
+                                    if (prevExpr.getNotCoercedNoDup() instanceof FalseItem) {
+                                        stack.push(rightSide);
+                                    } else if (rightSide.getNotCoercedNoDup() instanceof FalseItem) {
+                                        stack.push(prevExpr);
+                                    } else {
+                                        stack.push(new OrItem(null, localData.lineStartInstruction, prevExpr, rightSide));
+                                    }
                                 } else if (leftSide.invert(null).getNotCoercedNoDup() instanceof DuplicateItem) {
                                     isIf = false;
-                                    stack.push(new AndItem(null, localData.lineStartInstruction, prevExpr, rightSide));
+                                    if (prevExpr.getNotCoercedNoDup() instanceof TrueItem) {
+                                        stack.push(rightSide);
+                                    } else if (rightSide.getNotCoercedNoDup() instanceof TrueItem) {
+                                        stack.push(prevExpr);
+                                    } else {
+                                        stack.push(new AndItem(null, localData.lineStartInstruction, prevExpr, rightSide));
+                                    }
                                 } else if (prevExpr instanceof FalseItem) {
                                     isIf = false;
                                     leftSide = leftSide.invert(null);
-                                    stack.push(new AndItem(null, localData.lineStartInstruction, leftSide, rightSide));
+
+                                    if (leftSide.getNotCoercedNoDup() instanceof TrueItem) {
+                                        stack.push(rightSide);
+                                    } else if (rightSide.getNotCoercedNoDup() instanceof TrueItem) {
+                                        stack.push(leftSide);
+                                    } else {
+                                        stack.push(new AndItem(null, localData.lineStartInstruction, leftSide, rightSide));
+                                    }
                                 } else if (prevExpr instanceof TrueItem) {
                                     isIf = false;
-                                    stack.push(new OrItem(null, localData.lineStartInstruction, leftSide, rightSide));
+                                    if (leftSide.getNotCoercedNoDup() instanceof FalseItem) {
+                                        stack.push(rightSide);
+                                    } else if (rightSide.getNotCoercedNoDup() instanceof FalseItem) {
+                                        stack.push(leftSide);
+                                    } else {
+                                        stack.push(new OrItem(null, localData.lineStartInstruction, leftSide, rightSide));
+                                    }
                                 } else {
                                     stack.push(prevExpr); //push it back
                                     //Still unstructured
