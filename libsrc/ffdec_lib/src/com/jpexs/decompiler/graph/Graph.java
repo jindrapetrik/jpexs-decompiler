@@ -1448,6 +1448,9 @@ public class Graph {
         return false;
     }
 
+    protected boolean canHandleLoop(BaseLocalData localData, GraphPart part, List<Loop> loops) {
+        return true;
+    }
     protected List<GraphTargetItem> printGraph(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<Loop> loops, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
@@ -1495,11 +1498,19 @@ public class Graph {
         //List<GraphPart> loopContinues = getLoopsContinues(loops);
         boolean isLoop = false;
         Loop currentLoop = null;
+
+        boolean vCanHandleLoop = canHandleLoop(localData, part, loops);
+        Loop ignoredLoop = null;
         for (Loop el : loops) {
             if ((el.loopContinue == part) && (el.phase == 0)) {
-                currentLoop = el;
-                currentLoop.phase = 1;
-                isLoop = true;
+                if (vCanHandleLoop) {
+                    currentLoop = el;
+                    currentLoop.phase = 1;
+                    isLoop = true;
+                } else {
+                    ignoredLoop = el;
+                }
+
                 break;
             }
         }
@@ -1509,6 +1520,12 @@ public class Graph {
         }
         for (int l = loops.size() - 1; l >= 0; l--) {
             Loop el = loops.get(l);
+            if (el == ignoredLoop) {
+                if (debugPrintGraph) {
+                    System.err.println("ignoring to be loop " + el);
+                }
+                continue;
+            }
             if (el == currentLoop) {
                 if (debugPrintGraph) {
                     System.err.println("ignoring current loop " + el);

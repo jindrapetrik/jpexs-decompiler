@@ -1,0 +1,29 @@
+script
+ sinit
+  refid "tests:TestTryDoWhile2/init"
+  body
+   maxstack 2
+   localcount 1
+   initscopedepth 1
+   maxscopedepth 3
+   code
+    getlocal0
+    pushscope
+
+    findpropstrict      Multiname("TestTryDoWhile2", [PackageNamespace("tests")])
+    getlex              QName(PackageNamespace(""), "Object")
+    pushscope
+
+    getlex              Multiname("Object", [PrivateNamespace(null, "tests:TestTryDoWhile2"), PackageNamespace(""), PackageNamespace("tests"), PackageInternalNs("tests"), Namespace("http://adobe.com/AS3/2006/builtin")])
+    newclass            "tests:TestTryDoWhile2"
+    popscope
+    initproperty        QName(PackageNamespace("tests"), "TestTryDoWhile2")
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+ trait class QName(PackageNamespace("tests"), "TestTryDoWhile2")
+  #include "TestTryDoWhile2.class.asasm"
+ end ; trait
+end ; script

@@ -1,0 +1,118 @@
+class
+ refid "tests:TestTryDoWhile2"
+ instance QName(PackageNamespace("tests"), "TestTryDoWhile2")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestTryDoWhile2")
+  iinit
+   refid "tests:TestTryDoWhile2/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestTryDoWhile2/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     maxstack 3
+         localcount 3
+         initscopedepth 5
+         maxscopedepth 10         
+         trait slot QName(PackageInternalNs("tests"),"_loc5_")
+            slotid 1
+            type null            
+         end ; trait
+         
+         code
+            getlocal0
+            pushscope
+            newactivation
+            dup
+            setlocal1
+            pushscope
+            findpropstrict QName(PackageNamespace(""),"trace")
+            pushstring "hello"
+            callproperty QName(PackageNamespace(""),"trace"), 1
+            pop
+            getscopeobject 1
+            findpropstrict QName(PackageNamespace(""),"Math")
+            getproperty QName(PackageNamespace(""),"Math")
+            callproperty QName(PackageNamespace(""),"random"), 0
+            coerce_a
+            setslot 1
+   xxx:           
+
+            findpropstrict QName(PackageNamespace(""),"trace")
+            pushstring "second"
+            callproperty QName(PackageNamespace(""),"trace"), 1
+            pop
+   ofs0036:
+            jump ofs0056
+   ofs003c:
+            getlocal0
+            pushscope
+            getlocal1
+            pushscope
+            newcatch 0
+            dup
+            setlocal2
+            dup
+            pushscope
+            swap
+            setslot 1
+            findpropstrict QName(PackageNamespace(""),"trace")
+            pushstring "in catch"
+            callproperty QName(PackageNamespace(""),"trace"), 1
+            pop
+            popscope
+            kill 2
+   ofs0056:
+            getscopeobject 1
+            getslot 1
+            pushbyte 100
+            ifle xxx
+            findpropstrict QName(PackageNamespace(""),"trace")
+            pushstring "after"
+            callproperty QName(PackageNamespace(""),"trace"), 1
+            pop
+            returnvoid
+     end ; code
+     try from xxx to ofs0036 target ofs003c type QName(PackageNamespace(""),"Error") name QName(PackageNamespace(""),"e") end
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestTryDoWhile2/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

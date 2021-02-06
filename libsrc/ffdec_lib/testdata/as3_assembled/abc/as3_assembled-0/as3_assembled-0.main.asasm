@@ -17,5 +17,7 @@ program
  #include "tests/TestSwitchDefault.script.asasm"
  #include "tests/TestSwitch.script.asasm"
  #include "tests/TestDeclareReg.script.asasm"
+ #include "tests/TestTryDoWhile.script.asasm"
+ #include "tests/TestTryDoWhile2.script.asasm"
  ; place to add next
 end ; program
