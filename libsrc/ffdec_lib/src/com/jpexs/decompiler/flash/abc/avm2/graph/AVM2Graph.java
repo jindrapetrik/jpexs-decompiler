@@ -316,8 +316,12 @@ public class AVM2Graph extends Graph {
 
                     } else if (ins.definition instanceof PushByteIns) {
                         defaultPushByte = ins.operands[0];
+                        localData.pushDefaultPart.put(e, prevFinallyEndPart);
                     } else if (ins.definition instanceof JumpIns) {
                     } else {
+                        if(localData.pushDefaultPart.containsKey(e)){
+                            localData.pushDefaultPart.remove(e);
+                        }
                         defaultPushByte = null;
                         break;
                     }
@@ -333,6 +337,7 @@ public class AVM2Graph extends Graph {
 
                                 } else if (ins.definition instanceof PushByteIns) {
                                     defaultPushByte = ins.operands[0];
+                                    localData.pushDefaultPart.put(e, prevFinallyEndPart);
                                     break;
                                 } else {
                                     break;
@@ -1049,7 +1054,7 @@ public class AVM2Graph extends Graph {
                 if (afterPart == null) {
                     afterPart = searchFirstPartOutSideTryCatch(localData, finallyException, loops, allParts);
                 }
-
+                                
                 if (afterPart != null) {
                     tryStopPart.add(afterPart);
                 }
@@ -1061,6 +1066,11 @@ public class AVM2Graph extends Graph {
                         afterPart = null;
                     }
                 }
+                
+                if (afterPart == null && localData.pushDefaultPart.containsKey(finallyIndex)){
+                    exAfterPart = localData.pushDefaultPart.get(finallyIndex);
+                    tryStopPart.add(exAfterPart);
+                }                
 
                 tryCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, part, tryStopPart, loops, throwStates, staticOperation, path);
                 makeAllCommands(tryCommands, stack);

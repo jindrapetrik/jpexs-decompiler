@@ -83,6 +83,8 @@ public class AVM2LocalData extends BaseLocalData {
     public Map<Integer, GraphPart> defaultParts = new HashMap<>();
 
     public Map<Integer, Integer> switchedRegs = new HashMap<>();
+    
+    public Map<Integer, GraphPart> pushDefaultPart = new HashMap<>();
 
     /**
      * exception index -> switch throw part
@@ -159,6 +161,7 @@ public class AVM2LocalData extends BaseLocalData {
         inGetLoops = localData.inGetLoops;
         parsedExceptionIds = localData.parsedExceptionIds;
         finallyTargetParts = localData.finallyTargetParts;
+        pushDefaultPart = localData.pushDefaultPart;
     }
 
     public AVM2ConstantPool getConstants() {
