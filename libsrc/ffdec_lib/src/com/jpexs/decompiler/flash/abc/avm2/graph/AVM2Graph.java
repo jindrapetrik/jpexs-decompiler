@@ -1067,7 +1067,7 @@ public class AVM2Graph extends Graph {
                     }
                 }
 
-                if (afterPart == null && localData.pushDefaultPart.containsKey(finallyIndex)) {
+                if (localData.pushDefaultPart.containsKey(finallyIndex)) {
                     exAfterPart = localData.pushDefaultPart.get(finallyIndex);
                     tryStopPart.add(exAfterPart);
                 }

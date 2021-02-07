@@ -238,15 +238,14 @@ public class Graph {
 
             GraphPartQueue newParts = new GraphPartQueue();
             List<GraphPart> nextParts = new ArrayList<>(getNextParts(localData, part));
-            /*
-            !!THROW
+
             for (ThrowState ts : throwStates) {
                 if (ts.state != 1) {
                     if (ts.throwingParts.contains(part)) {
                         newParts.add(ts.targetPart);
                     }
                 }
-            }*/
+            }
             loopnext:
             for (GraphPart nextRaw : nextParts) {
 
