@@ -161,8 +161,26 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
+    protected boolean canBeBreakCandidate(BaseLocalData localData, GraphPart part) {
+        AVM2LocalData aLocalData = (AVM2LocalData) localData;
+        if (aLocalData.finallyTargetParts.containsValue(part)) {
+            return false;
+        }
+        return true;
+    }
+
+
+    @Override
     protected void beforeGetLoops(BaseLocalData localData, String path, Set<GraphPart> allParts, List<ThrowState> throwStates) throws InterruptedException {
         AVM2LocalData avm2LocalData = ((AVM2LocalData) localData);
+
+        for (int e = 0; e < body.exceptions.length; e++) {
+            ABCException ex = body.exceptions[e];
+            if (ex.isFinally()) {
+                avm2LocalData.finallyTargetParts.put(e, searchPart(code.adr2pos(ex.target), allParts));
+            }
+        }
+
         avm2LocalData.codeStats = avm2LocalData.code.getStats(avm2LocalData.abc, avm2LocalData.methodBody, avm2LocalData.methodBody.init_scope_depth, false);
         getIgnoredSwitches((AVM2LocalData) localData, allParts);
         Set<Integer> integerSwitchesIps = new HashSet<>();

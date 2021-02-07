@@ -13,4 +13,29 @@ public class ThrowState {
 
     public Set<GraphPart> throwingParts = new HashSet<>();
     public GraphPart targetPart;
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 97 * hash + this.exceptionId;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ThrowState other = (ThrowState) obj;
+        if (this.exceptionId != other.exceptionId) {
+            return false;
+        }
+        return true;
+    }
 }
