@@ -204,6 +204,31 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
     }
 
     @Test(dataProvider = "swfNamesProvider")
+    public void testTryCatchInWhile5(String swfUsed) {
+        decompileMethod(swfUsed, "testTryCatchInWhile5", "var i:int = 0;\r\n"
+                + "var j:int = 0;\r\n"
+                + "i = 0;\r\n"
+                + "j = 5;\r\n"
+                + "while(i < 10)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "if(j > 4)\r\n"
+                + "{\r\n"
+                + "throw new Error(\"Problem: \" + e);\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "i++;\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
+
+    @Test(dataProvider = "swfNamesProvider")
     public void testTryCatchLoop(String swfUsed) {
         decompileMethod(swfUsed, "testTryCatchLoop", "var j:int = 0;\r\n"
                 + "var i:int = 0;\r\n"

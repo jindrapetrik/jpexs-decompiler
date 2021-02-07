@@ -1328,9 +1328,9 @@ public class Graph {
         }
 
         List<Loop> loops2 = new ArrayList<>(loops);
-        /*for (Loop l : loops2) {
+        for (Loop l : loops2) {
             l.breakCandidatesLocked++;
-        }*/
+        }
         for (ThrowState ts : throwStates) {
             if (ts.throwingParts.contains(part) && (currentThrowStates.contains(ts) || ts.state != 1)) {
                 GraphPart t = ts.targetPart;
@@ -1339,9 +1339,9 @@ public class Graph {
                 }
             }
         }
-        /*for (Loop l : loops2) {
+        for (Loop l : loops2) {
             l.breakCandidatesLocked--;
-        }*/
+        }
 
         if (isLoop && currentLoop != null) {
             GraphPart found;

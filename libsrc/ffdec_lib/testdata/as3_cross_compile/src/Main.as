@@ -17,6 +17,7 @@ package
 		TestTryCatchInWhile2;
 		TestTryCatchInWhile3;
 		TestTryCatchInWhile4;
+		TestTryCatchInWhile5;
 		TestTryCatchLoop;
 		TestTryCatchLoopBreak;
 		TestTryCatchExceptionUsage
