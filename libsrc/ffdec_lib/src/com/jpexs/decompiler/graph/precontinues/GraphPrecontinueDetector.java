@@ -106,8 +106,26 @@ public class GraphPrecontinueDetector {
                 boolean wholeLoop = false;
                 boolean inTryTarget = false;
                 boolean hasMoreNexts = false;
+                boolean usePreNode = false;
+                if (node.parentNode == null) {
+                    if (node.prev.size() == 1) {
+                        Node prev = node.prev.get(0);
+                        if (prev.next.size() == 2) {
+                            Node other = null;
+                            if (prev.next.get(0) == node) {
+                                other = prev.next.get(1);
+                            } else {
+                                other = prev.next.get(0);
+                            }
+                            if (other.graphPart == el.loopBreak) {
+                                node = prev;
+                                usePreNode = true;
+                            }
+                        }
+                    }
+                }
 
-                if (node.next.size() > 1) {
+                if (!usePreNode && node.next.size() > 1) {
                     if (node.next.size() == 2) {
                         Node other = null;
                         if (node.next.get(0).graphPart == el.loopContinue) {
@@ -142,6 +160,7 @@ public class GraphPrecontinueDetector {
                 }
                 if (!wholeLoop && !inTryTarget && !hasMoreNexts) {
                     el.loopPreContinue = node.graphPart;
+                    //System.err.println("set precontinue of loop " + el.loopContinue + " to " + el.loopPreContinue);
                 }
             }
         }
