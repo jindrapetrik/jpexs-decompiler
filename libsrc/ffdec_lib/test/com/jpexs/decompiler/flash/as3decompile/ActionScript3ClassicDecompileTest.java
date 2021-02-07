@@ -202,6 +202,38 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testDeobfuscation() {
+        decompileMethod("classic", "testDeobfuscation", "var r:int = Math.random();\r\n"
+                + "var t:Boolean = true;\r\n"
+                + "var f:Boolean = false;\r\n"
+                + "if(r > 5 && t)\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "}\r\n"
+                + "if(r > 10 || f)\r\n"
+                + "{\r\n"
+                + "trace(\"B\");\r\n"
+                + "}\r\n"
+                + "if(t && r > 15)\r\n"
+                + "{\r\n"
+                + "trace(\"C\");\r\n"
+                + "}\r\n"
+                + "if(f || r > 20)\r\n"
+                + "{\r\n"
+                + "trace(\"D\");\r\n"
+                + "}\r\n"
+                + "if(f)\r\n"
+                + "{\r\n"
+                + "trace(\"trash1\");\r\n"
+                + "}\r\n"
+                + "if(!t)\r\n"
+                + "{\r\n"
+                + "trace(\"trash2\");\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
     public void testDoWhile() {
         decompileMethod("classic", "testDoWhile", "var a:* = 8;\r\n"
                 + "do\r\n"
@@ -728,6 +760,28 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "}\r\n"
                 + "trace(\"C\");\r\n"
                 + "return 7;\r\n",
+                false);
+    }
+
+    @Test
+    public void testIgnoreAndOr() {
+        decompileMethod("classic", "testIgnoreAndOr", "var k:int = Math.random();\r\n"
+                + "if(k > 5)\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "}\r\n"
+                + "if(k > 10)\r\n"
+                + "{\r\n"
+                + "trace(\"B\");\r\n"
+                + "}\r\n"
+                + "if(k > 15)\r\n"
+                + "{\r\n"
+                + "trace(\"C\");\r\n"
+                + "}\r\n"
+                + "if(k > 20)\r\n"
+                + "{\r\n"
+                + "trace(\"D\");\r\n"
+                + "}\r\n",
                 false);
     }
 

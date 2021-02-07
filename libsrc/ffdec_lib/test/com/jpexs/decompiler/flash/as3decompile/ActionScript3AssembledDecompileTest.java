@@ -122,7 +122,6 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "case 0:\r\n"
                 + "var _loc2_:String = \"X\";\r\n"
                 + "return;\r\n"
-                //+ "break;\r\n"
                 + "case 1:\r\n"
                 + "_loc2_ = \"A\";\r\n"
                 + "break;\r\n"
@@ -156,6 +155,52 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "default:\r\n"
                 + "_loc2_ = 100;\r\n"
                 + "}\r\n",
+                false);
+    }
+
+    @Test
+    public void testSwitchJoin() {
+        decompileMethod("assembled", "testSwitchJoin", "trace(\"before\");\r\n"
+                + "var _loc2_:int = 57;\r\n"
+                + "switch(_loc2_)\r\n"
+                + "{\r\n"
+                + "case 0:\r\n"
+                + "case 3:\r\n"
+                + "trace(\"0-3\");\r\n"
+                + "break;\r\n"
+                + "case 1:\r\n"
+                + "case 6:\r\n"
+                + "trace(\"1-6\");\r\n"
+                + "addr106:\r\n"
+                + "trace(\"F\");\r\n"
+                + "break;\r\n"
+                + "case 5:\r\n"
+                + "trace(\"5\");\r\n"
+                + "addr103:\r\n"
+                + "trace(\"E\");\r\n"
+                + "§§goto(addr106);\r\n"
+                + "case 7:\r\n"
+                + "trace(\"7\");\r\n"
+                + "addr100:\r\n"
+                + "trace(\"D\");\r\n"
+                + "§§goto(addr103);\r\n"
+                + "case 2:\r\n"
+                + "trace(\"2\");\r\n"
+                + "addr97:\r\n"
+                + "trace(\"C\");\r\n"
+                + "§§goto(addr100);\r\n"
+                + "case 8:\r\n"
+                + "trace(\"8\");\r\n"
+                + "addr94:\r\n"
+                + "trace(\"B\");\r\n"
+                + "§§goto(addr97);\r\n"
+                + "default:\r\n"
+                + "trace(\"def\");\r\n"
+                + "trace(\"A\");\r\n"
+                + "§§goto(addr94);\r\n"
+                + "}\r\n"
+                + "trace(\"G\");\r\n"
+                + "return null;\r\n",
                 false);
     }
 
