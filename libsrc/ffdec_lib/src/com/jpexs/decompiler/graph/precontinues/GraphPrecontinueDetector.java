@@ -105,11 +105,28 @@ public class GraphPrecontinueDetector {
                 //System.err.println("backedge:" + backEdgePart);
                 boolean wholeLoop = false;
                 boolean inTryTarget = false;
+                boolean hasMoreNexts = false;
+
+                if (node.next.size() > 1) {
+                    if (node.next.size() == 2) {
+                        Node other = null;
+                        if (node.next.get(0).graphPart == el.loopContinue) {
+                            other = node.next.get(1);
+                        } else {
+                            other = node.next.get(0);
+                        }
+                        if (other.graphPart != el.loopBreak) {
+                            hasMoreNexts = true;
+                        }
+                    } else {
+                        hasMoreNexts = true;
+                    }
+                }
 
                 if (targetParts.contains(node.graphPart)) {
                     inTryTarget = true;
                 }
-                if (!inTryTarget) {
+                if (!inTryTarget && !hasMoreNexts) {
                     while (node.parentNode != null) {
                         node = node.parentNode;
                         //System.err.println("- parent " + node.graphPart);
@@ -123,9 +140,8 @@ public class GraphPrecontinueDetector {
                         }
                     }
                 }
-                if (!wholeLoop && !inTryTarget) {
+                if (!wholeLoop && !inTryTarget && !hasMoreNexts) {
                     el.loopPreContinue = node.graphPart;
-                    //System.err.println("found precontinue:" + node.graphPart);
                 }
             }
         }
