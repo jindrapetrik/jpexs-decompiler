@@ -12,20 +12,20 @@ package tests
 		{
 			var a:int;
 			a = 0;			
-			trace("before loop"); //1-17
-			while (a > 5) //44-47
+			trace("before loop"); 
+			while (a > 5) 
 			{
 				try
 				{
-					return "intry return"; //20-23
+					return "intry return"; 
 				}
 				catch(e:Error)
 				{
-					trace("in catch"); //26-43
+					trace("in catch"); 
 				}				
-				a++; //26-43 cont.
+				a++; 
 			}			
-			return "OK";//48-50
+			return "OK";
 		}			
 		
 	}

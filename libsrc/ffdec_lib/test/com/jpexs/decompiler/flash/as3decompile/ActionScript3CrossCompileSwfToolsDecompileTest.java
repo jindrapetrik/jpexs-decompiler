@@ -195,6 +195,32 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
     }
 
     @Test
+    public void testTryCatchInWhile5() {
+        decompileMethod("swftools", "testTryCatchInWhile5", "var _loc1_:int = 0;\r\n"
+                + "_loc1_ = 0;\r\n"
+                + "var _loc2_:int = 0;\r\n"
+                + "_loc2_ = 5;\r\n"
+                + "while(_loc1_ < 10)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "var _loc3_:* = e;\r\n"
+                + "if(_loc2_ > 4)\r\n"
+                + "{\r\n"
+                + "throw new Error(\"Problem: \" + _loc3_);\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "_loc1_++;\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
+
+    @Test
     public void testTryCatchLoop() {
         decompileMethod("swftools", "testTryCatchLoop", "var _loc1_:int = 0;\r\n"
                 + "while(_loc1_ < 100)\r\n"

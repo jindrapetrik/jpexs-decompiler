@@ -16,7 +16,7 @@ package tests
 				
 				try
 				{
-					trace("try2");	//12-21
+					trace("try2");	
 					if (a == 10){
 						trace("br");
 						break;
@@ -29,7 +29,7 @@ package tests
 				}
 				trace("a=" + a); 
 			}
-			trace("after");  //61-66
+			trace("after");  
 		}
 		
 	}
