@@ -9,13 +9,14 @@ package
 	 * @author JPEXS
 	 */
 	public class Main extends MovieClip 
-	{
+	{		
 		TestTryCatch;
 		TestTryCatchIfInTry;
 		TestTryCatchInIf;
 		TestTryCatchInWhile;
 		TestTryCatchInWhile2;
 		TestTryCatchInWhile3;
+		TestTryCatchInWhile4;
 		TestTryCatchLoop;
 		TestTryCatchLoopBreak;
 		TestTryCatchExceptionUsage

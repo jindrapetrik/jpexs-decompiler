@@ -175,7 +175,6 @@ public class GraphPart implements Serializable {
                 return true;
             }
         }
-        if (useThrow)
         for (ThrowState ts : throwStates) {
             if (ts.state != 1) {
                 if (ts.throwingParts.contains(this)) {
@@ -188,15 +187,6 @@ public class GraphPart implements Serializable {
                 }
             }
         }
-        /*if (useThrow) {
-            for (GraphPart p : throwParts) {
-                if (p == part) {
-                    return true;
-                } else if (p.leadsTo(localData, gr, code, this, part, visited, loops, throwStates, useThrow)) {
-                    return true;
-                }
-            }
-        }*/
         return false;
     }
 

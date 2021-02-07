@@ -517,7 +517,6 @@ public class Graph {
         beforeGetLoops(localData, path, allParts, throwStates);
         List<Loop> loops = new ArrayList<>();
 
-
         getLoops(localData, heads.get(0), loops, throwStates, null);
 
         afterGetLoops(localData, path, allParts);
@@ -532,7 +531,7 @@ public class Graph {
         //TODO: Make getPrecontinues faster
         getBackEdges(localData, loops, throwStates);
 
-        new GraphPrecontinueDetector().detectPrecontinues(heads, allParts, loops);
+        new GraphPrecontinueDetector().detectPrecontinues(heads, allParts, loops, throwStates);
 
         /*System.err.println("<loopspre>");
          for (Loop el : loops) {
@@ -1155,13 +1154,21 @@ public class Graph {
         }
     }
 
-    private void getLoops(BaseLocalData localData, GraphPart part, List<Loop> loops, List<ThrowState> throwStates, List<GraphPart> stopPart) throws InterruptedException {
-        clearLoops(loops);
-        getLoops(localData, part, loops, throwStates, stopPart, true, 1, new ArrayList<>());
-        clearLoops(loops);
+    private void clearThrowStates(List<ThrowState> throwStates) {
+        for (ThrowState ts : throwStates) {
+            ts.state = 0;
+        }
     }
 
-    protected boolean canBeBreakCandidate(GraphPart part) {
+    private void getLoops(BaseLocalData localData, GraphPart part, List<Loop> loops, List<ThrowState> throwStates, List<GraphPart> stopPart) throws InterruptedException {
+        clearLoops(loops);
+        clearThrowStates(throwStates);
+        getLoopsWalk(localData, part, loops, throwStates, stopPart, true, new ArrayList<>(), 0);
+        clearLoops(loops);
+        clearThrowStates(throwStates);
+    }
+
+    protected boolean canBeBreakCandidate(BaseLocalData localData, GraphPart part) {
         return true;
     }
 
@@ -1169,7 +1176,21 @@ public class Graph {
 
     }
 
-    private void getLoops(BaseLocalData localData, GraphPart part, List<Loop> loops, List<ThrowState> throwStates, List<GraphPart> stopPart, boolean first, int level, List<GraphPart> visited) throws InterruptedException {
+    private void findPartsOutsideTry(ThrowState ts, GraphPart part, List<GraphPart> ret, Set<GraphPart> visited) {
+        if (visited.contains(part)) {
+            return;
+        }
+        visited.add(part);
+        if (!ts.throwingParts.contains(part)) {
+            ret.add(part);
+            return;
+        }
+        for (GraphPart n : part.nextParts) {
+            findPartsOutsideTry(ts, n, ret, visited);
+        }
+    }
+
+    private void getLoopsWalk(BaseLocalData localData, GraphPart part, List<Loop> loops, List<ThrowState> throwStates, List<GraphPart> stopPart, boolean first, List<GraphPart> visited, int level) throws InterruptedException {
 
         if (part == null) {
             return;
@@ -1183,6 +1204,15 @@ public class Graph {
             visited.add(part);
         }
         checkGetLoopsPart(part);
+
+        List<ThrowState> currentThrowStates = new ArrayList<>();
+
+        for (ThrowState ts : throwStates) {
+            if (ts.throwingParts.contains(part) && ts.state != 1) {
+                currentThrowStates.add(ts);
+                ts.state = 1;
+            }
+        }
 
         if (debugGetLoops) {
             System.err.println("getloops: " + part);
@@ -1200,8 +1230,11 @@ public class Graph {
 
             }
         }
-        if (lastP1 != null && canBeBreakCandidate(part)) {
+        if (lastP1 != null && canBeBreakCandidate(localData, part)) {
             if (lastP1.breakCandidates.contains(part)) {
+                if (part.start == 54) {
+                    System.err.println("xxx");
+                }
                 lastP1.breakCandidates.add(part);
                 lastP1.breakCandidatesLevels.add(level);
                 return;
@@ -1259,16 +1292,16 @@ public class Graph {
                 stopPart2.add(next);
             }
             if (next != nps.get(0)) {
-                getLoops(localData, nps.get(0), loops, throwStates, stopPart2, false, level + 1, visited);
+                getLoopsWalk(localData, nps.get(0), loops, throwStates, stopPart2, false, visited, level + 1);
             }
             if (next != nps.get(1)) {
-                getLoops(localData, nps.get(1), loops, throwStates, stopPart2, false, level + 1, visited);
+                getLoopsWalk(localData, nps.get(1), loops, throwStates, stopPart2, false, visited, level + 1);
             }
             if (next != null) {
-                getLoops(localData, next, loops, throwStates, stopPart, false, level, visited);
+                getLoopsWalk(localData, next, loops, throwStates, stopPart, false, visited, level);
             }
         } else if (part.nextParts.size() > 2 || partIsSwitch(part)) {
-            GraphPart next = getNextCommonPart(localData, part, loops, throwStates);
+            GraphPart next = getMostCommonPart(localData, part.nextParts, loops, throwStates);
 
             for (GraphPart p : part.nextParts) {
                 List<GraphPart> stopPart2 = stopPart == null ? new ArrayList<>() : new ArrayList<>(stopPart);
@@ -1284,45 +1317,107 @@ public class Graph {
                     }
                 }
                 if (next != p) {
-                    getLoops(localData, p, loops, throwStates, stopPart2, false, level + 1, visited);
+                    getLoopsWalk(localData, p, loops, throwStates, stopPart2, false, visited, level + 1);
                 }
             }
             if (next != null) {
-                getLoops(localData, next, loops, throwStates, stopPart, false, level, visited);
+                getLoopsWalk(localData, next, loops, throwStates, stopPart, false, visited, level);
             }
         } else if (part.nextParts.size() == 1) {
-            getLoops(localData, part.nextParts.get(0), loops, throwStates, stopPart, false, level, visited);
+            getLoopsWalk(localData, part.nextParts.get(0), loops, throwStates, stopPart, false, visited, level);
         }
 
         List<Loop> loops2 = new ArrayList<>(loops);
-        for (Loop l : loops2) {
+        /*for (Loop l : loops2) {
             l.breakCandidatesLocked++;
-        }
+        }*/
         for (ThrowState ts : throwStates) {
-            //check state?
-            if (ts.throwingParts.contains(part)) {
+            if (ts.throwingParts.contains(part) && (currentThrowStates.contains(ts) || ts.state != 1)) {
                 GraphPart t = ts.targetPart;
                 if (!visited.contains(t)) {
-                    getLoops(localData, t, loops, throwStates, stopPart, false, level, visited);
+                    getLoopsWalk(localData, t, loops, throwStates, stopPart, false, visited, level + 1 /*???*/);
                 }
             }
         }
-        for (Loop l : loops2) {
+        /*for (Loop l : loops2) {
             l.breakCandidatesLocked--;
-        }
+        }*/
 
         if (isLoop && currentLoop != null) {
             GraphPart found;
+
+            for (int i = 0; i < currentLoop.breakCandidates.size(); i++) {
+                GraphPart ch = checkPart(null, localData, null, currentLoop.breakCandidates.get(i), null);
+                if (ch == null) {
+                    currentLoop.breakCandidates.remove(i);
+                    currentLoop.breakCandidatesLevels.remove(i);
+                    i--;
+                }
+            }
+            if (debugGetLoops) {
+                System.err.println("loop " + currentLoop + " break candidates:");
+                for (GraphPart cand : currentLoop.breakCandidates) {
+                    System.err.println("- " + cand);
+                }
+            }
+
+            List<Integer> contThrowStates = new ArrayList<>();
+
+            for (ThrowState ts : throwStates) {
+                if (ts.throwingParts.contains(currentLoop.loopContinue)) {
+                    contThrowStates.add(ts.exceptionId);
+                }
+            }
+
             Map<GraphPart, Integer> removed = new HashMap<>();
-            do {
-                found = null;
-                for (int i = 0; i < currentLoop.breakCandidates.size(); i++) {
-                    GraphPart ch = checkPart(null, localData, null, currentLoop.breakCandidates.get(i), null);
-                    if (ch == null) {
-                        currentLoop.breakCandidates.remove(i);
-                        i--;
+
+            loopcand:
+            for (int c = 0; c < currentLoop.breakCandidates.size(); c++) {
+                GraphPart cand = currentLoop.breakCandidates.get(c);
+                List<Integer> candThrowStates = new ArrayList<>();
+                for (ThrowState ts : throwStates) {
+                    if (ts.throwingParts.contains(cand)) {
+                        if (contThrowStates.equals(candThrowStates)) {
+                            //adding new ts
+                            //this means breakcandidate is in nested try
+                            if (debugGetLoops) {
+                                System.err.println("candidate " + cand + " is in inner try, getting outside parts");
+                            }
+                            List<GraphPart> outsideTry = new ArrayList<>();
+                            findPartsOutsideTry(ts, cand, outsideTry, new HashSet<>());
+
+                            for (int j = outsideTry.size() - 1; j >= 0; j--) {
+                                if (!canBeBreakCandidate(localData, outsideTry.get(j))) {
+                                    outsideTry.remove(j);
+                                }
+                            }
+                            if (debugGetLoops) {
+                                for (GraphPart op : outsideTry) {
+                                    System.err.println("- outsidepart " + op);
+                                }
+                            }
+                            int bcLevel = currentLoop.breakCandidatesLevels.get(c);
+                            currentLoop.breakCandidates.remove(c);
+
+                            currentLoop.breakCandidates.addAll(c, outsideTry);
+                            currentLoop.breakCandidatesLevels.remove(c);
+
+                            removed.put(cand, bcLevel);
+                            for (int j = 0; j < outsideTry.size(); j++) {
+                                currentLoop.breakCandidatesLevels.add(c, bcLevel);
+                            }
+
+                            c--;
+                            continue loopcand;
+                        }
+                        candThrowStates.add(ts.exceptionId);
                     }
                 }
+            }
+
+            do {
+                found = null;
+
                 loopcand:
                 for (GraphPart cand : currentLoop.breakCandidates) {
                     for (GraphPart cand2 : currentLoop.breakCandidates) {
@@ -1372,7 +1467,7 @@ public class Graph {
                     removed.put(found, maxlevel);
                 }
             } while ((found != null) && (currentLoop.breakCandidates.size() > 1));
-
+             
             Map<GraphPart, Integer> count = new HashMap<>();
             GraphPart winner = null;
             int winnerCount = 0;
@@ -1431,7 +1526,7 @@ public class Graph {
                 if (removedVisited.contains(r)) {
                     continue;
                 }
-                getLoops(localData, r, loops, throwStates, stopPart, false, removed.get(r), visited);
+                getLoopsWalk(localData, r, loops, throwStates, stopPart, false, visited, removed.get(r));
                 removedVisited.add(r);
             }
             start = false;
@@ -1444,7 +1539,7 @@ public class Graph {
                     el.phase = 2;
                 }
             }
-            getLoops(localData, currentLoop.loopBreak, loops, throwStates, stopPart, false, level, visited);
+            getLoopsWalk(localData, currentLoop.loopBreak, loops, throwStates, stopPart, false, visited, level);
         }
     }
 
@@ -1638,9 +1733,7 @@ public class Graph {
 
         boolean vCanHandleVisited = canHandleVisited(localData, part);
 
-        /*if (part.start == 31) {
-        
-            FIXME
+        /*if (part.start == 25) {
             new RuntimeException().printStackTrace();
         }*/
         if (vCanHandleVisited) {

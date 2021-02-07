@@ -18,6 +18,7 @@ package com.jpexs.decompiler.graph.precontinues;
 
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.Loop;
+import com.jpexs.decompiler.graph.ThrowState;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ import java.util.Set;
  */
 public class GraphPrecontinueDetector {
 
-    public void detectPrecontinues(List<GraphPart> heads, Set<GraphPart> allParts, List<Loop> loops) {
+    public void detectPrecontinues(List<GraphPart> heads, Set<GraphPart> allParts, List<Loop> loops, List<ThrowState> throwStates) {
         boolean isSomethingTodo = false;
         for (Loop el : loops) {
             if (el.backEdges.size() == 1) {
@@ -60,6 +61,12 @@ public class GraphPrecontinueDetector {
         for (GraphPart part : allParts) {
             Node node = partToNode.get(part);
             for (GraphPart prev : part.refs) {
+                /*if (prev.start < 0 && !partToNode.containsKey(prev)) {
+                    Node minusNode = new Node();
+                    minusNode.graphPart = prev;
+                    partToNode.put(prev, node);
+                    continue;
+                }*/
                 if (prev.start < 0) {
                     continue;
                 }
@@ -90,6 +97,12 @@ public class GraphPrecontinueDetector {
             }
         }
 
+        List<GraphPart> targetParts = new ArrayList<>();
+
+        for (ThrowState ts : throwStates) {
+            targetParts.add(ts.targetPart);
+        }
+
         for (Loop el : loops) {
             if (el.backEdges.size() == 1) {
                 //System.err.println("loop " + el.loopContinue);
@@ -97,15 +110,26 @@ public class GraphPrecontinueDetector {
                 Node node = partToNode.get(backEdgePart);
                 //System.err.println("backedge:" + backEdgePart);
                 boolean wholeLoop = false;
-                while (node.parentNode != null) {
-                    node = node.parentNode;
-                    //System.err.println("- parent " + node.graphPart);
-                    if (node.graphPart.equals(el.loopContinue)) {
-                        wholeLoop = true;
-                        break;
+                boolean inTryTarget = false;
+
+                if (targetParts.contains(node.graphPart)) {
+                    inTryTarget = true;
+                }
+                if (!inTryTarget) {
+                    while (node.parentNode != null) {
+                        node = node.parentNode;
+                        //System.err.println("- parent " + node.graphPart);
+                        if (node.graphPart.equals(el.loopContinue)) {
+                            wholeLoop = true;
+                            break;
+                        }
+                        if (targetParts.contains(node.graphPart)) {
+                            inTryTarget = true;
+                            break;
+                        }
                     }
                 }
-                if (!wholeLoop) {
+                if (!wholeLoop && !inTryTarget) {
                     el.loopPreContinue = node.graphPart;
                     //System.err.println("found precontinue:" + node.graphPart);
                 }
