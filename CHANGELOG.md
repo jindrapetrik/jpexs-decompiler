@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
 - #735 AS3 - index out of bounds in deobfuscator 
 - AS3 deobfuscator on &&, || operators
 - Merged continues in try..catch
+- AS3 method display in GUI when method name is null
 
 ### Changed
 - AS3 test methods separated to classes
