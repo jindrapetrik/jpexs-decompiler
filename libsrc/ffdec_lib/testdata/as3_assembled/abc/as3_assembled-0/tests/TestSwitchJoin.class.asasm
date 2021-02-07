@@ -1,0 +1,195 @@
+class
+ refid "tests:TestSwitchJoin"
+ instance QName(PackageNamespace("tests"), "TestSwitchJoin")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestSwitchJoin")
+  iinit
+   refid "tests:TestSwitchJoin/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestSwitchJoin/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+              code
+            getlocal0
+            pushscope
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "before"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+            jump ofs0079
+   ofs0010:
+            label
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "0-3"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+            jump ofs0150
+   ofs001f:
+            label
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "1-6"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+            jump ofs0146
+   ofs002e:
+            label
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "5"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+            jump ofs013c
+   ofs003d:
+            label
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "7"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+            jump ofs0132
+   ofs004c:
+            label
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "2"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+            jump ofs0128
+   ofs005b:
+            label
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "8"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+            jump ofs011e
+   ofs006a:
+            label
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "def"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+            jump ofs0114
+   ofs0079:
+            pushbyte 57
+            setlocal2
+            getlocal2
+            setlocal3
+            pushbyte 0
+            getlocal3
+            ifstrictne ofs008b
+            pushbyte 0
+            jump ofs00f2
+   ofs008b:
+            pushbyte 3
+            getlocal3
+            ifstrictne ofs0098
+            pushbyte 1
+            jump ofs00f2
+   ofs0098:
+            pushbyte 1
+            getlocal3
+            ifstrictne ofs00a5
+            pushbyte 2
+            jump ofs00f2
+   ofs00a5:
+            pushbyte 6
+            getlocal3
+            ifstrictne ofs00b2
+            pushbyte 3
+            jump ofs00f2
+   ofs00b2:
+            pushbyte 5
+            getlocal3
+            ifstrictne ofs00bf
+            pushbyte 4
+            jump ofs00f2
+   ofs00bf:
+            pushbyte 7
+            getlocal3
+            ifstrictne ofs00cc
+            pushbyte 5
+            jump ofs00f2
+   ofs00cc:
+            pushbyte 2
+            getlocal3
+            ifstrictne ofs00d9
+            pushbyte 6
+            jump ofs00f2
+   ofs00d9:
+            pushbyte 8
+            getlocal3
+            ifstrictne ofs00e6
+            pushbyte 7
+            jump ofs00f2
+   ofs00e6:
+            jump ofs00f0
+            pushbyte 8
+            jump ofs00f0
+   ofs00f0:
+            pushbyte 8
+   ofs00f2:
+            kill 3
+            lookupswitch ofs006a, [ofs0010, ofs0010, ofs001f, ofs001f, ofs002e, ofs003d, ofs004c, ofs005b, ofs006a]
+   ofs0114:
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "A"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+   ofs011e:
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "B"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+   ofs0128:
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "C"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+   ofs0132:
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "D"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+   ofs013c:
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "E"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+   ofs0146:
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "F"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+   ofs0150:
+            findproperty QName(PackageNamespace(""),"trace")
+            pushstring "G"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1
+            pushnull
+            returnvalue
+         end ; code
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestSwitchJoin/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

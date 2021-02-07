@@ -69,6 +69,23 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
     }
 
     @Test
+    public void testTryCatchInIf() {
+        decompileMethod("swftools", "testTryCatchInIf", "var _loc1_:int = Math.random();\r\n"
+                + "if(_loc1_ > 10)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "return 1;\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "return 2;\r\n",
+                false);
+    }
+
+    @Test
     public void testTryCatchInWhile() {
         decompileMethod("swftools", "testTryCatchInWhile", "trace(\"before loop\");\r\n"
                 + "while(true)\r\n"
@@ -131,6 +148,57 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
     }
 
     @Test
+    public void testTryCatchInWhile3() {
+        decompileMethod("swftools", "testTryCatchInWhile3", "var _loc1_:int = 0;\r\n"
+                + "_loc1_ = 0;\r\n"
+                + "trace(\"before loop\");\r\n"
+                + "for(; _loc1_ > 5; §§goto(addr15))\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "return \"intry return\";\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "addr15:\r\n"
+                + "trace(\"in catch\");\r\n"
+                + "_loc1_++;\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "return \"OK\";\r\n",
+                false);
+    }
+
+    @Test
+    public void testTryCatchInWhile4() {
+        decompileMethod("swftools", "testTryCatchInWhile4", "var _loc1_:int = 0;\r\n"
+                + "_loc1_ = 0;\r\n"
+                + "for(; true; §§goto(addr23))\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"try2\");\r\n"
+                + "if(_loc1_ == 10)\r\n"
+                + "{\r\n"
+                + "trace(\"br\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "return;\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "addr23:\r\n"
+                + "trace(\"in catch2\");\r\n"
+                + "trace(\"a=\" + _loc1_);\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
+
+    @Test
     public void testTryCatchLoop() {
         decompileMethod("swftools", "testTryCatchLoop", "var _loc1_:int = 0;\r\n"
                 + "while(_loc1_ < 100)\r\n"
@@ -156,6 +224,79 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "_loc1_++;\r\n"
                 + "}\r\n"
                 + "trace(\"end\");\r\n",
+                false);
+    }
+
+    @Test
+    public void testTryCatchLoopBreak() {
+        decompileMethod("swftools", "testTryCatchLoopBreak", "var _loc1_:int = 0;\r\n"
+                + "_loc1_ = 0;\r\n"
+                + "trace(\"before loop\");\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try1\");\r\n"
+                + "while(_loc1_ < 10)\r\n"
+                + "{\r\n"
+                + "trace(\"a=\" + _loc1_);\r\n"
+                + "_loc1_++;\r\n"
+                + "}\r\n"
+                + "trace(\"in try2\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch\");\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
+
+    @Test
+    public void testTryCatchLoopBreak2() {
+        decompileMethod("swftools", "testTryCatchLoopBreak2", "var _loc1_:int = 0;\r\n"
+                + "_loc1_ = 0;\r\n"
+                + "trace(\"before loop\");\r\n"
+                + "for(; _loc1_ < 20; §§goto(addr17))\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try\");\r\n"
+                + "return;\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "addr17:\r\n"
+                + "trace(\"in catch\");\r\n"
+                + "trace(\"a=\" + _loc1_);\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
+
+    @Test
+    public void testTryCatchLoopBreak3() {
+        decompileMethod("swftools", "testTryCatchLoopBreak3", "var _loc1_:int = 0;\r\n"
+                + "_loc1_ = 0;\r\n"
+                + "trace(\"before loop\");\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch1\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "catch(e:EOFError)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch2\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
                 false);
     }
 
