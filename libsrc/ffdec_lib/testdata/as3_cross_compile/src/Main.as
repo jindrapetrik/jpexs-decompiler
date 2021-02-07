@@ -32,6 +32,7 @@ package
 		TestTryFinallyReturnNested;
 		TestTryFinallyReturnNested2;
 		TestTryFinallyReturnVoid;
+		TestTryCatchTry;
 		
 		public function Main() 
 		{

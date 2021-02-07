@@ -319,7 +319,7 @@ public class AVM2Graph extends Graph {
                         localData.pushDefaultPart.put(e, prevFinallyEndPart);
                     } else if (ins.definition instanceof JumpIns) {
                     } else {
-                        if(localData.pushDefaultPart.containsKey(e)){
+                        if (localData.pushDefaultPart.containsKey(e)) {
                             localData.pushDefaultPart.remove(e);
                         }
                         defaultPushByte = null;
@@ -862,7 +862,7 @@ public class AVM2Graph extends Graph {
                 for (int ip = outSideExceptionNonEmptyPart.start; ip <= outSideExceptionNonEmptyPart.end; ip++) {
                     AVM2Instruction ins = avm2code.code.get(outSideExceptionNonEmptyPart.start);
                     if (ins.definition instanceof PushByteIns) {
-                        
+
                     } else if (ins.definition instanceof JumpIns) {
 
                     } else if (ins.definition instanceof NopIns) {
@@ -1054,7 +1054,7 @@ public class AVM2Graph extends Graph {
                 if (afterPart == null) {
                     afterPart = searchFirstPartOutSideTryCatch(localData, finallyException, loops, allParts);
                 }
-                                
+
                 if (afterPart != null) {
                     tryStopPart.add(afterPart);
                 }
@@ -1066,11 +1066,11 @@ public class AVM2Graph extends Graph {
                         afterPart = null;
                     }
                 }
-                
-                if (afterPart == null && localData.pushDefaultPart.containsKey(finallyIndex)){
+
+                if (afterPart == null && localData.pushDefaultPart.containsKey(finallyIndex)) {
                     exAfterPart = localData.pushDefaultPart.get(finallyIndex);
                     tryStopPart.add(exAfterPart);
-                }                
+                }
 
                 tryCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, part, tryStopPart, loops, throwStates, staticOperation, path);
                 makeAllCommands(tryCommands, stack);
@@ -1190,9 +1190,6 @@ public class AVM2Graph extends Graph {
             for (List<GraphTargetItem> cc : tryItem.catchCommands) {
                 processIfs(cc);
             }
-
-
-            
 
             List<List<GraphTargetItem>> blocksToCheck = new ArrayList<>();
             blocksToCheck.add(tryItem.tryCommands);
@@ -1808,15 +1805,31 @@ public class AVM2Graph extends Graph {
     @Override
     protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
         super.finalProcessAfter(list, level, localData, path);
-        /*for (int i = 0; i < list.size(); i++) {
-            if (list.get(i) instanceof SetLocalAVM2Item) {
-                SetLocalAVM2Item ri = (SetLocalAVM2Item) list.get(i);
-                if (localData.temporaryRegisters.contains(ri.regIndex)) {
-                    list.remove(i);
-                    i--;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i) instanceof SetTypeAVM2Item) {
+                if (((SetTypeAVM2Item) list.get(i)).getValue().getThroughDuplicate() instanceof ExceptionAVM2Item) {
+
+                    boolean doRemove = false;
+                    if (list.get(i) instanceof SetSlotAVM2Item) {
+                        doRemove = true;
+                    }
+                    if (list.get(i) instanceof SetLocalAVM2Item) {
+                        int setLocalIp = avm2code.adr2pos(list.get(i).getSrc().getAddress());
+                        Set<Integer> usages = localData.getRegisterUsage(setLocalIp);
+                        //Note: There's a hack in PushScopeIns to bypass usage of register to puscope for restoring scopestack
+                        //for example in catch in catch
+                        if (usages.isEmpty()) {
+                            doRemove = true;
+                        }
+                    }
+                    if (doRemove) {
+                        list.remove(i);
+                        i--;
+                        continue;
+                    }
                 }
             }
-        }*/
+        }
     }
 
     private boolean isIntegerOrPopInteger(GraphTargetItem item) {
@@ -1938,27 +1951,6 @@ public class AVM2Graph extends Graph {
 
         List<GraphTargetItem> ret = list;
         for (int i = 0; i < list.size(); i++) {
-            if (list.get(i) instanceof SetTypeAVM2Item) {
-                if (((SetTypeAVM2Item) list.get(i)).getValue().getThroughDuplicate() instanceof ExceptionAVM2Item) {
-
-                    boolean doRemove = false;
-                    if (list.get(i) instanceof SetSlotAVM2Item) {
-                        doRemove = true;
-                    }
-                    if (list.get(i) instanceof SetLocalAVM2Item) {
-                        int setLocalIp = avm2code.adr2pos(list.get(i).getSrc().getAddress());
-                        Set<Integer> usages = localData.getRegisterUsage(setLocalIp);
-                        if (usages.isEmpty()) {
-                            doRemove = true;
-                        }
-                    }
-                    if (doRemove) {
-                        list.remove(i);
-                        i--;
-                        continue;
-                    }
-                }
-            }
             if (list.get(i) instanceof IfItem) {
                 IfItem ifi = (IfItem) list.get(i);
                 if (((ifi.expression instanceof HasNextAVM2Item)
