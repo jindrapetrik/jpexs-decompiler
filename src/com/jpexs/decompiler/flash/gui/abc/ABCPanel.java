@@ -1118,7 +1118,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
             List<MultinameUsage> usages = abc.findMultinameDefinition(multinameIndex);
 
             Multiname m = abc.constants.getMultiname(multinameIndex);
-
+            if (m == null){
+                return false;
+            }
             //search other ABC tags if this is not private multiname
             if (m.getSingleNamespaceIndex(abc.constants) > 0 && abc.constants.getNamespace(m.getSingleNamespaceIndex(abc.constants)).kind != Namespace.KIND_PRIVATE) {
                 for (ABCContainerTag at : getAbcList()) {
