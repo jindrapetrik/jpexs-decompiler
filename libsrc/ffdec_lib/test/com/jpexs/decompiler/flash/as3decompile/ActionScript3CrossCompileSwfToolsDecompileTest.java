@@ -86,6 +86,36 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
     }
 
     @Test
+    public void testTryCatchInIf2() {
+        decompileMethod("swftools", "testTryCatchInIf2", "var _loc1_:int = Math.random();\r\n"
+                + "if(_loc1_ > 10)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"a\");\r\n"
+                + "return;\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch 1\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"b\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch 2\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
+
+    @Test
     public void testTryCatchInWhile() {
         decompileMethod("swftools", "testTryCatchInWhile", "trace(\"before loop\");\r\n"
                 + "while(true)\r\n"

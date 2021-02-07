@@ -13,6 +13,7 @@ package
 		TestTryCatch;
 		TestTryCatchIfInTry;
 		TestTryCatchInIf;
+		TestTryCatchInIf2;
 		TestTryCatchInWhile;
 		TestTryCatchInWhile2;
 		TestTryCatchInWhile3;
