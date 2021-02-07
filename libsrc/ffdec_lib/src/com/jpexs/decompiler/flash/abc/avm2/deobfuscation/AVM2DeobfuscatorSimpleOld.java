@@ -59,6 +59,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewArrayIns
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewObjectIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfFalseIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfTrueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
@@ -98,8 +100,11 @@ import com.jpexs.decompiler.graph.NotCompileTimeItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.DuplicateItem;
 import com.jpexs.decompiler.graph.model.FalseItem;
+import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
+import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -182,12 +187,14 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
             localData.localRegs.clear();
             initLocalRegs(localData, localReservedCount, body.max_regs);
 
-            executeInstructions(importantOffsets, staticRegs, body, abc, code, localData, i, code.code.size() - 1, null, inlineIns, jumpTargets);
+            if (executeInstructions(importantOffsets, staticRegs, body, abc, code, localData, i, code.code.size() - 1, null, inlineIns, jumpTargets)) {
+                //startover because dead code was removed and current ip is thus invalid
+                i = -1;
+            }
         }
 
         return false;
     }
-
 
     protected AVM2LocalData newLocalData(int scriptIndex, ABC abc, AVM2ConstantPool cpool, MethodBody body, boolean isStatic, int classIndex) {
         AVM2LocalData localData = new AVM2LocalData();
@@ -214,12 +221,13 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
         }
     }
 
-    private void executeInstructions(Set<Long> importantOffsets, Map<Integer, GraphTargetItem> staticRegs, MethodBody body, ABC abc, AVM2Code code, AVM2LocalData localData, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns, List<Integer> jumpTargets) throws InterruptedException {
+    private boolean executeInstructions(Set<Long> importantOffsets, Map<Integer, GraphTargetItem> staticRegs, MethodBody body, ABC abc, AVM2Code code, AVM2LocalData localData, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns, List<Integer> jumpTargets) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
 
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
         int instructionsProcessed = 0;
 
+        endIdx = code.code.size() - 1;
         while (true) {
             if (idx > endIdx) {
                 break;
@@ -245,7 +253,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                 // do not throw EmptyStackException, much faster
                 int requiredStackSize = ins.getStackPopCount(localData);
                 if (stack.size() < requiredStackSize) {
-                    return;
+                    return false;
                 }
 
                 //Do not duplicate, whole tree, simplify first.  (Simplify always?)
@@ -297,13 +305,13 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                 int regId = ((GetLocalTypeIns) def).getRegisterId(ins);
                 if (staticRegs.containsKey(regId)) {
                     if (stack.isEmpty()) {
-                        return;
+                        return false;
                     }
 
                     stack.pop();
                     AVM2Instruction pushins = makePush(abc.constants, staticRegs.get(regId));
                     if (pushins == null) {
-                        return;
+                        return false;
                     }
 
                     code.replaceInstruction(idx, pushins, body);
@@ -393,7 +401,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                 int regId = ((GetLocalTypeIns) def).getRegisterId(ins);
                 if (staticRegs.containsKey(regId)) {
                     if (stack.isEmpty()) {
-                        return;
+                        return false;
                     }
 
                     stack.pop();
@@ -414,22 +422,20 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                 }
             } else if (def instanceof IfTypeIns) {
 
-                /*
-                TODOO: handle this
                 long ifAddress = code.pos2adr(idx);
                 if (importantOffsets.contains(ifAddress)) {
                     //There is jump directly to ifTypeIns like in &&, || operator
-                    return;
-                }*/
+                    return false;
+                }
                 if (stack.isEmpty()) {
-                    return;
+                    return false;
                 }
 
                 GraphTargetItem top = stack.pop();
                 Boolean res = top.getResultAsBoolean();
                 long address = ins.getTargetAddress();
                 int nidx = code.adr2pos(address);//code.indexOf(code.getByAddress(address));
-                AVM2Instruction tarIns = code.code.get(nidx);
+                AVM2Instruction tarIns = code.code.get(nidx);                
 
                 //Some IfType instructions need more than 1 operand, we must pop out all of them
                 int stackCount = -def.getStackDelta(ins, abc);
@@ -454,9 +460,17 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                     idx++;
                 }
 
+                //this might be slow:-(, but makes importantOffsets relevant
+                code.removeDeadCode(body);
+                removeZeroJumps(code, body);
+
                 importantOffsets.clear();
                 importantOffsets.addAll(code.getImportantOffsets(body, false));
-                ifed = true;
+
+                return true;
+                //endIdx = code.code.size()-1;
+
+                //ifed = true;
                 //break;
             } else {
                 idx++;
@@ -475,6 +489,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                 //break;
             }
         }
+        return false;
     }
 
     @Override
