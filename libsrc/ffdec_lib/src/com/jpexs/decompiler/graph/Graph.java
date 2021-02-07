@@ -2062,20 +2062,22 @@ public class Graph {
                                 GraphTargetItem prevExpr = stack.pop();
                                 GraphTargetItem leftSide = expr.getNotCoercedNoDup();
 
+                                boolean hideEmptyTrueFalse = true;
+                                
                                 if (leftSide instanceof DuplicateItem) {
                                     isIf = false;
-                                    if (prevExpr.getNotCoercedNoDup() instanceof FalseItem) {
+                                    if (hideEmptyTrueFalse && prevExpr.getNotCoercedNoDup() instanceof FalseItem) {
                                         stack.push(rightSide);
-                                    } else if (rightSide.getNotCoercedNoDup() instanceof FalseItem) {
+                                    } else if (hideEmptyTrueFalse && rightSide.getNotCoercedNoDup() instanceof FalseItem) {
                                         stack.push(prevExpr);
                                     } else {
                                         stack.push(new OrItem(null, localData.lineStartInstruction, prevExpr, rightSide));
                                     }
                                 } else if (leftSide.invert(null).getNotCoercedNoDup() instanceof DuplicateItem) {
                                     isIf = false;
-                                    if (prevExpr.getNotCoercedNoDup() instanceof TrueItem) {
+                                    if (hideEmptyTrueFalse && prevExpr.getNotCoercedNoDup() instanceof TrueItem) {
                                         stack.push(rightSide);
-                                    } else if (rightSide.getNotCoercedNoDup() instanceof TrueItem) {
+                                    } else if (hideEmptyTrueFalse && rightSide.getNotCoercedNoDup() instanceof TrueItem) {
                                         stack.push(prevExpr);
                                     } else {
                                         stack.push(new AndItem(null, localData.lineStartInstruction, prevExpr, rightSide));
@@ -2084,18 +2086,18 @@ public class Graph {
                                     isIf = false;
                                     leftSide = leftSide.invert(null);
 
-                                    if (leftSide.getNotCoercedNoDup() instanceof TrueItem) {
+                                    if (hideEmptyTrueFalse && leftSide.getNotCoercedNoDup() instanceof TrueItem) {
                                         stack.push(rightSide);
-                                    } else if (rightSide.getNotCoercedNoDup() instanceof TrueItem) {
+                                    } else if (hideEmptyTrueFalse && rightSide.getNotCoercedNoDup() instanceof TrueItem) {
                                         stack.push(leftSide);
                                     } else {
                                         stack.push(new AndItem(null, localData.lineStartInstruction, leftSide, rightSide));
                                     }
                                 } else if (prevExpr instanceof TrueItem) {
                                     isIf = false;
-                                    if (leftSide.getNotCoercedNoDup() instanceof FalseItem) {
+                                    if (hideEmptyTrueFalse && leftSide.getNotCoercedNoDup() instanceof FalseItem) {
                                         stack.push(rightSide);
-                                    } else if (rightSide.getNotCoercedNoDup() instanceof FalseItem) {
+                                    } else if (hideEmptyTrueFalse && rightSide.getNotCoercedNoDup() instanceof FalseItem) {
                                         stack.push(leftSide);
                                     } else {
                                         stack.push(new OrItem(null, localData.lineStartInstruction, leftSide, rightSide));
