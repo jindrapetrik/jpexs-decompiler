@@ -279,6 +279,28 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testDoWhile4() {
+        decompileMethod("classic_air", "testDoWhile4", "var k:int = 8;\r\n"
+                + "do\r\n"
+                + "{\r\n"
+                + "if(k == 9)\r\n"
+                + "{\r\n"
+                + "trace(\"h\");\r\n"
+                + "if(k == 9)\r\n"
+                + "{\r\n"
+                + "trace(\"f\");\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "trace(\"b\");\r\n"
+                + "}\r\n"
+                + "trace(\"gg\");\r\n"
+                + "}\r\n"
+                + "while(k < 10);\r\n"
+                + "trace(\"ss\");\r\n",
+                false);
+    }
+
+    @Test
     public void testDotParent() {
         decompileMethod("classic_air", "testDotParent", "var d:* = new TestClass1();\r\n"
                 + "var k:* = null;\r\n"

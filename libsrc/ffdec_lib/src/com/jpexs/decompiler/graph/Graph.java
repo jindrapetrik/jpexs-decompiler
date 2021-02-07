@@ -1013,6 +1013,9 @@ public class Graph {
         }
 
         for (Loop l : loops) {
+            if (l.phase == 2) {
+                continue;
+            }
             if (l.loopContinue == part) {
                 return (new ContinueItem(null, firstIns, l.id));
             }
@@ -1419,12 +1422,22 @@ public class Graph {
                 found = null;
 
                 loopcand:
-                for (GraphPart cand : currentLoop.breakCandidates) {
-                    for (GraphPart cand2 : currentLoop.breakCandidates) {
+                for (int c1 = 0; c1 < currentLoop.breakCandidates.size(); c1++) {
+                    GraphPart cand = currentLoop.breakCandidates.get(c1);
+                    for (int c2 = 0; c2 < currentLoop.breakCandidates.size(); c2++) {
+                        GraphPart cand2 = currentLoop.breakCandidates.get(c2);
                         if (cand == cand2) {
                             continue;
                         }
                         if (cand.leadsTo(localData, this, code, cand2, loops, throwStates, true)) {
+
+                            int curLevl = currentLoop.breakCandidatesLevels.get(c1);
+                            int curLev2 = currentLoop.breakCandidatesLevels.get(c2);
+                            /*
+                            found = cand;
+                            int lev2 = currentLoop.breakCandidatesLevels.get(c2);
+                            currentLoop.breakCandidates.set(c1, cand2);
+                            currentLoop.breakCandidatesLevels.set(c1, lev2);*/
                             int lev1 = Integer.MAX_VALUE;
                             int lev2 = Integer.MAX_VALUE;
                             for (int i = 0; i < currentLoop.breakCandidates.size(); i++) {
@@ -1440,11 +1453,21 @@ public class Graph {
                                 }
                             }
                             //
+                            GraphPart other;
+                            int curLev;
                             if (lev1 <= lev2) {
                                 found = cand2;
+                                other = cand;
+                                curLev = curLevl;
                             } else {
                                 found = cand;
+                                other = cand2;
+                                curLev = curLev2;
                             }
+
+                            currentLoop.breakCandidates.add(other);
+                            currentLoop.breakCandidatesLevels.add(curLev);
+                            
                             break loopcand;
                         }
                     }
@@ -2743,8 +2766,6 @@ public class Graph {
         List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
         GraphPart next = breakPart;
 
-        GraphTargetItem ti = checkLoop(new ArrayList<>() /*??*/, next, stopPart, loops, throwStates);
-
         //create switch as new loop break command detection to work
         Loop currentLoop = new Loop(loops.size(), null, next);
         currentLoop.phase = 1;
@@ -2848,8 +2869,11 @@ public class Graph {
             }
         }
         nextRef.setVal(next);
-        tiRef.setVal(ti);
+
         currentLoop.phase = 2;
+        GraphTargetItem ti = checkLoop(new ArrayList<>() /*??*/, next, stopPart, loops, throwStates);
+        tiRef.setVal(ti);
+
         return new SwitchItem(null, switchStartItem, currentLoop, switchedObject, caseValuesMap, caseCommands, valuesMapping);
 
     }

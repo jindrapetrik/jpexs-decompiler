@@ -277,6 +277,28 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testDoWhile4() {
+        decompileMethod("classic", "testDoWhile4", "var k:int = 8;\r\n"
+                + "do\r\n"
+                + "{\r\n"
+                + "if(k == 9)\r\n"
+                + "{\r\n"
+                + "trace(\"h\");\r\n"
+                + "if(k == 9)\r\n"
+                + "{\r\n"
+                + "trace(\"f\");\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "trace(\"b\");\r\n"
+                + "}\r\n"
+                + "trace(\"gg\");\r\n"
+                + "}\r\n"
+                + "while(k < 10);\r\n"
+                + "trace(\"ss\");\r\n",
+                false);
+    }
+
+    @Test
     public void testDotParent() {
         decompileMethod("classic", "testDotParent", "var d:* = undefined;\r\n"
                 + "var k:* = undefined;\r\n"
@@ -1351,23 +1373,19 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     @Test
     public void testWhileBreak() {
         decompileMethod("classic", "testWhileBreak", "var a:int = 0;\r\n"
-                + "while(true)\r\n"
-                + "{\r\n"
-                + "if(a < 10)\r\n"
+                + "while(a < 10)\r\n"
                 + "{\r\n"
                 + "if(a > 1 && a > 2 && a > 3 && a > 4 && a > 5)\r\n"
                 + "{\r\n"
-                + "break;\r\n"
+                + "return \"A\";\r\n"
                 + "}\r\n"
                 + "trace(\"middle\");\r\n"
-                + "if(a != 5)\r\n"
+                + "if(a == 5)\r\n"
                 + "{\r\n"
-                + "continue;\r\n"
+                + "break;\r\n"
                 + "}\r\n"
                 + "}\r\n"
-                + "return \"B\";\r\n"
-                + "}\r\n"
-                + "return \"A\";\r\n",
+                + "return \"B\";\r\n",
                 false);
     }
 
