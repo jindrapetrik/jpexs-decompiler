@@ -169,7 +169,6 @@ public class AVM2Graph extends Graph {
         return true;
     }
 
-
     @Override
     protected void beforeGetLoops(BaseLocalData localData, String path, Set<GraphPart> allParts, List<ThrowState> throwStates) throws InterruptedException {
         AVM2LocalData avm2LocalData = ((AVM2LocalData) localData);
@@ -308,34 +307,35 @@ public class AVM2Graph extends Graph {
                     }
                 }
 
-                int finEndIp = avm2code.adr2pos(ex.end, true);
-                GraphPart finallyEndPart = searchPart(finEndIp, allParts);
-                List<GraphPart> refs = getRealRefs(finallyEndPart);
+                int finEndIp = avm2code.adr2pos(ex.end, true) - 1;
+                GraphPart prevFinallyEndPart = searchPart(finEndIp, allParts);
 
-                if (refs.size() == 1) {
-                    GraphPart prev = refs.get(0);
-                    if (prev.getHeight() == 1) {
-                        if (avm2code.code.get(prev.start).definition instanceof PushByteIns) {
-                            defaultPushByte = avm2code.code.get(prev.start).operands[0];
-                        }
+                for (int j = prevFinallyEndPart.start; j <= prevFinallyEndPart.end; j++) {
+                    AVM2Instruction ins = avm2code.code.get(j);
+                    if (ins.definition instanceof NopIns) {
+
+                    } else if (ins.definition instanceof PushByteIns) {
+                        defaultPushByte = ins.operands[0];
+                    } else if (ins.definition instanceof JumpIns) {
+                    } else {
+                        defaultPushByte = null;
+                        break;
                     }
                 }
-                if (defaultPushByte == null) {
-                    if (getRealRefs(finallyEndPart).size() == 0) {
-                        if (avm2code.code.get(finallyEndPart.start - 1).definition instanceof JumpIns) {
-                            GraphPart prevPart = searchPart(finallyEndPart.start - 1, allParts);
-                            finallyEndPart = prevPart.nextParts.get(0);
-                            if (finallyEndPart.nextParts.size() == 1 && finallyEndPart.nextParts.get(0).refs.size() > 1) {
-                                for (int j = finallyEndPart.start; j <= finallyEndPart.end; j++) {
-                                    AVM2Instruction ins = avm2code.code.get(j);
-                                    if (ins.definition instanceof NopIns) {
 
-                                    } else if (ins.definition instanceof PushByteIns) {
-                                        defaultPushByte = ins.operands[0];
-                                        break;
-                                    } else {
-                                        break;
-                                    }
+                if (defaultPushByte == null) {
+                    if (avm2code.code.get(prevFinallyEndPart.end).definition instanceof JumpIns) {
+                        prevFinallyEndPart = prevFinallyEndPart.nextParts.get(0);
+                        if (prevFinallyEndPart.nextParts.size() == 1 && prevFinallyEndPart.nextParts.get(0).refs.size() > 1) {
+                            for (int j = prevFinallyEndPart.start; j <= prevFinallyEndPart.end; j++) {
+                                AVM2Instruction ins = avm2code.code.get(j);
+                                if (ins.definition instanceof NopIns) {
+
+                                } else if (ins.definition instanceof PushByteIns) {
+                                    defaultPushByte = ins.operands[0];
+                                    break;
+                                } else {
+                                    break;
                                 }
                             }
                         }
@@ -826,9 +826,6 @@ public class AVM2Graph extends Graph {
             }
         }
 
-        //GraphPart endPart = searchPart(endIp, allParts);
-        //finallyIndex.setVal(-1);
-
         Collections.sort(finnalysIndicesToBe, new Comparator<Integer>() {
             @Override
             public int compare(Integer o1, Integer o2) {
@@ -856,11 +853,22 @@ public class AVM2Graph extends Graph {
                 break;
             }
             if (outSideExceptionNonEmptyPart.nextParts.size() == 1 && outSideExceptionNonEmptyPart.nextParts.get(0) == outSideFinallyPart) {
-                if (outSideExceptionNonEmptyPart.getHeight() == 1) {
-                    if (avm2code.code.get(outSideExceptionNonEmptyPart.start).definition instanceof PushByteIns) {
-                        finallyIndex.setVal(e);
-                        break;
+                boolean hashPushByteOnly = true;
+                for (int ip = outSideExceptionNonEmptyPart.start; ip <= outSideExceptionNonEmptyPart.end; ip++) {
+                    AVM2Instruction ins = avm2code.code.get(outSideExceptionNonEmptyPart.start);
+                    if (ins.definition instanceof PushByteIns) {
+                        
+                    } else if (ins.definition instanceof JumpIns) {
+
+                    } else if (ins.definition instanceof NopIns) {
+
+                    } else {
+                        hashPushByteOnly = false;
                     }
+                }
+                if (hashPushByteOnly) {
+                    finallyIndex.setVal(e);
+                    break;
                 }
             }
         }
@@ -896,6 +904,7 @@ public class AVM2Graph extends Graph {
 
         if (finallyException != null) {
             catchedExceptions.add(finallyException);
+            catchedExceptionIds.add(finallyIndex);
         }
 
         int switchedReg = -1;
@@ -918,6 +927,7 @@ public class AVM2Graph extends Graph {
             parsedExceptionIds.addAll(catchedExceptionIds);
             if (finallyException != null) {
                 catchedExceptions.remove(finallyException);
+                catchedExceptionIds.remove((Integer) finallyIndex);
             }
             if (finallyIndex > -1) {
                 parsedExceptionIds.add(finallyIndex);
@@ -1163,6 +1173,70 @@ public class AVM2Graph extends Graph {
             }
 
             currentRet.add(tryItem);
+            /*processIfs(tryItem.tryCommands);
+            processIfs(tryItem.finallyCommands);
+            for (List<GraphTargetItem> cc : tryItem.catchCommands) {
+                processIfs(cc);
+            }
+
+
+            
+
+            List<List<GraphTargetItem>> blocksToCheck = new ArrayList<>();
+            blocksToCheck.add(tryItem.tryCommands);
+            blocksToCheck.addAll(tryItem.catchCommands);
+
+            boolean allCntBreExit = true;
+            for (List<GraphTargetItem> block : blocksToCheck) {
+                if (block.isEmpty()) {
+                    allCntBreExit = false;
+                    break;
+                }
+                GraphTargetItem last = block.get(block.size() - 1);
+                if (!(last instanceof ExitItem)
+                        && !(last instanceof ContinueItem)
+                        && !(last instanceof BreakItem)
+                        && !(last instanceof GotoItem)) {
+                    allCntBreExit = false;
+                    break;
+                }
+            }
+
+            if (allCntBreExit) {
+                Map<Long, Integer> loopIdToCntCount = new HashMap<>();
+
+                ContinueItem maxCountCnt = null;
+                int maxCount = 0;
+
+                for (List<GraphTargetItem> block : blocksToCheck) {
+                    GraphTargetItem last = block.get(block.size() - 1);
+                    if (last instanceof ContinueItem) {
+                        ContinueItem cnt = (ContinueItem) last;
+                        if (!loopIdToCntCount.containsKey(cnt.loopId)) {
+                            loopIdToCntCount.put(cnt.loopId, 0);
+                        }
+                        int newCount = loopIdToCntCount.get(cnt.loopId) + 1;
+                        if (newCount > maxCount) {
+                            maxCount = newCount;
+                            maxCountCnt = cnt;
+                        }
+                        loopIdToCntCount.put(cnt.loopId, newCount);
+                    }
+                }
+
+                if (maxCountCnt != null) {
+                    for (List<GraphTargetItem> block : blocksToCheck) {
+                        GraphTargetItem last = block.get(block.size() - 1);
+                        if (last instanceof ContinueItem) {
+                            ContinueItem cnt = (ContinueItem) last;
+                            if (cnt.loopId == maxCountCnt.loopId) {
+                                block.remove(block.size() - 1);
+                            }
+                        }
+                    }
+                    currentRet.add(maxCountCnt);
+                }
+            }*/
 
             if (afterPart != null) {
 
