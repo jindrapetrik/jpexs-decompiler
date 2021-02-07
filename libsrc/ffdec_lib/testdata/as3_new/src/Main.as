@@ -86,6 +86,7 @@ package
 		TestVector;
 		TestVector2;		
 		TestWhileAnd;
+		TestWhileBreak;
 		TestWhileContinue;
 		TestWhileTry;
 		TestWhileTry2;		

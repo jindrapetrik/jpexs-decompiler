@@ -282,6 +282,29 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
     }
 
     @Test(dataProvider = "swfNamesProvider")
+    public void testTryCatchTry(String swfUsed) {
+        decompileMethod(swfUsed, "testTryCatchTry", "trace(\"before try\");\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch\");\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in catch try\");\r\n"
+                + "}\r\n"
+                + "catch(e2:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch in catch\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
+
+    @Test(dataProvider = "swfNamesProvider")
     public void testTryFinally(String swfUsed) {
         decompileMethod(swfUsed, "testTryFinally", "trace(\"before try\");\r\n"
                 + "try\r\n"
