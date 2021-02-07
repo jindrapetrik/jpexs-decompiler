@@ -321,6 +321,29 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
     }
 
     @Test
+    public void testTryCatchTry() {
+        decompileMethod("swftools", "testTryCatchTry", "trace(\"before try\");\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch\");\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in catch try\");\r\n"
+                + "}\r\n"
+                + "catch(e2:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch in catch\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
+
+    @Test
     public void testTryFinally() {
         decompileMethod("swftools", "testTryFinally", "trace(\"before try\");\r\n"
                 + "try\r\n"
