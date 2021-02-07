@@ -414,11 +414,13 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                 }
             } else if (def instanceof IfTypeIns) {
 
+                /*
+                TODOO: handle this
                 long ifAddress = code.pos2adr(idx);
                 if (importantOffsets.contains(ifAddress)) {
                     //There is jump directly to ifTypeIns like in &&, || operator
                     return;
-                }
+                }*/
                 if (stack.isEmpty()) {
                     return;
                 }
