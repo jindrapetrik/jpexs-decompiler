@@ -171,7 +171,6 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "{\r\n"
                 + "trace(\"in catch\");\r\n"
                 + "a++;\r\n"
-                + "continue;\r\n"
                 + "}\r\n"
                 + "}\r\n"
                 + "return \"OK\";\r\n",
@@ -198,7 +197,6 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "{\r\n"
                 + "trace(\"in catch2\");\r\n"
                 + "trace(\"a=\" + a);\r\n"
-                + "continue;\r\n"
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",

@@ -1173,7 +1173,9 @@ public class AVM2Graph extends Graph {
             }
 
             currentRet.add(tryItem);
-            /*processIfs(tryItem.tryCommands);
+
+            //----- Merge continues from catches/try BEGIN
+            processIfs(tryItem.tryCommands);
             processIfs(tryItem.finallyCommands);
             for (List<GraphTargetItem> cc : tryItem.catchCommands) {
                 processIfs(cc);
@@ -1236,7 +1238,8 @@ public class AVM2Graph extends Graph {
                     }
                     currentRet.add(maxCountCnt);
                 }
-            }*/
+            }
+            //----- Merge continues from catches/try END
 
             if (afterPart != null) {
 

@@ -162,7 +162,6 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "{\r\n"
                 + "trace(\"in catch\");\r\n"
                 + "_loc1_++;\r\n"
-                + "continue;\r\n"
                 + "}\r\n"
                 + "}\r\n"
                 + "return \"OK\";\r\n",
@@ -189,7 +188,6 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "{\r\n"
                 + "trace(\"in catch2\");\r\n"
                 + "trace(\"a=\" + _loc1_);\r\n"
-                + "continue;\r\n"
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
@@ -264,7 +262,6 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "{\r\n"
                 + "trace(\"in catch\");\r\n"
                 + "trace(\"a=\" + _loc1_);\r\n"
-                + "continue;\r\n"
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
