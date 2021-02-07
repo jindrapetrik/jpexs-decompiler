@@ -61,12 +61,6 @@ public class GraphPrecontinueDetector {
         for (GraphPart part : allParts) {
             Node node = partToNode.get(part);
             for (GraphPart prev : part.refs) {
-                /*if (prev.start < 0 && !partToNode.containsKey(prev)) {
-                    Node minusNode = new Node();
-                    minusNode.graphPart = prev;
-                    partToNode.put(prev, node);
-                    continue;
-                }*/
                 if (prev.start < 0) {
                     continue;
                 }

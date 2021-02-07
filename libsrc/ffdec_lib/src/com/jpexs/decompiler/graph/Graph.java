@@ -2388,7 +2388,7 @@ public class Graph {
         List<Integer> alternateEntries = new ArrayList<>();
         for (GraphException ex : exceptions) {
             alternateEntries.add(ex.start);
-            alternateEntries.add(ex.end);
+            //alternateEntries.add(ex.end);
             alternateEntries.add(ex.target);
         }
         HashMap<Integer, List<Integer>> refs = code.visitCode(alternateEntries);
