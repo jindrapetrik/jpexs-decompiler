@@ -214,4 +214,33 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "   }\n"
                 + "}");
     }
+
+    @Test
+    public void testThisOutsideClass() {
+        decompileScriptPack("tests_classes.TestThisOutsideClass", "package tests_classes\n"
+                + "{\n"
+                + "   public class TestThisOutsideClass\n"
+                + "   {\n"
+                + "       \n"
+                + "      \n"
+                + "      public var attrib:int = 0;\n"
+                + "      \n"
+                + "      public function TestThisOutsideClass()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function run() : void\n"
+                + "      {\n"
+                + "         helperFunc.call(this,\"hello\");\n"
+                + "      }\n"
+                + "   }\n"
+                + "}\n"
+                + "\n"
+                + "function helperFunc(a:String):void\n"
+                + "{\n"
+                + "   trace(a);\n"
+                + "   this.attrib++;\n"
+                + "}");
+    }
 }
