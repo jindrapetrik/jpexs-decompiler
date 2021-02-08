@@ -1,0 +1,118 @@
+class
+ refid "tests:TestDeobfuscatorJumpsExceptionStart"
+ instance QName(PackageNamespace("tests"), "TestDeobfuscatorJumpsExceptionStart")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestDeobfuscatorJumpsExceptionStart")
+  iinit
+   refid "tests:TestDeobfuscatorJumpsExceptionStart/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestDeobfuscatorJumpsExceptionStart/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5     
+         
+         code
+            getlocal0
+            pushscope
+   ofs0004:
+            jump ofs0011
+   ofs0008:
+            label
+            findpropstrict QName(PackageNamespace(""),"trace")
+            pushstring "loop1"
+            callproperty QName(PackageNamespace(""),"trace"), 1
+            pop
+   ofs0011:
+            getlocal0
+            callproperty QName(PackageNamespace(""),"rnd"), 0
+            iftrue ofs0008
+   ofs0019:
+            jump ofs002b
+   ofs001d:
+            getlocal0
+            pushscope
+            newcatch 0
+            dup
+            setlocal1
+            dup
+            pushscope
+            swap
+            setslot 1
+            popscope
+            kill 1
+   ofs002b:
+            jump ofs0038
+   ofs002f:
+            label
+            findpropstrict QName(PackageNamespace(""),"trace")
+            pushstring "loop2"
+            callproperty QName(PackageNamespace(""),"trace"), 1
+            pop
+   ofs0038:
+            getlocal0
+            callproperty QName(PackageNamespace(""),"rnd"), 0
+            iftrue ofs002f
+   ofs0040:
+            jump ofs0052
+   ofs0044:
+            getlocal0
+            pushscope
+            newcatch 1
+            dup
+            setlocal1
+            dup
+            pushscope
+            swap
+            setslot 1
+            popscope
+            kill 1
+   ofs0052:
+            pushbyte 5
+            returnvalue
+     end ; code
+     
+     try from ofs0004 to ofs0019 target ofs001d type QName(PackageNamespace(""),"Error") name QName(PackageNamespace(""),"e") end
+     try from ofs002b to ofs0040 target ofs0044 type QName(PackageNamespace(""),"Error") name QName(PackageNamespace(""),"e") end
+     
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestDeobfuscatorJumpsExceptionStart/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

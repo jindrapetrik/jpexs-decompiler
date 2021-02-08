@@ -90,6 +90,9 @@ public abstract class ActionScript3DecompileTestBase extends ActionScriptTestBas
         try {
             List<Traits> ts = new ArrayList<>();
             ts.add(abc.instance_info.get(clsIndex).instance_traits);
+            
+            Configuration.autoDeobfuscate.set(methodName.toLowerCase().contains("obfus"));                            
+            
             abc.bodies.get(bodyIndex).convert(new ConvertData(), "run", ScriptExportMode.AS, isStatic, abc.bodies.get(bodyIndex).method_info, scriptIndex, clsIndex, abc, null, new ScopeStack(scriptIndex), 0, new NulWriter(), new ArrayList<>(), ts, true);
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
             abc.bodies.get(bodyIndex).toString("run", ScriptExportMode.AS, abc, null, writer, new ArrayList<>());
@@ -97,6 +100,7 @@ public abstract class ActionScript3DecompileTestBase extends ActionScriptTestBas
             fail();
             return;
         }
+        Configuration.autoDeobfuscate.set(false);
         String actualResult = cleanPCode(writer.toString());
         expectedResult = cleanPCode(expectedResult);
         assertEquals(actualResult, expectedResult);

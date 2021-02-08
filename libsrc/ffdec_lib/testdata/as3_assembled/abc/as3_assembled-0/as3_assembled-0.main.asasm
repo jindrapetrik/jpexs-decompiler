@@ -20,5 +20,6 @@ program
  #include "tests/TestTryDoWhile.script.asasm"
  #include "tests/TestTryDoWhile2.script.asasm"
  #include "tests/TestSwitchJoin.script.asasm"
+ #include "tests/TestDeobfuscatorJumpsExceptionStart.script.asasm"
  ; place to add next
 end ; program
