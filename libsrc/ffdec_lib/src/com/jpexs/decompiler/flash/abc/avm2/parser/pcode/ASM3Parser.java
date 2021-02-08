@@ -838,7 +838,7 @@ public class ASM3Parser {
                 break;
             }
             if (symb.type == ParsedSymbol.TYPE_COMMENT) {
-                if (lastIns != null) {
+                if (lastIns != null && blockStack.contains(ParsedSymbol.TYPE_KEYWORD_CODE)) {
                     lastIns.comment = (String) symb.value;
                 }
                 continue;
