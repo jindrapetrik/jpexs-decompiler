@@ -28,7 +28,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "trace(\"in catch\");\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -44,7 +44,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "trace(\"catched exception: \" + _loc1_.message);\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "trace(\"in catch\");\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -82,7 +82,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "}\r\n"
                 + "return 2;\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -112,7 +112,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -137,7 +137,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "continue;\r\n"
                 + "}\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -174,7 +174,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "_loc1_++;\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -195,7 +195,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "}\r\n"
                 + "return \"OK\";\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -221,7 +221,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -247,7 +247,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "_loc1_++;\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -276,7 +276,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "_loc1_++;\r\n"
                 + "}\r\n"
                 + "trace(\"end\");\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -299,7 +299,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "trace(\"in catch\");\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -321,7 +321,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -347,7 +347,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -370,7 +370,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -394,7 +394,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "trace(\"in finally\");\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -416,7 +416,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "return \"hu\" + _loc1_;\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -452,7 +452,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "trace(\"after\");\r\n"
                 + "_loc1_++;\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -482,7 +482,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "trace(\"after\");\r\n"
                 + "_loc1_++;\r\n"
                 + "}\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -510,7 +510,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "trace(\"in finally\");\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -527,7 +527,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "trace(\"in finally\");\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -565,7 +565,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "trace(\"in finally\");\r\n"
                 + "trace(\"after\");\r\n"
                 + "return \"RETFINAL\";\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -600,7 +600,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "trace(\"after\");\r\n"
                 + "return \"RETEXIT\";\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -641,7 +641,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "trace(\"in finally1\");\r\n"
                 + "return \"RETFINAL\";\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -708,7 +708,7 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "trace(\"in finally0\");\r\n"
                 + "trace(\"after0\");\r\n"
                 + "return \"RETFINAL\";\r\n",
-                 false);
+                false);
     }
 
     @Test
@@ -739,6 +739,6 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
                 + "}\r\n"
                 + "trace(\"in finally\");\r\n"
                 + "trace(\"after\");\r\n",
-                 false);
+                false);
     }
 }
