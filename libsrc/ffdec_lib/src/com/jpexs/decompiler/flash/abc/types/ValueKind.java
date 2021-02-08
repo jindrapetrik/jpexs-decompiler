@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
@@ -196,7 +197,7 @@ public class ValueKind {
                 ret = "Null()";
                 break;
             case CONSTANT_Undefined:
-                ret = "Undefined()";
+                ret = "Void()";
                 break;
             case CONSTANT_Namespace:
             case CONSTANT_PackageInternalNs:

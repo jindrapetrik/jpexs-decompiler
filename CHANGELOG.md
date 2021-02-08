@@ -47,6 +47,7 @@ All notable changes to this project will be documented in this file.
 - lookupswitch caseoffsets in brackets
 - get/setlocal_x renamed to get/setlocalx
 - QName casing changed from Qname
+- Void keyword instead of Undefined for optional parameters and slot/const values
 
 ### Removed
 - Code structure detection in Graphviz graphs as it was usually wrong

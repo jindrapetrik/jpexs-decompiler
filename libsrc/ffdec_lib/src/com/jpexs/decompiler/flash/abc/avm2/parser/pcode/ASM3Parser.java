@@ -557,7 +557,7 @@ public class ASM3Parser {
                     lexer.pushback(temp);
                 }
                 break;
-            case ParsedSymbol.TYPE_KEYWORD_UNDEFINED:
+            case ParsedSymbol.TYPE_KEYWORD_VOID:
                 value_kind = ValueKind.CONSTANT_Undefined;
                 temp = lexer.lex();
                 if (temp.type == ParsedSymbol.TYPE_PARENT_OPEN) {
