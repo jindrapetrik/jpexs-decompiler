@@ -130,10 +130,8 @@ The application was made in Czech republic.
 * **Rtsjx** - chinese translation
 
 ## Contact
-Note that the decompiler is ABANDONED. We do not provide support of any kind.
-You might look for some answers to the old issues in our issue tracker on
+You can use our Issue tracker to report bugs, but our support is very limited.
 [https://www.free-decompiler.com/flash/issues](https://www.free-decompiler.com/flash/issues)
-But it's currently read only.
 
 See [Frequently Asked Questions (FAQ) in wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki/FAQ) before you try to contact me.
 
