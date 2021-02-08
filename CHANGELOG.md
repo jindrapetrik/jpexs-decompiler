@@ -37,6 +37,7 @@ All notable changes to this project will be documented in this file.
 - Merged continues in try..catch
 - AS3 method display in GUI when method name is null
 - #1195 this keyword in functions outside class
+- AS3 p-code parser adding ;trait comment to last instruction
 
 ### Changed
 - AS3 test methods separated to classes
