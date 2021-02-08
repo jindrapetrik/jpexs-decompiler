@@ -221,14 +221,6 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "if(r > 20)\r\n"
                 + "{\r\n"
                 + "trace(\"D\");\r\n"
-                + "}\r\n"
-                + "if(false)\r\n"
-                + "{\r\n"
-                + "trace(\"trash1\");\r\n"
-                + "}\r\n"
-                + "if(false)\r\n"
-                + "{\r\n"
-                + "trace(\"trash2\");\r\n"
                 + "}\r\n",
                  false);
     }
