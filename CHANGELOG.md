@@ -40,8 +40,9 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - AS3 test methods separated to classes
-- AS3 p-code more RAbcDasm like (WARNING: Breaks backward compatibility): 
+- AS3 p-code more RAbcDasm like (WARNING: Older versions cannot read new code!): 
 - parenthesis after True/False/Undefined/Null trait kinds
+- end after try
 - commas in parameters list 
 - lookupswitch caseoffsets in brackets
 - get/setlocal_x renamed to get/setlocalx
