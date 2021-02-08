@@ -427,6 +427,26 @@ public class AVM2Code implements Cloneable {
 
     }
 
+    private static final String[][] instructionAliasesArray = {
+        //first is original name, then aliases
+        {"getlocal0", "getlocal_0"},
+        {"getlocal1", "getlocal_1"},
+        {"getlocal2", "getlocal_2"},
+        {"getlocal3", "getlocal_3"},
+        {"setlocal0", "setlocal_0"},
+        {"setlocal1", "setlocal_1"},
+        {"setlocal2", "setlocal_2"},
+        {"setlocal3", "setlocal_3"},};
+    public static final Map<String, String> instructionAliases = new HashMap<>();
+
+    static {
+        for (String[] aliases : instructionAliasesArray) {
+            for (int s = 1; s < aliases.length; s++) {
+                instructionAliases.put(aliases[s], aliases[0]);
+            }
+        }
+    }
+
     public static final InstructionDefinition[] instructionSet = new InstructionDefinition[256];
 
     public static final InstructionDefinition[] allInstructionSet = new InstructionDefinition[]{
@@ -1262,30 +1282,6 @@ public class AVM2Code implements Cloneable {
             writer.appendNoHilight(body.max_scope_depth);
             writer.newLine();
 
-            for (int e = 0; e < body.exceptions.length; e++) {
-                ABCException exception = body.exceptions[e];
-                writer.appendNoHilight("try");
-
-                //Note: start and end address can be not on instruction boundary - call adr2pos( nearest=true) to make them legal
-                writer.appendNoHilight(" from ");
-                writer.appendNoHilight("ofs");
-                writer.appendNoHilight(Helper.formatAddress(pos2adr(adr2pos(exception.start, true))));
-
-                writer.appendNoHilight(" to ");
-                writer.appendNoHilight("ofs");
-                writer.appendNoHilight(Helper.formatAddress(pos2adr(adr2pos(exception.end, true))));
-
-                writer.appendNoHilight(" target ");
-                writer.appendNoHilight("ofs");
-                writer.appendNoHilight(Helper.formatAddress(exception.target));
-
-                writer.appendNoHilight(" type ");
-                writer.hilightSpecial(exception.type_index == 0 ? "null" : constants.getMultiname(exception.type_index).toString(constants, new ArrayList<>()), HighlightSpecialType.TRY_TYPE, e);
-
-                writer.appendNoHilight(" name ");
-                writer.hilightSpecial(exception.name_index == 0 ? "null" : constants.getMultiname(exception.name_index).toString(constants, new ArrayList<>()), HighlightSpecialType.TRY_NAME, e);
-                writer.newLine();
-            }
             for (Trait t : body.traits.traits) {
                 t.convertTraitHeader(abc, writer);
                 writer.unindent().appendNoHilight("end ; trait").newLine();
@@ -1344,6 +1340,32 @@ public class AVM2Code implements Cloneable {
         }
         writer.unindent().appendNoHilight("end ; code").newLine();
         if (body != null) {
+            for (int e = 0; e < body.exceptions.length; e++) {
+                ABCException exception = body.exceptions[e];
+                writer.appendNoHilight("try");
+
+                //Note: start and end address can be not on instruction boundary - call adr2pos( nearest=true) to make them legal
+                writer.appendNoHilight(" from ");
+                writer.appendNoHilight("ofs");
+                writer.appendNoHilight(Helper.formatAddress(pos2adr(adr2pos(exception.start, true))));
+
+                writer.appendNoHilight(" to ");
+                writer.appendNoHilight("ofs");
+                writer.appendNoHilight(Helper.formatAddress(pos2adr(adr2pos(exception.end, true))));
+
+                writer.appendNoHilight(" target ");
+                writer.appendNoHilight("ofs");
+                writer.appendNoHilight(Helper.formatAddress(exception.target));
+
+                writer.appendNoHilight(" type ");
+                writer.hilightSpecial(exception.type_index == 0 ? "null" : constants.getMultiname(exception.type_index).toString(constants, new ArrayList<>()), HighlightSpecialType.TRY_TYPE, e);
+
+                writer.appendNoHilight(" name ");
+                writer.hilightSpecial(exception.name_index == 0 ? "null" : constants.getMultiname(exception.name_index).toString(constants, new ArrayList<>()), HighlightSpecialType.TRY_NAME, e);
+
+                writer.appendNoHilight(" end");
+                writer.newLine();
+            }
             writer.unindent().appendNoHilight("end ; body").newLine();
         }
         if (info != null) {

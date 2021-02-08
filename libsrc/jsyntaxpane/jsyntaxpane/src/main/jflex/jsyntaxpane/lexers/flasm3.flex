@@ -138,6 +138,7 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
     "to"                         |
     "target"                     |
     "name"                       |
+    "end"                        |
     "type"                       {  return token(TokenType.KEYWORD);}
     /* multinames */
   "QName"                      |
