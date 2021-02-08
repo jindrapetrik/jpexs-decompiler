@@ -1,0 +1,78 @@
+class
+ refid "tests:TestUnnamedException"
+ instance QName(PackageNamespace("tests"), "TestUnnamedException")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestUnnamedException")
+  iinit
+   refid "tests:TestUnnamedException/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestUnnamedException/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+      
+            getlocal0
+            pushscope  
+            pushbyte 5
+            setlocal 5                   
+   ofs005a:
+            findpropstrict QName(PackageNamespace(""),"trace")
+            pushstring "hello"
+            callpropvoid QName(PackageNamespace(""),"trace"), 1           
+   ofs016a:
+            jump ofs0175
+   ofs016e:
+            getlocal0
+            pushscope
+            getlocal2
+            pushscope
+            coerce_a
+            setlocal 14
+   ofs0175:            
+            getlocal 5
+            returnvalue
+     end ; code
+     try from ofs005a to ofs016a target ofs016e type null name null end
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestUnnamedException/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

@@ -86,6 +86,8 @@ public class AVM2LocalData extends BaseLocalData {
     
     public Map<Integer, GraphPart> pushDefaultPart = new HashMap<>();
 
+    public Map<Integer, Integer> finallyKinds = new HashMap<>();
+    
     /**
      * exception index -> switch throw part
      */
@@ -162,6 +164,7 @@ public class AVM2LocalData extends BaseLocalData {
         parsedExceptionIds = localData.parsedExceptionIds;
         finallyTargetParts = localData.finallyTargetParts;
         pushDefaultPart = localData.pushDefaultPart;
+        finallyKinds = localData.finallyKinds;
     }
 
     public AVM2ConstantPool getConstants() {

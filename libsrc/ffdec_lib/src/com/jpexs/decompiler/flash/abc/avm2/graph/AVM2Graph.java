@@ -131,6 +131,11 @@ public class AVM2Graph extends Graph {
 
     private final Logger logger = Logger.getLogger(AVM2Graph.class.getName());
 
+    final int FINALLY_KIND_STACK_BASED = 0;
+    final int FINALLY_KIND_REGISTER_BASED = 1;
+    final int FINALLY_KIND_INLINED = 2;
+    final int FINALLY_KIND_UNKNOWN = -1;
+
     public AVM2Code getCode() {
         return avm2code;
     }
@@ -231,27 +236,20 @@ public class AVM2Graph extends Graph {
 
             List<GraphTargetItem> targetOutput = translatePart(localData2, finallyTryTargetPart, finallyTryTargetStack, 0 /*??*/, "try_target");
 
-            final int FINALLY_KIND_STACK_BASED = 0;
-            final int FINALLY_KIND_REGISTER_BASED = 1;
-            final int FINALLY_KIND_INLINED = 2;
-            final int FINALLY_KIND_UNKNOWN = -1;
 
             int switchedReg = -1;
             int finallyKind = FINALLY_KIND_UNKNOWN;
             Integer finallyThrowPushByte = null;
-            if (finallyTryTargetStack.size() == 1) {
+            if (finallyTryTargetStack.size() == 1 && finallyTryTargetStack.peek() instanceof IntegerValueAVM2Item) {
                 finallyKind = FINALLY_KIND_STACK_BASED;
-                if (finallyTryTargetStack.peek() instanceof IntegerValueAVM2Item) {
-                    finallyThrowPushByte = ((IntegerValueAVM2Item) finallyTryTargetStack.peek()).intValue();
-                }
+                finallyThrowPushByte = ((IntegerValueAVM2Item) finallyTryTargetStack.peek()).intValue();
             } else if (targetOutput.size() >= 2
                     && (targetOutput.get(targetOutput.size() - 1) instanceof SetLocalAVM2Item)
-                    && (targetOutput.get(targetOutput.size() - 2) instanceof SetLocalAVM2Item)) {
+                    && (targetOutput.get(targetOutput.size() - 2) instanceof SetLocalAVM2Item)
+                    && (((SetLocalAVM2Item) targetOutput.get(targetOutput.size() - 1)).value instanceof IntegerValueAVM2Item)) {
                 SetLocalAVM2Item setLocal = ((SetLocalAVM2Item) targetOutput.get(targetOutput.size() - 1));
                 switchedReg = setLocal.regIndex;
-                if (setLocal.value instanceof IntegerValueAVM2Item) {
-                    finallyThrowPushByte = ((IntegerValueAVM2Item) setLocal.value).intValue();
-                }
+                finallyThrowPushByte = ((IntegerValueAVM2Item) setLocal.value).intValue();
                 finallyKind = FINALLY_KIND_REGISTER_BASED;
             } else if (!targetOutput.isEmpty() && (targetOutput.get(targetOutput.size() - 1) instanceof ThrowAVM2Item)) {
                 //inlined to single part                    
@@ -260,6 +258,7 @@ public class AVM2Graph extends Graph {
             } else {
                 //probably inlined code in more parts, cannot do :-(                    
             }
+            localData.finallyKinds.put(e, finallyKind);
             Integer defaultPushByte = null;
             GraphPart switchPart = null;
             if (finallyKind == FINALLY_KIND_STACK_BASED) {
@@ -975,6 +974,7 @@ public class AVM2Graph extends Graph {
             }
 
             boolean inlinedFinally = false;
+            boolean finallyAsUnnamedException = false;
 
             List<GraphTargetItem> finallyTargetItems = new ArrayList<>();
 
@@ -1065,6 +1065,7 @@ public class AVM2Graph extends Graph {
                     if (!inlinedFinally) {
                         afterPart = null;
                     }
+                    finallyAsUnnamedException = localData.finallyKinds.get(finallyIndex) == FINALLY_KIND_UNKNOWN;
                 }
 
                 if (localData.pushDefaultPart.containsKey(finallyIndex)) {
@@ -1152,12 +1153,21 @@ public class AVM2Graph extends Graph {
                     && (((SetLocalAVM2Item) currentRet.get(currentRet.size() - 1)).regIndex == switchedReg)) {
                 currentRet.remove(currentRet.size() - 1);
             }
+            
+            
 
-            if (!inlinedFinally && catchedExceptions.isEmpty() && finallyCommands.isEmpty()) {
+            if (!finallyAsUnnamedException && !inlinedFinally && catchedExceptions.isEmpty() && finallyCommands.isEmpty()) {
                 currentRet.addAll(tryCommands);
                 return true;
             }
 
+            if (finallyAsUnnamedException)
+            {
+                catchedExceptions.add(finallyException);
+                catchCommands.add(finallyCommands);
+                finallyCommands = new ArrayList<>();
+            }
+            
             TryAVM2Item tryItem = new TryAVM2Item(tryCommands, catchedExceptions, catchCommands, finallyCommands, "");
             if (inlinedFinally) {
                 List<List<GraphTargetItem>> parentCatchCommands = new ArrayList<>();
