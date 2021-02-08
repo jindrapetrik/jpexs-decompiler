@@ -48,6 +48,7 @@ All notable changes to this project will be documented in this file.
 - get/setlocal_x renamed to get/setlocalx
 - QName casing changed from Qname
 - Void keyword instead of Undefined for optional parameters and slot/const values
+- Not displaying slot/const value when Void
 
 ### Removed
 - Code structure detection in Graphviz graphs as it was usually wrong
