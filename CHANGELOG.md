@@ -36,6 +36,7 @@ All notable changes to this project will be documented in this file.
 - AS3 deobfuscator on &&, || operators
 - Merged continues in try..catch
 - AS3 method display in GUI when method name is null
+- #1195 this keyword in functions outside class
 
 ### Changed
 - AS3 test methods separated to classes

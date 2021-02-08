@@ -6,6 +6,7 @@ package
 	import tests_classes.mypackage1.SetupMyPackage1;
 	import tests_classes.mypackage2.SetupMyPackage2;
 	import tests_classes.mypackage3.SetupMyPackage3;
+	import tests_classes.TestThisOutsideClass;
 	
 	/**
 	 * ...
@@ -79,6 +80,7 @@ package
 		TestSwitchComma;
 		TestSwitchDefault;
 		TestTernarOperator;
+		TestThisOutsideClass;
 		TestTry;
 		TestTryIf;
 		TestTryReturn;

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -42,12 +43,9 @@ public class ThisAVM2Item extends AVM2Item {
 
     public boolean basicObject;
 
-    public Multiname classMultiname;
-
-    public ThisAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Multiname classMultiname, DottedChain className, boolean basicObject) {
+    public ThisAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, DottedChain className, boolean basicObject) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.className = className;
-        this.classMultiname = classMultiname;
         this.basicObject = basicObject;
         getSrcData().localName = "this";
     }

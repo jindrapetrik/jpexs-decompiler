@@ -32,7 +32,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.ScriptAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
@@ -71,17 +70,16 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
 
         if (regId == 0) {
             if ((localData.classIndex >= localData.getInstanceInfo().size()) || localData.classIndex < 0) {
-                stack.push(new ScriptAVM2Item(localData.scriptIndex));
+                stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, null, false));
                 return;
             }
             if (localData.isStatic) {
                 stack.push(new ClassAVM2Item(localData.getInstanceInfo().get(localData.classIndex).getName(localData.getConstants())));
             } else {
-
                 List<Trait> ts = localData.getInstanceInfo().get(localData.classIndex).instance_traits.traits;
                 boolean isBasicObject = localData.thisHasDefaultToPrimitive;
                 Multiname m = localData.getInstanceInfo().get(localData.classIndex).getName(localData.getConstants());
-                stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, m, m.getNameWithNamespace(localData.getConstants(), true), isBasicObject));
+                stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, m.getNameWithNamespace(localData.getConstants(), true), isBasicObject));
             }
             return;
         }

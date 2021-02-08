@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -32,7 +33,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.ScriptAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.helpers.Reference;
@@ -332,7 +332,7 @@ public abstract class InstructionDefinition implements Serializable {
     private Multiname searchSlotName(int slotIndex, AVM2LocalData localData, GraphTargetItem obj, int multiNameIndex) {
         if ((obj instanceof ExceptionAVM2Item) && (multiNameIndex == -1 || ((ExceptionAVM2Item) obj).exception.name_index == multiNameIndex)) {
             return localData.getConstants().getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
-        } else if ((obj instanceof ThisAVM2Item) || (obj instanceof ClassAVM2Item) || (obj instanceof ScriptAVM2Item)) {
+        } else if ((obj instanceof ThisAVM2Item) || (obj instanceof ClassAVM2Item)) {
             List<Trait> traits = localData.getScriptInfo().get(localData.scriptIndex).traits.traits;
             for (int t = 0; t < traits.size(); t++) {
                 Trait trait = traits.get(t);
