@@ -259,7 +259,8 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "Utf8"                       {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_UTF8, yytext());}
   "True"                       {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TRUE, yytext());}
   "False"                      {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_FALSE, yytext());}
-  "Undefined"                  {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_UNDEFINED, yytext());}
+  "Void"                       {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_VOID, yytext());}
+  "Undefined"                  {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_VOID, yytext());}
    
 
   "FINAL"                      {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_FINAL, yytext());}

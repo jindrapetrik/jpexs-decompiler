@@ -190,6 +190,7 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "Utf8"                       |
   "True"                       |
   "False"                      |
+  "Void"                       |
   "Undefined"                  {  return token(TokenType.KEYWORD2);}
    
   "FINAL"                      |
