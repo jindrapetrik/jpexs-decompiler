@@ -212,12 +212,17 @@ public class ASM3Parser {
         int slotid = (int) (long) (Long) symb.value;
         expected(ParsedSymbol.TYPE_KEYWORD_TYPE, "type", lexer);
         int type = parseMultiName(constants, lexer);
-        expected(ParsedSymbol.TYPE_KEYWORD_VALUE, "value", lexer);
-        ValueKind val = parseValue(constants, lexer);
+        symb = lexer.lex();
+        if (symb.type == ParsedSymbol.TYPE_KEYWORD_VALUE) {
+            ValueKind val = parseValue(constants, lexer);
+            tsc.value_kind = val.value_kind;
+            tsc.value_index = val.value_index;
+        } else {
+            tsc.value_kind = ValueKind.CONSTANT_Undefined;
+            tsc.value_index = 0;
+        }
         tsc.slot_id = slotid;
         tsc.type_index = type;
-        tsc.value_kind = val.value_kind;
-        tsc.value_index = val.value_index;
         tsc.name_index = name_index;
         return true;
     }
