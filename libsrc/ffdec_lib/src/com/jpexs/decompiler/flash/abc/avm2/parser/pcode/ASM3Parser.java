@@ -863,10 +863,9 @@ public class ASM3Parser {
                         for (int i = 0; i < def.operands.length; i++) {
                             ParsedSymbol parsedOperand = lexer.lex();
                             if (i > 0) {
-                                if (parsedOperand.type != ParsedSymbol.TYPE_COMMA) {
-                                    throw new AVM2ParseException("Comma (,) expected", lexer.yyline());
+                                if (parsedOperand.type == ParsedSymbol.TYPE_COMMA) {
+                                    parsedOperand = lexer.lex();
                                 }
-                                parsedOperand = lexer.lex();
                             }
                             switch (def.operands[i]) {
                                 case AVM2Code.DAT_MULTINAME_INDEX:
@@ -1060,8 +1059,21 @@ public class ASM3Parser {
                                         for (int d = 0; d < c; d++) {
                                             operandsList.add(0);
                                         }
+                                    } else if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) { //old syntax
+                                        int patCount = (int) (long) (Long) parsedOperand.value;
+                                        operandsList.add(patCount);
+
+                                        for (int c = 0; c <= patCount; c++) {
+                                            parsedOperand = lexer.lex();
+                                            if (parsedOperand.type == ParsedSymbol.TYPE_IDENTIFIER) {
+                                                offsetItems.add(new CaseOffsetItem((String) parsedOperand.value, code.code.size(), i + (c + 1)));
+                                                operandsList.add(0);
+                                            } else {
+                                                throw new AVM2ParseException("Offset expected", lexer.yyline());
+                                            }
+                                        }
                                     } else {
-                                        throw new AVM2ParseException("Bracket open [ expected", lexer.yyline());
+                                        throw new AVM2ParseException("Bracket open [ or case count expected", lexer.yyline());
                                     }
                                     break;
                                 case AVM2Code.OPT_S8:
