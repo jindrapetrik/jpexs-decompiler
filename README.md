@@ -130,7 +130,7 @@ The application was made in Czech republic.
 * **Rtsjx** - chinese translation
 
 ## Contact
-You can use our Issue tracker to report bugs, but our support is very limited.
+You can use our Issue tracker to report bugs, but our support is VERY limited.
 [https://www.free-decompiler.com/flash/issues](https://www.free-decompiler.com/flash/issues)
 
 See [Frequently Asked Questions (FAQ) in wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki/FAQ) before you try to contact me.
