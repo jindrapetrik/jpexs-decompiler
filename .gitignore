@@ -76,3 +76,5 @@ hs_err_pid*.log
 /libsrc/plugins/nbproject/private/
 /libsrc/plugins/dist/
 /libsrc/plugins/build/
+#amf 3 test
+exported1.all.bin
