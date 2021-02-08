@@ -546,7 +546,6 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                 aboutToBreak = true;
             }
 
-
             if (type != TYPE_IGNORED) {
                 if (!levels.isEmpty()) {
                     if (types.peek() == TYPE_PARAMETER) {
@@ -612,6 +611,9 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                 curLine = curLine.substring(0, curLine.indexOf(';'));
             }
             String insName = curLine.toLowerCase();
+            if (AVM2Code.instructionAliases.containsKey(insName)) {
+                insName = AVM2Code.instructionAliases.get(insName);
+            }
             Point loc = getLineLocation(getLine() + 1);
             if (loc != null) {
                 SwingUtilities.convertPointToScreen(loc, this);
