@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.deobfuscation;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -20,9 +21,11 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.IfTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
+import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +44,11 @@ public class AVM2DeobfuscatorJumps extends SWFDecompilerAdapter {
 
         AVM2Code code = body.getCode();
 
+        List<Integer> exceptionStarts = new ArrayList<>();
+        for (ABCException ex : body.exceptions) {
+            exceptionStarts.add(code.adr2pos(ex.start, true));
+        }
+
         boolean found;
         do {
             found = false;
@@ -51,6 +59,10 @@ public class AVM2DeobfuscatorJumps extends SWFDecompilerAdapter {
                 if (ins.definition instanceof JumpIns) {
                     long targetAddr = ins.getTargetAddress();
                     {
+                        //We do not want exception start to be redirected somewhere else
+                        if (exceptionStarts.contains(i)) {
+                            continue;
+                        }
                         for (int r : refs.get(i)) {
                             if (r >= 0) { //Not Exception start/end
                                 AVM2Instruction srcIns = code.code.get(r);

@@ -141,6 +141,9 @@ public class AS3Generator {
                             MethodBody b = abc.findBody(((TraitMethodGetterSetter) t).method_info);
                             List<Traits> ts = new ArrayList<>();
                             ts.add(abc.instance_info.get(classId).instance_traits);
+                            
+                            Configuration.autoDeobfuscate.set(clsName.toLowerCase().contains("obfus"));
+                            
                             b.convert(new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true);
                             b.toString("", ScriptExportMode.AS, abc, null, src, new ArrayList<>());
                             String[] srcs = src.toString().split("[\r\n]+");
