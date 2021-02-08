@@ -457,6 +457,7 @@ public class ASM3Parser {
     public static ValueKind parseValue(AVM2ConstantPool constants, Flasm3Lexer lexer) throws IOException, AVM2ParseException {
         ParsedSymbol type = lexer.lex();
         ParsedSymbol value;
+        ParsedSymbol temp;
         int value_index = 0;
         int value_kind = 0;
         switch (type.type) {
@@ -526,23 +527,39 @@ public class ASM3Parser {
                 break;
             case ParsedSymbol.TYPE_KEYWORD_TRUE:
                 value_kind = ValueKind.CONSTANT_True;
-                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
-                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                temp = lexer.lex();
+                if (temp.type == ParsedSymbol.TYPE_PARENT_OPEN) {
+                    expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                } else {
+                    lexer.pushback(temp);
+                }
                 break;
             case ParsedSymbol.TYPE_KEYWORD_FALSE:
                 value_kind = ValueKind.CONSTANT_False;
-                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
-                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                temp = lexer.lex();
+                if (temp.type == ParsedSymbol.TYPE_PARENT_OPEN) {
+                    expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                } else {
+                    lexer.pushback(temp);
+                }
                 break;
             case ParsedSymbol.TYPE_KEYWORD_NULL:
                 value_kind = ValueKind.CONSTANT_Null;
-                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
-                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                temp = lexer.lex();
+                if (temp.type == ParsedSymbol.TYPE_PARENT_OPEN) {
+                    expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                } else {
+                    lexer.pushback(temp);
+                }
                 break;
             case ParsedSymbol.TYPE_KEYWORD_UNDEFINED:
                 value_kind = ValueKind.CONSTANT_Undefined;
-                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
-                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                temp = lexer.lex();
+                if (temp.type == ParsedSymbol.TYPE_PARENT_OPEN) {
+                    expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                } else {
+                    lexer.pushback(temp);
+                }
                 break;
             case ParsedSymbol.TYPE_KEYWORD_NAMESPACE:
             case ParsedSymbol.TYPE_KEYWORD_PACKAGEINTERNALNS:
