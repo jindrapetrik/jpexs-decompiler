@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.pcode;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -778,6 +779,10 @@ public class ASM3Parser {
                 expected(ParsedSymbol.TYPE_KEYWORD_NAME, "Name", lexer);
                 ex.name_index = parseMultiName(constants, lexer);
                 exceptions.add(ex);
+                symb = lexer.lex();
+                if (symb.type != ParsedSymbol.TYPE_KEYWORD_END) {
+                    lexer.pushback(symb);
+                }
                 continue;
             }
             if (symb.type == ParsedSymbol.TYPE_EXCEPTION_START) {
@@ -845,9 +850,13 @@ public class ASM3Parser {
                     exceptionIndices.add((int) (long) (Long) exIndex.value);
                     continue;
                 }
+                String insName = (String) symb.value;
+                if (AVM2Code.instructionAliases.containsKey(insName)) {
+                    insName = AVM2Code.instructionAliases.get(insName); //search original unaliased name
+                }
                 boolean insFound = false;
                 for (InstructionDefinition def : AVM2Code.instructionSet) {
-                    if (def != null && !(def instanceof UnknownInstruction) && def.instructionName.equals((String) symb.value)) {
+                    if (def != null && !(def instanceof UnknownInstruction) && def.instructionName.equals(insName)) {
                         insFound = true;
                         List<Integer> operandsList = new ArrayList<>();
 

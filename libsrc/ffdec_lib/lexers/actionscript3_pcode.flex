@@ -225,6 +225,7 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "target"                     {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TARGET, yytext());}
   "name"                       {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NAME, yytext());}
   "type"                       {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TYPE, yytext());}
+  "end"                        {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_END, yytext());} 
   
   "slot"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_SLOT, yytext());}
   "const"                       {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_CONST, yytext());}
