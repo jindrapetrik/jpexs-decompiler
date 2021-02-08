@@ -123,7 +123,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         }
         MethodBody body = abc.bodies.get(bodyIndex);
         abc.bodies.get(bodyIndex).getCode().toASMSource(abc, abc.constants, abc.method_info.get(body.method_info), body, exportMode, writer);
-        if (trait != null) {
+        if (trait != null && exportMode != ScriptExportMode.AS && exportMode != ScriptExportMode.AS_METHOD_STUBS) {
             writer.unindent().appendNoHilight("end ; trait").newLine();
         }
         return new HighlightedText(writer);
