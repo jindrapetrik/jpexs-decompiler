@@ -57,6 +57,7 @@ package
 		TestIncDec;
 		TestInlineFunctions;
 		TestInnerFunctions;
+		TestInnerFunctionScope;
 		TestInnerIf;
 		TestInnerTry;
 		TestLogicalComputing;

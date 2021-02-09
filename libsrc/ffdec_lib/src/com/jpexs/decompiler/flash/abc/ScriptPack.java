@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -175,7 +176,7 @@ public class ScriptPack extends AS3ClassTreeItem {
             }
             ts.add(abc.script_info.get(scriptIndex).traits);
             writer.mark();
-            abc.bodies.get(sinit_bodyIndex).convert(convertData, path +/*packageName +*/ "/.scriptinitializer", exportMode, true, sinit_index, scriptIndex, -1, abc, null, new ScopeStack(scriptIndex), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<>(), ts, true);
+            abc.bodies.get(sinit_bodyIndex).convert(convertData, path +/*packageName +*/ "/.scriptinitializer", exportMode, true, sinit_index, scriptIndex, -1, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<>(), ts, true);
             scriptInitializerIsEmpty = !writer.getMark();
 
         }

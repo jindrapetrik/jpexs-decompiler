@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -52,7 +53,9 @@ public class NewFunctionAVM2Item extends AVM2Item {
 
     public int methodIndex;
 
-    public NewFunctionAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, List<DottedChain> fullyQualifiedNames, int methodIndex) {
+    public ScopeStack scopeStack;
+
+    public NewFunctionAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, List<DottedChain> fullyQualifiedNames, int methodIndex, ScopeStack scopeStack) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.functionName = functionName;
         this.path = path;
@@ -62,6 +65,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
         this.abc = abc;
         this.fullyQualifiedNames = fullyQualifiedNames;
         this.methodIndex = methodIndex;
+        this.scopeStack = scopeStack;
     }
 
     @Override
@@ -83,7 +87,7 @@ public class NewFunctionAVM2Item extends AVM2Item {
         abc.method_info.get(methodIndex).getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);
         writer.startBlock();
         if (body != null) {
-            body.convert(new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, new ScopeStack(scriptIndex), 0, new NulWriter(), fullyQualifiedNames, null, false);
+            body.convert(new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, (ScopeStack) this.scopeStack.clone(), 0, new NulWriter(), fullyQualifiedNames, null, false);
             body.toString(path + "/inner", ScriptExportMode.AS, abc, null, writer, fullyQualifiedNames);
         }
         writer.endBlock();

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.construction;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -38,7 +39,7 @@ public class NewFunctionIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int methodIndex = ins.operands[0];
-        NewFunctionAVM2Item function = new NewFunctionAVM2Item(ins, localData.lineStartInstruction, "", path, false, localData.scriptIndex, localData.classIndex, localData.abc, localData.fullyQualifiedNames, methodIndex);
+        NewFunctionAVM2Item function = new NewFunctionAVM2Item(ins, localData.lineStartInstruction, "", path, false, localData.scriptIndex, localData.classIndex, localData.abc, localData.fullyQualifiedNames, methodIndex, localData.scopeStack);
         stack.push(function);
     }
 
