@@ -22,5 +22,6 @@ program
  #include "tests/TestSwitchJoin.script.asasm"
  #include "tests/TestDeobfuscatorJumpsExceptionStart.script.asasm"
  #include "tests/TestUnnamedException.script.asasm"
+ #include "tests/TestTryCatchLoopBreakLevel2.script.asasm"
  ; place to add next
 end ; program

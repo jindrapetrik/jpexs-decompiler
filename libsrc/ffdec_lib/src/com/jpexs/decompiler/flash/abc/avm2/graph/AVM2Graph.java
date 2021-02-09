@@ -21,8 +21,10 @@ import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewCatchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.debug.DebugLineIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.IfStrictEqIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
@@ -32,6 +34,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.DecLocalIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.GetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.IncLocalIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.HasNext2Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.LabelIns;
@@ -43,6 +46,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.DecLocalPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.IncLocalPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
@@ -166,10 +170,15 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected boolean canBeBreakCandidate(BaseLocalData localData, GraphPart part) {
-        AVM2LocalData aLocalData = (AVM2LocalData) localData;
+    protected boolean canBeBreakCandidate(BaseLocalData localData, GraphPart part, List<ThrowState> throwStates) {
+        /*AVM2LocalData aLocalData = (AVM2LocalData) localData;
         if (aLocalData.finallyTargetParts.containsValue(part)) {
             return false;
+        }*/
+        for (ThrowState ts : throwStates) {
+            if (ts.targetPart == part) {
+                return false;
+            }
         }
         return true;
     }
@@ -177,7 +186,6 @@ public class AVM2Graph extends Graph {
     @Override
     protected void beforeGetLoops(BaseLocalData localData, String path, Set<GraphPart> allParts, List<ThrowState> throwStates) throws InterruptedException {
         AVM2LocalData avm2LocalData = ((AVM2LocalData) localData);
-
         for (int e = 0; e < body.exceptions.length; e++) {
             ABCException ex = body.exceptions[e];
             if (ex.isFinally()) {
@@ -185,7 +193,6 @@ public class AVM2Graph extends Graph {
             }
         }
 
-        avm2LocalData.codeStats = avm2LocalData.code.getStats(avm2LocalData.abc, avm2LocalData.methodBody, avm2LocalData.methodBody.init_scope_depth, false);
         getIgnoredSwitches((AVM2LocalData) localData, allParts);
         Set<Integer> integerSwitchesIps = new HashSet<>();
         for (GraphPart p : avm2LocalData.ignoredSwitches.values()) {
@@ -2065,7 +2072,11 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected List<ThrowState> getThrowStates(Set<GraphPart> allParts) {
+    protected List<ThrowState> getThrowStates(BaseLocalData localData, Set<GraphPart> allParts) {
+
+        AVM2LocalData avm2LocalData = (AVM2LocalData) localData;
+        avm2LocalData.codeStats = avm2LocalData.code.getStats(avm2LocalData.abc, avm2LocalData.methodBody, avm2LocalData.methodBody.init_scope_depth, false);
+
         List<ThrowState> ret = new ArrayList<>();
         for (int e = 0; e < body.exceptions.length; e++) {
             ThrowState ts = new ThrowState();
@@ -2079,9 +2090,113 @@ public class AVM2Graph extends Graph {
                     ts.throwingParts.add(p);
                 }
             }
+            GraphPart part = ts.targetPart;
+            boolean wasNewCatch = false;
+            int scopePos = -1;
+            int ip = part.start;
+            for (; ip <= part.end; ip++) {
+
+                if (avm2code.code.get(ip).definition instanceof NewCatchIns) {
+                    wasNewCatch = true;
+                }
+                if (avm2code.code.get(ip).definition instanceof PushScopeIns) {
+                    if (wasNewCatch) {
+                        scopePos = avm2LocalData.codeStats.instructionStats[ip].scopepos_after;
+                        break;
+                    }
+                }
+                if (ip == part.end && part.nextParts.size() == 1 && part.nextParts.get(0).refs.size() == 1) {
+                    part = part.nextParts.get(0);
+                    ip = part.start - 1;
+                    continue;
+                }
+            }
+
+            //Search all parts which have same or greater scope level, these all belong to catch
+            Set<GraphPart> catchParts = new HashSet<>();
+            if (scopePos > -1) {
+                walkCatchParts(avm2LocalData.codeStats, part, ip, catchParts, scopePos);
+            } else {
+                logger.fine("No newcatch..pushscope found in catch, probably swftools");
+                part = ts.targetPart;
+                ip = part.start;
+                int localRegId = -1;
+                for (; ip <= part.end; ip++) {
+                    AVM2Instruction ins = avm2code.code.get(ip);
+                    if ((ins.definition instanceof NopIns)
+                            || (ins.definition instanceof DebugLineIns)
+                            || (ins.definition instanceof JumpIns)) {
+                        //ignore
+                    } else if (ins.definition instanceof SetLocalTypeIns) {
+                        localRegId = (((SetLocalTypeIns) ins.definition).getRegisterId(ins));
+                        break;
+                    } else {
+                        break;
+                    }
+                    if (ip == part.end && part.nextParts.size() == 1 && part.nextParts.get(0).refs.size() == 1) {
+                        part = part.nextParts.get(0);
+                        ip = part.start - 1;
+                        continue;
+                    }
+                }
+                if (localRegId == -1) {
+                    logger.fine("Not even local reg assignment found in catch, weird :-(");
+                } else {
+                    walkCatchPartsReg(localRegId, part, ip + 1, catchParts, new ArrayList<>(), new HashSet<>());
+                }
+            }
+            ts.catchParts = catchParts;
             ret.add(ts);
         }
         return ret;
+    }
+
+    private void walkCatchPartsReg(int registerId, GraphPart part, int startIp, Set<GraphPart> catchParts, List<GraphPart> path, Set<GraphPart> visited) {
+        if (visited.contains(part)) {
+            return;
+        }
+        visited.add(part);
+        List<GraphPart> newPath = new ArrayList<>(path);
+        newPath.add(part);
+        for (int ip = startIp; ip <= part.end; ip++) {
+            AVM2Instruction ins = avm2code.code.get(ip);
+            if (ins.definition instanceof SetLocalTypeIns) {
+                int setLocalId = ((SetLocalTypeIns) ins.definition).getRegisterId(ins);
+                if (setLocalId == registerId) {
+                    return;
+                }
+            }
+            if (ins.definition instanceof KillIns) {
+                int killId = ins.operands[0];
+                if (killId == registerId) {
+                    return;
+                }
+            }
+            if (ins.definition instanceof GetLocalTypeIns) {
+                int getLocalId = ((GetLocalTypeIns) ins.definition).getRegisterId(ins);
+                if (getLocalId == registerId) {
+                    catchParts.addAll(newPath);
+                }
+            }
+        }
+        for (GraphPart n : part.nextParts) {
+            walkCatchPartsReg(registerId, n, n.start, catchParts, newPath, visited);
+        }
+    }
+
+    private void walkCatchParts(CodeStats stats, GraphPart part, int startIp, Set<GraphPart> catchParts, int scopePos) {
+        if (catchParts.contains(part)) {
+            return;
+        }
+        catchParts.add(part);
+        for (int ip = startIp; ip <= part.end; ip++) {
+            if (stats.instructionStats[ip].scopepos_after < scopePos) {
+                return;
+            }
+        }
+        for (GraphPart n : part.nextParts) {
+            walkCatchParts(stats, n, n.start, catchParts, scopePos);
+        }
     }
 
 }

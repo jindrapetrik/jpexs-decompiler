@@ -231,6 +231,35 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     }
 
     @Test
+    public void testTryCatchLoopBreakLevel2() {
+        decompileMethod("assembled", "testTryCatchLoopBreakLevel2", "var a:int = 0;\r\n"
+                + "a = 0;\r\n"
+                + "trace(\"before loop\");\r\n"
+                + "loop0:\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch1\");\r\n"
+                + "while(a <= 5)\r\n"
+                + "{\r\n"
+                + "if(a > 5)\r\n"
+                + "{\r\n"
+                + "break loop0;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"in catch1c\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
+
+    @Test
     public void testTryDoWhile() {
         decompileMethod("assembled", "testTryDoWhile", "trace(\"first\");\r\n"
                 + "var _loc5_:* = rnd();\r\n"

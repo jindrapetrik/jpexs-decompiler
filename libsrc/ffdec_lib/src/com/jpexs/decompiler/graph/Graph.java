@@ -481,7 +481,7 @@ public class Graph {
 
     }
 
-    protected List<ThrowState> getThrowStates(Set<GraphPart> allParts) {
+    protected List<ThrowState> getThrowStates(BaseLocalData localData, Set<GraphPart> allParts) {
         return new ArrayList<>();
     }
 
@@ -512,7 +512,7 @@ public class Graph {
             System.err.println("/parts");
         }
         TranslateStack stack = new TranslateStack(path);
-        List<ThrowState> throwStates = getThrowStates(allParts);
+        List<ThrowState> throwStates = getThrowStates(localData, allParts);
         beforeGetLoops(localData, path, allParts, throwStates);
         List<Loop> loops = new ArrayList<>();
 
@@ -1170,7 +1170,7 @@ public class Graph {
         clearThrowStates(throwStates);
     }
 
-    protected boolean canBeBreakCandidate(BaseLocalData localData, GraphPart part) {
+    protected boolean canBeBreakCandidate(BaseLocalData localData, GraphPart part, List<ThrowState> throwStates) {
         return true;
     }
 
@@ -1207,11 +1207,8 @@ public class Graph {
         }
         checkGetLoopsPart(part);
 
-        List<ThrowState> currentThrowStates = new ArrayList<>();
-
         for (ThrowState ts : throwStates) {
-            if (ts.throwingParts.contains(part) && ts.state != 1) {
-                currentThrowStates.add(ts);
+            if (ts.throwingParts.contains(part)) {
                 ts.state = 1;
             }
         }
@@ -1232,7 +1229,17 @@ public class Graph {
 
             }
         }
-        if (lastP1 != null && canBeBreakCandidate(localData, part)) {
+
+        boolean canBeCandidate = true;
+        if (lastP1 != null) {
+            for (ThrowState ts : throwStates) {
+                if (!ts.catchParts.contains(lastP1.loopContinue) && ts.catchParts.contains(part)) {
+                    canBeCandidate = false;
+                    break;
+                }
+            }
+        }
+        if (lastP1 != null && canBeCandidate && canBeBreakCandidate(localData, part, throwStates)) {
             if (lastP1.breakCandidates.contains(part)) {
                 lastP1.breakCandidates.add(part);
                 lastP1.breakCandidatesLevels.add(level);
@@ -1272,6 +1279,15 @@ public class Graph {
             currentLoop.phase = 1;
             loops.add(currentLoop);
             //loopContinues.add(part);
+        }
+
+        for (ThrowState ts : throwStates) {
+            if (ts.throwingParts.contains(part)) {
+                GraphPart t = ts.targetPart;
+                if (!visited.contains(t)) {
+                    getLoopsWalk(localData, t, loops, throwStates, stopPart, false, visited, level);
+                }
+            }
         }
 
         if (part.nextParts.size() == 2 && !partIsSwitch(part)) {
@@ -1326,22 +1342,13 @@ public class Graph {
             getLoopsWalk(localData, part.nextParts.get(0), loops, throwStates, stopPart, false, visited, level);
         }
 
-        List<Loop> loops2 = new ArrayList<>(loops);
+        /*List<Loop> loops2 = new ArrayList<>(loops);
         for (Loop l : loops2) {
             l.breakCandidatesLocked++;
-        }
-        for (ThrowState ts : throwStates) {
-            if (ts.throwingParts.contains(part) && (currentThrowStates.contains(ts) || ts.state != 1)) {
-                GraphPart t = ts.targetPart;
-                if (!visited.contains(t)) {
-                    getLoopsWalk(localData, t, loops, throwStates, stopPart, false, visited, level + 1 /*???*/);
-                }
-            }
-        }
-        for (Loop l : loops2) {
+        }*/
+ /*for (Loop l : loops2) {
             l.breakCandidatesLocked--;
-        }
-
+        }*/
         if (isLoop && currentLoop != null) {
             GraphPart found;
 
@@ -1386,7 +1393,7 @@ public class Graph {
                             findPartsOutsideTry(ts, cand, outsideTry, new HashSet<>());
 
                             for (int j = outsideTry.size() - 1; j >= 0; j--) {
-                                if (!canBeBreakCandidate(localData, outsideTry.get(j))) {
+                                if (!canBeBreakCandidate(localData, outsideTry.get(j), throwStates)) {
                                     outsideTry.remove(j);
                                 }
                             }
@@ -1463,7 +1470,7 @@ public class Graph {
 
                             currentLoop.breakCandidates.add(other);
                             currentLoop.breakCandidatesLevels.add(curLev);
-                            
+
                             break loopcand;
                         }
                     }
@@ -1486,7 +1493,7 @@ public class Graph {
                     removed.put(found, maxlevel);
                 }
             } while ((found != null) && (currentLoop.breakCandidates.size() > 1));
-             
+
             Map<GraphPart, Integer> count = new HashMap<>();
             GraphPart winner = null;
             int winnerCount = 0;
@@ -2082,7 +2089,7 @@ public class Graph {
                                 GraphTargetItem leftSide = expr.getNotCoercedNoDup();
 
                                 boolean hideEmptyTrueFalse = true;
-                                
+
                                 if (leftSide instanceof DuplicateItem) {
                                     isIf = false;
                                     if (hideEmptyTrueFalse && prevExpr.getNotCoercedNoDup() instanceof FalseItem) {

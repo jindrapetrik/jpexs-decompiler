@@ -143,7 +143,7 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    protected boolean canBeBreakCandidate(BaseLocalData localData, GraphPart part) {
+    protected boolean canBeBreakCandidate(BaseLocalData localData, GraphPart part, List<ThrowState> throwStates) {
         if (part.refs.size() <= 1) {
             return true;
         }

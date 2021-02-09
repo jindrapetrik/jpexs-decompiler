@@ -21,6 +21,10 @@ package
 		TestTryCatchInWhile5;
 		TestTryCatchLoop;
 		TestTryCatchLoopBreak;
+		TestTryCatchLoopBreak2;
+		TestTryCatchLoopBreak3;
+		TestTryCatchLoopBreak4;
+		TestTryCatchLoopBreak5;
 		TestTryCatchExceptionUsage
 		TestTryFinally;		
 		TestTryFinallyDirectReturnInFinally;

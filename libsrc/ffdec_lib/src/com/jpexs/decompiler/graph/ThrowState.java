@@ -13,6 +13,7 @@ public class ThrowState {
 
     public Set<GraphPart> throwingParts = new HashSet<>();
     public GraphPart targetPart;
+    public Set<GraphPart> catchParts = new HashSet<>();
 
     @Override
     public int hashCode() {

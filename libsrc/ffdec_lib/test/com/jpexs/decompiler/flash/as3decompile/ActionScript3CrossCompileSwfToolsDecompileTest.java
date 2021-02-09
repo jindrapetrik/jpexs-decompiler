@@ -351,6 +351,76 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
     }
 
     @Test
+    public void testTryCatchLoopBreak4() {
+        decompileMethod("swftools", "testTryCatchLoopBreak4", "var _loc1_:int = 0;\r\n"
+                + "_loc1_ = 0;\r\n"
+                + "trace(\"before loop\");\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch1\");\r\n"
+                + "if(_loc1_ > 5)\r\n"
+                + "{\r\n"
+                + "trace(\"a\");\r\n"
+                + "if(_loc1_ > 6)\r\n"
+                + "{\r\n"
+                + "trace(\"b\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"c\");\r\n"
+                + "}\r\n"
+                + "trace(\"in catch1b\");\r\n"
+                + "if(_loc1_ > 10)\r\n"
+                + "{\r\n"
+                + "trace(\"d\");\r\n"
+                + "if(_loc1_ > 11)\r\n"
+                + "{\r\n"
+                + "trace(\"e\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"f\");\r\n"
+                + "}\r\n"
+                + "trace(\"in catch1c\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
+
+    @Test
+    public void testTryCatchLoopBreak5() {
+        decompileMethod("swftools", "testTryCatchLoopBreak5", "var _loc1_:int = 0;\r\n"
+                + "_loc1_ = 0;\r\n"
+                + "trace(\"before loop\");\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch1\");\r\n"
+                + "while(true)\r\n"
+                + "{\r\n"
+                + "if(_loc1_ > 5)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"in catch1c\");\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
+
+    @Test
     public void testTryCatchTry() {
         decompileMethod("swftools", "testTryCatchTry", "trace(\"before try\");\r\n"
                 + "try\r\n"

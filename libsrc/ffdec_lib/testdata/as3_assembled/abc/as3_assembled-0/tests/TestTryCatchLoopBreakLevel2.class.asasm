@@ -1,0 +1,139 @@
+class
+ refid "tests:TestTryCatchLoopBreakLevel2"
+ instance QName(PackageNamespace("tests"), "TestTryCatchLoopBreakLevel2")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestTryCatchLoopBreakLevel2")
+  iinit
+   refid "tests:TestTryCatchLoopBreakLevel2/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestTryCatchLoopBreakLevel2/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+         maxstack 4
+         localcount 4
+         initscopedepth 0
+         maxscopedepth 2
+         
+         code
+            getlocal0
+            pushscope
+            debug 1, "a", 0, 0
+            pushbyte 0
+            setlocal1
+            debugline 15
+            pushbyte 0
+            setlocal1
+            getlex QName(PackageNamespace(""),"trace")
+            getglobalscope
+            debugline 16
+            pushstring "before loop"
+            call 1
+            pop
+            debugline 17
+            label
+            jump ofs007d
+   ofs0023:
+            label
+   ofs0024:
+            getlex QName(PackageNamespace(""),"trace")
+            getglobalscope
+            debugline 21
+            pushstring "in try"
+            call 1
+            pop
+            debugline 19
+   ofs0030:
+            jump ofs007d
+   ofs0034:
+            getlocal0
+            pushscope
+            newcatch 0
+            dup
+            setlocal3
+            dup
+            pushscope
+            swap
+            setslot 1
+            getlex QName(PackageNamespace(""),"trace")
+            getglobalscope
+            debugline 25
+            pushstring "in catch1"
+            call 1
+            pop
+            label
+            jump ofs006b
+   ofs004f:
+            label
+            getlocal1
+            debugline 27
+            pushbyte 5
+            ifgt ofs006f
+            getlocal1
+            debugline 30
+            pushbyte 5
+            ifngt ofs006b
+            popscope
+            kill 3
+            jump ofs0081
+            debugline 26
+   ofs006b:
+            jump ofs004f
+   ofs006f:
+            getlex QName(PackageNamespace(""),"trace")
+            getglobalscope
+            debugline 34
+            pushstring "in catch1c"
+            call 1
+            pop
+            popscope
+            debugline 18
+   ofs007d:
+            jump ofs0023
+   ofs0081:
+            getlex QName(PackageNamespace(""),"trace")
+            getglobalscope
+            debugline 37
+            pushstring "after"
+            call 1
+            returnvoid
+         end ; code
+         try from ofs0024 to ofs0030 target ofs0034 type QName(PackageNamespace(""),"Error") name QName(PackageInternalNs("tests"),"e") end
+      end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestTryCatchLoopBreakLevel2/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class
