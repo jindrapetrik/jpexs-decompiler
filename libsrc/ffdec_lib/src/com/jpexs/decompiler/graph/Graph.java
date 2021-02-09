@@ -1234,9 +1234,6 @@ public class Graph {
         }
         if (lastP1 != null && canBeBreakCandidate(localData, part)) {
             if (lastP1.breakCandidates.contains(part)) {
-                if (part.start == 54) {
-                    System.err.println("xxx");
-                }
                 lastP1.breakCandidates.add(part);
                 lastP1.breakCandidatesLevels.add(level);
                 return;
