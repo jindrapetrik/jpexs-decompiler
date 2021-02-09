@@ -640,15 +640,15 @@ public class ASM3Parser {
             }
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_TRAIT) {
                 blockStack.push(symb.type);
-                if (trait == null) {
-                    throw new AVM2ParseException("No trait expected", lexer.yyline());
-                }
                 if (blockStack.contains(ParsedSymbol.TYPE_KEYWORD_BODY)) {
                     lexer.pushback(symb);
                     TraitSlotConst tsc = new TraitSlotConst();
                     parseSlotConst(abc, lexer, constants, tsc);
                     body.traits.addTrait(tsc);
                 } else {
+                    if (trait == null) {
+                        throw new AVM2ParseException("No trait expected", lexer.yyline());
+                    }
                     symb = lexer.lex();
                     switch (symb.type) {
                         case ParsedSymbol.TYPE_KEYWORD_METHOD:
