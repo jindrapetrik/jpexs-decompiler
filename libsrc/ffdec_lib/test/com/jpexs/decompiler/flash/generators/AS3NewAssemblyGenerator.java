@@ -37,9 +37,9 @@ public class AS3NewAssemblyGenerator {
 
         String classData = templateClassData.replace("Template", className);;
         String scriptData = templateScriptData.replace("Template", className);
-        final String PLACEHOLDER = " ; place to add next\n";
+        final String PLACEHOLDER = " ; place to add next\r\n";
 
-        String mainDataUpdated = mainData.replace(PLACEHOLDER, " #include \"tests/" + className + ".script.asasm\"\n" + PLACEHOLDER);
+        String mainDataUpdated = mainData.replace(PLACEHOLDER, " #include \"tests/" + className + ".script.asasm\"\r\n" + PLACEHOLDER);
 
         Helper.writeFile(DIR + "tests/" + className + ".class.asasm", classData.getBytes("UTF-8"));
         Helper.writeFile(DIR + "tests/" + className + ".script.asasm", scriptData.getBytes("UTF-8"));
