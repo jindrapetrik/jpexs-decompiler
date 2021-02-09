@@ -23,5 +23,7 @@ program
  #include "tests/TestDeobfuscatorJumpsExceptionStart.script.asasm"
  #include "tests/TestUnnamedException.script.asasm"
  #include "tests/TestTryCatchLoopBreakLevel2.script.asasm"
+ #include "tests/TestSlots.script.asasm"
+ #include "tests/TestSlots.init/inline_method.method.asasm"
  ; place to add next
 end ; program

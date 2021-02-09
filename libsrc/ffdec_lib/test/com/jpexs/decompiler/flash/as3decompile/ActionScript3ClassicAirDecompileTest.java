@@ -881,6 +881,18 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testInnerFunctionScope() {
+        decompileMethod("classic_air", "testInnerFunctionScope", "a = a;\r\n"
+                + "var innerFunc:Function = function(b:String):*\r\n"
+                + "{\r\n"
+                + "testProm = 4;\r\n"
+                + "trace(testProm);\r\n"
+                + "};\r\n"
+                + "innerFunc(a);\r\n",
+                false);
+    }
+
+    @Test
     public void testInnerFunctions() {
         decompileMethod("classic_air", "testInnerFunctions", "a = a;\r\n"
                 + "var s:int = 0;\r\n"

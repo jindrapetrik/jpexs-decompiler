@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
@@ -40,6 +41,7 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitWithSlot;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -325,49 +327,51 @@ public abstract class InstructionDefinition implements Serializable {
         return localData.code.adr2pos(src.getAddress());
     }
 
-    protected Multiname searchSlotName(int slotIndex, AVM2LocalData localData, GraphTargetItem obj) {
-        return searchSlotName(slotIndex, localData, obj, -1);
+    protected static Multiname searchSlotName(int slotIndex, AVM2LocalData localData, GraphTargetItem obj, Reference<GraphTargetItem> realObj) {
+        return searchSlotName(slotIndex, localData, obj, -1, realObj);
     }
 
-    private Multiname searchSlotName(int slotIndex, AVM2LocalData localData, GraphTargetItem obj, int multiNameIndex) {
+    private static Multiname searchSlotName(int slotIndex, AVM2LocalData localData, GraphTargetItem obj, int multiNameIndex, Reference<GraphTargetItem> realObj) {
         if ((obj instanceof ExceptionAVM2Item) && (multiNameIndex == -1 || ((ExceptionAVM2Item) obj).exception.name_index == multiNameIndex)) {
             return localData.getConstants().getMultiname(((ExceptionAVM2Item) obj).exception.name_index);
-        } else if ((obj instanceof ThisAVM2Item) || (obj instanceof ClassAVM2Item)) {
-            List<Trait> traits = localData.getScriptInfo().get(localData.scriptIndex).traits.traits;
-            for (int t = 0; t < traits.size(); t++) {
-                Trait trait = traits.get(t);
-                if (trait instanceof TraitWithSlot) {
-                    if (multiNameIndex == -1 || trait.name_index == multiNameIndex) {
-                        if (((TraitWithSlot) trait).getSlotIndex() == slotIndex) {
-                            return trait.getName(localData.abc);
-                        }
-                    }
-                }
-            }
-        } else if (obj instanceof NewActivationAVM2Item) {
-            MethodBody body = localData.methodBody;
-            List<Trait> traits = body.traits.traits;
-            for (int t = 0; t < traits.size(); t++) {
-                Trait trait = traits.get(t);
-                if (trait instanceof TraitWithSlot) {
-                    if (multiNameIndex == -1 || trait.name_index == multiNameIndex) {
-                        if (((TraitWithSlot) trait).getSlotIndex() == slotIndex) {
-                            return trait.getName(localData.abc);
-                        }
-                    }
-                }
-            }
-        } else if (obj instanceof FindPropertyAVM2Item) {
+        }
+
+        if (obj instanceof FindPropertyAVM2Item) {
             FindPropertyAVM2Item findProp = (FindPropertyAVM2Item) obj;
 
             for (GraphTargetItem item : localData.scopeStack) {
-                Multiname ret = searchSlotName(slotIndex, localData, item, ((FullMultinameAVM2Item) findProp.propertyName).multinameIndex);
+                Multiname ret = searchSlotName(slotIndex, localData, item, ((FullMultinameAVM2Item) findProp.propertyName).multinameIndex, realObj);
                 if (ret != null) {
                     return ret;
                 }
             }
-
+            return null;
         }
+
+        Traits traits = null;
+        if (obj instanceof NewActivationAVM2Item) {
+            traits = localData.methodBody.traits;
+        } else if (obj instanceof ThisAVM2Item) {
+            traits = localData.abc.instance_info.get(localData.classIndex).instance_traits;
+        } else if (obj instanceof ClassAVM2Item) {
+            traits = localData.abc.class_info.get(localData.classIndex).static_traits;
+        } else if (obj instanceof GlobalAVM2Item) {
+            traits = localData.abc.script_info.get(localData.scriptIndex).traits;
+        }
+        if (traits != null) {
+            for (int t = 0; t < traits.traits.size(); t++) {
+                Trait trait = traits.traits.get(t);
+                if (trait instanceof TraitWithSlot) {
+                    if (multiNameIndex == -1 || trait.name_index == multiNameIndex) {
+                        if (((TraitWithSlot) trait).getSlotIndex() == slotIndex) {
+                            realObj.setVal(obj);
+                            return trait.getName(localData.abc);
+                        }
+                    }
+                }
+            }
+        }
+
         return null;
     }
 }

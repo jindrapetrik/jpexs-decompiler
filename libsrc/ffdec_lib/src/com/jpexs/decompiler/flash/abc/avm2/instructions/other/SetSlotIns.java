@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -38,6 +39,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.helpers.Reference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -57,12 +59,21 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         int slotIndex = ins.operands[0];
         GraphTargetItem value = stack.pop();
         GraphTargetItem obj = stack.pop(); //scopeId
+        if (obj.getThroughRegister() instanceof NewActivationAVM2Item) {
+            ((NewActivationAVM2Item) obj.getThroughRegister()).slots.put(slotIndex, value);
+        }
+        handleSetSlot(localData, stack, ins, output, slotIndex, obj, value);
+    }
+
+    public static void handleSetSlot(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, int slotIndex, GraphTargetItem obj, GraphTargetItem value) {
+
         GraphTargetItem objnoreg = obj;
         obj = obj.getThroughRegister();
-        if (obj instanceof NewActivationAVM2Item) {
-            ((NewActivationAVM2Item) obj).slots.put(slotIndex, value);
-        }
-        Multiname slotname = searchSlotName(slotIndex, localData, obj);
+
+        Reference<GraphTargetItem> realObj = new Reference<>(null);
+        Multiname slotname = InstructionDefinition.searchSlotName(slotIndex, localData, obj, realObj);
+
+        obj = realObj.getVal();
 
         if (slotname != null) {
             if (value instanceof LocalRegAVM2Item) {
@@ -133,21 +144,5 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
     @Override
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 2;
-    }
-
-    @Override
-    public String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) {
-        int slotIndex = ins.operands[0];
-        ////String obj = stack.get(1);
-        String slotname = "";
-        for (int t = 0; t < body.traits.traits.size(); t++) {
-            if (body.traits.traits.get(t) instanceof TraitSlotConst) {
-                if (((TraitSlotConst) body.traits.traits.get(t)).slot_id == slotIndex) {
-                    slotname = body.traits.traits.get(t).getName(abc).getName(abc.constants, fullyQualifiedNames, true, true);
-                }
-            }
-
-        }
-        return slotname;
     }
 }

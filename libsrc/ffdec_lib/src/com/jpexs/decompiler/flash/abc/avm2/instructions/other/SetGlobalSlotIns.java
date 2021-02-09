@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -22,8 +23,10 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.SetGlobalSlotAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -43,18 +46,14 @@ public class SetGlobalSlotIns extends InstructionDefinition implements SetTypeIn
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
+        int slotIndex = ins.operands[0];
         GraphTargetItem value = stack.pop();
-        GraphTargetItem result = new SetGlobalSlotAVM2Item(ins, localData.lineStartInstruction, ins.operands[0], value);
-        SetTypeIns.handleResult(value, stack, output, localData, result, -1);
+        GraphTargetItem obj = new GlobalAVM2Item(ins, localData.lineStartInstruction);
+        SetSlotIns.handleSetSlot(localData, stack, ins, output, slotIndex, obj, value);
     }
 
     @Override
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 1;
-    }
-
-    @Override
-    public String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) {
-        return "globalslot" + ins.operands[0];
     }
 }

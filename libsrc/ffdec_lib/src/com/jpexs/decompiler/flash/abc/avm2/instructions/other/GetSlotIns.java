@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -24,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.helpers.Reference;
 import java.util.List;
 
 /**
@@ -41,7 +43,9 @@ public class GetSlotIns extends InstructionDefinition {
         int slotIndex = ins.operands[0];
         GraphTargetItem objinreg = stack.pop(); //scope
         GraphTargetItem obj = objinreg.getThroughRegister();
-        Multiname slotname = searchSlotName(slotIndex, localData, obj);
+        Reference<GraphTargetItem> realObj = new Reference<>(null);
+        Multiname slotname = InstructionDefinition.searchSlotName(slotIndex, localData, obj, realObj);
+        obj = realObj.getVal();
         stack.push(new GetSlotAVM2Item(ins, localData.lineStartInstruction, obj, objinreg, slotIndex, slotname));
     }
 

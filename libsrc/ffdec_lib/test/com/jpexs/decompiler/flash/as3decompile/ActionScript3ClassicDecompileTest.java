@@ -875,6 +875,17 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testInnerFunctionScope() {
+        decompileMethod("classic", "testInnerFunctionScope", "var innerFunc:Function = function(b:String):*\r\n"
+                + "{\r\n"
+                + "testProm = 4;\r\n"
+                + "trace(testProm);\r\n"
+                + "};\r\n"
+                + "innerFunc(a);\r\n",
+                false);
+    }
+
+    @Test
     public void testInnerFunctions() {
         decompileMethod("classic", "testInnerFunctions", "var s:int = 0;\r\n"
                 + "var innerFunc:Function = function(b:String):*\r\n"

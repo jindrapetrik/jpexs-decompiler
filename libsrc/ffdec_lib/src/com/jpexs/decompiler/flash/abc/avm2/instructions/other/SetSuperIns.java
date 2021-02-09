@@ -64,13 +64,4 @@ public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
         return 2 + getMultinameRequiredStackSize(abc.constants, multinameIndex);
     }
 
-    @Override
-    public String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
-        int multinameIndex = ins.operands[0];
-        String multiname = resolveMultinameNoPop(1, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);
-        HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-        stack.get(1 + resolvedCount(abc.constants, multinameIndex)).toString(writer, LocalData.create(abc, localRegNames, fullyQualifiedNames));
-        String obj = writer.toString();
-        return obj + ".super." + multiname;
-    }
 }

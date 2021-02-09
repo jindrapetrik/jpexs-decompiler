@@ -1,0 +1,29 @@
+method
+ name "globalFunction"
+ refid "tests:TestSlots/init/inline_method"
+ returns QName(PackageNamespace(""), "void")
+ body
+  maxstack 3
+  localcount 1
+  initscopedepth 0
+  maxscopedepth 1
+  code
+   getlocal0
+   pushscope
+
+   debugfile           "C:\\Dropbox\\Programovani\\JavaSE\\FFDec\\libsrc\\ffdec_lib\\testdata\\testslots\\src;tests;TestSlots.as"
+   getlex              QName(PackageNamespace(""), "trace")
+   debugline           43
+   getglobalscope
+   getlex              QName(PrivateNamespace("FilePrivateNS:TestSlots"), "globalVar1")
+   call                1
+   pop
+   getlex              QName(PackageNamespace(""), "trace")
+   debugline           44
+   getglobalscope
+   getlex              QName(PrivateNamespace("FilePrivateNS:TestSlots"), "globalVar2")
+   call                1
+   returnvoid
+  end ; code
+ end ; body
+end ; method

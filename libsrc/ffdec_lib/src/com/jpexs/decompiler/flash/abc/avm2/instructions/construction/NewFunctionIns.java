@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class NewFunctionIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int methodIndex = ins.operands[0];
-        NewFunctionAVM2Item function = new NewFunctionAVM2Item(ins, localData.lineStartInstruction, "", path, false, localData.scriptIndex, localData.classIndex, localData.abc, localData.fullyQualifiedNames, methodIndex, localData.scopeStack);
+        NewFunctionAVM2Item function = new NewFunctionAVM2Item(ins, localData.lineStartInstruction, "", path, false, localData.scriptIndex, localData.classIndex, localData.abc, localData.fullyQualifiedNames, methodIndex, (ScopeStack) localData.scopeStack.clone());
         stack.push(function);
     }
 

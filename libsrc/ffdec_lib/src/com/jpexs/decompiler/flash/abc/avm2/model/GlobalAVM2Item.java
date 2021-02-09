@@ -12,56 +12,51 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.ecma.ObjectType;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
-import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.HashMap;
 
 /**
  *
  * @author JPEXS
  */
-public class SetGlobalSlotAVM2Item extends AVM2Item {
+public class GlobalAVM2Item extends AVM2Item {
 
-    public int slotId;
-
-    @Override
-    public GraphPart getFirstPart() {
-        return value.getFirstPart();
-    }
-
-    public SetGlobalSlotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int slotId, GraphTargetItem value) {
-        super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
-        this.slotId = slotId;
+    public GlobalAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
+        super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        writer.append("§§setglobalslot");
-        writer.spaceBeforeCallParenthesies(2);
-        writer.append("(");
-        writer.append(slotId).append(",");
-        value.toString(writer, localData);
-        return writer.append(")");
+        return writer.append("global");
     }
 
     @Override
-    public boolean hasSideEffect() {
+    public Object getResult() {
+        return new ObjectType(new HashMap<>()) {
+            @Override
+            public String toString() {
+                return "global";
+            }
+        };
+    }
+
+    @Override
+    public boolean hasReturnValue() {
         return true;
     }
 
     @Override
     public GraphTargetItem returnType() {
-        return TypeItem.UNBOUNDED;
+        return new TypeItem("global");
     }
 
-    @Override
-    public boolean hasReturnValue() {
-        return false;
-    }
 }

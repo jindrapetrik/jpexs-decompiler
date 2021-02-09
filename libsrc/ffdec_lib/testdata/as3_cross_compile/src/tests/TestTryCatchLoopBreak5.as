@@ -23,14 +23,16 @@ package tests
 				{
 					trace("in catch1"); 
 					while (true){
+						trace("xx");						
 						if (a > 5){
 							break;
 						}
+						trace("yy");
 					}
 					trace("in catch1c");
 				}				
 			}
-			trace("after"); 
+			//trace("after"); 
 			
 		}
 		

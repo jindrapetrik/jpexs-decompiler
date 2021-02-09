@@ -1,0 +1,57 @@
+script
+ sinit
+  refid "tests:TestSlots/init"
+  body
+   maxstack 3
+   localcount 1
+   initscopedepth 0
+   maxscopedepth 2
+   code
+    getlocal0
+    pushscope
+
+    getscopeobject      0
+    getlex              QName(PackageNamespace(""), "Object")
+    dup
+    pushscope
+
+    newclass            "tests:TestSlots"
+    popscope
+    initproperty        QName(PackageNamespace("tests"), "TestSlots")
+
+    getglobalscope
+    newfunction         "tests:TestSlots/init/inline_method"
+    setproperty         QName(PrivateNamespace("FilePrivateNS:TestSlots"), "globalFunction")
+
+    debugfile           "C:\\Dropbox\\Programovani\\JavaSE\\FFDec\\libsrc\\ffdec_lib\\testdata\\testslots\\src;tests;TestSlots.as"
+    debugline           38
+    pushstring          "glb1"
+    findproperty        QName(PrivateNamespace("FilePrivateNS:TestSlots"), "globalVar1")
+    swap
+    setproperty         QName(PrivateNamespace("FilePrivateNS:TestSlots"), "globalVar1")
+
+    debugline           39
+    pushstring          "glb2"
+    findproperty        QName(PrivateNamespace("FilePrivateNS:TestSlots"), "globalVar2")
+    swap
+    setproperty         QName(PrivateNamespace("FilePrivateNS:TestSlots"), "globalVar2")
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+ trait class QName(PackageNamespace("tests"), "TestSlots") flag METADATA
+  slotid 3
+  #include "TestSlots.class.asasm"
+  metadata "__go_to_definition_help"
+   item "pos" "73"
+  end ; metadata
+ end ; trait
+ trait slot QName(PrivateNamespace("FilePrivateNS:TestSlots"), "globalVar1") type QName(PackageNamespace(""), "String") 
+ slotid 1
+ end
+ trait slot QName(PrivateNamespace("FilePrivateNS:TestSlots"), "globalVar2") type QName(PackageNamespace(""), "String")
+ slotid 2
+ end
+ trait slot QName(PrivateNamespace("FilePrivateNS:TestSlots"), "globalFunction") end
+end ; script

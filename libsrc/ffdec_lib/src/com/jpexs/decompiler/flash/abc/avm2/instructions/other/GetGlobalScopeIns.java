@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.List;
@@ -43,7 +44,9 @@ public class GetGlobalScopeIns extends InstructionDefinition {
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.push(localData.scopeStack.get(0));
+        //Note: it is not true that "The global scope object is the object at the bottom of the scope stack.",
+        //It is special scope which is not present at standard scope stack.
+        stack.push(new GlobalAVM2Item(ins, localData.lineStartInstruction));
     }
 
     @Override

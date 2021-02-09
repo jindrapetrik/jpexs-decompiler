@@ -26,14 +26,15 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
     @BeforeClass
     public void init() throws IOException, InterruptedException {
         addSwf("standard", "testdata/as3_new/bin/as3_new.flex.swf");
+        addSwf("assembled", "testdata/as3_assembled/bin/as3_assembled.swf");
     }
 
-    private void decompileScriptPack(String path, String expectedResult) {
+    private void decompileScriptPack(String swfId, String path, String expectedResult) {
 
         DoABC2Tag tag = null;
         ABC abc = null;
         ScriptPack scriptPack = null;
-        for (Tag t : getSwf("standard").getTags()) {
+        for (Tag t : getSwf(swfId).getTags()) {
             if (t instanceof DoABC2Tag) {
                 tag = (DoABC2Tag) t;
                 abc = tag.getABC();
@@ -59,7 +60,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
 
     @Test
     public void testMyPackage1TestClass() {
-        decompileScriptPack("tests_classes.mypackage1.TestClass", "package tests_classes.mypackage1\n"
+        decompileScriptPack("standard", "tests_classes.mypackage1.TestClass", "package tests_classes.mypackage1\n"
                 + "{\n"
                 + "   public class TestClass implements tests_classes.mypackage1.TestInterface\n"
                 + "   {\n"
@@ -96,7 +97,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
 
     @Test
     public void testMyPackage1TestClass2() {
-        decompileScriptPack("tests_classes.mypackage1.TestClass2", "package tests_classes.mypackage1\n"
+        decompileScriptPack("standard", "tests_classes.mypackage1.TestClass2", "package tests_classes.mypackage1\n"
                 + "{\n"
                 + "   public class TestClass2\n"
                 + "   {\n"
@@ -139,7 +140,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
 
     @Test
     public void testMyPackage1TestInterface() {
-        decompileScriptPack("tests_classes.mypackage1.TestInterface", "package tests_classes.mypackage1\n"
+        decompileScriptPack("standard", "tests_classes.mypackage1.TestInterface", "package tests_classes.mypackage1\n"
                 + "{\n"
                 + "   public interface TestInterface extends tests_classes.mypackage2.TestInterface\n"
                 + "   {\n"
@@ -151,7 +152,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
 
     @Test
     public void testMyPackage1MyNamespace() {
-        decompileScriptPack("tests_classes.mypackage1.myNamespace", "package tests_classes.mypackage1\n"
+        decompileScriptPack("standard", "tests_classes.mypackage1.myNamespace", "package tests_classes.mypackage1\n"
                 + "{\n"
                 + "   public namespace myNamespace = \"https://www.free-decompiler.com/flash/test/namespace\";\n"
                 + "}");
@@ -159,7 +160,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
 
     @Test
     public void testMyPackage2TestClass() {
-        decompileScriptPack("tests_classes.mypackage2.TestClass", "package tests_classes.mypackage2\n"
+        decompileScriptPack("standard", "tests_classes.mypackage2.TestClass", "package tests_classes.mypackage2\n"
                 + "{\n"
                 + "   public class TestClass implements TestInterface\n"
                 + "   {\n"
@@ -184,7 +185,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
 
     @Test
     public void testMyPackage2TestInterface() {
-        decompileScriptPack("tests_classes.mypackage2.TestInterface", "package tests_classes.mypackage2\n"
+        decompileScriptPack("standard", "tests_classes.mypackage2.TestInterface", "package tests_classes.mypackage2\n"
                 + "{\n"
                 + "   public interface TestInterface\n"
                 + "   {\n"
@@ -196,7 +197,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
 
     @Test
     public void testMyPackage3TestClass() {
-        decompileScriptPack("tests_classes.mypackage3.TestClass", "package tests_classes.mypackage3\n"
+        decompileScriptPack("standard", "tests_classes.mypackage3.TestClass", "package tests_classes.mypackage3\n"
                 + "{\n"
                 + "   public class TestClass\n"
                 + "   {\n"
@@ -217,7 +218,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
 
     @Test
     public void testThisOutsideClass() {
-        decompileScriptPack("tests_classes.TestThisOutsideClass", "package tests_classes\n"
+        decompileScriptPack("standard", "tests_classes.TestThisOutsideClass", "package tests_classes\n"
                 + "{\n"
                 + "   public class TestThisOutsideClass\n"
                 + "   {\n"
@@ -241,6 +242,56 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "{\n"
                 + "   trace(a);\n"
                 + "   this.attrib++;\n"
+                + "}");
+    }
+
+    @Test
+    public void testSlots() {
+        decompileScriptPack("assembled", "tests.TestSlots", "package tests\n"
+                + "{\n"
+                + "   public class TestSlots\n"
+                + "   {\n"
+                + "      \n"
+                + "      public static var classVar1:String = \"cls1\";\n"
+                + "      \n"
+                + "      public static var classVar2:String = \"cls2\";\n"
+                + "       \n"
+                + "      \n"
+                + "      public var instanceVar1:String = \"ins1\";\n"
+                + "      \n"
+                + "      public var instanceVar2:String = \"ins2\";\n"
+                + "      \n"
+                + "      public function TestSlots()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public static function classMethod() : void\n"
+                + "      {\n"
+                + "         trace(classVar1);\n"
+                + "         trace(classVar2);\n"
+                + "         trace(globalVar1);\n"
+                + "         trace(globalVar2);\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function instanceMethod() : void\n"
+                + "      {\n"
+                + "         trace(instanceVar1);\n"
+                + "         trace(instanceVar2);\n"
+                + "         trace(globalVar1);\n"
+                + "         trace(globalVar2);\n"
+                + "      }\n"
+                + "   }\n"
+                + "}\n"
+                + "\n"
+                + "var globalVar1:String = \"glb1\";\n"
+                + "\n"
+                + "var globalVar2:String = \"glb2\";\n"
+                + "\n"
+                + "function globalFunction():void\n"
+                + "{\n"
+                + "   trace(globalVar1);\n"
+                + "   trace(globalVar2);\n"
                 + "}");
     }
 }

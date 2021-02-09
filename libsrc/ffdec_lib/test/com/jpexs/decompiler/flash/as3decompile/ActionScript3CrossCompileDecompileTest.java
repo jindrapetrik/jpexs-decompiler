@@ -417,15 +417,16 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "trace(\"in catch1\");\r\n"
                 + "while(true)\r\n"
                 + "{\r\n"
+                + "trace(\"xx\");\r\n"
                 + "if(a > 5)\r\n"
                 + "{\r\n"
                 + "break;\r\n"
                 + "}\r\n"
+                + "trace(\"yy\");\r\n"
                 + "}\r\n"
                 + "trace(\"in catch1c\");\r\n"
                 + "}\r\n"
-                + "}\r\n"
-                + "trace(\"after\");\r\n",
+                + "}\r\n",
                 false);
     }
 

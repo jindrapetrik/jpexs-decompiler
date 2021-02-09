@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -35,8 +36,6 @@ import java.util.Stack;
  * @author JPEXS
  */
 public interface SetTypeIns {
-
-    public abstract String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) throws InterruptedException;
 
     public static void handleResult(GraphTargetItem value, TranslateStack stack, List<GraphTargetItem> output, AVM2LocalData localData, GraphTargetItem result, int regId) {
         GraphTargetItem notCoercedValue = value;

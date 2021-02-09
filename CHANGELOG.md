@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - AS3 break loop in catch clause
 - AS3 inner functions scope (setslot/getslot)
 - AS3 p-code traits of bodys of inner methods
+- AS3 getslot/setslot, getglobalscope instruction
 
 ## [13.0.0] - 2021-02-08
 ### Added

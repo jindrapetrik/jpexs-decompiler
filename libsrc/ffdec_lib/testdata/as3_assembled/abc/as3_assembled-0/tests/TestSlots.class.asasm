@@ -1,0 +1,163 @@
+class
+ refid "tests:TestSlots"
+ instance QName(PackageNamespace("tests"), "TestSlots")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  iinit
+   refid "tests:TestSlots/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 0
+    maxscopedepth 1
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait slot QName(PackageNamespace(""), "instanceVar1") flag METADATA type QName(PackageNamespace(""), "String") value Utf8("ins1")
+   slotid 1
+   metadata "__go_to_definition_help"
+    item "pos" "106"
+   end ; metadata
+  end ; trait
+  trait slot QName(PackageNamespace(""), "instanceVar2") flag METADATA type QName(PackageNamespace(""), "String") value Utf8("ins2")
+   slotid 2
+   metadata "__go_to_definition_help"
+    item "pos" "150"
+   end ; metadata
+  end ; trait
+  trait method QName(PackageNamespace(""), "instanceMethod") flag METADATA
+   method
+    name "instanceMethod"
+    refid "tests:TestSlots/instance/instanceMethod"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 3
+     localcount 1
+     initscopedepth 0
+     maxscopedepth 1
+     code
+      getlocal0
+      pushscope
+
+      debugfile           "C:\\Dropbox\\Programovani\\JavaSE\\FFDec\\libsrc\\ffdec_lib\\testdata\\testslots\\src;tests;TestSlots.as"
+      findpropstrict      QName(PackageNamespace(""), "trace")
+      debugline           18
+      getscopeobject      0
+      getslot             1 ;instanceVar1
+      callpropvoid        QName(PackageNamespace(""), "trace"), 1
+      findpropstrict      QName(PackageNamespace(""), "trace")
+      debugline           19
+      getscopeobject      0
+      getslot             2 ;instanceVar2
+      callpropvoid        QName(PackageNamespace(""), "trace"), 1
+      
+      ;these are nested, I think this won't happen in real files
+      ;findpropstrict      QName(PackageNamespace(""), "trace")
+      ;debugline           20
+      ;getglobalscope
+      ;getslot             3 ;TestSlots
+      ;getslot             1 ;classVar1 
+      ;callpropvoid        QName(PackageNamespace(""), "trace"), 1
+      
+      ;findpropstrict      QName(PackageNamespace(""), "trace")
+      ;debugline           21
+      ;getglobalscope
+      ;getslot             3 ;TestSlots
+      ;getslot             2 ;classVar2
+      ;callpropvoid        QName(PackageNamespace(""), "trace"), 1
+      
+      findpropstrict      QName(PackageNamespace(""), "trace")
+      debugline           22
+      getglobalscope
+      getslot             1 ;globalVar1
+      callpropvoid        QName(PackageNamespace(""), "trace"), 1
+      findpropstrict      QName(PackageNamespace(""), "trace")
+      debugline           23
+      getglobalscope
+      getslot             2 ;globalVar2
+      callpropvoid        QName(PackageNamespace(""), "trace"), 1
+      returnvoid
+     end ; code
+    end ; body
+   end ; method
+   metadata "__go_to_definition_help"
+    item "pos" "309"
+   end ; metadata
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestSlots/class/init"
+  body
+   maxstack 0
+   localcount 1
+   initscopedepth 0
+   maxscopedepth 0
+   code
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+ trait slot QName(PackageNamespace(""), "classVar1") flag METADATA type QName(PackageNamespace(""), "String") value Utf8("cls1")
+  slotid 1
+  metadata "__go_to_definition_help"
+   item "pos" "205"
+  end ; metadata
+ end ; trait
+ trait slot QName(PackageNamespace(""), "classVar2") flag METADATA type QName(PackageNamespace(""), "String") value Utf8("cls2")
+  slotid 2
+  metadata "__go_to_definition_help"
+   item "pos" "254"
+  end ; metadata
+ end ; trait
+ trait method QName(PackageNamespace(""), "classMethod") flag METADATA
+  method
+   name "classMethod"
+   refid "tests:TestSlots/class/classMethod"
+   returns QName(PackageNamespace(""), "void")
+   body
+    maxstack 3
+    localcount 1
+    initscopedepth 0
+    maxscopedepth 1
+    code
+     getlocal0
+     pushscope
+
+     debugfile           "C:\\Dropbox\\Programovani\\JavaSE\\FFDec\\libsrc\\ffdec_lib\\testdata\\testslots\\src;tests;TestSlots.as"
+     findpropstrict      QName(PackageNamespace(""), "trace")
+     debugline           28
+     getscopeobject      0
+     getslot             1 ;classVar1         
+     callpropvoid        QName(PackageNamespace(""), "trace"), 1
+     findpropstrict      QName(PackageNamespace(""), "trace")
+     debugline           29
+     getscopeobject      0
+     getslot             2 ;classVar2
+     callpropvoid        QName(PackageNamespace(""), "trace"), 1
+     findpropstrict      QName(PackageNamespace(""), "trace")
+     debugline           30
+     getglobalscope
+     getslot             1 ;globalVar1
+     callpropvoid        QName(PackageNamespace(""), "trace"), 1
+     findpropstrict      QName(PackageNamespace(""), "trace")
+     debugline           31
+     getglobalscope
+     getslot             2 ;globalVar2
+     callpropvoid        QName(PackageNamespace(""), "trace"), 1
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  metadata "__go_to_definition_help"
+   item "pos" "512"
+  end ; metadata
+ end ; trait
+end ; class

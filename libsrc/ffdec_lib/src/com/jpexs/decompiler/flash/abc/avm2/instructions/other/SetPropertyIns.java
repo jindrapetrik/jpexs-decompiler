@@ -279,15 +279,4 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         int multinameIndex = ins.operands[0];
         return 2 + getMultinameRequiredStackSize(abc.constants, multinameIndex);
     }
-
-    @Override
-    public String getObject(Stack<AVM2Item> stack, ABC abc, AVM2Instruction ins, List<AVM2Item> output, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) {
-        int multinameIndex = ins.operands[0];
-        String multiname = resolveMultinameNoPop(0, stack, abc.constants, multinameIndex, ins, fullyQualifiedNames);
-        GraphTargetItem obj = stack.get(1 + resolvedCount(abc.constants, multinameIndex)); //pod vrcholem
-        if ((!obj.toString().isEmpty())) {
-            multiname = "." + multiname;
-        }
-        return obj + multiname;
-    }
 }

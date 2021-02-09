@@ -254,6 +254,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnVoidAVM2Item;
@@ -1875,32 +1876,34 @@ public class AVM2Code implements Cloneable {
                 }
                 if (subItem instanceof SetSlotAVM2Item) {
                     SetSlotAVM2Item ssti = (SetSlotAVM2Item) subItem;
-                    Slot sl = new Slot(ssti.scope, ssti.slotName);
-                    if (!declaredSlots.contains(sl)) {
-                        GraphTargetItem type = TypeItem.UNBOUNDED;
-                        for (int t = 0; t < body.traits.traits.size(); t++) {
-                            if (body.traits.traits.get(t).getName(abc) == sl.multiname) {
-                                if (body.traits.traits.get(t) instanceof TraitSlotConst) {
-                                    type = PropertyAVM2Item.multinameToType(((TraitSlotConst) body.traits.traits.get(t)).type_index, abc.constants);
+                    if (ssti.scope instanceof NewActivationAVM2Item) {
+                        Slot sl = new Slot(ssti.scope, ssti.slotName);
+                        if (!declaredSlots.contains(sl)) {
+                            GraphTargetItem type = TypeItem.UNBOUNDED;
+                            for (int t = 0; t < body.traits.traits.size(); t++) {
+                                if (body.traits.traits.get(t).getName(abc) == sl.multiname) {
+                                    if (body.traits.traits.get(t) instanceof TraitSlotConst) {
+                                        type = PropertyAVM2Item.multinameToType(((TraitSlotConst) body.traits.traits.get(t)).type_index, abc.constants);
+                                    }
                                 }
                             }
-                        }
-                        DeclarationAVM2Item d = new DeclarationAVM2Item(subItem, type);
-                        ssti.setDeclaration(d);
-                        declaredSlotsDec.add(d);
-                        declaredSlots.add(sl);
+                            DeclarationAVM2Item d = new DeclarationAVM2Item(subItem, type);
+                            ssti.setDeclaration(d);
+                            declaredSlotsDec.add(d);
+                            declaredSlots.add(sl);
 
-                        if (subItem == currentItem) {
-                            items.set(i, d);
+                            if (subItem == currentItem) {
+                                items.set(i, d);
+                            } else {
+                                d.showValue = false;
+                                items.add(i, d);
+                                i++;
+                            }
+
                         } else {
-                            d.showValue = false;
-                            items.add(i, d);
-                            i++;
+                            int idx = declaredSlots.indexOf(sl);
+                            ssti.setDeclaration(declaredSlotsDec.get(idx));
                         }
-
-                    } else {
-                        int idx = declaredSlots.indexOf(sl);
-                        ssti.setDeclaration(declaredSlotsDec.get(idx));
                     }
                 }
             }
