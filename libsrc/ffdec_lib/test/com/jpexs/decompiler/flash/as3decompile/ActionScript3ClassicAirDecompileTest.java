@@ -1061,9 +1061,9 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "a = 5;\r\n"
                 + "a = 5 % 7368;\r\n"
                 + "a = 1.5;\r\n"
-                + "a = 0.166666666666667;\r\n"
+                + "a = 0.16666666666666666;\r\n"
                 + "a = 6;\r\n"
-                + "a = 0.666666666666667;\r\n"
+                + "a = 0.6666666666666666;\r\n"
                 + "trace(\"a=\" + a);\r\n",
                 false);
     }
