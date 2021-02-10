@@ -204,8 +204,6 @@ import java.util.zip.InflaterInputStream;
  */
 public final class SWF implements SWFContainerItem, Timelined {
 
-    // big object for testing cleanup
-    //BigObject bigObj = new BigObject();
     /**
      * Default version of SWF file format
      */
