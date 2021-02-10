@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.swf;
 
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
@@ -86,7 +87,7 @@ public class SwfToSwcExporter {
         return dc.getWithoutLast().toRawString() + ":" + dc.getLast();
     }
 
-    private String generateCatalog(SWF swf, byte[] swfBytes, boolean skipDependencies) {
+    private String generateCatalog(SWF swf, byte[] swfBytes, boolean skipDependencies) throws InterruptedException {
         StringBuilder sb = new StringBuilder();
 
         final String libraryFileName = "library.swf";
@@ -148,7 +149,7 @@ public class SwfToSwcExporter {
                 if (!skipDependencies) {
                     List<Dependency> dependencies = new ArrayList<>();
                     List<String> uses = new ArrayList<>();
-                    pack.abc.script_info.get(pack.scriptIndex).traits.getDependencies(null, pack.abc, dependencies, uses, new DottedChain(new String[]{"NO:PACKAGE"}, ""), new ArrayList<>());
+                    pack.abc.script_info.get(pack.scriptIndex).traits.getDependencies(pack.scriptIndex, -1, false, null, pack.abc, dependencies, uses, new DottedChain(new String[]{"NO:PACKAGE"}, ""), new ArrayList<>());
 
                     for (Dependency d : dependencies) {
                         if ("*".equals(d.getId().getLast())) {
@@ -207,7 +208,7 @@ public class SwfToSwcExporter {
         //System.out.println("time " + title + ": " + (t2 - t1));
     }
 
-    public void exportSwf(SWF swf, File outSwcFile, boolean skipDependencies) throws IOException {
+    public void exportSwf(SWF swf, File outSwcFile, boolean skipDependencies) throws IOException, InterruptedException {
         long t4 = 0;
         //Make local copy of SWF so we do not modify original
         try {

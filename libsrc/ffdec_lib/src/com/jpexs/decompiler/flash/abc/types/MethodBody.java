@@ -101,6 +101,12 @@ public final class MethodBody implements Cloneable {
     @Internal
     private ABC abc;
 
+    /**
+     * DependencyParser uses this
+     */
+    @Internal
+    private MethodBody lastConvertedBody = null;
+
     public MethodBody() {
         this.traits = new Traits();
         this.codeBytes = SWFInputStream.BYTE_ARRAY_EMPTY;
@@ -297,7 +303,7 @@ public final class MethodBody implements Cloneable {
                     @Override
                     public Void call() throws InterruptedException {
                         try (Statistics s1 = new Statistics("MethodBody.convert")) {
-                            MethodBody converted = convertMethodBody(convertData, path, isStatic, scriptIndex, classIndex, abc, trait, scopeStack, initializerType != GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, fullyQualifiedNames, initTraits);
+                            MethodBody converted = convertMethodBody(convertData.deobfuscationMode != 0, path, isStatic, scriptIndex, classIndex, abc, trait);
                             HashMap<Integer, String> localRegNames = getLocalRegNames(abc);
                             List<GraphTargetItem> convertedItems1;
                             try (Statistics s = new Statistics("AVM2Code.toGraphTargetItems")) {
@@ -319,7 +325,6 @@ public final class MethodBody implements Cloneable {
             } catch (InterruptedException ex) {
                 throw ex;
             } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
-                ex.printStackTrace();
                 convertException = ex;
                 Throwable cause = ex.getCause();
                 if (ex instanceof ExecutionException && cause instanceof Exception) {
@@ -372,19 +377,29 @@ public final class MethodBody implements Cloneable {
         return writer;
     }
 
-    public MethodBody convertMethodBody(ConvertData convertData, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait, ScopeStack scopeStack, boolean isStaticInitializer, List<DottedChain> fullyQualifiedNames, List<Traits> initTraits) throws InterruptedException {
+    public MethodBody convertMethodBodyCanUseLast(boolean deobfuscate, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait) throws InterruptedException {
+        if (lastConvertedBody != null) {
+            return lastConvertedBody;
+        }
+        return convertMethodBody(deobfuscate, path, isStatic, scriptIndex, classIndex, abc, trait);
+    }
+
+    public void clearLastConverted() {
+        this.lastConvertedBody = null;
+    }
+
+    public MethodBody convertMethodBody(boolean deobfuscate, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, Trait trait) throws InterruptedException {
         MethodBody body = clone();
         AVM2Code code = body.getCode();
         code.markVirtualAddresses();
         code.fixJumps(path, body);
 
-        if (convertData.deobfuscationMode != 0) {
+        if (deobfuscate) {
             try {
                 code.removeTraps(trait, method_info, body, abc, scriptIndex, classIndex, isStatic, path);
             } catch (ThreadDeath | InterruptedException ex) {
                 throw ex;
             } catch (Throwable ex) {
-                ex.printStackTrace();
                 //ignore
                 logger.log(Level.SEVERE, "Deobfuscation failed in: " + path, ex);
                 body = clone();
@@ -394,6 +409,7 @@ public final class MethodBody implements Cloneable {
             }
         }
 
+        lastConvertedBody = body;
         return body;
     }
 

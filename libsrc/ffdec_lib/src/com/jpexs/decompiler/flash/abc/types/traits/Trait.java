@@ -168,7 +168,7 @@ public abstract class Trait implements Cloneable, Serializable {
         return getName(abc).getNamespace(abc.constants).getName(abc.constants);
     }
 
-    public void getDependencies(String ignoredCustom, ABC abc, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    public void getDependencies(int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (ignoredCustom == null) {
             Namespace n = getName(abc).getNamespace(abc.constants);
             if (n.kind == Namespace.KIND_NAMESPACE) {
@@ -189,7 +189,7 @@ public abstract class Trait implements Cloneable, Serializable {
         return false;
     }
 
-    public void writeImportsUsages(ABC abc, GraphTextWriter writer, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    public void writeImportsUsages(int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
 
         List<String> namesInThisPackage = new ArrayList<>();
         for (ABCContainerTag tag : abc.getAbcTags()) {
@@ -211,7 +211,7 @@ public abstract class Trait implements Cloneable, Serializable {
         if (ns.kind == Namespace.KIND_NAMESPACE) {
             customNs = ns.getName(abc.constants).toRawString();
         }
-        getDependencies(customNs, abc, dependencies, uses, ignorePackage, new ArrayList<>());
+        getDependencies(scriptIndex, classIndex, isStatic, customNs, abc, dependencies, uses, ignorePackage, new ArrayList<>());
 
         List<DottedChain> imports = new ArrayList<>();
         for (Dependency d : dependencies) {

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.script;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -32,6 +33,8 @@ import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.List;
@@ -92,7 +95,7 @@ public class DependencyParser {
         }
     }
 
-    public static void parseDependenciesFromMethodInfo(String ignoredCustom, ABC abc, int method_index, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<Integer> visitedMethods) {
+    public static void parseDependenciesFromMethodInfo(Trait trait, int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, int method_index, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames, List<Integer> visitedMethods) throws InterruptedException {
         if ((method_index < 0) || (method_index >= abc.method_info.size())) {
             return;
         }
@@ -107,7 +110,8 @@ public class DependencyParser {
         }
         MethodBody body = abc.findBody(method_index);
         if (body != null) {
-            body.traits.getDependencies(ignoredCustom, abc, dependencies, uses, ignorePackage, fullyQualifiedNames);
+            body = body.convertMethodBodyCanUseLast(Configuration.autoDeobfuscate.get(), "", isStatic, scriptIndex, classIndex, abc, trait);
+            body.traits.getDependencies(scriptIndex, classIndex, isStatic, ignoredCustom, abc, dependencies, uses, ignorePackage, fullyQualifiedNames);
             for (ABCException ex : body.exceptions) {
                 parseDependenciesFromMultiname(ignoredCustom, abc, dependencies, uses, abc.constants.getMultiname(ex.type_index), ignorePackage, fullyQualifiedNames, DependencyType.EXPRESSION /* or signature?*/);
             }
@@ -122,7 +126,7 @@ public class DependencyParser {
                 if (ins.definition instanceof NewFunctionIns) {
                     if (ins.operands[0] != method_index) {
                         if (!visitedMethods.contains(ins.operands[0])) {
-                            parseDependenciesFromMethodInfo(ignoredCustom, abc, ins.operands[0], dependencies, uses, ignorePackage, fullyQualifiedNames, visitedMethods);
+                            parseDependenciesFromMethodInfo(trait, scriptIndex, classIndex, isStatic, ignoredCustom, abc, ins.operands[0], dependencies, uses, ignorePackage, fullyQualifiedNames, visitedMethods);
                         }
                     }
                 }

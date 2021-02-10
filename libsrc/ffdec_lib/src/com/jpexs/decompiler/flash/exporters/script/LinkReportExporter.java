@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.script;
 
 import com.jpexs.decompiler.flash.EventListener;
@@ -81,7 +82,7 @@ public class LinkReportExporter {
         return sb.toString();
     }
 
-    public String generateReport(SWF swf, List<ScriptPack> as3scripts, EventListener evl) {
+    public String generateReport(SWF swf, List<ScriptPack> as3scripts, EventListener evl) throws InterruptedException {
         StringBuilder sb = new StringBuilder();
         Set<String> extDeps = new HashSet<>();
         sb.append("<report>").append(newLineChar);
@@ -101,7 +102,7 @@ public class LinkReportExporter {
             ScriptInfo script = sp.abc.script_info.get(sp.scriptIndex);
             for (int traitIndex : sp.traitIndices) {
                 Trait trait = script.traits.traits.get(traitIndex);
-                sb.append(reportTrait(extDeps, existingObjects, swf, sp.abc, trait));
+                sb.append(reportTrait(sp.scriptIndex, extDeps, existingObjects, swf, sp.abc, trait));
             }
             //how about script_init method(?)
             sb.append(indent(2)).append("</script>").append(newLineChar);
@@ -129,7 +130,7 @@ public class LinkReportExporter {
         return dc.getWithoutLast().toRawString() + ":" + dc.getLast();
     }
 
-    private String reportTrait(Set<String> externalDefs, List<DottedChain> existingObjects, SWF swf, ABC abc, Trait t) {
+    private String reportTrait(int scriptIndex, Set<String> externalDefs, List<DottedChain> existingObjects, SWF swf, ABC abc, Trait t) throws InterruptedException {
         //TODO: handle externalDefs - <external-defs> <ext id="..." /> </external-defs>
         StringBuilder sb = new StringBuilder();
         if (t instanceof TraitClass) {
@@ -156,17 +157,17 @@ public class LinkReportExporter {
             }
 
             for (Trait ct : ci.static_traits.traits) {
-                reportTrait(externalDefs, existingObjects, swf, abc, ct);
+                reportTrait(scriptIndex, externalDefs, existingObjects, swf, abc, ct);
             }
             for (Trait it : ii.instance_traits.traits) {
-                reportTrait(externalDefs, existingObjects, swf, abc, it);
+                reportTrait(scriptIndex, externalDefs, existingObjects, swf, abc, it);
             }
             List<Dependency> dependencies = new ArrayList<>();
             List<String> uses = new ArrayList<>();
 
             sb.append(indent(3)).append("<dep id=\"AS3\" />").append(newLineChar); //Automatic
 
-            tc.getDependencies(null, abc, dependencies, uses, new DottedChain(new String[]{"FAKE!PACKAGE"}, ""), new ArrayList<>());
+            tc.getDependencies(scriptIndex, -1, false, null, abc, dependencies, uses, new DottedChain(new String[]{"FAKE!PACKAGE"}, ""), new ArrayList<>());
             for (Dependency dependency : dependencies) {
                 DottedChain dc = dependency.getId();
                 if (!"*".equals(dc.getLast())) {

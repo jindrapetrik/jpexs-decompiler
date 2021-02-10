@@ -61,11 +61,11 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public void getDependencies(String customNs, ABC abc, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) {
+    public void getDependencies(int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getDependencies(customNs, abc, dependencies, uses, ignorePackage, fullyQualifiedNames);
+        super.getDependencies(scriptIndex, classIndex, isStatic, customNs, abc, dependencies, uses, ignorePackage, fullyQualifiedNames);
 
         if (customNs == null) {
             Namespace n = getName(abc).getNamespace(abc.constants);
@@ -75,7 +75,7 @@ public class TraitMethodGetterSetter extends Trait {
         }
         //if (method_info != 0)
         {
-            DependencyParser.parseDependenciesFromMethodInfo(customNs, abc, method_info, dependencies, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
+            DependencyParser.parseDependenciesFromMethodInfo(this, scriptIndex, classIndex, isStatic, customNs, abc, method_info, dependencies, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
         }
     }
 
@@ -107,7 +107,7 @@ public class TraitMethodGetterSetter extends Trait {
     @Override
     public void convert(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         if (classIndex < 0) {
-            writeImportsUsages(abc, writer, getPackage(abc), fullyQualifiedNames);
+            writeImportsUsages(scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
         }
         writer.startMethod(method_info);
         path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false, true);
@@ -127,7 +127,7 @@ public class TraitMethodGetterSetter extends Trait {
     public GraphTextWriter toString(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
 
         if (classIndex < 0) {
-            writeImportsUsages(abc, writer, getPackage(abc), fullyQualifiedNames);
+            writeImportsUsages(scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
         }
         getMetaData(parent, convertData, abc, writer);
         writer.startMethod(method_info);

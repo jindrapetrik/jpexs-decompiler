@@ -1128,7 +1128,11 @@ public class CommandLineArgumentParser {
         final File swfFile = new File(args.pop());
         processReadSWF(swfFile, null, (SWF swf, OutputStream stdout) -> {
             SwfToSwcExporter exporter = new SwfToSwcExporter();
-            exporter.exportSwf(swf, outFile, false);
+            try {
+                exporter.exportSwf(swf, outFile, false);
+            } catch (IOException | InterruptedException ex) {
+                Logger.getLogger(CommandLineArgumentParser.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
     }
 
@@ -1160,6 +1164,7 @@ public class CommandLineArgumentParser {
             badArguments("getinstancemetadata");
         }
         processReadSWF(swfFile, stdOutFile, (SWF swf, OutputStream stdout) -> {
+
             LinkReportExporter lre = new LinkReportExporter();
 
             List<ScriptPack> reportPacks;
@@ -1170,9 +1175,12 @@ public class CommandLineArgumentParser {
                 System.exit(1);
                 return;
             }
-
-            String reportStr = lre.generateReport(swf, reportPacks, null);
-            stdout.write(reportStr.getBytes("UTF-8"));
+            try {
+                String reportStr = lre.generateReport(swf, reportPacks, null);
+                stdout.write(reportStr.getBytes("UTF-8"));
+            } catch (InterruptedException ex) {
+                System.err.println("Report generation interrupted");
+            }
         });
     }
 
