@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.ecma;
 
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
@@ -443,7 +444,33 @@ public class EcmaScript {
     }
 
     public static String toString(Object o) {
-        return toString(o, false);
+        if (o == null) {
+            return "null";
+        }
+
+        if (o instanceof Number) {
+            // http://www.ecma-international.org/ecma-262/5.1/#sec-9.8.1
+            Number n = (Number) o;
+            double dn = n.doubleValue();
+            if ((int) dn == dn) { //isRepresentableAsInt
+                return Integer.toString((int) dn);
+            }
+
+            if (dn == Double.POSITIVE_INFINITY) {
+                return "Infinity";
+            }
+
+            if (dn == Double.NEGATIVE_INFINITY) {
+                return "-Infinity";
+            }
+
+            if (Double.isNaN(dn)) {
+                return "NaN";
+            }
+            return EcmaNumberToString.stringFor(dn);
+        }
+
+        return o.toString();
     }
 
     public static String toString(Object o, List<String> constantPool) {
@@ -453,21 +480,7 @@ public class EcmaScript {
                 return constantPool.get(index);
             }
         }
-        return toString(o, false);
-    }
-
-    public static String toString(Object o, boolean maxPrecision) {
-        if (o == null) {
-            return "null";
-        }
-
-        if (o instanceof Number) {
-            // http://www.ecma-international.org/ecma-262/5.1/#sec-9.8.1
-            Number n = (Number) o;
-            return new EcmaFloatingDecimal(n.doubleValue(), maxPrecision).toJavaFormatString();
-        }
-
-        return o.toString();
+        return toString(o);
     }
 
     public static Double parseFloat(Object string) {
