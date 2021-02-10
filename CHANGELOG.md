@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - AS3 pcode - Use Undefined as default keyword for value kind
 
+### Fixed
+- AS1/2 script export to single file maintains script order
+
 ## [13.0.1] - 2021-02-09
 ### Fixed
 - AS3 break loop in catch clause

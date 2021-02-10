@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.script;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -27,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +64,7 @@ public class AS2ScriptExporter {
         int cnt = 1;
         List<ExportScriptTask> tasks = new ArrayList<>();
         String[] keys = asms.keySet().toArray(new String[asms.size()]);
-        Arrays.sort(keys);
+
         for (String key : keys) {
             ASMSource asm = asms.get(key);
             String currentOutDir = outdir + key + File.separator;
