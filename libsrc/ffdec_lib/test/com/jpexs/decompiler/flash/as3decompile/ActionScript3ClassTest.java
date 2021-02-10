@@ -329,4 +329,38 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "   }\n"
                 + "}");
     }
+
+    @Test
+    public void testInitializer() {
+        decompileScriptPack("standard", "tests_classes.TestInitializer", "package tests_classes\n"
+                + "{\n"
+                + "   public class TestInitializer\n"
+                + "   {\n"
+                + "      public static var s_alpha:RegExp = /[a-z]+/;\n"
+                + "      \n"
+                + "      public static var s_regs:Array;\n"
+                + "      \n"
+                + "      public static var s_numbers:RegExp = /[0-9]+/;\n"
+                + "      \n"
+                + "      {\n"
+                + "         s_regs = [s_alpha,s_numbers];\n"
+                + "      }\n"
+                + "      \n"
+                + "      public var i_email:RegExp;\n"
+                + "      \n"
+                + "      public var i_link:RegExp;\n"
+                + "      \n"
+                + "      public var i_regs:Array;\n"
+                + "      \n"
+                + "      public function TestInitializer()\n"
+                + "      {\n"
+                + "         this.i_email = /.*@.*\\..*/;\n"
+                + "         this.i_link = /<a href=\".*\">/;\n"
+                + "         this.i_regs = [this.i_email,this.i_link];\n"
+                + "         super();\n"
+                + "         trace(s_regs[1]);\n"
+                + "      }\n"
+                + "   }\n"
+                + "}");
+    }
 }

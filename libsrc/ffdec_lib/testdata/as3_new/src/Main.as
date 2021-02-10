@@ -6,8 +6,7 @@ package
 	import tests_classes.mypackage1.SetupMyPackage1;
 	import tests_classes.mypackage2.SetupMyPackage2;
 	import tests_classes.mypackage3.SetupMyPackage3;
-	import tests_classes.TestThisOutsideClass;
-	import tests_classes.TestImports;
+	import tests_classes.*;
 	
 	/**
 	 * ...
@@ -102,9 +101,11 @@ package
 		
 		TestThisOutsideClass;
 		TestImports;
+		TestInitializer;
 		
 		public function Main()
 		{
+			new TestInitializer();
 			if (stage) init();
 			else addEventListener(Event.ADDED_TO_STAGE, init);
 		}

@@ -252,6 +252,8 @@ import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
@@ -1944,6 +1946,17 @@ public class AVM2Code implements Cloneable {
                     if (ti instanceof SetPropertyAVM2Item) {
                         multinameIndex = ((FullMultinameAVM2Item) ((SetPropertyAVM2Item) ti).propertyName).multinameIndex;
                         value = ((SetPropertyAVM2Item) ti).value;
+                    }
+                    Set<GraphTargetItem> subItems = value.getAllSubItemsRecursively();
+                    subItems.add(value);
+                    for (GraphTargetItem item : subItems) {
+                        if ((item instanceof GetPropertyAVM2Item) || (item instanceof GetLexAVM2Item)) { //references other property
+                            continue loopi;
+                        }
+
+                        if (item instanceof LocalRegAVM2Item) { //it is surely in static initializer block, not in slot/const
+                            continue loopi;
+                        }
                     }
                     Multiname m = abc.constants.getMultiname(multinameIndex);
                     for (Traits ts : initTraits) {
