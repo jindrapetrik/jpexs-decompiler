@@ -197,7 +197,7 @@ public class ValueKind {
                 ret = "Null()";
                 break;
             case CONSTANT_Undefined:
-                ret = "Void()";
+                ret = "Undefined()"; //"Void()" is also synonym
                 break;
             case CONSTANT_Namespace:
             case CONSTANT_PackageInternalNs:

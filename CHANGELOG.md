@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Changed
+- AS3 pcode - Use Undefined as default keyword for value kind
+
 ## [13.0.1] - 2021-02-09
 ### Fixed
 - AS3 break loop in catch clause
