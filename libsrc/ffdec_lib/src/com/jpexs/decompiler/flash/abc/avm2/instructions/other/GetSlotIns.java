@@ -45,7 +45,9 @@ public class GetSlotIns extends InstructionDefinition {
         GraphTargetItem obj = objinreg.getThroughRegister();
         Reference<GraphTargetItem> realObj = new Reference<>(null);
         Multiname slotname = InstructionDefinition.searchSlotName(slotIndex, localData, obj, realObj);
-        obj = realObj.getVal();
+        if (realObj.getVal() != null) {
+            obj = realObj.getVal();
+        }
         stack.push(new GetSlotAVM2Item(ins, localData.lineStartInstruction, obj, objinreg, slotIndex, slotname));
     }
 

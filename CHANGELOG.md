@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - AS1/2 script export to single file maintains script order
 - #1088 ECMA Number to string conversion
+- AS3 getslot/setslot in certain situations
 
 ## [13.0.1] - 2021-02-09
 ### Fixed

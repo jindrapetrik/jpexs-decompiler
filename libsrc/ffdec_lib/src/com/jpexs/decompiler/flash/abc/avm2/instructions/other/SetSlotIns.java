@@ -70,10 +70,13 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         GraphTargetItem objnoreg = obj;
         obj = obj.getThroughRegister();
 
-        Reference<GraphTargetItem> realObj = new Reference<>(null);
-        Multiname slotname = InstructionDefinition.searchSlotName(slotIndex, localData, obj, realObj);
+        Reference<GraphTargetItem> realObjRef = new Reference<>(null);
+        Multiname slotname = InstructionDefinition.searchSlotName(slotIndex, localData, obj, realObjRef);
 
-        obj = realObj.getVal();
+        GraphTargetItem realObj = realObjRef.getVal();
+        if (realObj != null) {
+            obj = realObj;
+        }
 
         if (slotname != null) {
             if (value instanceof LocalRegAVM2Item) {
