@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -28,6 +29,7 @@ import com.jpexs.helpers.plugin.CharSequenceJavaFileObject;
 import com.jpexs.helpers.plugin.ClassFileManager;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -111,12 +113,12 @@ public class SWFDecompilerPlugin {
             String pluginName = Path.getFileNameWithoutExtension(pluginFile);
             Class<?> cls = cl.loadClass(pluginName);
             if (SWFDecompilerListener.class.isAssignableFrom(cls)) {
-                SWFDecompilerListener listener = (SWFDecompilerListener) cls.newInstance();
+                SWFDecompilerListener listener = (SWFDecompilerListener) cls.getDeclaredConstructor().newInstance();
                 listeners.add(listener);
             }
 
             System.out.println("Plugin loaded: " + pluginName);
-        } catch (MalformedURLException | ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+        } catch (MalformedURLException | ClassNotFoundException | InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
     }
@@ -159,9 +161,15 @@ public class SWFDecompilerPlugin {
 
         // Creating an instance of our compiled class and
         try {
-            listeners.add((SWFDecompilerListener) fileManager.getClassLoader(null).loadClass(fullName).newInstance());
+            listeners.add((SWFDecompilerListener) fileManager.getClassLoader(null).loadClass(fullName).getDeclaredConstructor().newInstance());
             System.out.println("Plugin loaded: " + fullName);
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+        } catch (ClassNotFoundException
+                | InstantiationException
+                | IllegalAccessException
+                | NoSuchMethodException
+                | SecurityException
+                | IllegalArgumentException
+                | InvocationTargetException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
     }

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.types.FieldChangeObserver;
@@ -20,6 +21,7 @@ import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -207,7 +209,7 @@ public class ReflectionTools {
 
     }
 
-    public static Object newInstanceOf(Class cls) throws InstantiationException, IllegalAccessException {
+    public static Object newInstanceOf(Class<?> cls) throws InstantiationException, IllegalAccessException {
         if (cls == Integer.class || cls == int.class) {
             return 0;
         } else if (cls == Float.class || cls == float.class) {
@@ -223,7 +225,12 @@ public class ReflectionTools {
         if (Modifier.isAbstract(cls.getModifiers())) {
             return null;
         }
-        return cls.newInstance();
+        try {
+            return cls.getDeclaredConstructor().newInstance();
+        } catch (NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
+            Logger.getLogger(ReflectionTools.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     @SuppressWarnings("unchecked")
