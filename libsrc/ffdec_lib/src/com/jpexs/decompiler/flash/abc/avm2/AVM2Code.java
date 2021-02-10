@@ -1947,15 +1947,17 @@ public class AVM2Code implements Cloneable {
                         multinameIndex = ((FullMultinameAVM2Item) ((SetPropertyAVM2Item) ti).propertyName).multinameIndex;
                         value = ((SetPropertyAVM2Item) ti).value;
                     }
-                    Set<GraphTargetItem> subItems = value.getAllSubItemsRecursively();
-                    subItems.add(value);
-                    for (GraphTargetItem item : subItems) {
-                        if ((item instanceof GetPropertyAVM2Item) || (item instanceof GetLexAVM2Item)) { //references other property
-                            continue loopi;
-                        }
+                    if (ti instanceof SetPropertyAVM2Item) {
+                        Set<GraphTargetItem> subItems = value.getAllSubItemsRecursively();
+                        subItems.add(value);
+                        for (GraphTargetItem item : subItems) {
+                            if ((item instanceof GetPropertyAVM2Item) || (item instanceof GetLexAVM2Item)) { //references other property
+                                continue loopi;
+                            }
 
-                        if (item instanceof LocalRegAVM2Item) { //it is surely in static initializer block, not in slot/const
-                            continue loopi;
+                            if (item instanceof LocalRegAVM2Item) { //it is surely in static initializer block, not in slot/const
+                                continue loopi;
+                            }
                         }
                     }
                     Multiname m = abc.constants.getMultiname(multinameIndex);

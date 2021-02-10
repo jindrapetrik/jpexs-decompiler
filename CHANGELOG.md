@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 - AS3 getslot/setslot in certain situations
 - #1185 AS3 Incorrect imports in obfuscated files
 - #1186 Missing import when item is fully qualified
-- #1188 AS3 Static initializer - init slot/const only when not referencing other property
+- #1188 AS3 Static initializer - init slot only when not referencing other property
 
 ## [13.0.1] - 2021-02-09
 ### Fixed
