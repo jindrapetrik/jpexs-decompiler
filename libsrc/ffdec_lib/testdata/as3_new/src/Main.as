@@ -105,7 +105,6 @@ package
 		
 		public function Main()
 		{
-			new TestInitializer();
 			if (stage) init();
 			else addEventListener(Event.ADDED_TO_STAGE, init);
 		}

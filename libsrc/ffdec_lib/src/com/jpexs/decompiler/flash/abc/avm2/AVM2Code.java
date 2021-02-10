@@ -1958,7 +1958,7 @@ public class AVM2Code implements Cloneable {
                                         TraitSlotConst tsc = (TraitSlotConst) t;
                                         if (value != null && !convertData.assignedValues.containsKey(tsc)) {
 
-                                            if (ti instanceof SetPropertyAVM2Item) { //only for slots
+                                            /*if (ti instanceof SetPropertyAVM2Item) { //only for slots
                                                 Set<GraphTargetItem> subItems = value.getAllSubItemsRecursively();
                                                 subItems.add(value);
                                                 List<Multiname> laterMultinames = new ArrayList<>();
@@ -1989,7 +1989,7 @@ public class AVM2Code implements Cloneable {
                                                         continue loopi;
                                                     }
                                                 }
-                                            }
+                                            }*/
 
                                             if (value instanceof NewFunctionAVM2Item) {
                                                 NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;

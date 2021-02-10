@@ -105,7 +105,7 @@ public final class MethodBody implements Cloneable {
      * DependencyParser uses this
      */
     @Internal
-    private MethodBody lastConvertedBody = null;
+    private transient MethodBody lastConvertedBody = null;
 
     public MethodBody() {
         this.traits = new Traits();

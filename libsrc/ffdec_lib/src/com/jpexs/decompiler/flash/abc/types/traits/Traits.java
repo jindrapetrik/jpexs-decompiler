@@ -17,7 +17,11 @@
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.Dependency;
@@ -25,9 +29,13 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.search.MethodId;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -153,8 +161,51 @@ public class Traits implements Cloneable, Serializable {
     }
 
     public GraphTextWriter toString(Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
-        for (int t = 0; t < traits.size(); t++) {
-            Trait trait = traits.get(t);
+
+        List<Trait> ordered = new ArrayList<>(traits);
+        loopi:
+        for (int i = 0; i < ordered.size(); i++) {
+            for (int j = i + 1; j < ordered.size(); j++) {
+                if (i == j) {
+                    continue;
+                }
+                Trait o1 = ordered.get(i);
+                Trait o2 = ordered.get(j);
+                Multiname m2 = abc.constants.getMultiname(o2.name_index);
+                if (!convertData.assignedValues.containsKey(o1)) {
+                    continue;
+                }
+                GraphTargetItem v1 = convertData.assignedValues.get(o1).value;
+
+
+                Set<GraphTargetItem> subitems1 = v1.getAllSubItemsRecursively();
+                subitems1.add(v1);
+                for (GraphTargetItem si : subitems1) {
+                    if (si instanceof GetPropertyAVM2Item) {
+                        GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) si;
+                        Multiname sm1 = abc.constants.getMultiname(((FullMultinameAVM2Item) getProp.propertyName).multinameIndex);
+                        if (sm1.equals(m2)) {
+                            ordered.add(j + 1, o1);
+                            ordered.remove(i);
+                            i--;
+                            continue loopi;
+                        }
+                    }
+                    if (si instanceof GetLexAVM2Item) {
+                        GetLexAVM2Item lex = (GetLexAVM2Item) si;
+                        if (lex.propertyName.equals(m2)) {
+                            ordered.add(j + 1, o1);
+                            ordered.remove(i);
+                            i--;
+                            continue loopi;
+                        }
+                    }
+                }
+            }
+        }
+
+        for (Trait trait : ordered) {
+            int t = traits.indexOf(trait);
             if (traitTypes != null) {
                 boolean found = false;
                 for (Class c : traitTypes) {
