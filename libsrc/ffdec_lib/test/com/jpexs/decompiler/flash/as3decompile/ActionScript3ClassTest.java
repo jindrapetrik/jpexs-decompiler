@@ -294,4 +294,31 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "   trace(globalVar2);\n"
                 + "}");
     }
+
+    @Test
+    public void testImports() {
+        decompileScriptPack("standard", "tests_classes.TestImports", "package tests_classes\n"
+                + "{\n"
+                + "   import tests_classes.myjson.JSON;\n"
+                + "   import tests_classes.myjson2.JSON;\n"
+                + "   \n"
+                + "   public class TestImports\n"
+                + "   {\n"
+                + "       \n"
+                + "      \n"
+                + "      public function TestImports()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function run() : *\n"
+                + "      {\n"
+                + "         var j1:tests_classes.myjson.JSON = new tests_classes.myjson.JSON();\n"
+                + "         var j2:tests_classes.myjson2.JSON = new tests_classes.myjson2.JSON();\n"
+                + "         trace(j1);\n"
+                + "         trace(j2);\n"
+                + "      }\n"
+                + "   }\n"
+                + "}");
+    }
 }

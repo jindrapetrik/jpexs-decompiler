@@ -7,6 +7,7 @@ package
 	import tests_classes.mypackage2.SetupMyPackage2;
 	import tests_classes.mypackage3.SetupMyPackage3;
 	import tests_classes.TestThisOutsideClass;
+	import tests_classes.TestImports;
 	
 	/**
 	 * ...
@@ -81,7 +82,6 @@ package
 		TestSwitchComma;
 		TestSwitchDefault;
 		TestTernarOperator;
-		TestThisOutsideClass;
 		TestTry;
 		TestTryIf;
 		TestTryReturn;
@@ -99,6 +99,9 @@ package
 		SetupMyPackage1;
 		SetupMyPackage2;
 		SetupMyPackage3;
+		
+		TestThisOutsideClass;
+		TestImports;
 		
 		public function Main()
 		{

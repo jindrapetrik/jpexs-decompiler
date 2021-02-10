@@ -232,8 +232,6 @@ public abstract class Trait implements Cloneable, Serializable {
             }
             String name = ipath.getLast();
             if (importnames.contains(name)) {
-                imports.remove(i);
-                i--;
                 fullyQualifiedNames.add(DottedChain.parseWithSuffix(name));
             } else {
                 importnames.add(name);
