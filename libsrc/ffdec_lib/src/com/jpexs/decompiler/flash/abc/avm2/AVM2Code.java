@@ -1947,28 +1947,49 @@ public class AVM2Code implements Cloneable {
                         multinameIndex = ((FullMultinameAVM2Item) ((SetPropertyAVM2Item) ti).propertyName).multinameIndex;
                         value = ((SetPropertyAVM2Item) ti).value;
                     }
-                    if (ti instanceof SetPropertyAVM2Item) {
-                        Set<GraphTargetItem> subItems = value.getAllSubItemsRecursively();
-                        subItems.add(value);
-                        for (GraphTargetItem item : subItems) {
-                            if ((item instanceof GetPropertyAVM2Item) || (item instanceof GetLexAVM2Item)) { //references other property
-                                continue loopi;
-                            }
-
-                            if (item instanceof LocalRegAVM2Item) { //it is surely in static initializer block, not in slot/const
-                                continue loopi;
-                            }
-                        }
-                    }
                     Multiname m = abc.constants.getMultiname(multinameIndex);
                     for (Traits ts : initTraits) {
-                        for (Trait t : ts.traits) {
+                        for (int j = 0; j < ts.traits.size(); j++) {
+                            Trait t = ts.traits.get(j);
                             Multiname tm = abc.constants.getMultiname(t.name_index);
                             if (tm != null && tm.equals(m)) {
                                 if ((t instanceof TraitSlotConst)) {
                                     if (((TraitSlotConst) t).isConst() || initializerType == GraphTextWriter.TRAIT_CLASS_INITIALIZER || initializerType == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER) {
                                         TraitSlotConst tsc = (TraitSlotConst) t;
                                         if (value != null && !convertData.assignedValues.containsKey(tsc)) {
+
+                                            if (ti instanceof SetPropertyAVM2Item) { //only for slots
+                                                Set<GraphTargetItem> subItems = value.getAllSubItemsRecursively();
+                                                subItems.add(value);
+                                                List<Multiname> laterMultinames = new ArrayList<>();
+                                                for (int k = j + 1; k < ts.traits.size(); k++) {
+                                                    int tMultinameIndex = ts.traits.get(k).name_index;
+                                                    if (tMultinameIndex > 0) {
+                                                        Multiname tMultiname = abc.constants.getMultiname(tMultinameIndex);
+                                                        laterMultinames.add(tMultiname);
+                                                    }
+                                                }
+                                                for (GraphTargetItem item : subItems) {
+
+                                                    //if later slot is referenced, we must add it as {} block instead of direct assignment
+                                                    if (item instanceof GetPropertyAVM2Item) {
+                                                        Multiname multiName = abc.constants.getMultiname(((FullMultinameAVM2Item) ((GetPropertyAVM2Item) item).propertyName).multinameIndex);
+                                                        if (laterMultinames.contains(multiName)) {
+                                                            continue loopi;
+                                                        }
+                                                    }
+                                                    if (item instanceof GetLexAVM2Item) {
+                                                        Multiname multiName = ((GetLexAVM2Item) item).propertyName;
+                                                        if (laterMultinames.contains(multiName)) {
+                                                            continue loopi;
+                                                        }
+                                                    }
+
+                                                    if (item instanceof LocalRegAVM2Item) { //it is surely in static initializer block, not in slot/const
+                                                        continue loopi;
+                                                    }
+                                                }
+                                            }
 
                                             if (value instanceof NewFunctionAVM2Item) {
                                                 NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;
