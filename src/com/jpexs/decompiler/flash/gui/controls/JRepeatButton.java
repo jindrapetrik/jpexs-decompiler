@@ -54,7 +54,7 @@ public class JRepeatButton extends JButton {
                             cnt++;
                             JRepeatButton button = JRepeatButton.this;
                             repeatCount = cnt;
-                            fireActionPerformed(new ActionEvent(button, ActionEvent.ACTION_PERFORMED, button.getActionCommand(), e.getWhen(), e.getModifiers()));
+                            fireActionPerformed(new ActionEvent(button, ActionEvent.ACTION_PERFORMED, button.getActionCommand(), e.getWhen(), e.getModifiersEx()));
                         });
                     }
                 };

@@ -42,6 +42,7 @@ import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.BoxLayout;
@@ -390,7 +391,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         if (lg < 0) {
             lg = 0;
         }
-        BigDecimal bd = new BigDecimal(String.valueOf(realZoom)).setScale(lg, BigDecimal.ROUND_HALF_UP);
+        BigDecimal bd = new BigDecimal(String.valueOf(realZoom)).setScale(lg, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }
 

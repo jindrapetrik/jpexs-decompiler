@@ -101,7 +101,7 @@ public interface MenuBuilder {
         }
 
         public int getModifier() {
-            return (shiftDown ? KeyEvent.SHIFT_MASK : 0) + (ctrlDown ? KeyEvent.CTRL_MASK : 0) + (altDown ? KeyEvent.ALT_MASK : 0);
+            return (shiftDown ? KeyEvent.SHIFT_DOWN_MASK : 0) + (ctrlDown ? KeyEvent.CTRL_DOWN_MASK : 0) + (altDown ? KeyEvent.ALT_DOWN_MASK : 0);
         }
 
         public HotKey(String h) {
@@ -197,8 +197,8 @@ public interface MenuBuilder {
      * @param priority Priority
      * @param subloader Action which loads menu inside
      * @param isLeaf Has no subitems?
-     * @param key
-     * @param isOptional
+     * @param key Hot key
+     * @param isOptional Optional
      */
     public void addMenuItem(String path, String title, String icon, ActionListener action, int priority, ActionListener subloader, boolean isLeaf, HotKey key, boolean isOptional);
 
@@ -211,7 +211,7 @@ public interface MenuBuilder {
      * @param icon Icon - resource name
      * @param action Action for clicking
      * @param priority Priority
-     * @param key
+     * @param key Hot key
      */
     public void addToggleMenuItem(String path, String title, String group, String icon, ActionListener action, int priority, HotKey key);
 
@@ -227,7 +227,7 @@ public interface MenuBuilder {
      * Hotkey for menu
      *
      * @param path Menu path
-     * @return
+     * @return Hot key
      */
     public HotKey getMenuHotkey(String path);
 
