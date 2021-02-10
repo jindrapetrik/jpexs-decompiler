@@ -62,6 +62,9 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
     public void testMyPackage1TestClass() {
         decompileScriptPack("standard", "tests_classes.mypackage1.TestClass", "package tests_classes.mypackage1\n"
                 + "{\n"
+                + "   import tests_classes.mypackage2.TestClass;\n"
+                + "   import tests_classes.mypackage2.TestInterface;\n"
+                + "   \n"
                 + "   public class TestClass implements tests_classes.mypackage1.TestInterface\n"
                 + "   {\n"
                 + "       \n"
@@ -99,6 +102,9 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
     public void testMyPackage1TestClass2() {
         decompileScriptPack("standard", "tests_classes.mypackage1.TestClass2", "package tests_classes.mypackage1\n"
                 + "{\n"
+                + "   import tests_classes.mypackage2.TestClass;\n"
+                + "   import tests_classes.mypackage3.TestClass;\n"
+                + "   \n"
                 + "   public class TestClass2\n"
                 + "   {\n"
                 + "       \n"
@@ -142,6 +148,8 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
     public void testMyPackage1TestInterface() {
         decompileScriptPack("standard", "tests_classes.mypackage1.TestInterface", "package tests_classes.mypackage1\n"
                 + "{\n"
+                + "   import tests_classes.mypackage2.TestInterface;\n"
+                + "   \n"
                 + "   public interface TestInterface extends tests_classes.mypackage2.TestInterface\n"
                 + "   {\n"
                 + "       \n"
