@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- #1114 Script search results dialogs closing on swf close
+
 ## [13.0.2] - 2021-02-10
 ### Changed
 - AS3 pcode - Use Undefined as default keyword for value kind

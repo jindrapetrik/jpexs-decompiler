@@ -330,6 +330,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public TreeItem oldItem;
 
+    private Map<SWF, List<SearchResultsDialog>> searchResultsDialogs = new HashMap<>();
+
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
 
     public void setPercent(int percent) {
@@ -424,8 +426,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private JPanel createFolderPreviewCard() {
         JPanel folderPreviewCard = new JPanel(new BorderLayout());
         folderPreviewPanel = new FolderPreviewPanel(this, new ArrayList<>());
-	final JScrollPane jScrollPane = new JScrollPane(folderPreviewPanel);
-	jScrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        final JScrollPane jScrollPane = new JScrollPane(folderPreviewPanel);
+        jScrollPane.getVerticalScrollBar().setUnitIncrement(20);
         folderPreviewCard.add(jScrollPane, BorderLayout.CENTER);
 
         return folderPreviewCard;
@@ -927,6 +929,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         List<SWFList> swfsLists = new ArrayList<>(swfs);
+
+        for (SWF swf : searchResultsDialogs.keySet()) {
+            for (SearchResultsDialog sr : searchResultsDialogs.get(swf)) {
+                sr.setVisible(false);
+            }
+        }
+        searchResultsDialogs.clear();
+
         swfs.clear();
         oldItem = null;
         clear();
@@ -956,6 +966,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             boolean closeConfirmResult = closeConfirmation(swfList);
             if (!closeConfirmResult) {
                 return false;
+            }
+        }
+
+        for (SWF swf : swfList) {
+            if (searchResultsDialogs.containsKey(swf)) {
+                for (SearchResultsDialog sr : searchResultsDialogs.get(swf)) {
+                    sr.setVisible(false);
+                }
+                searchResultsDialogs.remove(swf);
             }
         }
 
@@ -1785,6 +1804,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                     SearchResultsDialog<ABCSearchResult> sr = new SearchResultsDialog<>(getMainFrame().getWindow(), txt, getABCPanel());
                                     sr.setResults(fAbcResult);
                                     sr.setVisible(true);
+                                    if (!searchResultsDialogs.containsKey(swf)) {
+                                        searchResultsDialogs.put(swf, new ArrayList<>());
+                                    }
+                                    searchResultsDialogs.get(swf).add(sr);
                                 } else if (fActionResult != null) {
                                     found = true;
                                     getActionPanel().searchPanel.setSearchText(txt);
@@ -1792,6 +1815,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                     SearchResultsDialog<ActionSearchResult> sr = new SearchResultsDialog<>(getMainFrame().getWindow(), txt, getActionPanel());
                                     sr.setResults(fActionResult);
                                     sr.setVisible(true);
+                                    if (!searchResultsDialogs.containsKey(swf)) {
+                                        searchResultsDialogs.put(swf, new ArrayList<>());
+                                    }
+                                    searchResultsDialogs.get(swf).add(sr);
                                 }
 
                                 if (!found) {
@@ -2776,8 +2803,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             doReplaceAction(ti, file);
         }
     }
+
     private void doReplaceAction(TreeItem item, File selectedFile) {
-        if (selectedFile == null) return;
+        if (selectedFile == null) {
+            return;
+        }
         if (item instanceof DefineSoundTag) {
             File selfile = Helper.fixDialogFile(selectedFile);
             DefineSoundTag ds = (DefineSoundTag) item;
@@ -2822,7 +2852,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
         if (item instanceof ShapeTag) {
-        ShapeTag st = (ShapeTag) item;
+            ShapeTag st = (ShapeTag) item;
             File selfile = Helper.fixDialogFile(selectedFile);
             byte[] data = null;
             String svgText = null;
