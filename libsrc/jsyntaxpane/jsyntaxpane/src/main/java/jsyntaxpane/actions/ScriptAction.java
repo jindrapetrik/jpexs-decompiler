@@ -81,7 +81,10 @@ public class ScriptAction extends DefaultSyntaxAction {
 	 * 
 	 * @param url
 	 */
-	public void getScriptFromURL(String url) {
+    public void getScriptFromURL(String url) {
+        if (engine == null) {
+            return;
+        }
 		InputStream is = JarServiceProvider.findResource(url, this.getClass().getClassLoader());
 		if (is != null) {
 			Reader reader = new InputStreamReader(is);

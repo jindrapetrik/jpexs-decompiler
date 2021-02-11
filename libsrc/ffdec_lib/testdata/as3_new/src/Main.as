@@ -102,6 +102,7 @@ package
 		TestThisOutsideClass;
 		TestImports;
 		TestInitializer;
+		TestRegexpHilight;
 		
 		public function Main()
 		{

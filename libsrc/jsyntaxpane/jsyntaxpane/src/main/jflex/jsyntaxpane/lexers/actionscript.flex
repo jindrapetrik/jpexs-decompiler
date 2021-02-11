@@ -17,7 +17,12 @@ package jsyntaxpane.lexers;
 
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
-
+import javax.swing.text.Segment;
+import java.io.CharArrayReader;
+import java.io.IOException;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+import java.util.List;
 %%
 
 %public
@@ -31,7 +36,7 @@ import jsyntaxpane.TokenType;
 
 %{
     /**
-     * Create an empty lexer, yyrset will be called later to reset and assign
+     * Create an empty lexer, yyreset will be called later to reset and assign
      * the reader
      */
     public ActionScriptLexer() {
@@ -48,6 +53,26 @@ import jsyntaxpane.TokenType;
     private static final byte CURLY     = 3;
 
     private static String xmlTagName="";
+
+    private Token prevToken = null;
+
+    @Override
+    public void parse(Segment segment, int ofst, List<Token> tokens) {
+        try {
+            CharArrayReader reader = new CharArrayReader(segment.array, segment.offset, segment.count);
+            yyreset(reader);
+            this.offset = ofst;
+            prevToken = null;
+            Token t = yylex();
+            prevToken = t;
+            for (; t != null; t = yylex()) {
+                prevToken = t;
+                tokens.add(t);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(DefaultJFlexLexer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
 %}
 
@@ -177,11 +202,20 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   "true"                         { return token(TokenType.KEYWORD); }
 
 
-  {RegExp}                       { return token(TokenType.REGEX); }
+  {RegExp}                       { 
+                                    if (prevToken == null || prevToken.type == TokenType.OPERATOR) {
+                                        return token(TokenType.REGEX);
+                                    } else {    
+                                        int ch = yychar;
+                                        yypushback(yylength()-1);
+                                        // divide "/" operator
+                                        return token(TokenType.OPERATOR,ch,1);
+                                    }
+                                 }
 
   /* operators */
 
-  "("                            { return token(TokenType.OPERATOR,  PARAN); }
+  "("                            { return  token(TokenType.OPERATOR,  PARAN); }
   ")"                            { return token(TokenType.OPERATOR, -PARAN); }
   "{"                            { return token(TokenType.OPERATOR,  CURLY); }
   "}"                            { return token(TokenType.OPERATOR, -CURLY); }

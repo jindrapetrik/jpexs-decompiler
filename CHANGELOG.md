@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - #1114 Script search results dialogs closing on swf close
+- #1159 Regexp syntax hilight when not a regexp (only division)
 
 ## [13.0.2] - 2021-02-10
 ### Changed
