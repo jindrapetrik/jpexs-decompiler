@@ -38,6 +38,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -144,8 +145,8 @@ public class AS3Generator {
                             
                             Configuration.autoDeobfuscate.set(clsName.toLowerCase().contains("obfus"));
                             
-                            b.convert(new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true);
-                            b.toString("", ScriptExportMode.AS, abc, null, src, new ArrayList<>());
+                            b.convert(new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true, new HashSet<>());
+                            b.toString("", ScriptExportMode.AS, abc, null, src, new ArrayList<>(), new HashSet<>());
                             String[] srcs = src.toString().split("[\r\n]+");
                             for (int i = 0; i < srcs.length; i++) {
                                 String ss = srcs[i];

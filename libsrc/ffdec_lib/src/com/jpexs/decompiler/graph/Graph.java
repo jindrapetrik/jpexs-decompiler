@@ -1759,9 +1759,6 @@ public class Graph {
 
         boolean vCanHandleVisited = canHandleVisited(localData, part);
 
-        /*if (part.start == 25) {
-            new RuntimeException().printStackTrace();
-        }*/
         if (vCanHandleVisited) {
             if (visited.contains(part)) {
                 String labelName = "addr" + part.start;

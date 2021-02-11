@@ -74,7 +74,7 @@ public class ConstructPropIns extends InstructionDefinition {
             multiname.property = false;  //can be type
         }
 
-        if (multiname.isXML(localData.abc, localData.localRegNames, localData.fullyQualifiedNames)) {
+        if (multiname.isXML(localData.abc, localData.localRegNames, localData.fullyQualifiedNames, localData.seenMethods)) {
             if (args.size() == 1) {
                 GraphTargetItem arg = args.get(0);
                 List<GraphTargetItem> xmlLines = new ArrayList<>();
@@ -85,7 +85,7 @@ public class ConstructPropIns extends InstructionDefinition {
             }
         }//
         boolean isRegExp = false;
-        if (multiname.isTopLevel("RegExp", localData.abc, localData.localRegNames, localData.fullyQualifiedNames)) {
+        if (multiname.isTopLevel("RegExp", localData.abc, localData.localRegNames, localData.fullyQualifiedNames, localData.seenMethods)) {
             isRegExp = true;
         }
         if (isRegExp && (args.size() >= 1) && (args.get(0) instanceof StringAVM2Item) && (args.size() == 1 || (args.size() == 2 && args.get(1) instanceof StringAVM2Item))) {

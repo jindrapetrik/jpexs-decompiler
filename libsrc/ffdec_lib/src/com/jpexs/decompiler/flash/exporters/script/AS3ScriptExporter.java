@@ -106,7 +106,7 @@ public class AS3ScriptExporter {
         StringBuilder out = new StringBuilder();
         int method = t.method_info;
         try {
-            pack.abc.findBody(method).convert(new ConvertData(), "??", ScriptExportMode.AS, false, method, pack.scriptIndex, cindex, pack.abc, t, new ScopeStack(), 0/*?*/, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
+            pack.abc.findBody(method).convert(new ConvertData(), "??", ScriptExportMode.AS, false, method, pack.scriptIndex, cindex, pack.abc, t, new ScopeStack(), 0/*?*/, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
 
             List<GraphTargetItem> ci = pack.abc.findBody(method).convertedItems;
             if (!ci.isEmpty()) {
@@ -179,7 +179,7 @@ public class AS3ScriptExporter {
         StringBuilder out = new StringBuilder();
         int method = t.method_info;
         try {
-            pack.abc.findBody(method).convert(new ConvertData(), "??", ScriptExportMode.AS, false, method, pack.scriptIndex, cindex, pack.abc, t, new ScopeStack(), 0/*?*/, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
+            pack.abc.findBody(method).convert(new ConvertData(), "??", ScriptExportMode.AS, false, method, pack.scriptIndex, cindex, pack.abc, t, new ScopeStack(), 0/*?*/, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>()/*??*/);
 
             List<GraphTargetItem> ci = pack.abc.findBody(method).convertedItems;
             if (!ci.isEmpty() && (ci.get(0) instanceof DeclarationAVM2Item)) {
@@ -270,7 +270,7 @@ public class AS3ScriptExporter {
                 int iinit = pack.abc.instance_info.get(cindex).iinit_index;
 
                 try {
-                    pack.abc.findBody(iinit).convert(new ConvertData(), "??", ScriptExportMode.AS, false, iinit, pack.scriptIndex, cindex, pack.abc, t, new ScopeStack(), 0/*?*/, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true);
+                    pack.abc.findBody(iinit).convert(new ConvertData(), "??", ScriptExportMode.AS, false, iinit, pack.scriptIndex, cindex, pack.abc, t, new ScopeStack(), 0/*?*/, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
                     List<GraphTargetItem> iinitBody = pack.abc.findBody(iinit).convertedItems;
                     for (GraphTargetItem it : iinitBody) {
                         if (it instanceof InitPropertyAVM2Item) {

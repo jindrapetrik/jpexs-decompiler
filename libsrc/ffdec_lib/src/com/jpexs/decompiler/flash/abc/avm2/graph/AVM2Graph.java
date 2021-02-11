@@ -1643,8 +1643,8 @@ public class AVM2Graph extends Graph {
                                                         FullMultinameAVM2Item gptXmlMult = (FullMultinameAVM2Item) gpt.propertyName;
 
                                                         try {
-                                                            isXMLList = fptXmlMult.isTopLevel("XMLList", aLocalData.abc, aLocalData.localRegNames, aLocalData.fullyQualifiedNames)
-                                                                    && gptXmlMult.isTopLevel("XMLList", aLocalData.abc, aLocalData.localRegNames, aLocalData.fullyQualifiedNames);
+                                                            isXMLList = fptXmlMult.isTopLevel("XMLList", aLocalData.abc, aLocalData.localRegNames, aLocalData.fullyQualifiedNames, aLocalData.seenMethods)
+                                                                    && gptXmlMult.isTopLevel("XMLList", aLocalData.abc, aLocalData.localRegNames, aLocalData.fullyQualifiedNames, aLocalData.seenMethods);
                                                         } catch (InterruptedException ex) {
                                                             //ignore
                                                         }

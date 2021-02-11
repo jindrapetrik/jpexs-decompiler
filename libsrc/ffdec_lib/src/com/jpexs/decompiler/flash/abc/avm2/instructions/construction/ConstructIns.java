@@ -107,8 +107,8 @@ public class ConstructIns extends InstructionDefinition {
                 FullMultinameAVM2Item fptXmlMult = (FullMultinameAVM2Item) fpt.propertyName;
                 FullMultinameAVM2Item gptXmlMult = (FullMultinameAVM2Item) gpt.propertyName;
 
-                isXML = fptXmlMult.isXML(localData.abc, localData.localRegNames, localData.fullyQualifiedNames)
-                        && gptXmlMult.isXML(localData.abc, localData.localRegNames, localData.fullyQualifiedNames);
+                isXML = fptXmlMult.isXML(localData.abc, localData.localRegNames, localData.fullyQualifiedNames, localData.seenMethods)
+                        && gptXmlMult.isXML(localData.abc, localData.localRegNames, localData.fullyQualifiedNames, localData.seenMethods);
             }
         }
         if (obj instanceof GetLexAVM2Item) {
@@ -135,8 +135,8 @@ public class ConstructIns extends InstructionDefinition {
                 FullMultinameAVM2Item fptRegExpMult = (FullMultinameAVM2Item) fpt.propertyName;
                 FullMultinameAVM2Item gptRegExpMult = (FullMultinameAVM2Item) gpt.propertyName;
 
-                isRegExp = fptRegExpMult.isTopLevel("RegExp", localData.abc, localData.localRegNames, localData.fullyQualifiedNames)
-                        && gptRegExpMult.isTopLevel("RegExp", localData.abc, localData.localRegNames, localData.fullyQualifiedNames);
+                isRegExp = fptRegExpMult.isTopLevel("RegExp", localData.abc, localData.localRegNames, localData.fullyQualifiedNames, localData.seenMethods)
+                        && gptRegExpMult.isTopLevel("RegExp", localData.abc, localData.localRegNames, localData.fullyQualifiedNames, localData.seenMethods);
             }
         }
         if (obj instanceof GetLexAVM2Item) {

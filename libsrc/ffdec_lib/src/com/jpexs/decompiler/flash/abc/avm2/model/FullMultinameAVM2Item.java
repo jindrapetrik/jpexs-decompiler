@@ -29,6 +29,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -87,16 +88,16 @@ public class FullMultinameAVM2Item extends AVM2Item {
         return (name != null) || (namespace != null);
     }
 
-    public boolean isTopLevel(String tname, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public boolean isTopLevel(String tname, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) throws InterruptedException {
         String cname;
         if (name != null) {
-            cname = name.toString(LocalData.create(abc, localRegNames, fullyQualifiedNames));
+            cname = name.toString(LocalData.create(abc, localRegNames, fullyQualifiedNames, seenMethods));
         } else {
             cname = (abc.constants.getMultiname(multinameIndex).getName(abc.constants, fullyQualifiedNames, true, true));
         }
         String cns = "";
         if (namespace != null) {
-            cns = namespace.toString(LocalData.create(abc, localRegNames, fullyQualifiedNames));
+            cns = namespace.toString(LocalData.create(abc, localRegNames, fullyQualifiedNames, seenMethods));
         } else {
             Namespace ns = abc.constants.getMultiname(multinameIndex).getNamespace(abc.constants);
             if ((ns != null) && (ns.name_index != 0)) {
@@ -106,8 +107,8 @@ public class FullMultinameAVM2Item extends AVM2Item {
         return cname.equals(tname) && cns.isEmpty();
     }
 
-    public boolean isXML(ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
-        return isTopLevel("XML", abc, localRegNames, fullyQualifiedNames);
+    public boolean isXML(ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) throws InterruptedException {
+        return isTopLevel("XML", abc, localRegNames, fullyQualifiedNames, seenMethods);
     }
 
     @Override

@@ -39,6 +39,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -121,7 +122,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                 writer.newLine();
             }
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
-                assignment.value.toString(writer, LocalData.create(abc, new HashMap<>(), fullyQualifiedNames));
+                assignment.value.toString(writer, LocalData.create(abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>()));
             }
             writer.endMethod();
             writer.endTrait();
@@ -161,7 +162,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (convertData.assignedValues.containsKey(this)) {
             GraphTargetItem val = convertData.assignedValues.get(this).value;
             if (val instanceof NewFunctionAVM2Item) {
-                return val.toString(writer, LocalData.create(abc, new HashMap<>(), fullyQualifiedNames));
+                return val.toString(writer, LocalData.create(abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>()));
             }
         }
         getNameStr(writer, abc, fullyQualifiedNames);

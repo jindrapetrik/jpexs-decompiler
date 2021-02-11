@@ -802,10 +802,10 @@ public class AVM2Code implements Cloneable {
     }
 
     public void calculateDebugFileLine(ABC abc) {
-        calculateDebugFileLine(null, 0, 0, abc, new HashSet<>());
+        calculateDebugFileLine(null, 0, 0, abc, new HashSet<>(), new HashSet<>());
     }
 
-    private boolean calculateDebugFileLine(String debugFile, int debugLine, int pos, ABC abc, Set<Integer> seen) {
+    private boolean calculateDebugFileLine(String debugFile, int debugLine, int pos, ABC abc, Set<Integer> seen, Set<Integer> seenMethods) {
         while (pos < code.size()) {
             AVM2Instruction ins = code.get(pos);
             if (seen.contains(pos)) {
@@ -828,10 +828,15 @@ public class AVM2Code implements Cloneable {
                 //Only analyze NewFunction objects that are not immediately discarded by Pop.
                 //This avoids bogus functions used in obfuscation or special compilers that can lead to infinite recursion.
                 if ((pos + 1 < code.size()) && !(code.get(pos + 1).definition instanceof PopIns)) {
-                    MethodBody innerBody = abc.findBody(ins.operands[0]);
-                    if (innerBody != null) { //Ignore functions without body
-                        innerBody.getCode().calculateDebugFileLine(debugFile, debugLine, 0, abc, new HashSet<>());
+                    int newMethodInfo = ins.operands[0];
+                    if (!seenMethods.contains(newMethodInfo)) { //avoid recursion
+                        MethodBody innerBody = abc.findBody(newMethodInfo);
+                        if (innerBody != null) { //Ignore functions without body
+                            seenMethods.add(newMethodInfo);
+                            innerBody.getCode().calculateDebugFileLine(debugFile, debugLine, 0, abc, new HashSet<>(), seenMethods);
+                        }
                     }
+
                 }
             }
 
@@ -851,7 +856,7 @@ public class AVM2Code implements Cloneable {
             } else if (ins.definition instanceof IfTypeIns) {
                 try {
                     int newpos = adr2pos(ins.getTargetAddress());
-                    calculateDebugFileLine(debugFile, debugLine, newpos, abc, seen);
+                    calculateDebugFileLine(debugFile, debugLine, newpos, abc, seen, seenMethods);
                 } catch (ConvertException ex) {
                     return false;
                 }
@@ -863,7 +868,7 @@ public class AVM2Code implements Cloneable {
                     }
                     try {
                         int newpos = adr2pos(pos2adr(pos) + ins.operands[i]);
-                        if (!calculateDebugFileLine(debugFile, debugLine, newpos, abc, seen)) {
+                        if (!calculateDebugFileLine(debugFile, debugLine, newpos, abc, seen, seenMethods)) {
                             return false;
                         }
                     } catch (ConvertException ex) {
@@ -1990,7 +1995,6 @@ public class AVM2Code implements Cloneable {
                                                     }
                                                 }
                                             }*/
-
                                             if (value instanceof NewFunctionAVM2Item) {
                                                 NewFunctionAVM2Item f = (NewFunctionAVM2Item) value;
                                                 f.functionName = tsc.getName(abc).getName(abc.constants, fullyQualifiedNames, true, true);

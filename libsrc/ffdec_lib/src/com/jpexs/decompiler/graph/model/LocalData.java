@@ -21,7 +21,9 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -39,6 +41,8 @@ public class LocalData {
 
     public List<DottedChain> fullyQualifiedNames;
 
+    public Set<Integer> seenMethods = new HashSet<>();
+
     public ABC abc;
 
     public static LocalData create(ConstantPool constants) {
@@ -47,12 +51,13 @@ public class LocalData {
         return localData;
     }
 
-    public static LocalData create(ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames) {
+    public static LocalData create(ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) {
         LocalData localData = new LocalData();
         localData.abc = abc;
         localData.constantsAvm2 = abc.constants;
         localData.localRegNames = localRegNames;
         localData.fullyQualifiedNames = fullyQualifiedNames;
+        localData.seenMethods = seenMethods;
         return localData;
     }
 }
