@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.configuration;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
@@ -654,6 +655,14 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationInternal
     public static ConfigurationItem<Boolean> showLineNumbersInPCodeGraphvizGraph = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("format")
+    public static ConfigurationItem<Boolean> indentAs3PCode = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("format")
+    public static ConfigurationItem<Boolean> labelOnSeparateLineAs3PCode = null;
 
     private enum OSId {
         WINDOWS, OSX, UNIX

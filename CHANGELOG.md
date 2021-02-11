@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- #1594 Option to disable AS3 P-code indentation, label on separate line
+
 ### Fixed
 - #1114 Script search results dialogs closing on swf close
 - #1159 Regexp syntax hilight when not a regexp (only division)

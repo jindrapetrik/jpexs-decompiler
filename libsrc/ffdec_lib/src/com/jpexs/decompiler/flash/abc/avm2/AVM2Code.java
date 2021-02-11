@@ -1194,7 +1194,11 @@ public class AVM2Code implements Cloneable {
     public GraphTextWriter toASMSource(ABC abc, AVM2ConstantPool constants, MethodInfo info, MethodBody body, List<Integer> outputMap, ScriptExportMode exportMode, GraphTextWriter writer) {
 
         if (info != null) {
-            writer.appendNoHilight("method").indent().newLine();
+            writer.appendNoHilight("method");
+            if (Configuration.indentAs3PCode.get()) {
+                writer.indent();
+            }
+            writer.newLine();
             writer.appendNoHilight("name ");
             writer.hilightSpecial(info.name_index == 0 ? "null" : "\"" + Helper.escapeActionScriptString(info.getName(constants)) + "\"", HighlightSpecialType.METHOD_NAME);
             writer.newLine();
@@ -1272,7 +1276,11 @@ public class AVM2Code implements Cloneable {
 
         Set<Long> importantOffsets = getImportantOffsets(body, true);
         if (body != null) {
-            writer.appendNoHilight("body").indent().newLine();
+            writer.appendNoHilight("body");
+            if (Configuration.indentAs3PCode.get()) {
+                writer.indent();
+            }
+            writer.newLine();
 
             writer.appendNoHilight("maxstack ");
             writer.appendNoHilight(body.max_stack);
@@ -1292,12 +1300,19 @@ public class AVM2Code implements Cloneable {
 
             for (Trait t : body.traits.traits) {
                 t.convertTraitHeader(abc, writer);
-                writer.unindent().appendNoHilight("end ; trait").newLine();
+                if (Configuration.indentAs3PCode.get()) {
+                    writer.unindent();
+                }
+                writer.appendNoHilight("end ; trait").newLine();
             }
         }
 
         writer.newLine();
-        writer.appendNoHilight("code").indent().newLine();
+        writer.appendNoHilight("code");
+        if (Configuration.indentAs3PCode.get()) {
+            writer.indent();
+        }
+        writer.newLine();
         int ip = 0;
         int largeLimit = 20000;
         boolean markOffsets = code.size() <= largeLimit;
@@ -1314,10 +1329,18 @@ public class AVM2Code implements Cloneable {
                 }
                 if (Configuration.showAllAddresses.get() || importantOffsets.contains(addr)) {
                     String label = "ofs" + Helper.formatAddress(addr) + ":";
-                    writer.unindent().unindent().unindent();
+                    if (Configuration.labelOnSeparateLineAs3PCode.get() && Configuration.indentAs3PCode.get()) {
+                        writer.unindent().unindent().unindent();
+                    }
+
                     writer.appendNoHilight(label);
-                    writer.newLine();
-                    writer.indent().indent().indent();
+
+                    if (Configuration.labelOnSeparateLineAs3PCode.get()) {
+                        writer.newLine();
+                        if (Configuration.indentAs3PCode.get()) {
+                            writer.indent().indent().indent();
+                        }
+                    }
                 }
                 /*for (int e = 0; e < body.exceptions.length; e++) {
                  if (body.exceptions[e].start == ofs) {
@@ -1346,7 +1369,10 @@ public class AVM2Code implements Cloneable {
         } else if (exportMode == ScriptExportMode.CONSTANTS) {
             writer.appendNoHilight("Constant export mode is not supported.").newLine();
         }
-        writer.unindent().appendNoHilight("end ; code").newLine();
+        if (Configuration.indentAs3PCode.get()) {
+            writer.unindent();
+        }
+        writer.appendNoHilight("end ; code").newLine();
         if (body != null) {
             for (int e = 0; e < body.exceptions.length; e++) {
                 ABCException exception = body.exceptions[e];
@@ -1374,10 +1400,16 @@ public class AVM2Code implements Cloneable {
                 writer.appendNoHilight(" end");
                 writer.newLine();
             }
-            writer.unindent().appendNoHilight("end ; body").newLine();
+            if (Configuration.indentAs3PCode.get()) {
+                writer.unindent();
+            }
+            writer.appendNoHilight("end ; body").newLine();
         }
         if (info != null) {
-            writer.unindent().appendNoHilight("end ; method").newLine();
+            if (Configuration.indentAs3PCode.get()) {
+                writer.unindent();
+            }
+            writer.appendNoHilight("end ; method").newLine();
         }
 
         return writer;
