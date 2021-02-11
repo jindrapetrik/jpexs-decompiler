@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -34,7 +35,13 @@ public class DecrementAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        value.toString(writer, localData);
+        if (value.getPrecedence() > precedence) {
+            writer.append("(");
+            value.toString(writer, localData);
+            writer.append(")");
+        } else {
+            value.toString(writer, localData);
+        }
         return writer.append(" - 1");
     }
 

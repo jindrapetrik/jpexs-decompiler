@@ -25,5 +25,6 @@ program
  #include "tests/TestTryCatchLoopBreakLevel2.script.asasm"
  #include "tests/TestSlots.script.asasm"
  #include "tests/TestSlots.init/inline_method.method.asasm"
+ #include "tests/TestDecrementPrecedence.script.asasm"
  ; place to add next
 end ; program

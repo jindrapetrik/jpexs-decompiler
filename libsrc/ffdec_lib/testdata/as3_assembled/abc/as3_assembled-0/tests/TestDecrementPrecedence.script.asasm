@@ -1,0 +1,29 @@
+script
+ sinit
+  refid "tests:TestDecrementPrecedence/init"
+  body
+   maxstack 2
+   localcount 1
+   initscopedepth 1
+   maxscopedepth 3
+   code
+    getlocal0
+    pushscope
+
+    findpropstrict      Multiname("TestDecrementPrecedence", [PackageNamespace("tests")])
+    getlex              QName(PackageNamespace(""), "Object")
+    pushscope
+
+    getlex              Multiname("Object", [PrivateNamespace(null, "tests:TestDecrementPrecedence"), PackageNamespace(""), PackageNamespace("tests"), PackageInternalNs("tests"), Namespace("http://adobe.com/AS3/2006/builtin")])
+    newclass            "tests:TestDecrementPrecedence"
+    popscope
+    initproperty        QName(PackageNamespace("tests"), "TestDecrementPrecedence")
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+ trait class QName(PackageNamespace("tests"), "TestDecrementPrecedence")
+  #include "TestDecrementPrecedence.class.asasm"
+ end ; trait
+end ; script

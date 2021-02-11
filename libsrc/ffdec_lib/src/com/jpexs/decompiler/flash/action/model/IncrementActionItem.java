@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -48,7 +49,13 @@ public class IncrementActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        object.toString(writer, localData);
+        if (object.getPrecedence() > precedence) {
+            writer.append("(");
+            object.toString(writer, localData);
+            writer.append(")");
+        } else {
+            object.toString(writer, localData);
+        }
         return writer.append(" + 1");
     }
 
