@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -41,7 +42,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -64,6 +67,15 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     private String file;
 
     private long virtualAddress = -1;
+
+    private static final Map<String, String> oldStyleNames = new HashMap<>();
+
+    static {
+        for (int i = 0; i <= 3; i++) {
+            oldStyleNames.put("getlocal" + i, "getlocal_" + i);
+            oldStyleNames.put("setlocal" + i, "setlocal_" + i);
+        }
+    }
 
     @Override
     public long getFileOffset() {
@@ -373,13 +385,20 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
     }
 
     public GraphTextWriter toString(GraphTextWriter writer, LocalData localData) {
-        writer.appendNoHilight(Helper.formatAddress(address) + " " + String.format("%-30s", Helper.byteArrToString(getBytes())) + definition.instructionName);
+        writer.appendNoHilight(Helper.formatAddress(address) + " " + String.format("%-30s", Helper.byteArrToString(getBytes())) + getCustomizedInstructionName());
         writer.appendNoHilight(getParams(localData.constantsAvm2, localData.fullyQualifiedNames) + getComment());
         return writer;
     }
 
+    private String getCustomizedInstructionName() {
+        if (Configuration.useOldStyleGetSetLocalsAs3PCode.get() && oldStyleNames.containsKey(definition.instructionName)) {
+            return oldStyleNames.get(definition.instructionName);
+        }
+        return definition.instructionName;
+    }
+
     public String toStringNoAddress(AVM2ConstantPool constants, List<DottedChain> fullyQualifiedNames) {
-        String s = definition.instructionName;
+        String s = getCustomizedInstructionName();
         if (Configuration.padAs3PCodeInstructionName.get()) {
             for (int i = s.length(); i < 19; i++) {
                 s += " ";

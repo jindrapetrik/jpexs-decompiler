@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - #1594 Option to disable AS3 P-code indentation, label on separate line
+- #1594 Option to use old style of getlocalx, setlocalx with underscore
 
 ### Fixed
 - #1114 Script search results dialogs closing on swf close

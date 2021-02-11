@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -59,6 +60,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         Configuration.decimalAddress.set(false);
         Configuration.decompilationTimeoutSingleMethod.set(Integer.MAX_VALUE);
         Configuration.padAs3PCodeInstructionName.set(false);
+        Configuration.useOldStyleGetSetLocalsAs3PCode.set(false);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")), false);
     }
 

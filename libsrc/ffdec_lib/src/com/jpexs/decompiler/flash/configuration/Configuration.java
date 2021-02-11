@@ -664,6 +664,10 @@ public final class Configuration {
     @ConfigurationCategory("format")
     public static ConfigurationItem<Boolean> labelOnSeparateLineAs3PCode = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> useOldStyleGetSetLocalsAs3PCode = null;
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
