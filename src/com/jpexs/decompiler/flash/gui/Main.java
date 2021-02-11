@@ -951,7 +951,7 @@ public class Main {
     }
 
     public static void saveFile(SWF swf, String outfile, SaveFileMode mode, ExeExportMode exeExportMode) throws IOException {
-        if (mode == SaveFileMode.SAVEAS && !swf.swfList.isBundle()) {
+        if (mode == SaveFileMode.SAVEAS && swf.swfList!= null /*SWF in binarydata has null*/ && !swf.swfList.isBundle()) {
             swf.setFile(outfile);
             swf.swfList.sourceInfo.setFile(outfile);
         }

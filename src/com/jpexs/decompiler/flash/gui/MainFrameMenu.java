@@ -180,7 +180,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         if (swf != null) {
             if (saveAs(swf, SaveFileMode.SAVEAS)) {
-                swf.clearModified();
+                if (swf.swfList != null) { //binarydata won't clear modified on saveas
+                    swf.clearModified();
+                }
             }
 
             return true;
