@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [13.0.3] - 2021-02-12
 ### Added
 - #1594 Option to disable AS3 P-code indentation, label on separate line
 - #1594 Option to use old style of getlocalx, setlocalx with underscore in AS3 P-code
