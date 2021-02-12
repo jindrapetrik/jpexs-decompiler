@@ -1061,14 +1061,13 @@ public class ASM3Parser {
                                         while (parsedOperand.type == ParsedSymbol.TYPE_IDENTIFIER) {
                                             offsetItems.add(new CaseOffsetItem((String) parsedOperand.value, code.code.size(), i + (c + 1)));
                                             c++;
-                                            parsedOperand = lexer.lex();
+                                            parsedOperand = lexer.lex();                                            
                                             if (parsedOperand.type == ParsedSymbol.TYPE_BRACKET_CLOSE) {
                                                 break;
                                             }
-                                            if (parsedOperand.type != ParsedSymbol.TYPE_COMMA) {
-                                                throw new AVM2ParseException("Comma , expected", lexer.yyline());
+                                            if (parsedOperand.type == ParsedSymbol.TYPE_COMMA) {
+                                                parsedOperand = lexer.lex();
                                             }
-                                            parsedOperand = lexer.lex();
                                         }
                                         if (parsedOperand.type != ParsedSymbol.TYPE_BRACKET_CLOSE) {
                                             throw new AVM2ParseException("Bracket close ] expected", lexer.yyline());
@@ -1087,6 +1086,9 @@ public class ASM3Parser {
 
                                         for (int c = 0; c <= patCount; c++) {
                                             parsedOperand = lexer.lex();
+                                            if (parsedOperand.type == ParsedSymbol.TYPE_COMMA) {
+                                                parsedOperand = lexer.lex();
+                                            }
                                             if (parsedOperand.type == ParsedSymbol.TYPE_IDENTIFIER) {
                                                 offsetItems.add(new CaseOffsetItem((String) parsedOperand.value, code.code.size(), i + (c + 1)));
                                                 operandsList.add(0);

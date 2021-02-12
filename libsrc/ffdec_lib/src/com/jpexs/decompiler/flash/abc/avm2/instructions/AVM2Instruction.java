@@ -348,8 +348,13 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                     s.append(Helper.formatAddress(address + operands[i]));
                     break;
                 case AVM2Code.OPT_CASE_OFFSETS:
-                    s.append(" [");
-                    boolean first = true;
+                    if (Configuration.useOldStyleLookupSwitchAs3PCode.get()) {
+                        s.append(" ");
+                        s.append(operands[i]);
+                    } else {
+                        s.append(" [");
+                    }
+                    boolean first = !Configuration.useOldStyleLookupSwitchAs3PCode.get();
                     for (int j = i + 1; j < operands.length; j++) {
                         if (!first) {
                             s.append(", ");
@@ -358,7 +363,9 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                         s.append("ofs");
                         s.append(Helper.formatAddress(address + operands[j]));
                     }
-                    s.append("]");
+                    if (!Configuration.useOldStyleLookupSwitchAs3PCode.get()) {
+                        s.append("]");
+                    }
                     break;
                 default:
                     s.append(" ");

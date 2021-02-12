@@ -667,6 +667,10 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> useOldStyleGetSetLocalsAs3PCode = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> useOldStyleLookupSwitchAs3PCode = null;
 
     private enum OSId {
         WINDOWS, OSX, UNIX
