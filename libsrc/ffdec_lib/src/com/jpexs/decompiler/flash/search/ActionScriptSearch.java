@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.search;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -26,8 +27,10 @@ import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
@@ -114,7 +117,7 @@ public class ActionScriptSearch {
                 swf.getFlexMainClass(ignoredClasses, ignoredNss);
             }
 
-            final List<ABCSearchResult> found = new ArrayList<>();
+            final List<ABCSearchResult> found = Collections.synchronizedList(new ArrayList<>());
             List<ScriptPack> allpacks = swf.getAS3Packs();
             final Pattern pat = regexp
                     ? Pattern.compile(txt, ignoreCase ? (Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE) : 0)
@@ -168,6 +171,9 @@ public class ActionScriptSearch {
                         Future<HighlightedText> text = SWF.getCachedFuture(pack, new ScriptDecompiledListener<HighlightedText>() {
                             @Override
                             public void onStart() {
+                                if (Thread.currentThread().isInterrupted()) {
+                                    return;
+                                }
                                 if (listener != null) {
                                     listener.onDecompile(fpos, allpacks.size(), pack.getClassPath().toString());
                                 }
@@ -175,8 +181,11 @@ public class ActionScriptSearch {
 
                             @Override
                             public void onComplete(HighlightedText result) {
-                                if (listener != null) {
-                                    listener.onSearch(fpos, allpacks.size(), pack.getClassPath().toString());
+
+                                if (!Thread.currentThread().isInterrupted()) {
+                                    if (listener != null) {
+                                        listener.onSearch(fpos, allpacks.size(), pack.getClassPath().toString());
+                                    }
                                 }
 
                                 if (pat.matcher(result.text).find()) {
@@ -193,6 +202,8 @@ public class ActionScriptSearch {
                 for (Future<HighlightedText> future : futures) {
                     try {
                         future.get();
+                    } catch (CancellationException ex) {
+                        throw new InterruptedException();
                     } catch (ExecutionException ex) {
                         Logger.getLogger(ActionScriptSearch.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -205,7 +216,6 @@ public class ActionScriptSearch {
 
             return found;
         }
-
         return null;
     }
 }

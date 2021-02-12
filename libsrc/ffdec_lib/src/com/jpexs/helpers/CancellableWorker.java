@@ -12,12 +12,15 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.helpers;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -42,11 +45,16 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
 
     private final FutureTask<T> future;
 
+    private static final Map<Thread, CancellableWorker> threadWorkers = Collections.synchronizedMap(new WeakHashMap<>());
+
+    private List<CancellableWorker> subWorkers = Collections.synchronizedList(new ArrayList<>());
+
     public CancellableWorker() {
         super();
         Callable<T> callable = new Callable<T>() {
             @Override
             public T call() throws Exception {
+                threadWorkers.put(Thread.currentThread(), CancellableWorker.this);
                 return doInBackground();
             }
         };
@@ -73,13 +81,22 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
     protected void done() {
     }
 
+    @SuppressWarnings("unchecked")
     public final void execute() {
+        Thread t = Thread.currentThread();
+        if (threadWorkers.containsKey(t)) {
+            threadWorkers.get(t).subWorkers.add(this);
+        }
         onStart();
         THREAD_POOL.execute(this);
     }
 
     @Override
     public final boolean cancel(boolean mayInterruptIfRunning) {
+        List<CancellableWorker> sw = new ArrayList<>(subWorkers);
+        for (CancellableWorker w : sw) {
+            w.cancel(mayInterruptIfRunning);
+        }
         boolean r = future.cancel(mayInterruptIfRunning);
         if (r) {
             workerCancelled();
@@ -118,6 +135,10 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
     }
 
     public static <T> T call(final Callable<T> c, long timeout, TimeUnit timeUnit) throws InterruptedException, ExecutionException, TimeoutException {
+        Thread t = Thread.currentThread();
+        if (t.isInterrupted()) {
+            throw new InterruptedException();
+        }
         CancellableWorker<T> worker = new CancellableWorker<T>() {
 
             @Override

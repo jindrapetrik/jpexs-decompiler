@@ -1837,7 +1837,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 Main.stopWork();
                             });
 
-                        }
+                        }                       
+                        
                     }.execute();
                 } else if (searchDialog.searchInTextsRadioButton.isSelected()) {
                     new CancellableWorker<Void>() {

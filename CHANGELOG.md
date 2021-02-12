@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - #1360 Precedence of increment/decrement operations
 - #1407 NullPointer on Save as in BinaryData SWF subtree
 - #1596 Infinite loop when sorting traits according to dependencies
+- Cannot properly cancel script searching
 
 ## [13.0.2] - 2021-02-10
 ### Changed

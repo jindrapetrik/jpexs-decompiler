@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -326,9 +327,10 @@ public final class MethodBody implements Cloneable {
                 }
             } catch (InterruptedException ex) {
                 throw ex;
+            } catch (CancellationException ex) {
+                throw new InterruptedException();
             } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
                 convertException = ex;
-                ex.printStackTrace();
                 Throwable cause = ex.getCause();
                 if (ex instanceof ExecutionException && cause instanceof Exception) {
                     convertException = (Exception) cause;

@@ -62,6 +62,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -255,14 +256,22 @@ public class ScriptPack extends AS3ClassTreeItem {
             logger.log(Level.SEVERE, "Decompilation timeout", ex);
             Helper.appendTimeoutCommentAs3(writer, timeout, 0);
             return;
+        } catch (CancellationException ex) {
+            throw new InterruptedException();
         } catch (ExecutionException ex) {
             writer.continueMeasure();
             Exception convertException = ex;
             Throwable cause = ex.getCause();
-            if (ex instanceof ExecutionException && cause instanceof Exception) {
+            if (cause instanceof Exception) {
                 convertException = (Exception) cause;
             }
 
+            if (convertException instanceof CancellationException) {
+                throw new InterruptedException();
+            }
+            if (convertException instanceof InterruptedException) {
+                throw (InterruptedException) convertException;
+            }
             logger.log(Level.SEVERE, "Decompilation error", convertException);
             Helper.appendErrorComment(writer, convertException);
             return;
