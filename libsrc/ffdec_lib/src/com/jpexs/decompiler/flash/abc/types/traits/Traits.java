@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
@@ -184,7 +185,7 @@ public class Traits implements Cloneable, Serializable {
                     if (si instanceof GetPropertyAVM2Item) {
                         GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) si;
                         Multiname sm1 = abc.constants.getMultiname(((FullMultinameAVM2Item) getProp.propertyName).multinameIndex);
-                        if (sm1.equals(m2)) {
+                        if (getProp.object instanceof FindPropertyAVM2Item && sm1.equals(m2)) {
                             ordered.add(j + 1, o1);
                             ordered.remove(i);
                             i--;
