@@ -672,6 +672,10 @@ public final class Configuration {
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> useOldStyleLookupSwitchAs3PCode = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> checkForModifications = null;
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

@@ -87,11 +87,18 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.FileSystems;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -100,6 +107,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -169,6 +177,16 @@ public class Main {
     private static File runTempFile;
 
     private static List<File> runTempFiles = new ArrayList<>();
+
+    private static WatchService watcher;
+
+    private static SwingWorker watcherWorker;
+
+    private static Map<WatchKey, File> watchedDirectories = new HashMap<>();
+
+    private static FilesChangedDialog filesChangedDialog;
+
+    private static List<File> savedFiles = Collections.synchronizedList(new ArrayList<>());
 
     public static void freeRun() {
         synchronized (Main.class) {
@@ -951,7 +969,9 @@ public class Main {
     }
 
     public static void saveFile(SWF swf, String outfile, SaveFileMode mode, ExeExportMode exeExportMode) throws IOException {
-        if (mode == SaveFileMode.SAVEAS && swf.swfList!= null /*SWF in binarydata has null*/ && !swf.swfList.isBundle()) {
+        File savedFile = new File(outfile);
+        savedFiles.add(savedFile);
+        if (mode == SaveFileMode.SAVEAS && swf.swfList != null /*SWF in binarydata has null*/ && !swf.swfList.isBundle()) {
             swf.setFile(outfile);
             swf.swfList.sourceInfo.setFile(outfile);
         }
@@ -1028,6 +1048,18 @@ public class Main {
         } else {
             throw new IOException("Output not found");
         }
+        View.execInEventDispatchLater(new Runnable() {
+            @Override
+            public void run() {
+                //TODO: handle this better
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ex) {
+                    //ignore
+                }
+                savedFiles.remove(savedFile);
+            }
+        });
     }
 
     private static class OpenFileWorker extends SwingWorker {
@@ -1292,6 +1324,15 @@ public class Main {
             String fileName = si.getFile();
             if (fileName != null) {
                 Configuration.addRecentFile(fileName);
+                try {
+                    File dir = new File(fileName).getParentFile();
+                    if (!watchedDirectories.containsValue(dir)) {
+                        WatchKey key = dir.toPath().register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+                        watchedDirectories.put(key, dir);
+                    }
+                } catch (IOException ex) {
+                    //ignore
+                }
             }
         }
 
@@ -1320,6 +1361,18 @@ public class Main {
         openFile(swf.sourceInfo, null, sourceInfos.indexOf(swf.sourceInfo));
     }
 
+    public static void reloadFile(File file) {
+        for (int i = 0; i < sourceInfos.size(); i++) {
+            SWFSourceInfo info = sourceInfos.get(i);
+            if (info.getFile() == null) {
+                continue;
+            }
+            if (file.equals(new File(info.getFile()))) {
+                openFile(info, null, i);
+            }
+        }
+    }
+
     public static boolean closeAll() {
         View.checkAccess();
 
@@ -1327,6 +1380,8 @@ public class Main {
         if (closeResult) {
             sourceInfos.clear();
         }
+
+        filesChangedDialog.setVisible(false);
 
         return closeResult;
     }
@@ -1635,6 +1690,76 @@ public class Main {
             autoCheckForUpdates();
             offerAssociation();
             loadingDialog = new LoadingDialog();
+
+            if (Configuration.checkForModifications.get()) {
+                try {
+                    watcher = FileSystems.getDefault().newWatchService();
+                } catch (IOException ex) {
+                    //ignore
+                }
+            }
+
+            filesChangedDialog = new FilesChangedDialog();
+
+            if (watcher != null) {
+                watcherWorker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        while (true) {
+                            WatchKey key;
+                            try {
+                                key = watcher.take();
+                            } catch (InterruptedException ex) {
+                                return null;
+                            }
+
+                            for (WatchEvent<?> event : key.pollEvents()) {
+                                WatchEvent.Kind<?> kind = event.kind();
+                                if (kind == StandardWatchEventKinds.OVERFLOW) {
+                                    System.err.println("overflow");
+                                    continue;
+                                }
+
+                                @SuppressWarnings("unchecked")
+                                WatchEvent<java.nio.file.Path> ev = (WatchEvent<java.nio.file.Path>) event;
+
+                                java.nio.file.Path filename = ev.context();
+
+                                if (watchedDirectories.containsKey(key)) {
+                                    File dir = watchedDirectories.get(key);
+                                    java.nio.file.Path child = dir.toPath().resolve(filename);
+                                    File fullPath = child.toFile();
+                                    if (savedFiles.contains(fullPath)) {
+                                        continue;
+                                    }
+
+                                    for (SWFSourceInfo info : sourceInfos) {
+                                        final String infoFile = info.getFile();
+                                        if (infoFile != null && new File(infoFile).equals(fullPath)) {
+                                            View.execInEventDispatchLater(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    filesChangedDialog.addItem(infoFile);
+                                                    if (!filesChangedDialog.isVisible()) {
+                                                        filesChangedDialog.setVisible(true);
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+
+                            }
+                            boolean valid = key.reset();
+                            if (!valid) {
+                                break;
+                            }
+                        }
+                        return null;
+                    }
+                };
+                watcherWorker.execute();
+            }
 
             DebuggerTools.initDebugger().addMessageListener(new DebugListener() {
                 @Override
