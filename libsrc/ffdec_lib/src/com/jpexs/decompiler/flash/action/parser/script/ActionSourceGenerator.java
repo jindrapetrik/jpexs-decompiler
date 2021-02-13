@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.parser.script;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -417,9 +418,8 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, NotItem item) throws CompilationException {
-        if (item.getOriginal() instanceof Inverted) {
-            GraphTargetItem norig = ((Inverted) item).invert(null);
-            return norig.toSource(localData, this);
+        if (item.value instanceof NotItem) {
+            return item.value.value.toSource(localData, this);
         }
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(item.getOriginal().toSource(localData, this));
