@@ -29,6 +29,7 @@ import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -39,6 +40,8 @@ public class GetPropertyActionItem extends ActionItem {
     public GraphTargetItem target;
 
     public int propertyIndex;
+
+    public boolean useGetPropertyFunction = true;
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
@@ -57,6 +60,13 @@ public class GetPropertyActionItem extends ActionItem {
             return writer.append(Action.propertyNames[propertyIndex]);
         }
 
+        if (!useGetPropertyFunction) {
+            target.appendToNoQuotes(writer, localData);
+            writer.append(":");
+            writer.append(Action.propertyNames[propertyIndex]);
+            return writer;
+        }
+
         writer.append("getProperty");
         writer.spaceBeforeCallParenthesies(2);
         writer.append("(");
@@ -65,6 +75,35 @@ public class GetPropertyActionItem extends ActionItem {
         writer.append(Action.propertyNames[propertyIndex]);
         writer.append(")");
         return writer;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + Objects.hashCode(this.target);
+        hash = 79 * hash + this.propertyIndex;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final GetPropertyActionItem other = (GetPropertyActionItem) obj;
+        if (this.propertyIndex != other.propertyIndex) {
+            return false;
+        }
+        if (!Objects.equals(this.target, other.target)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
