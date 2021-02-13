@@ -136,8 +136,8 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     private List<GraphSourceItem> generateIf(SourceGeneratorLocalData localData, GraphTargetItem expression, List<GraphTargetItem> onTrueCmds, List<GraphTargetItem> onFalseCmds, boolean ternar) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
-        if (expression instanceof Inverted) {
-            ret.addAll(((Inverted) expression).invert(null).toSource(localData, this));
+        if (expression instanceof NotItem) {
+            ret.addAll(expression.value.toSource(localData, this));
         } else {
             ret.addAll(expression.toSource(localData, this));
             ret.add(new ActionNot());
@@ -418,9 +418,9 @@ public class ActionSourceGenerator implements SourceGenerator {
 
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, NotItem item) throws CompilationException {
-        if (item.value instanceof NotItem) {
+        /*if (item.value instanceof NotItem) {
             return item.value.value.toSource(localData, this);
-        }
+        }*/
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(item.getOriginal().toSource(localData, this));
         ret.add(new ActionNot());
