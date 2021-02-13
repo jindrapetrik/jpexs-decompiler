@@ -792,6 +792,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void loadSwfAtPos(SWFList newSwfs, int index) {
         View.checkAccess();
 
+        List<List<String>> expandedNodes = View.getExpandedNodes(tagTree);
         previewPanel.clear();
         swfs.set(index, newSwfs);
         SWF swf = newSwfs.size() > 0 ? newSwfs.get(0) : null;
@@ -801,11 +802,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         doFilter();
         reload(false);
+        View.expandTreeNodes(tagTree, expandedNodes);
     }
 
     public void load(SWFList newSwfs, boolean first) {
         View.checkAccess();
 
+        List<List<String>> expandedNodes = View.getExpandedNodes(tagTree);
         previewPanel.clear();
 
         swfs.add(newSwfs);
@@ -816,6 +819,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         doFilter();
         reload(false);
+        View.expandTreeNodes(tagTree, expandedNodes);
     }
 
     private ABCPanel getABCPanel() {
