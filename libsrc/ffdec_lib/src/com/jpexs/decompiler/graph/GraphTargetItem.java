@@ -46,6 +46,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -394,8 +396,14 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     }
 
     public String toStringNoQuotes(LocalData localData) {
-        // todo: honfika: this method should not be called, maybe we should throw an exception
-        return toString();
+        try {
+            HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
+            toStringNoQuotes(writer, localData);
+            return writer.toString();
+        } catch (InterruptedException ex) {
+            //ignore
+        }
+        return "";
     }
 
     public GraphTextWriter toStringNoQuotes(GraphTextWriter writer, LocalData localData) throws InterruptedException {

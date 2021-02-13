@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.action.parser.script;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.AsciiToCharActionItem;
 import com.jpexs.decompiler.flash.action.model.CallActionItem;
@@ -25,6 +27,7 @@ import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
 import com.jpexs.decompiler.flash.action.model.CastOpActionItem;
 import com.jpexs.decompiler.flash.action.model.CharToAsciiActionItem;
 import com.jpexs.decompiler.flash.action.model.CloneSpriteActionItem;
+import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DefineLocalActionItem;
 import com.jpexs.decompiler.flash.action.model.DeleteActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -128,8 +131,13 @@ import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
+import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -159,6 +167,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -166,15 +175,83 @@ import java.util.List;
  */
 public class ActionScript2Parser {
 
-    private final int swfVersion;
+    public static final List<String> BUILTIN_CASTS = Arrays.asList(new String[]{
+        "flash.display.BitmapData",
+        "flash.external.ExternalInterface",
+        "flash.filters.BevelFilter",
+        "flash.filters.BitmapFilter",
+        "flash.filters.BlurFilter",
+        "flash.filters.ColorMatrixFilter",
+        "flash.filters.ConvolutionFilter",
+        "flash.filters.DisplacementMapFilter",
+        "flash.filters.DropShadowFilter",
+        "flash.filters.GlowFilter",
+        "flash.filters.GradientBevelFilter",
+        "flash.filters.GradientGlowFilter",
+        "flash.geom.ColorTransform",
+        "flash.geom.Matrix",
+        "flash.geom.Point",
+        "flash.geom.Rectangle",
+        "flash.geom.Transform",
+        "flash.net.FileReference",
+        "flash.net.FileReferenceList",
+        "flash.text.TextRenderer",
+        "Button",
+        "Camera",
+        "Color",
+        "ContextMenu",
+        "ContextMenuItem",
+        "CustomActions",
+        "Error",
+        "System.IME",
+        "LoadVars",
+        "LocalConnection",
+        "Microphone",
+        "MovieClip",
+        "MovieClipLoader",
+        "NetConnection",
+        "NetStream",
+        "PrintJob",
+        "System.security",
+        "SharedObject",
+        "Sound",
+        "TextField",
+        "TextFormat",
+        "TextSnapshot",
+        "XML",
+        "XMLNode",
+        "XMLSocket",
+        "XMLUI"
+    });
 
-    public ActionScript2Parser(int swfVersion) {
-        this.swfVersion = swfVersion;
+    private final int swfVersion;
+    private List<String> swfClasses = new ArrayList<>();
+
+    public ActionScript2Parser(SWF swf) {
+        this.swfVersion = swf.version;
+        parseSwfClasses(swf);
     }
 
     private long uniqLast = 0;
 
     private final boolean debugMode = false;
+
+    private void parseSwfClasses(SWF swf) {
+        Map<String, ASMSource> asms = swf.getASMs(false);
+        for (ASMSource s : asms.values()) {
+            if (s instanceof DoInitActionTag) {
+                String exportName = swf.getExportName(((DoInitActionTag) s).spriteId);
+
+                if (exportName != null) {
+                    final String PREFIX = "__Packages.";
+                    if (exportName.startsWith(PREFIX)) {
+                        String className = exportName.substring(PREFIX.length());
+                        swfClasses.add(className);
+                    }
+                }
+            }
+        }
+    }
 
     private String uniqId() {
         uniqLast++;
@@ -1504,15 +1581,6 @@ public class ActionScript2Parser {
                 }
                 lhs = new PostDecrementActionItem(null, null, lhs);
                 break;
-            default:
-                if (lhs instanceof ParenthesisItem) {
-                    if (isType(((ParenthesisItem) lhs).value)) {
-                        GraphTargetItem expr2 = expression(inFunction, inMethod, true, variables, functions);
-                        if (expr2 != null) {
-                            lhs = new CastOpActionItem(null, null, ((ParenthesisItem) lhs).value, expr2);
-                        }
-                    }
-                }
         }
         if (debugMode) {
             System.out.println("/expression1");
@@ -1764,7 +1832,17 @@ public class ActionScript2Parser {
                 break;
             case NEW:
                 GraphTargetItem newvar = expressionPrimary(false, inFunction, inMethod, false, variables, functions);//variable(inFunction, inMethod, variables, functions);
-                if (newvar instanceof ToNumberActionItem) {
+                if (newvar instanceof CastOpActionItem) {
+                    List<GraphTargetItem> args = new ArrayList<>();
+                    args.add((((CastOpActionItem) newvar).object));
+                    newvar = ((CastOpActionItem) newvar).constructor;
+                    if (newvar instanceof GetMemberActionItem) {
+                        ret = new NewMethodActionItem(null, null, ((GetMemberActionItem) newvar).object, ((GetMemberActionItem) newvar).memberName, args);
+                    } else if (newvar instanceof VariableActionItem) {
+                        ret = new NewObjectActionItem(null, null, newvar, args);
+                    }
+                }
+                else if (newvar instanceof ToNumberActionItem) {
                     List<GraphTargetItem> args = new ArrayList<>();
                     if (((ToNumberActionItem) newvar).value != null) {
                         args.add(((ToNumberActionItem) newvar).value);
@@ -1830,12 +1908,42 @@ public class ActionScript2Parser {
         return ret;
     }
 
+    private boolean isCastOp(GraphTargetItem item) {
+        LocalData localData = LocalData.create(new ConstantPool(constantPool));
+        List<String> items = new ArrayList<>();
+        while (item instanceof GetMemberActionItem) {
+            GetMemberActionItem mem = (GetMemberActionItem) item;
+            if (mem.memberName instanceof DirectValueActionItem) {
+                items.add(0, mem.memberName.toStringNoQuotes(localData));
+            }
+            item = mem.object;
+        }
+        if (item instanceof VariableActionItem) {
+            VariableActionItem v = (VariableActionItem) item;
+            items.add(0, v.getVariableName());
+        }
+
+        if (items.isEmpty()) {
+            return false;
+        }
+        String fullName = String.join(".", items);
+        if (BUILTIN_CASTS.contains(fullName)) {
+            return true;
+        }
+        if (swfClasses.contains(fullName)) {
+            return true;
+        }
+        return false;
+    }
+
     private GraphTargetItem memberOrCall(GraphTargetItem ret, boolean inFunction, boolean inMethod, List<VariableActionItem> variables, List<FunctionActionItem> functions) throws IOException, ActionParseException {
         ParsedSymbol op = lex();
         while (op.isType(SymbolType.PARENT_OPEN, SymbolType.BRACKET_OPEN, SymbolType.DOT)) {
             if (op.type == SymbolType.PARENT_OPEN) {
                 List<GraphTargetItem> args = call(inFunction, inMethod, variables, functions);
-                if (ret instanceof GetMemberActionItem) {
+                if (isCastOp(ret) && args.size() == 1) {
+                    ret = new CastOpActionItem(null, null, ret, args.get(0));
+                } else if (ret instanceof GetMemberActionItem) {
                     GetMemberActionItem mem = (GetMemberActionItem) ret;
                     ret = new CallMethodActionItem(null, null, mem.object, mem.memberName, args);
                 } else if (ret instanceof VariableActionItem) {

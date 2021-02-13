@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
@@ -38,7 +39,9 @@ public class ActionScript2ParserTest extends ActionScript2TestBase {
 
     private void parseAS2(String script) {
         try {
-            ActionScript2Parser par = new ActionScript2Parser(SWF.DEFAULT_VERSION);
+            SWF swf = new SWF();
+            swf.version = SWF.DEFAULT_VERSION;
+            ActionScript2Parser par = new ActionScript2Parser(swf);
             par.actionsFromString(script);
         } catch (IOException | CompilationException | ParseException ex) {
             fail("Unable to parse: " + script, ex);
