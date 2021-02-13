@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - #1339 AS1/2 direct editation - targetPath as an expression
 - #1467 AS1/2 direct editation - allow new Number call
 - #1489 AS1/2 direct editation - reversed conditions in if
+- #1489 AS1/2 direct editation - for in loop
 
 ## [13.0.3] - 2021-02-12
 ### Added

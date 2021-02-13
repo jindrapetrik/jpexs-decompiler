@@ -20,7 +20,9 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
@@ -158,8 +160,12 @@ public class ForInActionItem extends LoopActionItem implements Block {
         ActionIf forInEndIf = new ActionIf(0);
         loopExpr.add(forInEndIf);
         List<Action> loopBody = new ArrayList<>();
-        loopBody.add(new ActionPush(new RegisterNumber(exprReg)));
-        loopBody.addAll(asGenerator.toActionList(variableName.toSourceIgnoreReturnValue(localData, generator)));
+
+        //assuming (variableName instanceof VariableActionItem)
+        SetVariableActionItem setVar = new SetVariableActionItem(null, null, asGenerator.pushConstTargetItem(((VariableActionItem) variableName).getVariableName()), new DirectValueActionItem(new RegisterNumber(exprReg)));
+
+        loopBody.addAll(asGenerator.toActionList(setVar.toSourceIgnoreReturnValue(localData, generator)));
+        //loopBody.add(new ActionPush(new RegisterNumber(exprReg)));
         int oldForIn = asGenerator.getForInLevel(localData);
         asGenerator.setForInLevel(localData, oldForIn + 1);
         loopBody.addAll(asGenerator.toActionList(asGenerator.generate(localData, commands)));
