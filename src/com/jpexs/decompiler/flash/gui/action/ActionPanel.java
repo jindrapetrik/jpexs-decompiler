@@ -1082,8 +1082,12 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "IOException during action compiling", ex);
         } catch (ActionParseException ex) {
+            decompiledEditor.gotoLine((int) ex.line);
+            decompiledEditor.markError();
             View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
         } catch (CompilationException ex) {
+            decompiledEditor.gotoLine((int) ex.line);
+            decompiledEditor.markError();
             View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
         } catch (Throwable ex) {
             logger.log(Level.SEVERE, null, ex);

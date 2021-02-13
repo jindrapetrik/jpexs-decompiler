@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - #1298 AS1/2 properly decompiled setProperty/getProperty
+- AS1/2 Direct editation mark line on error
 
 ## [13.0.3] - 2021-02-12
 ### Added
