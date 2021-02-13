@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 Direct editation mark line on error
 - Collapsing tag tree on SWF reload
 - #1339 AS1/2 direct editation - targetPath as an expression
+- #1467 AS1/2 direct editation - allow new Number call
 
 ## [13.0.3] - 2021-02-12
 ### Added

@@ -1764,7 +1764,13 @@ public class ActionScript2Parser {
                 break;
             case NEW:
                 GraphTargetItem newvar = expressionPrimary(false, inFunction, inMethod, false, variables, functions);//variable(inFunction, inMethod, variables, functions);
-                if (newvar instanceof CallMethodActionItem) {
+                if (newvar instanceof ToNumberActionItem) {
+                    List<GraphTargetItem> args = new ArrayList<>();
+                    if (((ToNumberActionItem) newvar).value != null) {
+                        args.add(((ToNumberActionItem) newvar).value);
+                    }
+                    ret = new NewObjectActionItem(null, null, pushConst("Number"), args);
+                } else if (newvar instanceof CallMethodActionItem) {
                     CallMethodActionItem ca = (CallMethodActionItem) newvar;
                     ret = new NewMethodActionItem(null, null, ca.scriptObject, ca.methodName, ca.arguments);
                 } else if (newvar instanceof CallFunctionActionItem) {
