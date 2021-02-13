@@ -223,7 +223,11 @@ public class FontPanel extends JPanel {
         fontLeadingLabel.setText(ft.getLeading() == -1 ? translate("value.unknown") : Integer.toString(ft.getLeading()));
         String chars = ft.getCharacters();
         fontCharactersTextArea.setText(chars);
-        fontCharactersScrollPane.getVerticalScrollBar().scrollRectToVisible(new Rectangle(0, 0, 1, 1));
+        try {
+            fontCharactersScrollPane.getVerticalScrollBar().scrollRectToVisible(new Rectangle(0, 0, 1, 1));
+        } catch (Exception ex) {
+            //ignore
+        }
         setAllowSave(false);
 
         Font selFont = ft.getSystemFont();
