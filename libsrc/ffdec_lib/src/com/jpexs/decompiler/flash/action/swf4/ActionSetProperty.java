@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -84,50 +85,7 @@ public class ActionSetProperty extends Action {
                 indexInt = (int) Math.round((Float) ((DirectValueActionItem) index).value);
             }
         }
-        if (value.getThroughDuplicate() instanceof IncrementActionItem) {
-            GraphTargetItem obj = ((IncrementActionItem) value).object;
-            if (!stack.isEmpty() && stack.peek().valueEquals(obj)) {
-                stack.pop();
-                stack.push(new PostIncrementActionItem(this, lineStartAction, obj));
-                return;
-            }
-        }
-        if (value.getThroughDuplicate() instanceof DecrementActionItem) {
-            GraphTargetItem obj = ((DecrementActionItem) value).object;
-            if (!stack.isEmpty() && stack.peek().valueEquals(obj)) {
-                stack.pop();
-                stack.push(new PostDecrementActionItem(this, lineStartAction, obj));
-                return;
-            }
-        }
-
         GraphTargetItem ret = new SetPropertyActionItem(this, lineStartAction, target, indexInt, value);
-
-        if (value instanceof StoreRegisterActionItem) {
-            StoreRegisterActionItem sr = (StoreRegisterActionItem) value;
-            if (sr.define) {
-                value = sr.getValue();
-                ((SetPropertyActionItem) ret).setValue(value);
-                if (value instanceof IncrementActionItem) {
-                    if (((IncrementActionItem) value).object instanceof GetPropertyActionItem) {
-                        if (((GetPropertyActionItem) ((IncrementActionItem) value).object).valueEquals(((SetPropertyActionItem) ret).getObject())) {
-                            ret = new PreIncrementActionItem(this, lineStartAction, ((IncrementActionItem) value).object);
-                        }
-                    }
-                } else if (value instanceof DecrementActionItem) {
-                    if (((DecrementActionItem) value).object instanceof GetPropertyActionItem) {
-                        if (((GetPropertyActionItem) ((DecrementActionItem) value).object).valueEquals(((SetPropertyActionItem) ret).getObject())) {
-                            ret = new PreDecrementActionItem(this, lineStartAction, ((DecrementActionItem) value).object);
-                        }
-                    }
-                } else {
-                    sr.temporary = true;
-                    ((SetPropertyActionItem) ret).setValue(sr);
-                }
-                variables.put("__register" + sr.register.number, new TemporaryRegister(sr.register.number, ret));
-                return;
-            }
-        }
         output.add(ret);
     }
 
