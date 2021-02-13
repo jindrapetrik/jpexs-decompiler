@@ -1071,7 +1071,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     private void saveDecompiledButtonActionPerformed(ActionEvent evt) {
         try {
-            ActionScript2Parser par = new ActionScript2Parser(mainPanel.getCurrentSwf().version);
+            ActionScript2Parser par = new ActionScript2Parser(mainPanel.getCurrentSwf());
             src.setActions(par.actionsFromString(decompiledEditor.getText()));
             SWF.uncache(src);
             src.setModified();

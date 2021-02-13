@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
@@ -72,7 +73,7 @@ public class AS2ScriptImporter {
             if (new File(fileName).exists()) {
                 String txt = Helper.readTextFile(fileName);
 
-                ActionScript2Parser par = new ActionScript2Parser(asm.getSwf().version);
+                ActionScript2Parser par = new ActionScript2Parser(asm.getSwf());
                 try {
                     asm.setActions(par.actionsFromString(txt));
                 } catch (ActionParseException ex) {

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
@@ -52,7 +53,9 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
     }
 
     private String recompile(String str) throws ActionParseException, IOException, CompilationException, InterruptedException, TimeoutException {
-        ActionScript2Parser par = new ActionScript2Parser(SWF.DEFAULT_VERSION);
+        SWF swf = new SWF();
+        swf.version = SWF.DEFAULT_VERSION;
+        ActionScript2Parser par = new ActionScript2Parser(swf);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         List<Action> actions = par.actionsFromString(str);
         byte[] hex = Action.actionsToBytes(actions, true, SWF.DEFAULT_VERSION);
