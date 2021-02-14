@@ -55,7 +55,7 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
     private String recompile(String str) throws ActionParseException, IOException, CompilationException, InterruptedException, TimeoutException {
         SWF swf = new SWF();
         swf.version = SWF.DEFAULT_VERSION;
-        ActionScript2Parser par = new ActionScript2Parser(swf);
+        ActionScript2Parser par = new ActionScript2Parser(swf, new DoActionTag(swf));
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         List<Action> actions = par.actionsFromString(str);
         byte[] hex = Action.actionsToBytes(actions, true, SWF.DEFAULT_VERSION);

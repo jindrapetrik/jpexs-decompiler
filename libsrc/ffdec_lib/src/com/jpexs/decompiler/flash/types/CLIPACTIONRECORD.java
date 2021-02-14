@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
@@ -44,10 +45,15 @@ import java.util.List;
 public class CLIPACTIONRECORD implements ASMSource, Serializable {
 
     private String scriptName = "-";
+    private CLIPACTIONS parentClipActions;
 
     @Override
     public String getScriptName() {
         return scriptName;
+    }
+
+    public CLIPACTIONS getParentClipActions() {
+        return parentClipActions;
     }
 
     public static String keyToString(int key) {
@@ -56,6 +62,20 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
         } else {
             return "" + (char) key;
         }
+    }
+
+    public static Integer stringToKey(String str) {
+        for (int i = 0; i < KEYNAMES.length; i++) {
+            if (KEYNAMES[i] != null) {
+                if (str.equals(KEYNAMES[i])) {
+                    return i;
+                }
+            }
+        }
+        if (str.length() == 1) {
+            return (int) str.charAt(0);
+        }
+        return null;
     }
 
     public static final String[] KEYNAMES = {
@@ -113,7 +133,11 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
         this.scriptName = scriptName;
     }
 
-    public CLIPACTIONRECORD(SWF swf, SWFInputStream sis, Tag tag) throws IOException {
+    public void setParentClipActions(CLIPACTIONS parentClipActions) {
+        this.parentClipActions = parentClipActions;
+    }
+
+    public CLIPACTIONRECORD(SWF swf, SWFInputStream sis, Tag tag, CLIPACTIONS parentClipActions) throws IOException {
         this.swf = swf;
         this.tag = tag;
         eventFlags = sis.readCLIPEVENTFLAGS("eventFlags");
@@ -126,6 +150,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
             actionRecordSize--;
         }
         actionBytes = sis.readByteRangeEx(actionRecordSize, "actionBytes", DumpInfoSpecialType.ACTION_BYTES, sis.getPos());
+        this.parentClipActions = parentClipActions;
     }
 
     @Override
@@ -157,7 +182,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
      */
     @Override
     public String toString() {
-        return eventFlags.getHeader(keyCode, false);
+        return "CLIPACTIONRECORD " + eventFlags.getHeader(keyCode, false);
     }
 
     /**
@@ -293,7 +318,7 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
 
     @Override
     public String getExportFileName() {
-        return eventFlags.getHeader(keyCode, true);
+        return "CLIPACTIONRECORD " + eventFlags.getHeader(keyCode, true);
     }
 
     @Override

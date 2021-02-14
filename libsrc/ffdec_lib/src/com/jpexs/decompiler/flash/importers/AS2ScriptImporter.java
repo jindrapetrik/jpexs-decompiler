@@ -73,7 +73,7 @@ public class AS2ScriptImporter {
             if (new File(fileName).exists()) {
                 String txt = Helper.readTextFile(fileName);
 
-                ActionScript2Parser par = new ActionScript2Parser(asm.getSwf());
+                ActionScript2Parser par = new ActionScript2Parser(asm.getSwf(), asm);
                 try {
                     asm.setActions(par.actionsFromString(txt));
                 } catch (ActionParseException ex) {

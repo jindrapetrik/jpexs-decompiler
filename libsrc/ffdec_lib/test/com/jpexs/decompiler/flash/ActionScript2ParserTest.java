@@ -16,11 +16,21 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.List;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -41,7 +51,7 @@ public class ActionScript2ParserTest extends ActionScript2TestBase {
         try {
             SWF swf = new SWF();
             swf.version = SWF.DEFAULT_VERSION;
-            ActionScript2Parser par = new ActionScript2Parser(swf);
+            ActionScript2Parser par = new ActionScript2Parser(swf, new DoActionTag(swf));
             par.actionsFromString(script);
         } catch (IOException | CompilationException | ParseException ex) {
             fail("Unable to parse: " + script, ex);

@@ -57,7 +57,7 @@ public class ActionScript2CompilerTest extends ActionScript2TestBase {
             SWF swf = new SWF();
             ASMSource asm = new DoActionTag(swf);
 
-            ActionScript2Parser par = new ActionScript2Parser(swf);
+            ActionScript2Parser par = new ActionScript2Parser(swf, asm);
             try {
                 asm.setActions(par.actionsFromString(sourceAsToCompile));
             } catch (ActionParseException | CompilationException ex) {

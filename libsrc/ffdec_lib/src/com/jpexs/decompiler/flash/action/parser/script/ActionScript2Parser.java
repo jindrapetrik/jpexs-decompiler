@@ -138,6 +138,9 @@ import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
+import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
+import com.jpexs.decompiler.flash.types.CLIPEVENTFLAGS;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -226,10 +229,12 @@ public class ActionScript2Parser {
 
     private final int swfVersion;
     private List<String> swfClasses = new ArrayList<>();
+    private final ASMSource targetSource;
 
-    public ActionScript2Parser(SWF swf) {
+    public ActionScript2Parser(SWF swf, ASMSource targetSource) {
         this.swfVersion = swf.version;
         parseSwfClasses(swf);
+        this.targetSource = targetSource;
     }
 
     private long uniqLast = 0;
@@ -1841,8 +1846,7 @@ public class ActionScript2Parser {
                     } else if (newvar instanceof VariableActionItem) {
                         ret = new NewObjectActionItem(null, null, newvar, args);
                     }
-                }
-                else if (newvar instanceof ToNumberActionItem) {
+                } else if (newvar instanceof ToNumberActionItem) {
                     List<GraphTargetItem> args = new ArrayList<>();
                     if (((ToNumberActionItem) newvar).value != null) {
                         args.add(((ToNumberActionItem) newvar).value);
@@ -1996,6 +2000,172 @@ public class ActionScript2Parser {
         this.constantPool = constantPool;
         lexer = new ActionScriptLexer(new StringReader(str));
 
+        BUTTONCONDACTION newButtonCond = new BUTTONCONDACTION();
+
+        if (targetSource instanceof BUTTONCONDACTION) {
+            ParsedSymbol symb = lexer.lex();
+            if (symb.type != SymbolType.IDENTIFIER || !"on".equals(symb.value)) {
+                throw new ActionParseException("on keyword expected but " + symb + " found", lexer.yyline());
+            }
+            expectedType(SymbolType.PARENT_OPEN);
+            symb = lexer.lex();
+            boolean condEmpty = true;
+            while (symb.type == SymbolType.IDENTIFIER) {
+                condEmpty = false;
+                switch ((String) symb.value) {
+                    case "press":
+                        newButtonCond.condOverUpToOverDown = true;
+                        break;
+                    case "release":
+                        newButtonCond.condOverDownToOverUp = true;
+                        break;
+                    case "releaseOutside":
+                        newButtonCond.condOutDownToIdle = true;
+                        break;
+                    case "rollOver":
+                        newButtonCond.condIdleToOverUp = true;
+                        break;
+                    case "rollOut":
+                        newButtonCond.condOverUpToIddle = true;
+                        break;
+                    case "dragOut":
+                        newButtonCond.condOverDownToOutDown = true;
+                        break;
+                    case "dragOver":
+                        newButtonCond.condOutDownToOverDown = true;
+                        break;
+                    case "keyPress":
+                        symb = lexer.lex();
+                        expected(symb, lexer.yyline(), SymbolType.STRING);
+                        Integer key = CLIPACTIONRECORD.stringToKey((String) symb.value);
+                        if (key == null) {
+                            throw new ActionParseException("Invalid key", lexer.yyline());
+                        }
+                        newButtonCond.condKeyPress = key;
+                        break;
+                    default:
+                        throw new ActionParseException("Unrecognized event type", lexer.yyline());
+                }
+                symb = lexer.lex();
+                if (symb.type == SymbolType.PARENT_CLOSE) {
+                    break;
+                }
+                expected(symb, lexer.yyline(), SymbolType.COMMA);
+                symb = lexer.lex();
+            }
+            expected(symb, lexer.yyline(), SymbolType.PARENT_CLOSE);
+            if (condEmpty) {
+                throw new ActionParseException("condition must be non empty", lexer.yyline());
+            }
+            expectedType(SymbolType.CURLY_OPEN);
+        }
+
+        CLIPEVENTFLAGS newClipEventFlags = new CLIPEVENTFLAGS();
+        int newClipActionRecordKey = 0;
+        if (targetSource instanceof CLIPACTIONRECORD) {
+            ParsedSymbol symb = lexer.lex();
+            if (symb.type != SymbolType.IDENTIFIER || (!"on".equals(symb.value) && !"onClipEvent".equals(symb.value))) {
+                throw new ActionParseException("on or onClipEvent keyword expected but " + symb + " found", lexer.yyline());
+            }
+            expectedType(SymbolType.PARENT_OPEN);
+            if ("on".equals(symb.value)) {
+                symb = lexer.lex();
+                boolean condEmpty = true;
+                while (symb.type == SymbolType.IDENTIFIER) {
+                    condEmpty = false;
+                    switch ((String) symb.value) {
+                        case "press":
+                            newClipEventFlags.clipEventPress = true;
+                            break;
+                        case "release":
+                            newClipEventFlags.clipEventRelease = true;
+                            break;
+                        case "releaseOutside":
+                            newClipEventFlags.clipEventReleaseOutside = true;
+                            break;
+                        case "rollOver":
+                            newClipEventFlags.clipEventRollOver = true;
+                            break;
+                        case "rollOut":
+                            newClipEventFlags.clipEventRollOut = true;
+                            break;
+                        case "dragOut":
+                            newClipEventFlags.clipEventDragOut = true;
+                            break;
+                        case "dragOver":
+                            newClipEventFlags.clipEventDragOver = true;
+                            break;
+                        case "initialize":
+                            newClipEventFlags.clipEventInitialize = true;
+                            break;
+                        case "construct":
+                            newClipEventFlags.clipEventConstruct = true;
+                            break;
+
+                        case "keyPress":
+                            symb = lexer.lex();
+                            expected(symb, lexer.yyline(), SymbolType.STRING);
+                            Integer key = CLIPACTIONRECORD.stringToKey((String) symb.value);
+                            if (key == null) {
+                                throw new ActionParseException("Invalid key", lexer.yyline());
+                            }
+                            newClipActionRecordKey = key;
+                            newClipEventFlags.clipEventKeyPress = true;
+                            break;
+                        default:
+                            throw new ActionParseException("Unrecognized event type", lexer.yyline());
+                    }
+                    symb = lexer.lex();
+                    if (symb.type == SymbolType.PARENT_CLOSE) {
+                        break;
+                    }
+                    expected(symb, lexer.yyline(), SymbolType.COMMA);
+                    symb = lexer.lex();
+                }
+                expected(symb, lexer.yyline(), SymbolType.PARENT_CLOSE);
+                if (condEmpty) {
+                    throw new ActionParseException("condition must be non empty", lexer.yyline());
+                }
+            } else if ("onClipEvent".equals(symb.value)) {
+                symb = lexer.lex();
+                expected(symb, lexer.yyline(), SymbolType.IDENTIFIER);
+
+                switch ((String) symb.value) {
+                    case "keyUp":
+                        newClipEventFlags.clipEventKeyUp = true;
+                        break;
+                    case "keyDown":
+                        newClipEventFlags.clipEventKeyDown = true;
+                        break;
+                    case "mouseUp":
+                        newClipEventFlags.clipEventMouseUp = true;
+                        break;
+                    case "mouseDown":
+                        newClipEventFlags.clipEventMouseDown = true;
+                        break;
+                    case "mouseMove":
+                        newClipEventFlags.clipEventMouseMove = true;
+                        break;
+                    case "unload":
+                        newClipEventFlags.clipEventUnload = true;
+                        break;
+                    case "enterFrame":
+                        newClipEventFlags.clipEventEnterFrame = true;
+                        break;
+                    case "load":
+                        newClipEventFlags.clipEventLoad = true;
+                        break;
+                    case "data":
+                        newClipEventFlags.clipEventData = true;
+                        break;
+                    default:
+                        throw new ActionParseException("Unrecognized clipEvent type", lexer.yyline());
+                }
+                expectedType(SymbolType.PARENT_CLOSE);
+            }
+            expectedType(SymbolType.CURLY_OPEN);
+        }
+
         List<VariableActionItem> vars = new ArrayList<>();
         List<FunctionActionItem> functions = new ArrayList<>();
         retTree.addAll(commands(false, false, 0, vars, functions));
@@ -2034,8 +2204,33 @@ public class ActionScript2Parser {
                 v.setBoxedValue(new GetVariableActionItem(null, null, pushConst(varName)));
             }
         }
+
+        if ((targetSource instanceof BUTTONCONDACTION) || (targetSource instanceof CLIPACTIONRECORD)) {
+            expectedType(SymbolType.CURLY_CLOSE);
+        }
+
         if (lexer.lex().type != SymbolType.EOF) {
             throw new ActionParseException("Parsing finished before end of the file", lexer.yyline());
+        }
+        if (targetSource instanceof BUTTONCONDACTION) {
+            BUTTONCONDACTION targetButtonCond = (BUTTONCONDACTION) targetSource;
+            targetButtonCond.condIdleToOverDown = newButtonCond.condIdleToOverDown;
+            targetButtonCond.condIdleToOverUp = newButtonCond.condIdleToOverUp;
+            targetButtonCond.condOutDownToIdle = newButtonCond.condOutDownToIdle;
+            targetButtonCond.condOutDownToOverDown = newButtonCond.condOutDownToOverDown;
+            targetButtonCond.condOverDownToIdle = newButtonCond.condOverDownToIdle;
+            targetButtonCond.condOverDownToOutDown = newButtonCond.condOverDownToOutDown;
+            targetButtonCond.condOverDownToOverUp = newButtonCond.condOverDownToOverUp;
+            targetButtonCond.condOverUpToIddle = newButtonCond.condOverUpToIddle;
+            targetButtonCond.condOverUpToOverDown = newButtonCond.condOverUpToOverDown;
+            targetButtonCond.condKeyPress = newButtonCond.condKeyPress;
+        }
+
+        if (targetSource instanceof CLIPACTIONRECORD) {
+            CLIPACTIONRECORD targetClipActionRecord = (CLIPACTIONRECORD) targetSource;
+            targetClipActionRecord.eventFlags = newClipEventFlags;
+            targetClipActionRecord.keyCode = newClipActionRecordKey;
+            targetClipActionRecord.getParentClipActions().calculateAllEventFlags();
         }
         return retTree;
     }
