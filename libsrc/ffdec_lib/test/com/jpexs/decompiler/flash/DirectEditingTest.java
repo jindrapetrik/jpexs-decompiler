@@ -109,9 +109,9 @@ public class DirectEditingTest extends FileTestBase {
                         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
                         asm.getActionScriptSource(writer, null);
                         String as = writer.toString();
-                        as = asm.removePrefixAndSuffix(as);
+                        //as = asm.removePrefixAndSuffix(as);
 
-                        ActionScript2Parser par = new ActionScript2Parser(swf);
+                        ActionScript2Parser par = new ActionScript2Parser(swf, asm);
                         try {
                             asm.setActions(par.actionsFromString(as));
                         } catch (ActionParseException | CompilationException ex) {
@@ -120,7 +120,7 @@ public class DirectEditingTest extends FileTestBase {
                         writer = new HighlightedTextWriter(new CodeFormatting(), false);
                         asm.getActionScriptSource(writer, null);
                         String as2 = writer.toString();
-                        as2 = asm.removePrefixAndSuffix(as2);
+                        //as2 = asm.removePrefixAndSuffix(as2);
                         try {
                             asm.setActions(par.actionsFromString(as2));
                         } catch (ActionParseException | CompilationException ex) {
@@ -129,7 +129,7 @@ public class DirectEditingTest extends FileTestBase {
                         writer = new HighlightedTextWriter(new CodeFormatting(), false);
                         asm.getActionScriptSource(writer, null);
                         String as3 = writer.toString();
-                        as3 = asm.removePrefixAndSuffix(as3);
+                        //as3 = asm.removePrefixAndSuffix(as3);
                         if (!as3.equals(as2)) {
                             fail("ActionScript is different: " + asm.getSwf().getShortFileName() + "/" + asm.toString());
                         }

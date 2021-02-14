@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
@@ -169,7 +170,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
      */
     @Override
     public String toString() {
-        return "BUTTONCONDACTION";
+        return "BUTTONCONDACTION " + getHeader(false);
     }
 
     /**
@@ -289,10 +290,10 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
         if (condOverUpToIddle) {
             events.add("rollOut");
         }
-        if (condOverDownToOutDown) {
+        if (condOverDownToOutDown || condOverDownToIdle) {
             events.add("dragOut");
         }
-        if (condOutDownToOverDown) {
+        if (condOutDownToOverDown || condIdleToOverDown) {
             events.add("dragOver");
         }
         if (condKeyPress > 0) {
@@ -337,7 +338,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
 
     @Override
     public String getExportFileName() {
-        return getHeader(true);
+        return "BUTTONCONDACTION " + getHeader(true);
     }
 
     @Override

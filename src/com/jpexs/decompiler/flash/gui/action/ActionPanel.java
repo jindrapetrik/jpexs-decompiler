@@ -930,21 +930,10 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         View.checkAccess();
 
         if (src != null) {
-            int lastLine = decompiledEditor.getLine();
-            int prefLines = src.getPrefixLineCount();
             if (val) {
-                String newText = src.removePrefixAndSuffix(lastDecompiled.text);
-                setDecompiledText(src.getScriptName(), newText);
-                if (lastLine > -1) {
-                    if (lastLine - prefLines >= 0) {
-                        decompiledEditor.gotoLine(lastLine - prefLines + 1);
-                    }
-                }
+                setDecompiledText(src.getScriptName(), lastDecompiled.text);
             } else {
                 setDecompiledText(src.getScriptName(), lastDecompiled.text);
-                if (lastLine > -1) {
-                    decompiledEditor.gotoLine(lastLine + prefLines + 1);
-                }
             }
         }
 
@@ -1071,7 +1060,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     private void saveDecompiledButtonActionPerformed(ActionEvent evt) {
         try {
-            ActionScript2Parser par = new ActionScript2Parser(mainPanel.getCurrentSwf());
+            ActionScript2Parser par = new ActionScript2Parser(mainPanel.getCurrentSwf(), src);
             src.setActions(par.actionsFromString(decompiledEditor.getText()));
             SWF.uncache(src);
             src.setModified();

@@ -3561,7 +3561,7 @@ public class CommandLineArgumentParser {
     private static void replaceAS2(String as, ASMSource src) throws IOException, InterruptedException {
         System.out.println("Replace AS1/2");
         System.out.println("Warning: This feature is EXPERIMENTAL");
-        ActionScript2Parser par = new ActionScript2Parser(src.getSwf());
+        ActionScript2Parser par = new ActionScript2Parser(src.getSwf(), src);
         try {
             src.setActions(par.actionsFromString(as));
         } catch (ActionParseException ex) {

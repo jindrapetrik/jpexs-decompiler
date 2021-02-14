@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
@@ -2079,12 +2080,13 @@ public class SWFInputStream implements AutoCloseable {
      * @param swf
      * @param tag
      * @param name
+     * @param parentClipActions
      * @return CLIPACTIONRECORD value
      * @throws IOException
      */
-    public CLIPACTIONRECORD readCLIPACTIONRECORD(SWF swf, Tag tag, String name) throws IOException {
+    public CLIPACTIONRECORD readCLIPACTIONRECORD(SWF swf, Tag tag, String name, CLIPACTIONS parentClipActions) throws IOException {
         newDumpLevel(name, "CLIPACTIONRECORD");
-        CLIPACTIONRECORD ret = new CLIPACTIONRECORD(swf, this, tag);
+        CLIPACTIONRECORD ret = new CLIPACTIONRECORD(swf, this, tag, parentClipActions);
         endDumpLevel();
         if (ret.eventFlags.isClear()) {
             return null;
@@ -2108,7 +2110,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.allEventFlags = readCLIPEVENTFLAGS("allEventFlags");
         CLIPACTIONRECORD cr;
         ret.clipActionRecords = new ArrayList<>();
-        while ((cr = readCLIPACTIONRECORD(swf, tag, "record")) != null) {
+        while ((cr = readCLIPACTIONRECORD(swf, tag, "record", ret)) != null) {
             ret.clipActionRecords.add(cr);
         }
         endDumpLevel();
