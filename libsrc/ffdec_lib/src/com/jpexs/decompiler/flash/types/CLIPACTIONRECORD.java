@@ -128,6 +128,13 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
         actionBytes = ByteArrayRange.EMPTY;
     }
 
+    public CLIPACTIONRECORD(SWF swf, Tag tag) {
+        this.swf = swf;
+        this.tag = tag;
+        eventFlags = new CLIPEVENTFLAGS();
+        actionBytes = ByteArrayRange.EMPTY;
+    }
+
     @Override
     public void setScriptName(String scriptName) {
         this.scriptName = scriptName;

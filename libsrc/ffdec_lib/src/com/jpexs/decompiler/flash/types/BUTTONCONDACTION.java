@@ -63,6 +63,12 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
         actionBytes = new ByteArrayRange(SWFInputStream.BYTE_ARRAY_EMPTY);
     }
 
+    public BUTTONCONDACTION(SWF swf, Tag tag) {
+        this.swf = swf;
+        this.tag = tag;
+        actionBytes = new ByteArrayRange(SWFInputStream.BYTE_ARRAY_EMPTY);
+    }
+
     @Override
     public void setScriptName(String scriptName) {
         this.scriptName = scriptName;

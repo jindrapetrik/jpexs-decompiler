@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Calculated;
@@ -138,6 +139,17 @@ public class CXFORMWITHALPHA extends ColorTransform {
     }
 
     public CXFORMWITHALPHA() {
+    }
+
+    public CXFORMWITHALPHA(CXFORM cxform) {
+        redMultTerm = cxform.redMultTerm;
+        greenMultTerm = cxform.greenMultTerm;
+        blueMultTerm = cxform.blueMultTerm;
+        redAddTerm = cxform.redAddTerm;
+        greenAddTerm = cxform.greenAddTerm;
+        blueAddTerm = cxform.blueAddTerm;
+        alphaAddTerm = 0;
+        alphaMultTerm = 255;
     }
 
     public CXFORMWITHALPHA(ColorTransform colorTransform) {
