@@ -204,9 +204,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         public void render() {
             SerializableImage img = getImg();
             Rectangle rect = getRect();
-            if (img == null) {
+            /*if (img == null) {
                 return;
-            }
+            }*/
 
             Graphics2D g2 = null;
             VolatileImage ri;
@@ -231,7 +231,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     g2.fill(new Rectangle(0, 0, getWidth(), getHeight()));
 
                     g2.setComposite(AlphaComposite.SrcOver);
-                    if (rect != null) {
+                    if (rect != null && img != null) {
                         g2.drawImage(img.getBufferedImage(), rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, 0, 0, img.getWidth(), img.getHeight(), null);
                     }
                 } finally {
@@ -255,10 +255,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         renderImage = null;
                     }
 
-                    if (_img != null) {
-                        calcRect();
-                        render();
-                    }
+                    calcRect();
+                    render();
                     repaint();
                 }
             });
@@ -306,10 +304,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         public synchronized void setImg(SerializableImage img) {
             this._img = img;
-            if (img != null) {
-                calcRect();
-                render();
-            }
+            calcRect();
+            render();
             repaint();
         }
 
@@ -686,6 +682,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             if (drawable.getTimeline().getFrameCount() == 0) {
                 clearImagePanel();
+                fireMediaDisplayStateChanged();
                 return;
             }
 
