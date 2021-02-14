@@ -48,7 +48,8 @@ public class CLIPACTIONS implements Serializable {
 
     public void calculateAllEventFlags() {
 
-        Field[] fields = allEventFlags.getClass().getDeclaredFields();
+        allEventFlags = new CLIPEVENTFLAGS();
+        Field[] fields = CLIPEVENTFLAGS.class.getDeclaredFields();
         try {
             for (Field f : fields) {
                 if (!f.getName().startsWith("clipEvent")) {

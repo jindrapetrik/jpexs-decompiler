@@ -25,21 +25,33 @@ import com.jpexs.decompiler.flash.gui.ReplaceCharacterDialog;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
 import com.jpexs.decompiler.flash.timeline.TagScript;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
+import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
+import com.jpexs.decompiler.flash.types.CLIPACTIONS;
+import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.helpers.Helper;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -341,7 +353,11 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         boolean singleSelect = items.size() == 1;
         Predicate<Predicate<TreeItem>> canReplace = p -> {
-            for (TreeItem ti : items) if (!p.test(ti)) return false;
+            for (TreeItem ti : items) {
+                if (!p.test(ti)) {
+                    return false;
+                }
+            }
             return true;
         };
 
@@ -707,69 +723,217 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void addScriptActionPerformed(ActionEvent evt) {
-        AddScriptDialog addScriptDialog = new AddScriptDialog();
-        if (addScriptDialog.showDialog() == JOptionPane.OK_OPTION) {
-            int targetFrame = addScriptDialog.getFrame();
-            List<TreeItem> sel = tagTree.getSelected();
-            if (!sel.isEmpty()) {
-                if (sel.get(0) instanceof FolderItem) {
+        List<TreeItem> sel = tagTree.getSelected();
+        if (!sel.isEmpty()) {
+            if (sel.get(0) instanceof FolderItem) {
 
-                    FolderItem folder = (FolderItem) sel.get(0);
-                    SWF swf = folder.getSwf();
+                FolderItem folder = (FolderItem) sel.get(0);
+                SWF swf = folder.getSwf();
 
-                    DoActionTag doAction = new DoActionTag(swf);
+                AddScriptDialog addScriptDialog = new AddScriptDialog(swf);
+                if (addScriptDialog.showDialog() == JOptionPane.OK_OPTION) {
+                    if ((addScriptDialog.getScriptType() == AddScriptDialog.TYPE_FRAME)
+                            || (addScriptDialog.getScriptType() == AddScriptDialog.TYPE_SPRITE_FRAME)) {
 
-                    ReadOnlyTagList tagList = swf.getTags();
-                    int frame = 1;
-                    boolean frameFound = false;
-                    for (int i = 0; i < tagList.size(); i++) {
-                        Tag t = tagList.get(i);
-                        if (frame == targetFrame && t instanceof DoActionTag) {
-                            View.showMessageDialog(mainPanel, AppDialog.translateForDialog("message.alreadyhasscript", AddScriptDialog.class),
-                                    mainPanel.getMainFrame().translate("error"), JOptionPane.ERROR_MESSAGE
-                            );
-                            addScriptActionPerformed(evt);
-                            return;
+                        Timelined tim = swf;
+                        if (addScriptDialog.getScriptType() == AddScriptDialog.TYPE_SPRITE_FRAME) {
+                            tim = addScriptDialog.getSprite();
                         }
-                        if (t instanceof ShowFrameTag) {
-                            if (frame == targetFrame) {
-                                swf.addTag(i, doAction);
-                                frameFound = true;
-                                break;
+
+                        int targetFrame = addScriptDialog.getFrame();
+
+                        DoActionTag doAction = new DoActionTag(swf);
+
+                        ReadOnlyTagList tagList = tim.getTags();
+                        int frame = 1;
+                        boolean frameFound = false;
+                        for (int i = 0; i < tagList.size(); i++) {
+                            Tag t = tagList.get(i);
+                            if (frame == targetFrame && t instanceof DoActionTag) {
+                                View.showMessageDialog(mainPanel, AppDialog.translateForDialog("message.alreadyhasscript", AddScriptDialog.class),
+                                        mainPanel.getMainFrame().translate("error"), JOptionPane.ERROR_MESSAGE
+                                );
+                                addScriptActionPerformed(evt);
+                                return;
                             }
-                            frame++;
-                        }
-                    }
-                    if (!frameFound) {
-                        for (; frame < targetFrame; frame++) {
-                            swf.addTag(new ShowFrameTag(swf));
-                        }
-                        swf.addTag(doAction);
-                        swf.addTag(new ShowFrameTag(swf));
-                    }
-
-                    TreePath selection = mainPanel.tagTree.getSelectionPath();
-                    TreePath swfPath = selection.getParentPath();
-                    swf.resetTimeline();
-                    mainPanel.refreshTree(swf);
-
-                    FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getModel().getScriptsNode(swf);
-                    TreePath scriptsPath = swfPath.pathByAddingChild(scriptsNode);
-                    for (TreeItem subItem : scriptsNode.subItems) {
-                        if (subItem instanceof FrameScript) {
-                            if (((FrameScript) subItem).getFrame().frame + 1 == targetFrame) {
-                                TreePath framePath = scriptsPath.pathByAddingChild(subItem);
-                                TreeItem doActionTag = mainPanel.tagTree.getModel().getChild(subItem, 0);
-                                TreePath doActionPath = framePath.pathByAddingChild(doActionTag);
-                                mainPanel.tagTree.setSelectionPath(doActionPath);
-                                break;
+                            if (t instanceof ShowFrameTag) {
+                                if (frame == targetFrame) {
+                                    tim.addTag(i, doAction);
+                                    frameFound = true;
+                                    break;
+                                }
+                                frame++;
                             }
                         }
+                        if (!frameFound) {
+                            for (; frame < targetFrame; frame++) {
+                                tim.addTag(new ShowFrameTag(swf));
+                            }
+                            tim.addTag(doAction);
+                            tim.addTag(new ShowFrameTag(swf));
+                        }
+
+                        TreePath selection = mainPanel.tagTree.getSelectionPath();
+                        TreePath swfPath = selection.getParentPath();
+                        tim.resetTimeline();
+                        mainPanel.refreshTree(swf);
+
+                        FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getModel().getScriptsNode(swf);
+                        TreePath scriptsPath = swfPath.pathByAddingChild(scriptsNode);
+
+                        if (addScriptDialog.getScriptType() == AddScriptDialog.TYPE_FRAME) {
+                            for (TreeItem subItem : scriptsNode.subItems) {
+                                if (subItem instanceof FrameScript) {
+                                    if (((FrameScript) subItem).getFrame().frame + 1 == targetFrame) {
+                                        TreePath framePath = scriptsPath.pathByAddingChild(subItem);
+                                        TreeItem doActionTag = mainPanel.tagTree.getModel().getChild(subItem, 0);
+                                        TreePath doActionPath = framePath.pathByAddingChild(doActionTag);
+                                        mainPanel.tagTree.setSelectionPath(doActionPath);
+                                        break;
+                                    }
+                                }
+                            }
+                        } else { //sprite
+                            for (TreeItem subItem : scriptsNode.subItems) {
+                                if (subItem instanceof TagScript) {
+                                    if (((TagScript) subItem).getTag() == tim) {
+                                        TreePath spritePath = scriptsPath.pathByAddingChild(subItem);
+                                        TagScript ts = (TagScript) subItem;
+                                        for (TreeItem f : ts.getFrames()) {
+                                            if (f instanceof FrameScript) {
+                                                FrameScript fs = (FrameScript) f;
+                                                if (fs.getFrame().frame + 1 == targetFrame) {
+                                                    TreePath framePath = spritePath.pathByAddingChild(fs);
+                                                    TreeItem doActionTag = mainPanel.tagTree.getModel().getChild(fs, 0);
+                                                    TreePath doActionPath = framePath.pathByAddingChild(doActionTag);
+                                                    mainPanel.tagTree.setSelectionPath(doActionPath);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    } else if (addScriptDialog.getScriptType() == AddScriptDialog.TYPE_BUTTON_EVENT) {
+                        DefineButton2Tag button = addScriptDialog.getButton();
+                        BUTTONCONDACTION bca = new BUTTONCONDACTION(swf, button);
+                        bca.condOverUpToOverDown = true; //press
+                        button.actions.add(bca);
+                        button.setModified(true);
+
+                        button.resetTimeline();
+                        mainPanel.refreshTree(swf);
+
+                        FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getModel().getScriptsNode(swf);
+                        TreePath selection = mainPanel.tagTree.getSelectionPath();
+                        TreePath swfPath = selection.getParentPath();
+                        TreePath scriptsPath = swfPath.pathByAddingChild(scriptsNode);
+                        for (TreeItem subItem : scriptsNode.subItems) {
+                            if (subItem instanceof TagScript) {
+                                if (((TagScript) subItem).getTag() == button) {
+                                    TreePath buttonPath = scriptsPath.pathByAddingChild(subItem);
+                                    TreePath buttonCondPath = buttonPath.pathByAddingChild(bca);
+                                    mainPanel.tagTree.setSelectionPath(buttonCondPath);
+                                    break;
+                                }
+                            }
+                        }
+                    } else if (addScriptDialog.getScriptType() == AddScriptDialog.TYPE_INSTANCE_EVENT) {
+                        DefineSpriteTag sprite = addScriptDialog.getSprite();
+                        int frame = addScriptDialog.getFrame();
+                        PlaceObjectTypeTag placeType = addScriptDialog.getPlaceObject();
+                        CLIPACTIONS clipActions = null;
+
+                        Timelined tim = swf;
+                        if (sprite != null) {
+                            tim = sprite;
+                        }
+
+                        if (placeType instanceof PlaceObjectTag) {
+                            ReadOnlyTagList tags = tim.getTags();
+                            PlaceObjectTag place = (PlaceObjectTag) placeType;
+                            clipActions = new CLIPACTIONS();
+                            for (int i = 0; i < tags.size(); i++) {
+                                if (tags.get(i) == placeType) {
+                                    PlaceObject2Tag place2 = new PlaceObject2Tag(swf, false, place.depth, place.characterId, place.matrix,
+                                            new CXFORMWITHALPHA(place.colorTransform), -1, null, -1, clipActions);
+                                    tim.replaceTag(i, place2);
+                                    placeType = place2;
+                                    break;
+                                }
+                            }
+                        }
+                        if (placeType instanceof PlaceObject2Tag) {
+                            PlaceObject2Tag place2 = (PlaceObject2Tag) placeType;
+                            if (!place2.placeFlagHasClipActions) {
+                                clipActions = place2.clipActions = new CLIPACTIONS();
+                                place2.placeFlagHasClipActions = true;
+                            }
+                        }
+                        if (placeType instanceof PlaceObject3Tag) {
+                            PlaceObject3Tag place3 = (PlaceObject3Tag) placeType;
+                            if (!place3.placeFlagHasClipActions) {
+                                clipActions = place3.clipActions = new CLIPACTIONS();
+                                place3.placeFlagHasClipActions = true;
+                            }
+                        }
+                        if (placeType instanceof PlaceObject4Tag) {
+                            PlaceObject4Tag place4 = (PlaceObject4Tag) placeType;
+                            if (!place4.placeFlagHasClipActions) {
+                                clipActions = place4.clipActions = new CLIPACTIONS();
+                                place4.placeFlagHasClipActions = true;
+                            }
+                        }
+                        CLIPACTIONRECORD clipActionRecord = new CLIPACTIONRECORD(swf, (Tag) placeType);
+                        clipActionRecord.setParentClipActions(clipActions);
+                        clipActionRecord.eventFlags.clipEventPress = true;
+
+                        clipActions.clipActionRecords.add(clipActionRecord);
+                        clipActions.calculateAllEventFlags();
+
+                        ((Tag) placeType).setModified(true);
+
+                        TreePath selection = mainPanel.tagTree.getSelectionPath();
+                        TreePath swfPath = selection.getParentPath();
+                        tim.resetTimeline();
+                        mainPanel.refreshTree(swf);
+
+                        FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getModel().getScriptsNode(swf);
+                        TreePath scriptsPath = swfPath.pathByAddingChild(scriptsNode);
+
+                        for (TreeItem subItem : scriptsNode.subItems) {
+                            if (sprite != null) {
+                                if (subItem instanceof TagScript) {
+                                    if (((TagScript) subItem).getTag() == sprite) {
+                                        TreePath spritePaths = scriptsPath.pathByAddingChild(subItem);
+                                        List<TreeItem> frames = ((TagScript) subItem).getFrames();
+                                        loopframes:
+                                        for (TreeItem f : frames) {
+                                            if (f instanceof FrameScript) {
+                                                FrameScript fs = (FrameScript) f;
+                                                if (fs.getFrame().frame + 1 == frame) {
+                                                    TreePath framePath = spritePaths.pathByAddingChild(f);
+                                                    List<? extends TreeItem> subs = mainPanel.tagTree.getModel().getAllChildren(fs);
+                                                    for (TreeItem t : subs) {
+                                                        if (t instanceof TagScript) {
+                                                            if (((TagScript) t).getTag() == placeType) {
+                                                                TreePath placePath = framePath.pathByAddingChild(t);
+                                                                TreePath clipActionRecordPath = placePath.pathByAddingChild(clipActionRecord);
+                                                                mainPanel.tagTree.setSelectionPath(clipActionRecordPath);
+                                                                break loopframes;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
-                    //tagTree.getSelectionPath();
-                    /*mainPanel.tagTree.setSelectionPath(new TreePath(new Object[]{
-                        mainPanel.tagTree.getModel().getRoot()
-                    }));*/
                 }
             }
         }

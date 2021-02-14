@@ -758,4 +758,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 || (genericSaveButton.isVisible() && genericSaveButton.isEnabled())
                 || (metadataSaveButton.isVisible() && metadataSaveButton.isEnabled());
     }
+
+    public void selectImageDepth(int depth) {
+        imagePanel.selectDepth(depth);
+    }
 }

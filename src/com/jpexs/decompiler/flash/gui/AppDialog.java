@@ -55,7 +55,7 @@ public abstract class AppDialog extends JDialog {
         return resourceBundle;
     }
 
-    public String translate(String key) {
+    public final String translate(String key) {
         return resourceBundle.getString(key);
     }
 
