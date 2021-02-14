@@ -68,6 +68,7 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
+import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceExceptionItem;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
@@ -922,6 +923,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         newTraitButton.setToolTipText(AppStrings.translate("button.addtrait"));
         iconsPanel.add(newTraitButton);
 
+        JButton removeTraitButton = new JButton(View.getIcon("traitremove16"));
+        removeTraitButton.setMargin(new Insets(5, 5, 5, 5));
+        removeTraitButton.addActionListener(this::removeTraitButtonActionPerformed);
+        removeTraitButton.setToolTipText(AppStrings.translate("button.removetrait"));
+        iconsPanel.add(removeTraitButton);
+
         scriptNameLabel = new JLabel("-");
         scriptNameLabel.setAlignmentX(0);
         iconsPanel.setAlignmentX(0);
@@ -1481,6 +1488,47 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         } catch (Throwable ex) {
             Logger.getLogger(ABCPanel.class
                     .getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void removeTraitButtonActionPerformed(ActionEvent evt) {
+        int classIndex = decompiledTextArea.getClassIndex();
+        //int scriptIndex = decompiledTextArea.getScriptLeaf().scriptIndex;
+        int traitId = decompiledTextArea.lastTraitIndex;
+
+        if ((traitId == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER)
+                || (traitId == GraphTextWriter.TRAIT_CLASS_INITIALIZER)
+                || (traitId == GraphTextWriter.TRAIT_INSTANCE_INITIALIZER)) {
+            return;
+        }
+
+        Traits traits = null;
+        int traitIndex = -1;
+        if (classIndex < 0) {
+            return;
+        }
+        Traits staticTraits = abc.class_info.get(classIndex).static_traits;
+        Traits instanceTraits = abc.instance_info.get(classIndex).instance_traits;
+        if (traitId >= 0 && traitId < abc.class_info.get(classIndex).static_traits.traits.size()) {
+            traitIndex = traitId;
+            traits = staticTraits;
+        } else {
+            if (traitId >= 0 && traitId < staticTraits.traits.size() + instanceTraits.traits.size()) {
+                traitIndex = traitId - staticTraits.traits.size();
+                traits = instanceTraits;
+            } else {
+                traits = null;
+            }
+        }
+
+        if (traits == null) {
+            return;
+        }
+
+        if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.removetrait"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+            traits.traits.remove(traitIndex);
+            ((Tag) abc.parentTag).setModified(true);
+            reload();
         }
     }
 

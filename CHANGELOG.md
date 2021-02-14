@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - #1202 Check for modifications outside FFDec and ask user to reload
+- #1155, #1602 AS3 remove trait button
 
 ### Fixed
 - #1298 AS1/2 properly decompiled setProperty/getProperty
