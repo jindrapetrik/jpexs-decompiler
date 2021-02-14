@@ -131,9 +131,6 @@ public class TagTreeContextMenu extends JPopupMenu {
         this.mainPanel = mainPanel;
         this.tagTree = tagTree;
 
-        addScriptMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addScript"));
-        addScriptMenuItem.addActionListener(this::addScriptActionPerformed);
-        add(addScriptMenuItem);
 
         expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
         expandRecursiveMenuItem.addActionListener(this::expandRecursiveActionPerformed);
@@ -210,6 +207,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         openSWFInsideTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.openswfinside"));
         add(openSWFInsideTagMenuItem);
         openSWFInsideTagMenuItem.addActionListener(this::openSwfInsideActionPerformed);
+
+        addScriptMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addScript"));
+        addScriptMenuItem.addActionListener(this::addScriptActionPerformed);
+        add(addScriptMenuItem);
 
         tagTree.addMouseListener(new MouseAdapter() {
             @Override
@@ -749,13 +750,6 @@ public class TagTreeContextMenu extends JPopupMenu {
                         boolean frameFound = false;
                         for (int i = 0; i < tagList.size(); i++) {
                             Tag t = tagList.get(i);
-                            if (frame == targetFrame && t instanceof DoActionTag) {
-                                View.showMessageDialog(mainPanel, AppDialog.translateForDialog("message.alreadyhasscript", AddScriptDialog.class),
-                                        mainPanel.getMainFrame().translate("error"), JOptionPane.ERROR_MESSAGE
-                                );
-                                addScriptActionPerformed(evt);
-                                return;
-                            }
                             if (t instanceof ShowFrameTag) {
                                 if (frame == targetFrame) {
                                     tim.addTag(i, doAction);
