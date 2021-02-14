@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - #1202 Check for modifications outside FFDec and ask user to reload
 - #1155, #1602 AS3 remove trait button
 - #1260, #1438 AS1/2 direct editing on(xxx), onClipEvent(xxx) handlers
+- AS1/2 Add new frame script
 
 ### Fixed
 - #1298 AS1/2 properly decompiled setProperty/getProperty

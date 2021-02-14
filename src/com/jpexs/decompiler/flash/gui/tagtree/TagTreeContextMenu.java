@@ -16,22 +16,26 @@
  */
 package com.jpexs.decompiler.flash.gui.tagtree;
 
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.ReplaceCharacterDialog;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.FrameScript;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
@@ -109,9 +113,16 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem openSWFInsideTagMenuItem;
 
+    private JMenuItem addScriptMenuItem;
+
     public TagTreeContextMenu(final TagTree tagTree, MainPanel mainPanel) {
         this.mainPanel = mainPanel;
         this.tagTree = tagTree;
+
+        addScriptMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addScript"));
+        addScriptMenuItem.addActionListener(this::addScriptActionPerformed);
+        add(addScriptMenuItem);
+
         expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
         expandRecursiveMenuItem.addActionListener(this::expandRecursiveActionPerformed);
         add(expandRecursiveMenuItem);
@@ -311,6 +322,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         copyTagMenu.setVisible(false);
         copyTagWithDependenciesMenu.setVisible(false);
         openSWFInsideTagMenuItem.setVisible(false);
+        addScriptMenuItem.setVisible(false);
 
         if (allSelectedIsTag) {
             boolean canUndo = false;
@@ -353,6 +365,12 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         if (singleSelect) {
             final TreeItem firstItem = items.get(0);
+
+            if (firstItem instanceof FolderItem) {
+                if (((FolderItem) firstItem).getName().equals(TagTreeModel.FOLDER_SCRIPTS)) {
+                    addScriptMenuItem.setVisible(true);
+                }
+            }
 
             if (firstItem instanceof CharacterTag) {
                 replaceWithTagMenuItem.setVisible(true);
@@ -686,6 +704,75 @@ public class TagTreeContextMenu extends JPopupMenu {
             return;
         }
         View.expandTreeNodes(tagTree, path, true);
+    }
+
+    private void addScriptActionPerformed(ActionEvent evt) {
+        AddScriptDialog addScriptDialog = new AddScriptDialog();
+        if (addScriptDialog.showDialog() == JOptionPane.OK_OPTION) {
+            int targetFrame = addScriptDialog.getFrame();
+            List<TreeItem> sel = tagTree.getSelected();
+            if (!sel.isEmpty()) {
+                if (sel.get(0) instanceof FolderItem) {
+
+                    FolderItem folder = (FolderItem) sel.get(0);
+                    SWF swf = folder.getSwf();
+
+                    DoActionTag doAction = new DoActionTag(swf);
+
+                    ReadOnlyTagList tagList = swf.getTags();
+                    int frame = 1;
+                    boolean frameFound = false;
+                    for (int i = 0; i < tagList.size(); i++) {
+                        Tag t = tagList.get(i);
+                        if (frame == targetFrame && t instanceof DoActionTag) {
+                            View.showMessageDialog(mainPanel, AppDialog.translateForDialog("message.alreadyhasscript", AddScriptDialog.class),
+                                    mainPanel.getMainFrame().translate("error"), JOptionPane.ERROR_MESSAGE
+                            );
+                            addScriptActionPerformed(evt);
+                            return;
+                        }
+                        if (t instanceof ShowFrameTag) {
+                            if (frame == targetFrame) {
+                                swf.addTag(i, doAction);
+                                frameFound = true;
+                                break;
+                            }
+                            frame++;
+                        }
+                    }
+                    if (!frameFound) {
+                        for (; frame < targetFrame; frame++) {
+                            swf.addTag(new ShowFrameTag(swf));
+                        }
+                        swf.addTag(doAction);
+                        swf.addTag(new ShowFrameTag(swf));
+                    }
+
+                    TreePath selection = mainPanel.tagTree.getSelectionPath();
+                    TreePath swfPath = selection.getParentPath();
+                    swf.resetTimeline();
+                    mainPanel.refreshTree(swf);
+
+                    FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getModel().getScriptsNode(swf);
+                    TreePath scriptsPath = swfPath.pathByAddingChild(scriptsNode);
+                    for (TreeItem subItem : scriptsNode.subItems) {
+                        if (subItem instanceof FrameScript) {
+                            if (((FrameScript) subItem).getFrame().frame + 1 == targetFrame) {
+                                TreePath framePath = scriptsPath.pathByAddingChild(subItem);
+                                TreeItem doActionTag = mainPanel.tagTree.getModel().getChild(subItem, 0);
+                                TreePath doActionPath = framePath.pathByAddingChild(doActionTag);
+                                mainPanel.tagTree.setSelectionPath(doActionPath);
+                                break;
+                            }
+                        }
+                    }
+                    //tagTree.getSelectionPath();
+                    /*mainPanel.tagTree.setSelectionPath(new TreePath(new Object[]{
+                        mainPanel.tagTree.getModel().getRoot()
+                    }));*/
+                }
+            }
+        }
     }
 
     private void removeItemActionPerformed(ActionEvent evt, boolean removeDependencies) {
