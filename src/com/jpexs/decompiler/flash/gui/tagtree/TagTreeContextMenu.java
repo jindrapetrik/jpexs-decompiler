@@ -814,6 +814,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                         DefineButton2Tag button = addScriptDialog.getButton();
                         BUTTONCONDACTION bca = new BUTTONCONDACTION(swf, button);
                         bca.condOverUpToOverDown = true; //press
+                        if (!button.actions.isEmpty()) {
+                            button.actions.get(button.actions.size() - 1).isLast = false;
+                        }
+                        bca.isLast = true;
                         button.actions.add(bca);
                         button.setModified(true);
 
