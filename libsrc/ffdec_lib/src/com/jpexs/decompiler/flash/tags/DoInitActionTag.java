@@ -224,7 +224,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     public String getName() {
         String expName = swf == null ? "" : swf.getExportName(spriteId);
         if (expName == null || expName.isEmpty()) {
-            return super.getName();
+            return super.getName() + " (" + spriteId + ")";
         }
         String[] pathParts = expName.contains(".") ? expName.split("\\.") : new String[]{expName};
         return pathParts[pathParts.length - 1];
@@ -259,11 +259,4 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     public void setSourceTag(Tag t) {
         //nothing
     }
-
-    @Override
-    public String toString() {
-        return getName() + " (" + spriteId + ")";
-    }
-    
-    
 }
