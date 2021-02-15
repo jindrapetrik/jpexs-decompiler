@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.action;
 
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -25,6 +26,8 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
+import com.jpexs.decompiler.flash.tags.ImportAssetsTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -44,6 +47,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -60,9 +65,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.basic.BasicLabelUI;
-import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -84,6 +87,8 @@ public class AddScriptDialog extends AppDialog {
     private PreviewPanel buttonPreviewPanel;
     private PreviewPanel instancePreviewPanel;
 
+    private JTextField classNameTextField;
+
     private JTree instanceTree;
 
     private JTree spriteTree;
@@ -102,15 +107,33 @@ public class AddScriptDialog extends AppDialog {
     public static final int TYPE_SPRITE_FRAME = 1;
     public static final int TYPE_BUTTON_EVENT = 2;
     public static final int TYPE_INSTANCE_EVENT = 3;
+    public static final int TYPE_CLASS = 4;
+
     private final SWF swf;
 
     private final JComboBox<String> typeComboBox;
+
+    private List<String> existingClasses = new ArrayList<>();
 
     public AddScriptDialog(SWF swf) {
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setTitle(translate("dialog.title"));
 
         this.swf = swf;
+
+        ReadOnlyTagList tags = swf.getTags();
+        final String PACKAGES = "__Packages.";
+        for (Tag t : tags) {
+            if (t instanceof ExportAssetsTag) {
+                ExportAssetsTag ea = (ExportAssetsTag) t;
+                for (String n : ea.names) {
+                    if (n.startsWith(PACKAGES)) {
+                        existingClasses.add(n.substring(PACKAGES.length()));
+                    }
+                }
+            }
+        }
+
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
 
@@ -127,7 +150,8 @@ public class AddScriptDialog extends AppDialog {
             translate("type.frame"),
             translate("type.sprite.frame"),
             translate("type.button.event"),
-            translate("type.instance.event")
+            translate("type.instance.event"),
+            translate("type.class")
         });
         typeComboBox.addActionListener(this::typeChangedActionPerformed);
         typeLabel.setLabelFor(typeComboBox);
@@ -162,6 +186,7 @@ public class AddScriptDialog extends AppDialog {
         centerPanel.add(createSpritePanel(checkEnabledDocumentListener), "" + TYPE_SPRITE_FRAME);
         centerPanel.add(createButtonPanel(), "" + TYPE_BUTTON_EVENT);
         centerPanel.add(createInstancePanel(), "" + TYPE_INSTANCE_EVENT);
+        centerPanel.add(createClassPanel(), "" + TYPE_CLASS);
         cnt.add(centerPanel, BorderLayout.CENTER);
 
         cnt.add(panButtons, BorderLayout.SOUTH);
@@ -247,7 +272,7 @@ public class AddScriptDialog extends AppDialog {
                 sprite.setParent(root);
                 sprite.setData(t);
                 DefineSpriteTag s = (DefineSpriteTag) t;
-                int frame = 1;
+                int f = 1;
                 boolean hasScript = false;
                 for (Tag t2 : s.getTags()) {
                     if (t2 instanceof DoActionTag) {
@@ -255,12 +280,12 @@ public class AddScriptDialog extends AppDialog {
                     }
                     if (t2 instanceof ShowFrameTag) {
                         MyTreeNode frameNode = new MyTreeNode();
-                        MyFrame myf = new MyFrame(frame);
+                        MyFrame myf = new MyFrame(f);
                         myf.setInvalid(hasScript);
                         frameNode.setData(myf);
                         frameNode.setParent(sprite);
                         sprite.addChild(frameNode);
-                        frame++;
+                        f++;
                         hasScript = false;
                     }
                 }
@@ -285,12 +310,6 @@ public class AddScriptDialog extends AppDialog {
         });
         spriteFrameTextField.getDocument().addDocumentListener(documentListener);
 
-        List<DefineSpriteTag> sprites = new ArrayList<>();
-        for (Tag t : swf.getTags()) {
-            if (t instanceof DefineSpriteTag) {
-                sprites.add((DefineSpriteTag) t);
-            }
-        }
 
         MyTreeNode root = new MyTreeNode();
         root.setData("root");
@@ -361,10 +380,10 @@ public class AddScriptDialog extends AppDialog {
     }
 
     private JPanel createButtonPanel() {
-        List<ButtonTag> buttons = new ArrayList<>();
+        List<DefineButton2Tag> buttons = new ArrayList<>();
         for (Tag t : swf.getTags()) {
-            if (t instanceof ButtonTag) {
-                buttons.add((ButtonTag) t);
+            if (t instanceof DefineButton2Tag) {
+                buttons.add((DefineButton2Tag) t);
             }
         }
         buttonList = new JList<>(buttons.toArray(new DefineButton2Tag[buttons.size()]));
@@ -399,7 +418,7 @@ public class AddScriptDialog extends AppDialog {
 
     private static class MyTreeNode implements TreeNode {
 
-        private List<TreeNode> children = new ArrayList<>();
+        private final List<TreeNode> children = new ArrayList<>();
         private TreeNode parent;
         private Object data;
 
@@ -463,7 +482,7 @@ public class AddScriptDialog extends AppDialog {
 
     private static class MyFrame {
 
-        private int frame;
+        private final int frame;
         private boolean invalid;
 
         public MyFrame(int frame) {
@@ -489,7 +508,7 @@ public class AddScriptDialog extends AppDialog {
     }
 
     private void populateInstanceNodes(MyTreeNode root, Timelined tim) {
-        int frame = 1;
+        int f = 1;
         List<MyTreeNode> currentFramePlaces = new ArrayList<>();
         for (Tag t : tim.getTags()) {
             if (t instanceof DefineSpriteTag) {
@@ -506,7 +525,7 @@ public class AddScriptDialog extends AppDialog {
             if (t instanceof ShowFrameTag) {
                 if (!currentFramePlaces.isEmpty()) {
                     MyTreeNode frameNode = new MyTreeNode();
-                    frameNode.setData(new MyFrame(frame));
+                    frameNode.setData(new MyFrame(f));
                     frameNode.setParent(root);
                     for (MyTreeNode p : currentFramePlaces) {
                         p.setParent(frameNode);
@@ -515,7 +534,7 @@ public class AddScriptDialog extends AppDialog {
                     root.addChild(frameNode);
                     currentFramePlaces.clear();
                 }
-                frame++;
+                f++;
             }
             if (t instanceof PlaceObjectTypeTag) {
                 MyTreeNode place = new MyTreeNode();
@@ -583,6 +602,44 @@ public class AddScriptDialog extends AppDialog {
         return instancePanel;
     }
 
+    private JPanel createClassPanel() {
+        JPanel classPanel = new JPanel();
+        classPanel.setLayout(new BoxLayout(classPanel, BoxLayout.Y_AXIS));
+
+        JPanel classCenterPanel = new JPanel(new FlowLayout());
+        JLabel classNameLabel = new JLabel(translate("classname"));
+        classNameTextField = new JTextField(40);
+
+        classNameTextField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                checkEnabled();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                checkEnabled();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                checkEnabled();
+            }
+        });
+
+        classNameTextField.addActionListener(this::okButtonActionPerformed);
+
+        classNameLabel.setLabelFor(classNameTextField);
+        classCenterPanel.add(classNameLabel);
+        classCenterPanel.add(classNameTextField);
+
+        classPanel.add(Box.createVerticalGlue());
+        classPanel.add(classCenterPanel);
+        classPanel.add(Box.createVerticalGlue());
+
+        return classPanel;
+    }
+
     private void instanceValueChanged(TreeSelectionEvent e) {
         TreePath selection = instanceTree.getSelectionPath();
         if (selection == null) {
@@ -595,12 +652,12 @@ public class AddScriptDialog extends AppDialog {
 
             PlaceObjectTypeTag place = (PlaceObjectTypeTag) tnode.getData();
             instancePreviewPanel.selectImageDepth(place.getDepth());
-            int frame = ((MyFrame) ((MyTreeNode) tnode.getParent()).getData()).frame;
+            int f = ((MyFrame) ((MyTreeNode) tnode.getParent()).getData()).frame;
             Object parent = ((MyTreeNode) tnode.getParent().getParent()).getData();
             if (parent instanceof DefineSpriteTag) {
-                instancePreviewPanel.showImagePanel((DefineSpriteTag) parent, swf, frame - 1);
+                instancePreviewPanel.showImagePanel((DefineSpriteTag) parent, swf, f - 1);
             } else {
-                instancePreviewPanel.showImagePanel(swf, swf, frame - 1);
+                instancePreviewPanel.showImagePanel(swf, swf, f - 1);
             }
 
         } else if (tnode.getData() instanceof DefineSpriteTag) {
@@ -608,12 +665,12 @@ public class AddScriptDialog extends AppDialog {
             instancePreviewPanel.showImagePanel((DefineSpriteTag) tnode.getData(), swf, -1);
         } else if (tnode.getData() instanceof MyFrame) {
             instancePreviewPanel.selectImageDepth(-1);
-            int frame = ((MyFrame) tnode.getData()).frame;
+            int f = ((MyFrame) tnode.getData()).frame;
             Object parent = ((MyTreeNode) tnode.getParent()).getData();
             if (parent instanceof DefineSpriteTag) {
-                instancePreviewPanel.showImagePanel((DefineSpriteTag) parent, swf, frame - 1);
+                instancePreviewPanel.showImagePanel((DefineSpriteTag) parent, swf, f - 1);
             } else {
-                instancePreviewPanel.showImagePanel(swf, swf, frame - 1);
+                instancePreviewPanel.showImagePanel(swf, swf, f - 1);
             }
         }
         checkEnabled();
@@ -628,10 +685,10 @@ public class AddScriptDialog extends AppDialog {
             return;
         }
         framePreviewPanel.showImagePanel(swf, swf, selectedIndex);
-        int frame = selectedIndex + 1;
+        int f = selectedIndex + 1;
 
-        if (!frameTextField.getText().equals("" + frame)) {
-            frameTextField.setText("" + frame);
+        if (!frameTextField.getText().equals("" + f)) {
+            frameTextField.setText("" + f);
         }
         checkEnabled();
     }
@@ -657,15 +714,15 @@ public class AddScriptDialog extends AppDialog {
         if (tnode.getData() instanceof DefineSpriteTag) {
             spritePreviewPanel.showImagePanel((DefineSpriteTag) tnode.getData(), swf, -1);
         } else if (tnode.getData() instanceof MyFrame) {
-            int frame = ((MyFrame) tnode.getData()).frame;
+            int f = ((MyFrame) tnode.getData()).frame;
             Object parent = ((MyTreeNode) tnode.getParent()).getData();
             if (parent instanceof DefineSpriteTag) {
-                spritePreviewPanel.showImagePanel((DefineSpriteTag) parent, swf, frame - 1);
+                spritePreviewPanel.showImagePanel((DefineSpriteTag) parent, swf, f - 1);
             } else {
-                spritePreviewPanel.showImagePanel(swf, swf, frame - 1);
+                spritePreviewPanel.showImagePanel(swf, swf, f - 1);
             }
-            if (!spriteFrameTextField.getText().equals("" + frame)) {
-                spriteFrameTextField.setText("" + frame);
+            if (!spriteFrameTextField.getText().equals("" + f)) {
+                spriteFrameTextField.setText("" + f);
             }
         }
         checkEnabled();
@@ -680,11 +737,11 @@ public class AddScriptDialog extends AppDialog {
     private void updateFrames() {
         int type = typeComboBox.getSelectedIndex();
         if (type == TYPE_FRAME) {
-            int frame = -1;
+            int f = -1;
             boolean invalid = false;
             try {
-                frame = Integer.parseInt(frameTextField.getText());
-                if (frame <= 0) {
+                f = Integer.parseInt(frameTextField.getText());
+                if (f <= 0) {
                     invalid = true;
                 }
 
@@ -692,11 +749,11 @@ public class AddScriptDialog extends AppDialog {
                 invalid = true;
             }
             if (!invalid) {
-                if (frame > frameList.getModel().getSize()) {
+                if (f > frameList.getModel().getSize()) {
                     frameList.setSelectedIndices(new int[]{});
                 } else {
-                    frameList.setSelectedIndex(frame - 1);
-                    frameList.ensureIndexIsVisible(frame - 1);
+                    frameList.setSelectedIndex(f - 1);
+                    frameList.ensureIndexIsVisible(f - 1);
                 }
             }
         }
@@ -704,11 +761,11 @@ public class AddScriptDialog extends AppDialog {
             TreePath selection = spriteTree.getSelectionPath();
             if (selection != null) {
 
-                int frame = -1;
+                int f = -1;
                 boolean invalid = false;
                 try {
-                    frame = Integer.parseInt(spriteFrameTextField.getText());
-                    if (frame <= 0) {
+                    f = Integer.parseInt(spriteFrameTextField.getText());
+                    if (f <= 0) {
                         invalid = true;
                     }
 
@@ -728,7 +785,7 @@ public class AddScriptDialog extends AppDialog {
                     if (spriteTree.isExpanded(spritePath)) {
                         boolean found = false;
                         for (int i = 0; i < node.getChildCount(); i++) {
-                            if (((MyFrame) ((MyTreeNode) node.getChildAt(i)).data).frame == frame) {
+                            if (((MyFrame) ((MyTreeNode) node.getChildAt(i)).data).frame == f) {
                                 TreePath framePath = spritePath.pathByAddingChild(node.getChildAt(i));
                                 spriteTree.setSelectionPath(framePath);
                                 found = true;
@@ -814,6 +871,14 @@ public class AddScriptDialog extends AppDialog {
             }
         }
 
+        if (type == TYPE_CLASS) {
+            if (classNameTextField.getText().trim().isEmpty()) {
+                okButton.setEnabled(false);
+            }
+            if (existingClasses.contains(classNameTextField.getText().trim())) {
+                okButton.setEnabled(false);
+            }
+        }
     }
 
     private void okButtonActionPerformed(ActionEvent evt) {
@@ -833,6 +898,13 @@ public class AddScriptDialog extends AppDialog {
 
     public int getFrame() {
         return frame;
+    }
+
+    public String getClassName() {
+        if (getScriptType() == TYPE_CLASS) {
+            return classNameTextField.getText().trim();
+        }
+        return null;
     }
 
     public int getScriptType() {
