@@ -44,6 +44,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
@@ -123,14 +124,12 @@ public abstract class MainFrameMenu implements MenuBuilder {
         return true;
     }
 
-    protected boolean saveActionPerformed(ActionEvent evt) {
-        if (Main.isWorking()) {
-            return false;
-        }
-
+    private boolean saveSwf(SWF swf) {
+        boolean saved = false;
         if (swf != null) {
-            boolean saved = false;
             if (swf.swfList != null && swf.swfList.isBundle()) {
+                File savedFile = new File(swf.swfList.sourceInfo.getFile());
+                Main.startSaving(savedFile);
                 SWFBundle bundle = swf.swfList.bundle;
                 if (!bundle.isReadOnly()) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -141,13 +140,14 @@ public abstract class MainFrameMenu implements MenuBuilder {
                         Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
                     }
                 }
+                Main.stopSaving(savedFile);
             } else if (swf.binaryData != null) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 try {
                     swf.saveTo(baos);
                     swf.binaryData.binaryData = new ByteArrayRange(baos.toByteArray());
                     swf.binaryData.setModified(true);
-                    saved = true;
+                    saved = saveSwf(swf.binaryData.getSwf()); //save parent swf                   
                 } catch (IOException ex) {
                     Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
                 }
@@ -166,11 +166,15 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 swf.clearModified();
                 mainFrame.getPanel().refreshTree(swf);
             }
-
-            return true;
         }
+        return saved;
+    }
 
-        return false;
+    protected boolean saveActionPerformed(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return false;
+        }
+        return saveSwf(swf);
     }
 
     protected boolean saveAsActionPerformed(ActionEvent evt) {

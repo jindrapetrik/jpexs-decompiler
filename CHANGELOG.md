@@ -21,6 +21,9 @@ All notable changes to this project will be documented in this file.
 - Only last DoInitAction tag displayed
 - #1606 Run/Debug SWF that is embedded (has no file associated)
 
+### Changed
+- #1565, #1407, #1350 On BinaryData SWF save, parent SWF is saved
+
 ## [13.0.3] - 2021-02-12
 ### Added
 - #1594 Option to disable AS3 P-code indentation, label on separate line
