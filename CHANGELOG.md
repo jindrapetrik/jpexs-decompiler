@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - #1490, #1493 AS1/2 direct editation - cast op
 - AS1/2 cast op decompilation
 - Only last DoInitAction tag displayed
+- #1606 Run/Debug SWF that is embedded (has no file associated)
 
 ## [13.0.3] - 2021-02-12
 ### Added
