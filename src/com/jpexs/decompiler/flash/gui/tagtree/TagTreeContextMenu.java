@@ -16,8 +16,12 @@
  */
 package com.jpexs.decompiler.flash.gui.tagtree;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
@@ -26,11 +30,15 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.ReplaceCharacterDialog;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DoABC2Tag;
+import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
@@ -50,6 +58,7 @@ import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -58,6 +67,7 @@ import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -131,12 +141,12 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem openSWFInsideTagMenuItem;
 
-    private JMenuItem addScriptMenuItem;
+    private JMenuItem addAs12ScriptMenuItem;
+    private JMenuItem addAs3ClassMenuItem;
 
     public TagTreeContextMenu(final TagTree tagTree, MainPanel mainPanel) {
         this.mainPanel = mainPanel;
         this.tagTree = tagTree;
-
 
         expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
         expandRecursiveMenuItem.addActionListener(this::expandRecursiveActionPerformed);
@@ -214,9 +224,14 @@ public class TagTreeContextMenu extends JPopupMenu {
         add(openSWFInsideTagMenuItem);
         openSWFInsideTagMenuItem.addActionListener(this::openSwfInsideActionPerformed);
 
-        addScriptMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addScript"));
-        addScriptMenuItem.addActionListener(this::addScriptActionPerformed);
-        add(addScriptMenuItem);
+        addAs12ScriptMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addScript"));
+        addAs12ScriptMenuItem.addActionListener(this::addAs12ScriptActionPerformed);
+        add(addAs12ScriptMenuItem);
+
+        addAs3ClassMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addClass"));
+        addAs3ClassMenuItem.addActionListener(this::addAs3ClassActionPerformed);
+        add(addAs3ClassMenuItem);
+
 
         tagTree.addMouseListener(new MouseAdapter() {
             @Override
@@ -341,7 +356,8 @@ public class TagTreeContextMenu extends JPopupMenu {
         copyTagMenu.setVisible(false);
         copyTagWithDependenciesMenu.setVisible(false);
         openSWFInsideTagMenuItem.setVisible(false);
-        addScriptMenuItem.setVisible(false);
+        addAs12ScriptMenuItem.setVisible(false);
+        addAs3ClassMenuItem.setVisible(false);
 
         if (allSelectedIsTag) {
             boolean canUndo = false;
@@ -391,8 +407,11 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             if (firstItem instanceof FolderItem) {
                 if (((FolderItem) firstItem).getName().equals(TagTreeModel.FOLDER_SCRIPTS)) {
-                    addScriptMenuItem.setVisible(true);
+                    addAs12ScriptMenuItem.setVisible(true);
                 }
+            }
+            if (firstItem instanceof ClassesListTreeModel) {
+                addAs3ClassMenuItem.setVisible(true);
             }
 
             if (firstItem instanceof CharacterTag) {
@@ -729,7 +748,92 @@ public class TagTreeContextMenu extends JPopupMenu {
         View.expandTreeNodes(tagTree, path, true);
     }
 
-    private void addScriptActionPerformed(ActionEvent evt) {
+    private void addAs3ClassActionPerformed(ActionEvent evt) {
+        List<TreeItem> sel = tagTree.getSelected();
+        if (!sel.isEmpty()) {
+            if (sel.get(0) instanceof ClassesListTreeModel) {
+                String className = View.showInputDialog(AppDialog.translateForDialog("classname", AddScriptDialog.class), "");
+                if (className == null || className.isEmpty()) {
+                    return;
+                }
+                ClassesListTreeModel cl = (ClassesListTreeModel) sel.get(0);
+                SWF swf = cl.getSwf();
+                DoABC2Tag doAbc = new DoABC2Tag(swf);
+                doAbc.name = className;
+
+                List<ABC> abcs = new ArrayList<>();
+                for (ABCContainerTag ct : swf.getAbcList()) {
+                    abcs.add(ct.getABC());
+                }
+
+                ReadOnlyTagList tags = swf.getTags();
+                int insertPos = -1;
+                for (int i = 0; i < tags.size(); i++) {
+                    if (tags.get(i) instanceof ShowFrameTag) {
+                        insertPos = i;
+                        break;
+                    }
+                }
+                if (insertPos == -1) {
+                    insertPos = tags.size();
+                }
+                swf.addTag(insertPos, doAbc);
+
+                String pkg = className.contains(".") ? className.substring(0, className.lastIndexOf(".")) : "";
+                String classSimpleName = className.contains(".") ? className.substring(className.lastIndexOf(".") + 1) : className;
+                String fileName = className.replace(".", "/");
+                String pkgParts[] = new String[0];
+                if (!pkg.isEmpty()) {
+                    if (pkg.contains(".")) {
+                        pkgParts = pkg.split("\\.");
+                    } else {
+                        pkgParts = new String[]{pkg};
+                    }
+                }
+                try {
+                    ActionScript3Parser parser = new ActionScript3Parser(doAbc.getABC(), abcs);
+
+                    DottedChain dc = new DottedChain(pkgParts, "");
+                    String script = "package " + dc.toPrintableString(true) + " {"
+                            + "public class " + IdentifiersDeobfuscation.printIdentifier(true, classSimpleName) + " {"
+                            + " }"
+                            + "}";
+                    parser.addScript(script, false, fileName, 0, 0);
+                } catch (IOException | InterruptedException | AVM2ParseException | CompilationException ex) {
+                    Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, "Error during script compilation", ex);
+                }
+
+                doAbc.setModified(true);
+                swf.clearAllCache();
+                swf.setModified(true);
+                mainPanel.refreshTree(swf);
+
+                Object item = mainPanel.tagTree.getModel().getScriptsNode(swf);
+
+                String parts[] = className.contains(".") ? className.split("\\.") : new String[]{className};
+                TreePath selection = mainPanel.tagTree.getSelectionPath();
+                TreePath swfPath = selection.getParentPath();
+                TreePath scriptsPath = swfPath.pathByAddingChild(item);
+                TreePath classPath = scriptsPath;
+
+                for (int i = 0; i < parts.length; i++) {
+                    for (TreeItem ti : tagTree.getModel().getAllChildren(item)) {
+                        if (ti instanceof AS3ClassTreeItem) {
+                            AS3ClassTreeItem cti = (AS3ClassTreeItem) ti;
+                            if (parts[i].equals(cti.getNameWithNamespaceSuffix())) {
+                                classPath = classPath.pathByAddingChild(ti);
+                                item = ti;
+                                break;
+                            }
+                        }
+                    }
+                }
+                mainPanel.tagTree.setSelectionPath(classPath);
+            }
+        }
+    }
+
+    private void addAs12ScriptActionPerformed(ActionEvent evt) {
         List<TreeItem> sel = tagTree.getSelected();
         if (!sel.isEmpty()) {
             if (sel.get(0) instanceof FolderItem) {
