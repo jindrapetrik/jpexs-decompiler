@@ -188,6 +188,26 @@ public class Main {
 
     private static List<File> savedFiles = Collections.synchronizedList(new ArrayList<>());
 
+    //This method makes file watcher to shut up during our own file saving
+    public static void startSaving(File savedFile) {
+        savedFiles.add(savedFile);
+    }
+
+    public static void stopSaving(File savedFile) {
+        View.execInEventDispatchLater(new Runnable() {
+            @Override
+            public void run() {
+                //TODO: handle this better
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException ex) {
+                    //ignore
+                }
+                savedFiles.remove(savedFile);
+            }
+        });
+    }
+
     public static void freeRun() {
         synchronized (Main.class) {
             if (runTempFile != null) {
@@ -972,7 +992,7 @@ public class Main {
 
     public static void saveFile(SWF swf, String outfile, SaveFileMode mode, ExeExportMode exeExportMode) throws IOException {
         File savedFile = new File(outfile);
-        savedFiles.add(savedFile);
+        startSaving(savedFile);
         if (mode == SaveFileMode.SAVEAS && swf.swfList != null /*SWF in binarydata has null*/ && !swf.swfList.isBundle()) {
             swf.setFile(outfile);
             swf.swfList.sourceInfo.setFile(outfile);
@@ -1050,18 +1070,7 @@ public class Main {
         } else {
             throw new IOException("Output not found");
         }
-        View.execInEventDispatchLater(new Runnable() {
-            @Override
-            public void run() {
-                //TODO: handle this better
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ex) {
-                    //ignore
-                }
-                savedFiles.remove(savedFile);
-            }
-        });
+        stopSaving(savedFile);
     }
 
     private static class OpenFileWorker extends SwingWorker {
