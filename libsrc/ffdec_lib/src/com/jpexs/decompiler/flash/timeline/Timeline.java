@@ -99,7 +99,7 @@ public class Timeline {
 
     private final Map<Integer, Integer> depthMaxFrame = new HashMap<>();
 
-    private final List<ASMSource> asmSources = new ArrayList<>();
+    public final List<ASMSource> asmSources = new ArrayList<>();
 
     private final List<ASMSourceContainer> asmSourceContainers = new ArrayList<>();
 
@@ -448,7 +448,9 @@ public class Timeline {
             if (asm instanceof DoInitActionTag) {
                 DoInitActionTag initAction = (DoInitActionTag) asm;
                 String path = swf.getExportName(initAction.spriteId);
-                path = path != null ? path : "__doinit__" + initAction.spriteId;
+                if (path == null) {
+                    continue;
+                }
                 if (path.isEmpty()) {
                     path = initAction.getExportFileName();
                 }
