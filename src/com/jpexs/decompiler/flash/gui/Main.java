@@ -412,23 +412,25 @@ public class Main {
     private static void prepareSwf(SwfPreparation prep, File toPrepareFile, File origFile, List<File> tempFiles) throws IOException {
         SWF instrSWF = null;
         try (FileInputStream fis = new FileInputStream(toPrepareFile)) {
-            instrSWF = new SWF(fis, toPrepareFile.getAbsolutePath(), origFile.getName(), false);
+            instrSWF = new SWF(fis, toPrepareFile.getAbsolutePath(), origFile == null ? "unknown.swf" : origFile.getName(), false);
         } catch (InterruptedException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
         if (instrSWF != null) {
-            for (Tag t : instrSWF.getLocalTags()) {
-                if (t instanceof ImportTag) {
-                    ImportTag it = (ImportTag) t;
-                    String url = it.getUrl();
-                    File importedFile = new File(origFile.getParentFile(), url);
-                    if (importedFile.exists()) {
-                        File newTempFile = File.createTempFile("ffdec_run_import_", ".swf");
-                        it.setUrl("./" + newTempFile.getName());
-                        byte[] impData = Helper.readFile(importedFile.getAbsolutePath());
-                        Helper.writeFile(newTempFile.getAbsolutePath(), impData);
-                        tempFiles.add(newTempFile);
-                        prepareSwf(prep, newTempFile, importedFile, tempFiles);
+            if (origFile != null) {
+                for (Tag t : instrSWF.getLocalTags()) {
+                    if (t instanceof ImportTag) {
+                        ImportTag it = (ImportTag) t;
+                        String url = it.getUrl();
+                        File importedFile = new File(origFile.getParentFile(), url);
+                        if (importedFile.exists()) {
+                            File newTempFile = File.createTempFile("ffdec_run_import_", ".swf");
+                            it.setUrl("./" + newTempFile.getName());
+                            byte[] impData = Helper.readFile(importedFile.getAbsolutePath());
+                            Helper.writeFile(newTempFile.getAbsolutePath(), impData);
+                            tempFiles.add(newTempFile);
+                            prepareSwf(prep, newTempFile, importedFile, tempFiles);
+                        }
                     }
                 }
             }
@@ -461,7 +463,7 @@ public class Main {
                 swf.saveTo(fos);
             }
 
-            prepareSwf(new SwfRunPrepare(), tempFile, new File(swf.getFile()), tempFiles);
+            prepareSwf(new SwfRunPrepare(), tempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempFiles);
 
         } catch (IOException ex) {
             return;
@@ -506,7 +508,7 @@ public class Main {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
                         swf.saveTo(fos);
                     }
-                    prepareSwf(new SwfDebugPrepare(doPCode), fTempFile, new File(swf.getFile()), tempFiles);
+                    prepareSwf(new SwfDebugPrepare(doPCode), fTempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempFiles);
                     return null;
                 }
 
