@@ -1040,10 +1040,60 @@ public class TagTreeContextMenu extends JPopupMenu {
                             }
 
                         }
+                    } else if (addScriptDialog.getScriptType() == AddScriptDialog.TYPE_SPRITE_INIT) {
+                        DefineSpriteTag sprite = addScriptDialog.getSprite();
+                        DoInitActionTag doinit = new DoInitActionTag(swf);
+                        doinit.spriteId = sprite.spriteId;
+                        ReadOnlyTagList tags = swf.getTags();
+                        int addPos = -1;
+                        for (int i = 0; i < tags.size(); i++) {
+                            Tag t = tags.get(i);
+                            if (t instanceof PlaceObjectTypeTag) {
+                                int placeCharacterId = ((PlaceObjectTypeTag) t).getCharacterId();
+                                if (usesCharacter(swf, placeCharacterId, sprite.spriteId)) {
+                                    addPos = i;
+                                    break;
+                                }
+                            }
+                        }
+                        if (addPos == -1) {
+                            addPos = tags.size();
+                        }
+                        swf.addTag(addPos, doinit);
+
+                        swf.clearAllCache();
+                        swf.setModified(true);
+                        mainPanel.refreshTree(swf);
+
+                        TreePath selection = mainPanel.tagTree.getSelectionPath();
+                        TreePath swfPath = selection.getParentPath();
+                        FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getModel().getScriptsNode(swf);
+                        TreePath scriptsPath = swfPath.pathByAddingChild(scriptsNode);
+                        TreePath doinitPath = scriptsPath.pathByAddingChild(doinit);
+                        mainPanel.tagTree.setSelectionPath(doinitPath);
                     }
                 }
             }
         }
+    }
+
+    private boolean usesCharacter(SWF swf, int characterId, int searchedCharacterId) {
+        if (characterId == searchedCharacterId) {
+            return true;
+        }
+        CharacterTag character = swf.getCharacter(characterId);
+        if (character instanceof DefineSpriteTag) {
+            DefineSpriteTag sprite = (DefineSpriteTag) character;
+            for (Tag t : sprite.getTags()) {
+                if (t instanceof PlaceObjectTypeTag) {
+                    int placeCharacterId = ((PlaceObjectTypeTag) t).getCharacterId();
+                    if (usesCharacter(swf, placeCharacterId, searchedCharacterId)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private void removeItemActionPerformed(ActionEvent evt, boolean removeDependencies) {
