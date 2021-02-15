@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -447,7 +448,7 @@ public class Timeline {
             if (asm instanceof DoInitActionTag) {
                 DoInitActionTag initAction = (DoInitActionTag) asm;
                 String path = swf.getExportName(initAction.spriteId);
-                path = path != null ? path : "_unk_";
+                path = path != null ? path : "__doinit__" + initAction.spriteId;
                 if (path.isEmpty()) {
                     path = initAction.getExportFileName();
                 }
