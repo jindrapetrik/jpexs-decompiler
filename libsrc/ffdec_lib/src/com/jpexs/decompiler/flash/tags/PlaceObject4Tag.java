@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.EndOfStreamException;
@@ -661,5 +662,15 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
             return visible;
         }
         return null;
+    }
+
+    @Override
+    public void setClipActions(CLIPACTIONS clipActions) {
+        this.clipActions = clipActions;
+    }
+
+    @Override
+    public void setPlaceFlagHasClipActions(boolean placeFlagHasClipActions) {
+        this.placeFlagHasClipActions = placeFlagHasClipActions;
     }
 }
