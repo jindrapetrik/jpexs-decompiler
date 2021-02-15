@@ -232,7 +232,6 @@ public class TagTreeContextMenu extends JPopupMenu {
         addAs3ClassMenuItem.addActionListener(this::addAs3ClassActionPerformed);
         add(addAs3ClassMenuItem);
 
-
         tagTree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -752,12 +751,29 @@ public class TagTreeContextMenu extends JPopupMenu {
         List<TreeItem> sel = tagTree.getSelected();
         if (!sel.isEmpty()) {
             if (sel.get(0) instanceof ClassesListTreeModel) {
-                String className = View.showInputDialog(AppDialog.translateForDialog("classname", AddScriptDialog.class), "");
-                if (className == null || className.isEmpty()) {
-                    return;
-                }
                 ClassesListTreeModel cl = (ClassesListTreeModel) sel.get(0);
                 SWF swf = cl.getSwf();
+                String className = "";
+                String parts[];
+                loopinput:
+                while (true) {
+                    className = View.showInputDialog(AppDialog.translateForDialog("classname", AddScriptDialog.class), className);
+                    if (className == null || className.isEmpty()) {
+                        return;
+                    }
+
+
+                    parts = className.contains(".") ? className.split("\\.") : new String[]{className};
+                    DottedChain classNameDc = new DottedChain(parts, "");
+                    for (ABCContainerTag ct : swf.getAbcList()) {
+                        if (ct.getABC().findClassByName(classNameDc) > -1) {
+                            View.showMessageDialog(mainPanel, AppDialog.translateForDialog("message.classexists", AddScriptDialog.class), mainPanel.translate("error"), JOptionPane.ERROR_MESSAGE);
+                            continue loopinput;
+                        }
+                    }
+                    break;
+                }
+
                 DoABC2Tag doAbc = new DoABC2Tag(swf);
                 doAbc.name = className;
 
@@ -810,7 +826,6 @@ public class TagTreeContextMenu extends JPopupMenu {
 
                 Object item = mainPanel.tagTree.getModel().getScriptsNode(swf);
 
-                String parts[] = className.contains(".") ? className.split("\\.") : new String[]{className};
                 TreePath selection = mainPanel.tagTree.getSelectionPath();
                 TreePath swfPath = selection.getParentPath();
                 TreePath scriptsPath = swfPath.pathByAddingChild(item);
