@@ -18,6 +18,9 @@ package com.jpexs.decompiler.flash.gui.tagtree;
 
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
+import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
@@ -30,6 +33,7 @@ import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
@@ -41,6 +45,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
 import com.jpexs.decompiler.flash.timeline.TagScript;
@@ -52,6 +57,7 @@ import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.Helper;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -760,11 +766,17 @@ public class TagTreeContextMenu extends JPopupMenu {
                             }
                         }
                         if (!frameFound) {
+                            //inserting new frames
                             for (; frame < targetFrame; frame++) {
                                 tim.addTag(new ShowFrameTag(swf));
                             }
                             tim.addTag(doAction);
                             tim.addTag(new ShowFrameTag(swf));
+                            if (tim instanceof DefineSpriteTag) {
+                                ((DefineSpriteTag) tim).frameCount = targetFrame;
+                            } else {
+                                swf.frameCount = targetFrame;
+                            }
                         }
 
                         TreePath selection = mainPanel.tagTree.getSelectionPath();
@@ -930,6 +942,103 @@ public class TagTreeContextMenu extends JPopupMenu {
                                     }
                                 }
                             }
+                        }
+                    } else if (addScriptDialog.getScriptType() == AddScriptDialog.TYPE_CLASS) {
+                        String className = addScriptDialog.getClassName();
+                        ReadOnlyTagList tags = swf.getTags();
+                        List<Integer> exportedIds = new ArrayList<>();
+                        for (int i = 0; i < tags.size(); i++) {
+                            if (tags.get(i) instanceof ExportAssetsTag) {
+                                ExportAssetsTag ea = (ExportAssetsTag) tags.get(i);
+                                exportedIds.addAll(ea.tags);
+                            }
+                        }
+
+                        int insertPos = -1;
+                        for (int i = 0; i < tags.size(); i++) {
+                            if (tags.get(i) instanceof DoInitActionTag) {
+                                DoInitActionTag doinit = (DoInitActionTag) tags.get(i);
+                                if (!exportedIds.contains(doinit.spriteId)) {
+                                    //this is #initpragma, make sure class is inserted before it                                
+                                    insertPos = i;
+                                    break;
+                                }
+                            }
+                        }
+                        if (insertPos == -1) {
+                            for (int i = 0; i < tags.size(); i++) {
+                                if (tags.get(i) instanceof ShowFrameTag) {
+                                    insertPos = i;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (insertPos > -1) {
+                            int characterId = swf.getNextCharacterId();
+                            DefineSpriteTag sprite = new DefineSpriteTag(swf);
+                            sprite.spriteId = characterId;
+                            sprite.hasEndTag = true;
+
+                            String exportName = "__Packages." + className;
+
+                            ExportAssetsTag exportAssets = new ExportAssetsTag(swf);
+                            exportAssets.names = new ArrayList<>();
+                            exportAssets.names.add(exportName);
+                            exportAssets.tags = new ArrayList<>();
+                            exportAssets.tags.add(characterId);
+
+                            DoInitActionTag doInit = new DoInitActionTag(swf);
+                            doInit.spriteId = characterId;
+
+                            ActionScript2Parser parser = new ActionScript2Parser(swf, doInit);
+                            try {
+                                List<Action> actions = parser.actionsFromString("class " + className + "{}");
+                                doInit.setActions(actions);
+                            } catch (ActionParseException | IOException | CompilationException ex) {
+                                //ignore
+                            }
+
+                            sprite.setExportName(exportName);
+
+                            swf.addTag(insertPos, sprite);
+                            swf.addTag(insertPos + 1, exportAssets);
+                            swf.addTag(insertPos + 2, doInit);
+
+                            swf.clearAllCache();
+                            swf.setModified(true);
+                            mainPanel.refreshTree(swf);
+
+                            TreePath selection = mainPanel.tagTree.getSelectionPath();
+                            TreePath swfPath = selection.getParentPath();
+                            FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getModel().getScriptsNode(swf);
+                            TreePath scriptsPath = swfPath.pathByAddingChild(scriptsNode);
+                            String classParts[] = className.contains(".") ? className.split("\\.") : new String[]{className};
+
+                            for (TreeItem subItem : scriptsNode.subItems) {
+                                if (subItem instanceof AS2Package) {
+                                    AS2Package pkg = (AS2Package) subItem;
+                                    if (pkg.getName().equals("__Packages")) {
+                                        TreePath classPath = scriptsPath.pathByAddingChild(pkg);
+                                        for (int i = 0; i < classParts.length - 1; i++) {
+                                            List<TreeItem> subs = pkg.getAllChildren();
+                                            for (TreeItem s : subs) {
+                                                if (s instanceof AS2Package) {
+                                                    if (((AS2Package) s).getName().equals(classParts[i])) {
+                                                        pkg = (AS2Package) s;
+                                                        classPath = classPath.pathByAddingChild(pkg);
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        classPath = classPath.pathByAddingChild(doInit);
+                                        mainPanel.tagTree.setSelectionPath(classPath);
+                                        break;
+                                    }
+                                }
+                            }
+
                         }
                     }
                 }
