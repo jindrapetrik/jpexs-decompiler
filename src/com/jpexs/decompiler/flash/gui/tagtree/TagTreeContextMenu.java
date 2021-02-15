@@ -941,6 +941,24 @@ public class TagTreeContextMenu extends JPopupMenu {
                                         }
                                     }
                                 }
+                            } else {
+                                if (subItem instanceof FrameScript) {
+                                    FrameScript fs = (FrameScript) subItem;
+                                    if (fs.getFrame().frame + 1 == frame) {
+                                        TreePath framePath = scriptsPath.pathByAddingChild(fs);
+                                        List<? extends TreeItem> subs = mainPanel.tagTree.getModel().getAllChildren(fs);
+                                        for (TreeItem t : subs) {
+                                            if (t instanceof TagScript) {
+                                                if (((TagScript) t).getTag() == placeType) {
+                                                    TreePath placePath = framePath.pathByAddingChild(t);
+                                                    TreePath clipActionRecordPath = placePath.pathByAddingChild(clipActionRecord);
+                                                    mainPanel.tagTree.setSelectionPath(clipActionRecordPath);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     } else if (addScriptDialog.getScriptType() == AddScriptDialog.TYPE_CLASS) {
