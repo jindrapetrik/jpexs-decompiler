@@ -1790,6 +1790,15 @@ public final class SWF implements SWFContainerItem, Timelined {
         subNodes.addAll(timeline.getAS2RootPackage().subPackages.values());
         subNodes.addAll(timeline.getAS2RootPackage().scripts.values());
 
+        for (ASMSource ass : timeline.asmSources) {
+            if (ass instanceof DoInitActionTag) {
+                String exportName = getExportName(((DoInitActionTag) ass).spriteId);
+                if (exportName == null) {
+                    subNodes.add(ass);
+                }
+            }
+        }
+
         for (Tag tag : timeline.otherTags) {
             boolean hasInnerFrames = false;
             List<TreeItem> tagSubNodes = new ArrayList<>();
