@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -81,6 +82,10 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag {
     public abstract void writeTagWithMatrix(SWFOutputStream sos, MATRIX m) throws IOException;
 
     public abstract Amf3Value getAmfData();
+
+    public abstract void setClipActions(CLIPACTIONS clipActions);
+
+    public abstract void setPlaceFlagHasClipActions(boolean placeFlagHasClipActions);
 
     @Override
     public String getName() {

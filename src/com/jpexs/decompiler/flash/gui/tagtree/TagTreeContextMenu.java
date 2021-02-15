@@ -90,6 +90,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 /**
  *
@@ -142,6 +143,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem openSWFInsideTagMenuItem;
 
     private JMenuItem addAs12ScriptMenuItem;
+
     private JMenuItem addAs3ClassMenuItem;
 
     public TagTreeContextMenu(final TagTree tagTree, MainPanel mainPanel) {
@@ -269,18 +271,29 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         final List<SWFList> swfs = mainPanel.getSwfs();
 
-        boolean allSelectedIsTagOrFrame = true;
+        boolean canRemove = true;
+        boolean onlyClipActionButtonCond = true;
         for (TreeItem item : items) {
             if (!(item instanceof Tag) && !(item instanceof Frame)) {
                 if (item instanceof TagScript) {
                     Tag tag = ((TagScript) item).getTag();
                     if (tag instanceof DoActionTag || tag instanceof DoInitActionTag) {
+                        onlyClipActionButtonCond = false;
                         continue;
                     }
                 }
 
-                allSelectedIsTagOrFrame = false;
+                if (item instanceof CLIPACTIONRECORD) {
+                    continue;
+                }
+                if (item instanceof BUTTONCONDACTION) {
+                    continue;
+                }
+
+                canRemove = false;
                 break;
+            } else {
+                onlyClipActionButtonCond = false;
             }
         }
 
@@ -337,8 +350,8 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
 
         expandRecursiveMenuItem.setVisible(false);
-        removeMenuItem.setVisible(allSelectedIsTagOrFrame);
-        removeWithDependenciesMenuItem.setVisible(allSelectedIsTagOrFrame);
+        removeMenuItem.setVisible(canRemove);
+        removeWithDependenciesMenuItem.setVisible(canRemove && !onlyClipActionButtonCond);
         undoTagMenuItem.setVisible(allSelectedIsTag);
         exportSelectionMenuItem.setEnabled(tagTree.hasExportableNodes());
         replaceMenuItem.setVisible(false);
@@ -1238,10 +1251,18 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void removeItemActionPerformed(ActionEvent evt, boolean removeDependencies) {
-        List<TreeItem> sel = tagTree.getSelected();
+
+        TreePath[] tps = tagTree.getSelectionModel().getSelectionPaths();
+        if (tps == null) {
+            return;
+        }
 
         List<Tag> tagsToRemove = new ArrayList<>();
-        for (TreeItem item : sel) {
+        List<Object> itemsToRemove = new ArrayList<>();
+        List<Object> itemsToRemoveParents = new ArrayList<>();
+        List<Object> itemsToRemoveSprites = new ArrayList<>();
+        for (TreePath path : tps) {
+            TreeItem item = (TreeItem) path.getLastPathComponent();
             if (item instanceof Tag) {
                 tagsToRemove.add((Tag) item);
             } else if (item instanceof TagScript) {
@@ -1255,20 +1276,67 @@ public class TagTreeContextMenu extends JPopupMenu {
                     // this should be the last frame, so remove the inner tags
                     tagsToRemove.addAll(frame.innerTags);
                 }
+            } else if (item instanceof BUTTONCONDACTION) {
+                itemsToRemove.add(item);
+                itemsToRemoveParents.add(((TagScript) path.getParentPath().getLastPathComponent()).getTag());
+                itemsToRemoveSprites.add(new Object());
+            } else if (item instanceof CLIPACTIONRECORD) {
+                itemsToRemove.add(item);
+                Object sprite = path.getParentPath().getParentPath().getParentPath().getLastPathComponent();
+                if (sprite instanceof TagScript) {
+                    sprite = ((TagScript) sprite).getTag();
+                }
+                itemsToRemoveParents.add(((TagScript) path.getParentPath().getLastPathComponent()).getTag());
+                itemsToRemoveSprites.add(sprite);
             }
         }
 
-        if (tagsToRemove.size() > 0) {
+        if (tagsToRemove.size() > 0 || itemsToRemove.size() > 0) {
             String confirmationMessage;
-            if (tagsToRemove.size() == 1) {
-                Tag tag = tagsToRemove.get(0);
-                confirmationMessage = mainPanel.translate("message.confirm.remove").replace("%item%", tag.toString());
+            if (tagsToRemove.size() + itemsToRemove.size() == 1) {
+                Object toRemove;
+                if (tagsToRemove.size() == 1) {
+                    toRemove = tagsToRemove.get(0);
+                } else {
+                    toRemove = itemsToRemove.get(0);
+                }
+                confirmationMessage = mainPanel.translate("message.confirm.remove" + (removeDependencies ? "" : ".nodep")).replace("%item%", toRemove.toString());
             } else {
-                confirmationMessage = mainPanel.translate("message.confirm.removemultiple").replace("%count%", Integer.toString(tagsToRemove.size()));
+                confirmationMessage = mainPanel.translate("message.confirm.removemultiple" + (removeDependencies ? "" : ".nodep")).replace("%count%", Integer.toString(tagsToRemove.size()));
             }
 
             if (View.showConfirmDialog(this, confirmationMessage, mainPanel.translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                 Map<SWF, List<Tag>> tagsToRemoveBySwf = new HashMap<>();
+                for (int i = 0; i < itemsToRemove.size(); i++) {
+                    Object item = itemsToRemove.get(i);
+                    Object parent = itemsToRemoveParents.get(i);
+                    if (item instanceof BUTTONCONDACTION) {
+                        DefineButton2Tag button = (DefineButton2Tag) parent;
+                        BUTTONCONDACTION buttonCondAction = (BUTTONCONDACTION) item;
+                        button.actions.remove(buttonCondAction);
+                        if (buttonCondAction.isLast) {
+                            if (!button.actions.isEmpty()) {
+                                button.actions.get(button.actions.size() - 1).isLast = true;
+                            }
+                        }
+                        button.setModified(true);
+                    }
+                    if (item instanceof CLIPACTIONRECORD) {
+                        PlaceObjectTypeTag place = (PlaceObjectTypeTag) parent;
+                        Timelined tim = (itemsToRemoveSprites.get(i) instanceof DefineSpriteTag) ? (DefineSpriteTag) itemsToRemoveSprites.get(i) : place.getSwf();
+
+                        CLIPACTIONRECORD clipActionRecord = (CLIPACTIONRECORD) item;
+                        CLIPACTIONS clipActions = place.getClipActions();
+                        clipActions.clipActionRecords.remove(clipActionRecord);
+                        if (clipActions.clipActionRecords.isEmpty()) {
+                            place.setPlaceFlagHasClipActions(false);
+                            place.setClipActions(null);
+                        }
+                        clipActions.calculateAllEventFlags();
+                        place.setModified(true);
+                        tim.resetTimeline();
+                    }
+                }
                 for (Tag tag : tagsToRemove) {
                     SWF swf = tag.getSwf();
                     if (!tagsToRemoveBySwf.containsKey(swf)) {
