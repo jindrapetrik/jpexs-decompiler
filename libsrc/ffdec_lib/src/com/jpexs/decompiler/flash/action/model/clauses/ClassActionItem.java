@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
@@ -147,6 +148,14 @@ public class ClassActionItem extends ActionItem implements Block {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        GraphTargetItem clsName = className;
+        while (clsName instanceof GetMemberActionItem) {
+            ((GetMemberActionItem) clsName).printObfuscatedMemberName = true;
+            clsName = ((GetMemberActionItem) clsName).object;
+        }
+        if (clsName instanceof GetVariableActionItem) {
+            ((GetVariableActionItem) clsName).printObfuscatedName = true;
+        }
         writer.startClass(className.toStringNoQuotes(localData));
         writer.append("class ");
         className.toStringNoQuotes(writer, localData);

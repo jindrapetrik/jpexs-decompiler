@@ -1129,8 +1129,12 @@ public class TagTreeContextMenu extends JPopupMenu {
                             doInit.spriteId = characterId;
 
                             ActionScript2Parser parser = new ActionScript2Parser(swf, doInit);
+
+                            String[] parts = className.contains(".") ? className.split("\\.") : new String[]{className};
+                            DottedChain dc = new DottedChain(parts, "");
+
                             try {
-                                List<Action> actions = parser.actionsFromString("class " + className + "{}");
+                                List<Action> actions = parser.actionsFromString("class " + dc.toPrintableString(false) + "{}");
                                 doInit.setActions(actions);
                             } catch (ActionParseException | IOException | CompilationException ex) {
                                 //ignore
