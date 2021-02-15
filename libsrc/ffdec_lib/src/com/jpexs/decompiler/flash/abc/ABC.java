@@ -86,7 +86,7 @@ import java.util.logging.Logger;
  */
 public class ABC {
 
-    public ABCVersion version = new ABCVersion(47, 16);
+    public ABCVersion version = new ABCVersion(46, 16);
 
     public AVM2ConstantPool constants = new AVM2ConstantPool();
 
