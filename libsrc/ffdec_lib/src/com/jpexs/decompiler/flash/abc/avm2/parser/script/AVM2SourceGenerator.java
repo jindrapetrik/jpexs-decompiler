@@ -921,9 +921,6 @@ public class AVM2SourceGenerator implements SourceGenerator {
             finallySwitchCmds.addAll(toInsList(AssignableAVM2Item.getTemp(localData, this, tempReg2)));
             finallySwitchCmds.add(ins(AVM2Instructions.Kill, tempReg2.getVal()));
             finallySwitchCmds.add(ins(AVM2Instructions.Throw));
-            finallySwitchCmds.add(ins(AVM2Instructions.PushByte, 255));
-            finallySwitchCmds.add(ins(AVM2Instructions.PopScope));
-            finallySwitchCmds.add(ins(AVM2Instructions.Kill, tempReg.getVal()));
 
             int finSwitchLen = insToBytes(finallySwitchCmds).length;
 
@@ -933,7 +930,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
             preCatches.add(0, fjump);
             preCatches.add(0, new ExceptionMarkAVM2Instruction(finallyEx, MARK_E_END));
-            preCatches.add(0, ins(AVM2Instructions.PushByte, 255));
+            preCatches.add(0, ins(AVM2Instructions.PushByte, -1));
 
             finallySwitchCmds.add(new ExceptionMarkAVM2Instruction(finallyEx, MARK_E_FINALLYPART));
 
