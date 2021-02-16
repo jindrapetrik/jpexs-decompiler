@@ -1025,6 +1025,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                 if (tags.get(i) == placeType) {
                                     PlaceObject2Tag place2 = new PlaceObject2Tag(swf, false, place.depth, place.characterId, place.matrix,
                                             new CXFORMWITHALPHA(place.colorTransform), -1, null, -1, clipActions);
+                                    place2.setTimelined(tim);
                                     tim.replaceTag(i, place2);
                                     placeType = place2;
                                     break;
@@ -1153,6 +1154,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                             DefineSpriteTag sprite = new DefineSpriteTag(swf);
                             sprite.spriteId = characterId;
                             sprite.hasEndTag = true;
+                            sprite.setTimelined(swf);
 
                             String exportName = "__Packages." + className;
 
@@ -1161,9 +1163,11 @@ public class TagTreeContextMenu extends JPopupMenu {
                             exportAssets.names.add(exportName);
                             exportAssets.tags = new ArrayList<>();
                             exportAssets.tags.add(characterId);
+                            exportAssets.setTimelined(swf);
 
                             DoInitActionTag doInit = new DoInitActionTag(swf);
                             doInit.spriteId = characterId;
+                            doInit.setTimelined(swf);
 
                             ActionScript2Parser parser = new ActionScript2Parser(swf, doInit);
 
@@ -1221,6 +1225,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     } else if (addScriptDialog.getScriptType() == AddScriptDialog.TYPE_SPRITE_INIT) {
                         DefineSpriteTag sprite = addScriptDialog.getSprite();
                         DoInitActionTag doinit = new DoInitActionTag(swf);
+                        doinit.setTimelined(swf);
                         doinit.spriteId = sprite.spriteId;
                         ReadOnlyTagList tags = swf.getTags();
                         int addPos = -1;
