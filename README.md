@@ -128,6 +128,7 @@ The application was made in Czech republic.
 * **poxyran** - spanish translation
 * **realmaster42** - portugese-brasil translation
 * **Rtsjx** - chinese translation
+* **koiru** - japanese translation
 
 ## Contact
 You can use our Issue tracker to report bugs, but our support is VERY limited.
