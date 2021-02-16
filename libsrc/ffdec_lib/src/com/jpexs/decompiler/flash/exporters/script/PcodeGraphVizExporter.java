@@ -100,61 +100,51 @@ public class PcodeGraphVizExporter {
         List<GraphException> exceptions = graph.getExceptions();
 
         Set<Long> knownAddresses = graphSource.getImportantAddresses();
-        int h = 0;
-        List<Integer> exPassedStarts = new ArrayList<>();
-        List<Integer> exPassedEnds = new ArrayList<>();
 
-        StringBuilder ends = new StringBuilder();
-        loopheads:
-        for (GraphPart head : heads) {
-            String headName = "start";
-            if (heads.size() > 1 && head.start != 0) {
-                h++;
-                headName = "start" + h;
-            }
-            String headLabel = "";
-            List<String> headLabels = new ArrayList<>();
-            boolean isExEnd = false;
-            boolean isExTarget = false;
-            boolean isExStart = false;
-            for (int e = 0; e < exceptions.size(); e++) {
-                GraphException ex = exceptions.get(e);
-                if (head.start == ex.start && !exPassedStarts.contains(e)) {
-                    headLabels.add("try " + e + " begin");
-                    exPassedStarts.add(e);
-                    isExStart = true;
+        Set<GraphPart> knownHeads = new HashSet<>();
+        for (int e = 0; e < exceptions.size(); e++) {
+            GraphException ex = exceptions.get(e);
+
+            GraphPart exStartPart = graph.searchPart(ex.start, allBlocks);
+            knownHeads.add(exStartPart);
+
+            writer.append("ex_" + e + "_begin [shape=\"circle\"  label=\"try " + e + " begin\"];\r\n");
+            writer.append("ex_" + e + "_begin:se -> " + getBlockName(graphSource, exStartPart) + ":nw [style=dashed arrowhead=none];\r\n");
+
+            GraphPart exTargetPart = graph.searchPart(ex.target, allBlocks);
+            knownHeads.add(exTargetPart);
+
+            writer.append("ex_" + e + "_target [shape=\"circle\"  label=\"try " + e + " target\"];\r\n");
+            writer.append("ex_" + e + "_target -> " + getBlockName(graphSource, exTargetPart) + "[style=dashed];\r\n");
+
+            int end = ex.end - 1;
+
+            GraphPart exEndPart = null;
+            while (end >= 0) {
+                exEndPart = graph.searchPart(end, allBlocks);
+                if (exEndPart != null) {
                     break;
                 }
-                if (head.start == ex.end && !exPassedEnds.contains(e)) {
-                    headLabels.add("try " + e + " end");
-                    exPassedEnds.add(e);
-                    isExEnd = true;
-                    break;
-                }
-                if (head.start == ex.target) {
-                    headLabels.add("try " + e + " target");
-                    isExTarget = true;
-                }
+                end--;
             }
-            if (!headLabels.isEmpty()) {
-                headLabel = String.join("\\n", headLabels);
+            if (exEndPart != null) {
+                writer.append("ex_" + e + "_end [shape=\"circle\"  label=\"try " + e + " end\"]\r\n");
+                writer.append(getBlockName(graphSource, exEndPart) + ":sw -> ex_" + e + "_end:ne [style=dashed dir=back arrowtail=none];\r\n");
             }
-            String headDef = headName + " [shape=\"circle\"" + (headLabel.isEmpty() ? "" : " label=\"" + headLabel + "\"") + "]\r\n";
-
-            if (isExEnd) {
-                for (int i = head.start - 1; i >= 0; i--) {
-                    GraphPart endPrev = graph.searchPart(i, allBlocks);
-                    if (endPrev != null) {
-                        ends.append(getBlockName(graphSource, endPrev) + ":se -> " + headName + ":nw[dir=back arrowtail=none style=dashed];\r\n");
-                        ends.append(headDef);
-                        continue loopheads;
-                    }
-                }
-            }
-            writer.append(headDef);
-
-            writer.append(headName + ":" + (isExStart ? "se" : "s") + " -> " + getBlockName(graphSource, head) + ":" + (isExStart ? "nw[arrowhead=none style=dashed]" : "n") + ";\r\n");
         }
+
+        int startPos = 0;
+        for (GraphPart startPart : heads) {
+            if (knownHeads.contains(startPart)) {
+                continue;
+            }
+            startPos++;
+            String headName = startPos > 1 ? "start" + startPos : "start";
+
+            writer.append(headName + " [shape=\"circle\"];\r\n");
+            writer.append(headName + ":s -> " + getBlockName(graphSource, startPart) + ";\r\n");
+        }
+
         for (GraphPart part : allBlocks) {
             StringBuilder blkCodeBuilder = new StringBuilder();
             for (int j = part.start; j <= part.end; j++) {
@@ -197,7 +187,6 @@ public class PcodeGraphVizExporter {
                 writer.append(partBlockName + orientation + " -> " + nextBlockName + ":n" + (color != null ? "[color=\"" + color + "\"]" : "") + ";\r\n");
             }
         }
-        writer.append(ends.toString());
     }
 
     private static String hilight(AbstractLexer lexer, String code) {
