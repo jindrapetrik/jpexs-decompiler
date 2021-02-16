@@ -203,7 +203,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
 
   {RegExp}                       { 
-                                    if (prevToken == null || prevToken.type == TokenType.OPERATOR) {
+                                    if (prevToken == null || (prevToken.type == TokenType.OPERATOR && prevToken.pairValue >= 0)) {
                                         return token(TokenType.REGEX);
                                     } else {    
                                         int ch = yychar;
