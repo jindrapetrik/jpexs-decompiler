@@ -288,6 +288,11 @@ public class TagTreeContextMenu extends JPopupMenu {
                     continue;
                 }
 
+                if (item instanceof AS2Package) {
+                    allDoNotHaveDependencies = false;
+                    continue;
+                }
+
                 if (item instanceof CLIPACTIONRECORD) {
                     continue;
                 }
@@ -305,6 +310,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 if (item instanceof FrameScript) {
                     continue;
                 }
+
 
                 canRemove = false;
                 break;
@@ -1290,6 +1296,13 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
     }
 
+    private void getAllAS2PackageScriptPacks(AS2Package pkg, List<ASMSource> out) {
+        out.addAll(pkg.scripts.values());
+        for (AS2Package sub : pkg.subPackages.values()) {
+            getAllAS2PackageScriptPacks(sub, out);
+        }
+    }
+
     private void removeItemActionPerformed(ActionEvent evt, boolean removeDependencies) {
 
         TreePath[] tpsArr = tagTree.getSelectionModel().getSelectionPaths();
@@ -1329,8 +1342,11 @@ public class TagTreeContextMenu extends JPopupMenu {
                 itemsToRemove.add(item);
                 itemsToRemoveParents.add(new Object());
                 itemsToRemoveSprites.add(new Object());
-            }
-            if (item instanceof Tag) {
+            } else if (item instanceof AS2Package) {
+                itemsToRemove.add(item);
+                itemsToRemoveParents.add(new Object());
+                itemsToRemoveSprites.add(new Object());
+            } else if (item instanceof Tag) {
                 tagsToRemove.add((Tag) item);
             } else if ((item instanceof TagScript) && (((TagScript) item).getTag() instanceof ASMSource)) {
                 tagsToRemove.add(((TagScript) item).getTag());
@@ -1395,6 +1411,15 @@ public class TagTreeContextMenu extends JPopupMenu {
                                 itemsToRemove.add(pack);
                                 itemsToRemoveParents.add(new Object());
                                 itemsToRemoveSprites.add(new Object());
+                            }
+                        }
+                    }
+                    if (item instanceof AS2Package) {
+                        List<ASMSource> subAsmSources = new ArrayList<>();
+                        getAllAS2PackageScriptPacks((AS2Package) item, subAsmSources);
+                        for (ASMSource asmSource : subAsmSources) {
+                            if (!itemsToRemove.contains(asmSource)) {
+                                tagsToRemove.add((Tag) asmSource);
                             }
                         }
                     }

@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 - #1260, #1438 AS1/2 direct editing on(xxx), onClipEvent(xxx) handlers
 - #1366, #1409, #1429, #1573, #1598 AS1/2/3 Add script/class (context menu on scripts folder)
 - Removing BUTTONCONDACTION, CLIPACTIONRECORD
-- Removing whole AS1/2 script folders (frame, DefineSprite)
+- Removing whole AS1/2 script folders (frame, DefineSprite, packages)
 - Removing AS3 scripts and whole packages
 - Japanese translation
 
