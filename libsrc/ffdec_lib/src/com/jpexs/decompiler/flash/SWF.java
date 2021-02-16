@@ -93,6 +93,8 @@ import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DoABC2Tag;
+import com.jpexs.decompiler.flash.tags.DoABCTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.EnableDebugger2Tag;
 import com.jpexs.decompiler.flash.tags.EnableDebuggerTag;
@@ -2993,6 +2995,9 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     private void removeTagInternal(Timelined timelined, Tag tag, boolean removeDependencies) {
+        if ((tag instanceof DoABC2Tag) || (tag instanceof DoABCTag)) {
+            clearAbcListCache();
+        }
         if (tag instanceof ShowFrameTag || ShowFrameTag.isNestedTagType(tag.getId())) {
             timelined.removeTag(tag);
             timelined.setModified(true);
