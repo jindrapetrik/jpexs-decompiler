@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 cast op decompilation
 - Only last DoInitAction tag displayed
 - #1606 Run/Debug SWF that is embedded (has no file associated)
+- AS3 direct editation - coerce in setproperty
 
 ### Changed
 - #1565, #1407, #1350 On BinaryData SWF save, parent SWF is saved
