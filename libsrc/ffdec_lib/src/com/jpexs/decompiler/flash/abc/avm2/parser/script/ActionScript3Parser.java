@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.helpers.Reference;
@@ -2280,7 +2281,7 @@ public class ActionScript3Parser {
                         }
                         ret = (num);
                     } else {
-                        ret = (new SubtractAVM2Item(null, null, new IntegerValueAVM2Item(null, null, 0L), num));
+                        ret = (new NegAVM2Item(null, null, num));
                     }
                 }
                 break;

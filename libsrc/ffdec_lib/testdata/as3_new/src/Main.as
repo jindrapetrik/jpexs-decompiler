@@ -7,6 +7,7 @@ package
 	import tests_classes.mypackage2.SetupMyPackage2;
 	import tests_classes.mypackage3.SetupMyPackage3;
 	import tests_classes.*;
+	import tests_edit.*;
 	
 	/**
 	 * ...
@@ -103,6 +104,9 @@ package
 		TestImports;
 		TestInitializer;
 		TestRegexpHilight;
+		
+		TestPropertyCoerce;
+		TestUnaryMinus;
 		
 		public function Main()
 		{
