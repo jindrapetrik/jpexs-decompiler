@@ -49,6 +49,8 @@ import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -77,6 +79,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -281,8 +284,8 @@ public class TagTreeContextMenu extends JPopupMenu {
                     Tag tag = ((TagScript) item).getTag();
                     if (tag instanceof DoActionTag || tag instanceof DoInitActionTag) {
                         allDoNotHaveDependencies = false;
-                        continue;
                     }
+                    continue;
                 }
 
                 if (item instanceof CLIPACTIONRECORD) {
@@ -296,6 +299,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                     continue;
                 }
                 if (item instanceof AS3Package) {
+                    continue;
+                }
+
+                if (item instanceof FrameScript) {
                     continue;
                 }
 
@@ -797,6 +804,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
 
                 DoABC2Tag doAbc = new DoABC2Tag(swf);
+                doAbc.setTimelined(swf);
                 doAbc.name = className;
 
                 List<ABC> abcs = new ArrayList<>();
@@ -891,6 +899,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                         int targetFrame = addScriptDialog.getFrame();
 
                         DoActionTag doAction = new DoActionTag(swf);
+                        doAction.setTimelined(tim);
 
                         ReadOnlyTagList tagList = tim.getTags();
                         int frame = 1;
@@ -1266,17 +1275,54 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
     }
 
+    private void populateScriptSubs(TreePath path, TreeItem item, List<TreePath> out) {
+        List<? extends TreeItem> subs = tagTree.getModel().getAllChildren(item);
+        for (TreeItem t : subs) {
+            TreePath tPath = path.pathByAddingChild(t);
+            if ((t instanceof TagScript) && (((TagScript) t).getTag() instanceof ASMSource)) {
+                out.add(tPath);
+            }
+            else if (t instanceof ASMSource) {
+                out.add(tPath);
+            } else {
+                populateScriptSubs(tPath, t, out);
+            }
+        }
+    }
+
     private void removeItemActionPerformed(ActionEvent evt, boolean removeDependencies) {
 
-        TreePath[] tps = tagTree.getSelectionModel().getSelectionPaths();
-        if (tps == null) {
+        TreePath[] tpsArr = tagTree.getSelectionModel().getSelectionPaths();
+        if (tpsArr == null) {
             return;
         }
+        List<TreePath> tps = new ArrayList<>(Arrays.asList(tpsArr));
 
         List<Tag> tagsToRemove = new ArrayList<>();
         List<Object> itemsToRemove = new ArrayList<>();
         List<Object> itemsToRemoveParents = new ArrayList<>();
         List<Object> itemsToRemoveSprites = new ArrayList<>();
+
+        TreeItem itemLast = null;
+        int itemCountFix = 0;
+        for (int i = 0; i < tps.size(); i++) {
+            TreeItem item = (TreeItem) tps.get(i).getLastPathComponent();
+            if ((item instanceof FrameScript) || (item instanceof TagScript)) {
+                List<TreePath> subs = new ArrayList<>();
+                populateScriptSubs(tps.get(i), item, subs);
+                int cnt = 0;
+                for (TreePath tp : subs) {
+                    if (!tps.contains(tp)) {
+                        if (cnt > 0) {
+                            itemCountFix--;
+                        }
+                        cnt++;
+                        tps.add(tp);
+                        itemLast = item;
+                    }
+                }
+            }
+        }
         for (TreePath path : tps) {
             TreeItem item = (TreeItem) path.getLastPathComponent();
             if (item instanceof AS3Package) {
@@ -1286,7 +1332,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
             if (item instanceof Tag) {
                 tagsToRemove.add((Tag) item);
-            } else if (item instanceof TagScript) {
+            } else if ((item instanceof TagScript) && (((TagScript) item).getTag() instanceof ASMSource)) {
                 tagsToRemove.add(((TagScript) item).getTag());
             } else if (item instanceof Frame) {
                 Frame frameNode = (Frame) item;
@@ -1327,9 +1373,12 @@ public class TagTreeContextMenu extends JPopupMenu {
                 } else {
                     toRemove = itemsToRemove.get(0);
                 }
+                if (itemLast != null) {
+                    toRemove = itemLast;
+                }
                 confirmationMessage = mainPanel.translate("message.confirm.remove" + (removeDependencies ? "" : ".nodep")).replace("%item%", toRemove.toString());
             } else {
-                confirmationMessage = mainPanel.translate("message.confirm.removemultiple" + (removeDependencies ? "" : ".nodep")).replace("%count%", Integer.toString(tagsToRemove.size() + itemsToRemove.size()));
+                confirmationMessage = mainPanel.translate("message.confirm.removemultiple" + (removeDependencies ? "" : ".nodep")).replace("%count%", Integer.toString(tagsToRemove.size() + itemsToRemove.size() + itemCountFix));
             }
 
             if (View.showConfirmDialog(this, confirmationMessage, mainPanel.translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
