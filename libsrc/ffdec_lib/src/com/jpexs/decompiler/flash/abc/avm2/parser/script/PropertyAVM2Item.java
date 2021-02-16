@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.helpers.Reference;
@@ -644,7 +645,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             String srcType = assignedValue.returnType().toString();
             GraphTargetItem coerced = assignedValue;
             if (!targetType.toString().equals(srcType) && !propertyName.startsWith("@")) {
-                coerced = makeCoerced(assignedValue, targetType);
+                //coerced = makeCoerced(assignedValue, targetType);
             }
             return toSourceMerge(localData, generator, obj, coerced,
                     needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
