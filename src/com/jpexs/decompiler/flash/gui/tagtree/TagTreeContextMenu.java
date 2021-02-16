@@ -55,6 +55,7 @@ import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
+import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
 import com.jpexs.decompiler.flash.timeline.TagScript;
@@ -292,6 +293,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
 
                 if (item instanceof ScriptPack) {
+                    continue;
+                }
+                if (item instanceof AS3Package) {
                     continue;
                 }
 
@@ -1255,6 +1259,13 @@ public class TagTreeContextMenu extends JPopupMenu {
         return false;
     }
 
+    private void getAllAS3PackageScriptPacks(AS3Package pkg, List<ScriptPack> out) {
+        out.addAll(pkg.getScriptPacks());
+        for (AS3Package sub : pkg.getSubPackages()) {
+            getAllAS3PackageScriptPacks(sub, out);
+        }
+    }
+
     private void removeItemActionPerformed(ActionEvent evt, boolean removeDependencies) {
 
         TreePath[] tps = tagTree.getSelectionModel().getSelectionPaths();
@@ -1268,6 +1279,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         List<Object> itemsToRemoveSprites = new ArrayList<>();
         for (TreePath path : tps) {
             TreeItem item = (TreeItem) path.getLastPathComponent();
+            if (item instanceof AS3Package) {
+                itemsToRemove.add(item);
+                itemsToRemoveParents.add(new Object());
+                itemsToRemoveSprites.add(new Object());
+            }
             if (item instanceof Tag) {
                 tagsToRemove.add((Tag) item);
             } else if (item instanceof TagScript) {
@@ -1294,9 +1310,11 @@ public class TagTreeContextMenu extends JPopupMenu {
                 itemsToRemoveParents.add(((TagScript) path.getParentPath().getLastPathComponent()).getTag());
                 itemsToRemoveSprites.add(sprite);
             } else if (item instanceof ScriptPack) {
-                itemsToRemove.add(item);
-                itemsToRemoveParents.add(new Object());
-                itemsToRemoveSprites.add(new Object());
+                if (!itemsToRemove.contains(item)) { //If parent package is selected, do not add it twice
+                    itemsToRemove.add(item);
+                    itemsToRemoveParents.add(new Object());
+                    itemsToRemoveSprites.add(new Object());
+                }
             }
         }
 
@@ -1311,12 +1329,30 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
                 confirmationMessage = mainPanel.translate("message.confirm.remove" + (removeDependencies ? "" : ".nodep")).replace("%item%", toRemove.toString());
             } else {
-                confirmationMessage = mainPanel.translate("message.confirm.removemultiple" + (removeDependencies ? "" : ".nodep")).replace("%count%", Integer.toString(tagsToRemove.size()));
+                confirmationMessage = mainPanel.translate("message.confirm.removemultiple" + (removeDependencies ? "" : ".nodep")).replace("%count%", Integer.toString(tagsToRemove.size() + itemsToRemove.size()));
             }
 
             if (View.showConfirmDialog(this, confirmationMessage, mainPanel.translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                 Map<SWF, List<Tag>> tagsToRemoveBySwf = new HashMap<>();
                 Set<SWF> swfsToClearCache = new HashSet<>();
+
+                for (int i = 0; i < itemsToRemove.size(); i++) {
+                    Object item = itemsToRemove.get(i);
+                    if (item instanceof AS3Package) {
+                        List<ScriptPack> subScriptPacks = new ArrayList<>();
+                        getAllAS3PackageScriptPacks((AS3Package) item, subScriptPacks);
+                        for (ScriptPack pack : subScriptPacks) {
+                            if (!itemsToRemove.contains(pack)) {
+                                itemsToRemove.add(pack);
+                                itemsToRemoveParents.add(new Object());
+                                itemsToRemoveSprites.add(new Object());
+                            }
+                        }
+                    }
+                }
+
+                List<ABC> abcsToPack = new ArrayList<>();
+
                 for (int i = 0; i < itemsToRemove.size(); i++) {
                     Object item = itemsToRemove.get(i);
                     Object parent = itemsToRemoveParents.get(i);
@@ -1349,7 +1385,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     if (item instanceof ScriptPack) {
                         ScriptPack sp = (ScriptPack) item;
                         sp.delete(sp.abc, true);
-                        sp.abc.pack();
+                        abcsToPack.add(sp.abc);
                         swfsToClearCache.add(sp.getSwf());
                         for (ABCContainerTag ct : sp.getSwf().getAbcList()) {
                             if (ct.getABC() == sp.abc) {
@@ -1357,6 +1393,25 @@ public class TagTreeContextMenu extends JPopupMenu {
                                 break;
                             }
                         }
+                    }
+                }
+
+                for (ABC abc : abcsToPack) {
+                    abc.pack();
+
+                    ABCContainerTag container = null;
+                    for (ABCContainerTag ct : abc.getSwf().getAbcList()) {
+                        if (ct.getABC() == abc) {
+                            container = ct;
+                            break;
+                        }
+                    }
+
+                    if (abc.script_info.isEmpty()) { //all scripts in abc were removed
+                        abc.getSwf().removeTag((Tag) container);
+                        abc.getSwf().setModified(true);
+                    } else {
+                        ((Tag) container).setModified(true);
                     }
                 }
 
