@@ -138,8 +138,7 @@ See [Frequently Asked Questions (FAQ) in wiki](https://github.com/jindrapetrik/j
 
 ### Email contact
 Emergency contact to JPEXS developer is `jindra.petrik@gmail.com`.
-But as stated previously, the development has stopped so there's no way
-for asking for new featureas and or fix bugs.
+But we prefer Issue tracker contact.
 
 ## Licenses + Acknowledgments
 ### Application
