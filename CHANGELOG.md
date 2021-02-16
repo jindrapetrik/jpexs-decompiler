@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
 - AS3 direct editation - unary minus (negate) compiled as 0 - value
 - #1159, #1608 Regexp syntax hilight when not a regexp (only division) again
 - Graphviz Graph not showing AS3 exception end
+- #1609 First frame missing in frame to PDF export
 
 ### Changed
 - #1565, #1407, #1350 On BinaryData SWF save, parent SWF is saved

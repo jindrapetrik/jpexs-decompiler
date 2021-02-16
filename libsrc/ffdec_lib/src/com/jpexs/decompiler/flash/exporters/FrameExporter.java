@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpacker.JPacker;
@@ -458,9 +459,13 @@ public class FrameExporter {
                         p.setSize(img0.getWidth() + 10, img0.getHeight() + 10);
                         pf.setPaper(p);
 
+                        Graphics g = job.getGraphics(pf);
+                        g.drawImage(img0, 5, 5, img0.getWidth(), img0.getHeight(), null);
+                        g.dispose();
+
                         for (int i = 0; frameImages.hasNext(); i++) {
                             BufferedImage img = frameImages.next();
-                            Graphics g = job.getGraphics(pf);
+                            g = job.getGraphics(pf);
                             g.drawImage(img, 5, 5, img.getWidth(), img.getHeight(), null);
                             g.dispose();
                         }
