@@ -11,6 +11,7 @@
  - German
  - Hungarian
  - Italian
+ - Japanese
  - Polish
  - Portugese - Portugal
  - Portugese - Brasilian
