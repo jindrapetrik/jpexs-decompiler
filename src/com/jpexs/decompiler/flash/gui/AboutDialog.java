@@ -52,7 +52,6 @@ public class AboutDialog extends AppDialog {
 
     public AboutDialog() {
         setDefaultCloseOperation(HIDE_ON_CLOSE);
-        //setSize(new Dimension(300, 320));
         setTitle(translate("dialog.title"));
 
         DEVELOPERS[DEVELOPERS.length - 1] = translate("developers.others"); // translate "others" text
@@ -93,8 +92,9 @@ public class AboutDialog extends AppDialog {
         cp.add(appNamePanel);
         JLabel verLabel = new JLabel(translate("version") + " " + ApplicationInfo.version);
         verLabel.setAlignmentX(0.5f);
-        //verLabel.setPreferredSize(new Dimension(300, 15));
-        verLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
+
+        //Rather not, Tahoma does not supports japanese, etc. characters
+        //verLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
         verLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cp.add(verLabel);
 
