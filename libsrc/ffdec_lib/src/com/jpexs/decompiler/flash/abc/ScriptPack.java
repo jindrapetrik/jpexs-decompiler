@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
@@ -331,6 +332,9 @@ public class ScriptPack extends AS3ClassTreeItem {
 
     @Override
     public boolean isModified() {
+        if (scriptIndex >= abc.script_info.size()) {
+            return false;
+        }
         return abc.script_info.get(scriptIndex).isModified();
     }
 
@@ -635,6 +639,17 @@ public class ScriptPack extends AS3ClassTreeItem {
         for (int t : traitIndices) {
             Trait trait = traits.get(t);
             trait.getMethodInfos(abc, GraphTextWriter.TRAIT_UNKNOWN, -1, methodInfos);
+        }
+    }
+
+    public void delete(ABC abc, boolean d) {
+        ScriptInfo si = abc.script_info.get(scriptIndex);
+        if (isSimple) {
+            si.delete(abc, d);
+        } else {
+            for (int t : traitIndices) {
+                si.traits.traits.get(t).delete(abc, d);
+            }
         }
     }
 }

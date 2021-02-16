@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
 import com.jpexs.decompiler.flash.action.Action;
@@ -272,13 +273,13 @@ public class TagTreeContextMenu extends JPopupMenu {
         final List<SWFList> swfs = mainPanel.getSwfs();
 
         boolean canRemove = true;
-        boolean onlyClipActionButtonCond = true;
+        boolean allDoNotHaveDependencies = true;
         for (TreeItem item : items) {
             if (!(item instanceof Tag) && !(item instanceof Frame)) {
                 if (item instanceof TagScript) {
                     Tag tag = ((TagScript) item).getTag();
                     if (tag instanceof DoActionTag || tag instanceof DoInitActionTag) {
-                        onlyClipActionButtonCond = false;
+                        allDoNotHaveDependencies = false;
                         continue;
                     }
                 }
@@ -290,10 +291,14 @@ public class TagTreeContextMenu extends JPopupMenu {
                     continue;
                 }
 
+                if (item instanceof ScriptPack) {
+                    continue;
+                }
+
                 canRemove = false;
                 break;
             } else {
-                onlyClipActionButtonCond = false;
+                allDoNotHaveDependencies = false;
             }
         }
 
@@ -351,7 +356,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         expandRecursiveMenuItem.setVisible(false);
         removeMenuItem.setVisible(canRemove);
-        removeWithDependenciesMenuItem.setVisible(canRemove && !onlyClipActionButtonCond);
+        removeWithDependenciesMenuItem.setVisible(canRemove && !allDoNotHaveDependencies);
         undoTagMenuItem.setVisible(allSelectedIsTag);
         exportSelectionMenuItem.setEnabled(tagTree.hasExportableNodes());
         replaceMenuItem.setVisible(false);
@@ -1288,6 +1293,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
                 itemsToRemoveParents.add(((TagScript) path.getParentPath().getLastPathComponent()).getTag());
                 itemsToRemoveSprites.add(sprite);
+            } else if (item instanceof ScriptPack) {
+                itemsToRemove.add(item);
+                itemsToRemoveParents.add(new Object());
+                itemsToRemoveSprites.add(new Object());
             }
         }
 
@@ -1307,6 +1316,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             if (View.showConfirmDialog(this, confirmationMessage, mainPanel.translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                 Map<SWF, List<Tag>> tagsToRemoveBySwf = new HashMap<>();
+                Set<SWF> swfsToClearCache = new HashSet<>();
                 for (int i = 0; i < itemsToRemove.size(); i++) {
                     Object item = itemsToRemove.get(i);
                     Object parent = itemsToRemoveParents.get(i);
@@ -1336,7 +1346,20 @@ public class TagTreeContextMenu extends JPopupMenu {
                         place.setModified(true);
                         tim.resetTimeline();
                     }
+                    if (item instanceof ScriptPack) {
+                        ScriptPack sp = (ScriptPack) item;
+                        sp.delete(sp.abc, true);
+                        sp.abc.pack();
+                        swfsToClearCache.add(sp.getSwf());
+                        for (ABCContainerTag ct : sp.getSwf().getAbcList()) {
+                            if (ct.getABC() == sp.abc) {
+                                ((Tag) ct).setModified(true);
+                                break;
+                            }
+                        }
+                    }
                 }
+
                 for (Tag tag : tagsToRemove) {
                     SWF swf = tag.getSwf();
                     if (!tagsToRemoveBySwf.containsKey(swf)) {
@@ -1348,6 +1371,10 @@ public class TagTreeContextMenu extends JPopupMenu {
 
                 for (SWF swf : tagsToRemoveBySwf.keySet()) {
                     swf.removeTags(tagsToRemoveBySwf.get(swf), removeDependencies);
+                }
+
+                for (SWF swf : swfsToClearCache) {
+                    swf.clearAllCache();
                 }
 
                 mainPanel.refreshTree();
