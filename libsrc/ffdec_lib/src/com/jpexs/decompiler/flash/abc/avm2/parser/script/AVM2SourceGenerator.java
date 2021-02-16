@@ -1272,7 +1272,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                  */
                 List<GraphTargetItem> getterBody = new ArrayList<>();
                 UnresolvedAVM2Item sp = new UnresolvedAVM2Item(new ArrayList<>(), importedClasses, false, TypeItem.UNBOUNDED, 0, new DottedChain(new String[]{"_skinParts"}, ""),
-                        null, openedNamespaces);
+                        null, openedNamespaces, abcIndex);
                 getterBody.add(new ReturnValueAVM2Item(null, null, sp));
                 List<AssignableAVM2Item> subvars = new ArrayList<>();
                 subvars.add(sp);
@@ -1769,7 +1769,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     continue;
                 }
 
-                NameAVM2Item d = new NameAVM2Item(n.type, n.line, n.getVariableName(), NameAVM2Item.getDefaultValue("" + n.type), true, n.openedNamespaces);
+                NameAVM2Item d = new NameAVM2Item(n.type, n.line, n.getVariableName(), NameAVM2Item.getDefaultValue("" + n.type), true, n.openedNamespaces, abcIndex);
                 //no index
                 if (needsActivation) {
                     if (d.getSlotNumber() <= 0) {
@@ -1828,9 +1828,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     mbody.traits.traits.add(tsc);
                 }
                 for (int i = 1; i < paramRegCount; i++) {
-                    NameAVM2Item param = new NameAVM2Item(new TypeItem(registerTypes.get(i)), 0, registerNames.get(i), null, false, new ArrayList<>());
+                    NameAVM2Item param = new NameAVM2Item(new TypeItem(registerTypes.get(i)), 0, registerNames.get(i), null, false, new ArrayList<>(), abcIndex);
                     param.setRegNumber(i);
-                    NameAVM2Item d = new NameAVM2Item(new TypeItem(registerTypes.get(i)), 0, registerNames.get(i), param, true, new ArrayList<>());
+                    NameAVM2Item d = new NameAVM2Item(new TypeItem(registerTypes.get(i)), 0, registerNames.get(i), param, true, new ArrayList<>(), abcIndex);
                     d.setSlotScope(slotScope);
                     d.setSlotNumber(slotNames.indexOf(registerNames.get(i)));
                     declarations.add(d);
@@ -1849,8 +1849,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
             mbody.setCode(new AVM2Code(mbodyCode));
 
             if (needsActivation) {
-                if (localData.traitUsages.containsKey(mbody)) {
+                /*if (localData.traitUsages.containsKey(mbody)) {
                     List<Integer> usages = localData.traitUsages.get(mbody);
+                    List<AVM2Instruction> mbodyCodeDecl = new ArrayList<>();
                     for (int i = 0; i < mbody.traits.traits.size(); i++) {
                         if (usages.contains(i)) {
                             TraitSlotConst tsc = (TraitSlotConst) mbody.traits.traits.get(i);
@@ -1858,13 +1859,14 @@ public class AVM2SourceGenerator implements SourceGenerator {
                             if (tsc.type_index > 0) {
                                 type = new TypeItem(abcIndex.getSelectedAbc().constants.getMultiname(tsc.type_index).getNameWithNamespace(abcIndex.getSelectedAbc().constants, true));
                             }
-                            NameAVM2Item d = new NameAVM2Item(type, 0, tsc.getName(abcIndex.getSelectedAbc()).getName(abcIndex.getSelectedAbc().constants, null, true, true), NameAVM2Item.getDefaultValue("" + type), true, new ArrayList<>());
+                            NameAVM2Item d = new NameAVM2Item(type, 0, tsc.getName(abcIndex.getSelectedAbc()).getName(abcIndex.getSelectedAbc().constants, null, true, true), NameAVM2Item.getDefaultValue("" + type), true, new ArrayList<>(), abcIndex);
                             d.setSlotNumber(tsc.slot_id);
                             d.setSlotScope(slotScope);
-                            mbodyCode.addAll(0, toInsList(d.toSourceIgnoreReturnValue(localData, this)));
+                            mbodyCodeDecl.addAll(toInsList(d.toSourceIgnoreReturnValue(localData, this)));
                         }
                     }
-                }
+                    mbodyCode.addAll(0, mbodyCodeDecl);
+                }*/
 
                 List<AVM2Instruction> acts = new ArrayList<>();
                 acts.add(ins(AVM2Instructions.NewActivation));
