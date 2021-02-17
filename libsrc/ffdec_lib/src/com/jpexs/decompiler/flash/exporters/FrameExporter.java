@@ -37,15 +37,20 @@ import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
+import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.COLORMATRIXFILTER;
 import com.jpexs.decompiler.flash.types.filters.CONVOLUTIONFILTER;
@@ -59,7 +64,10 @@ import com.jpexs.helpers.Path;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import gnu.jpdf.PDFJob;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
@@ -455,19 +463,37 @@ public class FrameExporter {
                         PageFormat pf = new PageFormat();
                         pf.setOrientation(PageFormat.PORTRAIT);
                         Paper p = new Paper();
-                        BufferedImage img0 = frameImages.next();
-                        p.setSize(img0.getWidth() + 10, img0.getHeight() + 10);
+                        BufferedImage img = frameImages.next();
+                        p.setSize(img.getWidth() + 10, img.getHeight() + 10);
                         pf.setPaper(p);
 
-                        Graphics g = job.getGraphics(pf);
-                        g.drawImage(img0, 5, 5, img0.getWidth(), img0.getHeight(), null);
-                        g.dispose();
 
-                        for (int i = 0; frameImages.hasNext(); i++) {
-                            BufferedImage img = frameImages.next();
-                            g = job.getGraphics(pf);
+                        int pos = 0;
+                        RECT rect = tim.displayRect;
+                        double zoom = settings.zoom;
+                        int imageWidth = (int) (rect.getWidth() * zoom / SWF.unitDivisor) + 1;
+                        int imageHeight = (int) (rect.getHeight() * zoom / SWF.unitDivisor) + 1;
+                        Matrix m = new Matrix();
+                        m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
+                        m.scale(zoom);
+                        Matrix transformation = m;
+
+                        while (true) {
+                            int fframe = fframes.get(pos);
+                            Graphics2D g = (Graphics2D) job.getGraphics(pf);
                             g.drawImage(img, 5, 5, img.getWidth(), img.getHeight(), null);
+
+                            //This should print texts to PDF, but currently does nothing as gnujpdf does
+                            //not handle rotations correctly
+                            printStringsToImage(g, imageWidth, imageHeight, fframe, swf, tim, transformation);
+
                             g.dispose();
+                            if (frameImages.hasNext()) {
+                                img = frameImages.next();
+                            } else {
+                                break;
+                            }
+                            pos++;
                         }
 
                         job.end();
@@ -485,6 +511,108 @@ public class FrameExporter {
         }
 
         return ret;
+    }
+
+    private static void printStringsToImage(Graphics2D g, int imageWidth, int imageHeight, int frame, SWF swf, Timeline tim, Matrix transformation) {
+        double unzoom = SWF.unitDivisor;
+        Matrix absoluteTransformation = transformation;
+
+        int maxDepth = tim.getMaxDepth();
+        int time = frame;
+        Frame frameObj = tim.getFrame(frame);
+        for (int i = 1; i <= maxDepth; i++) {
+            if (!frameObj.layers.containsKey(i)) {
+                continue;
+            }
+            DepthState layer = frameObj.layers.get(i);
+            if (!swf.getCharacters().containsKey(layer.characterId)) {
+                continue;
+            }
+            if (!layer.isVisible) {
+                continue;
+            }
+            CharacterTag character = swf.getCharacter(layer.characterId);
+            Matrix layerMatrix = new Matrix(layer.matrix);
+            Matrix mat = transformation.concatenate(layerMatrix);
+            Matrix absMat = absoluteTransformation.concatenate(layerMatrix);
+            if (character instanceof DrawableTag) {
+                printStringsDrawDrawable(g, swf, imageWidth, imageHeight, layer, layerMatrix, transformation, absMat, time, layer.ratio, (DrawableTag) character, unzoom);
+            }
+        }
+    }
+
+    private static void printStringsDrawDrawable(Graphics2D g, SWF swf, int imageWidth, int imageHeight, DepthState layer, Matrix layerMatrix, Matrix transformation, Matrix absMat, int time, int ratio, DrawableTag drawable, double unzoom) {
+        Matrix drawMatrix = new Matrix();
+        int drawableFrameCount = drawable.getNumFrames();
+        if (drawableFrameCount == 0) {
+            drawableFrameCount = 1;
+        }
+        RECT boundRect = drawable.getRect();
+
+        ExportRectangle rect = new ExportRectangle(boundRect);
+        Matrix mat = transformation.concatenate(layerMatrix);
+        rect = mat.transform(rect);
+        int dframe = time % drawableFrameCount;
+        rect.xMin -= unzoom;
+        rect.yMin -= unzoom;
+        rect.xMin = Math.max(0, rect.xMin);
+        rect.yMin = Math.max(0, rect.yMin);
+        drawMatrix.translate(rect.xMin, rect.yMin);
+
+        int newWidth = (int) (rect.getWidth() / unzoom);
+        int newHeight = (int) (rect.getHeight() / unzoom);
+        int deltaX = (int) (rect.xMin / unzoom);
+        int deltaY = (int) (rect.yMin / unzoom);
+        newWidth = Math.min(imageWidth - deltaX, newWidth) + 1;
+        newHeight = Math.min(imageHeight - deltaY, newHeight) + 1;
+
+        if (newWidth <= 0 || newHeight <= 0) {
+            return;
+        }
+
+        Matrix m = mat.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
+        if (drawable instanceof DefineSpriteTag) {
+            printStringsToImage(g, newWidth, newHeight, dframe, swf, ((Timelined) drawable).getTimeline(), m);
+        }
+        if (drawable instanceof StaticTextTag) {
+            StaticTextTag staticText = (StaticTextTag) drawable;
+            Matrix trans = mat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor));
+            //This does not work yet, since GnuJPDF does not support correct transform handling - rotation, etc. :-(
+            //g.setTransform(trans.toTransform());
+            FontTag font = null;
+            int textHeight = 12;
+            int x = 0;
+            int y = 0;
+            for (TEXTRECORD rec : staticText.textRecords) {
+                if (rec.styleFlagsHasFont) {
+                    font = swf.getFont(rec.fontId);
+                    textHeight = rec.textHeight;
+                }
+                if (rec.styleFlagsHasXOffset) {
+                    int offsetX = rec.xOffset;
+                    x = offsetX;
+                }
+                if (rec.styleFlagsHasYOffset) {
+                    int offsetY = rec.yOffset;
+                    y = offsetY;
+                }
+                StringBuilder text = new StringBuilder();
+                for (GLYPHENTRY entry : rec.glyphEntries) {
+                    if (entry.glyphIndex != -1) {
+                        char ch = font.glyphToChar(entry.glyphIndex);
+                        text.append(ch);
+                    }
+                }
+
+                //This does not work yet, since GnuJPDF does not support correct transform handling - rotation, etc. :-(
+                /*
+                Font currentFont = g.getFont();
+                Font newFont = currentFont.deriveFont((float) (textHeight / SWF.unitDivisor));
+                g.setFont(newFont);
+                g.drawString(text.toString(), (float) x, (float) y);*/
+            }
+        }
+
     }
 
     private static String jsArrColor(RGB rgb) {
