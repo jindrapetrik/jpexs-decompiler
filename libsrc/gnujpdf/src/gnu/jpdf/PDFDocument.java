@@ -20,10 +20,20 @@
  */
 package gnu.jpdf;
 
+import java.awt.FontFormatException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * <p>This class is the base of the PDF generator. A PDFDocument class is 
@@ -249,7 +259,87 @@ public class PDFDocument implements Serializable
     add(ft);
     fonts.addElement(ft);
     return ft;
-  }
+    }
+
+    public PDFFont getEmbeddedFont(String font, int style, File file) throws FileNotFoundException, IOException {
+        for (PDFFont ft : fonts) {
+            if (ft.equals("/TrueType", font, style)) {
+                return ft;
+            }
+        }
+        PDFStream fontFile2 = new PDFStream() {
+            @Override
+            public void write(OutputStream os) throws IOException {
+                writeStart(os);
+                os.write("/Length1 ".getBytes());
+                os.write(Integer.toString(buf.size()).getBytes());
+                os.write("\n".getBytes());
+                writeStream(os);
+            }
+
+        };
+        fontFile2.setDeflate(true);
+        OutputStream ff2Os = fontFile2.getOutputStream();
+        InputStream is = new FileInputStream(file);
+        byte buf[] = new byte[1024];
+        int cnt = 0;
+        while ((cnt = is.read(buf)) > 0) {
+            ff2Os.write(buf, 0, cnt);
+        }
+        is.close();
+        //ff2Os.write("AHOJ".getBytes());
+
+        add(fontFile2);
+
+        // the font wasn't found, so create it
+        fontid++;
+        TtfParser par = new TtfParser();
+        try {
+            par.loadFromTTF(file, 1024);
+        } catch (FontFormatException ex) {
+            Logger.getLogger(PDFDocument.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        PDFFontDescriptor fontDescriptor = new PDFFontDescriptor(font, par.getAscent(), par.getDescent(), par.getCapHeight(), 80/*?*/, "" + fontFile2.getSerialID() + " 0 R");
+        add(fontDescriptor);
+
+        final List<Integer> widthsList = new ArrayList<>();
+
+        List<Integer> glyphAdvances = par.getAdvanceWidths();
+        Map<Integer, Integer> cmap = par.getCmap();
+        for (int i = 32; i <= 255; i++) {
+            if (cmap.containsKey(i)) {
+                widthsList.add(glyphAdvances.get(cmap.get(i)));
+            } else {
+                widthsList.add(0);
+            }
+        }
+
+        PDFObject widthStream = new PDFObject(null) {
+            @Override
+            public void write(OutputStream os) throws IOException {
+                os.write(Integer.toString(objser).getBytes());
+                os.write(" 0 obj\n".getBytes());
+                os.write("[ ".getBytes());
+                for (int i = 0; i < widthsList.size(); i++) {
+                    if (i > 0) {
+                        os.write(" ".getBytes());
+                    }
+                    os.write(("" + widthsList.get(i)).getBytes());
+                }
+                os.write(" ]\n".getBytes());
+                os.write("endobj\n".getBytes());
+            }
+
+        };
+
+        add(widthStream);
+
+
+        PDFFont ft = new PDFEmbeddedFont("/F" + fontid, font, style, "" + fontDescriptor.getSerialID() + " 0 R", widthStream.getSerialID() + " 0 R", 32, 255);
+        add(ft);
+        fonts.addElement(ft);
+        return ft;
+    }
     
   /**
    * Sets a unique name to a PDFImage
