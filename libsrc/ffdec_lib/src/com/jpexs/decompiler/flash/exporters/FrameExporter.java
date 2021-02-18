@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FrameExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FrameExportSettings;
@@ -62,6 +63,7 @@ import com.jpexs.decompiler.flash.types.filters.GRADIENTGLOWFILTER;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import gnu.jpdf.PDFGraphics;
 import gnu.jpdf.PDFJob;
 import java.awt.Color;
 import java.awt.Font;
@@ -78,9 +80,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -471,21 +475,18 @@ public class FrameExporter {
                         int pos = 0;
                         RECT rect = tim.displayRect;
                         double zoom = settings.zoom;
-                        int imageWidth = (int) (rect.getWidth() * zoom / SWF.unitDivisor) + 1;
-                        int imageHeight = (int) (rect.getHeight() * zoom / SWF.unitDivisor) + 1;
                         Matrix m = new Matrix();
                         m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
                         m.scale(zoom);
                         Matrix transformation = m;
+                        Map<Integer, Font> existingFonts = new HashMap<>();
 
                         while (true) {
                             int fframe = fframes.get(pos);
                             Graphics2D g = (Graphics2D) job.getGraphics(pf);
                             g.drawImage(img, 5, 5, img.getWidth(), img.getHeight(), null);
 
-                            //This should print texts to PDF, but currently does nothing as gnujpdf does
-                            //not handle rotations correctly
-                            printStringsToImage(g, imageWidth, imageHeight, fframe, swf, tim, transformation);
+                            printStringsToImage(existingFonts, g, fframe, swf, tim, transformation);
 
                             g.dispose();
                             if (frameImages.hasNext()) {
@@ -513,7 +514,7 @@ public class FrameExporter {
         return ret;
     }
 
-    private static void printStringsToImage(Graphics2D g, int imageWidth, int imageHeight, int frame, SWF swf, Timeline tim, Matrix transformation) {
+    private static void printStringsToImage(Map<Integer, Font> existingFonts, Graphics2D g, int frame, SWF swf, Timeline tim, Matrix transformation) {
         double unzoom = SWF.unitDivisor;
         Matrix absoluteTransformation = transformation;
 
@@ -533,52 +534,31 @@ public class FrameExporter {
             }
             CharacterTag character = swf.getCharacter(layer.characterId);
             Matrix layerMatrix = new Matrix(layer.matrix);
-            Matrix mat = transformation.concatenate(layerMatrix);
             Matrix absMat = absoluteTransformation.concatenate(layerMatrix);
             if (character instanceof DrawableTag) {
-                printStringsDrawDrawable(g, swf, imageWidth, imageHeight, layer, layerMatrix, transformation, absMat, time, layer.ratio, (DrawableTag) character, unzoom);
+                printStringsDrawDrawable(existingFonts, g, swf, layerMatrix, transformation, absMat, time, layer.ratio, (DrawableTag) character, unzoom);
             }
         }
     }
 
-    private static void printStringsDrawDrawable(Graphics2D g, SWF swf, int imageWidth, int imageHeight, DepthState layer, Matrix layerMatrix, Matrix transformation, Matrix absMat, int time, int ratio, DrawableTag drawable, double unzoom) {
-        Matrix drawMatrix = new Matrix();
+    private static void printStringsDrawDrawable(Map<Integer, Font> existingFonts, Graphics2D g, SWF swf, Matrix layerMatrix, Matrix transformation, Matrix absMat, int time, int ratio, DrawableTag drawable, double unzoom) {
         int drawableFrameCount = drawable.getNumFrames();
         if (drawableFrameCount == 0) {
             drawableFrameCount = 1;
         }
-        RECT boundRect = drawable.getRect();
 
-        ExportRectangle rect = new ExportRectangle(boundRect);
         Matrix mat = transformation.concatenate(layerMatrix);
-        rect = mat.transform(rect);
         int dframe = time % drawableFrameCount;
-        rect.xMin -= unzoom;
-        rect.yMin -= unzoom;
-        rect.xMin = Math.max(0, rect.xMin);
-        rect.yMin = Math.max(0, rect.yMin);
-        drawMatrix.translate(rect.xMin, rect.yMin);
 
-        int newWidth = (int) (rect.getWidth() / unzoom);
-        int newHeight = (int) (rect.getHeight() / unzoom);
-        int deltaX = (int) (rect.xMin / unzoom);
-        int deltaY = (int) (rect.yMin / unzoom);
-        newWidth = Math.min(imageWidth - deltaX, newWidth) + 1;
-        newHeight = Math.min(imageHeight - deltaY, newHeight) + 1;
-
-        if (newWidth <= 0 || newHeight <= 0) {
-            return;
-        }
-
-        Matrix m = mat.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
+        Matrix m = mat; //mat.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
         if (drawable instanceof DefineSpriteTag) {
-            printStringsToImage(g, newWidth, newHeight, dframe, swf, ((Timelined) drawable).getTimeline(), m);
+            printStringsToImage(existingFonts, g, dframe, swf, ((Timelined) drawable).getTimeline(), m);
         }
         if (drawable instanceof StaticTextTag) {
             StaticTextTag staticText = (StaticTextTag) drawable;
-            Matrix trans = mat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor));
-            //This does not work yet, since GnuJPDF does not support correct transform handling - rotation, etc. :-(
-            //g.setTransform(trans.toTransform());
+            Matrix mat0 = mat.concatenate(new Matrix(staticText.textMatrix));
+            Matrix trans = mat0.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor));
+            trans = trans.preConcatenate(Matrix.getTranslateInstance(5, 5));
             FontTag font = null;
             int textHeight = 12;
             int x = 0;
@@ -604,12 +584,24 @@ public class FrameExporter {
                     }
                 }
 
-                //This does not work yet, since GnuJPDF does not support correct transform handling - rotation, etc. :-(
-                /*
-                Font currentFont = g.getFont();
-                Font newFont = currentFont.deriveFont((float) (textHeight / SWF.unitDivisor));
-                g.setFont(newFont);
-                g.drawString(text.toString(), (float) x, (float) y);*/
+                PDFGraphics g2 = (PDFGraphics) g;
+                if (existingFonts.containsKey(rec.fontId)) {
+                    g2.setExistingTtfFont(existingFonts.get(rec.fontId));
+                } else {
+                    FontExporter fe = new FontExporter();
+                    File tempFile;
+                    try {
+                        tempFile = File.createTempFile("ffdec_font_export_", ".ttf");
+                        fe.exportFont(font, FontExportMode.TTF, tempFile);
+                        Font f = new Font("/MYFONT" + rec.fontId, font.getFontStyle(), textHeight);
+                        existingFonts.put(rec.fontId, f);
+                        g2.setTtfFont(f, tempFile);
+                    } catch (IOException ex) {
+                        Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
+                g2.drawTransparentStringWithTransform(text.toString(), (float) x, (float) y, trans.toTransform());
             }
         }
 
