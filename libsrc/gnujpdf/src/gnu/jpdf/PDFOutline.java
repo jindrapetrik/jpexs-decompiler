@@ -235,9 +235,11 @@ public class PDFOutline extends PDFObject implements Serializable
         // the number of outlines in this document
         if(parent==null) {
             // were the top level node, so all are open by default
-            os.write("/Count ".getBytes());
-            os.write(Integer.toString(outlines.size()).getBytes());
-            os.write("\n".getBytes());
+            if (outlines.size() > 0) {
+                os.write("/Count ".getBytes());
+                os.write(Integer.toString(outlines.size()).getBytes());
+                os.write("\n".getBytes());
+            }
         } else {
             // were a decendent, so by default we are closed. Find out how many
             // entries are below us

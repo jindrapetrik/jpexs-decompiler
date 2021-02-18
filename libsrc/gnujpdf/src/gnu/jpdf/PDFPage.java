@@ -22,6 +22,7 @@ package gnu.jpdf;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.print.PageFormat;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -213,6 +214,30 @@ public class PDFPage extends PDFObject implements Serializable
 
         // finally create and return the font
         PDFFont f = pdfDocument.getFont(type,font,style);
+        fonts.addElement(f);
+        return f;
+    }
+
+    public PDFFont getEmbeddedFont(String font, int style, File file) throws IOException {
+        // Search the fonts on this page, and return one that matches this
+        // font.
+        // This keeps the number of font definitions down to one per font/style
+        for (PDFFont ft : fonts) {
+            if (ft.equals("/TrueType", font, style)) {
+                return ft;
+            }
+        }
+
+        // Ok, the font isn't in the page, so create one.
+        // We need a procset if we are using fonts, so create it (if not
+        // already created, and add to our resources
+        if (fonts.size() == 0) {
+            addProcset();
+            procset.add("/Text");
+        }
+
+        // finally create and return the font
+        PDFFont f = pdfDocument.getEmbeddedFont(font, style, file);
         fonts.addElement(f);
         return f;
     }

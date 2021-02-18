@@ -50,6 +50,9 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable
    */
 
 
+  // Dimensions of the object.
+  private int objwidth;
+  private int objheight;
 
   // Dimensions of the image.
   private int width;
@@ -74,7 +77,7 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable
    */
   public PDFImage(Image img) {
     this();
-    setImage(img,img.getWidth(this), img.getHeight(this), this);
+    setImage(img, 0, 0, img.getWidth(this), img.getHeight(this), this);
   }
 
   /**
@@ -87,9 +90,11 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable
    * @param h an <code>int</code> value
    * @param obs an <code>ImageObserver</code> value
    */
-  public PDFImage(Image img,ImageObserver obs) {
+  public PDFImage(Image img,int x,int y,int w,int h,ImageObserver obs) {
     this();
-    setImage(img, img.getWidth(this), img.getHeight(this), obs);
+    objwidth = w;
+    objheight = h;
+    setImage(img, x, y, img.getWidth(this), img.getHeight(this), obs);
   }
 
 
@@ -154,7 +159,7 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable
    * @param h an <code>int</code> value
    * @param obs an <code>ImageObserver</code> value
    */
-  public void setImage(Image img,int w,int h,ImageObserver obs) {
+  public void setImage(Image img,int x,int y,int w,int h,ImageObserver obs) {
     this.img = img;
     width  = w;
     height = h;
@@ -400,6 +405,5 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable
     //}
     return false;
   }
-  
 
 } // end class PDFImage
