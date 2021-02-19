@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
+import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -41,12 +42,14 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.DynamicTextGlyphEntry;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
@@ -60,6 +63,7 @@ import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.decompiler.flash.types.filters.GLOWFILTER;
 import com.jpexs.decompiler.flash.types.filters.GRADIENTBEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.GRADIENTGLOWFILTER;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -554,16 +558,30 @@ public class FrameExporter {
         if (drawable instanceof DefineSpriteTag) {
             printStringsToImage(existingFonts, g, dframe, swf, ((Timelined) drawable).getTimeline(), m);
         }
-        if (drawable instanceof StaticTextTag) {
-            StaticTextTag staticText = (StaticTextTag) drawable;
-            Matrix mat0 = mat.concatenate(new Matrix(staticText.textMatrix));
+        if (drawable instanceof TextTag) {
+            TextTag textTag = (TextTag) drawable;
+
+            List<TEXTRECORD> textRecords = new ArrayList<>();
+
+            if (textTag instanceof StaticTextTag) {
+                textRecords = ((StaticTextTag) textTag).textRecords;
+            } else if (textTag instanceof DefineEditTextTag) {
+                DefineEditTextTag editText = (DefineEditTextTag) textTag;
+                if (editText.hasText) {
+                    textRecords = editText.getTextRecords();
+                }
+            }
+
+            Matrix textMatrix = new Matrix(textTag.getTextMatrix());
+            
+            Matrix mat0 = mat.concatenate(textMatrix);
             Matrix trans = mat0.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor));
             trans = trans.preConcatenate(Matrix.getTranslateInstance(5, 5));
             FontTag font = null;
             int textHeight = 12;
             int x = 0;
             int y = 0;
-            for (TEXTRECORD rec : staticText.textRecords) {
+            for (TEXTRECORD rec : textRecords) {
                 if (rec.styleFlagsHasFont) {
                     font = swf.getFont(rec.fontId);
                     textHeight = rec.textHeight;
@@ -581,6 +599,9 @@ public class FrameExporter {
                     if (entry.glyphIndex != -1) {
                         char ch = font.glyphToChar(entry.glyphIndex);
                         text.append(ch);
+                    } else if (entry instanceof DynamicTextGlyphEntry) {
+                        DynamicTextGlyphEntry dynamicEntry = (DynamicTextGlyphEntry) entry;
+                        text.append(dynamicEntry.character);
                     }
                 }
 
