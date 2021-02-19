@@ -362,7 +362,7 @@ public class PDFJob extends PrintJob implements Serializable
     /**
      * This is used by our version of create()
      */
-    graphic(PDFPage page,PDFJob job,PrintWriter pw) {
+      graphic(PDFPage page, PDFJob job, RawPrintWriter pw) {
       super();
       this.init(page,pw);
       this.job = job;

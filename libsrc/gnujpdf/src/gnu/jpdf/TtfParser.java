@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -17,67 +18,159 @@ import java.util.TreeMap;
  */
 public class TtfParser {
 
-    private int size = -1;
-
-
-    private long headOffset = -1;
-
-    private long os2Offset = -1;
-    private long hheaOffset = -1;
-    private long hmtxOffset = -1;
-    private long cmapOffset = -1;
-
-    private Font font;
-
     private int ascent;
     private int descent;
-    private int capHeight;
+    private int leading;
+    private int maxWidth;
 
     private float scale;
-    private int numOfHMetrics;
+    private int numberOfHMetrics;
 
-    private List<Integer> advanceWidths = new ArrayList<>();
-    private Map<Integer, Integer> cmap = new TreeMap<>();
+    private Map<Integer, Integer> cw = new TreeMap<>();
+    private Map<Integer, Integer> ctg = new TreeMap<>();
+    private Map<Integer, MyRect> cbbox = new HashMap<>();
 
-    private int firstChar = -1;
-    private int lastChar = -1;
+    private MyRect bbox;
 
-    public void loadFromTTF(File file, int size) throws IOException, FontFormatException {
-        font = Font.createFont(Font.TRUETYPE_FONT, file);
+    private int indexToLocFormat;
+
+    private int flags;
+
+    private String name;
+
+    private float italicAngle;
+    private int underlinePosition;
+    private int underlineThickness;
+
+    private int numGlyphs;
+    private int xHeight;
+    private int capHeight;
+    private int missingWidth;
+
+    private int avgWidth;
+    private int stemV;
+    private int stemH;
+
+    private int dw;
+
+    Map<Integer, Long> indexToLoc = new HashMap<>();
+
+    Map<String, Long> tableOffsets = new HashMap<>();
+    Map<String, Long> tableLengths = new HashMap<>();
+
+    private byte[] cidtogidmap = new byte[131072];
+
+
+    public void loadFromTTF(File file) throws IOException, FontFormatException {
         RandomAccessFile input = new RandomAccessFile(file, "r");
-        this.size = size;
-        if (input == null) {
-            throw new IllegalArgumentException("input cannot be null.");
-        }
         readTableDirectory(input);
-        if (headOffset == -1) {
-            throw new IOException("HEAD table not found.");
-        }
         readHEAD(input);
         readOS2(input);
         readHHEA(input);
-        readHMTX(input);
         readCMAP(input);
+        readLOCA(input);
+        readNAME(input);
+        readPOST(input);
+        readMAXP(input);
+        readGLYF(input);
+        readHMTX(input);
+
+        if (missingWidth > 0) {
+            dw = missingWidth;
+        } else {
+            dw = avgWidth;
+        }
+
+        for (int cid : ctg.keySet()) {
+            int gid = ctg.get(cid);
+            if ((gid >= 0) && (gid <= 0xFFFF) && (gid >= 0)) {
+                if (gid > 0xFFFF) {
+                    gid -= 0x10000;
+                }
+                cidtogidmap[(cid * 2)] = (byte) (gid >> 8);
+                cidtogidmap[((cid * 2) + 1)] = (byte) (gid & 0xFF);
+            }
+        }
 
         input.close();
     }
 
-    public int getFirstChar() {
-        return firstChar;
+    public byte[] getCidtogidmap() {
+        return cidtogidmap;
     }
 
-    public int getLastChar() {
-        return lastChar;
+    public int getAvgWidth() {
+        return avgWidth;
     }
 
+    public MyRect getBbox() {
+        return bbox;
+    }
 
-    public List<Integer> getAdvanceWidths() {
-        return advanceWidths;
+    public Map<Integer, MyRect> getCbbox() {
+        return cbbox;
+    }
+
+    public Map<Integer, Integer> getCw() {
+        return cw;
     }
 
     public Map<Integer, Integer> getCmap() {
-        return cmap;
+        return ctg;
     }
+
+    public int getLeading() {
+        return leading;
+    }
+
+    public int getMaxWidth() {
+        return maxWidth;
+    }
+
+    public Map<Integer, Integer> getCtg() {
+        return ctg;
+    }
+
+    public int getFlags() {
+        return flags;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public float getItalicAngle() {
+        return italicAngle;
+    }
+
+    public float getUnderlinePosition() {
+        return underlinePosition;
+    }
+
+    public float getUnderlineThickness() {
+        return underlineThickness;
+    }
+
+    public int getxHeight() {
+        return xHeight;
+    }
+
+    public int getMissingWidth() {
+        return missingWidth;
+    }
+
+    public int getStemV() {
+        return stemV;
+    }
+
+    public int getStemH() {
+        return stemH;
+    }
+
+    public int getDw() {
+        return dw;
+    }
+
 
     private void readTableDirectory(RandomAccessFile input) throws IOException {
         skip(input, 4);
@@ -96,27 +189,15 @@ public class TtfParser {
             long length = readUnsignedLong(input);
             prevOffset = offset;
             String tag = new String(tagBytes, "ISO-8859-1");
-            //System.err.println("tag " + tag + ", length: " + length);
-            if (tag.equals("head")) {
-                headOffset = offset;
-            }
-            if (tag.equals("OS/2")) {
-                os2Offset = offset;
-            }
-            if (tag.equals("hhea")) {
-                hheaOffset = offset;
-            }
-            if (tag.equals("hmtx")) {
-                hmtxOffset = offset;
-            }
-            if (tag.equals("cmap")) {
-                cmapOffset = offset;
-            }
+
+            tableOffsets.put(tag, offset);
+            tableLengths.put(tag, length);
+            //System.err.println("tag " + tag + ", length: " + length);            
         }
     }
 
     private void readCMAP(RandomAccessFile input) throws IOException {
-        seek(input, cmapOffset);
+        seek(input, tableOffsets.get("cmap"));
         int version = readUnsignedShort(input);
         int numberSubtables = readUnsignedShort(input);
 
@@ -124,7 +205,7 @@ public class TtfParser {
             int platFormId = readUnsignedShort(input);
             int platFormSpecificId = readUnsignedShort(input);
             long offset = readUnsignedLong(input);
-            seek(input, cmapOffset + offset);
+            seek(input, tableOffsets.get("cmap") + offset);
 
             int format = readUnsignedShort(input);
             switch (format) {
@@ -141,7 +222,6 @@ public class TtfParser {
                     List<Integer> startCodes = new ArrayList<>();
                     List<Integer> idDeltas = new ArrayList<>();
                     List<Integer> idRangeOffsets = new ArrayList<>();
-
 
                     for (int j = 0; j < segCount; j++) {
                         int endCode = readUnsignedShort(input);
@@ -163,9 +243,8 @@ public class TtfParser {
 
                     List<Integer> glyphIndices = new ArrayList<>();
                     long startA = input.getFilePointer();
-                    ;
                     long a = startA;
-                    for (; a < cmapOffset + offset + length; a += 2) {
+                    for (; a < tableOffsets.get("cmap") + offset + length; a += 2) {
                         int glyphIndex = readUnsignedShort(input);
                         glyphIndices.add(glyphIndex);
                     }
@@ -177,53 +256,196 @@ public class TtfParser {
                             }
                             if (idRangeOffsets.get(j) == 0) {
                                 int glyph = (idDeltas.get(j) + k) % 65536;
-                                cmap.put(k, glyph);
+                                ctg.put(k, glyph);
 
                             } else {
                                 int glyphIndex = (idRangeOffsets.get(j) - 2 * (segCount - j)) / 2 + (k - startCodes.get(j));
                                 int glyph = glyphIndices.get(glyphIndex);
-                                cmap.put(k, glyph);
+                                ctg.put(k, glyph);
                             }
                         }
                     }
                     break;
             }
-            
+
             break;
         }
-        //System.err.println("format=" + format);
+        if (!ctg.containsKey(0)) {
+            ctg.put(0, 0);
+        }
+
     }
 
     private void readHMTX(RandomAccessFile input) throws IOException {
-        seek(input, hmtxOffset);
-        for (int i = 0; i < numOfHMetrics; i++) {
+        seek(input, tableOffsets.get("hmtx"));
+        List<Integer> cw = new ArrayList<>();
+        for (int i = 0; i < numberOfHMetrics; i++) {
             int advanceWidth = readUnsignedShort(input);
-            advanceWidths.add((int) (scale * advanceWidth));
-            int leftSideBearing = readUnsignedShort(input);
+            cw.add(Math.round(scale * advanceWidth));
+            skip(input, 2); //skip leftSideBearing
+        }
+        if (numberOfHMetrics < numGlyphs) {
+            for (int i = numberOfHMetrics; i < numGlyphs; i++) {
+                cw.add(cw.get(numberOfHMetrics - 1));
+            }
+        }
+        missingWidth = cw.get(0);
+        for (int cid = 0; cid <= 65535; cid++) {
+            if (ctg.containsKey(cid)) {
+                if (ctg.get(cid) < cw.size() && ctg.get(cid) >= 0) {
+                    this.cw.put(cid, cw.get(ctg.get(cid)));
+                }
+            }
         }
     }
 
     private void readHHEA(RandomAccessFile input) throws IOException {
 
-        seek(input, hheaOffset + 4);
-        ascent = (int) (scale * readShort(input));
-        descent = (int) (scale * readShort(input));
-        capHeight = ascent;
-        seek(input, hheaOffset + 34);
-        numOfHMetrics = readUnsignedShort(input);
+        seek(input, tableOffsets.get("hhea"));
+        skip(input, 4); // skip Table version number
+        ascent = Math.round(scale * readShort(input));
+        descent = Math.round(scale * readShort(input));
+        leading = Math.round(scale * readShort(input));
+        maxWidth = Math.round(scale * readShort(input));
+        skip(input, 22);
+        numberOfHMetrics = readUnsignedShort(input);
+
     }
+
     private void readHEAD(RandomAccessFile input) throws IOException {
-        seek(input, headOffset + 2 * 4 + 2 * 4 + 2);
+        seek(input, tableOffsets.get("head"));
+        skip(input, 2 * 4 + 2 * 4 + 2);
         int unitsPerEm = readUnsignedShort(input);
-        scale = (float) size / (float) unitsPerEm;
+        scale = (float) 1000 / (float) unitsPerEm;
+
+        skip(input, 16);
+        int xMin = Math.round(scale * readShort(input));
+        int yMin = Math.round(scale * readShort(input));
+        int xMax = Math.round(scale * readShort(input));
+        int yMax = Math.round(scale * readShort(input));
+        bbox = new MyRect(xMin, yMin, xMax, yMax);
+
+        flags = 32;
+        int macStyle = readUnsignedShort(input);
+
+        if ((macStyle & 2) == 2) {
+            flags |= 64;
+        }
+
+        seek(input, tableOffsets.get("head") + 50);
+        indexToLocFormat = readShort(input);
+    }
+
+    private void readLOCA(RandomAccessFile input) throws IOException {
+        seek(input, tableOffsets.get("loca"));
+
+        boolean shortOffset = indexToLocFormat == 0;
+
+        if (shortOffset) {
+            int totNumGlyphs = (int) (tableLengths.get("local") / 2); // numGlyphs + 1
+            for (int i = 0; i < totNumGlyphs; i++) {
+                indexToLoc.put(i, (long) readUnsignedShort(input) * 2);
+                if (indexToLoc.containsKey(i - 1) && ((long) indexToLoc.get(i) == (long) indexToLoc.get(i - 1))) {
+                    // the last glyph didn't have an outline
+                    indexToLoc.remove(i - 1);
+                }
+            }
+        } else {
+            int totNumGlyphs = (int) Math.floor(tableLengths.get("loca") / 4); // numGlyphs + 1
+            for (int i = 0; i < totNumGlyphs; i++) {
+                indexToLoc.put(i, readUnsignedLong(input));
+                if (indexToLoc.containsKey(i - 1) && ((long) indexToLoc.get(i) == (long) indexToLoc.get(i - 1))) {
+                    // the last glyph didn't have an outline
+                    indexToLoc.remove(i - 1);
+                }
+            }
+        }
     }
 
     private void readOS2(RandomAccessFile input) throws IOException {
-        seek(input, os2Offset + 68);
-        //ascent = readShort(input);
-        //descent = readShort(input);
-        seek(input, os2Offset + 88);
-        //capHeight = readShort(input);
+        seek(input, tableOffsets.get("OS/2"));
+        skip(input, 2);
+        avgWidth = Math.round(readShort(input) * scale);
+        float usWeightClass = readUnsignedShort(input) * scale;
+        stemV = Math.round((70 * usWeightClass) / 400);
+        stemH = Math.round((30 * usWeightClass) / 400);
+        skip(input, 2); //usWidthClass
+        int fsType = readShort(input);
+        if (fsType == 2) {
+            //This Font cannot be modified, embedded or exchanged in any manner without first obtaining permission of the legal owner.            
+        }
+    }
+
+    private void readNAME(RandomAccessFile input) throws IOException {
+        seek(input, tableOffsets.get("name"));
+        skip(input, 2);
+        int numNameRecords = readUnsignedShort(input);
+        int stringStorageOffset = readUnsignedShort(input);
+        for (int i = 0; i < numNameRecords; i++) {
+            skip(input, 6); //skip Platform ID, Platform-specific encoding ID, Language ID.
+            int nameID = readUnsignedShort(input);
+            if (nameID == 6) {
+                int stringLength = readUnsignedShort(input);
+                int stringOffset = readUnsignedShort(input);
+                long offset = tableOffsets.get("name") + stringStorageOffset + stringOffset;
+                byte data[] = new byte[stringLength];
+                seek(input, offset);
+                input.read(data);
+                name = new String(data);
+                name = name.replaceAll("[^a-zA-Z0-9_\\-]", "");
+            } else {
+                skip(input, 4);// skip String length, String offset
+            }
+        }
+    }
+
+    private void readPOST(RandomAccessFile input) throws IOException {
+        seek(input, tableOffsets.get("post"));
+        skip(input, 4);  // skip Format Type
+        italicAngle = readFixed(input);
+        underlinePosition = Math.round(readShort(input) * scale);
+        underlineThickness = Math.round(readShort(input) * scale);
+        boolean isFixedPitch = readUnsignedLong(input) == 0 ? false : true;
+        if (isFixedPitch) {
+            flags |= 1;
+        }
+    }
+
+    private void readMAXP(RandomAccessFile input) throws IOException {
+        seek(input, tableOffsets.get("maxp"));
+        skip(input, 4); //skip Table version number
+        numGlyphs = readUnsignedShort(input);
+
+    }
+
+    private void readGLYF(RandomAccessFile input) throws IOException {
+        if (ctg.containsKey(120)) {
+            seek(input, tableOffsets.get("glyf") + indexToLoc.get(ctg.get(120)) + 4);
+            int yMin = readShort(input);
+            skip(input, 2);
+            int yMax = readShort(input);
+            xHeight = Math.round((yMax - yMin) * scale);
+        }
+        if (ctg.containsKey(72)) {
+            seek(input, tableOffsets.get("glyf") + indexToLoc.get(ctg.get(72)) + 4);
+            int yMin = readShort(input);
+            skip(input, 2);
+            int yMax = readShort(input);
+            capHeight = Math.round((yMax - yMin) * scale);
+        }
+
+        for (int cid = 0; cid <= 65535; cid++) {
+            if (ctg.containsKey(cid)) {
+                if (indexToLoc.containsKey(ctg.get(cid))) {
+                    seek(input, tableOffsets.get("glyf") + indexToLoc.get(ctg.get(cid)));
+                    int xMin = readShort(input);
+                    int yMin = readShort(input);
+                    int xMax = readShort(input);
+                    int yMax = readShort(input);
+                    cbbox.put(cid, new MyRect(xMin, yMin, xMax, yMax));
+                }
+            }
+        }
     }
 
     public int getAscent() {
@@ -238,6 +460,11 @@ public class TtfParser {
         return capHeight;
     }
 
+    private float readFixed(RandomAccessFile input) throws IOException {
+        int m = readShort(input);
+        int f = readUnsignedShort(input);
+        return Float.parseFloat("" + m + "." + f);
+    }
 
     private int readUnsignedByte(RandomAccessFile input) throws IOException {
         int b = input.read();

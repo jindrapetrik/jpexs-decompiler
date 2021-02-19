@@ -24,6 +24,12 @@
 
 package gnu.jpdf;
 
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * String manipulation methods
  *
@@ -47,7 +53,37 @@ public class PDFStringHelper
       s = replace(s,")","\\)");
     
     return "("+s+")";
-  }
+    }
+
+    public static byte[] makeRawPDFString(String s) {
+        try {
+            byte[] utf16be = s.getBytes("UTF-16BE");
+            List<Byte> bytes = new ArrayList<>();
+            for (int i = 0; i < utf16be.length; i += 2) {
+                if (utf16be[i] == 0 && utf16be[i + 1] == '(') {
+                    bytes.add((byte) 0);
+                    bytes.add((byte) '\\');
+                    bytes.add((byte) '(');
+                } else if (utf16be[i] == 0 && utf16be[i + 1] == ')') {
+                    bytes.add((byte) 0);
+                    bytes.add((byte) '\\');
+                    bytes.add((byte) ')');
+                } else {
+                    bytes.add(utf16be[i]);
+                    bytes.add(utf16be[i + 1]);
+                }
+            }
+            byte[] ret = new byte[bytes.size()];
+            for (int i = 0; i < bytes.size(); i++) {
+                ret[i] = bytes.get(i);
+            }
+            return ret;
+
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(PDFStringHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
   
   /**
    * Helper method for toString()
