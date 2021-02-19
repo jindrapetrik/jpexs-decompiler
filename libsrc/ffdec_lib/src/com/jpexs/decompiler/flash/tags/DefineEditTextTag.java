@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -987,186 +988,7 @@ public class DefineEditTextTag extends TextTag {
             }
         }
         if (hasText) {
-            DynamicTextModel textModel = new DynamicTextModel();
-            List<CharacterWithStyle> txt = getTextWithStyle();
-            TextStyle lastStyle = null;
-            char prevChar = 0;
-            boolean lastWasWhiteSpace = false;
-            for (int i = 0; i < txt.size(); i++) {
-                CharacterWithStyle cs = txt.get(i);
-                char c = cs.character;
-                if (c != '\r' && c != '\n') {
-                    // create new SameStyleTextRecord for all words and all diffrent style text parts
-                    if (lastWasWhiteSpace && !Character.isWhitespace(c)) {
-                        textModel.newWord();
-                        lastWasWhiteSpace = false;
-                    }
-                    if (cs.style != lastStyle) {
-                        lastStyle = cs.style;
-                        textModel.style = lastStyle;
-                        textModel.newRecord();
-                    }
-                    Character nextChar = null;
-                    if (i + 1 < txt.size()) {
-                        nextChar = txt.get(i + 1).character;
-                    }
-
-                    FontTag font = lastStyle.font;
-                    DynamicTextGlyphEntry ge = new DynamicTextGlyphEntry();
-                    ge.fontFace = lastStyle.fontFace;
-                    if (ge.fontFace == null && font != null) {
-                        ge.fontFace = font.getFontName();
-                    }
-
-                    ge.fontStyle = (lastStyle.bold ? Font.BOLD : 0) | (lastStyle.italic ? Font.ITALIC : 0);
-                    ge.character = c;
-
-                    ge.glyphIndex = -1; // always use system character glyphs in edit text
-
-                    String fontName = ge.fontFace != null ? ge.fontFace : FontTag.getDefaultFontName();
-                    int fontStyle = font == null ? ge.fontStyle : font.getFontStyle();
-                    ge.glyphAdvance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar));
-
-                    textModel.addGlyph(c, ge);
-                    if (Character.isWhitespace(c)) {
-                        lastWasWhiteSpace = true;
-                    }
-                } else if (multiline) {
-                    textModel.newParagraph();
-                }
-                prevChar = c;
-            }
-
-            textModel.calculateTextWidths();
-            List<List<SameStyleTextRecord>> lines;
-            if (multiline && wordWrap) {
-                lines = new ArrayList<>();
-                for (Paragraph paragraph : textModel.paragraphs) {
-                    List<SameStyleTextRecord> line = new ArrayList<>();
-                    int lineLength = 0;
-                    for (Word word : paragraph.words) {
-                        if (lineLength + word.width <= bounds.getWidth()) {
-                            line.addAll(word.records);
-                            lineLength += word.width;
-                        } else {
-                            lines.add(line);
-                            line = new ArrayList<>();
-                            line.addAll(word.records);
-                            lineLength = 0;
-                        }
-                    }
-                    if (!line.isEmpty()) {
-                        lines.add(line);
-                    }
-                }
-            } else {
-                lines = new ArrayList<>();
-                for (Paragraph paragraph : textModel.paragraphs) {
-                    List<SameStyleTextRecord> line = new ArrayList<>();
-                    for (Word word : paragraph.words) {
-                        for (SameStyleTextRecord tr : word.records) {
-                            line.add(tr);
-                        }
-                    }
-                    lines.add(line);
-                }
-            }
-
-            // remove spaces after last word
-            for (List<SameStyleTextRecord> line : lines) {
-                boolean removed = true;
-                while (removed) {
-                    removed = false;
-                    while (line.size() > 0 && line.get(line.size() - 1).glyphEntries.isEmpty()) {
-                        line.remove(line.size() - 1);
-                        removed = true;
-                    }
-                    if (line.size() > 0) {
-                        SameStyleTextRecord lastRecord = line.get(line.size() - 1);
-                        while (lastRecord.glyphEntries.size() > 0
-                                && Character.isWhitespace(lastRecord.glyphEntries.get(lastRecord.glyphEntries.size() - 1).character)) {
-                            lastRecord.glyphEntries.remove(lastRecord.glyphEntries.size() - 1);
-                            removed = true;
-                        }
-                    }
-                }
-            }
-
-            textModel.calculateTextWidths();
-
-            List<TEXTRECORD> allTextRecords = new ArrayList<>();
-            int lastHeight = 0;
-            int yOffset = -leading;
-            for (List<SameStyleTextRecord> line : lines) {
-                int width = 0;
-                int currentOffset = 0;
-                if (line.isEmpty()) {
-                    currentOffset = lastHeight;
-                } else {
-                    for (SameStyleTextRecord tr : line) {
-                        width += tr.width;
-                        int lineHeight = tr.style.fontHeight + tr.style.fontLeading;
-                        lastHeight = lineHeight;
-                        if (lineHeight > currentOffset) {
-                            currentOffset = lineHeight;
-                        }
-                    }
-                }
-                yOffset += currentOffset;
-                int alignOffset = 0;
-                switch (align) {
-                    case ALIGN_LEFT:
-                        alignOffset = 0;
-                        break;
-                    case ALIGN_RIGHT:
-                        alignOffset = bounds.getWidth() - width;
-                        break;
-                    case ALIGN_CENTER:
-                        alignOffset = (bounds.getWidth() - width) / 2;
-                        break;
-                    case ALIGN_JUSTIFY:
-                        // todo;
-                        break;
-                }
-                for (SameStyleTextRecord tr : line) {
-                    tr.xOffset = alignOffset;
-                    alignOffset += tr.width;
-                }
-                for (SameStyleTextRecord tr : line) {
-                    TEXTRECORD tr2 = new TEXTRECORD();
-                    int fid = fontId;
-                    if (fontClass != null) {
-                        FontTag ft = swf.getFontByClass(fontClass);
-                        if (ft != null) {
-                            fid = ft.getFontId();
-                        }
-                    }
-                    if (tr.style.font != null) {
-                        fid = tr.style.font.getFontId();
-                    }
-
-                    tr2.styleFlagsHasFont = fid != 0;
-                    tr2.fontId = fid;
-                    tr2.textHeight = tr.style.fontHeight;
-                    if (tr.style.textColor != null) {
-                        tr2.styleFlagsHasColor = true;
-                        tr2.textColorA = tr.style.textColor;
-                    }
-                    // always add xOffset, because no xOffset and 0 xOffset is diffrent in text rendering
-                    tr2.styleFlagsHasXOffset = true;
-                    tr2.xOffset = tr.xOffset;
-                    if (yOffset != 0) {
-                        tr2.styleFlagsHasYOffset = true;
-                        tr2.yOffset = yOffset;
-                    }
-                    tr2.glyphEntries = new ArrayList<>(tr.glyphEntries.size());
-                    for (GlyphCharacter ge : tr.glyphEntries) {
-                        tr2.glyphEntries.add(ge.glyphEntry);
-                    }
-                    allTextRecords.add(tr2);
-                }
-            }
-
+            List<TEXTRECORD> allTextRecords = getTextRecords();
             switch (renderMode) {
                 case BITMAP:
                     staticTextToImage(swf, allTextRecords, 2, image, getTextMatrix(), transformation, colorTransform);
@@ -1179,6 +1001,189 @@ public class DefineEditTextTag extends TextTag {
                     break;
             }
         }
+    }
+
+    public List<TEXTRECORD> getTextRecords() {
+        DynamicTextModel textModel = new DynamicTextModel();
+        List<CharacterWithStyle> txt = getTextWithStyle();
+        TextStyle lastStyle = null;
+        char prevChar = 0;
+        boolean lastWasWhiteSpace = false;
+        for (int i = 0; i < txt.size(); i++) {
+            CharacterWithStyle cs = txt.get(i);
+            char c = cs.character;
+            if (c != '\r' && c != '\n') {
+                // create new SameStyleTextRecord for all words and all diffrent style text parts
+                if (lastWasWhiteSpace && !Character.isWhitespace(c)) {
+                    textModel.newWord();
+                    lastWasWhiteSpace = false;
+                }
+                if (cs.style != lastStyle) {
+                    lastStyle = cs.style;
+                    textModel.style = lastStyle;
+                    textModel.newRecord();
+                }
+                Character nextChar = null;
+                if (i + 1 < txt.size()) {
+                    nextChar = txt.get(i + 1).character;
+                }
+
+                FontTag font = lastStyle.font;
+                DynamicTextGlyphEntry ge = new DynamicTextGlyphEntry();
+                ge.fontFace = lastStyle.fontFace;
+                if (ge.fontFace == null && font != null) {
+                    ge.fontFace = font.getFontName();
+                }
+
+                ge.fontStyle = (lastStyle.bold ? Font.BOLD : 0) | (lastStyle.italic ? Font.ITALIC : 0);
+                ge.character = c;
+
+                ge.glyphIndex = -1; // always use system character glyphs in edit text
+
+                String fontName = ge.fontFace != null ? ge.fontFace : FontTag.getDefaultFontName();
+                int fontStyle = font == null ? ge.fontStyle : font.getFontStyle();
+                ge.glyphAdvance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar));
+
+                textModel.addGlyph(c, ge);
+                if (Character.isWhitespace(c)) {
+                    lastWasWhiteSpace = true;
+                }
+            } else if (multiline) {
+                textModel.newParagraph();
+            }
+            prevChar = c;
+        }
+
+        textModel.calculateTextWidths();
+        List<List<SameStyleTextRecord>> lines;
+        if (multiline && wordWrap) {
+            lines = new ArrayList<>();
+            for (Paragraph paragraph : textModel.paragraphs) {
+                List<SameStyleTextRecord> line = new ArrayList<>();
+                int lineLength = 0;
+                for (Word word : paragraph.words) {
+                    if (lineLength + word.width <= bounds.getWidth()) {
+                        line.addAll(word.records);
+                        lineLength += word.width;
+                    } else {
+                        lines.add(line);
+                        line = new ArrayList<>();
+                        line.addAll(word.records);
+                        lineLength = 0;
+                    }
+                }
+                if (!line.isEmpty()) {
+                    lines.add(line);
+                }
+            }
+        } else {
+            lines = new ArrayList<>();
+            for (Paragraph paragraph : textModel.paragraphs) {
+                List<SameStyleTextRecord> line = new ArrayList<>();
+                for (Word word : paragraph.words) {
+                    for (SameStyleTextRecord tr : word.records) {
+                        line.add(tr);
+                    }
+                }
+                lines.add(line);
+            }
+        }
+
+        // remove spaces after last word
+        for (List<SameStyleTextRecord> line : lines) {
+            boolean removed = true;
+            while (removed) {
+                removed = false;
+                while (line.size() > 0 && line.get(line.size() - 1).glyphEntries.isEmpty()) {
+                    line.remove(line.size() - 1);
+                    removed = true;
+                }
+                if (line.size() > 0) {
+                    SameStyleTextRecord lastRecord = line.get(line.size() - 1);
+                    while (lastRecord.glyphEntries.size() > 0
+                            && Character.isWhitespace(lastRecord.glyphEntries.get(lastRecord.glyphEntries.size() - 1).character)) {
+                        lastRecord.glyphEntries.remove(lastRecord.glyphEntries.size() - 1);
+                        removed = true;
+                    }
+                }
+            }
+        }
+
+        textModel.calculateTextWidths();
+
+        List<TEXTRECORD> allTextRecords = new ArrayList<>();
+        int lastHeight = 0;
+        int yOffset = -leading;
+        for (List<SameStyleTextRecord> line : lines) {
+            int width = 0;
+            int currentOffset = 0;
+            if (line.isEmpty()) {
+                currentOffset = lastHeight;
+            } else {
+                for (SameStyleTextRecord tr : line) {
+                    width += tr.width;
+                    int lineHeight = tr.style.fontHeight + tr.style.fontLeading;
+                    lastHeight = lineHeight;
+                    if (lineHeight > currentOffset) {
+                        currentOffset = lineHeight;
+                    }
+                }
+            }
+            yOffset += currentOffset;
+            int alignOffset = 0;
+            switch (align) {
+                case ALIGN_LEFT:
+                    alignOffset = 0;
+                    break;
+                case ALIGN_RIGHT:
+                    alignOffset = bounds.getWidth() - width;
+                    break;
+                case ALIGN_CENTER:
+                    alignOffset = (bounds.getWidth() - width) / 2;
+                    break;
+                case ALIGN_JUSTIFY:
+                    // todo;
+                    break;
+            }
+            for (SameStyleTextRecord tr : line) {
+                tr.xOffset = alignOffset;
+                alignOffset += tr.width;
+            }
+            for (SameStyleTextRecord tr : line) {
+                TEXTRECORD tr2 = new TEXTRECORD();
+                int fid = fontId;
+                if (fontClass != null) {
+                    FontTag ft = swf.getFontByClass(fontClass);
+                    if (ft != null) {
+                        fid = ft.getFontId();
+                    }
+                }
+                if (tr.style.font != null) {
+                    fid = tr.style.font.getFontId();
+                }
+
+                tr2.styleFlagsHasFont = fid != 0;
+                tr2.fontId = fid;
+                tr2.textHeight = tr.style.fontHeight;
+                if (tr.style.textColor != null) {
+                    tr2.styleFlagsHasColor = true;
+                    tr2.textColorA = tr.style.textColor;
+                }
+                // always add xOffset, because no xOffset and 0 xOffset is diffrent in text rendering
+                tr2.styleFlagsHasXOffset = true;
+                tr2.xOffset = tr.xOffset;
+                if (yOffset != 0) {
+                    tr2.styleFlagsHasYOffset = true;
+                    tr2.yOffset = yOffset;
+                }
+                tr2.glyphEntries = new ArrayList<>(tr.glyphEntries.size());
+                for (GlyphCharacter ge : tr.glyphEntries) {
+                    tr2.glyphEntries.add(ge.glyphEntry);
+                }
+                allTextRecords.add(tr2);
+            }
+        }
+        return allTextRecords;
     }
 
     @Override
