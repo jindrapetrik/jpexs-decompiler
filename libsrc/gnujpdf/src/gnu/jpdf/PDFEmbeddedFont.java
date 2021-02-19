@@ -13,23 +13,19 @@ import java.util.List;
  */
 public class PDFEmbeddedFont extends PDFFont {
 
-    private final String descriptor;
     private String name;
     private String font;
     private String type;
-    private final String widths;
-    private final int firstChar;
-    private final int lastChar;
+    private final String descendantFont;
+    private final String toUnicode;
 
-    public PDFEmbeddedFont(String name, String font, int style, String descriptor, String widths, int firstChar, int lastChar) {
+    public PDFEmbeddedFont(String name, String font, int style, String descendantFont, String toUnicode) {
         super(name, "/TrueType", font, style);
-        this.descriptor = descriptor;
         this.name = name;
         this.font = font;
         this.type = "/TrueType";
-        this.widths = widths;
-        this.firstChar = firstChar;
-        this.lastChar = lastChar;
+        this.descendantFont = descendantFont;
+        this.toUnicode = toUnicode;
     }
 
     @Override
@@ -38,19 +34,13 @@ public class PDFEmbeddedFont extends PDFFont {
         writeStart(os);
 
         // now the objects body
-        os.write("/Subtype ".getBytes());
-        os.write(type.getBytes());
-        os.write("\n/Name ".getBytes());
-        os.write(name.getBytes());
-        os.write("\n/BaseFont ".getBytes());
-        os.write(font.getBytes());
-        os.write("\n".getBytes());
-
-        //os.write("/Encoding /WinAnsiEncoding\n".getBytes());
-
-        os.write(("/FirstChar " + firstChar + "\n").getBytes());
-        os.write(("/LastChar " + lastChar + "\n").getBytes());
-        os.write(("/Widths " + widths + "\n").getBytes());
+        os.write("/Subtype /Type0\n".getBytes());
+        os.write(("/BaseFont " + font + "\n").getBytes());
+        os.write(("/Name " + name + "\n").getBytes());
+        os.write("/Encoding /Identity-H\n".getBytes());
+        //System.err.println("descendantFont=" + descendantFont);
+        os.write(("/ToUnicode " + toUnicode + "\n").getBytes());
+        os.write(("/DescendantFonts [" + descendantFont + "]\n").getBytes());
         /*int cnt = 300;
 
         os.write(("/FirstChar 0\n").getBytes());
@@ -64,9 +54,9 @@ public class PDFEmbeddedFont extends PDFFont {
 */
         //os.write("/Widths [500 583 587 796]".getBytes());
 
-        os.write("/FontDescriptor ".getBytes());
+        /*os.write("/FontDescriptor ".getBytes());
         os.write(descriptor.getBytes());
-        os.write("\n".getBytes());
+        os.write("\n".getBytes());*/
 
         /*os.write("/ToUnicode ".getBytes());
         os.write(toUnicode.getBytes());

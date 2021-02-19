@@ -78,7 +78,8 @@ public class PDFCatalog extends PDFObject
     writeStart(os);
     
     // now the objects body
-    
+      os.write("/Version /1.7\n".getBytes());
+
     // the /Pages object
     os.write("/Pages ".getBytes());
     os.write(pdfPageList.toString().getBytes());
