@@ -622,7 +622,8 @@ public class FrameExporter {
                     }
                 }
 
-                g2.drawTransparentStringWithTransform(text.toString(), (float) x, (float) y, trans.toTransform());
+                g2.setTransform(trans.toTransform());
+                g2.drawTransparentString(text.toString(), (float) x, (float) y);
             }
         }
 
