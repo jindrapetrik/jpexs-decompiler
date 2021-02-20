@@ -71,6 +71,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThrowAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.WithAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.WithEndAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.WithObjectAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.FilterAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ForEachInAVM2Item;
@@ -242,7 +243,6 @@ public class AVM2Graph extends Graph {
             localData2.scopeStack = new ScopeStack();
 
             List<GraphTargetItem> targetOutput = translatePart(localData2, finallyTryTargetPart, finallyTryTargetStack, 0 /*??*/, "try_target");
-
 
             int switchedReg = -1;
             int finallyKind = FINALLY_KIND_UNKNOWN;
@@ -1018,7 +1018,7 @@ public class AVM2Graph extends Graph {
                 localData2.scopeStack = new ScopeStack();
 
                 //We are assuming Finally target has only 1 part
-                finallyTargetItems = translatePart(localData, finallyTryTargetPart, st2, staticOperation, path);//printGraph(foundGotos, partCodes, partCodePos, visited, localData2, st2, allParts, null, finallyTryTargetPart, finallyTargetStopPart, loops, throwStates, 0, path);
+                finallyTargetItems = translatePart(localData2, finallyTryTargetPart, st2, staticOperation, path);//printGraph(foundGotos, partCodes, partCodePos, visited, localData2, st2, allParts, null, finallyTryTargetPart, finallyTargetStopPart, loops, throwStates, 0, path);
                 //boolean targetHasThrow = false;
                 if (!finallyTargetItems.isEmpty() && (finallyTargetItems.get(finallyTargetItems.size() - 1) instanceof ThrowAVM2Item)) {
 
@@ -1132,6 +1132,30 @@ public class AVM2Graph extends Graph {
                         currentCatchCommands.remove(0);
                     }
                 }*/
+                loopwith:
+                while (!currentCatchCommands.isEmpty() && (currentCatchCommands.get(0) instanceof WithAVM2Item)) {
+                    WithAVM2Item w = (WithAVM2Item) currentCatchCommands.get(0);
+                    if (w.scope instanceof LocalRegAVM2Item) {
+                        int regId = ((LocalRegAVM2Item) w.scope).regIndex;
+                        for (GraphTargetItem item : localData.scopeStack) {
+                            if (item instanceof WithObjectAVM2Item) {
+                                WithObjectAVM2Item wo = (WithObjectAVM2Item) item;
+
+                                if (wo.scope instanceof SetLocalAVM2Item) {
+                                    SetLocalAVM2Item setLocal = (SetLocalAVM2Item) wo.scope;
+                                    if (setLocal.regIndex == regId) {
+                                        currentCatchCommands.remove(0);
+                                        int setLocalIp = localData.code.adr2pos(setLocal.getSrc().getAddress());
+                                        int getLocalIp = localData.code.adr2pos(w.scope.getSrc().getAddress());
+                                        localData.setLocalPosToGetLocalPos.get(setLocalIp).remove(getLocalIp);
+                                        continue loopwith;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break; //its a brand new with inside catch clause
+                }
                 if (!currentCatchCommands.isEmpty() && (currentCatchCommands.get(currentCatchCommands.size() - 1) instanceof SetLocalAVM2Item)) {
                     SetLocalAVM2Item setLocal = (SetLocalAVM2Item) currentCatchCommands.get(currentCatchCommands.size() - 1);
                     if (setLocal.regIndex == switchedReg) {
@@ -1160,21 +1184,18 @@ public class AVM2Graph extends Graph {
                     && (((SetLocalAVM2Item) currentRet.get(currentRet.size() - 1)).regIndex == switchedReg)) {
                 currentRet.remove(currentRet.size() - 1);
             }
-            
-            
 
             if (!finallyAsUnnamedException && !inlinedFinally && catchedExceptions.isEmpty() && finallyCommands.isEmpty()) {
                 currentRet.addAll(tryCommands);
                 return true;
             }
 
-            if (finallyAsUnnamedException)
-            {
+            if (finallyAsUnnamedException) {
                 catchedExceptions.add(finallyException);
                 catchCommands.add(finallyCommands);
                 finallyCommands = new ArrayList<>();
             }
-            
+
             TryAVM2Item tryItem = new TryAVM2Item(tryCommands, catchedExceptions, catchCommands, finallyCommands, "");
             if (inlinedFinally) {
                 List<List<GraphTargetItem>> parentCatchCommands = new ArrayList<>();
@@ -1871,6 +1892,26 @@ public class AVM2Graph extends Graph {
         }
 
         for (int i = 0; i < list.size(); i++) {
+
+            if (list.get(i) instanceof WithAVM2Item) {
+                WithAVM2Item wa = (WithAVM2Item) list.get(i);
+                if (wa.scope instanceof SetLocalAVM2Item) {
+                    SetLocalAVM2Item setLocal = (SetLocalAVM2Item) wa.scope;
+                    int setLocalIp = avm2code.adr2pos(setLocal.getSrc().getAddress());
+                    if (localData.getRegisterUsage(setLocalIp).isEmpty()) {
+                        for (int j = i + 1; j < list.size(); j++) {
+                            if (list.get(j) instanceof WithEndAVM2Item) {
+                                WithEndAVM2Item we = (WithEndAVM2Item) list.get(j);
+                                if (we.scope == wa.scope) {
+                                    wa.scope = we.scope = setLocal.value;
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
+
             if (list.get(i) instanceof SetLocalAVM2Item) {
                 SetLocalAVM2Item ri = (SetLocalAVM2Item) list.get(i);
                 int setLocalIp = avm2code.adr2pos(ri.getSrc().getAddress());

@@ -2585,7 +2585,10 @@ public class Graph {
     public static GraphTextWriter graphToString(List<GraphTargetItem> tree, GraphTextWriter writer, LocalData localData) throws InterruptedException {
         for (GraphTargetItem ti : tree) {
             if (!ti.isEmpty()) {
-                ti.toStringSemicoloned(writer, localData).newLine();
+                ti.toStringSemicoloned(writer, localData);
+                if (!ti.handlesNewLine()) {
+                    writer.newLine();
+                }
             }
         }
         return writer;

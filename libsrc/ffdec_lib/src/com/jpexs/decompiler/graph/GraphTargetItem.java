@@ -433,6 +433,10 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
         return false;
     }
 
+    public boolean handlesNewLine() {
+        return false;
+    }
+
     public GraphTextWriter toStringNL(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.startOffset(src, getLineStartItem(), getPos(), srcData);
         appendTry(writer, localData);
