@@ -21,7 +21,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * 
  */
-
 package gnu.jpdf;
 
 import java.io.UnsupportedEncodingException;
@@ -37,22 +36,25 @@ import java.util.logging.Logger;
  * @version $Revision: 1.2 $, $Date: 2007/08/26 18:56:35 $
  *
  */
-public class PDFStringHelper
-{
-  /**
-   * This converts a string into PDF. It prefixes ( or ) with \
-   * and wraps the string in a ( ) pair.
-   * @param s String to convert
-   * @return String that can be placed in a PDF (or Postscript) stream
-   */
-  public static String makePDFString(String s) {
-    if(s.indexOf("(")>-1)
-      s = replace(s,"(","\\(");
-    
-    if(s.indexOf(")")>-1)
-      s = replace(s,")","\\)");
-    
-    return "("+s+")";
+public class PDFStringHelper {
+
+    /**
+     * This converts a string into PDF. It prefixes ( or ) with \ and wraps the
+     * string in a ( ) pair.
+     *
+     * @param s String to convert
+     * @return String that can be placed in a PDF (or Postscript) stream
+     */
+    public static String makePDFString(String s) {
+        if (s.indexOf("(") > -1) {
+            s = replace(s, "(", "\\(");
+        }
+
+        if (s.indexOf(")") > -1) {
+            s = replace(s, ")", "\\)");
+        }
+
+        return "(" + s + ")";
     }
 
     public static byte[] makeRawPDFString(String s) {
@@ -84,32 +86,34 @@ public class PDFStringHelper
         }
         return null;
     }
-  
-  /**
-   * Helper method for toString()
-   * @param s source string
-   * @param f string to remove
-   * @param t string to replace f
-   * @return string with f replaced by t
-   */
-  private static String replace(String source,
-                                String removeThis,
-                                String replaceWith) {
-    StringBuffer b = new StringBuffer();
-    int p = 0, c=0;
-    
-    while(c>-1) {
-      if((c = source.indexOf(removeThis,p)) > -1) {
-        b.append(source.substring(p,c));
-        b.append(replaceWith);
-        p=c+1;
-      }
+
+    /**
+     * Helper method for toString()
+     *
+     * @param s source string
+     * @param f string to remove
+     * @param t string to replace f
+     * @return string with f replaced by t
+     */
+    private static String replace(String source,
+            String removeThis,
+            String replaceWith) {
+        StringBuffer b = new StringBuffer();
+        int p = 0, c = 0;
+
+        while (c > -1) {
+            if ((c = source.indexOf(removeThis, p)) > -1) {
+                b.append(source.substring(p, c));
+                b.append(replaceWith);
+                p = c + 1;
+            }
+        }
+
+        // include any remaining text
+        if (p < source.length()) {
+            b.append(source.substring(p));
+        }
+
+        return b.toString();
     }
-    
-    // include any remaining text
-    if(p<source.length())
-      b.append(source.substring(p));
-    
-    return b.toString();
-  }
 } // end class PDFStringHelper

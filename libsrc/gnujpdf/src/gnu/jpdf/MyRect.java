@@ -5,6 +5,7 @@ package gnu.jpdf;
  * @author JPEXS
  */
 public class MyRect {
+
     public int xMin;
     public int yMin;
     public int xMax;

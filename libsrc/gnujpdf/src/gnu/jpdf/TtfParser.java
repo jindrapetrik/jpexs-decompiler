@@ -60,7 +60,6 @@ public class TtfParser {
 
     private byte[] cidtogidmap = new byte[131072];
 
-
     public void loadFromTTF(File file) throws IOException, FontFormatException {
         RandomAccessFile input = new RandomAccessFile(file, "r");
         readTableDirectory(input);
@@ -170,7 +169,6 @@ public class TtfParser {
     public int getDw() {
         return dw;
     }
-
 
     private void readTableDirectory(RandomAccessFile input) throws IOException {
         skip(input, 4);

@@ -51,14 +51,14 @@ public class PDFEmbeddedFont extends PDFFont {
             os.write((" " + i).getBytes());
         }
         os.write(("]\n").getBytes());
-*/
+         */
         //os.write("/Widths [500 583 587 796]".getBytes());
 
         /*os.write("/FontDescriptor ".getBytes());
         os.write(descriptor.getBytes());
         os.write("\n".getBytes());*/
 
-        /*os.write("/ToUnicode ".getBytes());
+ /*os.write("/ToUnicode ".getBytes());
         os.write(toUnicode.getBytes());
         os.write("\n".getBytes());*/
         // finish off with its footer
