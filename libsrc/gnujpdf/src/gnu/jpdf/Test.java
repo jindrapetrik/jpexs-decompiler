@@ -1,6 +1,5 @@
 package gnu.jpdf;
 
-import gnu.jpdf.PDFJob;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;

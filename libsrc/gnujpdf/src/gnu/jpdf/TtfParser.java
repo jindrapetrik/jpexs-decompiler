@@ -1,6 +1,5 @@
 package gnu.jpdf;
 
-import java.awt.Font;
 import java.awt.FontFormatException;
 import java.io.EOFException;
 import java.io.File;

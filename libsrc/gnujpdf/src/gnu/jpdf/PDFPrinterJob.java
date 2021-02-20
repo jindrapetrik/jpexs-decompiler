@@ -10,7 +10,6 @@ import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Locale;
-
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.IntegerSyntax;
 import javax.print.attribute.PrintRequestAttributeSet;

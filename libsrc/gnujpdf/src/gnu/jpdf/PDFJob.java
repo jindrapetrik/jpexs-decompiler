@@ -27,7 +27,6 @@ import java.awt.Rectangle;
 import java.awt.print.PageFormat;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.io.Serializable;
 
 /**
