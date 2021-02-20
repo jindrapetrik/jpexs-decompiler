@@ -91,6 +91,10 @@ public class PDFPage extends PDFObject implements Serializable {
     // JM
     protected Vector<String> imageResources;
 
+    protected Vector<String> patternResources;
+
+    protected Vector<String> shadingResources;
+
     /**
      * The fonts associated with this page
      */
@@ -128,6 +132,8 @@ public class PDFPage extends PDFObject implements Serializable {
         resources = new Vector<String>();
         // JM
         imageResources = new Vector<String>();
+        patternResources = new Vector<>();
+        shadingResources = new Vector<>();
         fonts = new Vector<PDFFont>();
         procset = null;
     }
@@ -436,6 +442,14 @@ public class PDFPage extends PDFObject implements Serializable {
         imageResources.addElement(resource);
     }
 
+    public void addPatternResource(String resource) {
+        patternResources.add(resource);
+    }
+
+    public void addShadingResource(String resource) {
+        shadingResources.add(resource);
+    }
+
     /**
      * This adds an object that describes a thumbnail for this page.
      * <p>
@@ -557,6 +571,25 @@ public class PDFPage extends PDFObject implements Serializable {
             }
             os.write(" >> ".getBytes());
         }
+
+        if (patternResources.size() > 0) {
+            os.write("/Pattern << ".getBytes());
+            for (String str : patternResources) {
+                os.write(str.getBytes());
+                os.write(" ".getBytes());
+            }
+            os.write(" >> ".getBytes());
+        }
+
+        if (shadingResources.size() > 0) {
+            os.write("/Shading << ".getBytes());
+            for (String str : shadingResources) {
+                os.write(str.getBytes());
+                os.write(" ".getBytes());
+            }
+            os.write(" >> ".getBytes());
+        }
+
         os.write(">>\n".getBytes());
 
         // The thumbnail
