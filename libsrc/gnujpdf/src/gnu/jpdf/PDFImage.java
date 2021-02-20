@@ -49,7 +49,6 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
    * It is still licensed under the LGPL.
    * Got some help with base85 methods from Mathew Hreljac
      */
-
     // Dimensions of the object.
     private int objwidth;
     private int objheight;
@@ -250,6 +249,7 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
      * @param os an <code>OutputStream</code> value
      * @exception IOException if an error occurs
      */
+    @Override
     public void writeStream(OutputStream os) throws IOException {
         // This is a non-deflated stream
         /*
@@ -285,6 +285,7 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
      * @param os OutputStream to send the object to
      * @exception IOException on error
      */
+    @Override
     public void write(OutputStream os) throws IOException {
         writeStart(os);
 
@@ -390,6 +391,7 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
      * @param h an <code>int</code> value
      * @return a <code>boolean</code> value
      */
+    @Override
     public boolean imageUpdate(Image img, int infoflags, int x, int y, int w, int h) {
         System.err.println("img=" + img + "\ninfoflags=" + infoflags
                 + "\nx=" + x + " y=" + y + " w=" + w + " h=" + h);

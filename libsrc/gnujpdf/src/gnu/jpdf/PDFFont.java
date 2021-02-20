@@ -120,6 +120,7 @@ public class PDFFont extends PDFObject implements Serializable {
     /**
      * @return the Font's PDF type
      */
+    @Override
     public String getType() {
         return type;
     }
@@ -143,6 +144,7 @@ public class PDFFont extends PDFObject implements Serializable {
      * @param os OutputStream to send the object to
      * @exception IOException on error
      */
+    @Override
     public void write(OutputStream os) throws IOException {
         // Write the object header
         writeStart(os);

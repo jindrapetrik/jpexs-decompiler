@@ -44,10 +44,12 @@ public class StringTooLongException extends Exception {
         this.msg = msg;
     }
 
+    @Override
     public String toString() {
         return msg;
     }
 
+    @Override
     public String getMessage() {
         return msg;
     }
