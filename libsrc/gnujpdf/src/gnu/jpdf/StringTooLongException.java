@@ -20,34 +20,35 @@
  */
 package gnu.jpdf;
 
-
 /**
- * <p>This exception is thrown from {@link gnu.jpdf.BoundingBox} if the 
- * string won't fit into the box</p>
+ * <p>
+ * This exception is thrown from {@link gnu.jpdf.BoundingBox} if the string
+ * won't fit into the box</p>
  *
  * @author Eric Z. Beard, erizbeard@hotmail.com
  * @version $Revision: 1.1 $ $Date: 2007/08/22 01:02:32 $
  */
 public class StringTooLongException extends Exception {
-  private String msg;
 
+    private String msg;
 
-  /**
-   * <p>Normally this exception is constructed with a message containing 
-   * information about the sizes of the parent and child box, and maybe the 
-   * string that caused the overflow.</p>
-   *
-   * @param msg a <code>String</code>, some informative message for the logs
-   */
-  public StringTooLongException(String msg) {
-    this.msg = msg;
-  }
+    /**
+     * <p>
+     * Normally this exception is constructed with a message containing
+     * information about the sizes of the parent and child box, and maybe the
+     * string that caused the overflow.</p>
+     *
+     * @param msg a <code>String</code>, some informative message for the logs
+     */
+    public StringTooLongException(String msg) {
+        this.msg = msg;
+    }
 
-  public String toString() {
-    return msg;
-  }
+    public String toString() {
+        return msg;
+    }
 
-  public String getMessage() {
-    return msg;
-  }
+    public String getMessage() {
+        return msg;
+    }
 } // end class StringTooLongException

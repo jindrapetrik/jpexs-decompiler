@@ -25,250 +25,249 @@ import javax.swing.JFileChooser;
  * This class extends awt's PrinterJob, to provide a simple method of writing
  * PDF documents.
  * </p>
- * 
+ *
  * <p>
  * You can use this with any code that uses Java's printing mechanism. It does
  * include a few extra methods to provide access to some of PDF's features like
  * annotations, or outlines.
  * </p>
- * 
+ *
  * @author Gilbert DeLeeuw, gil1@users.sourceforge.net
  */
 public class PDFPrinterJob extends PrinterJob {
 
-	/**
-	 * The file chooser
-	 */
-	private static JFileChooser fileChooser;
+    /**
+     * The file chooser
+     */
+    private static JFileChooser fileChooser;
 
-	/**
-	 * Printing options;
-	 */
-	private PrintRequestAttributeSet attributes;
+    /**
+     * Printing options;
+     */
+    private PrintRequestAttributeSet attributes;
 
-	/**
-	 * PDF document properties
-	 */
-	private PDFInfo info;
+    /**
+     * PDF document properties
+     */
+    private PDFInfo info;
 
-	/**
-	 * A pageable, or null
-	 */
-	private Pageable pageable = null;
+    /**
+     * A pageable, or null
+     */
+    private Pageable pageable = null;
 
-	/**
-	 * Page format.
-	 */
-	private PageFormat pageFormat;
+    /**
+     * Page format.
+     */
+    private PageFormat pageFormat;
 
-	/**
-	 * The Printable object to print.
-	 */
-	private Printable printable;
+    /**
+     * The Printable object to print.
+     */
+    private Printable printable;
 
-	/**
-	 * The actual print job.
-	 */
-	private PDFJob printJob;
+    /**
+     * The actual print job.
+     */
+    private PDFJob printJob;
 
-	/**
-	 * Initializes a new instance of <code>PDFPrinterJob</code>.
-	 */
-	public PDFPrinterJob() {
-		attributes = new HashPrintRequestAttributeSet();
-		info = new PDFInfo();
-		pageFormat = new PageFormat(); // default page format.
-		setJobName("Java Printing");
-	}
+    /**
+     * Initializes a new instance of <code>PDFPrinterJob</code>.
+     */
+    public PDFPrinterJob() {
+        attributes = new HashPrintRequestAttributeSet();
+        info = new PDFInfo();
+        pageFormat = new PageFormat(); // default page format.
+        setJobName("Java Printing");
+    }
 
-	@Override
-	public void cancel() {
-		// Cancel is not an option
-	}
+    @Override
+    public void cancel() {
+        // Cancel is not an option
+    }
 
-	@Override
-	public PageFormat defaultPage(PageFormat page) {
-		return validatePage(page);
-	}
+    @Override
+    public PageFormat defaultPage(PageFormat page) {
+        return validatePage(page);
+    }
 
-	@Override
-	public int getCopies() {
-		return ((IntegerSyntax) attributes.get(Copies.class)).getValue();
-	}
+    @Override
+    public int getCopies() {
+        return ((IntegerSyntax) attributes.get(Copies.class)).getValue();
+    }
 
-	@Override
-	public String getJobName() {
-		return ((TextSyntax) attributes.get(JobName.class)).getValue();
-	}
+    @Override
+    public String getJobName() {
+        return ((TextSyntax) attributes.get(JobName.class)).getValue();
+    }
 
-	public static PrinterJob getPrinterJob() {
-		return new PDFPrinterJob();
-	}
+    public static PrinterJob getPrinterJob() {
+        return new PDFPrinterJob();
+    }
 
-	@Override
-	public String getUserName() {
-		return ((TextSyntax) attributes.get(RequestingUserName.class))
-				.getValue();
-	}
+    @Override
+    public String getUserName() {
+        return ((TextSyntax) attributes.get(RequestingUserName.class))
+                .getValue();
+    }
 
-	@Override
-	public boolean isCancelled() {
-		return false;
-	}
+    @Override
+    public boolean isCancelled() {
+        return false;
+    }
 
-	@Override
-	public PageFormat pageDialog(PageFormat page) throws HeadlessException {
-		// No page dialog is supported.
-		return (PageFormat) page.clone();
-	}
+    @Override
+    public PageFormat pageDialog(PageFormat page) throws HeadlessException {
+        // No page dialog is supported.
+        return (PageFormat) page.clone();
+    }
 
-	/**
-	 * Prints a set of pages.
-	 * 
-	 * @param pathname
-	 *            the full path for the output PDF file.
-	 * @exception PrinterException
-	 *                an error in the print system caused the job to be aborted.
-	 * @see Book
-	 * @see Pageable
-	 * @see Printable
-	 */
-	public void print(String pathname) throws PrinterException {
-		int pageCount;
-		File file = null;
-		FileOutputStream fileOutputStream = null;
+    /**
+     * Prints a set of pages.
+     *
+     * @param pathname the full path for the output PDF file.
+     * @exception PrinterException an error in the print system caused the job
+     * to be aborted.
+     * @see Book
+     * @see Pageable
+     * @see Printable
+     */
+    public void print(String pathname) throws PrinterException {
+        int pageCount;
+        File file = null;
+        FileOutputStream fileOutputStream = null;
 
-		try {
-			file = new File(pathname);
-			fileOutputStream = new FileOutputStream(file);
-		} catch (Exception e) {
-			System.err.println("Error!! - Invalid output file path: "
-					+ pathname);
-		}
+        try {
+            file = new File(pathname);
+            fileOutputStream = new FileOutputStream(file);
+        } catch (Exception e) {
+            System.err.println("Error!! - Invalid output file path: "
+                    + pathname);
+        }
 
-		PDFGraphics pdfGraphics = null;
-		printJob = new PDFJob(fileOutputStream);
+        PDFGraphics pdfGraphics = null;
+        printJob = new PDFJob(fileOutputStream);
 
-		if (info != null) {
-			printJob.getPDFDocument().setPDFInfo(info);
-		}
+        if (info != null) {
+            printJob.getPDFDocument().setPDFInfo(info);
+        }
 
-		pageCount = pageable.getNumberOfPages();
-		for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
-			pageFormat = pageable.getPageFormat(pageIndex);
+        pageCount = pageable.getNumberOfPages();
+        for (int pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+            pageFormat = pageable.getPageFormat(pageIndex);
 
-			pdfGraphics = (PDFGraphics) printJob.getGraphics(pageFormat);
-			printable = pageable.getPrintable(pageIndex);
-			printable.print(pdfGraphics, pageFormat, pageIndex);
-			pdfGraphics.dispose();
-		}
+            pdfGraphics = (PDFGraphics) printJob.getGraphics(pageFormat);
+            printable = pageable.getPrintable(pageIndex);
+            printable.print(pdfGraphics, pageFormat, pageIndex);
+            pdfGraphics.dispose();
+        }
 
-		printJob.end();
+        printJob.end();
 
-	}
+    }
 
-	@Override
-	public void print() throws PrinterException {
-		File file;
-		File path;
-		String jobName = getJobName();
+    @Override
+    public void print() throws PrinterException {
+        File file;
+        File path;
+        String jobName = getJobName();
 
-		if (fileChooser == null) {
-			fileChooser = new JFileChooser();
-			fileChooser.setMultiSelectionEnabled(false);
-			fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		}
+        if (fileChooser == null) {
+            fileChooser = new JFileChooser();
+            fileChooser.setMultiSelectionEnabled(false);
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        }
 
-		// Make sure job name is not blank
-		if (jobName.equals("")) {
-			jobName = "Java Printing";
-		}
-		// Eliminate invalid characters from job name.
-		jobName = jobName.replaceAll("\\\\", "-");
-		jobName = jobName.replaceAll("/", "-");
+        // Make sure job name is not blank
+        if (jobName.equals("")) {
+            jobName = "Java Printing";
+        }
+        // Eliminate invalid characters from job name.
+        jobName = jobName.replaceAll("\\\\", "-");
+        jobName = jobName.replaceAll("/", "-");
 
-		path = fileChooser.getCurrentDirectory();
-		file = new File(path, jobName + ".pdf");
+        path = fileChooser.getCurrentDirectory();
+        file = new File(path, jobName + ".pdf");
 
-		// Dialog to get file name...
-		fileChooser.setSelectedFile(file);
+        // Dialog to get file name...
+        fileChooser.setSelectedFile(file);
 
-		// Print
-		if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
-			file = fileChooser.getSelectedFile();
-			print(file.getAbsolutePath());
-		}
-	}
+        // Print
+        if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            file = fileChooser.getSelectedFile();
+            print(file.getAbsolutePath());
+        }
+    }
 
-	@Override
-	public boolean printDialog() throws HeadlessException {
-		return true;
-	}
+    @Override
+    public boolean printDialog() throws HeadlessException {
+        return true;
+    }
 
-	/**
-	 * Sets the author for this document.
-	 * 
-	 * @param author the author's name.
-	 */
-	public void setAuthor(String author) {
-		info.setAuthor(author);
-	}
-	
-	@Override
-	public void setCopies(int copies) {
-		// Will be ignored, but add attribute anyway
-		attributes.add(new Copies(copies));
-	}
+    /**
+     * Sets the author for this document.
+     *
+     * @param author the author's name.
+     */
+    public void setAuthor(String author) {
+        info.setAuthor(author);
+    }
 
-	/**
-	 * Sets the creator for this document.
-	 * 
-	 * @param creator the application name.
-	 */
-	public void setCreator(String creator) {
-		info.setCreator(creator);
-	}
+    @Override
+    public void setCopies(int copies) {
+        // Will be ignored, but add attribute anyway
+        attributes.add(new Copies(copies));
+    }
 
-	@Override
-	public void setJobName(String jobName) {
-		attributes.add(new JobName(jobName, Locale.getDefault()));
+    /**
+     * Sets the creator for this document.
+     *
+     * @param creator the application name.
+     */
+    public void setCreator(String creator) {
+        info.setCreator(creator);
+    }
 
-		if (info.getTitle() == null) {
-			info.setTitle(jobName);
-		}
-	}
+    @Override
+    public void setJobName(String jobName) {
+        attributes.add(new JobName(jobName, Locale.getDefault()));
 
-	@Override
-	public void setPageable(Pageable document) throws NullPointerException {
-		if (document == null) {
-			throw new NullPointerException("Pageable cannot be null.");
-		}
-		this.pageable = document;
-	}
+        if (info.getTitle() == null) {
+            info.setTitle(jobName);
+        }
+    }
 
-	@Override
-	public void setPrintable(Printable painter) {
-		this.printable = painter;
-	}
+    @Override
+    public void setPageable(Pageable document) throws NullPointerException {
+        if (document == null) {
+            throw new NullPointerException("Pageable cannot be null.");
+        }
+        this.pageable = document;
+    }
 
-	@Override
-	public void setPrintable(Printable painter, PageFormat format) {
-		this.printable = painter;
-		this.pageFormat = format;
-	}
+    @Override
+    public void setPrintable(Printable painter) {
+        this.printable = painter;
+    }
 
-	/**
-	 * Sets the title for this document.
-	 * 
-	 * @param title the document title.
-	 */
-	public void setTitle(String title) {
-		info.setTitle(title);
-	}
+    @Override
+    public void setPrintable(Printable painter, PageFormat format) {
+        this.printable = painter;
+        this.pageFormat = format;
+    }
 
-	@Override
-	public PageFormat validatePage(PageFormat page) {
-		return (PageFormat) page.clone();
-	}
+    /**
+     * Sets the title for this document.
+     *
+     * @param title the document title.
+     */
+    public void setTitle(String title) {
+        info.setTitle(title);
+    }
+
+    @Override
+    public PageFormat validatePage(PageFormat page) {
+        return (PageFormat) page.clone();
+    }
 
 }
