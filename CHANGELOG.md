@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 - Removing whole AS1/2 script folders (frame, DefineSprite, packages)
 - Removing AS3 scripts and whole packages
 - Japanese translation
-- Exporting PDFs with selectable text
+- #428, #583, #1373 Exporting PDFs with selectable text
 
 ### Fixed
 - #1298 AS1/2 properly decompiled setProperty/getProperty
