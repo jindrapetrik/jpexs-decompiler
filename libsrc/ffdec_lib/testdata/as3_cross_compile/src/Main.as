@@ -25,6 +25,8 @@ package
 		TestTryCatchLoopBreak3;
 		TestTryCatchLoopBreak4;
 		TestTryCatchLoopBreak5;
+		TestTryCatchLoopBreak6;
+		TestTryCatchReturn;
 		TestTryCatchExceptionUsage
 		TestTryFinally;		
 		TestTryFinallyDirectReturnInFinally;
