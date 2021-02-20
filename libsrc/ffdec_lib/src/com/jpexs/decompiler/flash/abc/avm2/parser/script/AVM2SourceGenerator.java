@@ -396,6 +396,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, WhileItem item) throws CompilationException {
+        localData.openedLoops.add(item.loop.id);
         List<GraphSourceItem> ret = new ArrayList<>();
         List<AVM2Instruction> whileExpr = new ArrayList<>();
 
@@ -434,6 +435,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     }
 
     public List<GraphSourceItem> generateForIn(SourceGeneratorLocalData localData, Loop loop, GraphTargetItem collection, AssignableAVM2Item assignable, List<GraphTargetItem> commands, final boolean each) throws CompilationException {
+        localData.openedLoops.add(loop.id);
         List<GraphSourceItem> ret = new ArrayList<>();
         final Reference<Integer> counterReg = new Reference<>(0);
         final Reference<Integer> collectionReg = new Reference<>(0);
@@ -505,6 +507,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DoWhileItem item) throws CompilationException {
+        localData.openedLoops.add(item.loop.id);
         List<GraphSourceItem> ret = new ArrayList<>();
         List<AVM2Instruction> whileExpr = new ArrayList<>();
 
@@ -554,6 +557,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ForItem item) throws CompilationException {
+        localData.openedLoops.add(item.loop.id);
         List<GraphSourceItem> ret = new ArrayList<>();
         List<AVM2Instruction> forExpr = new ArrayList<>();
 
@@ -603,6 +607,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, SwitchItem item) throws CompilationException {
+        localData.openedLoops.add(item.loop.id);
         List<GraphSourceItem> ret = new ArrayList<>();
         Reference<Integer> switchedReg = new Reference<>(0);
         AVM2Instruction forwardJump = ins(AVM2Instructions.Jump, 0);
@@ -695,8 +700,29 @@ public class AVM2SourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, BreakItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, BreakItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
+        if (!localData.finallyCatches.isEmpty()) {
+            for (int i = localData.finallyCatches.size() - 1; i >= 0; i--) {
+                if (localData.finallyOpenedLoops.get(i).contains(item.loopId)) {
+                    if (i < localData.finallyCatches.size() - 1) {
+                        ret.add(ins(AVM2Instructions.Label));
+                    }
+                    int clauseId = localData.finallyCatches.get(i);
+                    Integer cnt = localData.finallyCounter.get(clauseId);
+                    if (cnt == null) {
+                        cnt = -1;
+                    }
+                    cnt++;
+                    localData.finallyCounter.put(clauseId, cnt);
+                    ret.addAll(new IntegerValueAVM2Item(null, null, (long) cnt).toSource(localData, this));
+                    ret.add(ins(new FinallyJumpIns(clauseId), 0));
+                    ret.add(ins(AVM2Instructions.Label));
+                    ret.add(ins(AVM2Instructions.Pop));
+                }
+            }
+            ret.add(ins(AVM2Instructions.Label));
+        }
         AVM2Instruction abreak = ins(new BreakJumpIns(item.loopId), 0);
         ret.add(abreak);
         return ret;
@@ -767,6 +793,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         if (finallyEx > -1) {
             localData.finallyCatches.add(finId);
+            localData.finallyOpenedLoops.add(new ArrayList<>(localData.openedLoops));
         }
         List<AVM2Instruction> tryCmds = generateToInsList(localData, item.tryCommands);
 
@@ -962,6 +989,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         if (finallyEx > -1) {
             localData.finallyCatches.remove(localData.finallyCatches.size() - 1);
+            localData.finallyOpenedLoops.remove(localData.finallyOpenedLoops.size() - 1);
         }
         if (newFinallyReg) {
             localData.finallyRegister = -1;
@@ -1037,8 +1065,31 @@ public class AVM2SourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ContinueItem item) {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, ContinueItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
+
+        if (!localData.finallyCatches.isEmpty()) {
+            for (int i = localData.finallyCatches.size() - 1; i >= 0; i--) {
+                if (localData.finallyOpenedLoops.get(i).contains(item.loopId)) {
+                    if (i < localData.finallyCatches.size() - 1) {
+                        ret.add(ins(AVM2Instructions.Label));
+                    }
+                    int clauseId = localData.finallyCatches.get(i);
+                    Integer cnt = localData.finallyCounter.get(clauseId);
+                    if (cnt == null) {
+                        cnt = -1;
+                    }
+                    cnt++;
+                    localData.finallyCounter.put(clauseId, cnt);
+                    ret.addAll(new IntegerValueAVM2Item(null, null, (long) cnt).toSource(localData, this));
+                    ret.add(ins(new FinallyJumpIns(clauseId), 0));
+                    ret.add(ins(AVM2Instructions.Label));
+                    ret.add(ins(AVM2Instructions.Pop));
+                }
+            }
+            ret.add(ins(AVM2Instructions.Label));
+        }
+
         AVM2Instruction acontinue = ins(new ContinueJumpIns(item.loopId), 0);
         ret.add(acontinue);
         return ret;
