@@ -39,7 +39,6 @@ public class PDFAnnot extends PDFObject implements Serializable {
    * follows: the package name was changed to gnu.pdf.  It is still 
    * licensed under the LGPL.
      */
-
     /**
      * Solid border. The border is drawn as a solid line.
      */
@@ -221,6 +220,7 @@ public class PDFAnnot extends PDFObject implements Serializable {
      * @param os OutputStream to send the object to
      * @exception IOException on error
      */
+    @Override
     public void write(OutputStream os) throws IOException {
         // Write the object header
         writeStart(os);

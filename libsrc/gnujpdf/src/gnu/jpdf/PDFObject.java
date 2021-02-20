@@ -145,6 +145,7 @@ public abstract class PDFObject implements Serializable {
      *
      * @return the serial number in PDF format
      */
+    @Override
     public String toString() {
         return "" + objser + " 0 R";
     }

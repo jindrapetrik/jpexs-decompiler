@@ -195,6 +195,7 @@ public class PDFOutline extends PDFObject implements Serializable {
      * @param os OutputStream to send the object to
      * @exception IOException on error
      */
+    @Override
     public void write(OutputStream os) throws IOException {
         // Write the object header
         writeStart(os);

@@ -60,7 +60,6 @@ public class PDFJob extends PrintJob implements Serializable {
    *   static methods in PDFDocument (which used to be PDF)
    * It is still licensed under the LGPL.
      */
-
     /**
      * This is the OutputStream the PDF file will be written to when complete
      * Note: This is transient, as it's not valid after being Serialized.
@@ -174,6 +173,7 @@ public class PDFJob extends PrintJob implements Serializable {
      * This writes the PDF document to the OutputStream, finishing the
      * document.</p>
      */
+    @Override
     public void end() {
         try {
             pdfDocument.write(os);
@@ -206,6 +206,7 @@ public class PDFJob extends PrintJob implements Serializable {
      *
      * @return a <code>Graphics</code> object to draw to.
      */
+    @Override
     public Graphics getGraphics() {
         return getGraphics(PageFormat.PORTRAIT);
     }
@@ -216,6 +217,7 @@ public class PDFJob extends PrintJob implements Serializable {
      *
      * @return a <code>Dimension</code> instance, the size of the page
      */
+    @Override
     public Dimension getPageDimension() {
         if (page == null) {
             System.err.println("PDFJob.getPageDimension(), page is null");
@@ -236,6 +238,7 @@ public class PDFJob extends PrintJob implements Serializable {
      *
      * @return an <code>int</code>, the resolution in pixels per inch
      */
+    @Override
     public int getPageResolution() {
         return 72;
     }
@@ -248,6 +251,7 @@ public class PDFJob extends PrintJob implements Serializable {
      *
      * @return false
      */
+    @Override
     public boolean lastPageFirst() {
         return false;
     }
@@ -379,6 +383,7 @@ public class PDFJob extends PrintJob implements Serializable {
          *
          * @return Graphics object
          */
+        @Override
         public Graphics create() {
             closeBlock();
             graphic g = new graphic(getPage(), job, getWriter());
@@ -394,6 +399,7 @@ public class PDFJob extends PrintJob implements Serializable {
          *
          * @return PrintJob for this object
          */
+        @Override
         public PrintJob getPrintJob() {
             return (PrintJob) job;
         }

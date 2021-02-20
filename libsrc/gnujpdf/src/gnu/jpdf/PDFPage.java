@@ -50,7 +50,6 @@ public class PDFPage extends PDFObject implements Serializable {
    * The formatting was changed a little bit.
    * It is still licensed under the LGPL.
      */
-
     /**
      * Default page format (Letter size with 1 inch margins and Portrait
      * orientation)
@@ -493,6 +492,7 @@ public class PDFPage extends PDFObject implements Serializable {
      * @param os OutputStream to send the object to
      * @exception IOException on error
      */
+    @Override
     public void write(OutputStream os) throws IOException {
         // Write the object header
         writeStart(os);
@@ -631,6 +631,7 @@ public class PDFPage extends PDFObject implements Serializable {
          * @param os OutputStream to send the object to
          * @exception IOException on error
          */
+        @Override
         public void write(OutputStream os) throws IOException {
             // Write the object header
             //writeStart(os);

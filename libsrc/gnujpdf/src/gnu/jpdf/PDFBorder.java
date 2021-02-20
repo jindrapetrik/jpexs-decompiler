@@ -39,7 +39,6 @@ public class PDFBorder extends PDFObject {
      * follows: the package name was changed to gnu.pdf.  It is still 
      * licensed under the LGPL.
      */
-
     /**
      * The style of the border
      */
@@ -88,6 +87,7 @@ public class PDFBorder extends PDFObject {
      * @param os OutputStream to send the object to
      * @exception IOException on error
      */
+    @Override
     public void write(OutputStream os) throws IOException {
         //writeStart(os);
         os.write(Integer.toString(objser).getBytes());
