@@ -28,6 +28,8 @@ package
 		TestTryCatchLoopBreak6;
 		TestTryCatchReturn;
 		TestTryCatchExceptionUsage
+		TestTryCatchTry;
+		TestTryCatchWith;
 		TestTryFinally;		
 		TestTryFinallyDirectReturnInFinally;
 		TestTryFinallyLoop;
@@ -38,8 +40,7 @@ package
 		TestTryFinallyReturnInFinally;
 		TestTryFinallyReturnNested;
 		TestTryFinallyReturnNested2;
-		TestTryFinallyReturnVoid;
-		TestTryCatchTry;
+		TestTryFinallyReturnVoid;		
 		
 		public function Main() 
 		{

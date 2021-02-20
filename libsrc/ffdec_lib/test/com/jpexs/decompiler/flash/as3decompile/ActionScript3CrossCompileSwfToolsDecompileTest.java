@@ -505,6 +505,32 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
     }
 
     @Test
+    public void testTryCatchWith() {
+        decompileMethod("swftools", "testTryCatchWith", "var _loc1_:* = new MyTest();\r\n"
+                + "trace(\"before with\");\r\n"
+                + "var _loc2_:*;\r\n"
+                + "with(_loc2_ = _loc1_)\r\n"
+                + "{\r\n"
+                + "trace(\"before try\");\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "with(_loc2_)\r\n"
+                + "{\r\n"
+                + "\r\n"
+                + "attrib = attrib + 1;\r\n"
+                + "trace(\"in catch\");\r\n"
+                + "}\r\n"
+                + "trace(\"after try\");\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
+
+    @Test
     public void testTryFinally() {
         decompileMethod("swftools", "testTryFinally", "trace(\"before try\");\r\n"
                 + "try\r\n"

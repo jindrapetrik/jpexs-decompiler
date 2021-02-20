@@ -18,10 +18,8 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
 
     @Test
     public void testDeclareReg() {
-        decompileMethod("assembled", "testDeclareReg", "var _loc3_:*;\r\n"
-                + "with(_loc3_ = other)\r\n"
+        decompileMethod("assembled", "testDeclareReg", "with(other)\r\n"
                 + "{\r\n"
-                + "\r\n"
                 + "trace(\"hey\");\r\n"
                 + "}\r\n",
                 false);
