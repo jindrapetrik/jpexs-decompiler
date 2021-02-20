@@ -431,6 +431,66 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
     }
 
     @Test(dataProvider = "swfNamesProvider")
+    public void testTryCatchLoopBreak6(String swfUsed) {
+        decompileMethod(swfUsed, "testTryCatchLoopBreak6", "var a:int = 0;\r\n"
+                + "a = 0;\r\n"
+                + "trace(\"before loop\");\r\n"
+                + "while(a < 10)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch1\");\r\n"
+                + "if(a > 3)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try2\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch2\");\r\n"
+                + "if(a > 4)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "a++;\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
+
+    @Test(dataProvider = "swfNamesProvider")
+    public void testTryCatchReturn(String swfUsed) {
+        decompileMethod(swfUsed, "testTryCatchReturn", "var a:int = 0;\r\n"
+                + "a = 5;\r\n"
+                + "trace(\"before try\");\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch\");\r\n"
+                + "if(a == 5)\r\n"
+                + "{\r\n"
+                + "return a;\r\n"
+                + "}\r\n"
+                + "trace(\"in catch2\");\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n"
+                + "return -1;\r\n",
+                false);
+    }
+
+    @Test(dataProvider = "swfNamesProvider")
     public void testTryCatchTry(String swfUsed) {
         decompileMethod(swfUsed, "testTryCatchTry", "trace(\"before try\");\r\n"
                 + "try\r\n"

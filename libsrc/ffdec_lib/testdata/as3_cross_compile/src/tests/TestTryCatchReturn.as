@@ -9,7 +9,8 @@ package tests
 		
 		public function run() : int
 		{
-			var a:int = 5;
+			var a:int;
+			a = 5;
 			trace("before try");
 			try
 			{
