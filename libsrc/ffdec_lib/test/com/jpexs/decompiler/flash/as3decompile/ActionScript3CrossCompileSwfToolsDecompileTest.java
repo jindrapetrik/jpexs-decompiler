@@ -422,6 +422,66 @@ public class ActionScript3CrossCompileSwfToolsDecompileTest extends ActionScript
     }
 
     @Test
+    public void testTryCatchLoopBreak6() {
+        decompileMethod("swftools", "testTryCatchLoopBreak6", "var _loc1_:int = 0;\r\n"
+                + "_loc1_ = 0;\r\n"
+                + "trace(\"before loop\");\r\n"
+                + "while(_loc1_ < 10)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch1\");\r\n"
+                + "if(_loc1_ > 3)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try2\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch2\");\r\n"
+                + "if(_loc1_ > 4)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "_loc1_++;\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n",
+                false);
+    }
+
+    @Test
+    public void testTryCatchReturn() {
+        decompileMethod("swftools", "testTryCatchReturn", "var _loc1_:int = 0;\r\n"
+                + "_loc1_ = 5;\r\n"
+                + "trace(\"before try\");\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch\");\r\n"
+                + "if(_loc1_ == 5)\r\n"
+                + "{\r\n"
+                + "return _loc1_;\r\n"
+                + "}\r\n"
+                + "trace(\"in catch2\");\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n"
+                + "return -1;\r\n",
+                false);
+    }
+
+    @Test
     public void testTryCatchTry() {
         decompileMethod("swftools", "testTryCatchTry", "trace(\"before try\");\r\n"
                 + "try\r\n"
