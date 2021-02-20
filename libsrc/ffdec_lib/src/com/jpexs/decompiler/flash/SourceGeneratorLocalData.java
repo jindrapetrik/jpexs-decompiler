@@ -82,6 +82,9 @@ public class SourceGeneratorLocalData implements Serializable {
 
     public List<Long> openedLoops = new ArrayList<>();
 
+    public List<List<Long>> catchesOpenedLoops = new ArrayList<>();
+    public List<Integer> catchesTempRegs = new ArrayList<>();
+
     public String getFullClass() {
         return pkg == null ? currentClass : pkg.addWithSuffix(currentClass).toRawString();
     }

@@ -27,8 +27,10 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.KillIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnVoidIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
@@ -723,6 +725,16 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
             ret.add(ins(AVM2Instructions.Label));
         }
+
+        for (int i = 0; i < localData.catchesOpenedLoops.size(); i++) {
+            List<Long> openedLoops = localData.catchesOpenedLoops.get(i);
+
+            if (openedLoops.contains(item.loopId)) {
+                ret.add(ins(new PopScopeIns()));
+            }
+            ret.add(ins(new KillIns(), localData.catchesTempRegs.get(i)));
+        }
+
         AVM2Instruction abreak = ins(new BreakJumpIns(item.loopId), 0);
         ret.add(abreak);
         return ret;
@@ -830,9 +842,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     }
                 }
             }
+            localData.catchesTempRegs.add(tempReg.getVal());
             localData.scopeStack.add(new LocalRegAVM2Item(null, null, tempReg.getVal(), null));
+            localData.catchesOpenedLoops.add(new ArrayList<>(localData.openedLoops));
             catchCmd.addAll(generateToInsList(localData, item.catchCommands.get(c)));
+            localData.catchesOpenedLoops.remove(localData.catchesOpenedLoops.size() - 1);
             localData.scopeStack.remove(localData.scopeStack.size() - 1);
+            localData.catchesTempRegs.remove(localData.catchesTempRegs.size() - 1);
             catchCmd.add(ins(AVM2Instructions.PopScope));
             catchCmd.addAll(toInsList(AssignableAVM2Item.killTemp(localData, this, Arrays.asList(tempReg))));
             catchCmds.add(catchCmd);
@@ -1088,6 +1104,15 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
             }
             ret.add(ins(AVM2Instructions.Label));
+        }
+
+        for (int i = 0; i < localData.catchesOpenedLoops.size(); i++) {
+            List<Long> openedLoops = localData.catchesOpenedLoops.get(i);
+
+            if (openedLoops.contains(item.loopId)) {
+                ret.add(ins(new PopScopeIns()));
+            }
+            ret.add(ins(new KillIns(), localData.catchesTempRegs.get(i)));
         }
 
         AVM2Instruction acontinue = ins(new ContinueJumpIns(item.loopId), 0);
