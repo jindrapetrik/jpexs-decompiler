@@ -532,6 +532,7 @@ public class ASM3Parser {
                 break;
             case ParsedSymbol.TYPE_KEYWORD_TRUE:
                 value_kind = ValueKind.CONSTANT_True;
+                value_index = ValueKind.CONSTANT_True;
                 temp = lexer.lex();
                 if (temp.type == ParsedSymbol.TYPE_PARENT_OPEN) {
                     expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
@@ -541,6 +542,7 @@ public class ASM3Parser {
                 break;
             case ParsedSymbol.TYPE_KEYWORD_FALSE:
                 value_kind = ValueKind.CONSTANT_False;
+                value_index = ValueKind.CONSTANT_False;
                 temp = lexer.lex();
                 if (temp.type == ParsedSymbol.TYPE_PARENT_OPEN) {
                     expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
@@ -550,6 +552,7 @@ public class ASM3Parser {
                 break;
             case ParsedSymbol.TYPE_KEYWORD_NULL:
                 value_kind = ValueKind.CONSTANT_Null;
+                value_index = ValueKind.CONSTANT_Null;
                 temp = lexer.lex();
                 if (temp.type == ParsedSymbol.TYPE_PARENT_OPEN) {
                     expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
@@ -559,6 +562,7 @@ public class ASM3Parser {
                 break;
             case ParsedSymbol.TYPE_KEYWORD_VOID:
                 value_kind = ValueKind.CONSTANT_Undefined;
+                value_index = ValueKind.CONSTANT_Undefined;
                 temp = lexer.lex();
                 if (temp.type == ParsedSymbol.TYPE_PARENT_OPEN) {
                     expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
