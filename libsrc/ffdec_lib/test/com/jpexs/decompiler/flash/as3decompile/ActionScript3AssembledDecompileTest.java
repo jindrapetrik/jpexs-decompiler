@@ -127,7 +127,7 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
 
     @Test
     public void testIncrement3() {
-        decompileMethod("assembled", "testIncrement3", "--_loc1_.length;\r\n",
+        decompileMethod("assembled", "testIncrement3", "_loc1_.length--;\r\n",
                 false);
     }
 

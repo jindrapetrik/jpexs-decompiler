@@ -132,8 +132,77 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                                 return;
                             }
                         }
+                        if (notCoerced instanceof GetPropertyAVM2Item) {
+                            GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) notCoerced;
+                            if (((FullMultinameAVM2Item) getProp.propertyName).compareSame(multiname)) {
 
+                                if (getProp.object instanceof DuplicateItem) { //assembled/TestIncrement3
+                                    if (getProp.object.value == obj) {
+                                        getProp.object = obj;
+                                    }
+                                }
+
+                                stack.pop();
+                                if (isIncrement) {
+                                    stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                                } else {
+                                    stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                                }
+                                return;
+                            }
+                        }
                     }
+                }
+            }
+        }
+
+        if ((value instanceof IncrementAVM2Item) || (value instanceof DecrementAVM2Item)) {
+            boolean isIncrement = (value instanceof IncrementAVM2Item);
+
+            boolean hasConvert = value.value instanceof ConvertAVM2Item;
+            if (value.value.getNotCoercedNoDup() instanceof GetLexAVM2Item) {
+                GetLexAVM2Item getLex = (GetLexAVM2Item) value.value.getNotCoercedNoDup();
+                if (localData.abc.constants.getMultiname(multinameIndex).equals(getLex.propertyName)) {
+                    if (hasConvert) {
+                        if (isIncrement) {
+                            output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getLex));
+                        } else {
+                            output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getLex));
+                        }
+                    } else {
+                        if (isIncrement) {
+                            output.add(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getLex));
+                        } else {
+                            output.add(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getLex));
+                        }
+                    }
+                    return;
+                }
+            }
+
+            if (value.value.getNotCoercedNoDup() instanceof GetPropertyAVM2Item) {
+                GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) value.value.getNotCoercedNoDup();
+                if (((FullMultinameAVM2Item) getProp.propertyName).compareSame(multiname)) {
+
+                    if (getProp.object instanceof DuplicateItem) {
+                        if (getProp.object.value == obj) {
+                            getProp.object = obj;
+                        }
+                    }
+                    if (hasConvert) {
+                        if (isIncrement) {
+                            output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                        } else {
+                            output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                        }
+                    } else {
+                        if (isIncrement) {
+                            output.add(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                        } else {
+                            output.add(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                        }
+                    }
+                    return;
                 }
             }
         }
@@ -158,29 +227,22 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                                 return;
                             }
                         }
-                    }
-                }
-            }
-        }
-        //assembled/TestIncrement3
-        if ((value instanceof IncrementAVM2Item) || (value instanceof DecrementAVM2Item)) {
-            boolean isIncrement = (value instanceof IncrementAVM2Item);
-            if (value.value.getNotCoerced() instanceof GetPropertyAVM2Item) {
-                GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) value.value.getNotCoerced();
-                if (getProp.object instanceof DuplicateItem) {
-                    if (getProp.object.value == obj) {
-                        getProp.object = obj;
-                        if (isIncrement) {
-                            output.add(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
-                        } else {
-                            output.add(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                        if (incrementedProp instanceof GetPropertyAVM2Item) {
+                            GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) incrementedProp;
+                            if (((FullMultinameAVM2Item) getProp.propertyName).compareSame(multiname)) {
+                                stack.pop();
+                                if (isIncrement) {
+                                    stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                                } else {
+                                    stack.push(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                                }
+                                return;
+                            }
                         }
-                        return;
                     }
                 }
             }
         }
-
         if (value instanceof LocalRegAVM2Item) {
             LocalRegAVM2Item valueLocalReg = (LocalRegAVM2Item) value;
             LocalRegAVM2Item nameLocalReg = null;

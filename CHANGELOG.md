@@ -41,6 +41,7 @@ All notable changes to this project will be documented in this file.
 - Focused byte barely visible in hex view
 - AS3 P-code editation - only first try offset was saved when multiple try with same label
 - AS3 decompilation: try..catch..finally suborder when debugline info not present
+- AS3 decompilation: increment/decrement on properties
 
 ### Changed
 - #1565, #1407, #1350 On BinaryData SWF save, parent SWF is saved
