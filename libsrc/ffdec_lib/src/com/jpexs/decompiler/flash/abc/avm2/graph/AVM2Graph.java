@@ -816,19 +816,25 @@ public class AVM2Graph extends Graph {
             if (!previouslyCatchedExceptionIds.contains(e)) {
                 if (addr == fixedExStart) { //avm2code.getAddrThroughJumpAndDebugLine(fixedExStart)) {
                     ABCException ex = body.exceptions[e];
-
                     if (ex.isFinally()) {
-                        finnalysIndicesToBe.add(e);
+                        if (fixedExEnd >= maxEndAddr) {
+                            finnalysIndicesToBe.add(e);
+                        }
                     } else {
-                        long endAddr = avm2code.getAddrThroughJumpAndDebugLine(fixedExEnd);
+                        long endAddr = fixedExEnd;
                         if (endAddr > maxEndAddr) {
                             catchedExceptionIds.clear();
-                            maxEndAddr = avm2code.getAddrThroughJumpAndDebugLine(fixedExEnd);
-                            /*endIp = avm2code.adr2pos(maxEndAddr);
-                            realEndIp = avm2code.adr2pos(fixedExEnd);*/
+                            maxEndAddr = fixedExEnd;
 
                             catchedExceptionIds.add(e);
 
+                            //filter finallys that have lower endAddr - they do not belong to these catches
+                            for (int k = 0; k < finnalysIndicesToBe.size(); k++) {
+                                if (body.exceptions[finnalysIndicesToBe.get(k)].end < endAddr) {
+                                    finnalysIndicesToBe.remove(k);
+                                    k--;
+                                }
+                            }
                         } else if (endAddr == maxEndAddr) {
                             catchedExceptionIds.add(e);
                         }
@@ -849,11 +855,24 @@ public class AVM2Graph extends Graph {
             outSideExceptionPart = searchFirstPartOutSideTryCatch(localData, body.exceptions[catchedExceptionIds.get(0)], loops, allParts);
         }
 
+        if (!finnalysIndicesToBe.isEmpty()) {
+            long maxEnd = 0;
+            int maxF = -1;
+            for (int f : finnalysIndicesToBe) {
+                long fixedExEnd = avm2code.pos2adr(avm2code.adr2pos(body.exceptions[f].end, true));
+                if (fixedExEnd > maxEnd) {
+                    maxEnd = fixedExEnd;
+                    maxF = f;
+                }
+            }
+            finnalysIndicesToBe.clear();
+            finnalysIndicesToBe.add(maxF);
+        }
+
         for (int e : finnalysIndicesToBe) {
             ABCException finallyExceptionToBe = body.exceptions[e];
             if (catchedExceptionIds.isEmpty() || outSideExceptionPart == null) {
-                //there's no exception, finally only
-                finallyIndex.setVal(e);
+                //there's no exception, finally only                
                 break;
             }
             GraphPart outSideExceptionNonEmptyPart = nearestNonEmptyPart(outSideExceptionPart);
@@ -882,6 +901,11 @@ public class AVM2Graph extends Graph {
                     break;
                 }
             }
+        }
+
+        if (finallyIndex.getVal() == -1 && !finnalysIndicesToBe.isEmpty()) {
+            catchedExceptionIds.clear();
+            finallyIndex.setVal(finnalysIndicesToBe.get(0));
         }
     }
 
