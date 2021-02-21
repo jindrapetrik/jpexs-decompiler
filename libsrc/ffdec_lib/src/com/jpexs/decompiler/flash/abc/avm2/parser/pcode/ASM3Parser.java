@@ -66,17 +66,20 @@ public class ASM3Parser {
 
         public int insOperandIndex;
 
-        public OffsetItem(String label, long insOffset, int insOperandIndex) {
+        public int line;
+
+        public OffsetItem(String label, long insOffset, int insOperandIndex, int line) {
             this.label = label;
             this.insPosition = insOffset;
             this.insOperandIndex = insOperandIndex;
+            this.line = line;
         }
     }
 
     private static class CaseOffsetItem extends OffsetItem {
 
-        public CaseOffsetItem(String label, long insOffset, int insOperandIndex) {
-            super(label, insOffset, insOperandIndex);
+        public CaseOffsetItem(String label, long insOffset, int insOperandIndex, int line) {
+            super(label, insOffset, insOperandIndex, line);
         }
     }
 
@@ -90,6 +93,12 @@ public class ASM3Parser {
             this.label = label;
             this.offset = offset;
         }
+
+        @Override
+        public String toString() {
+            return label + " at address " + offset;
+        }
+
     }
 
     public static AVM2Code parse(ABC abc, Reader reader, Trait trait, MethodBody body, MethodInfo info) throws IOException, AVM2ParseException, InterruptedException {
@@ -617,7 +626,7 @@ public class ASM3Parser {
         AVM2Code code = new AVM2Code();
         boolean autoCloseBlocks = true; //TODO? Put to false. But how about old imports?
         List<OffsetItem> offsetItems = new ArrayList<>();
-        List<LabelItem> labelItems = new ArrayList<>();
+        Map<String, Integer> labelToOffset = new HashMap<>();
         List<ABCException> exceptions = new ArrayList<>();
         List<Integer> exceptionIndices = new ArrayList<>();
         int offset = 0;
@@ -629,6 +638,7 @@ public class ASM3Parser {
         List<String> exceptionsFrom = new ArrayList<>();
         List<String> exceptionsTo = new ArrayList<>();
         List<String> exceptionsTargets = new ArrayList<>();
+        List<Integer> exceptionLines = new ArrayList<>();
         info.flags = 0;
         info.name_index = 0;
         List<Integer> paramTypes = new ArrayList<>();
@@ -787,6 +797,7 @@ public class ASM3Parser {
                 continue;
             }
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_TRY) {
+                exceptionLines.add(lexer.yyline());
                 expected(ParsedSymbol.TYPE_KEYWORD_FROM, "From", lexer);
                 symb = lexer.lex();
                 expected(symb, ParsedSymbol.TYPE_IDENTIFIER, "Identifier");
@@ -1042,7 +1053,7 @@ public class ASM3Parser {
                                     break;
                                 case AVM2Code.DAT_OFFSET:
                                     if (parsedOperand.type == ParsedSymbol.TYPE_IDENTIFIER) {
-                                        offsetItems.add(new OffsetItem((String) parsedOperand.value, code.code.size(), i));
+                                        offsetItems.add(new OffsetItem((String) parsedOperand.value, code.code.size(), i, lexer.yyline()));
                                         operandsList.add(0);
                                     } else {
                                         throw new AVM2ParseException("Offset expected", lexer.yyline());
@@ -1050,7 +1061,7 @@ public class ASM3Parser {
                                     break;
                                 case AVM2Code.DAT_CASE_BASEOFFSET:
                                     if (parsedOperand.type == ParsedSymbol.TYPE_IDENTIFIER) {
-                                        offsetItems.add(new CaseOffsetItem((String) parsedOperand.value, code.code.size(), i));
+                                        offsetItems.add(new CaseOffsetItem((String) parsedOperand.value, code.code.size(), i, lexer.yyline()));
                                         operandsList.add(0);
                                     } else {
                                         throw new AVM2ParseException("Offset expected", lexer.yyline());
@@ -1063,9 +1074,9 @@ public class ASM3Parser {
 
                                         int c = 0;
                                         while (parsedOperand.type == ParsedSymbol.TYPE_IDENTIFIER) {
-                                            offsetItems.add(new CaseOffsetItem((String) parsedOperand.value, code.code.size(), i + (c + 1)));
+                                            offsetItems.add(new CaseOffsetItem((String) parsedOperand.value, code.code.size(), i + (c + 1), lexer.yyline()));
                                             c++;
-                                            parsedOperand = lexer.lex();                                            
+                                            parsedOperand = lexer.lex();
                                             if (parsedOperand.type == ParsedSymbol.TYPE_BRACKET_CLOSE) {
                                                 break;
                                             }
@@ -1094,7 +1105,7 @@ public class ASM3Parser {
                                                 parsedOperand = lexer.lex();
                                             }
                                             if (parsedOperand.type == ParsedSymbol.TYPE_IDENTIFIER) {
-                                                offsetItems.add(new CaseOffsetItem((String) parsedOperand.value, code.code.size(), i + (c + 1)));
+                                                offsetItems.add(new CaseOffsetItem((String) parsedOperand.value, code.code.size(), i + (c + 1), lexer.yyline()));
                                                 operandsList.add(0);
                                             } else {
                                                 throw new AVM2ParseException("Offset expected", lexer.yyline());
@@ -1150,7 +1161,7 @@ public class ASM3Parser {
                     throw new AVM2ParseException("Invalid instruction name:" + (String) symb.value, lexer.yyline());
                 }
             } else if (symb.type == ParsedSymbol.TYPE_LABEL) {
-                labelItems.add(new LabelItem((String) symb.value, offset));
+                labelToOffset.put((String) symb.value, offset);
 
             } else {
                 throw new AVM2ParseException("Unexpected symbol", lexer.yyline());
@@ -1162,40 +1173,40 @@ public class ASM3Parser {
         }
 
         code.compact();
-        for (LabelItem li : labelItems) {
-            int ind;
-            ind = exceptionsFrom.indexOf(li.label);
-            if (ind > -1) {
-                exceptions.get(ind).start = li.offset;
-            }
 
-            ind = exceptionsTo.indexOf(li.label);
-            if (ind > -1) {
-                exceptions.get(ind).end = li.offset;
+        for (int i = 0; i < exceptions.size(); i++) {
+            if (!labelToOffset.containsKey(exceptionsFrom.get(i))) {
+                throw new AVM2ParseException("Label " + exceptionsFrom.get(i) + " for exception from not defined", exceptionLines.get(i));
             }
+            exceptions.get(i).start = labelToOffset.get(exceptionsFrom.get(i));
 
-            ind = exceptionsTargets.indexOf(li.label);
-            if (ind > -1) {
-                exceptions.get(ind).target = li.offset;
+            if (!labelToOffset.containsKey(exceptionsTo.get(i))) {
+                throw new AVM2ParseException("Label " + exceptionsTo.get(i) + " for exception to not defined", exceptionLines.get(i));
             }
+            exceptions.get(i).end = labelToOffset.get(exceptionsTo.get(i));
+
+            if (!labelToOffset.containsKey(exceptionsTargets.get(i))) {
+                throw new AVM2ParseException("Label " + exceptionsTargets.get(i) + "for exception target not defined", exceptionLines.get(i));
+            }
+            exceptions.get(i).target = labelToOffset.get(exceptionsTargets.get(i));
         }
 
         for (OffsetItem oi : offsetItems) {
-            for (LabelItem li : labelItems) {
-                if (Thread.currentThread().isInterrupted()) {
-                    throw new InterruptedException();
-                }
-                if (oi.label.equals(li.label)) {
-                    AVM2Instruction ins = code.code.get((int) oi.insPosition);
-                    int relOffset;
-                    if (oi instanceof CaseOffsetItem) {
-                        relOffset = li.offset - (int) ins.getAddress();
-                    } else {
-                        relOffset = li.offset - ((int) ins.getAddress() + ins.getBytesLength());
-                    }
-                    ins.operands[oi.insOperandIndex] = relOffset;
-                }
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
             }
+            if (!labelToOffset.containsKey(oi.label)) {
+                throw new AVM2ParseException("Label " + oi.label + " not defined", oi.line);
+            }
+            int labelOffset = labelToOffset.get(oi.label);
+            AVM2Instruction ins = code.code.get((int) oi.insPosition);
+            int relOffset;
+            if (oi instanceof CaseOffsetItem) {
+                relOffset = labelOffset - (int) ins.getAddress();
+            } else {
+                relOffset = labelOffset - ((int) ins.getAddress() + ins.getBytesLength());
+            }
+            ins.operands[oi.insOperandIndex] = relOffset;
         }
         body.exceptions = new ABCException[exceptions.size()];
         for (int e = 0; e < exceptions.size(); e++) {
