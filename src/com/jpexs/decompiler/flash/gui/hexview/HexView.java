@@ -110,7 +110,7 @@ public class HexView extends JTable {
             if (idx != -1 && (idx == mouseOverIdx
                     || (idx >= selectionStart && idx <= selectionEnd))) {
                 l.setBorder(BorderFactory.createLineBorder(Color.black, 2));
-            } else if (idx == focusedIdx) {
+            } else if (idx != -1 && idx == focusedIdx) {
                 l.setBorder(BorderFactory.createLineBorder(Color.blue, 2));
             } else {
                 l.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
