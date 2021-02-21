@@ -293,14 +293,18 @@ public class HexView extends JTable {
             byteNum = data.length - 1;
         }
         scrollToByte(byteNum);
-        listener.byteValueChanged((int) byteNum, data[(int) byteNum]);
+        if (listener != null) {
+            listener.byteValueChanged((int) byteNum, data[(int) byteNum]);
+        }
     }
 
     public void selectBytes(long byteNum, int length) {
         selectionStart = (int) byteNum;
         selectionEnd = (int) (byteNum + length - 1);
         scrollToByte(new long[]{byteNum}, new long[]{byteNum + length - 1});
-        listener.byteValueChanged((int) byteNum, getData()[(int) byteNum]);
+        if (listener != null) {
+            listener.byteValueChanged((int) byteNum, getData()[(int) byteNum]);
+        }
         getModel().fireTableDataChanged();
     }
 
