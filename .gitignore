@@ -78,3 +78,6 @@ hs_err_pid*.log
 /libsrc/plugins/build/
 #amf 3 test
 exported1.all.bin
+/libsrc/flamingo/nbproject/private/
+/libsrc/flamingo/build/
+/libsrc/flamingo/dist/
