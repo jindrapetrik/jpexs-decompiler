@@ -294,9 +294,9 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     public void testDotParent() {
         decompileMethod("classic_air", "testDotParent", "var d:* = new TestClass1();\r\n"
                 + "var k:* = null;\r\n"
-                + "k.(++d.attrib, false);\r\n"
+                + "k.(d.attrib++, false);\r\n"
                 + "trace(\"between\");\r\n"
-                + "var g:* = k.(++d.attrib, false);\r\n"
+                + "var g:* = k.(d.attrib++, false);\r\n"
                 + "trace(\"end\");\r\n",
                 false);
     }
@@ -855,7 +855,19 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var index:uint = 0;\r\n"
                 + "chars[index++] = 5;\r\n"
                 + "trace(\"arr[++e]\");\r\n"
-                + "chars[++index] = 5;\r\n",
+                + "chars[++index] = 5;\r\n"
+                + "trace(\"attr++\");\r\n"
+                + "trace(attrx++);\r\n"
+                + "attrx++;\r\n"
+                + "trace(\"attr--\");\r\n"
+                + "trace(attrx--);\r\n"
+                + "attrx--;\r\n"
+                + "trace(\"++attr\");\r\n"
+                + "trace(++attrx);\r\n"
+                + "++attrx;\r\n"
+                + "trace(\"--attr\");\r\n"
+                + "trace(--attrx);\r\n"
+                + "--attrx;\r\n",
                 false);
     }
 

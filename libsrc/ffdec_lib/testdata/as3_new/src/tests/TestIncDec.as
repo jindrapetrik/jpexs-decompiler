@@ -3,6 +3,9 @@ package tests
 	
 	public class TestIncDec
 	{
+		
+		private var attrx:int = 0;
+		
 		public function run():*
 		{
 			var a:* = 5;
@@ -39,6 +42,19 @@ package tests
 			chars[index++] = 5;
 			trace("arr[++e]");
 			chars[++index] = 5;
+			trace("attr++");			
+			trace(attrx++);
+			attrx++;
+			trace("attr--");
+			trace(attrx--);
+			attrx--;
+			trace("++attr");
+			trace(++attrx);
+			++attrx;
+			trace("--attr");
+			trace(--attrx);
+			--attrx;
+			
 		}
 	}
 }

@@ -848,7 +848,19 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "chars[_loc7_] = 5;\r\n"
                 + "trace(\"arr[++e]\");\r\n"
                 + "var _loc8_:* = ++index;\r\n"
-                + "chars[_loc8_] = 5;\r\n",
+                + "chars[_loc8_] = 5;\r\n"
+                + "trace(\"attr++\");\r\n"
+                + "trace(this.attrx++);\r\n"
+                + "++this.attrx;\r\n"
+                + "trace(\"attr--\");\r\n"
+                + "trace(this.attrx--);\r\n"
+                + "--this.attrx;\r\n"
+                + "trace(\"++attr\");\r\n"
+                + "trace(++this.attrx);\r\n"
+                + "++this.attrx;\r\n"
+                + "trace(\"--attr\");\r\n"
+                + "trace(--this.attrx);\r\n"
+                + "--this.attrx;\r\n",
                 false);
     }
 
