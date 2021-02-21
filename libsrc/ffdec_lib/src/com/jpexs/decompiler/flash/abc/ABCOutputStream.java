@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.flash.abc.types.Decimal;
@@ -219,7 +220,7 @@ public class ABCOutputStream extends OutputStream {
         }
         writeU30(mi.name_index);
         write(mi.flags);
-        if ((mi.flags & 8) == 8) {
+        if ((mi.flags & MethodInfo.FLAG_HAS_OPTIONAL) == MethodInfo.FLAG_HAS_OPTIONAL) {
             writeU30(mi.optional.length);
             for (int i = 0; i < mi.optional.length; i++) {
                 writeU30(mi.optional[i].value_index);
@@ -227,7 +228,7 @@ public class ABCOutputStream extends OutputStream {
             }
         }
 
-        if ((mi.flags & 128) == 128) { // if has_paramnames
+        if ((mi.flags & MethodInfo.FLAG_HAS_PARAMNAMES) == MethodInfo.FLAG_HAS_PARAMNAMES) { // if has_paramnames
             for (int i = 0; i < mi.paramNames.length; i++) {
                 writeU30(mi.paramNames[i]);
             }
@@ -261,7 +262,7 @@ public class ABCOutputStream extends OutputStream {
             writeU30(t4.slot_id);
             writeU30(t4.method_info);
         }
-        if ((t.kindFlags & 4) == 4) {
+        if ((t.kindFlags & Trait.ATTR_Metadata) == Trait.ATTR_Metadata) {
             writeU30(t.metadata.length);
             for (int i = 0; i < t.metadata.length; i++) {
                 writeU30(t.metadata[i]);
@@ -280,7 +281,7 @@ public class ABCOutputStream extends OutputStream {
         writeU30(ii.name_index);
         writeU30(ii.super_index);
         write(ii.flags);
-        if ((ii.flags & 8) == 8) {
+        if ((ii.flags & InstanceInfo.CLASS_PROTECTEDNS) == InstanceInfo.CLASS_PROTECTEDNS) {
             writeU30(ii.protectedNS);
         }
         writeU30(ii.interfaces.length);
