@@ -372,8 +372,9 @@ public class JRibbonFrame extends JFrame {
 		this.ribbon = new JRibbon(this);
 		this.add(this.ribbon, BorderLayout.NORTH);
 
-		// this.keyTipManager = new KeyTipManager(this);
-		Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
+            // this.keyTipManager = new KeyTipManager(this);
+                //JPEXS: Disabled keytips as it constantly steals focus in my editors!
+		/*Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
 			private boolean prevAltModif = false;
 
 			@Override
@@ -451,7 +452,7 @@ public class JRibbonFrame extends JFrame {
 					}
 				}
 			}
-		}, AWTEvent.KEY_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK);
+		}, AWTEvent.KEY_EVENT_MASK | AWTEvent.MOUSE_EVENT_MASK);*/
 
 		final KeyTipLayer keyTipLayer = new KeyTipLayer();
 		JRootPane rootPane = this.getRootPane();

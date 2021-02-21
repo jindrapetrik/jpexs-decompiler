@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
 - AS3 with statement decompilation
 - #1610 AS3 unnecessary adding namespaces
 - #1610 AS3 P-code editation - true/false/undefined/null has value_index same as value_kind
+- Ribbon stealing focus when pressing Alt (for example in editors)
 
 ### Changed
 - #1565, #1407, #1350 On BinaryData SWF save, parent SWF is saved
