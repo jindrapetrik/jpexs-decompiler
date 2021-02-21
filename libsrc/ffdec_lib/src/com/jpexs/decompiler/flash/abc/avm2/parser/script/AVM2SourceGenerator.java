@@ -849,8 +849,14 @@ public class AVM2SourceGenerator implements SourceGenerator {
             localData.catchesOpenedLoops.remove(localData.catchesOpenedLoops.size() - 1);
             localData.scopeStack.remove(localData.scopeStack.size() - 1);
             localData.catchesTempRegs.remove(localData.catchesTempRegs.size() - 1);
-            catchCmd.add(ins(AVM2Instructions.PopScope));
-            catchCmd.addAll(toInsList(AssignableAVM2Item.killTemp(localData, this, Arrays.asList(tempReg))));
+            if (!item.catchCommands.get(c).isEmpty()
+                    && ((item.catchCommands.get(c).get(item.catchCommands.get(c).size() - 1) instanceof ContinueItem)
+                    || (item.catchCommands.get(c).get(item.catchCommands.get(c).size() - 1) instanceof BreakItem))) {
+                AssignableAVM2Item.killRegister(localData, this, tempReg.getVal());
+            } else {
+                catchCmd.add(ins(AVM2Instructions.PopScope));
+                catchCmd.addAll(toInsList(AssignableAVM2Item.killTemp(localData, this, Arrays.asList(tempReg))));
+            }
             catchCmds.add(catchCmd);
         }
         for (int c = item.catchCommands.size() - 1; c >= 0; c--) {

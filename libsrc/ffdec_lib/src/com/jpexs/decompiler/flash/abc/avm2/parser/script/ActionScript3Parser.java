@@ -1736,9 +1736,10 @@ public class ActionScript3Parser {
                         e.setSlotNumber(1);
                         e.setSlotScope(Integer.MAX_VALUE); //will be changed later
                         expectedType(SymbolType.PARENT_CLOSE);
-                        List<GraphTargetItem> cc = new ArrayList<>();
                         List<AssignableAVM2Item> catchVars = new ArrayList<>();
-                        cc.add(command(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, catchVars));
+                        expectedType(SymbolType.CURLY_OPEN);
+                        List<GraphTargetItem> cc = commands(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, catchVars);
+                        expectedType(SymbolType.CURLY_CLOSE);
                         catchesVars.add(catchVars);
                         variables.addAll(catchVars);
 
