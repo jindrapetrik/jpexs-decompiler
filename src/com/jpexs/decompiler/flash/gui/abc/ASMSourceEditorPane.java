@@ -35,6 +35,7 @@ import com.jpexs.decompiler.flash.docs.As3PCodeDocs;
 import com.jpexs.decompiler.flash.docs.As3PCodeOtherDocs;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.GraphDialog;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
@@ -56,6 +57,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -321,7 +323,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         } catch (AVM2ParseException ex) {
             gotoLine((int) ex.line);
             markError();
-            View.showMessageDialog(this, (ex.text + " on line " + ex.line));
+            View.showMessageDialog(Main.getMainFrame().getPanel(), (ex.text + " on line " + ex.line), Main.getMainFrame().translate("error"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
         return true;
