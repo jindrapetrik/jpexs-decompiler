@@ -3137,6 +3137,9 @@ public final class SWF implements SWFContainerItem, Timelined {
             DefineSpriteTag sprite = (DefineSpriteTag) timelined;
             sprite.frameCount = timelined.getTimeline().getFrameCount();
         }
+        if (timelined == this) {
+            frameCount = getTimeline().getFrameCount();
+        }
     }
 
     public Timelined getTimelined(TreeItem treeItem) {
