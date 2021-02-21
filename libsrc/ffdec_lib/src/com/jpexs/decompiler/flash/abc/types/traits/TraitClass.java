@@ -217,7 +217,17 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         AbcIndexing index = new AbcIndexing(abc.getSwf());
         //for simplification of String(this)
-        convertData.thisHasDefaultToPrimitive = null == index.findProperty(new AbcIndexing.PropertyDef("toString", new TypeItem(instanceInfo.getName(abc.constants).getNameWithNamespace(abc.constants, true)), abc, abc.constants.getNamespaceId(Namespace.KIND_PACKAGE, DottedChain.TOPLEVEL, abc.constants.getStringId("", true), true)), false, true);
+        int sIndex = abc.constants.getStringId("", false);
+        if (sIndex > -1) {
+            int nsIndex = abc.constants.getNamespaceId(Namespace.KIND_PACKAGE, DottedChain.TOPLEVEL, sIndex, false);
+            if (nsIndex > -1) {
+                convertData.thisHasDefaultToPrimitive = null == index.findProperty(new AbcIndexing.PropertyDef("toString", new TypeItem(instanceInfo.getName(abc.constants).getNameWithNamespace(abc.constants, true)), abc, nsIndex), false, true);
+            } else {
+                convertData.thisHasDefaultToPrimitive = true;
+            }
+        } else {
+            convertData.thisHasDefaultToPrimitive = true;
+        }
 
         //class initializer
         int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);

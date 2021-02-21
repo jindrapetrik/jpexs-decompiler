@@ -33,6 +33,7 @@ All notable changes to this project will be documented in this file.
 - Graphviz Graph not showing AS3 exception end
 - #1609 First frame missing in frame to PDF export
 - AS3 with statement decompilation
+- AS3 unnecessary adding namespaces
 
 ### Changed
 - #1565, #1407, #1350 On BinaryData SWF save, parent SWF is saved
