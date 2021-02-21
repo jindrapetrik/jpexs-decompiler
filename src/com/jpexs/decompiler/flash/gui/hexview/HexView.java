@@ -16,16 +16,24 @@
  */
 package com.jpexs.decompiler.flash.gui.hexview;
 
+import com.jpexs.decompiler.flash.gui.AppDialog;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -103,6 +111,10 @@ public class HexView extends JTable {
             l.setForeground(foreground);
             l.setBackground(background);
 
+            if (hasFocus) {
+                l.setBorder(BorderFactory.createLineBorder(Color.black, 2));
+            }
+
             return l;
         }
     }
@@ -129,6 +141,36 @@ public class HexView extends JTable {
     }
 
     private class HexViewMouseAdapter extends MouseAdapter {
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                doPop(e);
+            }
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                doPop(e);
+            }
+        }
+
+        private void doPop(MouseEvent e) {
+            JPopupMenu hexPopup = new JPopupMenu();
+            JMenuItem gotoAddressMenuItem = new JMenuItem(AppDialog.translateForDialog("dialog.title", GotoAddressDialog.class));
+            gotoAddressMenuItem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    Long value = new GotoAddressDialog().showDialog();
+                    if (value != null) {
+                        selectByte(value);
+                    }
+                }
+            });
+            hexPopup.add(gotoAddressMenuItem);
+            hexPopup.show(e.getComponent(), e.getX(), e.getY());
+        }
 
         @Override
         public void mouseExited(MouseEvent e) {
@@ -204,6 +246,18 @@ public class HexView extends JTable {
         ListSelectionListener selectionListener = new HexViewSelectionListener(this);
         rowSelModel.addListSelectionListener(selectionListener);
         colSelModel.addListSelectionListener(selectionListener);
+
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.isControlDown() && e.getKeyCode() == 'G') {
+                    Long value = new GotoAddressDialog().showDialog();
+                    if (value != null) {
+                        selectByte(value);
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -232,8 +286,12 @@ public class HexView extends JTable {
     }
 
     public void selectByte(long byteNum) {
+        byte[] data = getData();
+        if (data.length < byteNum) {
+            byteNum = data.length - 1;
+        }
         scrollToByte(byteNum);
-        listener.byteValueChanged((int) byteNum, getData()[(int) byteNum]);
+        listener.byteValueChanged((int) byteNum, data[(int) byteNum]);
     }
 
     public void selectBytes(long byteNum, int length) {

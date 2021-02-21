@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - Removing AS3 scripts and whole packages
 - Japanese translation
 - #428, #583, #1373 Exporting PDFs with selectable text
+- Goto address dialog in Hex view (Ctrl+G or via context menu)
 
 ### Fixed
 - #1298 AS1/2 properly decompiled setProperty/getProperty
@@ -36,6 +37,7 @@ All notable changes to this project will be documented in this file.
 - #1610 AS3 unnecessary adding namespaces
 - #1610 AS3 P-code editation - true/false/undefined/null has value_index same as value_kind
 - Ribbon stealing focus when pressing Alt (for example in editors)
+- Focused byte barely visible in hex view
 
 ### Changed
 - #1565, #1407, #1350 On BinaryData SWF save, parent SWF is saved
