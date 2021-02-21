@@ -41,6 +41,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - #1565, #1407, #1350 On BinaryData SWF save, parent SWF is saved
+- Mouseover / focused bytes in hexview displayed with border
+  instead of background color change to improve readability
 
 ## [13.0.3] - 2021-02-12
 ### Added

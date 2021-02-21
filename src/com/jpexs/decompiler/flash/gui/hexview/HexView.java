@@ -65,6 +65,8 @@ public class HexView extends JTable {
 
     private int mouseOverIdx = -1;
 
+    private int focusedIdx = -1;
+
     private int selectionStart = -1;
 
     private int selectionEnd = -1;
@@ -102,17 +104,16 @@ public class HexView extends JTable {
                 background = row % 2 == 0 ? bgColor : bgColorAlternate;
             }
 
-            if (idx != -1 && (idx == mouseOverIdx
-                    || (idx >= selectionStart && idx <= selectionEnd))) {
-                foreground = new Color(255 - foreground.getRed(), 255 - foreground.getGreen(), 255 - foreground.getBlue());
-                background = new Color(255 - background.getRed(), 255 - background.getGreen(), 255 - background.getBlue());
-            }
-
             l.setForeground(foreground);
             l.setBackground(background);
 
-            if (hasFocus) {
+            if (idx != -1 && (idx == mouseOverIdx
+                    || (idx >= selectionStart && idx <= selectionEnd))) {
                 l.setBorder(BorderFactory.createLineBorder(Color.black, 2));
+            } else if (idx == focusedIdx) {
+                l.setBorder(BorderFactory.createLineBorder(Color.blue, 2));
+            } else {
+                l.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
             }
 
             return l;
@@ -134,6 +135,7 @@ public class HexView extends JTable {
             int row = table.getSelectedRow();
 
             int idx = getIdxByColAndRow(row, col);
+            focusedIdx = idx;
             if (listener != null) {
                 listener.byteValueChanged(idx, idx == -1 ? 0 : getModel().getData()[idx]);
             }
@@ -235,7 +237,7 @@ public class HexView extends JTable {
 
         for (int i = 0; i < bytesInRow; i++) {
             column = columnModel.getColumn(i + bytesInRow + 1 + 1);
-            column.setMaxWidth(10);
+            column.setMaxWidth(14);
             column.setCellRenderer(cellRenderer);
         }
 
