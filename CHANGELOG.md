@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - Goto address dialog in Hex view (Ctrl+G or via context menu)
 - AS3 P-code editation checking all referenced labels exist
 - #1595 History of script search results per SWF
+- Ignore case and RegExp options displayed on search results dialog
 
 ### Fixed
 - #1298 AS1/2 properly decompiled setProperty/getProperty
@@ -43,6 +44,8 @@ All notable changes to this project will be documented in this file.
 - AS3 P-code editation - only first try offset was saved when multiple try with same label
 - AS3 decompilation: try..catch..finally suborder when debugline info not present
 - AS3 decompilation: increment/decrement on properties
+- AS1/2 Goto search result not properly selecting line (delay)
+- ActiveX exceptions when FlashPlayer disabled in classic GUI
 
 ### Changed
 - #1565, #1407, #1350 On BinaryData SWF save, parent SWF is saved

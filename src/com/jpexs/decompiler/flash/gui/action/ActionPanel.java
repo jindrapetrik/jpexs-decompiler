@@ -69,6 +69,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -173,6 +174,23 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     public SearchPanel<ActionSearchResult> searchPanel;
 
     private CancellableWorker setSourceWorker;
+
+    private List<Runnable> scriptListeners = new ArrayList<>();
+
+    public void addScriptListener(Runnable listener) {
+        scriptListeners.add(listener);
+    }
+
+    public void removeScriptListener(Runnable listener) {
+        scriptListeners.remove(listener);
+    }
+
+    private void fireScript() {
+        List<Runnable> list = new ArrayList<>(scriptListeners);
+        for (Runnable r : list) {
+            r.run();
+        }
+    }
 
     public void clearSource() {
         View.checkAccess();
@@ -546,6 +564,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
         setHex(getExportMode(), asm.getScriptName(), actions);
         setDecompiledText(asm.getScriptName(), decompiledText.text);
+        fireScript();
     }
 
     public void hilightOffset(long offset) {
@@ -1096,17 +1115,27 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         View.checkAccess();
         searchPanel.setOptions(ignoreCase, regExp);
         searchPanel.setSearchText(searchedText);
+        Runnable onScriptComplete = new Runnable() {
+            @Override
+            public void run() {
+                decompiledEditor.setCaretPosition(0);
+
+                if (item.isPcode()) {
+                    searchPanel.showQuickFindDialog(editor);
+                } else {
+                    searchPanel.showQuickFindDialog(decompiledEditor);
+                }
+                removeScriptListener(this);
+            }
+        };
+
+        addScriptListener(onScriptComplete);
+
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
         TreePath tp = ttm.getTreePath(item.getSrc());
         mainPanel.tagTree.setSelectionPath(tp);
         mainPanel.tagTree.scrollPathToVisible(tp);
-        decompiledEditor.setCaretPosition(0);
 
-        if (item.isPcode()) {
-            searchPanel.showQuickFindDialog(editor);
-        } else {
-            searchPanel.showQuickFindDialog(decompiledEditor);
-        }
     }
 
     @Override
