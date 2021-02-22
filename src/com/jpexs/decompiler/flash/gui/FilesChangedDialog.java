@@ -24,12 +24,14 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.Objects;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -43,6 +45,7 @@ import javax.swing.border.EmptyBorder;
  * @author JPEXS
  */
 public class FilesChangedDialog extends AppDialog {
+
     private final JButton okButton = new JButton(translate("button.ok"));
 
     private final JButton cancelButton = new JButton(translate("button.cancel"));
@@ -51,11 +54,12 @@ public class FilesChangedDialog extends AppDialog {
 
     private DefaultListModel<String> listModel;
 
+    private boolean onTopInited = false;
 
-    public FilesChangedDialog() {
+    public FilesChangedDialog(Window parent) {
+        super(parent);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setTitle(translate("dialog.title"));
-
 
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -84,7 +88,6 @@ public class FilesChangedDialog extends AppDialog {
 
         add(panButtons, BorderLayout.SOUTH);
 
-        setAlwaysOnTop(true);
         View.setWindowIcon(this);
         setResizable(true);
         pack();
@@ -101,6 +104,34 @@ public class FilesChangedDialog extends AppDialog {
 
     @Override
     public void setVisible(boolean b) {
+        if (b && !onTopInited) {
+            Main.getMainFrame().getWindow().addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowDeactivated(WindowEvent e) {
+                    Window wnd = e.getOppositeWindow();
+                    if (wnd != FilesChangedDialog.this) {
+                        FilesChangedDialog.this.setAlwaysOnTop(false);
+                    }
+                }
+
+                @Override
+                public void windowActivated(WindowEvent e) {
+                    if (!FilesChangedDialog.this.isAlwaysOnTop()) {
+                        FilesChangedDialog.this.setAlwaysOnTop(true);
+                    }
+                }
+            });
+
+            addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowDeactivated(WindowEvent e) {
+                    if (e.getOppositeWindow() == null) {
+                        setAlwaysOnTop(false);
+                    }
+                }
+            });
+            onTopInited = true;
+        }
         super.setVisible(b);
     }
 
