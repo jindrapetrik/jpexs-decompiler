@@ -46,10 +46,12 @@ public final class MainFrameClassic extends AppFrame implements MainFrame {
         FlashPlayerPanel flashPanel = null;
         FlashPlayerPanel flashPanel2 = null;
 
-        try {
-            flashPanel = new FlashPlayerPanel(this);
-            flashPanel2 = new FlashPlayerPanel(this);
-        } catch (FlashUnsupportedException fue) {
+        if (Configuration.useAdobeFlashPlayerForPreviews.get()) {
+            try {
+                flashPanel = new FlashPlayerPanel(this);
+                flashPanel2 = new FlashPlayerPanel(this);
+            } catch (FlashUnsupportedException fue) {
+            }
         }
 
         boolean externalFlashPlayerUnavailable = flashPanel == null;

@@ -123,7 +123,7 @@ public class SearchPanel<E> extends JPanel {
         View.checkAccess();
 
         searchPos.setText((foundPos + 1) + "/" + found.size());
-        listener.updateSearchPos(found.get(foundPos));
+        listener.updateSearchPos(searchFor, searchIgnoreCase, searchRegexp, found.get(foundPos));
     }
 
     private void cancelButtonActionPerformed(ActionEvent evt) {

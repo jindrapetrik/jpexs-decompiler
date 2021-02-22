@@ -16,7 +16,10 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.search.ABCSearchResult;
+import com.jpexs.decompiler.flash.search.ActionSearchResult;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -150,6 +153,58 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             }
         });
         return resizePolicies;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void loadRecentSearches(ActionEvent evt) {
+        if (evt.getSource() instanceof JPanel) {
+            JPanel targetPanel = (JPanel) evt.getSource();
+            targetPanel.removeAll();
+            JCommandButtonPanel searchHistoryPanel = new JCommandButtonPanel(CommandButtonDisplayState.MEDIUM);
+            String groupName = translate("menu.recentSearches");
+            searchHistoryPanel.addButtonGroup(groupName);
+
+            SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
+            List<Integer> indices = Main.searchResultsStorage.getIndicesForSwf(swf);
+
+            int j = 0;
+            for (int i = indices.size() - 1; i >= 0; i--) {
+                String searched = Main.searchResultsStorage.getSearchedValueAt(i);
+                RecentSearchesButton historyButton = new RecentSearchesButton(j + "    " + searched, null);
+                historyButton.search = searched;
+                final int fi = i;
+                historyButton.addActionListener((ActionEvent ae) -> {
+                    SearchResultsDialog sr;
+                    if (swf.isAS3()) {
+                        sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), Main.getMainFrame().getPanel().getABCPanel());
+                        sr.setResults(Main.searchResultsStorage.getAbcSearchResultsAt(swf, fi));
+                    } else {
+                        sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), Main.getMainFrame().getPanel().getActionPanel());
+                        sr.setResults(Main.searchResultsStorage.getActionSearchResultsAt(swf, fi));
+                    }
+                    sr.setVisible(true);
+                    if (!Main.getMainFrame().getPanel().searchResultsDialogs.containsKey(swf)) {
+                        Main.getMainFrame().getPanel().searchResultsDialogs.put(swf, new ArrayList<>());
+                    }
+                    Main.getMainFrame().getPanel().searchResultsDialogs.get(swf).add(sr);
+                });
+                j++;
+                historyButton.setHorizontalAlignment(SwingUtilities.LEFT);
+                searchHistoryPanel.addButtonToLastGroup(historyButton);
+            }
+
+            if (indices.isEmpty()) {
+                JCommandButton emptyLabel = new JCommandButton(translate("menu.recentSearches.empty"));
+                emptyLabel.setHorizontalAlignment(SwingUtilities.LEFT);
+                emptyLabel.setEnabled(false);
+                searchHistoryPanel.addButtonToLastGroup(emptyLabel);
+            }
+
+            searchHistoryPanel.setMaxButtonColumns(1);
+            targetPanel.setLayout(new BorderLayout());
+            targetPanel.add(searchHistoryPanel, BorderLayout.CENTER);
+        }
     }
 
     @Override

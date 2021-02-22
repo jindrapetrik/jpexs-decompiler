@@ -48,6 +48,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -433,6 +434,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
         Configuration.recentFiles.set(null);
     }
 
+    protected void clearRecentSearchesActionPerformed(ActionEvent evt) {
+        Main.searchResultsStorage.clear();
+    }
+
     protected void removeNonScripts() {
         mainFrame.getPanel().removeNonScripts(swf);
     }
@@ -769,7 +774,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/debugging/debug/stop", isRunningOrDebugging); //same as previous
 
         setPathVisible("/debugging", isDebugRunning);
-        setMenuEnabled("/debugging/debug", isDebugRunning);
+        setPathVisible("/debugging/debug", isDebugRunning);
         //setMenuEnabled("/debugging/debug/pause", isDebugRunning);
         setMenuEnabled("/debugging/debug/stepOver", isDebugPaused);
         setMenuEnabled("/debugging/debug/stepInto", isDebugPaused);
@@ -908,7 +913,14 @@ public abstract class MainFrameMenu implements MenuBuilder {
         finishMenu("/debugging");
 
         addMenuItem("/tools", translate("menu.tools"), null, null, 0, null, false, null, false);
-        addMenuItem("/tools/search", translate("menu.tools.search"), "search16", this::searchActionPerformed, PRIORITY_TOP, null, true, null, false);
+        addMenuItem("/tools/search", translate("menu.tools.search"), "search16", this::searchActionPerformed, PRIORITY_TOP, this::loadRecentSearches, !supportsMenuAction(), null, false);
+
+        if (!supportsMenuAction()) {
+            addMenuItem("/tools/recentsearch", translate("menu.recentSearches"), null, null, 0, this::loadRecentSearches, false, null, false);
+            finishMenu("/tools/recentsearch");
+        } else {
+            finishMenu("/tools/search");
+        }
 
         addMenuItem("/tools/replace", translate("menu.tools.replace"), "replace32", this::replaceActionPerformed, PRIORITY_TOP, null, true, null, false);
         addToggleMenuItem("/tools/timeline", translate("menu.tools.timeline"), null, "timeline32", this::timelineActionPerformed, PRIORITY_TOP, null);
@@ -967,6 +979,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/settings/advancedSettings", translate("menu.advancedsettings.advancedsettings"), null, null, 0, null, false, null, false);
         addMenuItem("/settings/advancedSettings/advancedSettings", translate("menu.advancedsettings.advancedsettings"), "settings32", this::advancedSettingsActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/settings/advancedSettings/clearRecentFiles", translate("menu.tools.otherTools.clearRecentFiles"), "clearrecent16", this::clearRecentFilesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/settings/advancedSettings/clearRecentSearches", translate("menu.tools.otherTools.clearRecentSearches"), "clearrecent16", this::clearRecentSearchesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         finishMenu("/settings/advancedSettings");
 
         finishMenu("/settings");
@@ -1021,7 +1034,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
          */
 
-        /*int deobfuscationMode = Configuration.deobfuscationMode.get();
+ /*int deobfuscationMode = Configuration.deobfuscationMode.get();
          switch (deobfuscationMode) {
          case 0:
          setGroupSelection("deobfuscation", "/settings/deobfuscation/old");
@@ -1155,6 +1168,35 @@ public abstract class MainFrameMenu implements MenuBuilder {
             setGroupSelection("view", "/file/view/viewResources");
             mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
         }
+    }
+
+    protected void loadRecentSearches(ActionEvent evt) {
+        clearMenu("/tools/" + (supportsMenuAction() ? "search" : "recentsearch"));
+        SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
+
+        List<Integer> indices = Main.searchResultsStorage.getIndicesForSwf(swf);
+        for (int i = 0; i < indices.size(); i++) {
+            String searched = Main.searchResultsStorage.getSearchedValueAt(i);
+            final int fi = i;
+            ActionListener a = (ActionEvent e) -> {
+                SearchResultsDialog sr;
+                if (swf.isAS3()) {
+                    sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), Main.getMainFrame().getPanel().getABCPanel());
+                    sr.setResults(Main.searchResultsStorage.getAbcSearchResultsAt(swf, fi));
+                } else {
+                    sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), Main.getMainFrame().getPanel().getActionPanel());
+                    sr.setResults(Main.searchResultsStorage.getActionSearchResultsAt(swf, fi));
+                }
+                sr.setVisible(true);
+                if (!Main.getMainFrame().getPanel().searchResultsDialogs.containsKey(swf)) {
+                    Main.getMainFrame().getPanel().searchResultsDialogs.put(swf, new ArrayList<>());
+                }
+                Main.getMainFrame().getPanel().searchResultsDialogs.get(swf).add(sr);
+            };
+            addMenuItem("/tools/" + (supportsMenuAction() ? "search" : "recentsearch") + "/" + i, searched, null, a, 0, null, true, null, false);
+        }
+
+        finishMenu("/tools/" + (supportsMenuAction() ? "search" : "recentsearch"));
     }
 
     protected void loadRecent(ActionEvent evt) {

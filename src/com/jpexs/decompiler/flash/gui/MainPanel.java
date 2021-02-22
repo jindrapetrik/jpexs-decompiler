@@ -330,7 +330,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public TreeItem oldItem;
 
-    private Map<SWF, List<SearchResultsDialog>> searchResultsDialogs = new HashMap<>();
+    public Map<SWF, List<SearchResultsDialog>> searchResultsDialogs = new HashMap<>();
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
 
@@ -822,7 +822,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         View.expandTreeNodes(tagTree, expandedNodes);
     }
 
-    private ABCPanel getABCPanel() {
+    public ABCPanel getABCPanel() {
         if (abcPanel == null) {
             abcPanel = new ABCPanel(this);
             displayPanel.add(abcPanel, CARDACTIONSCRIPT3PANEL);
@@ -1804,25 +1804,25 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 boolean found = false;
                                 if (fAbcResult != null) {
                                     found = true;
-                                    getABCPanel().searchPanel.setSearchText(txt);
-                                    SearchResultsDialog<ABCSearchResult> sr = new SearchResultsDialog<>(getMainFrame().getWindow(), txt, getABCPanel());
+                                    SearchResultsDialog<ABCSearchResult> sr = new SearchResultsDialog<>(getMainFrame().getWindow(), txt, ignoreCase, regexp, getABCPanel());
                                     sr.setResults(fAbcResult);
                                     sr.setVisible(true);
                                     if (!searchResultsDialogs.containsKey(swf)) {
                                         searchResultsDialogs.put(swf, new ArrayList<>());
                                     }
                                     searchResultsDialogs.get(swf).add(sr);
+                                    Main.searchResultsStorage.addABCResults(swf, txt, ignoreCase, regexp, fAbcResult);
                                 } else if (fActionResult != null) {
                                     found = true;
-                                    getActionPanel().searchPanel.setSearchText(txt);
 
-                                    SearchResultsDialog<ActionSearchResult> sr = new SearchResultsDialog<>(getMainFrame().getWindow(), txt, getActionPanel());
+                                    SearchResultsDialog<ActionSearchResult> sr = new SearchResultsDialog<>(getMainFrame().getWindow(), txt, ignoreCase, regexp, getActionPanel());
                                     sr.setResults(fActionResult);
                                     sr.setVisible(true);
                                     if (!searchResultsDialogs.containsKey(swf)) {
                                         searchResultsDialogs.put(swf, new ArrayList<>());
                                     }
                                     searchResultsDialogs.get(swf).add(sr);
+                                    Main.searchResultsStorage.addActionResults(swf, txt, ignoreCase, regexp, fActionResult);
                                 }
 
                                 if (!found) {
@@ -1971,7 +1971,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     @Override
-    public void updateSearchPos(TextTag item) {
+    public void updateSearchPos(String searchedText, boolean ignoreCase, boolean regExp, TextTag item) {
         View.checkAccess();
 
         setTagTreeSelectedNode(item);

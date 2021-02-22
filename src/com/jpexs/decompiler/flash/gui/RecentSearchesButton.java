@@ -16,12 +16,18 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import org.pushingpixels.flamingo.api.common.JCommandButton;
+import org.pushingpixels.flamingo.api.common.icon.ResizableIcon;
+
 /**
  *
  * @author JPEXS
- * @param <E> Element to search
  */
-public interface SearchListener<E> {
+public class RecentSearchesButton extends JCommandButton {
 
-    public void updateSearchPos(String searchedText, boolean ignoreCase, boolean regExp, E item);
+    public String search;
+
+    public RecentSearchesButton(String title, ResizableIcon icon) {
+        super(title, icon);
+    }
 }
