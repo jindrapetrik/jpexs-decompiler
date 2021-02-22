@@ -1392,7 +1392,9 @@ public class Main {
             sourceInfos.clear();
         }
 
-        filesChangedDialog.setVisible(false);
+        if (filesChangedDialog != null) {
+            filesChangedDialog.setVisible(false);
+        }
 
         return closeResult;
     }
@@ -1710,7 +1712,6 @@ public class Main {
                 }
             }
 
-            filesChangedDialog = new FilesChangedDialog();
 
             if (watcher != null) {
                 watcherWorker = new SwingWorker() {
@@ -1750,6 +1751,9 @@ public class Main {
                                             View.execInEventDispatchLater(new Runnable() {
                                                 @Override
                                                 public void run() {
+                                                    if (filesChangedDialog == null) {
+                                                        filesChangedDialog = new FilesChangedDialog(Main.mainFrame.getWindow());
+                                                    }
                                                     filesChangedDialog.addItem(infoFile);
                                                     if (!filesChangedDialog.isVisible()) {
                                                         filesChangedDialog.setVisible(true);
