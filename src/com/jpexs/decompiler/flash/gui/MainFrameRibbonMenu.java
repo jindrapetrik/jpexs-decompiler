@@ -170,10 +170,11 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
 
             int j = 0;
             for (int i = indices.size() - 1; i >= 0; i--) {
-                String searched = Main.searchResultsStorage.getSearchedValueAt(i);
+                final int fi = indices.get(i);
+                String searched = Main.searchResultsStorage.getSearchedValueAt(fi);
                 RecentSearchesButton historyButton = new RecentSearchesButton(j + "    " + searched, null);
                 historyButton.search = searched;
-                final int fi = i;
+
                 historyButton.addActionListener((ActionEvent ae) -> {
                     SearchResultsDialog sr;
                     if (swf.isAS3()) {

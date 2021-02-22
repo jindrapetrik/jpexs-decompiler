@@ -1170,14 +1170,15 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected void loadRecentSearches(ActionEvent evt) {
         clearMenu("/tools/" + (supportsMenuAction() ? "search" : "recentsearch"));
         SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
 
         List<Integer> indices = Main.searchResultsStorage.getIndicesForSwf(swf);
         for (int i = 0; i < indices.size(); i++) {
-            String searched = Main.searchResultsStorage.getSearchedValueAt(i);
-            final int fi = i;
+            final int fi = indices.get(i);
+            String searched = Main.searchResultsStorage.getSearchedValueAt(fi);
             ActionListener a = (ActionEvent e) -> {
                 SearchResultsDialog sr;
                 if (swf.isAS3()) {

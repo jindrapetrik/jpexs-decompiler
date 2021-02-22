@@ -22,6 +22,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.Map;
 
@@ -37,22 +39,20 @@ public class ActionSearchResult {
 
     private final String path;
 
-    public ActionSearchResult(SWF swf, InputStream is) throws IOException, ScriptNotFoundException {
+    public ActionSearchResult(SWF swf, ObjectInputStream ois) throws IOException, ScriptNotFoundException {
         Map<String, ASMSource> asms = swf.getASMs(false);
-        DataInputStream dais = new DataInputStream(is);
-        path = dais.readUTF();
+        path = ois.readUTF();
         if (asms.containsKey(path)) {
             src = asms.get(path);
         } else {
             throw new ScriptNotFoundException();
         }
-        pcode = dais.readBoolean();
+        pcode = ois.readBoolean();
     }
 
-    public void save(OutputStream os) throws IOException {
-        DataOutputStream daos = new DataOutputStream(os);
-        daos.writeUTF(path);
-        daos.writeBoolean(pcode);
+    public void save(ObjectOutputStream oos) throws IOException {
+        oos.writeUTF(path);
+        oos.writeBoolean(pcode);
     }
 
     public ActionSearchResult(ASMSource src, boolean pcode, String path) {
