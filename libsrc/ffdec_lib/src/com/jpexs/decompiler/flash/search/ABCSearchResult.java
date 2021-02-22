@@ -55,11 +55,10 @@ public class ABCSearchResult implements Serializable {
     private final int traitId;
 
     @SuppressWarnings("unchecked")
-    public ABCSearchResult(SWF swf, InputStream is) throws IOException, ScriptNotFoundException {
-        ObjectInputStream ois = new ObjectInputStream(is);
+    public ABCSearchResult(SWF swf, ObjectInputStream ois) throws IOException, ScriptNotFoundException {
         int versionMajor = ois.read();
         ois.read(); //minor
-        if (versionMajor != -1) {
+        if (versionMajor != 1) {
             throw new IOException("Unknown search result version");
         }
 
@@ -89,8 +88,7 @@ public class ABCSearchResult implements Serializable {
         }
     }
 
-    public void save(OutputStream os) throws IOException {
-        ObjectOutputStream oos = new ObjectOutputStream(os);
+    public void save(ObjectOutputStream oos) throws IOException {
         oos.write(1); //version major
         oos.write(0); //version minor
         oos.writeObject(scriptPack.getClassPath());

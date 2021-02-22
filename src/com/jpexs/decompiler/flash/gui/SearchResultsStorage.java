@@ -113,11 +113,11 @@ public class SearchResultsStorage {
         byte[] itemData = data.get(index);
 
         try {
-            DataInputStream dais = new DataInputStream(new ByteArrayInputStream(itemData));
-            int cnt = dais.readInt();
+            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(itemData));
+            int cnt = ois.readInt();
             for (int i = 0; i < cnt; i++) {
                 try {
-                    result.add(new ABCSearchResult(swf, dais));
+                    result.add(new ABCSearchResult(swf, ois));
                 } catch (ScriptNotFoundException ex) {
                     //ignore
                 }
@@ -138,11 +138,11 @@ public class SearchResultsStorage {
         byte[] itemData = data.get(index);
 
         try {
-            DataInputStream dais = new DataInputStream(new ByteArrayInputStream(itemData));
-            int cnt = dais.readInt();
+            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(itemData));
+            int cnt = ois.readInt();
             for (int i = 0; i < cnt; i++) {
                 try {
-                    result.add(new ActionSearchResult(swf, dais));
+                    result.add(new ActionSearchResult(swf, ois));
                 } catch (ScriptNotFoundException ex) {
                     //ignore
                 }
@@ -190,13 +190,13 @@ public class SearchResultsStorage {
         isRegExp.add(regExp);
         unpackedData.put(data.size(), new ArrayList<>(results));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream daos = new DataOutputStream(baos);
         try {
-            daos.writeInt(results.size());
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeInt(results.size());
             for (ABCSearchResult res : results) {
-                res.save(daos);
+                res.save(oos);
             }
-            daos.flush();
+            oos.flush();
         } catch (IOException ex) {
             Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -212,13 +212,13 @@ public class SearchResultsStorage {
         isRegExp.add(regExp);
         unpackedData.put(data.size(), new ArrayList<>(results));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream daos = new DataOutputStream(baos);
         try {
-            daos.writeInt(results.size());
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeInt(results.size());
             for (ActionSearchResult res : results) {
-                res.save(daos);
+                res.save(oos);
             }
-            daos.flush();
+            oos.flush();
         } catch (IOException ex) {
             Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -12,17 +12,19 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc;
 
 import com.jpexs.decompiler.graph.DottedChain;
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  *
  * @author JPEXS
  */
-public class ClassPath {
+public class ClassPath implements Serializable {
 
     public final DottedChain packageStr;
 
