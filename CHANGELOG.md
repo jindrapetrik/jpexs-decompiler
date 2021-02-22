@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - #428, #583, #1373 Exporting PDFs with selectable text
 - Goto address dialog in Hex view (Ctrl+G or via context menu)
 - AS3 P-code editation checking all referenced labels exist
+- #1595 History of script search results per SWF
 
 ### Fixed
 - #1298 AS1/2 properly decompiled setProperty/getProperty

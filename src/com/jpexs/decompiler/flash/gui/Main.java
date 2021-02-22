@@ -188,6 +188,8 @@ public class Main {
 
     private static List<File> savedFiles = Collections.synchronizedList(new ArrayList<>());
 
+    public static SearchResultsStorage searchResultsStorage = new SearchResultsStorage();
+
     //This method makes file watcher to shut up during our own file saving
     public static void startSaving(File savedFile) {
         savedFiles.add(savedFile);
@@ -1855,9 +1857,12 @@ public class Main {
                     }
                 });
                 flashDebugger.addConnectionListener(debugHandler);
+
+                searchResultsStorage.load();
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, "eeex", ex);
+                //ignore
             }
+
         });
     }
 
@@ -2265,6 +2270,11 @@ public class Main {
     }
 
     public static void exit() {
+        try {
+            searchResultsStorage.save();
+        } catch (IOException ex) {
+            //ignore
+        }
         Configuration.saveConfig();
         if (mainFrame != null && mainFrame.getPanel() != null) {
             mainFrame.getPanel().unloadFlashPlayer();

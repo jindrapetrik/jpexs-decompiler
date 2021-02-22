@@ -293,6 +293,9 @@ public class MainFrameClassicMenu extends MainFrameMenu {
         if (path.startsWith("/file/recent")) {
             return;
         }
+        if (path.startsWith("/tools/recentsearch")) {
+            return;
+        }
         MenuElement me = menuElements.get(path);
         if (me instanceof JMenu) {
             JMenu jm = (JMenu) me;

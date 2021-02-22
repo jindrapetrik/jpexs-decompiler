@@ -1340,9 +1340,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     @Override
-    public void updateSearchPos(ABCSearchResult item) {
+    public void updateSearchPos(String searchedText, boolean ignoreCase, boolean regExp, ABCSearchResult item) {
         View.checkAccess();
 
+        searchPanel.setOptions(ignoreCase, regExp);
+        searchPanel.setSearchText(searchedText);
         ScriptPack pack = item.getScriptPack();
         setAbc(pack.abc);
 

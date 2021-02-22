@@ -12,10 +12,18 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.search;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Map;
 
 /**
  *
@@ -28,6 +36,24 @@ public class ActionSearchResult {
     private final boolean pcode;
 
     private final String path;
+
+    public ActionSearchResult(SWF swf, InputStream is) throws IOException, ScriptNotFoundException {
+        Map<String, ASMSource> asms = swf.getASMs(false);
+        DataInputStream dais = new DataInputStream(is);
+        path = dais.readUTF();
+        if (asms.containsKey(path)) {
+            src = asms.get(path);
+        } else {
+            throw new ScriptNotFoundException();
+        }
+        pcode = dais.readBoolean();
+    }
+
+    public void save(OutputStream os) throws IOException {
+        DataOutputStream daos = new DataOutputStream(os);
+        daos.writeUTF(path);
+        daos.writeBoolean(pcode);
+    }
 
     public ActionSearchResult(ASMSource src, boolean pcode, String path) {
         this.src = src;

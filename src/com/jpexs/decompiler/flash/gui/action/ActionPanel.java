@@ -1092,9 +1092,10 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     @Override
-    public void updateSearchPos(ActionSearchResult item) {
+    public void updateSearchPos(String searchedText, boolean ignoreCase, boolean regExp, ActionSearchResult item) {
         View.checkAccess();
-
+        searchPanel.setOptions(ignoreCase, regExp);
+        searchPanel.setSearchText(searchedText);
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
         TreePath tp = ttm.getTreePath(item.getSrc());
         mainPanel.tagTree.setSelectionPath(tp);

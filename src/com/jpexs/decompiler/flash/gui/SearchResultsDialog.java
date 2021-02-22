@@ -27,8 +27,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -43,6 +46,7 @@ public class SearchResultsDialog<E> extends AppDialog {
     private final JList<E> resultsList;
 
     private final DefaultListModel<E> model;
+    private final boolean regExp;
 
     private final SearchListener<E> listener;
 
@@ -50,16 +54,29 @@ public class SearchResultsDialog<E> extends AppDialog {
 
     private final JButton closeButton = new JButton(translate("button.close"));
 
-    public SearchResultsDialog(Window owner, String text, SearchListener<E> listener) {
+    private String text;
+    private final boolean ignoreCase;
+
+    public SearchResultsDialog(Window owner, String text, boolean ignoreCase, boolean regExp, SearchListener<E> listener) {
         super(owner);
         setTitle(translate("dialog.title").replace("%text%", text));
+        this.text = text;
         Container cnt = getContentPane();
         model = new DefaultListModel<>();
         resultsList = new JList<>(model);
+        this.regExp = regExp;
         this.listener = listener;
 
         gotoButton.addActionListener(this::gotoButtonActionPerformed);
         closeButton.addActionListener(this::closeButtonActionPerformed);
+
+        JPanel paramsPanel = new JPanel();
+        paramsPanel.setLayout(new BoxLayout(paramsPanel, BoxLayout.Y_AXIS));
+        JLabel ignoreCaseLabel = new JLabel(AppDialog.translateForDialog("checkbox.ignorecase", SearchDialog.class) + ": " + (ignoreCase ? AppStrings.translate("yes") : AppStrings.translate("no")));
+        JLabel regExpLabel = new JLabel(AppDialog.translateForDialog("checkbox.regexp", SearchDialog.class) + ": " + (regExp ? AppStrings.translate("yes") : AppStrings.translate("no")));
+        paramsPanel.add(ignoreCaseLabel);
+        paramsPanel.add(regExpLabel);
+
 
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout());
@@ -88,9 +105,11 @@ public class SearchResultsDialog<E> extends AppDialog {
         sp.setPreferredSize(new Dimension(300, 300));
         cnt.add(sp, BorderLayout.CENTER);
         cnt.add(buttonsPanel, BorderLayout.SOUTH);
+        cnt.add(paramsPanel, BorderLayout.NORTH);
         pack();
         View.centerScreen(this);
         View.setWindowIcon(this);
+        this.ignoreCase = ignoreCase;
     }
 
     public void setResults(List<E> results) {
@@ -102,7 +121,6 @@ public class SearchResultsDialog<E> extends AppDialog {
 
     private void gotoButtonActionPerformed(ActionEvent evt) {
         gotoElement();
-        setVisible(false);
     }
 
     private void closeButtonActionPerformed(ActionEvent evt) {
@@ -111,7 +129,7 @@ public class SearchResultsDialog<E> extends AppDialog {
 
     private void gotoElement() {
         if (resultsList.getSelectedIndex() != -1) {
-            listener.updateSearchPos(resultsList.getSelectedValue());
+            listener.updateSearchPos(text, ignoreCase, regExp, resultsList.getSelectedValue());
         }
     }
 }
