@@ -31,7 +31,7 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public class ActionSearchResult {
+public class ActionSearchResult implements ScriptSearchResult {
 
     private final ASMSource src;
 

@@ -56,6 +56,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.search.ActionScriptSearch;
 import com.jpexs.decompiler.flash.search.ActionSearchResult;
 import com.jpexs.decompiler.flash.search.ScriptSearchListener;
+import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -72,6 +73,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -102,7 +104,7 @@ import jsyntaxpane.actions.ActionUtils;
  *
  * @author JPEXS
  */
-public class ActionPanel extends JPanel implements SearchListener<ActionSearchResult>, TagEditorPanel {
+public class ActionPanel extends JPanel implements SearchListener<ScriptSearchResult>, TagEditorPanel {
 
     private static final Logger logger = Logger.getLogger(ActionPanel.class.getName());
 
@@ -171,7 +173,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
 
     private ASMSource lastASM;
 
-    public SearchPanel<ActionSearchResult> searchPanel;
+    public SearchPanel<ScriptSearchResult> searchPanel;
 
     private CancellableWorker setSourceWorker;
 
@@ -276,7 +278,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         return null;
     }
 
-    public List<ActionSearchResult> search(SWF swf, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, CancellableWorker<Void> worker) {
+    public List<ActionSearchResult> search(SWF swf, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, CancellableWorker<Void> worker, Map<String, ASMSource> scope) {
         if (txt != null && !txt.isEmpty()) {
             searchPanel.setOptions(ignoreCase, regexp);
 
@@ -292,7 +294,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
                 public void onSearch(int pos, int total, String name) {
                     Main.startWork(workText + " \"" + txt + "\" - (" + pos + "/" + total + ") " + name + "... ", worker);
                 }
-            });
+            }, scope);
         }
 
         return null;
@@ -1111,8 +1113,14 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
     }
 
     @Override
-    public void updateSearchPos(String searchedText, boolean ignoreCase, boolean regExp, ActionSearchResult item) {
+    public void updateSearchPos(String searchedText, boolean ignoreCase, boolean regExp, ScriptSearchResult item) {
         View.checkAccess();
+
+        if (!(item instanceof ActionSearchResult)) {
+            return;
+        }
+        ActionSearchResult result = (ActionSearchResult) item;
+
         searchPanel.setOptions(ignoreCase, regExp);
         searchPanel.setSearchText(searchedText);
         Runnable onScriptComplete = new Runnable() {
@@ -1120,7 +1128,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
             public void run() {
                 decompiledEditor.setCaretPosition(0);
 
-                if (item.isPcode()) {
+                if (result.isPcode()) {
                     searchPanel.showQuickFindDialog(editor);
                 } else {
                     searchPanel.showQuickFindDialog(decompiledEditor);
@@ -1132,7 +1140,7 @@ public class ActionPanel extends JPanel implements SearchListener<ActionSearchRe
         addScriptListener(onScriptComplete);
 
         TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-        TreePath tp = ttm.getTreePath(item.getSrc());
+        TreePath tp = ttm.getTreePath(result.getSrc());
         mainPanel.tagTree.setSelectionPath(tp);
         mainPanel.tagTree.scrollPathToVisible(tp);
 

@@ -76,6 +76,7 @@ import com.jpexs.decompiler.flash.importers.FFDecAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.search.ABCSearchResult;
 import com.jpexs.decompiler.flash.search.ActionScriptSearch;
 import com.jpexs.decompiler.flash.search.ScriptSearchListener;
+import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -140,7 +141,7 @@ import jsyntaxpane.TokenType;
  *
  * @author JPEXS
  */
-public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABCSearchResult>, TagEditorPanel {
+public class ABCPanel extends JPanel implements ItemListener, SearchListener<ScriptSearchResult>, TagEditorPanel {
 
     private As3ScriptReplacerInterface scriptReplacer = null;
 
@@ -174,7 +175,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
 
     public final JTabbedPane tabbedPane;
 
-    public final SearchPanel<ABCSearchResult> searchPanel;
+    public final SearchPanel<ScriptSearchResult> searchPanel;
 
     private NewTraitDialog newTraitDialog;
 
@@ -198,7 +199,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
         return mainPanel;
     }
 
-    public List<ABCSearchResult> search(final SWF swf, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, CancellableWorker<Void> worker) {
+    public List<ABCSearchResult> search(final SWF swf, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, CancellableWorker<Void> worker, List<ScriptPack> scope) {
         if (txt != null && !txt.isEmpty()) {
             searchPanel.setOptions(ignoreCase, regexp);
 
@@ -214,7 +215,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 public void onSearch(int pos, int total, String name) {
                     Main.startWork(workText + " \"" + txt + "\" - (" + pos + "/" + total + ") " + name + "... ", worker);
                 }
-            });
+            }, scope);
         }
 
         return null;
@@ -1340,12 +1341,18 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
     }
 
     @Override
-    public void updateSearchPos(String searchedText, boolean ignoreCase, boolean regExp, ABCSearchResult item) {
+    public void updateSearchPos(String searchedText, boolean ignoreCase, boolean regExp, ScriptSearchResult item) {
         View.checkAccess();
+
+        if (!(item instanceof ABCSearchResult)) {
+            return;
+        }
+
+        ABCSearchResult result = (ABCSearchResult) item;
 
         searchPanel.setOptions(ignoreCase, regExp);
         searchPanel.setSearchText(searchedText);
-        ScriptPack pack = item.getScriptPack();
+        ScriptPack pack = result.getScriptPack();
         setAbc(pack.abc);
 
         Runnable setScriptComplete = new Runnable() {
@@ -1354,10 +1361,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<ABC
                 decompiledTextArea.removeScriptListener(this);
                 hilightScript(pack);
 
-                boolean pcode = item.isPcode();
+                boolean pcode = result.isPcode();
                 if (pcode) {
-                    decompiledTextArea.setClassIndex(item.getClassIndex());
-                    decompiledTextArea.gotoTrait(item.getTraitId());
+                    decompiledTextArea.setClassIndex(result.getClassIndex());
+                    decompiledTextArea.gotoTrait(result.getTraitId());
                 } else {
                     decompiledTextArea.setCaretPosition(0);
                 }

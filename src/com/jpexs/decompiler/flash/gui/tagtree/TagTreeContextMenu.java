@@ -56,6 +56,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -151,6 +152,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem addAs3ClassMenuItem;
 
+    private JMenuItem textSearchMenuItem;
+
     public TagTreeContextMenu(final TagTree tagTree, MainPanel mainPanel) {
         this.mainPanel = mainPanel;
         this.tagTree = tagTree;
@@ -239,6 +242,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         addAs3ClassMenuItem.addActionListener(this::addAs3ClassActionPerformed);
         add(addAs3ClassMenuItem);
 
+        textSearchMenuItem = new JMenuItem(mainPanel.translate("menu.tools.search"));
+        textSearchMenuItem.addActionListener(this::textSearchActionPerformed);
+        add(textSearchMenuItem);
+
         tagTree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -319,6 +326,46 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
         }
 
+        boolean hasScripts = false;
+        boolean hasTexts = false;
+        for (TreeItem item : items) {
+            if (item instanceof SWF) {
+                hasScripts = true;
+                hasTexts = true;
+                break;
+            }
+            if (item instanceof ASMSource) {
+                hasScripts = true;
+            }
+            if (item instanceof TagScript) {
+                hasScripts = true;
+            }
+            if (item instanceof FrameScript) {
+                hasScripts = true;
+            }
+            if (item instanceof AS2Package) {
+                hasScripts = true;
+            }
+            if (item instanceof ScriptPack) {
+                hasScripts = true;
+            }
+            if (item instanceof AS3Package) {
+                hasScripts = true;
+            }
+            if (item instanceof TextTag) {
+                hasTexts = true;
+            }
+            if (item instanceof FolderItem) {
+                FolderItem f = (FolderItem) item;
+                if (f.getName().equals(TagTreeModel.FOLDER_SCRIPTS)) {
+                    hasScripts = true;
+                }
+                if (f.getName().equals(TagTreeModel.FOLDER_TEXTS)) {
+                    hasTexts = true;
+                }
+            }
+        }
+
         boolean allSelectedIsTag = true;
         for (TreeItem item : items) {
             if (!(item instanceof Tag)) {
@@ -392,6 +439,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         openSWFInsideTagMenuItem.setVisible(false);
         addAs12ScriptMenuItem.setVisible(false);
         addAs3ClassMenuItem.setVisible(false);
+        textSearchMenuItem.setVisible(hasScripts || hasTexts);
 
         if (allSelectedIsTag) {
             boolean canUndo = false;
@@ -780,6 +828,10 @@ public class TagTreeContextMenu extends JPopupMenu {
             return;
         }
         View.expandTreeNodes(tagTree, path, true);
+    }
+
+    private void textSearchActionPerformed(ActionEvent evt) {
+        Main.getMainFrame().getPanel().searchInActionScriptOrText(null, Main.getMainFrame().getPanel().getCurrentSwf());
     }
 
     private void addAs3ClassActionPerformed(ActionEvent evt) {

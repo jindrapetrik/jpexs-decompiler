@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - #1595 History of script search results per SWF
 - Ignore case and RegExp options displayed on search results dialog
 - #1611 Warning about initializers has do not show again checkbox
+- Scoped script text search and search across multiple SWFs
 
 ### Fixed
 - #1298 AS1/2 properly decompiled setProperty/getProperty

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.search.ABCSearchResult;
 import com.jpexs.decompiler.flash.search.ActionSearchResult;
+import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -176,12 +177,16 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                 historyButton.search = searched;
 
                 historyButton.addActionListener((ActionEvent ae) -> {
+
+                    List<SearchListener<ScriptSearchResult>> listeners = new ArrayList<>();
+                    listeners.add(Main.getMainFrame().getPanel().getABCPanel());
+                    listeners.add(Main.getMainFrame().getPanel().getActionPanel());
                     SearchResultsDialog sr;
                     if (swf.isAS3()) {
-                        sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), Main.getMainFrame().getPanel().getABCPanel());
+                        sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
                         sr.setResults(Main.searchResultsStorage.getAbcSearchResultsAt(swf, fi));
                     } else {
-                        sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), Main.getMainFrame().getPanel().getActionPanel());
+                        sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
                         sr.setResults(Main.searchResultsStorage.getActionSearchResultsAt(swf, fi));
                     }
                     sr.setVisible(true);

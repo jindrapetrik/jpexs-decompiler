@@ -38,7 +38,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class ABCSearchResult implements Serializable {
+public class ABCSearchResult implements Serializable, ScriptSearchResult {
 
     public static String STR_INSTANCE_INITIALIZER = AppResources.translate("trait.instanceinitializer");
 

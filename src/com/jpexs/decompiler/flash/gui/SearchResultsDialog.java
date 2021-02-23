@@ -48,7 +48,7 @@ public class SearchResultsDialog<E> extends AppDialog {
     private final DefaultListModel<E> model;
     private final boolean regExp;
 
-    private final SearchListener<E> listener;
+    private final List<SearchListener<E>> listeners;
 
     private final JButton gotoButton = new JButton(translate("button.goto"));
 
@@ -57,7 +57,7 @@ public class SearchResultsDialog<E> extends AppDialog {
     private String text;
     private final boolean ignoreCase;
 
-    public SearchResultsDialog(Window owner, String text, boolean ignoreCase, boolean regExp, SearchListener<E> listener) {
+    public SearchResultsDialog(Window owner, String text, boolean ignoreCase, boolean regExp, List<SearchListener<E>> listeners) {
         super(owner);
         setTitle(translate("dialog.title").replace("%text%", text));
         this.text = text;
@@ -65,7 +65,7 @@ public class SearchResultsDialog<E> extends AppDialog {
         model = new DefaultListModel<>();
         resultsList = new JList<>(model);
         this.regExp = regExp;
-        this.listener = listener;
+        this.listeners = listeners;
 
         gotoButton.addActionListener(this::gotoButtonActionPerformed);
         closeButton.addActionListener(this::closeButtonActionPerformed);
@@ -129,7 +129,9 @@ public class SearchResultsDialog<E> extends AppDialog {
 
     private void gotoElement() {
         if (resultsList.getSelectedIndex() != -1) {
-            listener.updateSearchPos(text, ignoreCase, regExp, resultsList.getSelectedValue());
+            for (SearchListener<E> listener : listeners) {
+                listener.updateSearchPos(text, ignoreCase, regExp, resultsList.getSelectedValue());
+            }
         }
     }
 }
