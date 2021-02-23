@@ -108,6 +108,7 @@ import com.jpexs.decompiler.flash.importers.TextImporter;
 import com.jpexs.decompiler.flash.importers.svg.SvgImporter;
 import com.jpexs.decompiler.flash.search.ABCSearchResult;
 import com.jpexs.decompiler.flash.search.ActionSearchResult;
+import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
@@ -192,6 +193,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1759,10 +1762,86 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
+    private void populateSwfs(SWF swfParent, List<SWF> output) {
+        for (Tag t : swfParent.getTags()) {
+            if (t instanceof DefineBinaryDataTag) {
+                DefineBinaryDataTag b = (DefineBinaryDataTag) t;
+                if (b.innerSwf != null) {
+                    output.add(b.innerSwf);
+                    populateSwfs(b.innerSwf, output);
+                }
+            }
+        }
+    }
+
     public void searchInActionScriptOrText(Boolean searchInText, SWF swf) {
         View.checkAccess();
 
-        SearchDialog searchDialog = new SearchDialog(getMainFrame().getWindow(), false);
+        List<TreeItem> allItems = tagTree.getAllSelected();
+
+        Map<SWF, List<ScriptPack>> scopeAs3 = new LinkedHashMap<>();
+        Map<SWF, Map<String, ASMSource>> swfToAllASMSourceMap = new HashMap<>();
+        Map<SWF, Map<String, ASMSource>> scopeAs12 = new LinkedHashMap<>();
+
+        Set<SWF> swfsUsed = new LinkedHashSet<>();
+
+        for (TreeItem t : allItems) {
+            if (t instanceof ScriptPack) {
+                ScriptPack sp = (ScriptPack) t;
+                SWF s = sp.getSwf();
+                if (!scopeAs3.containsKey(s)) {
+                    scopeAs3.put(s, new ArrayList<>());
+                }
+                scopeAs3.get(s).add(sp);
+                swfsUsed.add(s);
+            }
+            ASMSource as = null;
+            if (t instanceof ASMSource) {
+                as = (ASMSource) t;
+            } else if (t instanceof TagScript) {
+                TagScript ts = (TagScript) t;
+                if (ts.getTag() instanceof ASMSource) {
+                    as = (ASMSource) ts.getTag();
+                }
+            }
+            if (as != null) {
+                SWF s = as.getSourceTag().getSwf();
+                String asId = null;
+                Map<String, ASMSource> allSources;
+                if (swfToAllASMSourceMap.containsKey(s)) {
+                    allSources = swfToAllASMSourceMap.get(s);
+                } else {
+                    allSources = s.getASMs(false);
+                }
+                for (String path : allSources.keySet()) {
+                    if (allSources.get(path) == as) {
+                        asId = path;
+                        break;
+                    }
+                }
+                if (!scopeAs12.containsKey(s)) {
+                    scopeAs12.put(s, new LinkedHashMap<>());
+                }
+                scopeAs12.get(s).put(asId, as);
+                swfsUsed.add(s);
+            }
+        }
+
+        List<TreeItem> items = tagTree.getSelected();
+        String selected;
+
+        if (scopeAs12.isEmpty() && scopeAs3.isEmpty()) {
+            selected = null;
+        } else if (items.size() == 1) {
+            selected = items.get(0).toString();
+        } else if (items.isEmpty()) {
+            selected = null;
+        } else {
+            selected = AppDialog.translateForDialog("scope.selection.nodes", SearchDialog.class).replace("%count%", "" + items.size());
+        }
+
+
+        SearchDialog searchDialog = new SearchDialog(getMainFrame().getWindow(), false, selected);
         if (searchInText != null) {
             if (searchInText) {
                 searchDialog.searchInTextsRadioButton.setSelected(true);
@@ -1774,10 +1853,42 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (searchDialog.showDialog() == AppDialog.OK_OPTION) {
             final String txt = searchDialog.searchField.getText();
             if (!txt.isEmpty()) {
-                if (swf.isAS3()) {
+                if (!scopeAs3.isEmpty()) {
                     getABCPanel();
-                } else {
+                }
+                if (!scopeAs12.isEmpty()) {
                     getActionPanel();
+                }
+
+                if (searchDialog.getCurrentScope() == SearchDialog.SCOPE_CURRENT_FILE) {
+                    scopeAs3.clear();
+                    scopeAs12.clear();
+                    if (swf.isAS3()) {
+                        scopeAs3.put(swf, swf.getAS3Packs());
+                    } else {
+                        scopeAs12.put(swf, swf.getASMs(false));
+                    }
+                    swfsUsed.clear();
+                    swfsUsed.add(swf);
+                }
+                if (searchDialog.getCurrentScope() == SearchDialog.SCOPE_ALL_FILES) {
+                    List<SWF> allSwfs = new ArrayList<>();
+                    for (SWFList slist : getSwfs()) {
+                        for (SWF s : slist.swfs) {
+                            allSwfs.add(s);
+                            populateSwfs(s, allSwfs);
+                        }
+                    }
+
+                    for (SWF s : allSwfs) {
+                        if (s.isAS3()) {
+                            scopeAs3.put(s, s.getAS3Packs());
+                        } else {
+                            scopeAs12.put(s, s.getASMs(false));
+                        }
+                    }
+                    swfsUsed.clear();
+                    swfsUsed.addAll(allSwfs);
                 }
 
                 boolean ignoreCase = searchDialog.ignoreCaseCheckBox.isSelected();
@@ -1790,41 +1901,37 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     new CancellableWorker<Void>() {
                         @Override
                         protected Void doInBackground() throws Exception {
-                            List<ABCSearchResult> abcResult = null;
-                            List<ActionSearchResult> actionResult = null;
-                            if (swf.isAS3()) {
-                                abcResult = getABCPanel().search(swf, txt, ignoreCase, regexp, pCodeSearch, this);
-                            } else {
-                                actionResult = getActionPanel().search(swf, txt, ignoreCase, regexp, pCodeSearch, this);
+
+                            List<ScriptSearchResult> fResult = new ArrayList<>();
+                            for (SWF s : swfsUsed) {
+                                if (scopeAs3.containsKey(s)) {
+                                    List<ABCSearchResult> abcResult = getABCPanel().search(s, txt, ignoreCase, regexp, pCodeSearch, this, scopeAs3.get(s));
+                                    fResult.addAll(abcResult);
+                                    Main.searchResultsStorage.addABCResults(s, txt, ignoreCase, regexp, abcResult);
+                                }
+                                if (scopeAs12.containsKey(s)) {
+                                    List<ActionSearchResult> actionResult = getActionPanel().search(s, txt, ignoreCase, regexp, pCodeSearch, this, scopeAs12.get(s));
+                                    fResult.addAll(actionResult);
+                                    Main.searchResultsStorage.addActionResults(s, txt, ignoreCase, regexp, actionResult);
+                                }
                             }
 
-                            List<ABCSearchResult> fAbcResult = abcResult;
-                            List<ActionSearchResult> fActionResult = actionResult;
                             View.execInEventDispatch(() -> {
                                 boolean found = false;
-                                if (fAbcResult != null) {
-                                    found = true;
-                                    SearchResultsDialog<ABCSearchResult> sr = new SearchResultsDialog<>(getMainFrame().getWindow(), txt, ignoreCase, regexp, getABCPanel());
-                                    sr.setResults(fAbcResult);
-                                    sr.setVisible(true);
-                                    if (!searchResultsDialogs.containsKey(swf)) {
-                                        searchResultsDialogs.put(swf, new ArrayList<>());
+                                found = true;
+                                List<SearchListener<ScriptSearchResult>> listeners = new ArrayList<>();
+                                listeners.add(getABCPanel());
+                                listeners.add(getActionPanel());
+                                SearchResultsDialog<ScriptSearchResult> sr = new SearchResultsDialog<>(getMainFrame().getWindow(), txt, ignoreCase, regexp, listeners);
+                                sr.setResults(fResult);
+                                sr.setVisible(true);
+                                if (swfsUsed.size() == 1) {
+                                    SWF usedSwf = swfsUsed.iterator().next();
+                                    if (!searchResultsDialogs.containsKey(usedSwf)) {
+                                        searchResultsDialogs.put(usedSwf, new ArrayList<>());
                                     }
-                                    searchResultsDialogs.get(swf).add(sr);
-                                    Main.searchResultsStorage.addABCResults(swf, txt, ignoreCase, regexp, fAbcResult);
-                                } else if (fActionResult != null) {
-                                    found = true;
-
-                                    SearchResultsDialog<ActionSearchResult> sr = new SearchResultsDialog<>(getMainFrame().getWindow(), txt, ignoreCase, regexp, getActionPanel());
-                                    sr.setResults(fActionResult);
-                                    sr.setVisible(true);
-                                    if (!searchResultsDialogs.containsKey(swf)) {
-                                        searchResultsDialogs.put(swf, new ArrayList<>());
-                                    }
-                                    searchResultsDialogs.get(swf).add(sr);
-                                    Main.searchResultsStorage.addActionResults(swf, txt, ignoreCase, regexp, fActionResult);
+                                    searchResultsDialogs.get(usedSwf).add(sr);
                                 }
-
                                 if (!found) {
                                     View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                                 }
@@ -1881,7 +1988,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void replaceText() {
-        SearchDialog replaceDialog = new SearchDialog(getMainFrame().getWindow(), true);
+
+        List<TreeItem> items = tagTree.getSelected();
+        String selected;
+        if (items.size() == 1) {
+            selected = items.get(0).toString();
+        } else if (items.isEmpty()) {
+            selected = null;
+        } else {
+            selected = AppDialog.translateForDialog("scope.selection.nodes", SearchDialog.class).replace("%count%", "" + items.size());
+        }
+
+        SearchDialog replaceDialog = new SearchDialog(getMainFrame().getWindow(), true, selected);
         if (replaceDialog.showDialog() == AppDialog.OK_OPTION) {
             final String txt = replaceDialog.searchField.getText();
             if (!txt.isEmpty()) {

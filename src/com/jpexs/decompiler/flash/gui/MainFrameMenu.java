@@ -26,6 +26,8 @@ import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
+import com.jpexs.decompiler.flash.search.ScriptSearchListener;
+import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
@@ -1181,11 +1183,15 @@ public abstract class MainFrameMenu implements MenuBuilder {
             String searched = Main.searchResultsStorage.getSearchedValueAt(fi);
             ActionListener a = (ActionEvent e) -> {
                 SearchResultsDialog sr;
+                List<SearchListener<ScriptSearchResult>> listeners = new ArrayList<>();
+                listeners.add(Main.getMainFrame().getPanel().getABCPanel());
+                listeners.add(Main.getMainFrame().getPanel().getActionPanel());
+
                 if (swf.isAS3()) {
-                    sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), Main.getMainFrame().getPanel().getABCPanel());
+                    sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
                     sr.setResults(Main.searchResultsStorage.getAbcSearchResultsAt(swf, fi));
                 } else {
-                    sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), Main.getMainFrame().getPanel().getActionPanel());
+                    sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
                     sr.setResults(Main.searchResultsStorage.getActionSearchResultsAt(swf, fi));
                 }
                 sr.setVisible(true);
