@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.search.SearchResult;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -30,9 +31,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -62,6 +66,8 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
 
     private String text;
     private final boolean ignoreCase;
+
+    private boolean showSwfTitles = false;
 
     public SearchResultsDialog(Window owner, String text, boolean ignoreCase, boolean regExp, List<SearchListener<E>> listeners) {
         super(owner);
@@ -107,6 +113,21 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
             }
         });
 
+        resultsList.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                Component ret = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (ret instanceof JLabel) {
+                    JLabel lab = (JLabel) ret;
+                    if (showSwfTitles) {
+                        lab.setText(((SearchResult) value).getSWF().toString() + ": " + lab.getText());
+                    }
+                }
+                return ret;
+            }
+
+        });
+
         cnt.setLayout(new BorderLayout());
         JScrollPane sp = new JScrollPane(resultsList);
         sp.setPreferredSize(new Dimension(300, 300));
@@ -131,9 +152,12 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
 
     public void setResults(List<E> results) {
         model.clear();
+        Set<SWF> allSWFs = new HashSet<>();
         for (E e : results) {
             model.addElement(e);
+            allSWFs.add(e.getSWF());
         }
+        showSwfTitles = allSWFs.size() > 1;
     }
 
     public void removeSwf(SWF swf) {
