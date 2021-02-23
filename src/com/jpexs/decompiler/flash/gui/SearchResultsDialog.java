@@ -16,7 +16,9 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.search.SearchResult;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -27,6 +29,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -44,7 +47,7 @@ import javax.swing.SwingConstants;
  * @author JPEXS
  * @param <E> Element to search
  */
-public class SearchResultsDialog<E> extends AppDialog {
+public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
 
     private final JList<E> resultsList;
 
@@ -131,6 +134,20 @@ public class SearchResultsDialog<E> extends AppDialog {
         for (E e : results) {
             model.addElement(e);
         }
+    }
+
+    public void removeSwf(SWF swf) {
+        List<E> newItems = new ArrayList<>();
+        for (int i = 0; i < model.getSize(); i++) {
+            if (model.getElementAt(i).getSWF() != swf) {
+                newItems.add(model.getElementAt(i));
+            }
+        }
+        setResults(newItems);
+    }
+
+    public boolean isEmpty() {
+        return model.isEmpty();
     }
 
     private void gotoButtonActionPerformed(ActionEvent evt) {

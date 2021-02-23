@@ -176,4 +176,9 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
 
         return result;
     }
+
+    @Override
+    public SWF getSWF() {
+        return scriptPack.getSwf();
+    }
 }
