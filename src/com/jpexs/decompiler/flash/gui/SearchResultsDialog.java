@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -27,6 +28,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -35,6 +37,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 
 /**
  *
@@ -71,12 +74,13 @@ public class SearchResultsDialog<E> extends AppDialog {
         closeButton.addActionListener(this::closeButtonActionPerformed);
 
         JPanel paramsPanel = new JPanel();
-        paramsPanel.setLayout(new BoxLayout(paramsPanel, BoxLayout.Y_AXIS));
+        paramsPanel.setLayout(new FlowLayout());
+        JLabel searchTextLabel = new JLabel(AppDialog.translateForDialog("label.searchtext", SearchDialog.class) + text);
         JLabel ignoreCaseLabel = new JLabel(AppDialog.translateForDialog("checkbox.ignorecase", SearchDialog.class) + ": " + (ignoreCase ? AppStrings.translate("yes") : AppStrings.translate("no")));
         JLabel regExpLabel = new JLabel(AppDialog.translateForDialog("checkbox.regexp", SearchDialog.class) + ": " + (regExp ? AppStrings.translate("yes") : AppStrings.translate("no")));
         paramsPanel.add(ignoreCaseLabel);
+        paramsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         paramsPanel.add(regExpLabel);
-
 
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.setLayout(new FlowLayout());
@@ -104,8 +108,18 @@ public class SearchResultsDialog<E> extends AppDialog {
         JScrollPane sp = new JScrollPane(resultsList);
         sp.setPreferredSize(new Dimension(300, 300));
         cnt.add(sp, BorderLayout.CENTER);
-        cnt.add(buttonsPanel, BorderLayout.SOUTH);
-        cnt.add(paramsPanel, BorderLayout.NORTH);
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
+        JPanel searchTextPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        searchTextPanel.add(searchTextLabel);
+        if (Configuration.parametersPanelInSearchResults.get()) {
+            bottomPanel.add(searchTextPanel);
+            bottomPanel.add(paramsPanel);
+            bottomPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        }
+        bottomPanel.add(buttonsPanel);
+        cnt.add(bottomPanel, BorderLayout.SOUTH);
         pack();
         View.centerScreen(this);
         View.setWindowIcon(this);

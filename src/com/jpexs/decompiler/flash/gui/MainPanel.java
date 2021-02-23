@@ -1774,10 +1774,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public void searchInActionScriptOrText(Boolean searchInText, SWF swf) {
-        View.checkAccess();
+    public Set<SWF> getAllSwfs() {
+        List<SWF> allSwfs = new ArrayList<>();
+        for (SWFList slist : getSwfs()) {
+            for (SWF s : slist.swfs) {
+                allSwfs.add(s);
+                populateSwfs(s, allSwfs);
+            }
+        }
+        return new LinkedHashSet<>(allSwfs);
+    }
 
-        List<TreeItem> allItems = tagTree.getAllSelected();
+    public void searchInActionScriptOrText(Boolean searchInText, SWF swf, boolean useSelection) {
+        View.checkAccess();
 
         Map<SWF, List<ScriptPack>> scopeAs3 = new LinkedHashMap<>();
         Map<SWF, Map<String, ASMSource>> swfToAllASMSourceMap = new HashMap<>();
@@ -1785,6 +1794,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         Set<SWF> swfsUsed = new LinkedHashSet<>();
 
+        List<TreeItem> allItems = tagTree.getAllSelected();
         for (TreeItem t : allItems) {
             if (t instanceof ScriptPack) {
                 ScriptPack sp = (ScriptPack) t;
@@ -1812,6 +1822,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     allSources = swfToAllASMSourceMap.get(s);
                 } else {
                     allSources = s.getASMs(false);
+                    swfToAllASMSourceMap.put(s, allSources);
                 }
                 for (String path : allSources.keySet()) {
                     if (allSources.get(path) == as) {
@@ -1837,11 +1848,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (items.isEmpty()) {
             selected = null;
         } else {
-            selected = AppDialog.translateForDialog("scope.selection.nodes", SearchDialog.class).replace("%count%", "" + items.size());
+            selected = AppDialog.translateForDialog("scope.selection.items", SearchDialog.class).replace("%count%", "" + items.size());
         }
 
-
-        SearchDialog searchDialog = new SearchDialog(getMainFrame().getWindow(), false, selected);
+        SearchDialog searchDialog = new SearchDialog(getMainFrame().getWindow(), false, selected, useSelection);
         if (searchInText != null) {
             if (searchInText) {
                 searchDialog.searchInTextsRadioButton.setSelected(true);
@@ -1853,12 +1863,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (searchDialog.showDialog() == AppDialog.OK_OPTION) {
             final String txt = searchDialog.searchField.getText();
             if (!txt.isEmpty()) {
-                if (!scopeAs3.isEmpty()) {
-                    getABCPanel();
-                }
-                if (!scopeAs12.isEmpty()) {
-                    getActionPanel();
-                }
 
                 if (searchDialog.getCurrentScope() == SearchDialog.SCOPE_CURRENT_FILE) {
                     scopeAs3.clear();
@@ -1872,13 +1876,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     swfsUsed.add(swf);
                 }
                 if (searchDialog.getCurrentScope() == SearchDialog.SCOPE_ALL_FILES) {
-                    List<SWF> allSwfs = new ArrayList<>();
-                    for (SWFList slist : getSwfs()) {
-                        for (SWF s : slist.swfs) {
-                            allSwfs.add(s);
-                            populateSwfs(s, allSwfs);
-                        }
-                    }
+                    Set<SWF> allSwfs = getAllSwfs();
+
 
                     for (SWF s : allSwfs) {
                         if (s.isAS3()) {
@@ -1889,6 +1888,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
                     swfsUsed.clear();
                     swfsUsed.addAll(allSwfs);
+                }
+
+                if (!scopeAs3.isEmpty()) {
+                    getABCPanel();
+                }
+                if (!scopeAs12.isEmpty()) {
+                    getActionPanel();
                 }
 
                 boolean ignoreCase = searchDialog.ignoreCaseCheckBox.isSelected();
@@ -1907,12 +1913,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 if (scopeAs3.containsKey(s)) {
                                     List<ABCSearchResult> abcResult = getABCPanel().search(s, txt, ignoreCase, regexp, pCodeSearch, this, scopeAs3.get(s));
                                     fResult.addAll(abcResult);
-                                    Main.searchResultsStorage.addABCResults(s, txt, ignoreCase, regexp, abcResult);
+                                    if (!abcResult.isEmpty()) {
+                                        Main.searchResultsStorage.addABCResults(s, txt, ignoreCase, regexp, abcResult);
+                                    }
                                 }
                                 if (scopeAs12.containsKey(s)) {
                                     List<ActionSearchResult> actionResult = getActionPanel().search(s, txt, ignoreCase, regexp, pCodeSearch, this, scopeAs12.get(s));
                                     fResult.addAll(actionResult);
-                                    Main.searchResultsStorage.addActionResults(s, txt, ignoreCase, regexp, actionResult);
+                                    if (!actionResult.isEmpty()) {
+                                        Main.searchResultsStorage.addActionResults(s, txt, ignoreCase, regexp, actionResult);
+                                    }
                                 }
                             }
 
@@ -1948,8 +1958,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 Main.stopWork();
                             });
 
-                        }                       
-                        
+                        }
+
                     }.execute();
                 } else if (searchDialog.searchInTextsRadioButton.isSelected()) {
                     new CancellableWorker<Void>() {
@@ -1988,18 +1998,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void replaceText() {
-
-        List<TreeItem> items = tagTree.getSelected();
-        String selected;
-        if (items.size() == 1) {
-            selected = items.get(0).toString();
-        } else if (items.isEmpty()) {
-            selected = null;
-        } else {
-            selected = AppDialog.translateForDialog("scope.selection.nodes", SearchDialog.class).replace("%count%", "" + items.size());
-        }
-
-        SearchDialog replaceDialog = new SearchDialog(getMainFrame().getWindow(), true, selected);
+        SearchDialog replaceDialog = new SearchDialog(getMainFrame().getWindow(), true, null, false);
         if (replaceDialog.showDialog() == AppDialog.OK_OPTION) {
             final String txt = replaceDialog.searchField.getText();
             if (!txt.isEmpty()) {

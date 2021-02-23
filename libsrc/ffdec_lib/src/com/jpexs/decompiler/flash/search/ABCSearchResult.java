@@ -102,6 +102,7 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
         oos.writeInt(classIndex);
         oos.writeInt(traitId);
         oos.flush();
+        oos.close();
     }
 
     public ABCSearchResult(ScriptPack scriptPack) {
