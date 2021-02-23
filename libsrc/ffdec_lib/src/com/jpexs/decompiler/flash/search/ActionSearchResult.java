@@ -87,4 +87,9 @@ public class ActionSearchResult implements ScriptSearchResult {
     public String toString() {
         return path;
     }
+
+    @Override
+    public SWF getSWF() {
+        return src.getSwf();
+    }
 }

@@ -189,10 +189,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                     }
                     sr.setResults(Main.searchResultsStorage.getSearchResultsAt(Main.getMainFrame().getPanel().getAllSwfs(), fi));
                     sr.setVisible(true);
-                    if (!Main.getMainFrame().getPanel().searchResultsDialogs.containsKey(swf)) {
-                        Main.getMainFrame().getPanel().searchResultsDialogs.put(swf, new ArrayList<>());
-                    }
-                    Main.getMainFrame().getPanel().searchResultsDialogs.get(swf).add(sr);
+                    Main.getMainFrame().getPanel().searchResultsDialogs.add(sr);
                 });
                 j++;
                 historyButton.setHorizontalAlignment(SwingUtilities.LEFT);

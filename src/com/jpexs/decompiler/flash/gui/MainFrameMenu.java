@@ -1195,10 +1195,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 }
                 sr.setResults(Main.searchResultsStorage.getSearchResultsAt(mainFrame.getPanel().getAllSwfs(), fi));
                 sr.setVisible(true);
-                if (!Main.getMainFrame().getPanel().searchResultsDialogs.containsKey(swf)) {
-                    Main.getMainFrame().getPanel().searchResultsDialogs.put(swf, new ArrayList<>());
-                }
-                Main.getMainFrame().getPanel().searchResultsDialogs.get(swf).add(sr);
+                Main.getMainFrame().getPanel().searchResultsDialogs.add(sr);
             };
             addMenuItem("/tools/" + (supportsMenuAction() ? "search" : "recentsearch") + "/" + i, searched, null, a, 0, null, true, null, false);
         }

@@ -139,7 +139,16 @@ public class SearchResultsStorage {
     @SuppressWarnings("unchecked")
     public List<ScriptSearchResult> getSearchResultsAt(Set<SWF> allSwfs, int index) {
         if (unpackedData.containsKey(index)) {
-            return unpackedData.get(index);
+
+            List<ScriptSearchResult> unpacked = unpackedData.get(index);
+            List<ScriptSearchResult> res = new ArrayList<>();
+            for (ScriptSearchResult sr : unpacked) {
+                if (allSwfs.contains(sr.getSWF())) {
+                    res.add(sr);
+                }
+            }
+
+            return res;
         }
         List<ScriptSearchResult> result = new ArrayList<>();
 

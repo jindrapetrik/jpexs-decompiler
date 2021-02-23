@@ -333,7 +333,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public TreeItem oldItem;
 
-    public Map<SWF, List<SearchResultsDialog>> searchResultsDialogs = new HashMap<>();
+    public List<SearchResultsDialog> searchResultsDialogs = new ArrayList<>();
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
 
@@ -937,10 +937,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         List<SWFList> swfsLists = new ArrayList<>(swfs);
 
-        for (SWF swf : searchResultsDialogs.keySet()) {
-            for (SearchResultsDialog sr : searchResultsDialogs.get(swf)) {
-                sr.setVisible(false);
-            }
+        for (SearchResultsDialog sr : searchResultsDialogs) {
+            sr.setVisible(false);
         }
         searchResultsDialogs.clear();
 
@@ -976,12 +974,21 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
 
+        List<SWF> swfsToClose = new ArrayList<>();
+        swfsToClose.addAll(swfList);
         for (SWF swf : swfList) {
-            if (searchResultsDialogs.containsKey(swf)) {
-                for (SearchResultsDialog sr : searchResultsDialogs.get(swf)) {
-                    sr.setVisible(false);
-                }
-                searchResultsDialogs.remove(swf);
+            populateSwfs(swf, swfsToClose);
+        }
+
+        for (int i = 0; i < searchResultsDialogs.size(); i++) {
+            SearchResultsDialog sr = searchResultsDialogs.get(i);
+            for (SWF swf : swfsToClose) {
+                sr.removeSwf(swf);
+            }
+            if (sr.isEmpty()) {
+                sr.setVisible(false);
+                searchResultsDialogs.remove(i);
+                i--;
             }
         }
 
@@ -1935,13 +1942,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 SearchResultsDialog<ScriptSearchResult> sr = new SearchResultsDialog<>(getMainFrame().getWindow(), txt, ignoreCase, regexp, listeners);
                                 sr.setResults(fResult);
                                 sr.setVisible(true);
-                                if (swfsUsed.size() == 1) {
-                                    SWF usedSwf = swfsUsed.iterator().next();
-                                    if (!searchResultsDialogs.containsKey(usedSwf)) {
-                                        searchResultsDialogs.put(usedSwf, new ArrayList<>());
-                                    }
-                                    searchResultsDialogs.get(usedSwf).add(sr);
-                                }
+                                searchResultsDialogs.add(sr);
                                 if (!found) {
                                     View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                                 }
