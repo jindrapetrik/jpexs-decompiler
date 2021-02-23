@@ -39,8 +39,17 @@ public class ActionSearchResult {
 
     private final String path;
 
-    public ActionSearchResult(SWF swf, ObjectInputStream ois) throws IOException, ScriptNotFoundException {
+    private static final int SERIAL_VERSION_MAJOR = 1;
+    private static final int SERIAL_VERSION_MINOR = 0;
+
+    public ActionSearchResult(SWF swf, InputStream is) throws IOException, ScriptNotFoundException {
         Map<String, ASMSource> asms = swf.getASMs(false);
+        ObjectInputStream ois = new ObjectInputStream(is);
+        int versionMajor = ois.read();
+        ois.read(); //minor
+        if (versionMajor != SERIAL_VERSION_MAJOR) {
+            throw new IOException("Unknown search result version: " + versionMajor);
+        }
         path = ois.readUTF();
         if (asms.containsKey(path)) {
             src = asms.get(path);
@@ -50,9 +59,13 @@ public class ActionSearchResult {
         pcode = ois.readBoolean();
     }
 
-    public void save(ObjectOutputStream oos) throws IOException {
+    public void save(OutputStream os) throws IOException {
+        ObjectOutputStream oos = new ObjectOutputStream(os);
+        oos.write(SERIAL_VERSION_MAJOR);
+        oos.write(SERIAL_VERSION_MINOR);
         oos.writeUTF(path);
         oos.writeBoolean(pcode);
+        oos.flush();
     }
 
     public ActionSearchResult(ASMSource src, boolean pcode, String path) {

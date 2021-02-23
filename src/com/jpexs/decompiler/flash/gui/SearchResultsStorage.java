@@ -44,7 +44,10 @@ import java.util.logging.Logger;
  */
 public class SearchResultsStorage {
 
-    public static final String SEARCH_RESULTS_FILE = "search_results.bin";
+    public static final String SEARCH_RESULTS_FILE = "searchresults.bin";
+
+    private static final int SERIAL_VERSION_MAJOR = 1;
+    private static final int SERIAL_VERSION_MINOR = 0;
 
     private static String getConfigFile() throws IOException {
         return Configuration.getFFDecHome() + SEARCH_RESULTS_FILE;
@@ -114,15 +117,15 @@ public class SearchResultsStorage {
 
         try {
             ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(itemData));
-            int cnt = ois.readInt();
-            for (int i = 0; i < cnt; i++) {
+            List<byte[]> resultData = (List<byte[]>) ois.readObject();
+            for (int i = 0; i < resultData.size(); i++) {
                 try {
-                    result.add(new ABCSearchResult(swf, ois));
-                } catch (ScriptNotFoundException ex) {
+                    result.add(new ABCSearchResult(swf, new ByteArrayInputStream(resultData.get(i))));
+                } catch (ScriptNotFoundException | IOException ex) {
                     //ignore
                 }
             }
-        } catch (IOException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
         }
         unpackedData.put(index, result);
@@ -139,15 +142,15 @@ public class SearchResultsStorage {
 
         try {
             ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(itemData));
-            int cnt = ois.readInt();
-            for (int i = 0; i < cnt; i++) {
+            List<byte[]> resultData = (List<byte[]>) ois.readObject();
+            for (int i = 0; i < resultData.size(); i++) {
                 try {
-                    result.add(new ActionSearchResult(swf, ois));
-                } catch (ScriptNotFoundException ex) {
+                    result.add(new ActionSearchResult(swf, new ByteArrayInputStream(resultData.get(i))));
+                } catch (ScriptNotFoundException | IOException ex) {
                     //ignore
                 }
             }
-        } catch (IOException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
         }
         unpackedData.put(index, result);
@@ -160,6 +163,11 @@ public class SearchResultsStorage {
         if (new File(configFile).exists()) {
             try (FileInputStream fis = new FileInputStream(configFile);
                     ObjectInputStream ois = new ObjectInputStream(fis)) {
+                int major = ois.read();
+                ois.read(); // minor
+                if (major != SERIAL_VERSION_MAJOR) { //incompatible version
+                    return;
+                }
                 swfIds = (List<String>) ois.readObject();
                 searchedValues = (List<String>) ois.readObject();
                 isIgnoreCase = (List<Boolean>) ois.readObject();
@@ -175,6 +183,8 @@ public class SearchResultsStorage {
         String configFile = getConfigFile();
         try (FileOutputStream fos = new FileOutputStream(configFile);
                 ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            oos.write(SERIAL_VERSION_MAJOR);
+            oos.write(SERIAL_VERSION_MINOR);
             oos.writeObject(swfIds);
             oos.writeObject(searchedValues);
             oos.writeObject(isIgnoreCase);
@@ -192,10 +202,13 @@ public class SearchResultsStorage {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeInt(results.size());
+            List<byte[]> resultData = new ArrayList<>();
             for (ABCSearchResult res : results) {
-                res.save(oos);
+                ByteArrayOutputStream resultBaos = new ByteArrayOutputStream();
+                res.save(resultBaos);
+                resultData.add(resultBaos.toByteArray());
             }
+            oos.writeObject(resultData);
             oos.flush();
         } catch (IOException ex) {
             Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
@@ -214,10 +227,13 @@ public class SearchResultsStorage {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeInt(results.size());
+            List<byte[]> resultData = new ArrayList<>();
             for (ActionSearchResult res : results) {
-                res.save(oos);
+                ByteArrayOutputStream resultBaos = new ByteArrayOutputStream();
+                res.save(resultBaos);
+                resultData.add(resultBaos.toByteArray());
             }
+            oos.writeObject(resultData);
             oos.flush();
         } catch (IOException ex) {
             Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
