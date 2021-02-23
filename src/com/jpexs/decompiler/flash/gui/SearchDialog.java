@@ -79,7 +79,7 @@ public class SearchDialog extends AppDialog {
         }
     }
 
-    public SearchDialog(Window owner, boolean replace, String selection) {
+    public SearchDialog(Window owner, boolean replace, String selection, boolean selectionFirst) {
         super(owner);
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         ignoreCaseCheckBox.setSelected(true);
@@ -117,6 +117,17 @@ public class SearchDialog extends AppDialog {
         panField.add(new JLabel(translate("label.scope")));
         scopeComboBox = new JComboBox<>(scopeItems.toArray(new String[scopeItems.size()]));
         panField.add(scopeComboBox);
+
+        if (selection != null && !selectionFirst) {
+            scopeComboBox.setSelectedIndex(1);
+        }
+
+        if (replace) {
+            if (selection != null) {
+                scopeComboBox.setSelectedIndex(1);
+            }
+            scopeComboBox.setEnabled(false);
+        }
 
         cnt.add(panField);
 

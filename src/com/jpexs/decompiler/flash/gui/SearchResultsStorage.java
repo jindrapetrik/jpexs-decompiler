@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.search.ABCSearchResult;
 import com.jpexs.decompiler.flash.search.ActionSearchResult;
 import com.jpexs.decompiler.flash.search.ScriptNotFoundException;
+import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -33,8 +34,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,8 +49,11 @@ public class SearchResultsStorage {
 
     public static final String SEARCH_RESULTS_FILE = "searchresults.bin";
 
-    private static final int SERIAL_VERSION_MAJOR = 1;
+    private static final int SERIAL_VERSION_MAJOR = 2;
     private static final int SERIAL_VERSION_MINOR = 0;
+
+    private static final int DATA_ABC = 1;
+    private static final int DATA_ACTION = 2;
 
     private static String getConfigFile() throws IOException {
         return Configuration.getFFDecHome() + SEARCH_RESULTS_FILE;
@@ -58,7 +64,14 @@ public class SearchResultsStorage {
     List<Boolean> isRegExp = new ArrayList<>();
     List<Boolean> isIgnoreCase = new ArrayList<>();
     List<byte[]> data = new ArrayList<>();
-    Map<Integer, Object> unpackedData = new HashMap<>();
+    Map<Integer, List<ScriptSearchResult>> unpackedData = new HashMap<>();
+    List<Integer> groups = new ArrayList<>();
+
+    private int currentGroupId = 0;
+
+    public void finishGroup() {
+        currentGroupId++;
+    }
 
     public static String getSwfId(SWF swf) {
 
@@ -85,75 +98,89 @@ public class SearchResultsStorage {
     }
 
     public String getSearchedValueAt(int index) {
-        return searchedValues.get(index);
+        for (int j = 0; j < data.size(); j++) {
+            if (groups.get(j) == index) {
+                return searchedValues.get(j);
+            }
+        }
+        return null;
     }
 
     public boolean isIgnoreCaseAt(int index) {
-        return isIgnoreCase.get(index);
+        for (int j = 0; j < data.size(); j++) {
+            if (groups.get(j) == index) {
+                return isIgnoreCase.get(j);
+            }
+        }
+        return false;
     }
 
     public boolean isRegExpAt(int index) {
-        return isRegExp.get(index);
+        for (int j = 0; j < data.size(); j++) {
+            if (groups.get(j) == index) {
+                return isRegExp.get(j);
+            }
+        }
+        return false;
     }
 
     public List<Integer> getIndicesForSwf(SWF swf) {
         String swfId = getSwfId(swf);
         List<Integer> res = new ArrayList<>();
+        Set<Integer> foundGroups = new LinkedHashSet<>();
         for (int i = 0; i < swfIds.size(); i++) {
             if (swfIds.get(i).equals(swfId)) {
-                res.add(i);
+                foundGroups.add(groups.get(i));
             }
         }
-        return res;
+        return new ArrayList<>(foundGroups);
     }
 
     @SuppressWarnings("unchecked")
-    public List<ABCSearchResult> getAbcSearchResultsAt(SWF swf, int index) {
+    public List<ScriptSearchResult> getSearchResultsAt(Set<SWF> allSwfs, int index) {
         if (unpackedData.containsKey(index)) {
-            return (List<ABCSearchResult>) unpackedData.get(index);
+            return unpackedData.get(index);
         }
-        List<ABCSearchResult> result = new ArrayList<>();
-        byte[] itemData = data.get(index);
+        List<ScriptSearchResult> result = new ArrayList<>();
 
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(itemData));
-            List<byte[]> resultData = (List<byte[]>) ois.readObject();
-            for (int i = 0; i < resultData.size(); i++) {
-                try {
-                    result.add(new ABCSearchResult(swf, new ByteArrayInputStream(resultData.get(i))));
-                } catch (ScriptNotFoundException | IOException ex) {
-                    //ignore
+        Map<String, SWF> swfIdToSwf = new HashMap<>();
+        for (SWF s : allSwfs) {
+            swfIdToSwf.put(getSwfId(s), s);
+        }
+
+        for (int j = 0; j < data.size(); j++) {
+            if (groups.get(j) == index) {
+                if (!swfIdToSwf.containsKey(swfIds.get(j))) {
+                    continue;
                 }
-            }
-        } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        unpackedData.put(index, result);
-        return result;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<ActionSearchResult> getActionSearchResultsAt(SWF swf, int index) {
-        if (unpackedData.containsKey(index)) {
-            return (List<ActionSearchResult>) unpackedData.get(index);
-        }
-        List<ActionSearchResult> result = new ArrayList<>();
-        byte[] itemData = data.get(index);
-
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(itemData));
-            List<byte[]> resultData = (List<byte[]>) ois.readObject();
-            for (int i = 0; i < resultData.size(); i++) {
+                SWF swf = swfIdToSwf.get(swfIds.get(j));
+                byte[] itemData = data.get(j);
                 try {
-                    result.add(new ActionSearchResult(swf, new ByteArrayInputStream(resultData.get(i))));
-                } catch (ScriptNotFoundException | IOException ex) {
-                    //ignore
+                    ByteArrayInputStream bais1 = new ByteArrayInputStream(itemData);
+                    int kind = bais1.read();
+                    ObjectInputStream ois = new ObjectInputStream(bais1);
+                    List<byte[]> resultData = readByteList(ois);
+                    for (int i = 0; i < resultData.size(); i++) {
+                        try {
+                            ByteArrayInputStream bais = new ByteArrayInputStream(resultData.get(i));
+
+                            if (kind == DATA_ABC) {
+                                result.add(new ABCSearchResult(swf, bais));
+                            }
+                            if (kind == DATA_ACTION) {
+                                result.add(new ActionSearchResult(swf, bais));
+                            }
+                        } catch (ScriptNotFoundException | IOException ex) {
+                            ex.printStackTrace();
+                            //ignore
+                        }
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                unpackedData.put(j, result);
             }
-        } catch (IOException | ClassNotFoundException ex) {
-            Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
         }
-        unpackedData.put(index, result);
         return result;
     }
 
@@ -172,7 +199,15 @@ public class SearchResultsStorage {
                 searchedValues = (List<String>) ois.readObject();
                 isIgnoreCase = (List<Boolean>) ois.readObject();
                 isRegExp = (List<Boolean>) ois.readObject();
-                data = (List<byte[]>) ois.readObject();
+                groups = (List<Integer>) ois.readObject();
+                data = readByteList(ois);
+                int maxgroup = -1;
+                for (int g : groups) {
+                    if (g > maxgroup) {
+                        maxgroup = g;
+                    }
+                }
+                currentGroupId = maxgroup + 1;
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -189,7 +224,8 @@ public class SearchResultsStorage {
             oos.writeObject(searchedValues);
             oos.writeObject(isIgnoreCase);
             oos.writeObject(isRegExp);
-            oos.writeObject(data);
+            oos.writeObject(groups);
+            writeByteList(oos, data);
         }
     }
 
@@ -198,8 +234,10 @@ public class SearchResultsStorage {
         searchedValues.add(searchedString);
         isIgnoreCase.add(ignoreCase);
         isRegExp.add(regExp);
+        groups.add(currentGroupId);
         unpackedData.put(data.size(), new ArrayList<>(results));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos.write(DATA_ABC);
         try {
             ObjectOutputStream oos = new ObjectOutputStream(baos);
             List<byte[]> resultData = new ArrayList<>();
@@ -208,7 +246,7 @@ public class SearchResultsStorage {
                 res.save(resultBaos);
                 resultData.add(resultBaos.toByteArray());
             }
-            oos.writeObject(resultData);
+            writeByteList(oos, resultData);
             oos.flush();
         } catch (IOException ex) {
             Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
@@ -223,8 +261,10 @@ public class SearchResultsStorage {
         searchedValues.add(searchedString);
         isIgnoreCase.add(ignoreCase);
         isRegExp.add(regExp);
+        groups.add(currentGroupId);
         unpackedData.put(data.size(), new ArrayList<>(results));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos.write(DATA_ACTION);
         try {
             ObjectOutputStream oos = new ObjectOutputStream(baos);
             List<byte[]> resultData = new ArrayList<>();
@@ -233,7 +273,7 @@ public class SearchResultsStorage {
                 res.save(resultBaos);
                 resultData.add(resultBaos.toByteArray());
             }
-            oos.writeObject(resultData);
+            writeByteList(oos, resultData);
             oos.flush();
         } catch (IOException ex) {
             Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
@@ -246,6 +286,28 @@ public class SearchResultsStorage {
         searchedValues.clear();
         isIgnoreCase.clear();
         isRegExp.clear();
+        groups.clear();
+        data.clear();
         unpackedData.clear();
+    }
+
+    private static void writeByteList(ObjectOutputStream os, List<byte[]> data) throws IOException {
+        os.writeInt(data.size());
+        for (byte[] d : data) {
+            os.writeInt(d.length);
+            os.write(d);
+        }
+    }
+
+    private static List<byte[]> readByteList(ObjectInputStream ois) throws IOException {
+        List<byte[]> ret = new ArrayList<>();
+        int cnt = ois.readInt();
+        for (int i = 0; i < cnt; i++) {
+            int len = ois.readInt();
+            byte buf[] = new byte[len];
+            ois.readFully(buf);
+            ret.add(buf);
+        }
+        return ret;
     }
 }

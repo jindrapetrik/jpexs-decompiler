@@ -66,6 +66,7 @@ public class ActionSearchResult implements ScriptSearchResult {
         oos.writeUTF(path);
         oos.writeBoolean(pcode);
         oos.flush();
+        oos.close();
     }
 
     public ActionSearchResult(ASMSource src, boolean pcode, String path) {

@@ -333,7 +333,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         View.checkAccess();
 
         if (swf != null) {
-            mainFrame.getPanel().searchInActionScriptOrText(searchInText, swf);
+            mainFrame.getPanel().searchInActionScriptOrText(searchInText, swf, false);
             return true;
         }
 
@@ -1189,11 +1189,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
                 if (swf.isAS3()) {
                     sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
-                    sr.setResults(Main.searchResultsStorage.getAbcSearchResultsAt(swf, fi));
+
                 } else {
                     sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
-                    sr.setResults(Main.searchResultsStorage.getActionSearchResultsAt(swf, fi));
                 }
+                sr.setResults(Main.searchResultsStorage.getSearchResultsAt(mainFrame.getPanel().getAllSwfs(), fi));
                 sr.setVisible(true);
                 if (!Main.getMainFrame().getPanel().searchResultsDialogs.containsKey(swf)) {
                     Main.getMainFrame().getPanel().searchResultsDialogs.put(swf, new ArrayList<>());

@@ -681,6 +681,10 @@ public final class Configuration {
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> warningInitializers = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> parametersPanelInSearchResults = null;
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
