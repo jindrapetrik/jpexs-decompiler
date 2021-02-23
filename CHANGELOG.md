@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - AS3 P-code editation checking all referenced labels exist
 - #1595 History of script search results per SWF
 - Ignore case and RegExp options displayed on search results dialog
+- #1611 Warning about initializers has do not show again checkbox
 
 ### Fixed
 - #1298 AS1/2 properly decompiled setProperty/getProperty

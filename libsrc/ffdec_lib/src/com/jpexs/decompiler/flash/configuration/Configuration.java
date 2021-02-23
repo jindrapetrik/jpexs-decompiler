@@ -676,6 +676,11 @@ public final class Configuration {
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> checkForModifications = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationName("warning.initializers")
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> warningInitializers = null;
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
