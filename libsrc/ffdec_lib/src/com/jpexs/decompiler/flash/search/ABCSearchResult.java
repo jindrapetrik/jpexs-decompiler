@@ -54,12 +54,16 @@ public class ABCSearchResult implements Serializable {
 
     private final int traitId;
 
+    private static final int SERIAL_VERSION_MAJOR = 1;
+    private static final int SERIAL_VERSION_MINOR = 0;
+
     @SuppressWarnings("unchecked")
-    public ABCSearchResult(SWF swf, ObjectInputStream ois) throws IOException, ScriptNotFoundException {
+    public ABCSearchResult(SWF swf, InputStream is) throws IOException, ScriptNotFoundException {
+        ObjectInputStream ois = new ObjectInputStream(is);
         int versionMajor = ois.read();
         ois.read(); //minor
-        if (versionMajor != 1) {
-            throw new IOException("Unknown search result version");
+        if (versionMajor != SERIAL_VERSION_MAJOR) {
+            throw new IOException("Unknown search result version: " + versionMajor);
         }
 
         ClassPath cp;
@@ -88,14 +92,16 @@ public class ABCSearchResult implements Serializable {
         }
     }
 
-    public void save(ObjectOutputStream oos) throws IOException {
-        oos.write(1); //version major
-        oos.write(0); //version minor
+    public void save(OutputStream os) throws IOException {
+        ObjectOutputStream oos = new ObjectOutputStream(os);
+        oos.write(SERIAL_VERSION_MAJOR);
+        oos.write(SERIAL_VERSION_MINOR);
         oos.writeObject(scriptPack.getClassPath());
         oos.writeObject(scriptPack.traitIndices);
         oos.writeBoolean(pcode);
         oos.writeInt(classIndex);
         oos.writeInt(traitId);
+        oos.flush();
     }
 
     public ABCSearchResult(ScriptPack scriptPack) {
