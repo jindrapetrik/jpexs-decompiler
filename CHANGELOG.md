@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - Ignore case and RegExp options displayed on search results dialog
 - #1611 Warning about initializers has do not show again checkbox
 - Scoped script text search and search across multiple SWFs
+- #1601 Option to hide AS3 docs panel and traitslist/constants panel
 
 ### Fixed
 - #1298 AS1/2 properly decompiled setProperty/getProperty
