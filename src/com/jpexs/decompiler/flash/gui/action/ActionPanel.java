@@ -789,6 +789,8 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         panelWithHint.add(brokenHintPanel, BorderLayout.NORTH);
         panelWithHint.add(new JScrollPane(decompiledEditor), BorderLayout.CENTER);
 
+        brokenHintPanel.setVisible(false);
+
         panA.add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, panelWithHint, debugPanel, Configuration.guiActionVarsSplitPaneDividerLocationPercent), BorderLayout.CENTER);
         panA.add(decButtonsPan, BorderLayout.SOUTH);
 
