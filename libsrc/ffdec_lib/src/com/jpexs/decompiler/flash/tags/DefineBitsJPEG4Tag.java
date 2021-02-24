@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -27,6 +28,7 @@ import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.JpegFixer;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
@@ -178,7 +180,15 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
     @Override
     public InputStream getOriginalImageData() {
         if (bitmapAlphaData.getLength() == 0) { // No alpha
-            return new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength());
+
+            JpegFixer jpegFixer = new JpegFixer();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                jpegFixer.fixJpeg(new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength()), baos);
+            } catch (IOException ex) {
+                Logger.getLogger(DefineBitsJPEG4Tag.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return new ByteArrayInputStream(baos.toByteArray());
         }
 
         return null;
