@@ -190,7 +190,7 @@ public final class Configuration {
     public static ConfigurationItem<Boolean> showOriginalBytesInPcodeHex = null;
 
     @ConfigurationDefaultBoolean(false)
-    @ConfigurationCategory("script")
+    @ConfigurationCategory("format")
     public static ConfigurationItem<Boolean> padAs3PCodeInstructionName = null;
 
     /**
