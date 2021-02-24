@@ -3587,7 +3587,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 abcPanel.decompiledTextArea.setNoTrait();
             }
 
-            showDetail(DETAILCARDAS3NAVIGATOR);
+            if (Configuration.displayAs3TraitsListAndConstantsPanel.get()) {
+                showDetail(DETAILCARDAS3NAVIGATOR);
+            } else {
+                showDetail(DETAILCARDEMPTYPANEL);
+            }
             showCard(CARDACTIONSCRIPT3PANEL);
             return;
         }

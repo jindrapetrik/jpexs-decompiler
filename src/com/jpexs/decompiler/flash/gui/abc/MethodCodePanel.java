@@ -118,7 +118,11 @@ public class MethodCodePanel extends JPanel {
 
         docsPanel = new DocsPanel();
         sourceTextArea.addDocsListener(docsPanel);
-        add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(sourceTextArea), new JScrollPane(docsPanel), Configuration.guiAvm2DocsSplitPaneDividerLocationPercent));
+        if (Configuration.displayAs3PCodeDocsPanel.get()) {
+            add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(sourceTextArea), new JScrollPane(docsPanel), Configuration.guiAvm2DocsSplitPaneDividerLocationPercent));
+        } else {
+            add(new JScrollPane(sourceTextArea));
+        }
         sourceTextArea.changeContentType("text/flasm3");
         sourceTextArea.setFont(Configuration.getSourceFont());
 

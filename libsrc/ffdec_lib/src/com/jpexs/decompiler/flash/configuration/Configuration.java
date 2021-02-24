@@ -685,6 +685,14 @@ public final class Configuration {
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> parametersPanelInSearchResults = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> displayAs3PCodeDocsPanel = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> displayAs3TraitsListAndConstantsPanel = null;
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
