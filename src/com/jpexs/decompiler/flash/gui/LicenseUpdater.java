@@ -95,7 +95,7 @@ public class LicenseUpdater {
                 + " * Lesser General Public License for more details.\r\n"
                 + " * \r\n"
                 + " * You should have received a copy of the GNU Lesser General Public\r\n"
-                + " * License along with this library.\r"
+                + " * License along with this library.\r\n"
                 + " */";
         String license = lgpl ? lgplLicense : gplLicense;
 
