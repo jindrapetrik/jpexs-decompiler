@@ -1730,6 +1730,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
                                     registerNames.add(UNUSED);
                                     registerTypes.add("*");
                                     registerLines.add(paramLine);
+                                    slotNames.add(UNUSED);
+                                    slotTypes.add("*");
                                 }
                                 registerNames.set(regIndex, varName);
                                 registerTypes.set(regIndex, varName);
