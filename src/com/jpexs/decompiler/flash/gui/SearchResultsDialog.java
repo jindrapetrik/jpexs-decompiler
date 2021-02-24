@@ -31,20 +31,26 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingConstants;
+import javax.swing.JTree;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeWillExpandListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 /**
  *
@@ -53,9 +59,8 @@ import javax.swing.SwingConstants;
  */
 public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
 
-    private final JList<E> resultsList;
+    private final JTree resultsTree;
 
-    private final DefaultListModel<E> model;
     private final boolean regExp;
 
     private final List<SearchListener<E>> listeners;
@@ -67,15 +72,14 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
     private String text;
     private final boolean ignoreCase;
 
-    private boolean showSwfTitles = false;
+    private Map<SWF, List<SearchResult>> swfToResults = new LinkedHashMap<>();
 
     public SearchResultsDialog(Window owner, String text, boolean ignoreCase, boolean regExp, List<SearchListener<E>> listeners) {
         super(owner);
         setTitle(translate("dialog.title").replace("%text%", text));
         this.text = text;
         Container cnt = getContentPane();
-        model = new DefaultListModel<>();
-        resultsList = new JList<>(model);
+        resultsTree = new JTree(new BasicTreeNode("root"));
         this.regExp = regExp;
         this.listeners = listeners;
 
@@ -95,7 +99,7 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
         buttonsPanel.setLayout(new FlowLayout());
         buttonsPanel.add(gotoButton);
         buttonsPanel.add(closeButton);
-        resultsList.addKeyListener(new KeyAdapter() {
+        resultsTree.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -104,7 +108,7 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
             }
         });
 
-        resultsList.addMouseListener(new MouseAdapter() {
+        resultsTree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -113,23 +117,42 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
             }
         });
 
-        resultsList.setCellRenderer(new DefaultListCellRenderer() {
+        resultsTree.setRootVisible(false);
+
+        resultsTree.addTreeWillExpandListener(new TreeWillExpandListener() {
             @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                Component ret = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (ret instanceof JLabel) {
-                    JLabel lab = (JLabel) ret;
-                    if (showSwfTitles) {
-                        lab.setText(((SearchResult) value).getSWF().toString() + ": " + lab.getText());
+            public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
+
+            }
+
+            @Override
+            public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
+                throw new ExpandVetoException(event, "Collapsing tree not allowed");
+            }
+        });
+
+        final ImageIcon flashIcon = View.getIcon("flash16");
+
+        resultsTree.setCellRenderer(new DefaultTreeCellRenderer() {
+            @Override
+            public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                Component c = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+                if (c instanceof JLabel) {
+                    JLabel label = (JLabel) c;
+                    BasicTreeNode node = (BasicTreeNode) value;
+                    if (node.getData() instanceof SWF) {
+                        label.setIcon(flashIcon);
+                    } else {
+                        label.setIcon(null);
                     }
                 }
-                return ret;
+                return c;
             }
 
         });
 
         cnt.setLayout(new BorderLayout());
-        JScrollPane sp = new JScrollPane(resultsList);
+        JScrollPane sp = new JScrollPane(resultsTree);
         sp.setPreferredSize(new Dimension(300, 300));
         cnt.add(sp, BorderLayout.CENTER);
 
@@ -150,28 +173,118 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
         this.ignoreCase = ignoreCase;
     }
 
-    public void setResults(List<E> results) {
-        model.clear();
-        Set<SWF> allSWFs = new HashSet<>();
-        for (E e : results) {
-            model.addElement(e);
-            allSWFs.add(e.getSWF());
+    private static class BasicTreeNode implements TreeNode {
+
+        private final List<TreeNode> children = new ArrayList<>();
+        private TreeNode parent;
+        private final Object data;
+
+        public BasicTreeNode(Object data) {
+            this.data = data;
         }
-        showSwfTitles = allSWFs.size() > 1;
+
+        @Override
+        public String toString() {
+            return data.toString();
+        }
+
+
+        public Object getData() {
+            return data;
+        }
+
+        public void addChild(TreeNode node) {
+            children.add(node);
+        }
+
+        public void setParent(TreeNode parent) {
+            this.parent = parent;
+        }
+
+        @Override
+        public TreeNode getChildAt(int childIndex) {
+            return children.get(childIndex);
+        }
+
+        @Override
+        public int getChildCount() {
+            return children.size();
+        }
+
+        @Override
+        public TreeNode getParent() {
+            return parent;
+        }
+
+        @Override
+        public int getIndex(TreeNode node) {
+            return children.indexOf(node);
+        }
+
+        @Override
+        public boolean getAllowsChildren() {
+            return true;
+        }
+
+        @Override
+        public boolean isLeaf() {
+            return children.isEmpty();
+        }
+
+        @Override
+        public Enumeration<? extends TreeNode> children() {
+            return Collections.enumeration(children);
+        }
+
+    }
+
+    public void setResults(List<E> results) {
+        swfToResults.clear();
+        for (E e : results) {
+            if (!swfToResults.containsKey(e.getSWF())) {
+                swfToResults.put(e.getSWF(), new ArrayList<>());
+            }
+            swfToResults.get(e.getSWF()).add(e);
+        }
+        updateModel();
+    }
+
+    private void updateModel() {
+        boolean showSwfTitles = swfToResults.size() > 1;
+        BasicTreeNode rootNode = new BasicTreeNode("root");
+        List<BasicTreeNode> swfNodes = new ArrayList<>();
+        for (SWF s : swfToResults.keySet()) {
+            BasicTreeNode swfNode = new BasicTreeNode(s);
+            if (showSwfTitles) {
+                rootNode.addChild(swfNode);
+                swfNode.setParent(rootNode);
+                swfNodes.add(swfNode);
+            }
+            for (SearchResult r : swfToResults.get(s)) {
+                BasicTreeNode rNode = new BasicTreeNode(r);
+                if (showSwfTitles) {
+                    swfNode.addChild(rNode);
+                    rNode.setParent(swfNode);
+                } else {
+                    rootNode.addChild(rNode);
+                    rNode.setParent(rootNode);
+                }
+            }
+        }
+        resultsTree.setModel(new DefaultTreeModel(rootNode, false));
+        for (TreeNode t : swfNodes) {
+            TreePath tp = new TreePath(new Object[]{rootNode, t});
+            resultsTree.expandPath(tp);
+        }
     }
 
     public void removeSwf(SWF swf) {
-        List<E> newItems = new ArrayList<>();
-        for (int i = 0; i < model.getSize(); i++) {
-            if (model.getElementAt(i).getSWF() != swf) {
-                newItems.add(model.getElementAt(i));
-            }
-        }
-        setResults(newItems);
+        swfToResults.remove(swf);
+        updateModel();
     }
 
     public boolean isEmpty() {
-        return model.isEmpty();
+        return swfToResults.isEmpty();
     }
 
     private void gotoButtonActionPerformed(ActionEvent evt) {
@@ -182,10 +295,12 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
         setVisible(false);
     }
 
+    @SuppressWarnings("unchecked")
     private void gotoElement() {
-        if (resultsList.getSelectedIndex() != -1) {
+        BasicTreeNode selection = (BasicTreeNode) resultsTree.getLastSelectedPathComponent();
+        if (selection.getData() instanceof SearchResult) {
             for (SearchListener<E> listener : listeners) {
-                listener.updateSearchPos(text, ignoreCase, regExp, resultsList.getSelectedValue());
+                listener.updateSearchPos(text, ignoreCase, regExp, (E) selection.getData());
             }
         }
     }
