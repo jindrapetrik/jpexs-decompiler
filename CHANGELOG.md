@@ -50,7 +50,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 Goto search result not properly selecting line (delay)
 - ActiveX exceptions when FlashPlayer disabled in classic GUI
 - #1569 AS3 direct editation - incorrect slot names handling (IndexOutOfBounds)
-- #1153, #1347, #1552, #1553 Images export for some nonstandard JPEGs
+- #1153, #1347, #1400, #1552, #1553 Images export for some nonstandard JPEGs
 
 ### Changed
 - #1565, #1407, #1350 On BinaryData SWF save, parent SWF is saved
