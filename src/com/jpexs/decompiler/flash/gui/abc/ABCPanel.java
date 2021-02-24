@@ -942,6 +942,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         panelWithHint.add(brokenHintPanel, BorderLayout.NORTH);
         panelWithHint.add(decompiledScrollPane, BorderLayout.CENTER);
 
+        brokenHintPanel.setVisible(false);
+
         iconDecPanel.add(panelWithHint);
         final JPanel decButtonsPan = new JPanel(new FlowLayout());
         decButtonsPan.setBorder(new BevelBorder(BevelBorder.RAISED));
