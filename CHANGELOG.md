@@ -49,6 +49,7 @@ All notable changes to this project will be documented in this file.
 - AS3 decompilation: increment/decrement on properties
 - AS1/2 Goto search result not properly selecting line (delay)
 - ActiveX exceptions when FlashPlayer disabled in classic GUI
+- #1569 AS3 direct editation - incorrect slot names handling (IndexOutOfBounds)
 
 ### Changed
 - #1565, #1407, #1350 On BinaryData SWF save, parent SWF is saved
