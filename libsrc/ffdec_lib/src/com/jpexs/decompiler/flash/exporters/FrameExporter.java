@@ -607,7 +607,7 @@ public class FrameExporter {
 
                 PDFGraphics g2 = (PDFGraphics) g;
                 if (existingFonts.containsKey(rec.fontId)) {
-                    g2.setExistingTtfFont(existingFonts.get(rec.fontId));
+                    g2.setExistingTtfFont(existingFonts.get(rec.fontId).deriveFont((float) textHeight));
                 } else {
                     FontExporter fe = new FontExporter();
                     File tempFile;
