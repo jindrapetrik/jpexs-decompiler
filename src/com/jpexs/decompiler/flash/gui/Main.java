@@ -1337,14 +1337,16 @@ public class Main {
             String fileName = si.getFile();
             if (fileName != null) {
                 Configuration.addRecentFile(fileName);
-                try {
-                    File dir = new File(fileName).getParentFile();
-                    if (!watchedDirectories.containsValue(dir)) {
-                        WatchKey key = dir.toPath().register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
-                        watchedDirectories.put(key, dir);
+                if (watcher != null) {
+                    try {
+                        File dir = new File(fileName).getParentFile();
+                        if (!watchedDirectories.containsValue(dir)) {
+                            WatchKey key = dir.toPath().register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+                            watchedDirectories.put(key, dir);
+                        }
+                    } catch (IOException ex) {
+                        //ignore
                     }
-                } catch (IOException ex) {
-                    //ignore
                 }
             }
         }
@@ -1713,7 +1715,6 @@ public class Main {
                     //ignore
                 }
             }
-
 
             if (watcher != null) {
                 watcherWorker = new SwingWorker() {
