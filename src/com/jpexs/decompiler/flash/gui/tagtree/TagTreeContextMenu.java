@@ -214,10 +214,6 @@ public class TagTreeContextMenu extends JPopupMenu {
         importSwfXmlMenuItem.addActionListener(mainPanel::importSwfXmlActionPerformed);
         add(importSwfXmlMenuItem);
 
-        closeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
-        closeMenuItem.addActionListener(this::closeSwfActionPerformed);
-        add(closeMenuItem);
-
         addTagMenu = new JMenu(mainPanel.translate("contextmenu.addTag"));
         add(addTagMenu);
 
@@ -245,6 +241,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         textSearchMenuItem = new JMenuItem(mainPanel.translate("menu.tools.search"));
         textSearchMenuItem.addActionListener(this::textSearchActionPerformed);
         add(textSearchMenuItem);
+
+        closeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
+        closeMenuItem.addActionListener(this::closeSwfActionPerformed);
+        add(closeMenuItem);
 
         tagTree.addMouseListener(new MouseAdapter() {
             @Override
