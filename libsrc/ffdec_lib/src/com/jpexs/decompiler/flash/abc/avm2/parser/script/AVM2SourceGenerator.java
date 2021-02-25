@@ -1465,7 +1465,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     }
 
     @Override
-    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, CommaExpressionItem item) throws CompilationException {
+    public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, CommaExpressionItem item, boolean withReturnValue) throws CompilationException {
         if (item.commands.isEmpty()) {
             return new ArrayList<>();
         }
@@ -1475,7 +1475,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         GraphTargetItem lastExpr = cmds.remove(cmds.size() - 1);
         List<GraphSourceItem> ret = new ArrayList<>();
         ret.addAll(generate(localData, cmds));
-        ret.addAll(lastExpr.toSource(localData, this));
+        ret.addAll(withReturnValue ? lastExpr.toSource(localData, this) : lastExpr.toSourceIgnoreReturnValue(localData, this));
         return ret;
     }
 

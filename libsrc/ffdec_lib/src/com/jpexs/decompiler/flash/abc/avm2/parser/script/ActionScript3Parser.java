@@ -1512,7 +1512,7 @@ public class ActionScript3Parser {
                 case WHILE:
                     expectedType(SymbolType.PARENT_OPEN);
                     List<GraphTargetItem> whileExpr = new ArrayList<>();
-                    whileExpr.add(commaExpression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, variables));
+                    whileExpr.add(expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                     expectedType(SymbolType.PARENT_CLOSE);
                     List<GraphTargetItem> whileBody = new ArrayList<>();
                     Loop wloop = new Loop(uniqId(), null, null);
@@ -1534,7 +1534,7 @@ public class ActionScript3Parser {
                     expectedType(SymbolType.WHILE);
                     expectedType(SymbolType.PARENT_OPEN);
                     List<GraphTargetItem> doExpr = new ArrayList<>();
-                    doExpr.add(commaExpression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, variables));
+                    doExpr.add(expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
                     expectedType(SymbolType.PARENT_CLOSE);
                     ret = new DoWhileItem(null, null, dloop, doBody, doExpr);
                     break;
@@ -1892,32 +1892,26 @@ public class ActionScript3Parser {
         return arrCnt;
     }
 
-    private GraphTargetItem commaExpression(List<List<NamespaceItem>> allOpenedNamespaces, TypeItem thisType, NamespaceItem pkg, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, Stack<Loop> loops, Map<Loop, String> loopLabels, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, int forInLevel, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
-        GraphTargetItem cmd = null;
-        List<GraphTargetItem> expr = new ArrayList<>();
-        ParsedSymbol s;
-        do {
-            cmd = command(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forInLevel, false, variables);
-            if (cmd != null) {
-                expr.add(cmd);
-            }
-            s = lex();
-        } while (s.type == SymbolType.COMMA && cmd != null);
-        lexer.pushback(s);
-        if (cmd == null) {
-            expr.add(expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables));
-        } else if (!cmd.hasReturnValue()) {
-            throw new AVM2ParseException("Expression expected", lexer.yyline());
-        }
-        return new CommaExpressionItem(null, null, expr);
-    }
-
     private GraphTargetItem expression(List<List<NamespaceItem>> allOpenedNamespaces, TypeItem thisType, NamespaceItem pkg, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, boolean allowEmpty, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, boolean allowRemainder, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException {
-        GraphTargetItem prim = expressionPrimary(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, allowRemainder, variables);
-        if (prim == null) {
-            return null;
+
+        List<GraphTargetItem> commaItems = new ArrayList<>();
+        ParsedSymbol symb;
+        do {
+            GraphTargetItem prim = expressionPrimary(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, allowRemainder, variables);
+            if (prim == null) {
+                return null;
+            }
+            GraphTargetItem item = expression1(allOpenedNamespaces, prim, GraphTargetItem.NOPRECEDENCE, thisType, pkg, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, allowRemainder, variables);
+            commaItems.add(item);
+            symb = lex();
+        } while (symb != null && symb.type == SymbolType.COMMA);
+        if (symb != null) {
+            lexer.pushback(symb);
         }
-        return expression1(allOpenedNamespaces, prim, GraphTargetItem.NOPRECEDENCE, thisType, pkg, needsActivation, importedClasses, openedNamespaces, allowEmpty, registerVars, inFunction, inMethod, allowRemainder, variables);
+        if (commaItems.size() == 1) {
+            return commaItems.get(0);
+        }
+        return new CommaExpressionItem(null, null, commaItems);
     }
 
     /**
