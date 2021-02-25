@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - #1336 AS3 direct editation - Regexp / character escaping
+- #1615 Turning off Checking for modifications disables SWF loading
 
 ## [14.0.0] - 2021-02-24
 ### Added
