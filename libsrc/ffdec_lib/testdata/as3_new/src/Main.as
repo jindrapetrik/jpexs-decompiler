@@ -54,6 +54,7 @@ package
 		TestIfElse;
 		TestIfInIf;
 		TestIgnoreAndOr;
+		TestImportedVar;
 		TestInc2;
 		TestIncDec;
 		TestInlineFunctions;
