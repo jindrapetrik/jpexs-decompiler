@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - #1615 Turning off Checking for modifications disables SWF loading
 - #1100, #1123, #1516 AS1/2/3 direct editation - comma operator
 - #1618 Export to PDF selectable text escaping and text size
+- #1101 AS3 direct editation - handling imported vars
 
 ### Changed
 - #1616 Close SWF menuitem is last in the context menu
