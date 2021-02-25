@@ -330,11 +330,12 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 }
 
                 if (name.size() == 1) {
-                    resolved = new TypeAssignableItem(ret);
-                    //TODO: check whether it is really an assignable and not a Class
-                    if (assignedValue != null) {
-                        ((TypeAssignableItem) resolved).assignedValue = assignedValue;
-                        //throw new CompilationException("Cannot assign type", line);
+                    AbcIndexing.TraitIndex ti = abc.findScriptProperty(imp);
+                    if (ti != null && (ti.trait instanceof TraitSlotConst)) {
+                        resolved = new ImportedSlotConstItem(ret);
+                        if (assignedValue != null) {
+                            ((ImportedSlotConstItem) resolved).assignedValue = assignedValue;
+                        }
                     }
                 }
 

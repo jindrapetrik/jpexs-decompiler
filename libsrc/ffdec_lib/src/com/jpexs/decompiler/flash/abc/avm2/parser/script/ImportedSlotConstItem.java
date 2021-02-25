@@ -30,11 +30,11 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class TypeAssignableItem extends AssignableAVM2Item {
+public class ImportedSlotConstItem extends AssignableAVM2Item {
 
-    private final TypeItem type;
+    public TypeItem type;
 
-    public TypeAssignableItem(TypeItem type) {
+    public ImportedSlotConstItem(TypeItem type) {
         this.type = type;
     }
 
@@ -50,12 +50,12 @@ public class TypeAssignableItem extends AssignableAVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return TypeItem.UNBOUNDED;
+        return type.returnType();
     }
 
     @Override
     public AssignableAVM2Item copy() {
-        return new TypeAssignableItem(type);
+        return new ImportedSlotConstItem(type);
     }
 
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
@@ -114,6 +114,16 @@ public class TypeAssignableItem extends AssignableAVM2Item {
                 ins(AVM2Instructions.SetProperty, propertyId),
                 killTemp(localData, generator, Arrays.asList(ret_temp, obj_temp)));
         return ret;
+    }
+
+    @Override
+    public String toString() {
+        return type.toString();
+    }
+
+    @Override
+    public String toString(LocalData localData) throws InterruptedException {
+        return super.toString(localData); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

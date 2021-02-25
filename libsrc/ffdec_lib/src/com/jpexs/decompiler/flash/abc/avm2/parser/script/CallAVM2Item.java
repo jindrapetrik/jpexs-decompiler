@@ -73,6 +73,9 @@ public class CallAVM2Item extends AVM2Item {
         if (callable instanceof UnresolvedAVM2Item) {
             callable = ((UnresolvedAVM2Item) callable).resolved;
         }
+        if (callable instanceof ImportedSlotConstItem) {
+            callable = ((ImportedSlotConstItem) callable).type;
+        }
         if (callable instanceof NameAVM2Item) {
             NameAVM2Item n = (NameAVM2Item) callable;
             /*List<ABC> allAbcs = new ArrayList<>();
