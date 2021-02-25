@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.model.BooleanAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NanAVM2Item;
@@ -327,9 +328,16 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                         ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
                     }
                 }
-                if (name.size() == 1 && assignedValue != null) {
-                    throw new CompilationException("Cannot assign type", line);
+
+                if (name.size() == 1) {
+                    resolved = new TypeAssignableItem(ret);
+                    //TODO: check whether it is really an assignable and not a Class
+                    if (assignedValue != null) {
+                        ((TypeAssignableItem) resolved).assignedValue = assignedValue;
+                        //throw new CompilationException("Cannot assign type", line);
+                    }
                 }
+
                 return resolvedRoot = ret;
             }
         }
