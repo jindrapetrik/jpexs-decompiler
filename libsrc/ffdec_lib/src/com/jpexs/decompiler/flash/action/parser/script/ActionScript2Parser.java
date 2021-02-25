@@ -1317,7 +1317,7 @@ public class ActionScript2Parser {
         List<GraphTargetItem> commaItems = new ArrayList<>();
         ParsedSymbol symb;
         do {
-            GraphTargetItem prim = expressionPrimary(false, inFunction, inMethod, allowRemainder, variables, functions);
+            GraphTargetItem prim = expressionPrimary(false, inFunction, inMethod, allowRemainder, variables, functions, true);
             if (prim == null) {
                 return null;
             }
@@ -1397,7 +1397,7 @@ public class ActionScript2Parser {
                 }
             }
 
-            rhs = expressionPrimary(allowRemainder, inFunction, inMethod, allowRemainder, variables, functions);
+            rhs = expressionPrimary(allowRemainder, inFunction, inMethod, allowRemainder, variables, functions, true);
             if (rhs == null) {
                 lexer.pushback(op);
                 break;
@@ -1639,7 +1639,7 @@ public class ActionScript2Parser {
         return arrCnt;
     }
 
-    private GraphTargetItem expressionPrimary(boolean allowEmpty, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions) throws IOException, ActionParseException {
+    private GraphTargetItem expressionPrimary(boolean allowEmpty, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean allowCall) throws IOException, ActionParseException {
         if (debugMode) {
             System.out.println("primary:");
         }
@@ -1681,7 +1681,7 @@ public class ActionScript2Parser {
                 break;
             case NEGATE:
                 versionRequired(s, 5);
-                ret = expressionPrimary(false, inFunction, inMethod, false, variables, functions);
+                ret = expressionPrimary(false, inFunction, inMethod, false, variables, functions, true);
                 ret = new BitXorActionItem(null, null, ret, new DirectValueActionItem(4.294967295E9));
 
                 break;
@@ -1695,7 +1695,7 @@ public class ActionScript2Parser {
 
                 } else {
                     lexer.pushback(s);
-                    GraphTargetItem num = expressionPrimary(false, inFunction, inMethod, true, variables, functions);
+                    GraphTargetItem num = expressionPrimary(false, inFunction, inMethod, true, variables, functions, true);
                     if ((num instanceof DirectValueActionItem)
                             && (((DirectValueActionItem) num).value instanceof Long)) {
                         ((DirectValueActionItem) num).value = -(Long) ((DirectValueActionItem) num).value;
@@ -1719,7 +1719,7 @@ public class ActionScript2Parser {
                 }
                 break;
             case TYPEOF:
-                ret = new TypeOfActionItem(null, null, expressionPrimary(false, inFunction, inMethod, false, variables, functions));
+                ret = new TypeOfActionItem(null, null, expressionPrimary(false, inFunction, inMethod, false, variables, functions, true));
                 allowMemberOrCall = true;
                 break;
             case TRUE:
@@ -1798,7 +1798,7 @@ public class ActionScript2Parser {
 
                 break;
             case DELETE:
-                GraphTargetItem varDel = expressionPrimary(false, inFunction, inMethod, false, variables, functions);
+                GraphTargetItem varDel = expressionPrimary(false, inFunction, inMethod, false, variables, functions, true);
                 if (varDel instanceof GetMemberActionItem) {
                     GetMemberActionItem gm = (GetMemberActionItem) varDel;
                     ret = new DeleteActionItem(null, null, gm.object, gm.memberName);
@@ -1808,7 +1808,7 @@ public class ActionScript2Parser {
                 break;
             case INCREMENT:
             case DECREMENT: //preincrement
-                GraphTargetItem prevar = expressionPrimary(false, inFunction, inMethod, false, variables, functions);//variable(inFunction, inMethod, variables, functions);
+                GraphTargetItem prevar = expressionPrimary(false, inFunction, inMethod, false, variables, functions, true);//variable(inFunction, inMethod, variables, functions);
                 if (s.type == SymbolType.INCREMENT) {
                     ret = new PreIncrementActionItem(null, null, prevar);
                 }
@@ -1818,7 +1818,7 @@ public class ActionScript2Parser {
 
                 break;
             case NOT:
-                ret = new NotItem(null, null, expressionPrimary(false, inFunction, inMethod, false, variables, functions));
+                ret = new NotItem(null, null, expressionPrimary(false, inFunction, inMethod, false, variables, functions, true));
 
                 break;
             case PARENT_OPEN:
@@ -1828,31 +1828,28 @@ public class ActionScript2Parser {
                 allowMemberOrCall = true;
                 break;
             case NEW:
-                GraphTargetItem newvar = expressionPrimary(false, inFunction, inMethod, false, variables, functions);//variable(inFunction, inMethod, variables, functions);
-                if (newvar instanceof CastOpActionItem) {
-                    List<GraphTargetItem> args = new ArrayList<>();
-                    args.add((((CastOpActionItem) newvar).object));
-                    newvar = ((CastOpActionItem) newvar).constructor;
-                    if (newvar instanceof GetMemberActionItem) {
-                        ret = new NewMethodActionItem(null, null, ((GetMemberActionItem) newvar).object, ((GetMemberActionItem) newvar).memberName, args);
-                    } else if (newvar instanceof VariableActionItem) {
-                        ret = new NewObjectActionItem(null, null, newvar, args);
-                    }
-                } else if (newvar instanceof ToNumberActionItem) {
+                GraphTargetItem newvar = expressionPrimary(false, inFunction, inMethod, false, variables, functions, false);//variable(inFunction, inMethod, variables, functions);
+                if (newvar instanceof ToNumberActionItem) {
                     List<GraphTargetItem> args = new ArrayList<>();
                     if (((ToNumberActionItem) newvar).value != null) {
                         args.add(((ToNumberActionItem) newvar).value);
                     }
                     ret = new NewObjectActionItem(null, null, pushConst("Number"), args);
-                } else if (newvar instanceof CallMethodActionItem) {
-                    CallMethodActionItem ca = (CallMethodActionItem) newvar;
-                    ret = new NewMethodActionItem(null, null, ca.scriptObject, ca.methodName, ca.arguments);
-                } else if (newvar instanceof CallFunctionActionItem) {
-                    CallFunctionActionItem cf = (CallFunctionActionItem) newvar;
-                    ret = new NewObjectActionItem(null, null, cf.functionName, cf.arguments);
+                } else if (newvar instanceof GetMemberActionItem) {
+
+                    GetMemberActionItem ca = (GetMemberActionItem) newvar;
+                    expectedType(SymbolType.PARENT_OPEN);
+                    List<GraphTargetItem> args = call(inFunction, inMethod, variables, functions);
+                    ret = new NewMethodActionItem(null, null, ca.object, ca.memberName, args);
+                } else if (newvar instanceof VariableActionItem) {
+                    VariableActionItem cf = (VariableActionItem) newvar;
+                    expectedType(SymbolType.PARENT_OPEN);
+                    List<GraphTargetItem> args = call(inFunction, inMethod, variables, functions);
+                    ret = new NewObjectActionItem(null, null, pushConst(cf.getVariableName()), args);
                 } else {
                     throw new ActionParseException("Invalid new item", lexer.yyline());
                 }
+                allowMemberOrCall = true;
 
                 break;
             case EVAL:
@@ -1869,7 +1866,7 @@ public class ActionScript2Parser {
             case SUPER:
             case PATH:
                 if (s.value.equals("not")) {
-                    ret = new NotItem(null, null, expressionPrimary(false, inFunction, inMethod, false, variables, functions));
+                    ret = new NotItem(null, null, expressionPrimary(false, inFunction, inMethod, false, variables, functions, true));
                 } else {
                     if (s.type == SymbolType.PATH) {
                         expectedType(SymbolType.COLON);
@@ -1896,7 +1893,7 @@ public class ActionScript2Parser {
         }
 
         if (allowMemberOrCall && ret != null) {
-            ret = memberOrCall(ret, inFunction, inMethod, variables, functions);
+            ret = memberOrCall(ret, inFunction, inMethod, variables, functions, allowCall);
         }
         if (debugMode) {
             System.out.println("/primary");
@@ -1932,10 +1929,13 @@ public class ActionScript2Parser {
         return false;
     }
 
-    private GraphTargetItem memberOrCall(GraphTargetItem ret, boolean inFunction, boolean inMethod, List<VariableActionItem> variables, List<FunctionActionItem> functions) throws IOException, ActionParseException {
+    private GraphTargetItem memberOrCall(GraphTargetItem ret, boolean inFunction, boolean inMethod, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean allowCall) throws IOException, ActionParseException {
         ParsedSymbol op = lex();
         while (op.isType(SymbolType.PARENT_OPEN, SymbolType.BRACKET_OPEN, SymbolType.DOT)) {
             if (op.type == SymbolType.PARENT_OPEN) {
+                if (!allowCall) {
+                    break;
+                }
                 List<GraphTargetItem> args = call(inFunction, inMethod, variables, functions);
                 if (isCastOp(ret) && args.size() == 1) {
                     ret = new CastOpActionItem(null, null, ret, args.get(0));
