@@ -32,7 +32,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 cast op decompilation
 - Only last DoInitAction tag displayed
 - #1606 Run/Debug SWF that is embedded (has no file associated)
-- AS3 direct editation - coerce in setproperty
+- #1270, #1336 AS3 direct editation - unnecessary coerce in setproperty
 - AS3 direct editation - unary minus (negate) compiled as 0 - value
 - AS3 direct editation - using finally clause for continue and break
 - AS3 direct editation - popscope in catch on continue and break
