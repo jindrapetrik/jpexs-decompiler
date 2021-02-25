@@ -2241,7 +2241,6 @@ public class ActionScript3Parser {
                 int spos = p.lastIndexOf('/');
                 String mod = p.substring(spos + 1);
                 p = p.substring(0, spos);
-                p = p.replace("\\/", "/");
                 ret = new RegExpAvm2Item(p, mod, null, null);
                 allowMemberOrCall = true;
 
