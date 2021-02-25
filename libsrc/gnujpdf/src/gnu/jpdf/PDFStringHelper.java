@@ -61,18 +61,18 @@ public class PDFStringHelper {
         try {
             byte[] utf16be = s.getBytes("UTF-16BE");
             List<Byte> bytes = new ArrayList<>();
-            for (int i = 0; i < utf16be.length; i += 2) {
-                if (utf16be[i] == 0 && utf16be[i + 1] == '(') {
-                    bytes.add((byte) 0);
-                    bytes.add((byte) '\\');
-                    bytes.add((byte) '(');
-                } else if (utf16be[i] == 0 && utf16be[i + 1] == ')') {
-                    bytes.add((byte) 0);
-                    bytes.add((byte) '\\');
-                    bytes.add((byte) ')');
-                } else {
-                    bytes.add(utf16be[i]);
-                    bytes.add(utf16be[i + 1]);
+            for (int i = 0; i < utf16be.length; i++) {
+                switch (utf16be[i]) {
+                    case '\r':
+                        bytes.add((byte) '\\');
+                        bytes.add((byte) 'r');
+                        break;
+                    case '(':
+                    case ')':
+                    case '\\':
+                        bytes.add((byte) '\\');
+                    default:
+                        bytes.add(utf16be[i]);
                 }
             }
             byte[] ret = new byte[bytes.size()];
