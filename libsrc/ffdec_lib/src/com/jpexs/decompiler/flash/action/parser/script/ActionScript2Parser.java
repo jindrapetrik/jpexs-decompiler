@@ -1065,7 +1065,7 @@ public class ActionScript2Parser {
             case WHILE:
                 expectedType(SymbolType.PARENT_OPEN);
                 List<GraphTargetItem> whileExpr = new ArrayList<>();
-                whileExpr.add(commaExpression(inFunction, inMethod, forinlevel, variables, functions));
+                whileExpr.add(expression(inFunction, inMethod, true, variables, functions));
                 expectedType(SymbolType.PARENT_CLOSE);
                 List<GraphTargetItem> whileBody = new ArrayList<>();
                 whileBody.add(command(inFunction, inMethod, forinlevel, true, variables, functions));
@@ -1077,7 +1077,7 @@ public class ActionScript2Parser {
                 expectedType(SymbolType.WHILE);
                 expectedType(SymbolType.PARENT_OPEN);
                 List<GraphTargetItem> doExpr = new ArrayList<>();
-                doExpr.add(commaExpression(inFunction, inMethod, forinlevel, variables, functions));
+                doExpr.add(expression(inFunction, inMethod, true, variables, functions));
                 expectedType(SymbolType.PARENT_CLOSE);
                 ret = new DoWhileItem(null, null, null, doBody, doExpr);
                 break;
@@ -1314,15 +1314,27 @@ public class ActionScript2Parser {
         if (debugMode) {
             System.out.println("expression:");
         }
-        GraphTargetItem prim = expressionPrimary(false, inFunction, inMethod, allowRemainder, variables, functions);
-        if (prim == null) {
-            return null;
+        List<GraphTargetItem> commaItems = new ArrayList<>();
+        ParsedSymbol symb;
+        do {
+            GraphTargetItem prim = expressionPrimary(false, inFunction, inMethod, allowRemainder, variables, functions);
+            if (prim == null) {
+                return null;
+            }
+            GraphTargetItem expr = expression1(prim, GraphTargetItem.NOPRECEDENCE, inFunction, inMethod, allowRemainder, variables, functions);
+            commaItems.add(expr);
+            symb = lex();
+        } while (symb != null && symb.type == SymbolType.COMMA);
+        if (symb != null) {
+            lexer.pushback(symb);
         }
-        GraphTargetItem ret = expression1(prim, GraphTargetItem.NOPRECEDENCE, inFunction, inMethod, allowRemainder, variables, functions);
         if (debugMode) {
             System.out.println("/expression");
         }
-        return ret;
+        if (commaItems.size() == 1) {
+            return commaItems.get(0);
+        }
+        return new CommaExpressionItem(null, null, commaItems);
     }
 
     private ParsedSymbol peekLex() throws IOException, ActionParseException {
@@ -1625,26 +1637,6 @@ public class ActionScript2Parser {
             return -1;
         }
         return arrCnt;
-    }
-
-    private GraphTargetItem commaExpression(boolean inFunction, boolean inMethod, int forInLevel, List<VariableActionItem> variables, List<FunctionActionItem> functions) throws IOException, ActionParseException {
-        GraphTargetItem cmd = null;
-        List<GraphTargetItem> expr = new ArrayList<>();
-        ParsedSymbol s;
-        do {
-            cmd = command(inFunction, inMethod, forInLevel, false, variables, functions);
-            if (cmd != null) {
-                expr.add(cmd);
-            }
-            s = lex();
-        } while (s.type == SymbolType.COMMA && cmd != null);
-        lexer.pushback(s);
-        if (cmd == null) {
-            expr.add(expression(inFunction, inMethod, true, variables, functions));
-        } else if (!cmd.hasReturnValue()) {
-            throw new ActionParseException("Expression expected", lexer.yyline());
-        }
-        return new CommaExpressionItem(null, null, expr);
     }
 
     private GraphTargetItem expressionPrimary(boolean allowEmpty, boolean inFunction, boolean inMethod, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions) throws IOException, ActionParseException {
