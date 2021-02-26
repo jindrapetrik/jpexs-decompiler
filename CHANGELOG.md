@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- AS3 goto definition on imports
+
 ### Fixed
 - #1336 AS3 direct editation - Regexp / character escaping
 - #1615 Turning off Checking for modifications disables SWF loading
@@ -13,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - AS3 decompilation - do not show setslot on activation when has same name as method parameter
 - #1450 AS3 direct editation - handling types from same package
 - AS3 goto definition for types in another ABC tag
+- AS3 goto definition for obfuscated names
 
 ### Changed
 - #1616 Close SWF menuitem is last in the context menu
