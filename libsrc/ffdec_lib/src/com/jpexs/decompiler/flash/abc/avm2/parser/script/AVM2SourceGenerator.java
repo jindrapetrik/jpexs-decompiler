@@ -1607,7 +1607,6 @@ public class AVM2SourceGenerator implements SourceGenerator {
         newlocalData.callStack.addAll(localData.callStack);
         newlocalData.traitUsages = localData.traitUsages;
         newlocalData.currentScript = localData.currentScript;
-        newlocalData.documentClass = localData.documentClass;
         newlocalData.privateNs = localData.privateNs;
         newlocalData.protectedNs = localData.protectedNs;
         newlocalData.isStatic = isStatic;
@@ -2463,8 +2462,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
         for (Trait t : si.traits.traits) {
             if (t instanceof TraitClass) {
                 TraitClass tc = (TraitClass) t;
+                DottedChain className = tc.getName(abc).getNameWithNamespace(abc.constants, true);
+
                 List<Integer> parents = new ArrayList<>();
-                if (localData.documentClass) {
+                if (className.size() == 1) {
                     mbCode.add(ins(AVM2Instructions.GetScopeObject, 0));
                     traitScope++;
                 } else {
@@ -2682,19 +2683,21 @@ public class AVM2SourceGenerator implements SourceGenerator {
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, TypeItem item) throws CompilationException {
         String currentFullClassName = localData.getFullClass();
 
-        if (localData.documentClass && item.toString().equals(currentFullClassName)) {
-            int slotId = 0;
+        int globalSlotId = 0;
+        if (item.fullTypeName.size() == 1 && item.toString().equals(currentFullClassName)) {
             int c = abcIndex.getSelectedAbc().findClassByName(currentFullClassName);
             for (Trait t : localData.currentScript.traits.traits) {
                 if (t instanceof TraitClass) {
                     TraitClass tc = (TraitClass) t;
                     if (tc.class_info == c) {
-                        slotId = tc.slot_id;
+                        globalSlotId = tc.slot_id;
                         break;
                     }
                 }
             }
-            return GraphTargetItem.toSourceMerge(localData, this, ins(AVM2Instructions.GetGlobalScope), ins(AVM2Instructions.GetSlot, slotId));
+        }
+        if (globalSlotId > 0) {
+            return GraphTargetItem.toSourceMerge(localData, this, ins(AVM2Instructions.GetGlobalScope), ins(AVM2Instructions.GetSlot, globalSlotId));
         } else {
             return GraphTargetItem.toSourceMerge(localData, this, ins(AVM2Instructions.GetLex, resolveType(localData, item, abcIndex)));
         }

@@ -2534,18 +2534,17 @@ public class ActionScript3Parser {
         return ret;
     }
 
-    public void addScriptFromTree(List<List<NamespaceItem>> allOpenedNamespaces, List<GraphTargetItem> items, boolean documentClass, int classPos) throws AVM2ParseException, CompilationException {
+    public void addScriptFromTree(List<List<NamespaceItem>> allOpenedNamespaces, List<GraphTargetItem> items, int classPos) throws AVM2ParseException, CompilationException {
         AVM2SourceGenerator gen = new AVM2SourceGenerator(abcIndex);
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
                 new HashMap<>(), 0, Boolean.FALSE, 0);
-        localData.documentClass = documentClass;
         abcIndex.getSelectedAbc().script_info.add(gen.generateScriptInfo(allOpenedNamespaces, localData, items, classPos));
     }
 
-    public void addScript(String s, boolean documentClass, String fileName, int classPos, int scriptIndex) throws AVM2ParseException, IOException, CompilationException {
+    public void addScript(String s, String fileName, int classPos, int scriptIndex) throws AVM2ParseException, IOException, CompilationException {
         List<List<NamespaceItem>> allOpenedNamespaces = new ArrayList<>();
         List<GraphTargetItem> traits = scriptTraitsFromString(allOpenedNamespaces, s, fileName, scriptIndex);
-        addScriptFromTree(allOpenedNamespaces, traits, documentClass, classPos);
+        addScriptFromTree(allOpenedNamespaces, traits, classPos);
     }
 
     public ActionScript3Parser(ABC abc, List<ABC> otherAbcs) throws IOException, InterruptedException {
@@ -2571,14 +2570,14 @@ public class ActionScript3Parser {
         }
     }
 
-    public static void compile(String src, ABC abc, List<ABC> otherABCs, boolean documentClass, String fileName, int classPos, int scriptIndex) throws AVM2ParseException, IOException, InterruptedException, CompilationException {
+    public static void compile(String src, ABC abc, List<ABC> otherABCs, String fileName, int classPos, int scriptIndex) throws AVM2ParseException, IOException, InterruptedException, CompilationException {
         //List<ABC> parABCs = new ArrayList<>();
         initPlayer();
         ActionScript3Parser parser = new ActionScript3Parser(abc, otherABCs);
         boolean success = false;
         ABC originalAbc = ((ABCContainerTag) ((Tag) abc.parentTag).cloneTag()).getABC();
         try {
-            parser.addScript(src, documentClass, fileName, classPos, scriptIndex);
+            parser.addScript(src, fileName, classPos, scriptIndex);
             success = true;
         } finally {
             if (!success) {
@@ -2601,7 +2600,7 @@ public class ActionScript3Parser {
             initPlayer();
             ABC abc = new ABC(null);
             ActionScript3Parser parser = new ActionScript3Parser(abc, new ArrayList<>());
-            parser.addScript(new String(Helper.readFile(src), Utf8Helper.charset), true, src, classPos, scriptIndex);
+            parser.addScript(new String(Helper.readFile(src), Utf8Helper.charset), src, classPos, scriptIndex);
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(dst)))) {
                 abc.saveToStream(fos);
 

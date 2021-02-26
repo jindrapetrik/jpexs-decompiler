@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - #1450 AS3 direct editation - handling types from same package
 - AS3 goto definition for types in another ABC tag
 - AS3 goto definition for obfuscated names
+- AS3 direct editation - compilation of top level classes
 
 ### Changed
 - #1616 Close SWF menuitem is last in the context menu
