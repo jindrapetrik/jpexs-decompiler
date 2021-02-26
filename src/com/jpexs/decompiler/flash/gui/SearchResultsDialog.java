@@ -434,7 +434,10 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
         } else {
             DefaultListModel<SearchResult> model = (DefaultListModel<SearchResult>) resultsList.getModel();
             model.clear();
-            model.addAll(swfToResults.get(swfToResults.keySet().iterator().next()));
+            List<SearchResult> elements = swfToResults.get(swfToResults.keySet().iterator().next());
+            for (SearchResult e : elements) {
+                model.addElement(e);
+            }
         }
 
         ((CardLayout) resultsPanel.getLayout()).show(resultsPanel, showSwfTitles ? "tree" : "list");
