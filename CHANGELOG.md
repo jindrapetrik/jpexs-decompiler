@@ -18,6 +18,8 @@ All notable changes to this project will be documented in this file.
 - AS3 goto definition for types in another ABC tag
 - AS3 goto definition for obfuscated names
 - AS3 direct editation - compilation of top level classes
+- #1494 AS1/2 Direct editation - GetURL not properly saved caused by case
+- AS1/2 Direct editation - functions case sensitivity
 
 ### Changed
 - #1616 Close SWF menuitem is last in the context menu
