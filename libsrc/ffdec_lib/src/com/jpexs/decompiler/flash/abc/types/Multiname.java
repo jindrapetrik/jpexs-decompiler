@@ -414,7 +414,7 @@ public class Multiname {
                 }
             }
         }
-        String name = getName(constants, null, false, false);
+        String name = getName(constants, null, true, false);
         if (ns != null) {
             return ns.getName(constants).add(name, withSuffix ? getNamespaceSuffix() : "");
         }

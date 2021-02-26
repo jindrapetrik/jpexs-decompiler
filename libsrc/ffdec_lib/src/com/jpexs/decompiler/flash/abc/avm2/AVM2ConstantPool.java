@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.abc.ABCVersionRequirements;
@@ -556,14 +557,15 @@ public class AVM2ConstantPool implements Cloneable {
      * @param origConst
      * @return
      */
-    public int getMultinameId(Multiname val, AVM2ConstantPool origConst) {
+    public List<Integer> getMultinameIds(Multiname val, AVM2ConstantPool origConst) {
 
+        List<Integer> ret = new ArrayList<>();
         for (int i = 1; i < getMultinameCount(); i++) {
             if (getMultiname(i).qnameEquals(this, val, origConst)) {
-                return i;
+                ret.add(i);
             }
         }
-        return -1;
+        return ret;
     }
 
     public int getStringId(String val, boolean add) {
