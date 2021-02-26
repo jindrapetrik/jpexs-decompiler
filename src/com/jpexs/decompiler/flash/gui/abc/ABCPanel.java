@@ -1139,8 +1139,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                         continue;
                     }
 
-                    int mid = a.constants.getMultinameId(m, abc.constants);
-                    if (mid > 0) {
+                    List<Integer> mids = a.constants.getMultinameIds(m, abc.constants);
+                    for (int mid : mids) {
                         usages.addAll(a.findMultinameDefinition(mid));
                     }
                 }
@@ -1181,8 +1181,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     if (a == abc) {
                         continue;
                     }
-                    int mid = a.constants.getMultinameId(m, abc.constants);
-                    if (mid > 0) {
+                    List<Integer> mids = a.constants.getMultinameIds(m, abc.constants);
+                    for (int mid : mids) {
                         usages.addAll(a.findMultinameDefinition(mid));
                     }
                 }

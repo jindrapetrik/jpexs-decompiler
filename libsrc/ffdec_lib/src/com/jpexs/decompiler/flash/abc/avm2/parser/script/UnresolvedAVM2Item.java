@@ -287,7 +287,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         throw new RuntimeException("Cannot assign");
     }
 
-    public GraphTargetItem resolve(GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
+    public GraphTargetItem resolve(String currentClass, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
         if (scopeStack.isEmpty()) { //Everything is multiname property in with command
 
             //search for variable
@@ -315,6 +315,27 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 }
             }
         }
+
+        if (currentClass != null) {
+            DottedChain classChain = DottedChain.parseWithSuffix(currentClass);
+            DottedChain pkg = classChain.getWithoutLast();
+
+            TypeItem ti = new TypeItem(pkg.addWithSuffix(name.get(0)));
+            AbcIndexing.ClassIndex ci = abc.findClass(ti);
+
+            if (ci != null) {
+                resolved = ti;
+                for (int i = 1; i < name.size(); i++) {
+                    resolved = new PropertyAVM2Item(resolved, name.get(i), abc, openedNamespaces, new ArrayList<>());
+                    if (i == name.size() - 1) {
+                        ((PropertyAVM2Item) resolved).assignedValue = assignedValue;
+                    }
+                }
+                return resolvedRoot = ti;
+            }
+
+        }
+
         //Search for types in imported classes
         for (DottedChain imp : importedClasses) {
             String impName = imp.getLast();
