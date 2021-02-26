@@ -60,6 +60,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.HasNextAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NextNameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NextValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnValueAVM2Item;
@@ -1911,6 +1912,33 @@ public class AVM2Graph extends Graph {
             if (!list.isEmpty()) {
                 if (list.get(list.size() - 1) instanceof ReturnVoidAVM2Item) {
                     list.remove(list.size() - 1);
+                }
+            }
+        }
+
+        if (level == 0) {
+            Map<Integer, String> localRegNames = body.getLocalRegNames(abc);
+            loopi:
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i) instanceof SetSlotAVM2Item) {
+                    SetSlotAVM2Item sslot = (SetSlotAVM2Item) list.get(0);
+                    if (sslot.slotObject instanceof NewActivationAVM2Item) {
+                        String slotName = sslot.slotName.getName(abc.constants, new ArrayList<>(), true, true);
+                        if (sslot.value.getNotCoercedNoDup() instanceof LocalRegAVM2Item) {
+                            LocalRegAVM2Item locReg = (LocalRegAVM2Item) sslot.value.getNotCoercedNoDup();
+                            if (localRegNames.containsValue(slotName)) {
+                                for (int regIndex : localRegNames.keySet()) {
+                                    if (slotName.equals(localRegNames.get(regIndex))) {
+                                        if (locReg.regIndex == regIndex) {
+                                            list.remove(i);
+                                            i--;
+                                            continue loopi;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
