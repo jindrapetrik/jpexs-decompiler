@@ -1647,30 +1647,30 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         boolean hasArguments = false;
         List<String> slotNames = new ArrayList<>();
-        List<String> slotTypes = new ArrayList<>();
+        List<GraphTargetItem> slotTypes = new ArrayList<>();
         slotNames.add("--first");
-        slotTypes.add("-");
+        slotTypes.add(TypeItem.UNBOUNDED);
 
         int paramLine = 0; //?
 
         List<String> registerNames = new ArrayList<>();
         List<Integer> registerLines = new ArrayList<>();
-        List<String> registerTypes = new ArrayList<>();
+        List<GraphTargetItem> registerTypes = new ArrayList<>();
         if (className != null) {
             String fullClassName = pkg.addWithSuffix(className).toRawString();
-            registerTypes.add(fullClassName);
+            registerTypes.add(new TypeItem(fullClassName));
             localData.scopeStack.add(new LocalRegAVM2Item(null, null, registerNames.size(), null));
             registerNames.add("this");
             registerLines.add(0); //?
 
         } else {
-            registerTypes.add("global");
+            registerTypes.add(new TypeItem("global"));
             registerNames.add("this");
             registerLines.add(0); //?
         }
         for (GraphTargetItem t : paramTypes) {
-            registerTypes.add(t.toString());
-            slotTypes.add(t.toString());
+            registerTypes.add(t);
+            slotTypes.add(t);
         }
         for (int i = 0; i < paramNames.size(); i++) {
             registerLines.add(paramLine);
@@ -1681,8 +1681,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
          slotTypes.add("" + p);
          }*/
         if (hasRest) {
-            registerTypes.add("Array");
-            slotTypes.add("Array");
+            registerTypes.add(TypeItem.ARRAY);
+            slotTypes.add(TypeItem.ARRAY);
         }
         localData.registerVars.clear();
         for (AssignableAVM2Item an : subvariables) {
@@ -1690,7 +1690,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 NameAVM2Item n = (NameAVM2Item) an;
                 if (n.getVariableName().equals("arguments") & !n.isDefinition()) {
                     registerNames.add("arguments");
-                    registerTypes.add("Object");
+                    registerTypes.add(new TypeItem("Object"));
                     registerLines.add(0); //?
                     hasArguments = true;
                     break;
@@ -1703,7 +1703,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             registerNames.add("+$activation");
             registerLines.add(0); //?
             localData.activationReg = registerNames.size() - 1;
-            registerTypes.add("Object");
+            registerTypes.add(new TypeItem("Object"));
             localData.scopeStack.add(new LocalRegAVM2Item(null, null, localData.activationReg, null));
         }
 
@@ -1728,17 +1728,17 @@ public class AVM2SourceGenerator implements SourceGenerator {
                                 int regIndex = Integer.parseInt(regIndexStr);
                                 while (registerNames.size() <= regIndex) {
                                     registerNames.add(UNUSED);
-                                    registerTypes.add("*");
+                                    registerTypes.add(TypeItem.UNBOUNDED);
                                     registerLines.add(paramLine);
                                     slotNames.add(UNUSED);
-                                    slotTypes.add("*");
+                                    slotTypes.add(TypeItem.UNBOUNDED);
                                 }
                                 registerNames.set(regIndex, varName);
-                                registerTypes.set(regIndex, varName);
+                                registerTypes.set(regIndex, n.type);
                                 registerLines.set(regIndex, n.line);
 
                                 slotNames.add(varName);
-                                slotTypes.add(n.type.toString());
+                                slotTypes.add(n.type);
                             } //in second round the rest
                             else if (round == 2 && !m.matches()) {
 
@@ -1753,15 +1753,15 @@ public class AVM2SourceGenerator implements SourceGenerator {
                                 if (newRegIndex == -1) {
                                     newRegIndex = registerNames.size();
                                     registerNames.add(UNUSED);
-                                    registerTypes.add("*");
+                                    registerTypes.add(TypeItem.UNBOUNDED);
                                     registerLines.add(paramLine);
                                 }
                                 registerNames.set(newRegIndex, n.getVariableName());
-                                registerTypes.set(newRegIndex, n.type.toString());
+                                registerTypes.set(newRegIndex, n.type);
                                 registerLines.set(newRegIndex, n.line);
 
                                 slotNames.add(n.getVariableName());
-                                slotTypes.add(n.type.toString());
+                                slotTypes.add(n.type);
                             }
                         }
                     }
@@ -1905,13 +1905,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     TraitSlotConst tsc = new TraitSlotConst();
                     tsc.slot_id = slotId++;
                     tsc.name_index = abcIndex.getSelectedAbc().constants.getMultinameId(Multiname.createQName(false, abcIndex.getSelectedAbc().constants.getStringId(slotNames.get(i), true), abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, pkg, 0, true)), true);
-                    tsc.type_index = typeName(localData, new TypeItem(slotTypes.get(i)));
+                    tsc.type_index = typeName(localData, slotTypes.get(i));
                     mbody.traits.traits.add(tsc);
                 }
                 for (int i = 1; i < paramRegCount; i++) {
-                    NameAVM2Item param = new NameAVM2Item(new TypeItem(registerTypes.get(i)), 0, registerNames.get(i), null, false, new ArrayList<>(), abcIndex);
+                    NameAVM2Item param = new NameAVM2Item(registerTypes.get(i), 0, registerNames.get(i), null, false, new ArrayList<>(), abcIndex);
                     param.setRegNumber(i);
-                    NameAVM2Item d = new NameAVM2Item(new TypeItem(registerTypes.get(i)), 0, registerNames.get(i), param, true, new ArrayList<>(), abcIndex);
+                    NameAVM2Item d = new NameAVM2Item(registerTypes.get(i), 0, registerNames.get(i), param, true, new ArrayList<>(), abcIndex);
                     d.setSlotScope(slotScope);
                     d.setSlotNumber(slotNames.indexOf(registerNames.get(i)));
                     declarations.add(d);
