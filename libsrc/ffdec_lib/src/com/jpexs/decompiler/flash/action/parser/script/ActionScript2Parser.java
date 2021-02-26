@@ -710,7 +710,7 @@ public class ActionScript2Parser {
                 GraphTargetItem url = (expression(inFunction, inMethod, true, variables, functions, false));
                 s = lex();
                 expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE, SymbolType.COMMA);
-                int getuMethod = 1;
+                int getuMethod = 0;
                 GraphTargetItem target;
                 if (s.type == SymbolType.COMMA) {
                     target = (expression(inFunction, inMethod, true, variables, functions, false));
