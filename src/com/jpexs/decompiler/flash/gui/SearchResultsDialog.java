@@ -434,9 +434,11 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
         } else {
             DefaultListModel<SearchResult> model = (DefaultListModel<SearchResult>) resultsList.getModel();
             model.clear();
-            List<SearchResult> elements = swfToResults.get(swfToResults.keySet().iterator().next());
-            for (SearchResult e : elements) {
-                model.addElement(e);
+            if (!swfToResults.isEmpty()) {
+                List<SearchResult> elements = swfToResults.get(swfToResults.keySet().iterator().next());
+                for (SearchResult e : elements) {
+                    model.addElement(e);
+                }
             }
         }
 
