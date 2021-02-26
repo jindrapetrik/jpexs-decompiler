@@ -41,9 +41,6 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
         int oldIndex = pack.scriptIndex;
         int newIndex = abc.script_info.size();
         try {
-            String documentClass = swf.getDocumentClass();
-            boolean isDocumentClass = documentClass != null && documentClass.equals(pack.getClassPath().toString());
-
             ScriptInfo si = abc.script_info.get(oldIndex);
             if (pack.isSimple) {
                 si.delete(abc, true);
@@ -66,7 +63,7 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
             otherAbcs.remove(abc);
             abc.script_info.get(oldIndex).delete(abc, true);
 
-            ActionScript3Parser.compile(text, abc, otherAbcs, isDocumentClass, scriptName, newClassIndex, oldIndex);
+            ActionScript3Parser.compile(text, abc, otherAbcs, scriptName, newClassIndex, oldIndex);
             if (pack.isSimple) {
                 // Move newly added script to its position
                 abc.script_info.set(oldIndex, abc.script_info.get(newIndex));

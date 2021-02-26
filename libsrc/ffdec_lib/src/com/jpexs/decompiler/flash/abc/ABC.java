@@ -1372,6 +1372,9 @@ public class ABC {
 
     public int findClassByName(String nameWithSuffix) {
         for (int c = 0; c < instance_info.size(); c++) {
+            if (instance_info.get(c).deleted) {
+                continue;
+            }
             DottedChain s = constants.getMultiname(instance_info.get(c).name_index).getNameWithNamespace(constants, true);
             if (nameWithSuffix.equals(s.toRawString())) {
                 return c;

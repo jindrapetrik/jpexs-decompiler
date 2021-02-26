@@ -258,7 +258,7 @@ public abstract class Trait implements Cloneable, Serializable {
             if (imp.size() > 1) {  //No imports from root package
                 writer.appendNoHilight("import ");
 
-                if (!imp.isTopLevel()) {
+                if (imp.size() > 1) {
                     writer.appendNoHilight(imp.getWithoutLast().toPrintableString(true));
                     writer.appendNoHilight(".");
                 }
