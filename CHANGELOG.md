@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - #1616 Close SWF menuitem is last in the context menu
+- #1620 Search results - Using list component instead of tree when searching in single SWF
 
 ## [14.0.0] - 2021-02-24
 ### Added

@@ -20,32 +20,46 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.search.SearchResult;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.swing.AbstractListModel;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
+import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.ExpandVetoException;
@@ -60,6 +74,10 @@ import javax.swing.tree.TreePath;
 public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
 
     private final JTree resultsTree;
+
+    private final JList<SearchResult> resultsList;
+
+    private final JPanel resultsPanel;
 
     private final boolean regExp;
 
@@ -80,6 +98,7 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
         this.text = text;
         Container cnt = getContentPane();
         resultsTree = new JTree(new BasicTreeNode("root"));
+        resultsList = new JList<>(new DefaultListModel<>());
         this.regExp = regExp;
         this.listeners = listeners;
 
@@ -99,23 +118,28 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
         buttonsPanel.setLayout(new FlowLayout());
         buttonsPanel.add(gotoButton);
         buttonsPanel.add(closeButton);
-        resultsTree.addKeyListener(new KeyAdapter() {
+        KeyListener keyListener = new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     gotoElement();
                 }
             }
-        });
+        };
+        resultsTree.addKeyListener(keyListener);
 
-        resultsTree.addMouseListener(new MouseAdapter() {
+        resultsList.addKeyListener(keyListener);
+
+        MouseListener mouseListener = new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     gotoElement();
                 }
             }
-        });
+        };
+        resultsTree.addMouseListener(mouseListener);
+        resultsList.addMouseListener(mouseListener);
 
         resultsTree.setRootVisible(false);
 
@@ -151,8 +175,138 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
 
         });
 
+        resultsTree.setUI(new BasicTreeUI() {
+
+            @Override
+            public void paint(Graphics g, JComponent c) {
+                if (tree != c) {
+                    throw new InternalError("incorrect component");
+                }
+
+                // Should never happen if installed for a UI
+                if (treeState == null) {
+                    return;
+                }
+
+                Rectangle paintBounds = g.getClipBounds();
+                Insets insets = tree.getInsets();
+                TreePath initialPath = getClosestPathForLocation(tree, 0, paintBounds.y);
+                Enumeration<?> paintingEnumerator = treeState.getVisiblePathsFrom(initialPath);
+                int row = treeState.getRowForPath(initialPath);
+                int endY = paintBounds.y + paintBounds.height;
+
+                drawingCache.clear();
+
+                if (initialPath != null && paintingEnumerator != null) {
+                    TreePath parentPath = initialPath;
+
+                    // Draw the lines, knobs, and rows
+                    // Find each parent and have them draw a line to their last child
+                    parentPath = parentPath.getParentPath();
+                    while (parentPath != null) {
+                        paintVerticalPartOfLeg(g, paintBounds, insets, parentPath);
+                        drawingCache.put(parentPath, Boolean.TRUE);
+                        parentPath = parentPath.getParentPath();
+                    }
+
+                    boolean done = false;
+                    // Information for the node being rendered.
+                    boolean isExpanded;
+                    boolean hasBeenExpanded;
+                    boolean isLeaf;
+                    Rectangle boundsBuffer = new Rectangle();
+                    Rectangle bounds;
+                    TreePath path;
+                    boolean rootVisible = isRootVisible();
+
+                    while (!done && paintingEnumerator.hasMoreElements()) {
+                        path = (TreePath) paintingEnumerator.nextElement();
+                        if (path != null) {
+                            isLeaf = treeModel.isLeaf(path.getLastPathComponent());
+                            if (isLeaf) {
+                                isExpanded = hasBeenExpanded = false;
+                            } else {
+                                isExpanded = treeState.getExpandedState(path);
+                                hasBeenExpanded = tree.hasBeenExpanded(path);
+                            }
+                            bounds = getPathBounds(path, insets, boundsBuffer);
+                            if (bounds == null) // This will only happen if the model changes out
+                            // from under us (usually in another thread).
+                            // Swing isn't multithreaded, but I'll put this
+                            // check in anyway.
+                            {
+                                return;
+                            }
+                            // See if the vertical line to the parent has been drawn.
+                            parentPath = path.getParentPath();
+                            if (parentPath != null) {
+                                if (drawingCache.get(parentPath) == null) {
+                                    paintVerticalPartOfLeg(g, paintBounds,
+                                            insets, parentPath);
+                                    drawingCache.put(parentPath, Boolean.TRUE);
+                                }
+                                paintHorizontalPartOfLeg(g, paintBounds, insets,
+                                        bounds, path, row,
+                                        isExpanded,
+                                        hasBeenExpanded, isLeaf);
+                            } else if (rootVisible && row == 0) {
+                                paintHorizontalPartOfLeg(g, paintBounds, insets,
+                                        bounds, path, row,
+                                        isExpanded,
+                                        hasBeenExpanded, isLeaf);
+                            }
+                            if (shouldPaintExpandControl(path, row, isExpanded,
+                                    hasBeenExpanded, isLeaf)) {
+                                paintExpandControl(g, paintBounds, insets, bounds,
+                                        path, row, isExpanded,
+                                        hasBeenExpanded, isLeaf);
+                            }
+                            paintRow(g, paintBounds, insets, bounds, path,
+                                    row, isExpanded, hasBeenExpanded, isLeaf);
+                            if ((bounds.y + bounds.height) >= endY) {
+                                done = true;
+                            }
+                        } else {
+                            done = true;
+                        }
+                        row++;
+                    }
+                }
+
+                paintDropLine(g);
+
+                // Empty out the renderer pane, allowing renderers to be gc'ed.
+                rendererPane.removeAll();
+
+                drawingCache.clear();
+            }
+
+            @Override
+            public Rectangle getPathBounds(JTree tree, TreePath path) {
+                if (tree != null && treeState != null) {
+                    return getPathBounds(path, tree.getInsets(), new Rectangle());
+                }
+                return null;
+            }
+
+            private Rectangle getPathBounds(
+                    TreePath path, Insets insets, Rectangle bounds) {
+                bounds = treeState.getBounds(path, bounds);
+                if (bounds != null) {
+                    bounds.width = tree.getWidth();
+                    bounds.y += insets.top;
+                }
+                return bounds;
+            }
+        });
+
         cnt.setLayout(new BorderLayout());
-        JScrollPane sp = new JScrollPane(resultsTree);
+
+        resultsPanel = new JPanel(new CardLayout());
+        resultsPanel.add(resultsTree, "tree");
+        resultsPanel.add(resultsList, "list");
+
+        JScrollPane sp = new JScrollPane(resultsPanel);
         sp.setPreferredSize(new Dimension(300, 300));
         cnt.add(sp, BorderLayout.CENTER);
 
@@ -187,7 +341,6 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
         public String toString() {
             return data.toString();
         }
-
 
         public Object getData() {
             return data;
@@ -251,31 +404,40 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
 
     private void updateModel() {
         boolean showSwfTitles = swfToResults.size() > 1;
-        BasicTreeNode rootNode = new BasicTreeNode("root");
-        List<BasicTreeNode> swfNodes = new ArrayList<>();
-        for (SWF s : swfToResults.keySet()) {
-            BasicTreeNode swfNode = new BasicTreeNode(s);
-            if (showSwfTitles) {
-                rootNode.addChild(swfNode);
-                swfNode.setParent(rootNode);
-                swfNodes.add(swfNode);
-            }
-            for (SearchResult r : swfToResults.get(s)) {
-                BasicTreeNode rNode = new BasicTreeNode(r);
+
+        if (showSwfTitles) {
+            BasicTreeNode rootNode = new BasicTreeNode("root");
+            List<BasicTreeNode> swfNodes = new ArrayList<>();
+            for (SWF s : swfToResults.keySet()) {
+                BasicTreeNode swfNode = new BasicTreeNode(s);
                 if (showSwfTitles) {
-                    swfNode.addChild(rNode);
-                    rNode.setParent(swfNode);
-                } else {
-                    rootNode.addChild(rNode);
-                    rNode.setParent(rootNode);
+                    rootNode.addChild(swfNode);
+                    swfNode.setParent(rootNode);
+                    swfNodes.add(swfNode);
+                }
+                for (SearchResult r : swfToResults.get(s)) {
+                    BasicTreeNode rNode = new BasicTreeNode(r);
+                    if (showSwfTitles) {
+                        swfNode.addChild(rNode);
+                        rNode.setParent(swfNode);
+                    } else {
+                        rootNode.addChild(rNode);
+                        rNode.setParent(rootNode);
+                    }
                 }
             }
+            resultsTree.setModel(new DefaultTreeModel(rootNode, false));
+            for (TreeNode t : swfNodes) {
+                TreePath tp = new TreePath(new Object[]{rootNode, t});
+                resultsTree.expandPath(tp);
+            }
+        } else {
+            DefaultListModel<SearchResult> model = (DefaultListModel<SearchResult>) resultsList.getModel();
+            model.clear();
+            model.addAll(swfToResults.get(swfToResults.keySet().iterator().next()));
         }
-        resultsTree.setModel(new DefaultTreeModel(rootNode, false));
-        for (TreeNode t : swfNodes) {
-            TreePath tp = new TreePath(new Object[]{rootNode, t});
-            resultsTree.expandPath(tp);
-        }
+
+        ((CardLayout) resultsPanel.getLayout()).show(resultsPanel, showSwfTitles ? "tree" : "list");
     }
 
     public void removeSwf(SWF swf) {
@@ -297,10 +459,16 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
 
     @SuppressWarnings("unchecked")
     private void gotoElement() {
-        BasicTreeNode selection = (BasicTreeNode) resultsTree.getLastSelectedPathComponent();
-        if (selection.getData() instanceof SearchResult) {
+        if (swfToResults.size() > 1) {
+            BasicTreeNode selection = (BasicTreeNode) resultsTree.getLastSelectedPathComponent();
+            if (selection.getData() instanceof SearchResult) {
+                for (SearchListener<E> listener : listeners) {
+                    listener.updateSearchPos(text, ignoreCase, regExp, (E) selection.getData());
+                }
+            }
+        } else {
             for (SearchListener<E> listener : listeners) {
-                listener.updateSearchPos(text, ignoreCase, regExp, (E) selection.getData());
+                listener.updateSearchPos(text, ignoreCase, regExp, (E) resultsList.getSelectedValue());
             }
         }
     }
