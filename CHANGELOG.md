@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - #1101 AS3 direct editation - handling imported vars
 - #1169 AS1/2 direct editation - getmember after new operator
 - #1338, #1480 AS3 direct editation - Vector in combination with activation
+- AS3 decompilation - do not show setslot on activation when has same name as method parameter
 
 ### Changed
 - #1616 Close SWF menuitem is last in the context menu
