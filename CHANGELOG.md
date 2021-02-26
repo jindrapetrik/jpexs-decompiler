@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - #1618 Export to PDF selectable text escaping and text size
 - #1101 AS3 direct editation - handling imported vars
 - #1169 AS1/2 direct editation - getmember after new operator
+- #1338, #1480 AS3 direct editation - Vector in combination with activation
 
 ### Changed
 - #1616 Close SWF menuitem is last in the context menu
