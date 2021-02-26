@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [14.0.1] - 2021-02-26
 ### Added
 - AS3 goto definition on imports
 
