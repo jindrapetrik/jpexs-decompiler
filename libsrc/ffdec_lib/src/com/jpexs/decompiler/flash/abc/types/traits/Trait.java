@@ -256,7 +256,14 @@ public abstract class Trait implements Cloneable, Serializable {
         Collections.sort(imports);
         for (DottedChain imp : imports) {
             if (imp.size() > 1) {  //No imports from root package
-                writer.appendNoHilight("import " + imp.toPrintableString(true) + ";").newLine();
+                writer.appendNoHilight("import ");
+
+                if (!imp.isTopLevel()) {
+                    writer.appendNoHilight(imp.getWithoutLast().toPrintableString(true));
+                    writer.appendNoHilight(".");
+                }
+                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, imp.getLast()), HighlightSpecialType.TYPE_NAME, imp.toRawString());
+                writer.appendNoHilight(";").newLine();
                 hasImport = true;
             }
         }

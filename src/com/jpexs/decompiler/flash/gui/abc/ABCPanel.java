@@ -869,7 +869,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         decompiledTextArea.setLinkHandler(new LinkHandler() {
             @Override
             public boolean isLink(Token token) {
-                return hasDeclaration(token.start);
+                return hasDeclaration(token);
             }
 
             @Override
@@ -1099,18 +1099,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         cancelDecompiledButton.setEnabled(value);
     }
 
-    private boolean hasDeclaration(int pos) {
+    private boolean hasDeclaration(Token t) {
         if (decompiledTextArea == null) {
             return false; //?
         }
-        SyntaxDocument sd = (SyntaxDocument) decompiledTextArea.getDocument();
-        Token currentChartoken = sd.getTokenAt(pos);
-        Token nextChartoken = sd.getTokenAt(pos + 1);
 
-        Token t = currentChartoken != null && currentChartoken.length == 1 ? currentChartoken : nextChartoken;
         if (t == null || (t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD && t.type != TokenType.REGEX)) {
             return false;
         }
+        int pos = t.start;
         Reference<Integer> abcIndex = new Reference<>(0);
         Reference<Integer> classIndex = new Reference<>(0);
         Reference<Integer> traitIndex = new Reference<>(0);
