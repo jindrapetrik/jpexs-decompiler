@@ -181,57 +181,105 @@ Preprocessor = \u00A7\u00A7 {Identifier}
   "null"                         { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.NULL, yytext()); }
   "this"                         { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.THIS, yytext()); }
   "true"                         { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.TRUE, yytext()); }
-  "getUrl"                       { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.GETURL, yytext()); }
-  "trace"                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.TRACE, yytext()); }
-  "gotoAndStop"                  { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.GOTOANDSTOP, yytext()); }
-  "nextFrame"                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.NEXTFRAME, yytext()); }
-  "play"                         { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.PLAY, yytext()); }
-  "prevFrame"                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.PREVFRAME, yytext()); }
-  "tellTarget"                   { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.TELLTARGET, yytext()); }
-  "stop"                         { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.STOP, yytext()); }
-  "stopAllSounds"                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.STOPALLSOUNDS, yytext()); }
-  "toggleHighQuality"            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.TOGGLEHIGHQUALITY, yytext()); }
-  "ifFrameLoaded"                { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.IFFRAMELOADED, yytext()); }
-  "ord"                          { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.ORD, yytext()); }
-  "chr"                          { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.CHR, yytext()); }
-  "duplicateMovieClip"           { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.DUPLICATEMOVIECLIP, yytext()); }
-  "stopDrag"                     { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.STOPDRAG, yytext()); }
-  "getTimer"                     { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.GETTIMER, yytext()); }
-  "loadVariables"                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.LOADVARIABLES, yytext()); }
-  "loadMovie"                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.LOADMOVIE, yytext()); }
-  "gotoAndPlay"                  { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.GOTOANDPLAY, yytext()); }
-  "mbord"                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.MBORD, yytext()); }
-  "mbchr"                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.MBCHR, yytext()); }
-  "mblength"                     { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.MBLENGTH, yytext()); }
-  "mbsubstring"                  { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.MBSUBSTRING, yytext()); }
-  "random"                       { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.RANDOM, yytext()); }
-  "removeMovieClip"              { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.REMOVEMOVIECLIP, yytext()); }
-  "startDrag"                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.STARTDRAG, yytext()); }
-  "substr"                       { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.SUBSTR, yytext()); }
-  "length"                       { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.LENGTH, yytext()); }
-  "int"                          { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.INT, yytext()); }
-  "targetPath"                   { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.TARGETPATH, yytext()); }
-  "Number"                       { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.NUMBER_OP, yytext()); }
-  "String"                       { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.STRING_OP, yytext()); }
-  "eval"                         { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.EVAL, yytext()); }
-  "undefined"                    { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.UNDEFINED, yytext()); }
-  "newline"                      { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.NEWLINE, yytext()); }
-  "Infinity"                     { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.INFINITY, yytext()); }
-  "NaN"                          { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.NAN, yytext()); }
-  "getVersion"                   { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.GETVERSION, yytext()); }
-  "call"                         { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.CALL, yytext()); }
-  "loadMovieNum"                 { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.LOADMOVIENUM, yytext()); }
-  "loadVariablesNum"             { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.LOADVARIABLESNUM, yytext()); }
-  "printAsBitmapNum"             { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.PRINTASBITMAPNUM, yytext()); }
-  "printNum"                     { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.PRINTNUM, yytext()); }
-  "printAsBitmap"                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.PRINTASBITMAP, yytext()); }
-  "print"                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.PRINT, yytext()); }
-  "unloadMovie"                  { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.UNLOADMOVIE, yytext()); }
-  "unloadMovieNum"               { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.UNLOADMOVIENUM, yytext()); }
-  "fscommand"                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.FSCOMMAND, yytext()); }
+  /* getURL */ 
+  [gG][eE][tT][uU][rR][lL]                                                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.GETURL, yytext()); }
+  /* trace */ 
+  [tT][rR][aA][cC][eE]                                                            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.TRACE, yytext()); }
+  /* gotoAndStop */ 
+  [gG][oO][tT][oO][aA][nN][dD][sS][tT][oO][pP]                                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.GOTOANDSTOP, yytext()); }
+  /* nextFrame */ 
+  [nN][eE][xX][tT][fF][rR][aA][mM][eE]                                            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.NEXTFRAME, yytext()); }
+  /* play */ 
+  [pP][lL][aA][yY]                                                                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.PLAY, yytext()); }
+  /* prevFrame */ 
+  [pP][rR][eE][vV][fF][rR][aA][mM][eE]                                            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.PREVFRAME, yytext()); }
+  /* tellTarget */ 
+  [tT][eE][lL][lL][tT][aA][rR][gG][eE][tT]                                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.TELLTARGET, yytext()); }
+  /* stop */ 
+  [sS][tT][oO][pP]                                                                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.STOP, yytext()); }
+  /* stopAllSounds */ 
+  [sS][tT][oO][pP][aA][lL][lL][sS][oO][uU][nN][dD][sS]                            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.STOPALLSOUNDS, yytext()); }
+  /* toggleHighQuality */ 
+  [tT][oO][gG][gG][lL][eE][hH][iI][gG][hH][qQ][uU][aA][lL][iI][tT][yY]            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.TOGGLEHIGHQUALITY, yytext()); }
+  /* ifFrameLoaded */ 
+  [iI][fF][fF][rR][aA][mM][eE][lL][oO][aA][dD][eE][dD]                            { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.IFFRAMELOADED, yytext()); }
+  /* ord */ 
+  [oO][rR][dD]                                                                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.ORD, yytext()); }
+  /* chr */ 
+  [cC][hH][rR]                                                                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.CHR, yytext()); }
+  /* duplicateMovieClip */ 
+  [dD][uU][pP][lL][iI][cC][aA][tT][eE][mM][oO][vV][iI][eE][cC][lL][iI][pP]        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.DUPLICATEMOVIECLIP, yytext()); }
+  /* stopDrag */ 
+  [sS][tT][oO][pP][dD][rR][aA][gG]                                                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.STOPDRAG, yytext()); }
+  /* getTimer */ 
+  [gG][eE][tT][tT][iI][mM][eE][rR]                                                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.GETTIMER, yytext()); }
+  /* loadVariables */ 
+  [lL][oO][aA][dD][vV][aA][rR][iI][aA][bB][lL][eE][sS]                            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.LOADVARIABLES, yytext()); }
+  /* loadMovie */ 
+  [lL][oO][aA][dD][mM][oO][vV][iI][eE]                                            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.LOADMOVIE, yytext()); }
+  /* gotoAndPlay */ 
+  [gG][oO][tT][oO][aA][nN][dD][pP][lL][aA][yY]                                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.GOTOANDPLAY, yytext()); }
+  /* mbord */ 
+  [mM][bB][oO][rR][dD]                                                            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.MBORD, yytext()); }
+  /* mbchr */ 
+  [mM][bB][cC][hH][rR]                                                            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.MBCHR, yytext()); }
+  /* mblength */ 
+  [mM][bB][lL][eE][nN][gG][tT][hH]                                                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.MBLENGTH, yytext()); }
+  /* mbsubstring */ 
+  [mM][bB][sS][uU][bB][sS][tT][rR][iI][nN][gG]                                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.MBSUBSTRING, yytext()); }
+  /* random */ 
+  [rR][aA][nN][dD][oO][mM]                                                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.RANDOM, yytext()); }
+  /* removeMovieClip */ 
+  [rR][eE][mM][oO][vV][eE][mM][oO][vV][iI][eE][cC][lL][iI][pP]                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.REMOVEMOVIECLIP, yytext()); }
+  /* startDrag */ 
+  [sS][tT][aA][rR][tT][dD][rR][aA][gG]                                            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.STARTDRAG, yytext()); }
+  /* substr */ 
+  [sS][uU][bB][sS][tT][rR]                                                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.SUBSTR, yytext()); }
+  /* length */ 
+  [lL][eE][nN][gG][tT][hH]                                                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.LENGTH, yytext()); }
+  /* int */ 
+  [iI][nN][tT]                                                                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.INT, yytext()); }
+  /* targetPath */ 
+  [tT][aA][rR][gG][eE][tT][pP][aA][tT][hH]                                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.TARGETPATH, yytext()); }
+  /* Number */ 
+  [nN][uU][mM][bB][eE][rR]                                                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.NUMBER_OP, yytext()); }
+  /* String */ 
+  [sS][tT][rR][iI][nN][gG]                                                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.STRING_OP, yytext()); }
+  /* eval */ 
+  [eE][vV][aA][lL]                                                                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.EVAL, yytext()); }
+  /* undefined */ 
+  [uU][nN][dD][eE][fF][iI][nN][eE][dD]                                            { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.UNDEFINED, yytext()); }
+  /* newline */ 
+  [nN][eE][wW][lL][iI][nN][eE]                                                    { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.NEWLINE, yytext()); }
+  /* Infinity */ 
+  [iI][nN][fF][iI][nN][iI][tT][yY]                                                { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.INFINITY, yytext()); }
+  /* NaN */ 
+  [nN][aA][nN]                                                                    { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.NAN, yytext()); }
+  /* getVersion */ 
+  [gG][eE][tT][vV][eE][rR][sS][iI][oO][nN]                                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.GETVERSION, yytext()); }
+  /* call */ 
+  [cC][aA][lL][lL]                                                                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.CALL, yytext()); }
+  /* loadMovieNum */ 
+  [lL][oO][aA][dD][mM][oO][vV][iI][eE][nN][uU][mM]                                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.LOADMOVIENUM, yytext()); }
+  /* loadVariablesNum */ 
+  [lL][oO][aA][dD][vV][aA][rR][iI][aA][bB][lL][eE][sS][nN][uU][mM]                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.LOADVARIABLESNUM, yytext()); }
+  /* printAsBitmapNum */ 
+  [pP][rR][iI][nN][tT][aA][sS][bB][iI][tT][mM][aA][pP][nN][uU][mM]                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.PRINTASBITMAPNUM, yytext()); }
+  /* printNum */ 
+  [pP][rR][iI][nN][tT][nN][uU][mM]                                                { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.PRINTNUM, yytext()); }
+  /* printAsBitmap */ 
+  [pP][rR][iI][nN][tT][aA][sS][bB][iI][tT][mM][aA][pP]                            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.PRINTASBITMAP, yytext()); }
+  /* print */ 
+  [pP][rR][iI][nN][tT]                                                            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.PRINT, yytext()); }
+  /* unloadMovie */ 
+  [uU][nN][lL][oO][aA][dD][mM][oO][vV][iI][eE]                                    { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.UNLOADMOVIE, yytext()); }
+  /* unloadMovieNum */ 
+  [uU][nN][lL][oO][aA][dD][mM][oO][vV][iI][eE][nN][uU][mM]                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.UNLOADMOVIENUM, yytext()); }
+  /* fscommand */ 
+  [fF][sS][cC][oO][mM][mM][aA][nN][dD]                                            { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.FSCOMMAND, yytext()); }
+  
 
-
-  /* operators */
+/* operators */
 
   "("                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.PARENT_OPEN, yytext());  }
   ")"                            { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.PARENT_CLOSE, yytext());  }
