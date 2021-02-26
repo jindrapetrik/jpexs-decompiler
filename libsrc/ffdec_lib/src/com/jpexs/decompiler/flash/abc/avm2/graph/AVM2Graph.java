@@ -1921,7 +1921,7 @@ public class AVM2Graph extends Graph {
             loopi:
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i) instanceof SetSlotAVM2Item) {
-                    SetSlotAVM2Item sslot = (SetSlotAVM2Item) list.get(0);
+                    SetSlotAVM2Item sslot = (SetSlotAVM2Item) list.get(i);
                     if (sslot.slotObject instanceof NewActivationAVM2Item) {
                         String slotName = sslot.slotName.getName(abc.constants, new ArrayList<>(), true, true);
                         if (sslot.value.getNotCoercedNoDup() instanceof LocalRegAVM2Item) {
