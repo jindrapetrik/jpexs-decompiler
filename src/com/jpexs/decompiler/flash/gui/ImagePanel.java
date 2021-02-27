@@ -1185,6 +1185,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         clearImagePanel();
         timelined = null;
         swf = null;
+        lda = null;
 
         fireMediaDisplayStateChanged();
     }

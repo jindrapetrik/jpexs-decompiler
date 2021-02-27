@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -57,7 +58,16 @@ public class ScriptInfo {
         this.traits = traits;
     }
 
+    private List<ScriptPack> cachedPacks;
+
+    public void clearPacksCache() {
+        cachedPacks = null;
+    }
+
     public List<ScriptPack> getPacks(ABC abc, int scriptIndex, String packagePrefix, List<ABC> allAbcs) {
+        if (packagePrefix == null && cachedPacks != null) {
+            return new ArrayList<>(cachedPacks);
+        }
         List<ScriptPack> ret = new ArrayList<>();
 
         List<Integer> otherTraits = new ArrayList<>();
@@ -114,6 +124,9 @@ public class ScriptInfo {
                 ret.add(new ScriptPack(cp, abc, allAbcs, scriptIndex, traitIndices));
             }
         }
+        if (packagePrefix == null) {
+            cachedPacks = new ArrayList<>(ret);
+        }
         return ret;
     }
 
@@ -134,5 +147,8 @@ public class ScriptInfo {
         deleted = d;
         abc.method_info.get(init_index).delete(abc, d);
         traits.delete(abc, d);
+        if (d) {
+            clearPacksCache();
+        }
     }
 }

@@ -989,17 +989,23 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 i--;
             }
         }
+        for (SWF swf : swfsToClose) {
+            Main.searchResultsStorage.destroySwf(swf);
+        }
 
         swfs.remove(swfList);
         oldItem = null;
         clear();
         updateUi();
 
-        List<SWF> swfs2 = new ArrayList<>(swfList);
-        for (SWF swf : swfs2) {
+        for (SWF swf : swfsToClose) {
             swf.clearTagSwfs();
         }
 
+        refreshTree();
+
+        mainMenu.updateComponents(null);
+        previewPanel.clear();
         return true;
     }
 
@@ -1882,7 +1888,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 if (searchDialog.getCurrentScope() == SearchDialog.SCOPE_ALL_FILES) {
                     Set<SWF> allSwfs = getAllSwfs();
-
 
                     for (SWF s : allSwfs) {
                         if (s.isAS3()) {
@@ -2791,9 +2796,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         tagTree.updateSwfs(swfs);
 
         if (treeItem != null) {
-            SWF treeItemSwf = treeItem.getSwf().getRootSwf();
-            if (this.swfs.contains(treeItemSwf.swfList)) {
-                setTagTreeSelectedNode(treeItem);
+            SWF swf = treeItem.getSwf();
+            if (swf != null) {
+                SWF treeItemSwf = swf.getRootSwf();
+                if (this.swfs.contains(treeItemSwf.swfList)) {
+                    setTagTreeSelectedNode(treeItem);
+                }
             }
         }
 

@@ -107,7 +107,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
@@ -922,6 +921,8 @@ public class Main {
 
             try {
                 result.add(worker.get());
+                worker.free();
+                worker = null;
             } catch (CancellationException ex) {
                 logger.log(Level.WARNING, "Loading SWF {0} was cancelled.", sourceInfo.getFileTitleOrName());
             }

@@ -100,13 +100,21 @@ public class ActionScriptSearch {
 
                         futures.add(text);
                     }
+                    for (Future<HighlightedText> future : futures) {
+                        try {
+                            future.get();
+                        } catch (CancellationException ex) {
+                            throw new InterruptedException();
+                        } catch (ExecutionException ex) {
+                            Logger.getLogger(ActionScriptSearch.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
                 }
             } catch (InterruptedException ex) {
                 for (Future<HighlightedText> future : futures) {
                     future.cancel(true);
                 }
             }
-
             return found;
         }
 

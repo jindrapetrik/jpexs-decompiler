@@ -143,6 +143,8 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
         removeButtons.clear();
         genericTagPropertiesEditPanel.removeAll();
         genericTagPropertiesEditPanel.setSize(0, 0);
+        tag = null;
+        editedTag = null;
     }
 
     public void setEditMode(boolean edit, Tag tag) {

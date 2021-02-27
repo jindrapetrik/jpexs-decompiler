@@ -467,7 +467,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     @Override
     public void clear() {
-
+        tag = null;
+        editedTag = null;
+        tree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("root")));
+        revalidate();
+        repaint();
     }
 
     private static final class TableFieldNodes extends DefaultMutableTreeNode {
