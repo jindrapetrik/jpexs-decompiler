@@ -429,9 +429,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private JPanel createFolderPreviewCard() {
         JPanel folderPreviewCard = new JPanel(new BorderLayout());
         folderPreviewPanel = new FolderPreviewPanel(this, new ArrayList<>());
-        final JScrollPane jScrollPane = new JScrollPane(folderPreviewPanel);
-        jScrollPane.getVerticalScrollBar().setUnitIncrement(20);
-        folderPreviewCard.add(jScrollPane, BorderLayout.CENTER);
+        folderPreviewCard.add(new FasterScrollPane(folderPreviewPanel), BorderLayout.CENTER);
 
         return folderPreviewCard;
     }
@@ -439,7 +437,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private JPanel createDumpPreviewCard() {
         JPanel dumpViewCard = new JPanel(new BorderLayout());
         dumpViewPanel = new DumpViewPanel(dumpTree);
-        dumpViewCard.add(new JScrollPane(dumpViewPanel), BorderLayout.CENTER);
+        dumpViewCard.add(new FasterScrollPane(dumpViewPanel), BorderLayout.CENTER);
 
         return dumpViewCard;
     }
@@ -3306,13 +3304,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private JPanel createDumpViewCard() {
         JPanel r = new JPanel(new BorderLayout());
-        r.add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(dumpTree), dumpPreviewPanel, Configuration.guiDumpSplitPaneDividerLocationPercent), BorderLayout.CENTER);
+        r.add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, new FasterScrollPane(dumpTree), dumpPreviewPanel, Configuration.guiDumpSplitPaneDividerLocationPercent), BorderLayout.CENTER);
         return r;
     }
 
     private JPanel createResourcesViewCard() {
         JPanel r = new JPanel(new BorderLayout());
-        r.add(new JScrollPane(tagTree), BorderLayout.CENTER);
+        r.add(new FasterScrollPane(tagTree), BorderLayout.CENTER);
         r.add(searchPanel, BorderLayout.SOUTH);
         return r;
     }

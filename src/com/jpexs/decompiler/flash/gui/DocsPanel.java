@@ -35,7 +35,7 @@ public class DocsPanel extends JPanel implements DocsListener {
 
     public DocsPanel() {
         setLayout(new BorderLayout(0, 0));
-        JScrollPane sp = new JScrollPane(textDisplay);
+        JScrollPane sp = new FasterScrollPane(textDisplay);
 
         textDisplay.setMargin(new Insets(0, 0, 0, 0));
         add(sp, BorderLayout.CENTER);

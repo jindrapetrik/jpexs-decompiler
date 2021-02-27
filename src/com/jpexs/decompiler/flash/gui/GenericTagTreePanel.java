@@ -301,7 +301,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         setLayout(new BorderLayout());
         tree = new MyTree();
 
-        add(new JScrollPane(tree), BorderLayout.CENTER);
+        add(new FasterScrollPane(tree), BorderLayout.CENTER);
         tree.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {

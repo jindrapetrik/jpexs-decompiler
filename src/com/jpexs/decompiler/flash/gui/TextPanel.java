@@ -99,7 +99,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.add(textSearchPanel);
         textValue = new LineMarkedEditorPane();
-        add(new JScrollPane(textValue), BorderLayout.CENTER);
+        add(new FasterScrollPane(textValue), BorderLayout.CENTER);
         textValue.setFont(Configuration.getSourceFont());
         textValue.changeContentType("text/swftext");
         textValue.addTextChangedListener(this::textChanged);

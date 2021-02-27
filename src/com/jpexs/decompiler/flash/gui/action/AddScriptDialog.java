@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.action;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.AppDialog;
+import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.PreviewPanel;
@@ -263,7 +264,7 @@ public class AddScriptDialog extends AppDialog {
         framePreviewPanel.showEmpty();
 
         JPanel framePanel = new JPanel(new BorderLayout());
-        JScrollPane frameListScrollPane = new JScrollPane(frameList);
+        JScrollPane frameListScrollPane = new FasterScrollPane(frameList);
         frameListScrollPane.setMinimumSize(new Dimension(400, 1));
         JSplitPane frameSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, frameListScrollPane, framePreviewPanel);
         frameSplitPane.setDividerLocation(400);
@@ -346,7 +347,7 @@ public class AddScriptDialog extends AppDialog {
 
         spriteInitList.addListSelectionListener(this::spriteInitValueChanged);
 
-        JScrollPane spriteInitListScrollPane = new JScrollPane(spriteInitList);
+        JScrollPane spriteInitListScrollPane = new FasterScrollPane(spriteInitList);
         //spriteTreeScrollPane.setMinimumSize(new Dimension(400, 1));
         JSplitPane spriteInitSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, spriteInitListScrollPane, spriteInitPreviewPanel);
         spriteInitSplitPane.setDividerLocation(400);
@@ -431,7 +432,7 @@ public class AddScriptDialog extends AppDialog {
         spriteFramePreviewPanel.showEmpty();
         spriteFramePreviewPanel.setParametersPanelVisible(false);
 
-        JScrollPane spriteFrameTreeScrollPane = new JScrollPane(spriteFrameTree);
+        JScrollPane spriteFrameTreeScrollPane = new FasterScrollPane(spriteFrameTree);
         //spriteTreeScrollPane.setMinimumSize(new Dimension(400, 1));
         JSplitPane spriteFrameSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, spriteFrameTreeScrollPane, spriteFramePreviewPanel);
         spriteFrameSplitPane.setDividerLocation(400);
@@ -468,7 +469,7 @@ public class AddScriptDialog extends AppDialog {
         buttonPreviewPanel.showEmpty();
 
         JPanel buttonPanel = new JPanel(new BorderLayout());
-        JScrollPane buttonListScrollPane = new JScrollPane(buttonList);
+        JScrollPane buttonListScrollPane = new FasterScrollPane(buttonList);
         buttonListScrollPane.setMinimumSize(new Dimension(400, 1));
         JSplitPane buttonSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, buttonListScrollPane, buttonPreviewPanel);
         buttonSplitPane.setDividerLocation(400);
@@ -654,7 +655,7 @@ public class AddScriptDialog extends AppDialog {
         instancePreviewPanel.setParametersPanelVisible(false);
 
         JPanel instancePanel = new JPanel(new BorderLayout());
-        JScrollPane instanceTreeScrollPane = new JScrollPane(instanceTree);
+        JScrollPane instanceTreeScrollPane = new FasterScrollPane(instanceTree);
         instanceTreeScrollPane.setMinimumSize(new Dimension(400, 1));
         JSplitPane instanceSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, instanceTreeScrollPane, instancePreviewPanel);
         instanceSplitPane.setDividerLocation(400);

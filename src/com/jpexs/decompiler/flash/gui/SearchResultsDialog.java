@@ -306,7 +306,7 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
         resultsPanel.add(resultsTree, "tree");
         resultsPanel.add(resultsList, "list");
 
-        JScrollPane sp = new JScrollPane(resultsPanel);
+        JScrollPane sp = new FasterScrollPane(resultsPanel);
         sp.setPreferredSize(new Dimension(300, 300));
         cnt.add(sp, BorderLayout.CENTER);
 

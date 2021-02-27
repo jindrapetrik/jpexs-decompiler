@@ -245,14 +245,14 @@ public class FontPanel extends JPanel {
 
     private void initComponents() {
 
-        contentScrollPane = new JScrollPane();
+        contentScrollPane = new FasterScrollPane();
         addCharsPanel = new JPanel();
         fontParamsPanel = new JPanel();
         fontNameIntagLabel = new JLabel();
-        JScrollPane fontDisplayNameScrollPane = new JScrollPane();
+        JScrollPane fontDisplayNameScrollPane = new FasterScrollPane();
         fontNameTextArea = new JTextArea();
         JLabel jLabel3 = new JLabel();
-        JScrollPane fontCopyrightScrollPane = new JScrollPane();
+        JScrollPane fontCopyrightScrollPane = new FasterScrollPane();
         fontCopyrightTextArea = new JTextArea();
         JLabel jLabel4 = new JLabel();
         fontIsBoldCheckBox = new JCheckBox();
@@ -265,7 +265,7 @@ public class FontPanel extends JPanel {
         JLabel jLabel8 = new JLabel();
         fontLeadingLabel = new JLabel();
         JLabel jLabel9 = new JLabel();
-        fontCharactersScrollPane = new JScrollPane();
+        fontCharactersScrollPane = new FasterScrollPane();
         fontCharactersTextArea = new JTextArea();
         JLabel fontCharsAddLabel = new JLabel();
         fontAddCharactersField = new JTextField();

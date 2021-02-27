@@ -50,7 +50,7 @@ public final class BinaryPanel extends JPanel {
         super(new BorderLayout());
         this.mainPanel = mainPanel;
 
-        add(new JScrollPane(hexEditor), BorderLayout.CENTER);
+        add(new FasterScrollPane(hexEditor), BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
         JPanel buttonsPanel = new JPanel(new FlowLayout());

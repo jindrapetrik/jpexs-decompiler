@@ -121,14 +121,14 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             }
         };
         genericTagPropertiesEditorPane.setEditable(false);
-        genericTagPropertiesEditorPaneScrollPanel = new JScrollPane(genericTagPropertiesEditorPane);
+        genericTagPropertiesEditorPaneScrollPanel = new FasterScrollPane(genericTagPropertiesEditorPane);
         add(genericTagPropertiesEditorPaneScrollPanel, BorderLayout.CENTER);
 
         genericTagPropertiesEditPanel = new JPanel();
         genericTagPropertiesEditPanel.setLayout(new SpringLayout());
         JPanel edPanel = new JPanel(new BorderLayout());
         edPanel.add(genericTagPropertiesEditPanel, BorderLayout.NORTH);
-        genericTagPropertiesEditPanelScrollPanel = new JScrollPane(edPanel);
+        genericTagPropertiesEditPanelScrollPanel = new FasterScrollPane(edPanel);
     }
 
     public void clear() {

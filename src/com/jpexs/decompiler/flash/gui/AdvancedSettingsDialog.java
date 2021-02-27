@@ -172,7 +172,7 @@ public class AdvancedSettingsDialog extends AppDialog {
 
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-        //cnt.add(new JScrollPane(configurationTable),BorderLayout.CENTER);
+        //cnt.add(new FasterScrollPane(configurationTable),BorderLayout.CENTER);
 
         JPanel buttonsPanel = new JPanel(new BorderLayout());
 
@@ -487,7 +487,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                 p.add(tipPanel, BorderLayout.SOUTH);
                 configPanel = p;
             }
-            tabs.put(cat, new JScrollPane(configPanel));
+            tabs.put(cat, new FasterScrollPane(configPanel));
         }
     }
 

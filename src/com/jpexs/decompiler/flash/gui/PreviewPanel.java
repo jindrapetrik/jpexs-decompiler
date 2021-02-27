@@ -352,7 +352,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private JPanel createMetadataCard() {
         JPanel metadataCard = new JPanel(new BorderLayout());
         metadataEditor = new LineMarkedEditorPane();
-        metadataCard.add(new JScrollPane(metadataEditor), BorderLayout.CENTER);
+        metadataCard.add(new FasterScrollPane(metadataEditor), BorderLayout.CENTER);
         //metadataEditor.setContentType("text/xml");
         metadataEditor.setEditable(false);
 

@@ -47,7 +47,7 @@ public class DebugLogDialog extends AppDialog {
         setTitle(translate("dialog.title"));
         logTextArea.setBackground(Color.white);
         logTextArea.setEditable(false);
-        JScrollPane spane = new JScrollPane(logTextArea);
+        JScrollPane spane = new FasterScrollPane(logTextArea);
         spane.setPreferredSize(new Dimension(800, 500));
 
         debug.addMessageListener(new DebugListener() {

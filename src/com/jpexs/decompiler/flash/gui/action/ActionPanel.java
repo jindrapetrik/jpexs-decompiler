@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.DebugPanel;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler;
+import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -728,7 +729,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         }
 
         JPanel panCode = new JPanel(new BorderLayout());
-        panCode.add(new JScrollPane(editor), BorderLayout.CENTER);
+        panCode.add(new FasterScrollPane(editor), BorderLayout.CENTER);
         panCode.add(topButtonsPan, BorderLayout.NORTH);
 
         JPanel panB = new JPanel();
@@ -787,7 +788,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         brokenHintPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED), new EmptyBorder(5, 5, 5, 5)));
 
         panelWithHint.add(brokenHintPanel, BorderLayout.NORTH);
-        panelWithHint.add(new JScrollPane(decompiledEditor), BorderLayout.CENTER);
+        panelWithHint.add(new FasterScrollPane(decompiledEditor), BorderLayout.CENTER);
 
         brokenHintPanel.setVisible(false);
 

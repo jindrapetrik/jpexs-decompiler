@@ -138,7 +138,7 @@ public class ErrorLogFrame extends AppFrame {
         collapseIcon = View.getIcon("collapse16");
         cnt.add(buttonsPanel, BorderLayout.SOUTH);
 
-        cnt.add(new JScrollPane(logView), BorderLayout.CENTER);
+        cnt.add(new FasterScrollPane(logView), BorderLayout.CENTER);
         handler = new Handler() {
             SimpleFormatter formatter = new SimpleFormatter();
 
@@ -257,7 +257,7 @@ public class ErrorLogFrame extends AppFrame {
 
                 final JScrollPane scrollPane;
                 if (detailComponent != null) {
-                    scrollPane = new JScrollPane(detailComponent);
+                    scrollPane = new FasterScrollPane(detailComponent);
                     scrollPane.setAlignmentX(0f);
                 } else {
                     scrollPane = null;

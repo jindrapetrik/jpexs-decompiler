@@ -78,7 +78,7 @@ public class FilesChangedDialog extends AppDialog {
         cnt.add(label, BorderLayout.NORTH);
         filesList = new JList<String>(listModel);
         filesList.setBackground(Color.white);
-        cnt.add(new JScrollPane(filesList), BorderLayout.CENTER);
+        cnt.add(new FasterScrollPane(filesList), BorderLayout.CENTER);
 
         JPanel panButtons = new JPanel(new FlowLayout());
         okButton.addActionListener(this::okButtonActionPerformed);

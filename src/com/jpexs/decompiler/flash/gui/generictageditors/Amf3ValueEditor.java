@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.generictageditors;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
@@ -149,7 +150,7 @@ public class Amf3ValueEditor extends JPanel implements GenericTagEditor, FullSiz
         titlePanel.add(helpButton, BorderLayout.EAST);
         add(titlePanel, BorderLayout.NORTH);
 
-        add(new JScrollPane(editor), BorderLayout.CENTER);
+        add(new FasterScrollPane(editor), BorderLayout.CENTER);
         add(errorLabel, BorderLayout.SOUTH);
         errorLabel.setBackground(Color.red);
         errorLabel.setForeground(Color.white);
