@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] - 2021-02-27
+## [Unreleased]
 ### Fixed
 - #1623 Right side marker (gray line) in P-code
 - #1622 Slow scrolling (search results, advanced settings and others)
