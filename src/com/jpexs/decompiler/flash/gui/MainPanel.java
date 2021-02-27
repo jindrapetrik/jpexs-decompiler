@@ -1930,6 +1930,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                     }
                                 }
                             }
+                            Main.searchResultsStorage.finishGroup();
 
                             View.execInEventDispatch(() -> {
                                 boolean found = false;
