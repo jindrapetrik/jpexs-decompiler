@@ -2636,7 +2636,7 @@ public class Graph {
         }
     }
 
-    protected static void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
+    protected void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
         int clen = commands.size();
         boolean isExit = false;
         if (clen > 0) {

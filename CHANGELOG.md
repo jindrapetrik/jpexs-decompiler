@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - #1623 Right side marker (gray line) in P-code
 - #1622 Slow scrolling (search results, advanced settings and others)
+- #1626 AS3 decompilation - unpopped obfuscated function
 
 ## [14.0.1] - 2021-02-26
 ### Added
