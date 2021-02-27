@@ -319,4 +319,13 @@ public class SearchResultsStorage {
         }
         return ret;
     }
+
+    public void destroySwf(SWF swf) {
+        String swfId = getSwfId(swf);
+        for (int i = 0; i < swfIds.size(); i++) {
+            if (swfIds.get(i).equals(swfId)) {
+                unpackedData.remove(i);
+            }
+        }
+    }
 }

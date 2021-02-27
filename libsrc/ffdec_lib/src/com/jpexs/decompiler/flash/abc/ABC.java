@@ -2092,4 +2092,15 @@ public class ABC {
         }
         return null;
     }
+
+    public void clearPacksCache() {
+        for (ScriptInfo si : script_info) {
+            si.clearPacksCache();
+        }
+    }
+
+    public void free() {
+        deobfuscation = null;
+        abcMethodIndexing = null;
+    }
 }

@@ -43,18 +43,21 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
 
     private static List<CancellableWorker> workers = Collections.synchronizedList(new ArrayList<CancellableWorker>());
 
-    private final FutureTask<T> future;
+    private FutureTask<T> future;
 
     private static final Map<Thread, CancellableWorker> threadWorkers = Collections.synchronizedMap(new WeakHashMap<>());
 
     private List<CancellableWorker> subWorkers = Collections.synchronizedList(new ArrayList<>());
+
+    private Thread thread;
 
     public CancellableWorker() {
         super();
         Callable<T> callable = new Callable<T>() {
             @Override
             public T call() throws Exception {
-                threadWorkers.put(Thread.currentThread(), CancellableWorker.this);
+                thread = Thread.currentThread();
+                threadWorkers.put(thread, CancellableWorker.this);
                 return doInBackground();
             }
         };
@@ -130,6 +133,9 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
     }
 
     private void workerDone() {
+        if (thread != null && threadWorkers.get(thread) == this) {
+            threadWorkers.remove(thread);
+        }
         workers.remove(this);
         done();
     }
@@ -163,6 +169,13 @@ public abstract class CancellableWorker<T> implements RunnableFuture<T> {
             } else {
                 Logger.getLogger(CancellableWorker.class.getName()).log(Level.SEVERE, "worker is null");
             }
+        }
+    }
+
+    public void free() {
+        future = null;
+        for (CancellableWorker w : subWorkers) {
+            w.free();
         }
     }
 }

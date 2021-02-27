@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
@@ -348,6 +349,12 @@ public final class SWF implements SWFContainerItem, Timelined {
     @Internal
     public final AS3Cache as3Cache = new AS3Cache();
 
+    @Internal
+    private Map<String, ASMSource> asmsCacheExportFilenames;
+
+    @Internal
+    private Map<String, ASMSource> asmsCache;
+
     private static final DecompilerPool decompilerPool = new DecompilerPool();
 
     public static final String AS2_PKG_PREFIX = "__Packages.";
@@ -375,6 +382,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 DefineSpriteTag spriteTag = (DefineSpriteTag) tag;
                 for (Tag tag1 : spriteTag.getTags()) {
                     tag1.setSwf(null);
+                    tag1.setTimelined(null);
                 }
 
                 for (int i = spriteTag.getTags().size() - 1; i >= 0; i--) {
@@ -390,10 +398,15 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
 
             tag.setSwf(null);
+            tag.setTimelined(null);
         }
 
         tags.clear();
         if (abcList != null) {
+
+            for (ABCContainerTag c : abcList) {
+                c.getABC().free();
+            }
             abcList.clear();
         }
 
@@ -401,8 +414,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             swfList.swfs.clear();
         }
 
-        as2Cache.clear();
-        as3Cache.clear();
+        clearScriptCache();
         frameCache.clear();
         soundCache.clear();
 
@@ -1703,11 +1715,25 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public Map<String, ASMSource> getASMs(boolean exportFileNames, List<TreeItem> nodesToExport, boolean exportAll) {
+        if (exportAll) {
+            if (exportFileNames && asmsCacheExportFilenames != null) {
+                return asmsCacheExportFilenames;
+            }
+            if (!exportFileNames && asmsCache != null) {
+                return asmsCache;
+            }
+        }
         Map<String, ASMSource> asmsToExport = new LinkedHashMap<>();
         for (TreeItem treeItem : getFirstLevelASMNodes(null)) {
             getASMs(exportFileNames, treeItem, nodesToExport, exportAll, asmsToExport, File.separator + getASMPath(exportFileNames, treeItem));
         }
-
+        if (exportAll) {
+            if (exportFileNames) {
+                asmsCacheExportFilenames = asmsToExport;
+            } else {
+                asmsCache = asmsToExport;
+            }
+        }
         return asmsToExport;
     }
 
@@ -2567,6 +2593,13 @@ public final class SWF implements SWFContainerItem, Timelined {
     public void clearScriptCache() {
         as2Cache.clear();
         as3Cache.clear();
+        if (abcList != null) {
+            for (ABCContainerTag c : abcList) {
+                c.getABC().clearPacksCache();
+            }
+        }
+        asmsCache = null;
+        asmsCacheExportFilenames = null;
         IdentifiersDeobfuscation.clearCache();
     }
 
@@ -3003,15 +3036,15 @@ public final class SWF implements SWFContainerItem, Timelined {
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
-         if (removeDependencies) {
-                removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
+        if (removeDependencies) {
+            removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
+            timelined.setModified(true);
+        } else {
+            boolean modified = removeTagFromTimeline(tag, timelined.getTimeline());
+            if (modified) {
                 timelined.setModified(true);
-            } else {
-                boolean modified = removeTagFromTimeline(tag, timelined.getTimeline());
-                if (modified) {
-                    timelined.setModified(true);
-                }
             }
+        }
     }
 
     @Override
