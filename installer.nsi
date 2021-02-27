@@ -34,9 +34,10 @@ ${StrLoc}
 ;Old not working
 ;!define FLASH_URL "http://download.macromedia.com/pub/flashplayer/current/support/install_flash_player_ax.exe"
 
-!define FLASH_URL "http://fpdownload.macromedia.com/pub/flashplayer/latest/help/install_flash_player_ax.exe"
+;Not working too since 2021
+;!define FLASH_URL "http://fpdownload.macromedia.com/pub/flashplayer/latest/help/install_flash_player_ax.exe"
 
-!include "nsis_plugins\Flash_Inetc.nsh"
+;!include "nsis_plugins\Flash_Inetc.nsh"
 !include x64.nsh
 
 
@@ -293,7 +294,7 @@ IntOp ${Var} $0 - $1
   !insertmacro MUI_PAGE_COMPONENTS
   !insertmacro MUI_PAGE_DIRECTORY
   ;!insertmacro CUSTOM_PAGE_JREINFO
-  !insertmacro CUSTOM_PAGE_FLASHINFO
+  ;!insertmacro CUSTOM_PAGE_FLASHINFO
 
 var SMDir
 
@@ -681,7 +682,7 @@ Section "FFDec" SecDummy
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
   ;call DownloadAndInstallJREIfNecessary
-  call DownloadAndInstallFlashIfNecessary
+  ;call DownloadAndInstallFlashIfNecessary
 
 SectionEnd
 
