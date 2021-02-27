@@ -234,7 +234,7 @@ public class FontEmbedDialog extends AppDialog {
             rangeRowPanel.setAlignmentX(0);
             rangesPanel.add(rangeRowPanel);
         }
-        cnt.add(new JScrollPane(rangesPanel));
+        cnt.add(new FasterScrollPane(rangesPanel));
 
         JPanel specialPanel = new JPanel();
         specialPanel.setLayout(new BoxLayout(specialPanel, BoxLayout.X_AXIS));

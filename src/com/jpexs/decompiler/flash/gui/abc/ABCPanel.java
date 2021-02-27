@@ -50,6 +50,7 @@ import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.DebugPanel;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler;
+import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
@@ -911,7 +912,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         brokenHintPanel.setBackground(new Color(253, 205, 137));
         brokenHintPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED), new EmptyBorder(5, 5, 5, 5)));
 
-        decompiledScrollPane = new JScrollPane(decompiledTextArea);
+        decompiledScrollPane = new FasterScrollPane(decompiledTextArea);
 
         JPanel iconDecPanel = new JPanel();
         iconDecPanel.setLayout(new BoxLayout(iconDecPanel, BoxLayout.Y_AXIS));
@@ -1034,7 +1035,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         sortButton.setMargin(new Insets(3, 3, 3, 3));
         navIconsPanel.add(sortButton);
         navPanel.add(navIconsPanel, BorderLayout.SOUTH);
-        navPanel.add(new JScrollPane(navigator), BorderLayout.CENTER);
+        navPanel.add(new FasterScrollPane(navigator), BorderLayout.CENTER);
         sortButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1078,7 +1079,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         });
         constantTypeList.addItemListener(this);
         panConstants.add(constantTypeList, BorderLayout.NORTH);
-        panConstants.add(new JScrollPane(constantTable), BorderLayout.CENTER);
+        panConstants.add(new FasterScrollPane(constantTable), BorderLayout.CENTER);
         tabbedPane.addTab(AppStrings.translate("constants"), panConstants);
     }
 

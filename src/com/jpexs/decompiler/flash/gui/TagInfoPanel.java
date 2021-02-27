@@ -54,7 +54,7 @@ public class TagInfoPanel extends JPanel {
         setLayout(new BorderLayout());
         JLabel topLabel = new JLabel(AppStrings.translate("taginfo.header"), JLabel.CENTER);
         add(topLabel, BorderLayout.NORTH);
-        add(new JScrollPane(editorPane), BorderLayout.CENTER);
+        add(new FasterScrollPane(editorPane), BorderLayout.CENTER);
 
         editorPane.setContentType("text/html");
         editorPane.setEditable(false);

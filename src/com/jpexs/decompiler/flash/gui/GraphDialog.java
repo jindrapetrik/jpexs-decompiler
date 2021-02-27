@@ -117,8 +117,7 @@ public class GraphDialog extends AppDialog {
         });
 
         setTitle(translate("graph") + " " + name);
-        JScrollPane scrollPane = new JScrollPane(gp);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(20);
+        JScrollPane scrollPane = new FasterScrollPane(gp);
         scrollBarWidth = scrollPane.getVerticalScrollBar().getPreferredSize().width;
         scrollBarHeight = scrollPane.getHorizontalScrollBar().getPreferredSize().height;
         cnt.add(scrollPane, BorderLayout.CENTER);

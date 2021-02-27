@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.RunnableIOEx;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppFrame;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.GuiAbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainFrame;
@@ -263,7 +264,7 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
         switchButton.addActionListener(this::switchStateButtonActionPerformed);
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-        cnt.add(new JScrollPane(replacementsTable), BorderLayout.CENTER);
+        cnt.add(new FasterScrollPane(replacementsTable), BorderLayout.CENTER);
 
         portField.setPreferredSize(new Dimension(80, portField.getPreferredSize().height));
         JPanel buttonsPanel = new JPanel();

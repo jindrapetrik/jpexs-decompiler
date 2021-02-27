@@ -319,7 +319,7 @@ public class LoadFromMemoryFrame extends AppFrame {
         cnt.setLayout(new BorderLayout());
 
         JPanel leftPanel = new JPanel(new BorderLayout());
-        leftPanel.add(new JScrollPane(list), BorderLayout.CENTER);
+        leftPanel.add(new FasterScrollPane(list), BorderLayout.CENTER);
         JPanel leftButtonsPanel = new JPanel(new FlowLayout());
         JButton selectButton = new JButton(translate("button.select"));
         selectButton.addActionListener(this::selectProcessButtonActionPerformed);
@@ -330,7 +330,7 @@ public class LoadFromMemoryFrame extends AppFrame {
         leftPanel.add(leftButtonsPanel, BorderLayout.SOUTH);
 
         JPanel rightPanel = new JPanel(new BorderLayout());
-        rightPanel.add(new JScrollPane(tableRes), BorderLayout.CENTER);
+        rightPanel.add(new FasterScrollPane(tableRes), BorderLayout.CENTER);
         JPanel rightButtonsPanel = new JPanel(new FlowLayout());
         JButton openButton = new JButton(translate("button.open"));
         openButton.addActionListener(this::openSwfButtonActionPerformed);

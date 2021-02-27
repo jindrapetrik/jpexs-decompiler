@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -60,7 +61,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     public SlotConstTraitDetailPanel(final DecompiledEditorPane editor) {
         slotConstEditor = new LineMarkedEditorPane();
         setLayout(new BorderLayout());
-        add(new JScrollPane(slotConstEditor), BorderLayout.CENTER);
+        add(new FasterScrollPane(slotConstEditor), BorderLayout.CENTER);
         slotConstEditor.setFont(Configuration.getSourceFont());
         slotConstEditor.changeContentType("text/flasm3");
         slotConstEditor.addCaretListener(new CaretListener() {

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.dumpview;
 
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
+import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.MyTextField;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.hexview.HexView;
@@ -196,7 +197,7 @@ public class DumpViewPanel extends JPanel {
         });
 
         JPanel hexPanel = new JPanel(new BorderLayout());
-        hexPanel.add(new JScrollPane(dumpViewHexTable), BorderLayout.CENTER);
+        hexPanel.add(new FasterScrollPane(dumpViewHexTable), BorderLayout.CENTER);
         hexPanel.add(searchPanel, BorderLayout.SOUTH);
         add(hexPanel, BorderLayout.CENTER);
     }

@@ -105,7 +105,7 @@ public class LoadFromCacheFrame extends AppFrame {
         });
         cnt.setLayout(new BorderLayout());
         cnt.add(searchField, BorderLayout.NORTH);
-        cnt.add(new JScrollPane(list), BorderLayout.CENTER);
+        cnt.add(new FasterScrollPane(list), BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));

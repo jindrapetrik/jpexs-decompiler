@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.DocsPanel;
+import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
@@ -119,9 +120,9 @@ public class MethodCodePanel extends JPanel {
         docsPanel = new DocsPanel();
         sourceTextArea.addDocsListener(docsPanel);
         if (Configuration.displayAs3PCodeDocsPanel.get()) {
-            add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(sourceTextArea), new JScrollPane(docsPanel), Configuration.guiAvm2DocsSplitPaneDividerLocationPercent));
+            add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, new FasterScrollPane(sourceTextArea), new FasterScrollPane(docsPanel), Configuration.guiAvm2DocsSplitPaneDividerLocationPercent));
         } else {
-            add(new JScrollPane(sourceTextArea));
+            add(new FasterScrollPane(sourceTextArea));
         }
         sourceTextArea.changeContentType("text/flasm3");
         sourceTextArea.setFont(Configuration.getSourceFont());
