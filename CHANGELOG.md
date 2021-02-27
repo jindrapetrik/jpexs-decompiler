@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased] - 2021-02-27
+### Fixed
+- #1623 Right side marker (gray line) in P-code
+
 ## [14.0.1] - 2021-02-26
 ### Added
 - AS3 goto definition on imports
