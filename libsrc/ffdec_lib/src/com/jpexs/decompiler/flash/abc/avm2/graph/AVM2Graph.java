@@ -61,6 +61,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.InAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NextNameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NextValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ReturnValueAVM2Item;
@@ -2291,5 +2292,18 @@ public class AVM2Graph extends Graph {
             walkCatchParts(stats, n, n.start, catchParts, scopePos);
         }
     }
+
+    @Override
+    protected void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
+        for (int i = 0; i < stack.size(); i++) {
+            //These are often obfuscated, so ignore them                
+            if (stack.get(i) instanceof NewFunctionAVM2Item) {
+                stack.remove(i);
+                i--;
+            }
+        }
+        super.makeAllCommands(commands, stack);
+    }
+
 
 }
