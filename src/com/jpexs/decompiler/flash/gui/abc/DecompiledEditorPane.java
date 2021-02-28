@@ -176,19 +176,14 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         if (currentMethodHighlight == null) {
             return;
         }
-        for (Highlighting h : highlightedText.getTraitHighlights()) {
-            if (h.getProperties().index == lastTraitIndex) {
-                Highlighting h2 = Highlighting.searchOffset(highlightedText.getInstructionHighlights(), offset, h.startPos, h.startPos + h.len);
-                if (h2 != null) {
-                    ignoreCarret = true;
-                    if (h2.startPos <= getDocument().getLength()) {
-                        setCaretPosition(h2.startPos);
-                    }
-                    getCaret().setVisible(true);
-                    ignoreCarret = false;
-                }
-
+        Highlighting h2 = Highlighting.searchOffset(highlightedText.getInstructionHighlights(), offset, currentMethodHighlight.startPos, currentMethodHighlight.startPos + currentMethodHighlight.len);
+        if (h2 != null) {
+            ignoreCarret = true;
+            if (h2.startPos <= getDocument().getLength()) {
+                setCaretPosition(h2.startPos);
             }
+            getCaret().setVisible(true);
+            ignoreCarret = false;
         }
     }
 
