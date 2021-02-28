@@ -934,7 +934,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
         this.tag = tag;
         try {
-            editedTag = tag.cloneTag();
+            editedTag = tag == null ? null : tag.cloneTag();
         } catch (InterruptedException ex) {
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
