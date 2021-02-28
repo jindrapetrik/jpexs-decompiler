@@ -318,6 +318,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             textWithHex = null;
             textNoHex = null;
             textHexOnly = null;
+            setHex(exportMode, true);
         } catch (IOException ex) {
         } catch (InterruptedException ex) {
         } catch (AVM2ParseException ex) {
