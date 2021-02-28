@@ -537,7 +537,8 @@ public class Graph {
 
         List<GraphTargetItem> ret = printGraph(gotos, new HashMap<>(), new HashMap<>(), new HashSet<>(), localData, stack, allParts, null, heads.get(0), null, null, loops, throwStates, staticOperation, path);
 
-        processIfGotos(gotos, ret);
+        processIfGotos2(new ArrayList<>(), gotos, ret, ret);
+        processIfGotos(gotos, ret, ret);
 
         Map<String, Integer> usages = new HashMap<>();
         Map<String, GotoItem> lastUsage = new HashMap<>();
@@ -809,6 +810,40 @@ public class Graph {
         }
     }
 
+    private void processIfGotos2(List<List<GraphTargetItem>> alreadyProcessedBlocks, List<GotoItem> allGotos, List<GraphTargetItem> list, List<GraphTargetItem> rootList) {
+        for (int i = 0; i < list.size(); i++) {
+            GraphTargetItem item = list.get(i);
+            if (item instanceof Block) {
+                List<List<GraphTargetItem>> subs = ((Block) item).getSubs();
+                for (List<GraphTargetItem> sub : subs) {
+                    processIfGotos2(alreadyProcessedBlocks, allGotos, sub, rootList);
+                }
+            }
+            if (item instanceof GotoItem) {
+                GotoItem gi = (GotoItem) item;
+                loopblk:
+                for (List<GraphTargetItem> blk : alreadyProcessedBlocks) {
+                    for (int j = 0; j < blk.size(); j++) {
+                        GraphTargetItem ti = blk.get(j);
+                        if (ti instanceof LabelItem) {
+                            LabelItem label = (LabelItem) ti;
+                            if (label.labelName.equals(gi.labelName)) {
+                                if (blk.get(blk.size() - 1) instanceof ExitItem) {
+                                    int siz = blk.size();
+                                    for (int k = 0; k < siz - j; k++) {
+                                        list.add(i + 1 + k, blk.remove(j));
+                                    }
+                                    blk.add(j, list.remove(i));
+                                }
+                                break loopblk;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        alreadyProcessedBlocks.add(list);
+    }
     /**
      * if (xxx) { y ; goto a } else { z ; goto a }
      *
@@ -817,30 +852,17 @@ public class Graph {
      * if (xxx) { y } else { z } goto a
      *
      */
-    private void processIfGotos(List<GotoItem> allGotos, List<GraphTargetItem> list) {
+    private void processIfGotos(List<GotoItem> allGotos, List<GraphTargetItem> list, List<GraphTargetItem> rootList) {
         for (int i = 0; i < list.size(); i++) {
             GraphTargetItem item = list.get(i);
             if (item instanceof Block) {
                 List<List<GraphTargetItem>> subs = ((Block) item).getSubs();
                 for (List<GraphTargetItem> sub : subs) {
-                    processIfGotos(allGotos, sub);
+                    processIfGotos(allGotos, sub, rootList);
                 }
             }
             if (item instanceof IfItem) {
                 IfItem ii = (IfItem) item;
-                if (!ii.onTrue.isEmpty() && ii.onFalse.isEmpty()) {
-                    if (ii.onTrue.get(ii.onTrue.size() - 1) instanceof GotoItem) {
-                        if (i + 1 < list.size()) {
-                            if (list.get(i + 1) instanceof GotoItem) {
-                                GotoItem g1 = (GotoItem) ii.onTrue.get(ii.onTrue.size() - 1);
-                                GotoItem g2 = (GotoItem) list.get(i + 1);
-                                if (g1.labelName.equals(g2.labelName)) {
-                                    ii.onTrue.remove(ii.onTrue.size() - 1);
-                                }
-                            }
-                        }
-                    }
-                }
                 if (!ii.onTrue.isEmpty() && !ii.onFalse.isEmpty()) {
                     if (ii.onTrue.get(ii.onTrue.size() - 1) instanceof GotoItem) {
                         if (ii.onFalse.get(ii.onFalse.size() - 1) instanceof GotoItem) {
@@ -874,6 +896,20 @@ public class Graph {
                                         list.add(i + 1, gotoMerged);
                                         allGotos.remove(gotoRemoved);
                                     }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!ii.onTrue.isEmpty() && ii.onFalse.isEmpty()) {
+                    if (ii.onTrue.get(ii.onTrue.size() - 1) instanceof GotoItem) {
+                        GotoItem g1 = (GotoItem) ii.onTrue.get(ii.onTrue.size() - 1);
+                        if (i + 1 < list.size()) {
+                            if (list.get(i + 1) instanceof GotoItem) {
+
+                                GotoItem g2 = (GotoItem) list.get(i + 1);
+                                if (g1.labelName.equals(g2.labelName)) {
+                                    ii.onTrue.remove(ii.onTrue.size() - 1);
                                 }
                             }
                         }
@@ -1652,7 +1688,7 @@ public class Graph {
         }
 
         if (ret == null) {
-            ret = new ArrayList<>();
+            ret = new GraphPartMarkedArrayList<>();
         }
 
         //try {
@@ -1806,6 +1842,15 @@ public class Graph {
                 if (firstCodePos > firstCode.size()) {
                     firstCodePos = firstCode.size();
                 }
+                if (firstCode instanceof GraphPartMarkedArrayList) {
+                    GraphPartMarkedArrayList<GraphTargetItem> markedFirstCode = (GraphPartMarkedArrayList<GraphTargetItem>) firstCode;
+                    firstCodePos = markedFirstCode.indexOfPart(part);
+                    if (firstCodePos == -1) {
+                        firstCodePos = firstCode.size();
+                    }
+                    ((GraphPartMarkedArrayList<GraphTargetItem>) firstCode).startPart(part);
+                }
+
                 if (firstCode.size() > firstCodePos && (firstCode.get(firstCodePos) instanceof LabelItem)) {
                     labelName = ((LabelItem) firstCode.get(firstCodePos)).labelName;
                 } else {
@@ -1842,8 +1887,12 @@ public class Graph {
         boolean parseNext = true;
 
         //****************************DECOMPILING PART*************
-        List<GraphTargetItem> output = new ArrayList<>();
+        GraphPartMarkedArrayList<GraphTargetItem> output = new GraphPartMarkedArrayList<>();
 
+        output.startPart(part);
+        if (currentRet instanceof GraphPartMarkedArrayList) {
+            ((GraphPartMarkedArrayList) currentRet).startPart(part);
+        }
         if (checkPartOutput(currentRet, foundGotos, partCodes, partCodePos, visited, code, localData, allParts, stack, parent, part, stopPart, stopPartKind, loops, throwStates, currentLoop, staticOperation, path, recursionLevel)) {
             parseNext = false;
         } else {
