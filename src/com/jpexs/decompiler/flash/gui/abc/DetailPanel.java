@@ -313,7 +313,11 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
                     @Override
                     public void run() {
                         decompiledTextArea.removeScriptListener(this);
-                        decompiledTextArea.gotoTrait(lastTrait);
+                        if (lastTrait == GraphTextWriter.TRAIT_UNKNOWN) {
+                            decompiledTextArea.gotoLastMethod();
+                        } else {
+                            decompiledTextArea.gotoTrait(lastTrait);
+                        }
                         setEditMode(false);
                         View.showMessageDialog(null, AppStrings.translate("message.trait.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showTraitSavedMessage);
                     }

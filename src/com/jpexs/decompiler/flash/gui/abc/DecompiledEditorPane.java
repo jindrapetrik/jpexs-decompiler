@@ -77,7 +77,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
     private ScriptPack script;
 
-    public int lastTraitIndex = 0;
+    public int lastTraitIndex = GraphTextWriter.TRAIT_UNKNOWN;
 
     public boolean ignoreCarret = false;
 
@@ -526,6 +526,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         getCaret().setVisible(true);
         int pos = getCaretPosition();
         abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setIgnoreCarret(true);
+        lastTraitIndex = GraphTextWriter.TRAIT_UNKNOWN;
         try {
             classIndex = -1;
             Highlighting cm = Highlighting.searchPos(highlightedText.getClassHighlights(), pos);
@@ -607,6 +608,20 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
     public void gotoLastTrait() {
         gotoTrait(lastTraitIndex);
+    }
+
+    public void gotoLastMethod() {
+        if (currentMethodHighlight != null) {
+            final int fpos = currentMethodHighlight.startPos;
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (fpos <= getDocument().getLength()) {
+                        setCaretPosition(fpos);
+                    }
+                }
+            }, 100);
+        }
     }
 
     public void gotoTrait(int traitId) {
