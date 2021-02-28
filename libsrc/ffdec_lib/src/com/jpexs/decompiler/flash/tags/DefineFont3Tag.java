@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -475,6 +476,33 @@ public class DefineFont3Tag extends FontTag {
                 fontBoundsTable.set(pos, shp.getBounds());
                 fontAdvanceTable.set(pos, (int) getDivider() * Math.round(FontHelper.getFontAdvance(advanceFont, character)));
             }
+
+            for (int k = 0; k < fontKerningTable.size(); k++) {
+                if (fontKerningTable.get(k).fontKerningCode1 == character
+                        || fontKerningTable.get(k).fontKerningCode2 == character) {
+                    fontKerningTable.remove(k);
+                    k--;
+                }
+            }
+            List<FontHelper.KerningPair> kerning = getFontKerningPairs(font, (int) (getDivider() * 1024));
+            for (FontHelper.KerningPair pair : kerning) {
+                if (pair.char1 != character && pair.char2 != character) {
+                    continue;
+                }
+                int glyph1 = charToGlyph(pair.char1);
+                if (pair.char1 == character) {
+
+                } else if (glyph1 == -1) {
+                    continue;
+                }
+                int glyph2 = charToGlyph(pair.char2);
+                if (pair.char2 == character) {
+
+                } else if (glyph2 == -1) {
+                    continue;
+                }
+                fontKerningTable.add(new KERNINGRECORD(pair.char1, pair.char2, pair.kerning));
+            }
         }
 
         checkWideParameters();
@@ -519,6 +547,14 @@ public class DefineFont3Tag extends FontTag {
         if (fontFlagsHasLayout) {
             fontBoundsTable.remove(pos);
             fontAdvanceTable.remove(pos);
+
+            for (int i = 0; i < fontKerningTable.size(); i++) {
+                if (fontKerningTable.get(i).fontKerningCode1 == character
+                        || fontKerningTable.get(i).fontKerningCode2 == character) {
+                    fontKerningTable.remove(i);
+                    i--;
+                }
+            }
         }
 
         shiftGlyphIndices(fontID, pos + 1, false);

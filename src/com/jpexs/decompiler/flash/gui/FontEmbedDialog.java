@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.font.CharacterRanges;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
@@ -383,6 +384,7 @@ public class FontEmbedDialog extends AppDialog {
             File selfile = Helper.fixDialogFile(fc.getSelectedFile());
             try {
                 customFont = Font.createFont(Font.TRUETYPE_FONT, selfile);
+                FontTag.addCustomFont(customFont, selfile);
                 ttfFileRadio.setText(translate("ttffile.selection").replace("%fontname%", customFont.getName()).replace("%filename%", selfile.getName()));
                 return true;
             } catch (FontFormatException ex) {

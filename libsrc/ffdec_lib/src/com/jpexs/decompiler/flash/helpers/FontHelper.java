@@ -163,37 +163,14 @@ public class FontHelper {
         return withKerningX - noKerningX;
     }
 
-    /**
-     * Gets all kerning pairs of a Font. It is very slow.
-     *
-     * @param font
-     * @param size
-     * @return
-     */
-    public static List<KerningPair> getFontKerningPairs(Font font, int size) {
-        //NOT AVAILABLE IN java9+
-        /*File fontFile = getFontFile(font);
-        if (fontFile != null && fontFile.getName().toLowerCase().endsWith(".ttf")) {
-            KerningLoader k = new KerningLoader();
-            try {
-                return k.loadFromTTF(fontFile, size);
-            } catch (IOException | FontFormatException ex) {
-                // ignore
-            }
-        }
-        List<KerningPair> ret = new ArrayList<>();
+    public static List<KerningPair> getFontKerningPairs(File fontFile, int size) {
 
-        List<Character> availableChars = new ArrayList<>();
-        for (char c1 = 0; c1 < Character.MAX_VALUE; c1++) {
-            if (font.canDisplay((int) c1)) {
-                availableChars.add(c1);
-            }
+        KerningLoader k = new KerningLoader();
+        try {
+            return k.loadFromTTF(fontFile, size);
+        } catch (IOException | FontFormatException ex) {
+            // ignore
         }
-        for (char c1 : availableChars) {
-            ret.addAll(getFontKerningPairsOneChar(availableChars, font, c1));
-
-        }
-        return ret;*/
         return new ArrayList<>();
     }
 
@@ -343,7 +320,7 @@ public class FontHelper {
                 Object[] paths = Files.find(d.toPath(), Integer.MAX_VALUE, new BiPredicate<Path, BasicFileAttributes>() {
                     @Override
                     public boolean test(Path t, BasicFileAttributes u) {
-                        return u.isRegularFile() && (t.endsWith(".ttf") || t.endsWith(".TTF"));
+                        return u.isRegularFile() && (t.toString().endsWith(".ttf") || t.toString().endsWith(".TTF"));
                     }
                 }).toArray();
                 for (Object o : paths) {

@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- #1561 Font editing - import kerning when adding characters
+
 ### Fixed
 - #1623 Right side marker (gray line) in P-code
 - #1622 Slow scrolling (search results, advanced settings and others)
@@ -16,6 +19,8 @@ All notable changes to this project will be documented in this file.
 - Decompilation - Goto handling
 - Not selecting proper script after restoring session
 - #1603 empty script after search selection
+- Generic tag tree exception on save
+- Copying to clipboard does not support transparency
 
 ### Removed
 - #1631 ActiveX Flash component download in windows installer
