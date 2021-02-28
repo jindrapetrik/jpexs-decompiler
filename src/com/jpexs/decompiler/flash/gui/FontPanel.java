@@ -138,7 +138,9 @@ public class FontPanel extends JPanel {
         for (int ic : selChars) {
             char c = (char) ic;
             if (oldchars.indexOf((int) c) == -1) {
-                font = font.deriveFont(f.getFontStyle(), 1024);
+                if (font.getSize() != 1024) { //Do not resize if not required so we can have single instance of custom fonts
+                    font = font.deriveFont(f.getFontStyle(), 1024);
+                }
                 if (!font.canDisplay(c)) {
                     String msg = translate("error.font.nocharacter").replace("%char%", "" + c);
                     Logger.getLogger(FontPanel.class.getName()).log(Level.SEVERE, msg);
