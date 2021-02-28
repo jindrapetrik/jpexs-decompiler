@@ -39,8 +39,10 @@ package
 		TestForEach;
 		TestForEachObjectArray;
 		TestForEachObjectAttribute;
+		TestForEachReturn;
 		TestForGoto;
 		TestForIn;
+		TestForInReturn;
 		TestForXml;
 		TestGotos;
 		TestGotos2;
