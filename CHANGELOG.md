@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - AS3 p-code/AS hilighting when outside trait
 - AS3 p-code/AS hilighting after p-code save
 - Decompilation - Goto handling
+- Not selecting proper script after restoring session
 
 ### Removed
 - #1631 ActiveX Flash component download in windows installer
