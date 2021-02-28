@@ -883,6 +883,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 return decompiledTextArea.linkPainter();
             }
         });
+        decompiledTextArea.addScriptListener(new Runnable() {
+            @Override
+            public void run() {
+                lastDecompiled = decompiledTextArea.getText();
+            }
+        });
 
         // Register the component on the tooltip manager
         // So that #getToolTipText(MouseEvent) gets invoked when the mouse
@@ -1353,13 +1359,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         searchPanel.setOptions(ignoreCase, regExp);
         searchPanel.setSearchText(searchedText);
         ScriptPack pack = result.getScriptPack();
-        setAbc(pack.abc);
 
         Runnable setScriptComplete = new Runnable() {
             @Override
             public void run() {
                 decompiledTextArea.removeScriptListener(this);
                 hilightScript(pack);
+                setAbc(pack.abc);
 
                 boolean pcode = result.isPcode();
                 if (pcode) {

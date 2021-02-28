@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - AS3 p-code/AS hilighting after p-code save
 - Decompilation - Goto handling
 - Not selecting proper script after restoring session
+- #1603 empty script after search selection
 
 ### Removed
 - #1631 ActiveX Flash component download in windows installer
