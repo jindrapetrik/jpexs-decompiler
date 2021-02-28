@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import java.awt.Component;
 import javax.swing.JScrollPane;
+import javax.swing.Scrollable;
 
 /**
  *
@@ -27,26 +28,26 @@ public class FasterScrollPane extends JScrollPane {
 
     public FasterScrollPane(Component view) {
         super(view);
-        initSpeed();
     }
 
     public FasterScrollPane() {
         super();
-        initSpeed();
     }
 
     public FasterScrollPane(int vsbPolicy, int hsbPolicy) {
         super(vsbPolicy, hsbPolicy);
-        initSpeed();
     }
 
     public FasterScrollPane(Component view, int vsbPolicy, int hsbPolicy) {
         super(view, vsbPolicy, hsbPolicy);
-        initSpeed();
     }
 
-    private void initSpeed() {
-        getVerticalScrollBar().setUnitIncrement(20);
+    @Override
+    public void setViewportView(Component view) {
+        super.setViewportView(view);
+        if (!(view instanceof Scrollable)) {
+            getVerticalScrollBar().setUnitIncrement(20);
+        }
     }
 
 }
