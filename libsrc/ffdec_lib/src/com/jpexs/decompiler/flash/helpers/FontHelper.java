@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.helpers;
 
 import java.awt.Canvas;
@@ -27,6 +28,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.AttributedCharacterIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.BiPredicate;
 
 /**
  *
@@ -309,6 +314,70 @@ public class FontHelper {
             return null;
         }
     }*/
+
+    public static Map<String, Map<String, File>> getInstalledFontFiles() {
+        Map<String, Map<String, File>> ret = new HashMap<>();
+
+        List<File> fontFiles = getSystemFontFiles();
+        for (File file : fontFiles) {
+            try {
+                Font f = Font.createFont(Font.TRUETYPE_FONT, file);
+                String fam = f.getFamily(Locale.ENGLISH);
+                if (!ret.containsKey(fam)) {
+                    ret.put(fam, new HashMap<>());
+                }
+                ret.get(fam).put(f.getFontName(Locale.ENGLISH), file);
+
+            } catch (FontFormatException | IOException ex) {
+                //ignore
+            }
+        }
+        return ret;
+    }
+
+    private static List<File> getSystemFontFiles() {
+        List<File> dirs = getSystemFontDirectories();
+        List<File> ret = new ArrayList<>();
+        for (File d : dirs) {
+            try {
+                Object[] paths = Files.find(d.toPath(), Integer.MAX_VALUE, new BiPredicate<Path, BasicFileAttributes>() {
+                    @Override
+                    public boolean test(Path t, BasicFileAttributes u) {
+                        return u.isRegularFile() && (t.endsWith(".ttf") || t.endsWith(".TTF"));
+                    }
+                }).toArray();
+                for (Object o : paths) {
+                    ret.add(((Path) o).toFile());
+                }
+            } catch (IOException ex) {
+                //ignore
+            }
+        }
+        return ret;
+    }
+
+    private static List<File> getSystemFontDirectories() {
+        final String osName = System.getProperty("os.name");
+        List<File> ret = new ArrayList<>();
+        if (osName.startsWith("Windows")) {
+            ret.add(new File(System.getenv("WINDIR") + "\\" + "Fonts"));
+        } else if (osName.startsWith("Mac")) {
+            ret.add(new File(System.getProperty("user.home") + File.separator + "Library/Fonts"));
+            ret.add(new File("/Library/Fonts"));
+            ret.add(new File("/System/Library/Fonts"));
+        } else if (osName.startsWith("Linux") || osName.startsWith("LINUX")) {
+            ret.add(new File(System.getProperty("user.home") + File.separator + ".fonts"));
+            ret.add(new File("/usr/share/fonts/truetype"));
+            ret.add(new File("/usr/share/fonts/TTF"));
+            for (int i = ret.size() - 1; i >= 0; i--) {
+                File f = ret.get(i);
+                if (!(f.exists() && f.isDirectory() && f.canRead())) {
+                    ret.remove(i);
+                }
+            }
+        }
+        return ret;
+    }
 
     private static Map<Integer, Character> getFontGlyphToCharMap(Font f) {
         Map<Integer, Character> ret = new HashMap<>();
