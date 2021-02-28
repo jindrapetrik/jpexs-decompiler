@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -40,6 +41,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphMetrics;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Area;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,6 +124,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     private static Map<String, Map<String, Font>> installedFontsByFamily;
+    private static Map<String, Map<String, File>> installedFontFilesByFamily;
 
     private static Map<String, Font> installedFontsByName;
 
@@ -271,6 +274,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
 
     public static void reload() {
         installedFontsByFamily = FontHelper.getInstalledFonts();
+        installedFontFilesByFamily = FontHelper.getInstalledFontFiles();
         installedFontsByName = new HashMap<>();
 
         for (String fam : installedFontsByFamily.keySet()) {
