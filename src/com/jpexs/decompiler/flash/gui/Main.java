@@ -1195,7 +1195,11 @@ public class Main {
                     SwfSpecificConfiguration swfConf = Configuration.getSwfSpecificConfiguration(fswf.getShortFileName());
                     if (swfConf != null) {
                         String pathStr = swfConf.lastSelectedPath;
-                        mainFrame.getPanel().tagTree.setSelectionPathString(pathStr);
+                        if (isInited()) {
+                            mainFrame.getPanel().tagTree.setSelectionPathString(pathStr);
+                        } else {
+                            mainFrame.getPanel().tagTree.setExpandPathString(pathStr);
+                        }
                     }
                 }
 
