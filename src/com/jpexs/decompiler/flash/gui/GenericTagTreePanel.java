@@ -924,6 +924,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
     }
 
     private TreeModel getModel() {
+        if (editedTag == null) {
+            return new DefaultTreeModel(new DefaultMutableTreeNode("root"));
+        }
         return new MyTreeModel(editedTag);
     }
 
