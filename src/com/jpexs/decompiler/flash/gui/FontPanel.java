@@ -24,11 +24,13 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Reference;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.awt.FontMetrics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
@@ -542,15 +544,29 @@ public class FontPanel extends JPanel {
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         if (item instanceof FontTag) {
             FontTag ft = (FontTag) item;
-            FontEmbedDialog fed = new FontEmbedDialog((FontFace) fontFaceSelection.getSelectedItem(), fontAddCharactersField.getText());
+            FontEmbedDialog fed = new FontEmbedDialog(ft.hasLayout() || ft.getCharacterCount() == 0, (FontFace) fontFaceSelection.getSelectedItem(), fontAddCharactersField.getText());
             if (fed.showDialog() == AppDialog.OK_OPTION) {
                 Set<Integer> selChars = fed.getSelectedChars();
-                if (!selChars.isEmpty()) {
+                if (!selChars.isEmpty() || fed.isImportAscentDescentLeading()) {
+                    if (ft.getCharacterCount() == 0) {
+                        ft.setHasLayout(true);
+                    }
                     Font selFont = fed.getSelectedFont();
                     fontFamilyNameSelection.setSelectedItem(new FontFamily(selFont));
                     fontFaceSelection.setSelectedItem(new FontFace(selFont));
                     fontAddChars(ft, selChars, selFont);
+                    if (fed.isImportAscentDescentLeading()) {
+                        Font adlFont = selFont;
+                        if (selFont.getSize() != 1024) {
+                            adlFont = selFont.deriveFont(1024f);
+                        }
+                        ft.setAscent((int) (ft.getDivider() * this.getFontMetrics(adlFont).getAscent()));
+                        ft.setDescent((int) (ft.getDivider() * this.getFontMetrics(adlFont).getDescent()));
+                        int leading = this.getFontMetrics(adlFont).getAscent() + this.getFontMetrics(adlFont).getDescent() - 1024;
+                        ft.setLeading((int) (ft.getDivider() * leading));
+                    }
                     fontAddCharactersField.setText("");
+                    ft.setModified(true);
                     mainPanel.reload(true);
                 }
             }

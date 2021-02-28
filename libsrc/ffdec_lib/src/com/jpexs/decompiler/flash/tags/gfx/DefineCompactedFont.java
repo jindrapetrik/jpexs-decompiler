@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.gfx;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -454,5 +455,24 @@ public final class DefineCompactedFont extends FontTag {
     @Override
     public boolean hasLayout() {
         return true;
+    }
+
+    @Override
+    public void setAscent(int ascent) {
+        fonts.get(0).ascent = ascent;
+    }
+
+    @Override
+    public void setDescent(int descent) {
+        fonts.get(0).descent = descent;
+    }
+
+    @Override
+    public void setLeading(int leading) {
+        fonts.get(0).leading = leading;
+    }
+
+    @Override
+    public void setHasLayout(boolean hasLayout) {
     }
 }

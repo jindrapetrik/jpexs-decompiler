@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
@@ -42,6 +43,7 @@ import java.awt.font.GlyphMetrics;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Area;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -108,6 +110,14 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     public abstract int getDescent();
 
     public abstract int getLeading();
+
+    public abstract void setAscent(int ascent);
+
+    public abstract void setDescent(int descent);
+
+    public abstract void setLeading(int leading);
+
+    public abstract void setHasLayout(boolean hasLayout);
 
     public String getFontName() {
         DefineFontNameTag fontNameTag = getFontNameTag();

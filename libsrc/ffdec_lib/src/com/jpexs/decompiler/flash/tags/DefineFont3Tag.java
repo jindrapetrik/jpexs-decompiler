@@ -637,4 +637,42 @@ public class DefineFont3Tag extends FontTag {
         }
         return kerningAdjustment;
     }
+
+    @Override
+    public void setAscent(int ascent) {
+        if (fontFlagsHasLayout) {
+            fontAscent = ascent;
+        }
+    }
+
+    @Override
+    public void setDescent(int descent) {
+        if (fontFlagsHasLayout) {
+            fontDescent = descent;
+        }
+    }
+
+    @Override
+    public void setLeading(int leading) {
+        if (fontFlagsHasLayout) {
+            fontLeading = leading;
+        }
+    }
+
+    @Override
+    public void setHasLayout(boolean hasLayout) {
+        fontFlagsHasLayout = hasLayout;
+
+        if (hasLayout) {
+            if (fontAdvanceTable == null) {
+                fontAdvanceTable = new ArrayList<>();
+            }
+            if (fontBoundsTable == null) {
+                fontBoundsTable = new ArrayList<>();
+            }
+            if (fontKerningTable == null) {
+                fontKerningTable = new ArrayList<>();
+            }
+        }
+    }
 }

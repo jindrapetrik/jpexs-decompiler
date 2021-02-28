@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
-- #1561 Font editing - import kerning when adding characters
+- #1561 Font editing - import ascent, descent, leading, kerning
 
 ### Fixed
 - #1623 Right side marker (gray line) in P-code
