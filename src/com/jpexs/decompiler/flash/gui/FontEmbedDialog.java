@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.font.CharacterRanges;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -80,11 +81,17 @@ public class FontEmbedDialog extends AppDialog {
 
     private final JCheckBox allCheckbox;
 
+    private final JCheckBox importAscentDescentLeadingCheckBox;
+
     public Font getSelectedFont() {
         if (ttfFileRadio.isSelected() && customFont != null) {
             return customFont;
         }
         return ((FontFace) faceSelection.getSelectedItem()).font;
+    }
+
+    public boolean isImportAscentDescentLeading() {
+        return importAscentDescentLeadingCheckBox.isSelected();
     }
 
     public Set<Integer> getSelectedChars() {
@@ -128,7 +135,7 @@ public class FontEmbedDialog extends AppDialog {
         faceSelection.setModel(FontPanel.getFaceModel((FontFamily) familyNamesSelection.getSelectedItem()));
     }
 
-    public FontEmbedDialog(FontFace selectedFace, String selectedChars) {
+    public FontEmbedDialog(boolean hasLayout, FontFace selectedFace, String selectedChars) {
         setSize(900, 600);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setTitle(translate("dialog.title"));
@@ -247,6 +254,12 @@ public class FontEmbedDialog extends AppDialog {
 
         cnt.add(specialPanel);
         cnt.add(individialSample);
+
+        importAscentDescentLeadingCheckBox = new JCheckBox(translate("ascentdescentleading"));
+        importAscentDescentLeadingCheckBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        if (hasLayout) {
+            cnt.add(importAscentDescentLeadingCheckBox);
+        }
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton okButton = new JButton(AppStrings.translate("button.ok"));
