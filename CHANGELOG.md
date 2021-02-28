@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - #1633 AS3 decompilation - return in for..in clause
 - AS3 p-code/AS hilighting when outside trait
 - AS3 p-code/AS hilighting after p-code save
+- Decompilation - Goto handling
 
 ### Removed
 - #1631 ActiveX Flash component download in windows installer
