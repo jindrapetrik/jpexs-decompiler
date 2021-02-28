@@ -472,6 +472,24 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testForEachReturn() {
+        decompileMethod("classic_air", "testForEachReturn", "var list:Array = null;\r\n"
+                + "var item:* = undefined;\r\n"
+                + "list = [];\r\n"
+                + "list[0] = \"first\";\r\n"
+                + "list[1] = \"second\";\r\n"
+                + "list[2] = \"third\";\r\n"
+                + "var _loc4_:int = 0;\r\n"
+                + "var _loc3_:* = list;\r\n"
+                + "for each(item in _loc3_)\r\n"
+                + "{\r\n"
+                + "return item;\r\n"
+                + "}\r\n"
+                + "return null;\r\n",
+                false);
+    }
+
+    @Test
     public void testForGoto() {
         decompileMethod("classic_air", "testForGoto", "var i:* = 0;\r\n"
                 + "var c:int = 0;\r\n"
@@ -509,6 +527,20 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "{\r\n"
                 + "trace(item);\r\n"
                 + "}\r\n",
+                false);
+    }
+
+    @Test
+    public void testForInReturn() {
+        decompileMethod("classic_air", "testForInReturn", "var dic:Dictionary = null;\r\n"
+                + "var item:* = null;\r\n"
+                + "var _loc4_:int = 0;\r\n"
+                + "var _loc3_:* = dic;\r\n"
+                + "for(item in _loc3_)\r\n"
+                + "{\r\n"
+                + "return item;\r\n"
+                + "}\r\n"
+                + "return null;\r\n",
                 false);
     }
 
@@ -803,6 +835,13 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "{\r\n"
                 + "trace(\"D\");\r\n"
                 + "}\r\n",
+                false);
+    }
+
+    @Test
+    public void testImportedVar() {
+        decompileMethod("classic_air", "testImportedVar", "trace(myvar);\r\n"
+                + "myvar = 5;\r\n",
                 false);
     }
 
