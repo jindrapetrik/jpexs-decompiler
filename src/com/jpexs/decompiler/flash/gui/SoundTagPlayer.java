@@ -323,4 +323,9 @@ public class SoundTagPlayer implements MediaDisplay {
             loopCount--;
         }
     }
+
+    @Override
+    public Color getBackgroundColor() {
+        return Color.white;
+    }
 }

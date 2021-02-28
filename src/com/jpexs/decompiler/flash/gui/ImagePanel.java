@@ -171,6 +171,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         listeners.remove(listener);
     }
 
+    @Override
+    public Color getBackgroundColor() {
+        if (swf != null && swf.getBackgroundColor() != null) {
+            return swf.getBackgroundColor().backgroundColor.toColor();
+        }
+        return Color.white;
+    }
+
     private class IconPanel extends JPanel {
 
         private SerializableImage _img;

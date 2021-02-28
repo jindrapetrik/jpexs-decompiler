@@ -70,6 +70,8 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
 
     private float frameRate;
 
+    private Color bgColor;
+
     @Override
     public boolean loopAvailable() {
         return false;
@@ -434,5 +436,13 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     @Override
     public void removeEventListener(MediaDisplayListener listener) {
         listeners.remove(listener);
+    }
+
+    @Override
+    public Color getBackgroundColor() {
+        if (bgColor == null) {
+            return Color.white;
+        }
+        return bgColor;
     }
 }
