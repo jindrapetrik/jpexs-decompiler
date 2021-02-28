@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - #1627 Previously decompiled scripts not cached
 - SWF is not garbage collected on close in some situations
 - AS1/2 script search does not show all results
+- #1633 AS3 decompilation - return in for..in clause
 
 ### Removed
 - #1631 ActiveX Flash component download in windows installer

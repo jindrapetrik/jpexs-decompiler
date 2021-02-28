@@ -1944,6 +1944,50 @@ public class AVM2Graph extends Graph {
             }
         }
 
+        List<GraphTargetItem> ret = list;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i) instanceof IfItem) {
+                IfItem ifi = (IfItem) list.get(i);
+                if (((ifi.expression instanceof HasNextAVM2Item)
+                        || ((ifi.expression instanceof NotItem)
+                        && (((NotItem) ifi.expression).getOriginal() instanceof HasNextAVM2Item)))) {
+                    HasNextAVM2Item hnt;
+                    List<GraphTargetItem> body = new ArrayList<>();
+                    List<GraphTargetItem> nextbody;//= new ArrayList<>();
+                    if (ifi.expression instanceof NotItem) {
+                        hnt = (HasNextAVM2Item) ((NotItem) ifi.expression).getOriginal();
+                        body.addAll(ifi.onFalse);
+                        for (int j = i + 1; j < list.size();) {
+                            body.add(list.remove(i + 1));
+                        }
+                        nextbody = ifi.onTrue;
+                    } else {
+                        hnt = (HasNextAVM2Item) ifi.expression;
+                        body = ifi.onTrue;
+                        nextbody = ifi.onFalse;
+                    }
+                    if (!body.isEmpty()) {
+                        if (body.get(0) instanceof SetTypeAVM2Item) {
+                            SetTypeAVM2Item sti = (SetTypeAVM2Item) body.remove(0);
+                            GraphTargetItem gti = sti.getValue().getNotCoerced();
+                            GraphTargetItem repl = null;
+
+                            if (gti instanceof NextValueAVM2Item) {
+                                repl = new ForEachInAVM2Item(ifi.getSrc(), ifi.getLineStartItem(), new Loop(0, null, null), new InAVM2Item(null, null, sti.getObject(), hnt.obj), body);
+                            } else if (gti instanceof NextNameAVM2Item) {
+                                repl = new ForInAVM2Item(ifi.getSrc(), ifi.getLineStartItem(), new Loop(0, null, null), new InAVM2Item(null, null, sti.getObject(), hnt.obj), body);
+                            }
+                            if (repl != null) {
+                                list.remove(i);
+                                list.add(i, repl);
+                                list.addAll(i + 1, nextbody);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         for (int i = 0; i < list.size(); i++) {
 
             if (list.get(i) instanceof WithAVM2Item) {
@@ -2060,49 +2104,6 @@ public class AVM2Graph extends Graph {
             }
         }
 
-        List<GraphTargetItem> ret = list;
-        for (int i = 0; i < list.size(); i++) {
-            if (list.get(i) instanceof IfItem) {
-                IfItem ifi = (IfItem) list.get(i);
-                if (((ifi.expression instanceof HasNextAVM2Item)
-                        || ((ifi.expression instanceof NotItem)
-                        && (((NotItem) ifi.expression).getOriginal() instanceof HasNextAVM2Item)))) {
-                    HasNextAVM2Item hnt;
-                    List<GraphTargetItem> body = new ArrayList<>();
-                    List<GraphTargetItem> nextbody;//= new ArrayList<>();
-                    if (ifi.expression instanceof NotItem) {
-                        hnt = (HasNextAVM2Item) ((NotItem) ifi.expression).getOriginal();
-                        body.addAll(ifi.onFalse);
-                        for (int j = i + 1; j < list.size();) {
-                            body.add(list.remove(i + 1));
-                        }
-                        nextbody = ifi.onTrue;
-                    } else {
-                        hnt = (HasNextAVM2Item) ifi.expression;
-                        body = ifi.onTrue;
-                        nextbody = ifi.onFalse;
-                    }
-                    if (!body.isEmpty()) {
-                        if (body.get(0) instanceof SetTypeAVM2Item) {
-                            SetTypeAVM2Item sti = (SetTypeAVM2Item) body.remove(0);
-                            GraphTargetItem gti = sti.getValue().getNotCoerced();
-                            GraphTargetItem repl = null;
-
-                            if (gti instanceof NextValueAVM2Item) {
-                                repl = new ForEachInAVM2Item(ifi.getSrc(), ifi.getLineStartItem(), new Loop(0, null, null), new InAVM2Item(null, null, sti.getObject(), hnt.obj), body);
-                            } else if (gti instanceof NextNameAVM2Item) {
-                                repl = new ForInAVM2Item(ifi.getSrc(), ifi.getLineStartItem(), new Loop(0, null, null), new InAVM2Item(null, null, sti.getObject(), hnt.obj), body);
-                            }
-                            if (repl != null) {
-                                list.remove(i);
-                                list.add(i, repl);
-                                list.addAll(i + 1, nextbody);
-                            }
-                        }
-                    }
-                }
-            }
-        }
         //Handle for loops at the end:
         super.finalProcess(list, level, localData, path);
     }
