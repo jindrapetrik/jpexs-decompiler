@@ -26,6 +26,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Toolkit;
@@ -585,7 +586,16 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         if (img == null) {
             return;
         }
-        TransferableImage trans = new TransferableImage(img);
+
+        //Copy to clipboard does not support transparency
+        BufferedImage newImage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = newImage.createGraphics();
+        g.setColor(display.getBackgroundColor());
+        g.fillRect(0, 0, img.getWidth(), img.getHeight());
+        g.drawImage(img, 0, 0, null);
+        g.dispose();
+
+        TransferableImage trans = new TransferableImage(newImage);
         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
         c.setContents(trans, new ClipboardOwner() {
             @Override
