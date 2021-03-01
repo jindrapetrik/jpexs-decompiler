@@ -85,6 +85,8 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
 
     public abstract String getFontNameIntag();
 
+    public abstract void setFontNameIntag(String name);
+
     public abstract boolean isSmall();
 
     public abstract boolean isBold();
@@ -96,6 +98,14 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     public abstract boolean isBoldEditable();
 
     public abstract boolean isItalicEditable();
+
+    public abstract boolean isFontNameInTagEditable();
+
+    public abstract boolean isAscentEditable();
+
+    public abstract boolean isDescentEditable();
+
+    public abstract boolean isLeadingEditable();
 
     public abstract void setSmall(boolean value);
 

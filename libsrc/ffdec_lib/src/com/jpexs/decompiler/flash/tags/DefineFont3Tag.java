@@ -675,4 +675,29 @@ public class DefineFont3Tag extends FontTag {
             }
         }
     }
+
+    @Override
+    public void setFontNameIntag(String name) {
+        fontName = name;
+    }
+
+    @Override
+    public boolean isFontNameInTagEditable() {
+        return true;
+    }
+
+    @Override
+    public boolean isAscentEditable() {
+        return hasLayout();
+    }
+
+    @Override
+    public boolean isDescentEditable() {
+        return hasLayout();
+    }
+
+    @Override
+    public boolean isLeadingEditable() {
+        return hasLayout();
+    }
 }

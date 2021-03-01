@@ -129,14 +129,7 @@ public final class DefineCompactedFont extends FontTag {
 
     @Override
     public String getFontNameIntag() {
-        StringBuilder ret = new StringBuilder();
-        for (int i = 0; i < fonts.size(); i++) {
-            if (i > 0) {
-                ret.append(", ");
-            }
-            ret.append(fonts.get(i).fontName);
-        }
-        return ret.toString();
+        return fonts.get(0).fontName;
     }
 
     @Override
@@ -194,6 +187,33 @@ public final class DefineCompactedFont extends FontTag {
             shapeCache.set(pos, font.glyphs.get(pos).toSHAPE());
         }
 
+        for (int k = 0; k < font.kerning.size(); k++) {
+            if (font.kerning.get(k).char1 == character
+                    || font.kerning.get(k).char2 == character) {
+                font.kerning.remove(k);
+                k--;
+            }
+        }
+        List<FontHelper.KerningPair> kerning = getFontKerningPairs(cfont, (int) (getDivider() * 1024));
+        for (FontHelper.KerningPair pair : kerning) {
+            if (pair.char1 != character && pair.char2 != character) {
+                continue;
+            }
+            int glyph1 = charToGlyph(pair.char1);
+            if (pair.char1 == character) {
+
+            } else if (glyph1 == -1) {
+                continue;
+            }
+            int glyph2 = charToGlyph(pair.char2);
+            if (pair.char2 == character) {
+
+            } else if (glyph2 == -1) {
+                continue;
+            }
+            font.kerning.add(new KerningPairType(pair.char1, pair.char2, pair.kerning));
+        }
+
         setModified(true);
         getSwf().clearImageCache();
     }
@@ -222,6 +242,15 @@ public final class DefineCompactedFont extends FontTag {
         font.glyphInfo.remove(pos);
         font.glyphs.remove(pos);
         shapeCache.remove(pos);
+
+        for (int k = 0; k < font.kerning.size(); k++) {
+            if (font.kerning.get(k).char1 == character
+                    || font.kerning.get(k).char2 == character) {
+                font.kerning.remove(k);
+                k--;
+            }
+        }
+
         shiftGlyphIndices(fontId, pos + 1, false);
 
         setModified(true);
@@ -474,5 +503,30 @@ public final class DefineCompactedFont extends FontTag {
 
     @Override
     public void setHasLayout(boolean hasLayout) {
+    }
+
+    @Override
+    public void setFontNameIntag(String name) {
+        fonts.get(0).fontName = name;
+    }
+
+    @Override
+    public boolean isFontNameInTagEditable() {
+        return true;
+    }
+
+    @Override
+    public boolean isAscentEditable() {
+        return true;
+    }
+
+    @Override
+    public boolean isDescentEditable() {
+        return true;
+    }
+
+    @Override
+    public boolean isLeadingEditable() {
+        return true;
     }
 }
