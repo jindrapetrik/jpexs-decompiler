@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.helpers.TableLayoutHelper;
+import com.jpexs.decompiler.flash.tags.DefineFontTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -121,12 +122,37 @@ public class FontPanel extends JPanel {
             if (fontTag.isItalicEditable()) {
                 fontIsItalicCheckBox.setEnabled(true);
             }
+            if (fontTag.isFontNameInTagEditable()) {
+                fontNameIntagTextField.setVisible(true);
+                fontNameIntagLabel.setVisible(false);
+            }
+
+            boolean layoutEditable = (fontTag.hasLayout() || fontTag.getCharacterCount() == 0) && (!(fontTag instanceof DefineFontTag));
+
+            if (layoutEditable) {
+                fontAscentTextField.setVisible(true);
+                fontAscentLabel.setVisible(false);
+
+                fontDescentTextField.setVisible(true);
+                fontDescentLabel.setVisible(false);
+
+                fontLeadingTextField.setVisible(true);
+                fontLeadingLabel.setVisible(false);
+            }
         } else {
             buttonEdit.setVisible(true);
             buttonSave.setVisible(false);
             buttonCancel.setVisible(false);
             fontIsBoldCheckBox.setEnabled(false);
             fontIsItalicCheckBox.setEnabled(false);
+            fontNameIntagTextField.setVisible(false);
+            fontNameIntagLabel.setVisible(true);
+            fontAscentTextField.setVisible(false);
+            fontAscentLabel.setVisible(true);
+            fontDescentTextField.setVisible(false);
+            fontDescentLabel.setVisible(true);
+            fontLeadingTextField.setVisible(false);
+            fontLeadingLabel.setVisible(true);
         }
     }
 
@@ -217,14 +243,18 @@ public class FontPanel extends JPanel {
         SWF swf = ft.getSwf();
         fontTag = ft;
         fontNameIntagLabel.setText(ft.getFontNameIntag());
+        fontNameIntagTextField.setText(ft.getFontNameIntag());
         fontNameTextArea.setText(ft.getFontName());
         fontCopyrightTextArea.setText(ft.getFontCopyright());
 
         fontIsBoldCheckBox.setSelected(ft.isBold());
         fontIsItalicCheckBox.setSelected(ft.isItalic());
-        fontDescentLabel.setText(ft.getDescent() == -1 ? translate("value.unknown") : Integer.toString(ft.getDescent()));
         fontAscentLabel.setText(ft.getAscent() == -1 ? translate("value.unknown") : Integer.toString(ft.getAscent()));
+        fontAscentTextField.setText(ft.getAscent() == -1 ? "0" : "" + ft.getAscent());
+        fontDescentLabel.setText(ft.getDescent() == -1 ? translate("value.unknown") : Integer.toString(ft.getDescent()));
+        fontDescentTextField.setText(ft.getDescent() == -1 ? "0" : "" + ft.getDescent());
         fontLeadingLabel.setText(ft.getLeading() == -1 ? translate("value.unknown") : Integer.toString(ft.getLeading()));
+        fontLeadingTextField.setText(ft.getLeading() == -1 ? "0" : "" + ft.getLeading());
         String chars = ft.getCharacters();
         fontCharactersTextArea.setText(chars);
         try {
@@ -252,6 +282,7 @@ public class FontPanel extends JPanel {
         contentScrollPane = new FasterScrollPane();
         addCharsPanel = new JPanel();
         fontParamsPanel = new JPanel();
+        fontNameIntagTextField = new JTextField(30);
         fontNameIntagLabel = new JLabel();
         JScrollPane fontDisplayNameScrollPane = new FasterScrollPane();
         fontNameTextArea = new JTextArea();
@@ -264,10 +295,13 @@ public class FontPanel extends JPanel {
         fontIsItalicCheckBox = new JCheckBox();
         JLabel jLabel6 = new JLabel();
         fontAscentLabel = new JLabel();
+        fontAscentTextField = new JTextField(30);
         JLabel jLabel7 = new JLabel();
         fontDescentLabel = new JLabel();
+        fontDescentTextField = new JTextField(30);
         JLabel jLabel8 = new JLabel();
         fontLeadingLabel = new JLabel();
+        fontLeadingTextField = new JTextField(30);
         JLabel jLabel9 = new JLabel();
         fontCharactersScrollPane = new FasterScrollPane();
         fontCharactersTextArea = new JTextArea();
@@ -305,10 +339,19 @@ public class FontPanel extends JPanel {
         fontNameIntagLabLabel.setText(AppStrings.translate("font.name.intag"));
         fontParamsPanel.add(fontNameIntagLabLabel, "0,0,R");
 
+        fontNameIntagTextField.setText(AppStrings.translate("value.unknown"));
+        //fontNameIntagTextField.setMinimumSize(new Dimension(100, fontNameIntagTextField.getMinimumSize().height));
+        //fontNameIntagTextField.setPreferredSize(new Dimension(250, fontNameIntagTextField.getPreferredSize().height));
+
         fontNameIntagLabel.setText(AppStrings.translate("value.unknown"));
         fontNameIntagLabel.setMinimumSize(new Dimension(100, fontNameIntagLabel.getMinimumSize().height));
         fontNameIntagLabel.setPreferredSize(new Dimension(250, fontNameIntagLabel.getPreferredSize().height));
-        fontParamsPanel.add(fontNameIntagLabel, "1,0");
+
+        JPanel fontNamePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        fontNamePanel.add(fontNameIntagTextField);
+        fontNamePanel.add(fontNameIntagLabel);
+        fontNameIntagTextField.setVisible(false);
+        fontParamsPanel.add(fontNamePanel, "1,0");
 
         JLabel fontNameNameLabLabel = new JLabel();
         fontNameNameLabLabel.setText(AppStrings.translate("font.name"));
@@ -367,19 +410,37 @@ public class FontPanel extends JPanel {
         fontParamsPanel.add(jLabel6, "0,5,R");
 
         fontAscentLabel.setText(AppStrings.translate("value.unknown"));
-        fontParamsPanel.add(fontAscentLabel, "1,5");
+
+        JPanel fontAscentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        fontAscentPanel.add(fontAscentLabel);
+        fontAscentPanel.add(fontAscentTextField);
+        fontAscentTextField.setVisible(false);
+
+        fontParamsPanel.add(fontAscentPanel, "1,5");
 
         jLabel7.setText(AppStrings.translate("font.descent"));
         fontParamsPanel.add(jLabel7, "0,6,R");
 
         fontDescentLabel.setText(AppStrings.translate("value.unknown"));
-        fontParamsPanel.add(fontDescentLabel, "1,6");
+
+        JPanel fontDescentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        fontDescentPanel.add(fontDescentLabel);
+        fontDescentPanel.add(fontDescentTextField);
+        fontDescentTextField.setVisible(false);
+
+        fontParamsPanel.add(fontDescentPanel, "1,6");
 
         jLabel8.setText(AppStrings.translate("font.leading"));
         fontParamsPanel.add(jLabel8, "0,7,R");
 
         fontLeadingLabel.setText(AppStrings.translate("value.unknown"));
-        fontParamsPanel.add(fontLeadingLabel, "1,7");
+
+        JPanel fontLeadingPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        fontLeadingPanel.add(fontLeadingLabel);
+        fontLeadingPanel.add(fontLeadingTextField);
+        fontLeadingTextField.setVisible(false);
+
+        fontParamsPanel.add(fontLeadingPanel, "1,7");
 
         jLabel9.setText(AppStrings.translate("font.characters"));
         fontParamsPanel.add(jLabel9, "0,8,R,T");
@@ -608,12 +669,47 @@ public class FontPanel extends JPanel {
     }
 
     private void buttonSaveActionPerformed(ActionEvent evt) {
+
+        if (!(fontTag instanceof DefineFontTag)) {
+            if (fontTag.getCharacterCount() == 0 && !fontTag.hasLayout()) {
+                fontTag.setHasLayout(true);
+            }
+            if (fontTag.hasLayout()) {
+
+                try {
+                    int ascent = Integer.parseInt(fontAscentTextField.getText());
+                    int descent = Integer.parseInt(fontLeadingTextField.getText());
+                    int leading = Integer.parseInt(fontLeadingTextField.getText());
+                    if (ascent < 0 || descent < 0 || leading < 0) {
+                        return;
+                    }
+                    fontTag.setAscent(ascent);
+                    fontTag.setDescent(descent);
+                    fontTag.setLeading(leading);
+
+                    fontAscentLabel.setText("" + ascent);
+                    fontDescentLabel.setText("" + descent);
+                    fontLeadingLabel.setText("" + leading);
+                } catch (NumberFormatException nfe) {
+                    return;
+                }
+            }
+        }
+
         if (fontTag.isBoldEditable()) {
             fontTag.setBold(fontIsBoldCheckBox.isSelected());
         }
         if (fontTag.isItalicEditable()) {
             fontTag.setItalic(fontIsItalicCheckBox.isSelected());
         }
+        if (fontTag.isFontNameInTagEditable()) {
+            fontTag.setFontNameIntag(fontNameIntagTextField.getText());
+            fontNameIntagLabel.setText(fontNameIntagTextField.getText());
+
+        }
+
+        mainPanel.tagTree.repaint();
+        fontTag.setModified(true);
         setEditable(false);
     }
 
@@ -705,6 +801,8 @@ public class FontPanel extends JPanel {
 
     private JButton fontRemoveCharsButton;
 
+    private JTextField fontAscentTextField;
+
     private JLabel fontAscentLabel;
 
     private JScrollPane fontCharactersScrollPane;
@@ -715,6 +813,8 @@ public class FontPanel extends JPanel {
 
     private JLabel fontDescentLabel;
 
+    private JTextField fontDescentTextField;
+
     private JTextArea fontNameTextArea;
 
     private JButton fontEmbedButton;
@@ -724,6 +824,10 @@ public class FontPanel extends JPanel {
     private JCheckBox fontIsItalicCheckBox;
 
     private JLabel fontLeadingLabel;
+
+    private JTextField fontLeadingTextField;
+
+    private JTextField fontNameIntagTextField;
 
     private JLabel fontNameIntagLabel;
 
