@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - #1603 empty script after search selection
 - Generic tag tree exception on save
 - Copying to clipboard does not support transparency
+- #1634 AS3 slot/const editor loses focus on edit button press
 
 ### Removed
 - #1631 ActiveX Flash component download in windows installer
