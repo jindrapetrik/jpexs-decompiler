@@ -134,6 +134,9 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
             View.showMessageDialog(null, AppStrings.translate("warning.initializers"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningInitializers);
         }
         slotConstEditor.setEditable(val);
+        if (val) {
+            slotConstEditor.requestFocusInWindow();
+        }
     }
 
     private boolean active = false;
