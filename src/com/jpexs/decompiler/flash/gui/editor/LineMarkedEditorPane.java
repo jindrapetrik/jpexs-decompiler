@@ -671,7 +671,11 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
             line += firstLineOffset();
             g.fillRect(0, d + lh * (line - 1), getWidth(), lh);
         }
-        super.paint(g);
+        try {
+            super.paint(g);
+        } catch (Exception ex) {
+            //ignore
+        }
         for (int line : lineMarkers.keySet()) {
 
             SortedSet<LineMarker> cs = lineMarkers.get(line);
