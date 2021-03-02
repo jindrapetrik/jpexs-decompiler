@@ -32,11 +32,13 @@ import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.BorderLayout;
@@ -93,6 +95,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private static final String CARDFONTPANEL = "Font card";
 
+    private static final String PLACE_TAG_CARD = "PLACETAG";
+
     private final MainPanel mainPanel;
 
     private final JPanel viewerCards;
@@ -141,6 +145,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private JButton genericCancelButton;
 
+    private JButton placeEditButton;
+
+    private JButton placeSaveButton;
+
+    private JButton placeCancelButton;
+
     private JPanel parametersPanel;
 
     private FontPanel fontPanel;
@@ -153,7 +163,13 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private boolean readOnly = false;
 
+    private ImagePanel placeImagePanel;
+
     private final int dividerSize;
+
+    private PlaceObjectTypeTag placeTag;
+
+    private MATRIX oldMatrix;
 
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
@@ -176,6 +192,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         viewerCards.add(createBinaryCard(), BINARY_TAG_CARD);
         viewerCards.add(createMetadataCard(), METADATA_TAG_CARD);
         viewerCards.add(createGenericTagCard(), GENERIC_TAG_CARD);
+        viewerCards.add(createPlaceTagCard(), PLACE_TAG_CARD);
         viewerCards.add(createEmptyCard(), EMPTY_CARD);
         setLeftComponent(viewerCards);
 
@@ -403,6 +420,49 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         return genericTagCard;
     }
 
+    private JPanel createPlaceTagCard() {
+        JPanel placeTagCard = new JPanel(new BorderLayout());
+
+        JPanel previewPanel = new JPanel(new BorderLayout());
+
+        JPanel previewCnt = new JPanel(new BorderLayout());
+        placeImagePanel = new ImagePanel();
+        //imagePanel.setLoop(Configuration.loopMedia.get());
+        previewCnt.add(placeImagePanel, BorderLayout.CENTER);
+        PlayerControls placeImagePlayControls = new PlayerControls(mainPanel, placeImagePanel);
+        previewCnt.add(placeImagePlayControls, BorderLayout.SOUTH);
+        placeImagePlayControls.setMedia(placeImagePanel);
+        previewPanel.add(previewCnt, BorderLayout.CENTER);
+        JLabel prevIntLabel = new HeaderLabel(mainPanel.translate("swfpreview.internal"));
+        prevIntLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        previewPanel.add(prevIntLabel, BorderLayout.NORTH);
+
+        placeTagCard.add(previewPanel, BorderLayout.CENTER);
+        placeTagCard.add(createPlaceTagButtonsPanel(), BorderLayout.SOUTH);
+
+        return placeTagCard;
+    }
+
+    private JPanel createPlaceTagButtonsPanel() {
+        placeEditButton = new JButton(mainPanel.translate("button.edit"), View.getIcon("edit16"));
+        placeEditButton.setMargin(new Insets(3, 3, 3, 10));
+        placeEditButton.addActionListener(this::editPlaceTagButtonActionPerformed);
+        placeSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
+        placeSaveButton.setMargin(new Insets(3, 3, 3, 10));
+        placeSaveButton.addActionListener(this::savePlaceTagButtonActionPerformed);
+        placeSaveButton.setVisible(false);
+        placeCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
+        placeCancelButton.setMargin(new Insets(3, 3, 3, 10));
+        placeCancelButton.addActionListener(this::cancelPlaceTagButtonActionPerformed);
+        placeCancelButton.setVisible(false);
+
+        ButtonsPanel placeTagButtonsPanel = new ButtonsPanel();
+        placeTagButtonsPanel.add(placeEditButton);
+        placeTagButtonsPanel.add(placeSaveButton);
+        placeTagButtonsPanel.add(placeCancelButton);
+        return placeTagButtonsPanel;
+    }
+
     private void showCardLeft(String card) {
         CardLayout cl = (CardLayout) (viewerCards.getLayout());
         cl.show(viewerCards, card);
@@ -567,6 +627,19 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         parametersPanel.setVisible(false);
     }
 
+    public void showPlaceTagPanel(PlaceObjectTypeTag tag, int frame) {
+        showCardLeft(PLACE_TAG_CARD);
+        placeTag = tag;
+        oldMatrix = tag.getMatrix();
+        placeImagePanel.setTimelined(((Tag) tag).getTimelined(), ((Tag) tag).getSwf(), frame);
+        placeImagePanel.selectDepth(tag.getDepth());
+        parametersPanel.setVisible(false);
+        placeEditButton.setVisible(!tag.isReadOnly());
+        placeEditButton.setEnabled(true);
+        placeSaveButton.setVisible(false);
+        placeCancelButton.setVisible(false);
+    }
+
     public void setImageReplaceButtonVisible(boolean show, boolean showAlpha) {
         if (readOnly) {
             show = false;
@@ -726,6 +799,41 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         genericSaveButton.setVisible(false);
         genericCancelButton.setVisible(false);
         genericTagPanel.setEditMode(false, null);
+    }
+
+    private void savePlaceTagButtonActionPerformed(ActionEvent evt) {
+        MATRIX matrix = placeImagePanel.getNewMatrix();
+        placeTag.setMatrix(matrix);
+        placeTag.setModified(true);
+        placeImagePanel.selectDepth(placeTag.getDepth());
+        placeImagePanel.freeTransformDepth(-1);
+        placeTag.getTimelined().resetTimeline();
+        placeEditButton.setVisible(true);
+        placeSaveButton.setVisible(false);
+        placeCancelButton.setVisible(false);
+    }
+
+    private void editPlaceTagButtonActionPerformed(ActionEvent evt) {
+        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        if (item == null) {
+            return;
+        }
+        placeImagePanel.selectDepth(-1);
+        placeImagePanel.freeTransformDepth(placeTag.getDepth());
+        placeEditButton.setVisible(false);
+        placeSaveButton.setVisible(true);
+        placeCancelButton.setVisible(true);
+    }
+
+    private void cancelPlaceTagButtonActionPerformed(ActionEvent evt) {
+        placeImagePanel.selectDepth(placeTag.getDepth());
+        placeImagePanel.freeTransformDepth(-1);
+        placeTag.setMatrix(oldMatrix);
+        placeTag.getTimelined().resetTimeline();
+
+        placeEditButton.setVisible(true);
+        placeSaveButton.setVisible(false);
+        placeCancelButton.setVisible(false);
     }
 
     private void prevFontsButtonActionPerformed(ActionEvent evt) {
