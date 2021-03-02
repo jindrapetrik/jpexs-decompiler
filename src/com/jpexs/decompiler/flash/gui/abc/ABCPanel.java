@@ -1359,6 +1359,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         searchPanel.setOptions(ignoreCase, regExp);
         searchPanel.setSearchText(searchedText);
         ScriptPack pack = result.getScriptPack();
+        setAbc(pack.abc);
 
         Runnable setScriptComplete = new Runnable() {
             @Override
