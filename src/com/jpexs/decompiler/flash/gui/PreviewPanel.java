@@ -811,6 +811,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeEditButton.setVisible(true);
         placeSaveButton.setVisible(false);
         placeCancelButton.setVisible(false);
+        mainPanel.repaintTree();
     }
 
     private void editPlaceTagButtonActionPerformed(ActionEvent evt) {
