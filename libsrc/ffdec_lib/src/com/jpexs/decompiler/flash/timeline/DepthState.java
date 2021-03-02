@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -116,6 +117,11 @@ public class DepthState {
         } else {
             instanceId = getNewInstanceId();
         }
+    }
+
+    public void setMATRIX(MATRIX matrix) {
+        this.matrix = matrix;
+        this.placeObjectTag.setMatrix(matrix);
     }
 
     public boolean cacheAsBitmap() {

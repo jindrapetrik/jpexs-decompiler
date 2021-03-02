@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - #1561 Font editing - import ascent, descent, leading, kerning
 - Font editing - font name, ascent, descent, leading
+- PlaceObject tags matrix editation - FreeTransform tool (move, resize, rotate, shear)
 
 ### Fixed
 - #1623 Right side marker (gray line) in P-code

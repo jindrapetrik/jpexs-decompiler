@@ -42,10 +42,12 @@ import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
+import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
+import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.Stopwatch;
 import java.awt.AlphaComposite;
@@ -55,9 +57,12 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -67,6 +72,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 import java.io.IOException;
@@ -78,10 +86,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.event.MouseInputAdapter;
 
 /**
  *
@@ -129,6 +139,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private int selectedDepth = -1;
 
+    private int freeTransformDepth = -1;
+
     private Zoom zoom = new Zoom();
 
     private final Object delayObject = new Object();
@@ -145,13 +157,150 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private final boolean lowQuality = false;
 
+    private Object lock = new Object();
+
+    private Point2D registrationPoint = null;
+    private Point2D registrationPointUpdated = null;
+
+    private int mode = Cursor.DEFAULT_CURSOR;
+    private Rectangle2D bounds;
+
+    private Matrix transform;
+    private AffineTransform transformUpdated;
+
     private final double LQ_FACTOR = 2;
+
+    private static final int TOLERANCE_SCALESHEAR = 8;
+
+    private static final int TOLERANCE_ROTATE = 30;
+    private static final int REGISTRATION_TOLERANCE = 8;
+
+    private static final double CENTER_POINT_SIZE = 8;
+
+    private static final double HANDLES_WIDTH = 5;
+
+    private static final int HANDLES_STROKE_WIDTH = 2;
+
+    private static final int MODE_ROTATE_NE = -1;
+    private static final int MODE_ROTATE_SE = -2;
+    private static final int MODE_ROTATE_NW = -3;
+    private static final int MODE_ROTATE_SW = -4;
+
+    private static final int MODE_SHEAR_S = -5;
+    private static final int MODE_SHEAR_E = -6;
+
+    private static final int MODE_SHEAR_N = -7;
+    private static final int MODE_SHEAR_W = -8;
+
+    private static Cursor moveCursor;
+    private static Cursor moveRegPointCursor;
+    private static Cursor resizeNWSECursor;
+    private static Cursor resizeSWNECursor;
+    private static Cursor resizeXCursor;
+    private static Cursor resizeYCursor;
+    private static Cursor rotateCursor;
+    private static Cursor selectCursor;
+    private static Cursor shearXCursor;
+    private static Cursor shearYCursor;
+
+    private static Cursor loadCursor(String name, int x, int y) throws IOException {
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Image image = ImageIO.read(MainPanel.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/cursors/" + name + ".png"));
+        return toolkit.createCustomCursor(image, new Point(x, y), name);
+    }
+
+    static {
+        try {
+            moveCursor = loadCursor("move", 0, 0);
+            moveRegPointCursor = loadCursor("move_regpoint", 0, 0);
+            resizeNWSECursor = loadCursor("resize_nw_se", 5, 5);
+            resizeSWNECursor = loadCursor("resize_sw_ne", 5, 5);
+            resizeXCursor = loadCursor("resize_x", 7, 4);
+            resizeYCursor = loadCursor("resize_y", 4, 7);
+            rotateCursor = loadCursor("rotate", 10, 7);
+            selectCursor = loadCursor("select", 0, 0);
+            shearXCursor = loadCursor("shear_x", 9, 5);
+            shearYCursor = loadCursor("shear_y", 5, 9);
+
+        } catch (IOException ex) {
+            Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public MATRIX getNewMatrix() {
+        DepthState ds = null;
+        Timeline timeline = timelined.getTimeline();
+        if (freeTransformDepth > -1 && timeline.getFrameCount() > frame) {
+            ds = timeline.getFrame(frame).layers.get(freeTransformDepth);
+        }
+
+        if (ds != null) {
+            CharacterTag cht = swf.getCharacter(ds.characterId);
+            if (cht != null) {
+                if (cht instanceof DrawableTag) {
+                    RECT rect = timelined.getRect();
+                    Matrix m = new Matrix();
+                    double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+                    if (lowQuality) {
+                        zoomDouble /= LQ_FACTOR;
+                    }
+                    double zoom = zoomDouble;
+                    m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
+                    m.scale(zoom);
+
+                    Matrix eMatrix = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).inverse();
+
+                    return transform.preConcatenate(eMatrix).toMATRIX();
+                }
+            }
+        }
+        return null;
+    }
 
     public synchronized void selectDepth(int depth) {
         if (depth != selectedDepth) {
             this.selectedDepth = depth;
+            freeTransformDepth = -1;
         }
 
+        hideMouseSelection();
+    }
+
+    public synchronized void freeTransformDepth(int depth) {
+        if (depth != freeTransformDepth) {
+            this.freeTransformDepth = depth;
+        }
+        registrationPoint = null;
+
+        DepthState ds = null;
+        Timeline timeline = timelined.getTimeline();
+        if (freeTransformDepth > -1 && timeline.getFrameCount() > frame) {
+            ds = timeline.getFrame(frame).layers.get(freeTransformDepth);
+        }
+
+        if (ds != null) {
+            CharacterTag cht = swf.getCharacter(ds.characterId);
+            if (cht != null) {
+                if (cht instanceof DrawableTag) {
+                    DrawableTag dt = (DrawableTag) cht;
+                    int drawableFrameCount = dt.getNumFrames();
+                    if (drawableFrameCount == 0) {
+                        drawableFrameCount = 1;
+                    }
+                    RECT rect = timelined.getRect();
+                    Matrix m = new Matrix();
+                    double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+                    if (lowQuality) {
+                        zoomDouble /= LQ_FACTOR;
+                    }
+                    double zoom = zoomDouble;
+                    m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
+                    m.scale(zoom);
+
+                    transform = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).concatenate(new Matrix(ds.matrix));
+                }
+            }
+        }
         hideMouseSelection();
     }
 
@@ -268,7 +417,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     repaint();
                 }
             });
-            addMouseListener(new MouseAdapter() {
+
+            MouseInputAdapter mouseInputAdapter = new MouseInputAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     if (e.getButton() == MouseEvent.BUTTON1) {
@@ -280,13 +430,64 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 public void mouseReleased(MouseEvent e) {
                     if (e.getButton() == MouseEvent.BUTTON1) {
                         dragStart = null;
+
+                        if (freeTransformDepth > -1 && mode != Cursor.DEFAULT_CURSOR && registrationPointUpdated != null && transformUpdated != null) {
+                            synchronized (lock) {
+                                registrationPoint = new Point2D.Double(registrationPointUpdated.getX(), registrationPointUpdated.getY());
+                                transform = new Matrix(transformUpdated);
+                                transformUpdated = null;
+
+                                /*DepthState ds = timelined.getTimeline().getFrame(frame).layers.get(freeTransformDepth);
+                                CharacterTag cht = swf.getCharacter(ds.characterId);
+
+                                DrawableTag dt = (DrawableTag) cht;
+                                int drawableFrameCount = dt.getNumFrames();
+                                if (drawableFrameCount == 0) {
+                                    drawableFrameCount = 1;
+                                }
+
+                                RenderContext renderContext = new RenderContext();
+                                renderContext.displayObjectCache = displayObjectCache;
+                                if (cursorPosition != null) {
+                                    renderContext.cursorPosition = new Point((int) (cursorPosition.x * SWF.unitDivisor), (int) (cursorPosition.y * SWF.unitDivisor));
+                                }
+
+                                renderContext.mouseButton = mouseButton;
+                                renderContext.stateUnderCursor = new ArrayList<>();
+
+                                int dframe = time % drawableFrameCount;
+                                RECT rect = timelined.getRect();
+                                Matrix m = new Matrix();
+                                double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+                                if (lowQuality) {
+                                    zoomDouble /= LQ_FACTOR;
+                                }
+                                double zoom = zoomDouble;
+                                m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
+                                m.scale(zoom);
+
+                                Matrix eMatrix = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).inverse();
+
+                                MATRIX oldMatrix = ds.matrix;
+                                ds.matrix = transform.preConcatenate(eMatrix).toMATRIX();
+                                // Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m.concatenate(new Matrix(ds.matrix)))
+                                Matrix outlineMatrix = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m.concatenate(new Matrix(
+                                        //ds.matrix
+                                        transform.preConcatenate(eMatrix).toMATRIX()
+                                )));
+                                Shape outline = dt.getOutline(dframe, time, ds.ratio, renderContext, outlineMatrix, true);
+                                //ds.matrix = oldMatrix;
+                                //bounds = outline.getBounds();*/
+                            }
+                            repaint();
+                        }
+                        mode = Cursor.DEFAULT_CURSOR;
                     }
                 }
-            });
-            addMouseMotionListener(new MouseMotionAdapter() {
+
                 @Override
                 public void mouseDragged(MouseEvent e) {
-                    if (dragStart != null && allowMove) {
+                    if (dragStart != null && allowMove && mode == Cursor.DEFAULT_CURSOR) {
                         Point dragEnd = e.getPoint();
                         Point delta = new Point(dragEnd.x - dragStart.x, dragEnd.y - dragStart.y);
                         offsetPoint.x += delta.x;
@@ -294,8 +495,556 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         dragStart = dragEnd;
                         repaint();
                     }
+
+                    if (dragStart != null && freeTransformDepth > -1) {
+                        if (transform == null) {
+                            return;
+                        }
+                        int ex = e.getX() - _rect.x;
+                        int ey = e.getY() - _rect.y;
+                        int dsx = dragStart.x - _rect.x;
+                        int dsy = dragStart.y - _rect.y;
+                        if (mode == MODE_SHEAR_N) {
+
+                            double shearX = -(ex - dsx) / (bounds.getHeight());
+
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.translate(bounds.getX(), bounds.getY());
+                            t.shear(shearX, 0);
+                            t.translate(-bounds.getX(), -bounds.getY());
+                            t.translate(ex - dsx, 0);
+
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+                        if (mode == MODE_SHEAR_S) {
+
+                            double shearX = (ex - dsx) / (bounds.getHeight());
+
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.translate(bounds.getX(), bounds.getY());
+                            t.shear(shearX, 0);
+                            t.translate(-bounds.getX(), -bounds.getY());
+
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+
+                        if (mode == MODE_SHEAR_W) {
+                            double shearY = -(ey - dsy) / (bounds.getWidth());
+
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.translate(bounds.getX(), bounds.getY());
+                            t.shear(0, shearY);
+                            t.translate(-bounds.getX(), -bounds.getY());
+                            t.translate(0, ey - dsy);
+
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+                        if (mode == MODE_SHEAR_E) {
+                            double shearY = (ey - dsy) / (bounds.getWidth());
+
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.translate(bounds.getX(), bounds.getY());
+                            t.shear(0, shearY);
+                            t.translate(-bounds.getX(), -bounds.getY());
+
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+
+                        if (mode == MODE_ROTATE_SE) {
+                            double deltaStartX = Math.abs(dsx - registrationPoint.getX());
+                            double deltaStartY = Math.abs(dsy - registrationPoint.getY());
+
+                            double deltaEndX = Math.abs(ex - registrationPoint.getX());
+                            double deltaEndY = Math.abs(ey - registrationPoint.getY());
+
+                            double deltaTheta = 0;
+                            if (ex >= registrationPoint.getX() && ey >= registrationPoint.getY()) {
+                                //same
+                                double thetaStart = Math.atan(deltaStartY / deltaStartX);
+                                double thetaEnd = Math.atan(deltaEndY / deltaEndX);
+                                deltaTheta = thetaEnd - thetaStart;
+                            } else if (ex >= registrationPoint.getX() && ey <= registrationPoint.getY()) {
+                                //anti clockwise
+                                double thetaStart = Math.atan(deltaStartY / deltaStartX);
+                                double thetaEnd = Math.atan(deltaEndY / deltaEndX);
+                                deltaTheta = -(thetaStart + thetaEnd);
+                            } else if (ex <= registrationPoint.getX() && ey >= registrationPoint.getY()) {
+                                //clock wise
+                                double thetaStart = Math.atan(deltaStartX / deltaStartY);
+                                double thetaEnd = Math.atan(deltaEndX / deltaEndY);
+                                deltaTheta = thetaStart + thetaEnd;
+                            } else if (ex <= registrationPoint.getX() && ey <= registrationPoint.getY()) {
+                                //opposite
+                                double thetaStart = Math.atan(deltaStartX / deltaStartY);
+                                double thetaEnd = Math.atan(deltaEndY / deltaEndX);
+                                deltaTheta = thetaStart + Math.toRadians(90) + thetaEnd;
+                            }
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.rotate(deltaTheta, registrationPoint.getX(), registrationPoint.getY());
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+
+                        if (mode == MODE_ROTATE_NW) {
+                            double deltaStartX = Math.abs(dsx - registrationPoint.getX());
+                            double deltaStartY = Math.abs(dsy - registrationPoint.getY());
+
+                            double deltaEndX = Math.abs(ex - registrationPoint.getX());
+                            double deltaEndY = Math.abs(ey - registrationPoint.getY());
+
+                            double deltaTheta = 0;
+                            if (ex >= registrationPoint.getX() && ey >= registrationPoint.getY()) {
+                                //opposite
+                                double thetaStart = Math.atan(deltaStartX / deltaStartY);
+                                double thetaEnd = Math.atan(deltaEndY / deltaEndX);
+                                deltaTheta = thetaStart + Math.toRadians(90) + thetaEnd;
+                            } else if (ex >= registrationPoint.getX() && ey <= registrationPoint.getY()) {
+                                //clock wise
+                                double thetaStart = Math.atan(deltaStartX / deltaStartY);
+                                double thetaEnd = Math.atan(deltaEndX / deltaEndY);
+                                deltaTheta = thetaStart + thetaEnd;
+                            } else if (ex <= registrationPoint.getX() && ey >= registrationPoint.getY()) {
+                                //anti clockwise
+                                double thetaStart = Math.atan(deltaStartY / deltaStartX);
+                                double thetaEnd = Math.atan(deltaEndY / deltaEndX);
+                                deltaTheta = -(thetaStart + thetaEnd);
+                            } else if (ex <= registrationPoint.getX() && ey <= registrationPoint.getY()) {
+                                //same
+                                double thetaStart = Math.atan(deltaStartY / deltaStartX);
+                                double thetaEnd = Math.atan(deltaEndY / deltaEndX);
+                                deltaTheta = thetaEnd - thetaStart;
+                            }
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.rotate(deltaTheta, registrationPoint.getX(), registrationPoint.getY());
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+
+                        if (mode == MODE_ROTATE_NE) {
+                            double deltaStartX = Math.abs(dsx - registrationPoint.getX());
+                            double deltaStartY = Math.abs(dsy - registrationPoint.getY());
+
+                            double deltaEndX = Math.abs(ex - registrationPoint.getX());
+                            double deltaEndY = Math.abs(ey - registrationPoint.getY());
+
+                            double deltaTheta = 0;
+                            if (ex >= registrationPoint.getX() && ey >= registrationPoint.getY()) {
+                                //clock wise
+                                double thetaStart = Math.atan(deltaStartY / deltaStartX);
+                                double thetaEnd = Math.atan(deltaEndY / deltaEndX);
+                                deltaTheta = thetaStart + thetaEnd;
+                            } else if (ex >= registrationPoint.getX() && ey <= registrationPoint.getY()) {
+                                //same
+                                double thetaStart = Math.atan(deltaStartY / deltaStartX);
+                                double thetaEnd = Math.atan(deltaEndY / deltaEndX);
+                                deltaTheta = thetaStart - thetaEnd;
+                            } else if (ex <= registrationPoint.getX() && ey >= registrationPoint.getY()) {
+                                //opposite
+                                double thetaStart = Math.atan(deltaStartY / deltaStartX);
+                                double thetaEnd = Math.atan(deltaEndX / deltaEndY);
+                                deltaTheta = thetaStart + Math.toRadians(90) + thetaEnd;
+                            } else if (ex <= registrationPoint.getX() && ey <= registrationPoint.getY()) {
+                                //anti clockwise
+                                double thetaStart = Math.atan(deltaStartX / deltaStartY);
+                                double thetaEnd = Math.atan(deltaEndX / deltaEndY);
+                                deltaTheta = -(thetaStart + thetaEnd);
+                            }
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.rotate(deltaTheta, registrationPoint.getX(), registrationPoint.getY());
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+
+                        if (mode == MODE_ROTATE_SW) {
+                            double deltaStartX = Math.abs(dsx - registrationPoint.getX());
+                            double deltaStartY = Math.abs(dsy - registrationPoint.getY());
+
+                            double deltaEndX = Math.abs(ex - registrationPoint.getX());
+                            double deltaEndY = Math.abs(ey - registrationPoint.getY());
+
+                            double deltaTheta = 0;
+                            if (ex >= registrationPoint.getX() && ey >= registrationPoint.getY()) {
+                                //anti clockwise
+                                double thetaStart = Math.atan(deltaStartX / deltaStartY);
+                                double thetaEnd = Math.atan(deltaEndX / deltaEndY);
+                                deltaTheta = -(thetaStart + thetaEnd);
+                            } else if (ex >= registrationPoint.getX() && ey <= registrationPoint.getY()) {
+                                //opposite
+                                double thetaStart = Math.atan(deltaStartY / deltaStartX);
+                                double thetaEnd = Math.atan(deltaEndX / deltaEndY);
+                                deltaTheta = thetaStart + Math.toRadians(90) + thetaEnd;
+                            } else if (ex <= registrationPoint.getX() && ey >= registrationPoint.getY()) {
+                                //same
+                                double thetaStart = Math.atan(deltaStartY / deltaStartX);
+                                double thetaEnd = Math.atan(deltaEndY / deltaEndX);
+                                deltaTheta = thetaStart - thetaEnd;
+                            } else if (ex <= registrationPoint.getX() && ey <= registrationPoint.getY()) {
+                                //clock wise
+                                double thetaStart = Math.atan(deltaStartY / deltaStartX);
+                                double thetaEnd = Math.atan(deltaEndY / deltaEndX);
+                                deltaTheta = thetaStart + thetaEnd;
+                            }
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.rotate(deltaTheta, registrationPoint.getX(), registrationPoint.getY());
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+
+                        if (mode == Cursor.HAND_CURSOR) {
+                            transformUpdated = new AffineTransform(transform.toTransform());
+                            registrationPointUpdated = new Point2D.Double(ex, ey);
+                            repaint();
+                        }
+                        if (mode == Cursor.MOVE_CURSOR) {
+                            int deltaX = ex - dsx;
+                            int deltaY = ey - dsy;
+
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.translate(deltaX, deltaY);
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+
+                        if (mode == Cursor.E_RESIZE_CURSOR) {
+                            double deltaBefore = bounds.getX() + bounds.getWidth() - registrationPoint.getX();
+                            double deltaX = ex - registrationPoint.getX();
+                            double scaleX = deltaX / deltaBefore;
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.translate(registrationPoint.getX(), 0);
+                            t.scale(scaleX, 1);
+                            t.translate(-registrationPoint.getX(), 0);
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+                        if (mode == Cursor.W_RESIZE_CURSOR) {
+                            double deltaBefore = registrationPoint.getX() - bounds.getX();
+                            double deltaX = registrationPoint.getX() - ex;
+                            double scaleX = deltaX / deltaBefore;
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.translate(registrationPoint.getX(), 0);
+                            t.scale(scaleX, 1);
+                            t.translate(-registrationPoint.getX(), 0);
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+
+                        if (mode == Cursor.S_RESIZE_CURSOR) {
+                            double deltaBefore = bounds.getY() + bounds.getHeight() - registrationPoint.getY();
+                            double deltaY = ey - registrationPoint.getY();
+                            double scaleY = deltaY / deltaBefore;
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.translate(0, registrationPoint.getY());
+                            t.scale(1, scaleY);
+                            t.translate(0, -registrationPoint.getY());
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+                        if (mode == Cursor.N_RESIZE_CURSOR) {
+                            double deltaBefore = registrationPoint.getY() - bounds.getY();
+                            double deltaY = registrationPoint.getY() - ey;
+                            double scaleY = deltaY / deltaBefore;
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.translate(0, registrationPoint.getY());
+                            t.scale(1, scaleY);
+                            t.translate(0, -registrationPoint.getY());
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+                        if (mode == Cursor.SE_RESIZE_CURSOR) {
+                            double deltaXBefore = bounds.getX() + bounds.getWidth() - registrationPoint.getX();
+                            double deltaYBefore = bounds.getY() + bounds.getHeight() - registrationPoint.getY();
+                            double deltaX = ex - registrationPoint.getX();
+                            double deltaY = ey - registrationPoint.getY();
+                            double scaleX = deltaX / deltaXBefore;
+                            double scaleY = deltaY / deltaYBefore;
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.translate(registrationPoint.getX(), registrationPoint.getY());
+                            t.scale(scaleX, scaleY);
+                            t.translate(-registrationPoint.getX(), -registrationPoint.getY());
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+
+                        if (mode == Cursor.NE_RESIZE_CURSOR) {
+                            double deltaXBefore = bounds.getX() + bounds.getWidth() - registrationPoint.getX();
+                            double deltaYBefore = registrationPoint.getY() - bounds.getY();
+                            double deltaX = ex - registrationPoint.getX();
+                            double deltaY = registrationPoint.getY() - ey;
+                            double scaleX = deltaX / deltaXBefore;
+                            double scaleY = deltaY / deltaYBefore;
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.translate(registrationPoint.getX(), registrationPoint.getY());
+                            t.scale(scaleX, scaleY);
+                            t.translate(-registrationPoint.getX(), -registrationPoint.getY());
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+
+                        if (mode == Cursor.SW_RESIZE_CURSOR) {
+                            double deltaXBefore = registrationPoint.getX() - bounds.getX();
+                            double deltaYBefore = bounds.getY() + bounds.getHeight() - registrationPoint.getY();
+                            double deltaX = registrationPoint.getX() - ex;
+                            double deltaY = ey - registrationPoint.getY();
+                            double scaleX = deltaX / deltaXBefore;
+                            double scaleY = deltaY / deltaYBefore;
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.translate(registrationPoint.getX(), registrationPoint.getY());
+                            t.scale(scaleX, scaleY);
+                            t.translate(-registrationPoint.getX(), -registrationPoint.getY());
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+
+                        if (mode == Cursor.NW_RESIZE_CURSOR) {
+                            double deltaXBefore = registrationPoint.getX() - bounds.getX();
+                            double deltaYBefore = registrationPoint.getY() - bounds.getY();
+                            double deltaX = registrationPoint.getX() - ex;
+                            double deltaY = registrationPoint.getY() - ey;
+                            double scaleX = deltaX / deltaXBefore;
+                            double scaleY = deltaY / deltaYBefore;
+                            AffineTransform newTransform = new AffineTransform(transform.toTransform());
+                            AffineTransform t = new AffineTransform();
+                            t.translate(registrationPoint.getX(), registrationPoint.getY());
+                            t.scale(scaleX, scaleY);
+                            t.translate(-registrationPoint.getX(), -registrationPoint.getY());
+                            newTransform.preConcatenate(t);
+
+                            Point2D newRegistrationPoint = new Point2D.Double();
+                            t.transform(registrationPoint, newRegistrationPoint);
+
+                            transformUpdated = newTransform;
+                            registrationPointUpdated = newRegistrationPoint;
+                            repaint();
+                        }
+                    }
                 }
-            });
+
+                @Override
+                public void mouseMoved(MouseEvent e) {
+                    if (freeTransformDepth > -1) {
+                        if (bounds == null) {
+                            return;
+                        }
+                        if (registrationPoint == null) {
+                            return;
+                        }
+                        int ex = e.getX() - _rect.x;
+                        int ey = e.getY() - _rect.y;
+
+                        boolean left = ex >= bounds.getX() - TOLERANCE_SCALESHEAR && ex <= bounds.getX() + TOLERANCE_SCALESHEAR;
+                        boolean right = ex >= bounds.getX() + bounds.getWidth() - TOLERANCE_SCALESHEAR && ex <= bounds.getX() + bounds.getWidth() + TOLERANCE_SCALESHEAR;
+                        boolean top = ey >= bounds.getY() - TOLERANCE_SCALESHEAR && ey <= bounds.getY() + TOLERANCE_SCALESHEAR;
+                        boolean bottom = ey >= bounds.getY() + bounds.getHeight() - TOLERANCE_SCALESHEAR && ey <= bounds.getY() + bounds.getHeight() + TOLERANCE_SCALESHEAR;
+
+                        boolean xcenter = ex >= bounds.getCenterX() - TOLERANCE_SCALESHEAR && ex <= bounds.getCenterX() + TOLERANCE_SCALESHEAR;
+                        boolean ycenter = ey >= bounds.getCenterY() - TOLERANCE_SCALESHEAR && ey <= bounds.getCenterY() + TOLERANCE_SCALESHEAR;
+
+                        boolean registration = ex >= registrationPoint.getX() - REGISTRATION_TOLERANCE
+                                && ex <= registrationPoint.getX() + REGISTRATION_TOLERANCE
+                                && ey >= registrationPoint.getY() - REGISTRATION_TOLERANCE
+                                && ey <= registrationPoint.getY() + REGISTRATION_TOLERANCE;
+
+                        boolean rightRotate = ex > bounds.getX() + bounds.getWidth() - TOLERANCE_ROTATE && ex
+                                <= bounds.getX() + bounds.getWidth() + TOLERANCE_ROTATE;
+                        boolean bottomRotate = ey > bounds.getY() + bounds.getHeight() - TOLERANCE_ROTATE && ey
+                                <= bounds.getY() + bounds.getHeight() + TOLERANCE_ROTATE;
+
+                        boolean leftRotate = ex < bounds.getX() + TOLERANCE_ROTATE
+                                && ex >= bounds.getX() - TOLERANCE_ROTATE;
+
+                        boolean topRotate = ey < bounds.getY() + TOLERANCE_ROTATE
+                                && ey >= bounds.getY() - TOLERANCE_ROTATE;
+
+                        boolean inBounds = bounds.contains(ex, ey);
+
+                        boolean shearX = ex > bounds.getX() && ex < bounds.getX() + bounds.getWidth();
+                        boolean shearY = ey > bounds.getY() && ey < bounds.getY() + bounds.getHeight();
+
+                        Cursor cursor;
+                        if (top && left) {
+                            mode = Cursor.NW_RESIZE_CURSOR;
+                            cursor = resizeNWSECursor;
+                        } else if (bottom && left) {
+                            mode = Cursor.SW_RESIZE_CURSOR;
+                            cursor = resizeSWNECursor;
+                        } else if (top && right) {
+                            mode = Cursor.NE_RESIZE_CURSOR;
+                            cursor = resizeSWNECursor;
+                        } else if (bottom && right) {
+                            mode = Cursor.SE_RESIZE_CURSOR;
+                            cursor = resizeNWSECursor;
+                        } else if (top && xcenter) {
+                            mode = Cursor.N_RESIZE_CURSOR;
+                            cursor = resizeYCursor;
+                        } else if (bottom && xcenter) {
+                            mode = Cursor.S_RESIZE_CURSOR;
+                            cursor = resizeYCursor;
+                        } else if (left && ycenter) {
+                            mode = Cursor.W_RESIZE_CURSOR;
+                            cursor = resizeXCursor;
+                        } else if (right && ycenter) {
+                            mode = Cursor.E_RESIZE_CURSOR;
+                            cursor = resizeXCursor;
+                        } else if (registration) {
+                            mode = Cursor.HAND_CURSOR;
+                            cursor = moveRegPointCursor;
+                        } else if (!inBounds && rightRotate && topRotate) {
+                            mode = MODE_ROTATE_NE;
+                            cursor = rotateCursor;
+                        } else if (!inBounds && rightRotate && bottomRotate) {
+                            mode = MODE_ROTATE_SE;
+                            cursor = rotateCursor;
+                        } else if (!inBounds && leftRotate && topRotate) {
+                            mode = MODE_ROTATE_NW;
+                            cursor = rotateCursor;
+                        } else if (!inBounds && leftRotate && bottomRotate) {
+                            mode = MODE_ROTATE_SW;
+                            cursor = rotateCursor;
+                        } else if (shearY && (left || right)) {
+                            if (left) {
+                                mode = MODE_SHEAR_W;
+                            } else {
+                                mode = MODE_SHEAR_E;
+                            }
+                            cursor = shearYCursor;
+                        } else if (shearX && (top || bottom)) {
+                            if (top) {
+                                mode = MODE_SHEAR_N;
+                            } else {
+                                mode = MODE_SHEAR_S;
+                            }
+                            cursor = shearXCursor;
+                        } else if (inBounds) {
+                            mode = Cursor.MOVE_CURSOR;
+                            cursor = moveCursor;
+                        } else {
+                            mode = Cursor.DEFAULT_CURSOR;
+                            cursor = selectCursor;
+                        }
+
+                        setCursor(cursor);
+                    }
+                }
+
+            };
+            addMouseListener(mouseInputAdapter);
+            addMouseMotionListener(mouseInputAdapter);
         }
 
         public void setAutoFit(boolean autoFit) {
@@ -506,7 +1255,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     lastMouseEvent = e;
                     redraw();
                     ButtonTag button = iconPanel.mouseOverButton;
-                    if (button != null) {
+                    if (button != null && freeTransformDepth == -1) {
                         DefineButtonSoundTag sounds = button.getSounds();
                         if (sounds != null && sounds.buttonSoundChar2 != 0) { // OverUpToOverDown
                             playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar2), sounds.buttonSoundInfo2, timer);
@@ -522,7 +1271,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     lastMouseEvent = e;
                     redraw();
                     ButtonTag button = iconPanel.mouseOverButton;
-                    if (button != null) {
+                    if (button != null && freeTransformDepth == -1) {
                         DefineButtonSoundTag sounds = button.getSounds();
                         if (sounds != null && sounds.buttonSoundChar3 != 0) { // OverDownToOverUp
                             playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar3), sounds.buttonSoundInfo3, timer);
@@ -815,8 +1564,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private void clear() {
         if (timer != null) {
-            timer.cancel();
+            Timer ptimer = timer;
             timer = null;
+            ptimer.cancel();
             fireMediaDisplayStateChanged();
         }
 
@@ -861,7 +1611,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         fireMediaDisplayStateChanged();
     }
 
-    private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, int selectedDepth, double zoom) {
+    private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, int selectedDepth, int freeTransformDepth, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix) {
         Timeline timeline = drawable.getTimeline();
         //int mouseButton = renderContext.mouseButton;
         //Point cursorPosition = renderContext.cursorPosition;
@@ -878,17 +1628,30 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 (int) Math.ceil(height / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB);
         //renderContext.borderImage = new SerializableImage(image.getWidth(), image.getHeight(), SerializableImage.TYPE_INT_ARGB);
         image.fillTransparent();
+
         Matrix m = new Matrix();
         m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
         m.scale(zoom);
+        MATRIX oldMatrix = null;
+        if (freeTransformDepth > -1) {
+
+            Matrix eMatrix = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).inverse();
+
+            MATRIX newMatrix = transform.preConcatenate(eMatrix).toMATRIX();
+            oldMatrix = timeline.getFrame(frame).layers.get(freeTransformDepth).matrix;
+
+            timeline.getFrame(frame).layers.get(freeTransformDepth).matrix = newMatrix;
+        }
+
         timeline.toImage(frame, time, renderContext, image, false, m, m, m, null);
+
 
         Graphics2D gg = (Graphics2D) image.getGraphics();
         gg.setStroke(new BasicStroke(3));
         gg.setPaint(Color.green);
         gg.setTransform(AffineTransform.getTranslateInstance(0, 0));
         DepthState ds = null;
-        if (timeline.getFrameCount() > frame) {
+        if (selectedDepth > -1 && timeline.getFrameCount() > frame) {
             ds = timeline.getFrame(frame).layers.get(selectedDepth);
         }
 
@@ -915,6 +1678,50 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
         }
 
+        ds = null;
+        if (freeTransformDepth > -1 && timeline.getFrameCount() > frame) {
+            ds = timeline.getFrame(frame).layers.get(freeTransformDepth);
+        }
+
+        if (ds != null) {
+            CharacterTag cht = swf.getCharacter(ds.characterId);
+            if (cht != null) {
+                if (cht instanceof DrawableTag) {
+                    DrawableTag dt = (DrawableTag) cht;
+                    int drawableFrameCount = dt.getNumFrames();
+                    if (drawableFrameCount == 0) {
+                        drawableFrameCount = 1;
+                    }
+
+                    int dframe = time % drawableFrameCount;
+                    //Matrix finalMatrix = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).concatenate(new Matrix(ds.matrix));
+                    Shape outline = dt.getOutline(dframe, time, ds.ratio, renderContext, transform, true);
+
+                    if (temporaryMatrix != null) {
+                        Shape tempOutline = dt.getOutline(dframe, time, ds.ratio, renderContext, temporaryMatrix, true);
+                        gg.setStroke(new BasicStroke(1));
+                        gg.setPaint(Color.black);
+                        gg.draw(tempOutline);
+                    }
+
+                    Rectangle bounds = outline.getBounds();
+                    boundsRef.setVal(bounds);
+                    gg.setStroke(new BasicStroke(1));
+                    gg.setPaint(Color.black);
+                    gg.draw(bounds);
+                    drawHandles(gg, bounds);
+
+                    if (registrationPointRef.getVal() == null) {
+                        registrationPointRef.setVal(new Point2D.Double(bounds.getCenterX(), bounds.getCenterY()));
+                    }
+                    drawRegistrationPoint(gg, registrationPointRef.getVal());
+                }
+            }
+        }
+
+        if (freeTransformDepth > -1) {
+            timeline.getFrame(frame).layers.get(freeTransformDepth).matrix = oldMatrix;
+        }
         img = image;
 
         /*if (shouldCache) {
@@ -922,6 +1729,45 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
          }*/
         //}
         return img;
+    }
+
+    private static void drawRegistrationPoint(Graphics2D g2, Point2D registrationPoint) {
+        Stroke stroke = new BasicStroke(1);
+        g2.setStroke(stroke);
+        g2.setColor(Color.white);
+        Shape registrationPointShape = new Ellipse2D.Double(registrationPoint.getX() - CENTER_POINT_SIZE / 2,
+                registrationPoint.getY() - CENTER_POINT_SIZE / 2,
+                CENTER_POINT_SIZE,
+                CENTER_POINT_SIZE);
+        g2.fill(registrationPointShape);
+        g2.setColor(Color.black);
+        g2.draw(registrationPointShape);
+    }
+
+    private static void drawHandles(Graphics2D g2, Rectangle bounds) {
+        drawHandle(g2, bounds.getX(), bounds.getY());
+        drawHandle(g2, bounds.getCenterX(), bounds.getY());
+        drawHandle(g2, bounds.getX() + bounds.getWidth(), bounds.getY());
+        drawHandle(g2, bounds.getX(), bounds.getCenterY());
+        drawHandle(g2, bounds.getX(), bounds.getY() + bounds.getHeight());
+        drawHandle(g2, bounds.getX() + bounds.getWidth(), bounds.getCenterY());
+        drawHandle(g2, bounds.getX() + bounds.getWidth(), bounds.getY() + bounds.getHeight());
+        drawHandle(g2, bounds.getCenterX(), bounds.getY() + bounds.getHeight());
+    }
+
+    private static void drawHandle(Graphics2D g2, double x, double y) {
+        Shape handleTopCenter = new Rectangle2D.Double(
+                x - HANDLES_WIDTH / 2,
+                y - HANDLES_WIDTH / 2,
+                HANDLES_WIDTH + HANDLES_STROKE_WIDTH,
+                HANDLES_WIDTH + HANDLES_STROKE_WIDTH);
+        g2.setColor(Color.black);
+        g2.fill(handleTopCenter);
+
+        Stroke stroke = new BasicStroke(HANDLES_STROKE_WIDTH);
+        g2.setStroke(stroke);
+        g2.setColor(Color.white);
+        g2.draw(handleTopCenter);
     }
 
     private Object execute(SWFInputStream sis) throws IOException {
@@ -1021,7 +1867,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         RenderContext renderContext = new RenderContext();
         renderContext.displayObjectCache = displayObjectCache;
-        if (cursorPosition != null) {
+        if (cursorPosition != null && freeTransformDepth == -1) {
             renderContext.cursorPosition = new Point((int) (cursorPosition.x * SWF.unitDivisor), (int) (cursorPosition.y * SWF.unitDivisor));
         }
 
@@ -1048,7 +1894,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             img = null;
             if (display) {
                 Stopwatch sw = Stopwatch.startNew();
-                img = getFrame(swf, frame, time, timelined, renderContext, selectedDepth, zoomDouble);
+
+                synchronized (lock) {
+                    Reference<Point2D> registrationPointRef = new Reference<>(registrationPoint);
+                    Reference<Rectangle2D> boundsRef = new Reference<>(bounds);
+                    img = getFrame(swf, frame, time, timelined, renderContext, selectedDepth, freeTransformDepth, zoomDouble, registrationPointRef, boundsRef, transform, transformUpdated == null ? null : new Matrix(transformUpdated));
+                    bounds = boundsRef.getVal();
+                    registrationPoint = registrationPointRef.getVal();
+                }
+
                 sw.stop();
                 if (sw.getElapsedMilliseconds() > 100) {
                     logger.log(Level.WARNING, "Slow rendering. {0}. frame, time={1}, {2}ms", new Object[]{frame, time, sw.getElapsedMilliseconds()});
@@ -1115,17 +1969,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     lastMouseOverButton = iconPanel.mouseOverButton;
                     iconPanel.mouseOverButton = renderContext.mouseOverButton;
                     debugLabel.setText(ret.toString());
-                    if (handCursor) {
-                        iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    } else if (iconPanel.hasAllowMove()) {
-                        iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-                    } else {
-                        iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    if (freeTransformDepth == -1) {
+                        if (handCursor) {
+                            iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                        } else if (iconPanel.hasAllowMove()) {
+                            iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+                        } else {
+                            iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                        }
                     }
 
                     if (lastMouseOverButton != renderContext.mouseOverButton) {
                         ButtonTag b = renderContext.mouseOverButton;
-                        if (b != null) {
+                        if (b != null && freeTransformDepth == -1) {
                             // New mouse entered
                             DefineButtonSoundTag sounds = b.getSounds();
                             if (sounds != null && sounds.buttonSoundChar1 != 0) { // IdleToOverUp
@@ -1134,7 +1990,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
 
                         b = lastMouseOverButton;
-                        if (b != null) {
+                        if (b != null && freeTransformDepth == -1) {
                             // Old mouse leave
                             DefineButtonSoundTag sounds = b.getSounds();
                             if (sounds != null && sounds.buttonSoundChar0 != 0) { // OverUpToIdle
@@ -1298,6 +2154,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         long frameTimeMsIs = System.currentTimeMillis();
                         //Total number of frames in this timeline
                         int frameCount = timelined.getTimeline().getFrameCount();
+                        if (frameCount == 0) {
+                            return;
+                        }
                         //How many ticks (= times where frame should be displayed in framerate) are there from hitting play button
                         int ticksFromStart = (int) Math.floor((frameTimeMsIs - startRun) / (double) getMsPerFrame()) + 1;
                         //Add ticks to first frame when hitting play button, ignoring total framecount => this value can be larger than number of frames in timeline

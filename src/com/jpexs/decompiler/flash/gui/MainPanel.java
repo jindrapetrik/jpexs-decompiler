@@ -130,6 +130,7 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
@@ -3474,6 +3475,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     previewPanel.showSwf(swf);
                 }
             }
+        } else if (treeItem instanceof PlaceObjectTypeTag) {
+            TreePath path = tagTree.getModel().getTreePath(treeItem);
+            Frame frame = (Frame) path.getParentPath().getLastPathComponent();
+            previewPanel.showPlaceTagPanel((PlaceObjectTypeTag) treeItem, frame.frame);
         } else if (treeItem instanceof MetadataTag) {
             MetadataTag metadataTag = (MetadataTag) treeItem;
             previewPanel.showMetaDataPanel(metadataTag);
@@ -3655,6 +3660,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if ((treeItem instanceof Frame) || (treeItem instanceof CharacterTag) || (treeItem instanceof FontTag) || (treeItem instanceof SoundStreamHeadTypeTag)) {
             showPreview(treeItem, previewPanel);
 
+            showCard(CARDPREVIEWPANEL);
+        } else if (treeItem instanceof PlaceObjectTypeTag) {
+            showPreview(treeItem, previewPanel);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof Tag) {
             showGenericTag((Tag) treeItem);
