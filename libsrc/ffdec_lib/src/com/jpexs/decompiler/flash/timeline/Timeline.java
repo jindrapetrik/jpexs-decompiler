@@ -306,6 +306,13 @@ public class Timeline {
                 if (characterId != -1) {
                     fl.characterId = characterId;
                 }
+                CharacterTag character = swf.getCharacter(characterId);
+                if (character instanceof DefineSpriteTag) {
+                    Stack<Integer> cyStack = new Stack<>();
+                    if (isCyclic(timelined, cyStack)) {
+                        fl.characterId = -1;
+                    }
+                }
                 if (po.flagMove()) {
                     MATRIX matrix2 = po.getMatrix();
                     if (matrix2 != null) {
@@ -1213,6 +1220,30 @@ public class Timeline {
             return timelined.equals(timelineObj.timelined);
         }
 
+        return false;
+    }
+
+    private boolean isCyclic(Timelined tim, Stack<Integer> walked) {
+        for (Tag t : tim.getTags()) {
+            if (t instanceof PlaceObjectTypeTag) {
+                PlaceObjectTypeTag p = (PlaceObjectTypeTag) t;
+                int chid = p.getCharacterId();
+                if (chid != -1) {
+                    if (walked.contains(chid)) {
+                        return true;
+                    }
+                    CharacterTag character = swf.getCharacter(chid);
+                    if (character instanceof DefineSpriteTag) {
+                        walked.push(chid);
+                        if (isCyclic((DefineSpriteTag) character, walked)) {
+                            walked.pop();
+                            return true;
+                        }
+                        walked.pop();
+                    }
+                }
+            }
+        }
         return false;
     }
 }

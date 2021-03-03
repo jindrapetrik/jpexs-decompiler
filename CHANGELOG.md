@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - Copying to clipboard does not support transparency
 - #1634 AS3 slot/const editor loses focus on edit button press
 - #1636 Exception after search - traitslist with not properly set abc, other ui exception
+- Flash viewer- cyclic DefineSprite usage
 
 ### Removed
 - #1631 ActiveX Flash component download in windows installer
