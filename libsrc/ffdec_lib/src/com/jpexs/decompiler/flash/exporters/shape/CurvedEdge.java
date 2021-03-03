@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.shape;
 
 /**
@@ -43,4 +44,10 @@ public class CurvedEdge extends StraightEdge implements IEdge {
     public IEdge reverseWithNewFillStyle(int newFillStyleIdx) {
         return new CurvedEdge(toX, toY, controlX, controlY, fromX, fromY, lineStyleIdx, newFillStyleIdx);
     }
+
+    @Override
+    public String toString() {
+        return "curved[" + fromX / 20f + "," + fromY / 20f + " -> " + toX / 20f + "," + toY / 20f + " control:" + controlX / 20f + "," + controlY / 20f + "]";
+    }
+
 }

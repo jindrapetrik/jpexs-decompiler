@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.shape;
 
 /**
@@ -76,4 +77,10 @@ public class StraightEdge implements IEdge {
     public IEdge reverseWithNewFillStyle(int newFillStyleIdx) {
         return new StraightEdge(toX, toY, fromX, fromY, lineStyleIdx, newFillStyleIdx);
     }
+
+    @Override
+    public String toString() {
+        return "straight[" + fromX / 20f + "," + fromY / 20f + " -> " + toX / 20f + "," + toY / 20f + "]";
+    }
+
 }
