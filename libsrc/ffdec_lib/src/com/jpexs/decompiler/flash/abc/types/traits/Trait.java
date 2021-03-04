@@ -262,7 +262,11 @@ public abstract class Trait implements Cloneable, Serializable {
                     writer.appendNoHilight(imp.getWithoutLast().toPrintableString(true));
                     writer.appendNoHilight(".");
                 }
-                writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, imp.getLast()), HighlightSpecialType.TYPE_NAME, imp.toRawString());
+                if ("*".equals(imp.getLast())){
+                    writer.appendNoHilight("*");
+                }else{
+                    writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, imp.getLast()), HighlightSpecialType.TYPE_NAME, imp.toRawString());
+                }
                 writer.appendNoHilight(";").newLine();
                 hasImport = true;
             }
