@@ -1237,7 +1237,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "var b:* = 4;\r\n"
                 + "var c:* = 4;\r\n"
                 + "var d:* = 78;\r\n"
-                + "var e:* = a == b?c == d?1:7:3;\r\n"
+                + "var e:* = a == b ? (c == d ? 1 : 7) : 3;\r\n"
                 + "trace(\"e=\" + e);\r\n",
                 false);
     }

@@ -1249,7 +1249,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var b:int = 4;\r\n"
                 + "var c:int = 4;\r\n"
                 + "var d:int = 78;\r\n"
-                + "var e:* = a == b?c == d?1:7:3;\r\n"
+                + "var e:* = a == b ? (c == d ? 1 : 7) : 3;\r\n"
                 + "trace(\"e=\" + e);\r\n",
                 false);
     }
