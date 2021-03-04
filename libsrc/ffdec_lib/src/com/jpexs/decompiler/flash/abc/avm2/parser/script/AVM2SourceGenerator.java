@@ -2057,9 +2057,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
         if (val instanceof BooleanAVM2Item) {
             BooleanAVM2Item bi = (BooleanAVM2Item) val;
             if (bi.value) {
-                return new ValueKind(0, ValueKind.CONSTANT_True);
+                return new ValueKind(ValueKind.CONSTANT_True, ValueKind.CONSTANT_True);
             } else {
-                return new ValueKind(0, ValueKind.CONSTANT_False);
+                return new ValueKind(ValueKind.CONSTANT_False, ValueKind.CONSTANT_False);
             }
         }
 
@@ -2092,10 +2092,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
             return new ValueKind(abcIndex.getSelectedAbc().constants.getDoubleId(Double.NaN, true), ValueKind.CONSTANT_Double);
         }
         if (val instanceof NullAVM2Item) {
-            return new ValueKind(0, ValueKind.CONSTANT_Null);
+            return new ValueKind(ValueKind.CONSTANT_Null, ValueKind.CONSTANT_Null);
         }
         if (val instanceof UndefinedAVM2Item) {
-            return new ValueKind(0, ValueKind.CONSTANT_Undefined);
+            return new ValueKind(ValueKind.CONSTANT_Undefined, ValueKind.CONSTANT_Undefined);
         }
         return null;
     }
@@ -2386,6 +2386,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
                 ValueKind vk = getValueKind(namespace, type, val);
                 if (vk == null) {
+                    tsc.value_index = ValueKind.CONSTANT_Undefined;
                     tsc.value_kind = ValueKind.CONSTANT_Undefined;
                 } else {
                     tsc.value_kind = vk.value_kind;
