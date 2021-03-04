@@ -46,6 +46,8 @@ import java.util.Map;
  */
 public abstract class ShapeExporterBase implements IShapeExporter {
 
+    private static final boolean USE_REVERSE_LOOKUP = true;
+    
     protected final SHAPE shape;
 
     private final List<FillStyle> _fillStyles;
@@ -454,13 +456,10 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                                 if (edge != null) {
                                     idx = subPath.indexOf(edge);
                                 } else {
-
-                                    boolean useNew = false;
-
                                     IEdge revEdge = findNextEdgeInCoordMap(reverseCoordMap, prevEdge);
 
                                     if (revEdge != null) {
-                                        if (useNew) {
+                                        if (USE_REVERSE_LOOKUP) {
                                             idx = subPath.indexOf(revEdge);
                                             IEdge r = revEdge.reverseWithNewFillStyle(revEdge.getFillStyleIdx());
                                             updateEdgeInCoordMap(coordMap, revEdge, r);
