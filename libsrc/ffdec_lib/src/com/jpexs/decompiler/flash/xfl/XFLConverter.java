@@ -228,7 +228,18 @@ public class XFLConverter {
     private static void convertShapeEdges(int startX, int startY, MATRIX mat, List<SHAPERECORD> records, StringBuilder ret) {
         int x = startX;
         int y = startY;
-        ret.append("!").append(startX).append(" ").append(startY);
+        boolean hasMove = false;
+        if (!records.isEmpty()) {
+            if (records.get(0) instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) records.get(0);
+                if (scr.stateMoveTo) {
+                    hasMove = true;
+                }
+            }
+        }
+        if (!hasMove) {
+            ret.append("!").append(startX).append(" ").append(startY);
+        }
         for (SHAPERECORD rec : records) {
             convertShapeEdge(mat, rec, x, y, ret);
             x = rec.changeX(x);
@@ -715,8 +726,9 @@ public class XFLConverter {
         if (mat == null) {
             mat = new MATRIX();
         }
-        //TODO: insert some magic methods here to fix issue #1257
-        shapeRecords = smoothShape(shapeRecords);
+        
+        //smoothing fixes some shapes in #503, but also breaks some shapes of #1257
+        //shapeRecords = smoothShape(shapeRecords);
         List<SHAPERECORD> edges = new ArrayList<>();
         int lineStyleCount = 0;
         int fillStyle0 = -1;
@@ -3841,7 +3853,7 @@ public class XFLConverter {
         XMLReader parser;
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
-            SAXParser sparser = factory.newSAXParser();   
+            SAXParser sparser = factory.newSAXParser();
             parser = sparser.getXMLReader();
             parser.setContentHandler(tparser);
             parser.setErrorHandler(tparser);
@@ -3855,7 +3867,7 @@ public class XFLConverter {
                 System.out.println(html);
                 System.err.println(tparser.result);
             }
-        } catch (SAXException | IOException| ParserConfigurationException e) {
+        } catch (SAXException | IOException | ParserConfigurationException e) {
             logger.log(Level.SEVERE, "Error while converting HTML", e);
         }
         return tparser.result.toString();
