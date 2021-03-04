@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.parser.script;
 
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -102,7 +103,7 @@ public enum SymbolType {
     BITAND(GraphTargetItem.PRECEDENCE_BITWISEAND, true),
     BITOR(GraphTargetItem.PRECEDENCE_BITWISEOR, true),
     XOR(GraphTargetItem.PRECEDENCE_BITWISEXOR, true),
-    MODULO(GraphTargetItem.PRECEDENCE_BITWISESHIFT, true),
+    MODULO(GraphTargetItem.PRECEDENCE_MULTIPLICATIVE, true),
     SHIFT_LEFT(GraphTargetItem.PRECEDENCE_BITWISESHIFT, true),
     SHIFT_RIGHT(GraphTargetItem.PRECEDENCE_BITWISESHIFT, true),
     USHIFT_RIGHT(GraphTargetItem.PRECEDENCE_BITWISESHIFT, true),
