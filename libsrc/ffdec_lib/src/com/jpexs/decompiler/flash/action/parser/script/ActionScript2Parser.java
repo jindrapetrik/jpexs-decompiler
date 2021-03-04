@@ -1873,24 +1873,17 @@ public class ActionScript2Parser {
                 if (s.value.equals("not")) {
                     ret = new NotItem(null, null, expressionPrimary(false, inFunction, inMethod, false, variables, functions, true));
                 } else {
-                    if (s.type == SymbolType.PATH) {
-                        expectedType(SymbolType.COLON);
-                        ParsedSymbol s2 = lex();
+                    String varName = s.value.toString();
+                    ParsedSymbol s2 = lex();
+                    while (s2.type == SymbolType.COLON) {
+                        s2 = lex();
                         expected(s2, lexer.yyline(), SymbolType.IDENTIFIER);
-                        ret = new VariableActionItem(s.value.toString() + ":" + s2.value.toString(), null, false);
-                    } else {
-                        String varName = s.value.toString();
-                        ParsedSymbol s2 = lex();
-                        while (s2.type == SymbolType.COLON) {
-                            s2 = lex();
-                            expected(s2, lexer.yyline(), SymbolType.IDENTIFIER);
-                            varName += ":" + s2.value.toString();
-                            s2 = lex();
-                        }
-                        lexer.pushback(s2);
-
-                        ret = new VariableActionItem(varName, null, false);
+                        varName += ":" + s2.value.toString();
+                        s2 = lex();
                     }
+                    lexer.pushback(s2);
+
+                    ret = new VariableActionItem(varName, null, false);
                     variables.add((VariableActionItem) ret);
                     allowMemberOrCall = true;
                 }
