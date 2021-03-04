@@ -1345,6 +1345,9 @@ public class Main {
                 if (watcher != null) {
                     try {
                         File dir = new File(fileName).getParentFile();
+                        if (dir == null) {
+                            continue;
+                        }
                         if (!watchedDirectories.containsValue(dir)) {
                             WatchKey key = dir.toPath().register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
                             watchedDirectories.put(key, dir);

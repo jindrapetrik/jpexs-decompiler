@@ -1113,7 +1113,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                     Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                Main.openFile(new SWFSourceInfo(new ByteArrayInputStream(baos.toByteArray()), "New SWF", "New SWF"));
+                Main.openFile(new SWFSourceInfo(new ByteArrayInputStream(baos.toByteArray()), "new.swf", "New SWF"));
             }, PRIORITY_MEDIUM, null, true, null, false);
             finishMenu("/debug");
         }
