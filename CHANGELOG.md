@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - #1636 Exception after search - traitslist with not properly set abc, other ui exception
 - Flash viewer- cyclic DefineSprite usage
 - #1570 Incorrect shape rendering when edge is reversed
+- #1643 Separate AS1/2 and AS3 editor hilighting
 
 ### Removed
 - #1631 ActiveX Flash component download in windows installer

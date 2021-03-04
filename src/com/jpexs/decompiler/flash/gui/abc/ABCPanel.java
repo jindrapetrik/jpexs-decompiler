@@ -1006,7 +1006,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         splitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, panB, detailPanel, Configuration.guiAvm2SplitPaneDividerLocationPercent);
         splitPane.setContinuousLayout(true);
 
-        decompiledTextArea.changeContentType("text/actionscript");
+        decompiledTextArea.changeContentType("text/actionscript3");
         decompiledTextArea.setFont(Configuration.getSourceFont());
 
         View.addEditorAction(decompiledTextArea, new AbstractAction() {
