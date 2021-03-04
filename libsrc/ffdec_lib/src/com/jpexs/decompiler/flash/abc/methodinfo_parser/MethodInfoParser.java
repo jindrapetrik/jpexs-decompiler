@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.methodinfo_parser;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -70,16 +71,16 @@ public class MethodInfoParser {
                         value = new ValueKind(abc.constants.getStringId((String) symbValue.value, true), ValueKind.CONSTANT_Utf8);
                         break;
                     case ParsedSymbol.TYPE_TRUE:
-                        value = new ValueKind(0, ValueKind.CONSTANT_True);
+                        value = new ValueKind(ValueKind.CONSTANT_True, ValueKind.CONSTANT_True);
                         break;
                     case ParsedSymbol.TYPE_FALSE:
-                        value = new ValueKind(0, ValueKind.CONSTANT_False);
+                        value = new ValueKind(ValueKind.CONSTANT_False, ValueKind.CONSTANT_False);
                         break;
                     case ParsedSymbol.TYPE_NULL:
-                        value = new ValueKind(0, ValueKind.CONSTANT_Null);
+                        value = new ValueKind(ValueKind.CONSTANT_Null, ValueKind.CONSTANT_Null);
                         break;
                     case ParsedSymbol.TYPE_UNDEFINED:
-                        value = new ValueKind(0, ValueKind.CONSTANT_Undefined);
+                        value = new ValueKind(ValueKind.CONSTANT_Undefined, ValueKind.CONSTANT_Undefined);
                         break;
                     case ParsedSymbol.TYPE_NAMESPACE:
                         if (nstype.equals("9:")) {
@@ -208,16 +209,16 @@ public class MethodInfoParser {
                                 optionalValues.add(new ValueKind(abc.constants.getStringId((String) symbValue.value, true), ValueKind.CONSTANT_Utf8));
                                 break;
                             case ParsedSymbol.TYPE_TRUE:
-                                optionalValues.add(new ValueKind(0, ValueKind.CONSTANT_True));
+                                optionalValues.add(new ValueKind(ValueKind.CONSTANT_True, ValueKind.CONSTANT_True));
                                 break;
                             case ParsedSymbol.TYPE_FALSE:
-                                optionalValues.add(new ValueKind(0, ValueKind.CONSTANT_False));
+                                optionalValues.add(new ValueKind(ValueKind.CONSTANT_False, ValueKind.CONSTANT_False));
                                 break;
                             case ParsedSymbol.TYPE_NULL:
-                                optionalValues.add(new ValueKind(0, ValueKind.CONSTANT_Null));
+                                optionalValues.add(new ValueKind(ValueKind.CONSTANT_Null, ValueKind.CONSTANT_Null));
                                 break;
                             case ParsedSymbol.TYPE_UNDEFINED:
-                                optionalValues.add(new ValueKind(0, ValueKind.CONSTANT_Undefined));
+                                optionalValues.add(new ValueKind(ValueKind.CONSTANT_Undefined, ValueKind.CONSTANT_Undefined));
                                 break;
                             case ParsedSymbol.TYPE_NAMESPACE:
                                 if (nstype.equals("9:")) {
