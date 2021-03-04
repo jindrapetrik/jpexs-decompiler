@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - #1570 Incorrect shape rendering when edge is reversed
 - #1643 Separate AS1/2 and AS3 editor hilighting
 - AS3 direct editation - slot/const default values
+- #1328 AS1/2/3 direct editation - empty commands (just semicolon)
 
 ### Removed
 - #1631 ActiveX Flash component download in windows installer
