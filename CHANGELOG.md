@@ -32,6 +32,9 @@ All notable changes to this project will be documented in this file.
 ### Removed
 - #1631 ActiveX Flash component download in windows installer
 
+### Changed
+- Spaces around ternar operators, parenthesis on ternar inside ternat
+
 ## [14.0.1] - 2021-02-26
 ### Added
 - AS3 goto definition on imports
