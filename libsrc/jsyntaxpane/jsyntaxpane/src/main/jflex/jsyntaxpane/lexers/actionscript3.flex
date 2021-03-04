@@ -26,7 +26,7 @@ import java.util.List;
 %%
 
 %public
-%class ActionScriptLexer
+%class ActionScript3Lexer
 %extends DefaultJFlexLexer
 %final
 %unicode
@@ -39,7 +39,7 @@ import java.util.List;
      * Create an empty lexer, yyreset will be called later to reset and assign
      * the reader
      */
-    public ActionScriptLexer() {
+    public ActionScript3Lexer() {
         super();
     }
 
@@ -99,11 +99,19 @@ IdentifierOrParent = {Identifier} | ".."
 
 Path = "/" | "/"? {IdentifierOrParent} ("/" {IdentifierOrParent})* "/"?
 
-SlashVariable = {Path} ":" {Identifier}
-
 /* identifiers */
 
 IdentifierNs = {Identifier} ":" {Identifier}
+
+TypeNameSpec = ".<" {Identifier} ">"
+
+/* XML */
+LetterColon = [:jletter] | ":"
+XMLIdentifier = {Identifier} | {IdentifierNs}
+XMLAttribute = " "* {XMLIdentifier} " "* "=" " "* \" {InputCharacter}* \" " "*
+XMLBeginOneTag = "<" {XMLIdentifier} {XMLAttribute}* ">"
+XMLBeginTag = "<" {XMLIdentifier} " "
+XMLEndTag = "</" {XMLIdentifier} ">"
 
 /* integer literals */
 DecIntegerLiteral = 0 | [1-9][0-9]*
@@ -302,12 +310,46 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   {Comment}                      { return token(TokenType.COMMENT); }
 
   /* whitespace */
-  {WhiteSpace}                   { }  
+  {WhiteSpace}                   { }
+  {TypeNameSpec}                 { return token(TokenType.IDENTIFIER); }
+  {XMLBeginOneTag}                  {  yybegin(XML);
+                                    tokenStart = yychar;
+                                    tokenLength = yylength();
+                                    String s=yytext();
+                                    s=s.substring(1,s.length()-1);
+                                    if(s.contains(" ")){
+                                       s=s.substring(0,s.indexOf(" "));
+                                    }
+                                    xmlTagName = s;
+                                 }
+  /*{XMLBeginTag}                  {  yybegin(XMLSTARTTAG);
+                                    tokenStart = yychar;
+                                    tokenLength = yylength();
+                                    String s=yytext();
+                                    xmlTagName = s.substring(1);
+                                 }*/
   /* identifiers */
-  {SlashVariable}                { return token(TokenType.IDENTIFIER); }
   {Identifier}{NamespaceSuffix}  { return token(TokenType.REGEX); }
   {Identifier}                   { return token(TokenType.IDENTIFIER); }
   
+}
+
+<XMLSTARTTAG> {
+   {XMLAttribute}                { tokenLength += yylength();}
+   {WhiteSpace}                   { tokenLength += yylength(); }
+   ">"                             { yybegin(XML);  tokenLength += yylength();}
+}
+<XML> {
+   {XMLBeginOneTag}                 { tokenLength += yylength();}
+   {XMLEndTag}                   { tokenLength += yylength();
+                                   String endtagname=yytext();
+                                   endtagname=endtagname.substring(2,endtagname.length()-1);
+                                   if(endtagname.equals(xmlTagName)){
+                                       yybegin(YYINITIAL);
+                                       return token(TokenType.STRING, tokenStart, tokenLength);
+                                   }
+                                 }
+   .|\n                          { tokenLength += yylength(); }
 }
 
 <STRING> {
