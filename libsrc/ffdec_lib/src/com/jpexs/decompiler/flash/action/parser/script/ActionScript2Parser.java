@@ -1561,7 +1561,7 @@ public class ActionScript2Parser {
                     }
                     break;
                 case IDENTIFIER:
-                    switch (lookahead.value.toString()) {
+                    switch (op.value.toString()) {
                         case "add":
                             lhs = new StringAddActionItem(null, null, lhs, rhs);
                             break;
