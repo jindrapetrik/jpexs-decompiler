@@ -1168,7 +1168,7 @@ public class ActionScript2Parser {
                     }
                     forExpr = expression(inFunction, inMethod, true, variables, functions, false);
                     if (forExpr == null) {
-                        forExpr = new TrueItem(null,null);
+                        forExpr = new TrueItem(null, null);
                     }
                     expectedType(SymbolType.SEMICOLON);
                     GraphTargetItem fcom = command(inFunction, inMethod, forinlevel, true, variables, functions);
@@ -1306,7 +1306,7 @@ public class ActionScript2Parser {
             buf.pushAllBack(lexer);
             ret = expression(inFunction, inMethod, true, variables, functions, false);
         }
-        s = lex();        
+        s = lex();
         if ((s != null) && (s.type != SymbolType.SEMICOLON)) {
             lexer.pushback(s);
         }
@@ -1879,7 +1879,17 @@ public class ActionScript2Parser {
                         expected(s2, lexer.yyline(), SymbolType.IDENTIFIER);
                         ret = new VariableActionItem(s.value.toString() + ":" + s2.value.toString(), null, false);
                     } else {
-                        ret = new VariableActionItem(s.value.toString(), null, false);
+                        String varName = s.value.toString();
+                        ParsedSymbol s2 = lex();
+                        while (s2.type == SymbolType.COLON) {
+                            s2 = lex();
+                            expected(s2, lexer.yyline(), SymbolType.IDENTIFIER);
+                            varName += ":" + s2.value.toString();
+                            s2 = lex();
+                        }
+                        lexer.pushback(s2);
+
+                        ret = new VariableActionItem(varName, null, false);
                     }
                     variables.add((VariableActionItem) ret);
                     allowMemberOrCall = true;

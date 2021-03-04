@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - #1328 AS1/2/3 direct editation - empty commands (just semicolon)
 - #1310 AS1/2/3 direct editation - modulo operator precedence
 - AS3 - escaping star import
+- #1298 AS1/2 colon syntax handling
 
 ### Removed
 - #1631 ActiveX Flash component download in windows installer
