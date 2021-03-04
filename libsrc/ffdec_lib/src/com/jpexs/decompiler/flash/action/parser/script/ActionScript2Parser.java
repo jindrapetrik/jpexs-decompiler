@@ -153,6 +153,7 @@ import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.DefaultItem;
 import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.EmptyCommand;
 import com.jpexs.decompiler.graph.model.ForItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -163,6 +164,7 @@ import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
+import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import java.io.IOException;
 import java.io.StringReader;
@@ -1164,7 +1166,10 @@ public class ActionScript2Parser {
                     if (fc != null) { //can be empty command
                         forFirstCommands.add(fc);
                     }
-                    forExpr = (expression(inFunction, inMethod, true, variables, functions, false));
+                    forExpr = expression(inFunction, inMethod, true, variables, functions, false);
+                    if (forExpr == null) {
+                        forExpr = new TrueItem(null,null);
+                    }
                     expectedType(SymbolType.SEMICOLON);
                     GraphTargetItem fcom = command(inFunction, inMethod, forinlevel, true, variables, functions);
                     if (fcom != null) {
@@ -1283,7 +1288,7 @@ public class ActionScript2Parser {
                 if (debugMode) {
                     System.out.println("/command");
                 }
-                return null;
+                return new EmptyCommand();
             default:
                 GraphTargetItem valcmd = expressionCommands(s, inFunction, inMethod, forinlevel, variables, functions);
                 if (valcmd != null) {
@@ -1301,7 +1306,7 @@ public class ActionScript2Parser {
             buf.pushAllBack(lexer);
             ret = expression(inFunction, inMethod, true, variables, functions, false);
         }
-        s = lex();
+        s = lex();        
         if ((s != null) && (s.type != SymbolType.SEMICOLON)) {
             lexer.pushback(s);
         }
