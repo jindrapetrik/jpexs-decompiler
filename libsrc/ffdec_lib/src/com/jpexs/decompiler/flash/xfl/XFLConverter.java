@@ -1604,6 +1604,10 @@ public class XFLConverter {
                                         symbolStr.writeEndElement(); //SoundEnvelopePoint
                                     }
                                     symbolStr.writeEndElement(); //SoundEnvelope
+                                } else {
+                                    symbolStr.writeStartElement("SoundEnvelope");
+                                    symbolStr.writeEmptyElement("SoundEnvelopePoint", new String[]{"level0", "32768", "level1", "32768"});
+                                    symbolStr.writeEndElement(); //SoundEnvelope
                                 }
                             }
                             symbolStr.writeStartElement("elements");
