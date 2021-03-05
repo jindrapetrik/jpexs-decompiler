@@ -532,13 +532,19 @@ public class Multiname {
         }
         Namespace otherNs = other.getSingleNamespace(otherCpool);
         Namespace thisNs = getSingleNamespace(thisCpool);
-        if (otherNs.kind != thisNs.kind) {
-            return false;
+        if (thisNs != null && otherNs != null) {
+            if (otherNs.kind != thisNs.kind) {
+                return false;
+            }
+            if (otherNs.kind == Namespace.KIND_PRIVATE) {
+                return false;
+            }
+            if (!Objects.equals(otherNs.getName(otherCpool).toRawString(), thisNs.getName(thisCpool).toRawString())) {
+                return false;
+            }
         }
-        if (otherNs.kind == Namespace.KIND_PRIVATE) {
-            return false;
-        }
-        if (!Objects.equals(otherNs.getName(otherCpool).toRawString(), thisNs.getName(thisCpool).toRawString())) {
+
+        if ((thisNs == null && otherNs != null) || (otherNs == null && thisNs != null)) {
             return false;
         }
 
