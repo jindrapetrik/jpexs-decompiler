@@ -467,4 +467,9 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
     public void setPlaceFlagHasClipActions(boolean placeFlagHasClipActions) {
         this.placeFlagHasClipActions = placeFlagHasClipActions;
     }
+
+    @Override
+    public void setPlaceFlagHasMatrix(boolean placeFlagHasMatrix) {
+        this.placeFlagHasMatrix = placeFlagHasMatrix;
+    }
 }
