@@ -252,11 +252,8 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   "<<="                          |
   ">>="                          |
   ">>>="                         |
-  "as"                           |
   "delete"                       |
   "instanceof"                   |
-  "is"                           |
-  "::"                           |
   "new"                          |
   "typeof"                       |
   "void"                         |

@@ -34,6 +34,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - escaping star import
 - #1298 AS1 colon syntax handling
 - #1298 AS1 direct editation of add,eq,ne and such operations
+- #1260 AS1/2 direct editation - is/as/:: are not reserved operators
 
 ### Removed
 - #1631 ActiveX Flash component download in windows installer

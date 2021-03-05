@@ -1489,16 +1489,9 @@ public class ActionScript2Parser {
                 case XOR:
                     lhs = new BitXorActionItem(null, null, lhs, rhs);
                     break;
-                case AS:
-
-                    break;
                 case INSTANCEOF:
                     lhs = new InstanceOfActionItem(null, null, lhs, rhs);
                     break;
-                case IS:
-
-                    break;
-
                 case ASSIGN:
                 case ASSIGN_BITAND:
                 case ASSIGN_BITOR:
