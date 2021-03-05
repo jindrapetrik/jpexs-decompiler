@@ -110,6 +110,7 @@ import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.SOUNDENVELOPE;
+import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.BLURFILTER;
@@ -726,7 +727,7 @@ public class XFLConverter {
         if (mat == null) {
             mat = new MATRIX();
         }
-        
+
         //smoothing fixes some shapes in #503, but also breaks some shapes of #1257
         //shapeRecords = smoothShape(shapeRecords);
         List<SHAPERECORD> edges = new ArrayList<>();
@@ -1458,15 +1459,15 @@ public class XFLConverter {
         return date.getTime() / 1000;
     }
 
-    private void convertLibrary(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, Map<Integer, ScriptPack> characterScriptPacks, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
+    private void convertLibrary(Map<Integer, String> soundExportNames, SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, Map<Integer, ScriptPack> characterScriptPacks, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
 
         //TODO: Imported assets
         //linkageImportForRS="true" linkageIdentifier="xxx" linkageURL="yyy.swf"
-        convertMedia(swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, tags, characters, files, datfiles, flaVersion, writer);
-        convertSymbols(swf, characterVariables, characterClasses, characterScriptPacks, nonLibraryShapes, backgroundColor, tags, characters, files, datfiles, flaVersion, writer);
+        convertMedia(soundExportNames, swf, characterVariables, characterClasses, nonLibraryShapes, backgroundColor, tags, characters, files, datfiles, flaVersion, writer);
+        convertSymbols(soundExportNames, swf, characterVariables, characterClasses, characterScriptPacks, nonLibraryShapes, backgroundColor, tags, characters, files, datfiles, flaVersion, writer);
     }
 
-    private void convertSymbols(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, Map<Integer, ScriptPack> characterScriptPacks, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
+    private void convertSymbols(Map<Integer, String> soundExportNames, SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, Map<Integer, ScriptPack> characterScriptPacks, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
         boolean hasSymbol = false;
         for (int ch : characters.keySet()) {
             CharacterTag symbol = characters.get(ch);
@@ -1518,8 +1519,103 @@ public class XFLConverter {
                             maxDepth = rec.placeDepth;
                         }
                     }
+
+                    DefineButtonSoundTag sound = button.getSounds();
+                    int soundLayerOffset = 0;
+                    if (sound != null) {
+                        soundLayerOffset = 1;
+                        symbolStr.writeStartElement("DOMLayer", new String[]{"name", "Layer 1"});
+                        symbolStr.writeStartElement("frames");
+                        for (int frame = 1; frame <= 4; frame++) {
+
+                            int soundChar = 0;
+                            SOUNDINFO soundInfo = null;
+                            switch (frame) {
+                                case 1:
+                                    soundChar = sound.buttonSoundChar0;
+                                    soundInfo = sound.buttonSoundInfo0;
+                                    break;
+                                case 2:
+                                    soundChar = sound.buttonSoundChar1;
+                                    soundInfo = sound.buttonSoundInfo1;
+                                    break;
+                                case 3:
+                                    soundChar = sound.buttonSoundChar2;
+                                    soundInfo = sound.buttonSoundInfo2;
+                                    break;
+                                case 4:
+                                    soundChar = sound.buttonSoundChar3;
+                                    soundInfo = sound.buttonSoundInfo3;
+                                    break;
+                            }
+                            symbolStr.writeStartElement("DOMFrame", new String[]{
+                                "index", Integer.toString(frame - 1),
+                                "keyMode", Integer.toString(KEY_MODE_NORMAL),});
+                            if (soundChar > 0) {
+                                symbolStr.writeAttribute("soundName", soundExportNames.get(soundChar));
+                                if (soundInfo.hasLoops) {
+                                    if (soundInfo.loopCount == 32767) {
+                                        symbolStr.writeAttribute("soundLoopMode", "loop");
+                                    }
+                                    symbolStr.writeAttribute("soundLoop", soundInfo.loopCount);
+                                }
+                                if (soundInfo.syncNoMultiple) {
+                                    symbolStr.writeAttribute("soundSync", "start");
+                                } else if (soundInfo.syncStop) {
+                                    symbolStr.writeAttribute("soundSync", "stop");
+                                }
+                                if (soundInfo.hasInPoint) {
+                                    symbolStr.writeAttribute("inPoint44", soundInfo.inPoint);
+                                }
+                                if (soundInfo.hasOutPoint) {
+                                    symbolStr.writeAttribute("outPoint44", soundInfo.outPoint);
+                                }
+                                if (soundInfo.hasEnvelope) {
+
+                                    if (soundInfo.envelopeRecords.length == 1
+                                            && soundInfo.envelopeRecords[0].pos44 == 0
+                                            && soundInfo.envelopeRecords[0].leftLevel == 32768
+                                            && soundInfo.envelopeRecords[0].rightLevel == 0) {
+                                        symbolStr.writeAttribute("soundEffect", "left channel");
+                                    } else if (soundInfo.envelopeRecords.length == 1
+                                            && soundInfo.envelopeRecords[0].pos44 == 0
+                                            && soundInfo.envelopeRecords[0].rightLevel == 32768
+                                            && soundInfo.envelopeRecords[0].leftLevel == 0) {
+                                        symbolStr.writeAttribute("soundEffect", "right channel");
+                                    } else {
+                                        symbolStr.writeAttribute("soundEffect", "custom");
+                                    }
+                                    //other sound Effects
+                                    // "fade left to right", "fade right to left", "fade in", "fade out"
+                                    // cannot be properly detected without knowing real sound length
+
+                                    symbolStr.writeStartElement("SoundEnvelope");
+                                    for (SOUNDENVELOPE envelope : soundInfo.envelopeRecords) {
+                                        symbolStr.writeStartElement("SoundEnvelopePoint");
+                                        if (envelope.pos44 > 0) {
+                                            symbolStr.writeAttribute("mark44", envelope.pos44);
+                                        }
+                                        if (envelope.leftLevel > 0) {
+                                            symbolStr.writeAttribute("level0", envelope.leftLevel);
+                                        }
+                                        if (envelope.rightLevel > 0) {
+                                            symbolStr.writeAttribute("level1", envelope.rightLevel);
+                                        }
+                                        symbolStr.writeEndElement(); //SoundEnvelopePoint
+                                    }
+                                    symbolStr.writeEndElement(); //SoundEnvelope
+                                }
+                            }
+                            symbolStr.writeStartElement("elements");
+                            symbolStr.writeEndElement(); //elements
+                            symbolStr.writeEndElement(); //DOMFrame
+                        }
+                        symbolStr.writeEndElement(); // frames
+                        symbolStr.writeEndElement(); // DOMLayer
+                    }
+
                     for (int i = maxDepth; i >= 1; i--) {
-                        symbolStr.writeStartElement("DOMLayer", new String[]{"name", "Layer " + (maxDepth - i + 1)});
+                        symbolStr.writeStartElement("DOMLayer", new String[]{"name", "Layer " + (maxDepth - i + 1 + soundLayerOffset)});
                         if (i == 1) {
                             symbolStr.writeAttribute("current", true);
                             symbolStr.writeAttribute("isSelected", true);
@@ -1527,21 +1623,10 @@ public class XFLConverter {
                         symbolStr.writeAttribute("color", randomOutlineColor());
                         symbolStr.writeStartElement("frames");
                         int lastFrame = 0;
-                        DefineButtonSoundTag sound = button.getSounds();
+
                         loopframes:
                         for (int frame = 1; frame <= 4; frame++) {
-                            if (sound != null) {
-                                switch (frame) {
-                                    case 1:
-                                        break;
-                                    case 2:
-                                        break;
-                                    case 3:
-                                        break;
-                                    case 4:
-                                        break;
-                                }
-                            }
+
                             for (BUTTONRECORD rec : records) {
                                 if (rec.placeDepth == i) {
                                     boolean ok = false;
@@ -1627,7 +1712,7 @@ public class XFLConverter {
                         continue;
                     }
                     final ScriptPack spriteScriptPack = characterScriptPacks.containsKey(sprite.spriteId) ? characterScriptPacks.get(sprite.spriteId) : null;
-                    convertTimeline(sprite.spriteId, nonLibraryShapes, backgroundColor, tags, sprite.getTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files, symbolStr, spriteScriptPack);
+                    convertTimeline(soundExportNames, sprite.spriteId, nonLibraryShapes, backgroundColor, tags, sprite.getTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files, symbolStr, spriteScriptPack);
 
                 } else if (symbol instanceof ShapeTag) {
                     itemIcon = "1";
@@ -1672,7 +1757,7 @@ public class XFLConverter {
         }
     }
 
-    private void convertMedia(SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
+    private void convertMedia(Map<Integer, String> soundExportNames, SWF swf, Map<Integer, String> characterVariables, Map<Integer, String> characterClasses, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, HashMap<Integer, CharacterTag> characters, HashMap<String, byte[]> files, HashMap<String, byte[]> datfiles, FLAVersion flaVersion, XFLXmlWriter writer) throws XMLStreamException {
         boolean hasMedia = false;
         for (int ch : characters.keySet()) {
             CharacterTag symbol = characters.get(ch);
@@ -1905,6 +1990,7 @@ public class XFLConverter {
                 }
 
                 String symbolFile = "sound" + symbol.getCharacterId() + "." + exportFormat;
+                soundExportNames.put(symbol.getCharacterId(), symbolFile);
                 files.put(symbolFile, data);
                 writer.writeStartElement("DOMSoundItem", new String[]{
                     "name", symbolFile,
@@ -2772,7 +2858,7 @@ public class XFLConverter {
         return outlineColor.toHexRGB();
     }
 
-    private void convertTimeline(int spriteId, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException {
+    private void convertTimeline(Map<Integer,String> soundExportNames, int spriteId, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException {
         writer.writeStartElement("DOMTimeline", new String[]{"name", name});
         writer.writeStartElement("layers");
 
@@ -3374,11 +3460,12 @@ public class XFLConverter {
             }
 
             convertFonts(swf.getTags(), domDocument);
-            convertLibrary(swf, characterVariables, characterClasses, characterScriptPacks, nonLibraryShapes, backgroundColor, swf.getTags(), characters, files, datfiles, flaVersion, domDocument);
+            Map<Integer, String> soundExportNames = new HashMap<>();
+            convertLibrary(soundExportNames, swf, characterVariables, characterClasses, characterScriptPacks, nonLibraryShapes, backgroundColor, swf.getTags(), characters, files, datfiles, flaVersion, domDocument);
 
             domDocument.writeStartElement("timelines");
             ScriptPack documentScriptPack = characterScriptPacks.containsKey(0) ? characterScriptPacks.get(0) : null;
-            convertTimeline(0, nonLibraryShapes, backgroundColor, swf.getTags(), swf.getTags(), characters, "Scene 1", flaVersion, files, domDocument, documentScriptPack);
+            convertTimeline(soundExportNames, 0, nonLibraryShapes, backgroundColor, swf.getTags(), swf.getTags(), characters, "Scene 1", flaVersion, files, domDocument, documentScriptPack);
             domDocument.writeEndElement();
 
             if (hasAmfMetadata) {
