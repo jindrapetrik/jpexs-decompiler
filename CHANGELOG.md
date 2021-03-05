@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [14.1.0] - 2021-03-05
 ### Added
 - #1561 Font editing - import ascent, descent, leading, kerning
 - Font editing - font name, ascent, descent, leading
