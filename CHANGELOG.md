@@ -37,6 +37,7 @@ All notable changes to this project will be documented in this file.
 - #1260 AS1/2 direct editation - is/as/:: are not reserved operators
 - Goto declaration - exception when exists QName with 0 namespace index
 - #1179 FLA Export - button sounds
+- FLA export - sound effects - fade in / out / left to right / right to left
 
 ### Removed
 - #1631 ActiveX Flash component download in windows installer

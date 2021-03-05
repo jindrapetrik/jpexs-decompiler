@@ -1553,64 +1553,7 @@ public class XFLConverter {
                                 "keyMode", Integer.toString(KEY_MODE_NORMAL),});
                             if (soundChar > 0) {
                                 DefineSoundTag sound = (DefineSoundTag) swf.getCharacter(soundChar);
-
-                                symbolStr.writeAttribute("soundName", "sound" + soundChar + "." + sound.getExportFormat().toString().toLowerCase());
-                                if (soundInfo.hasLoops) {
-                                    if (soundInfo.loopCount == 32767) {
-                                        symbolStr.writeAttribute("soundLoopMode", "loop");
-                                    }
-                                    symbolStr.writeAttribute("soundLoop", soundInfo.loopCount);
-                                }
-                                if (soundInfo.syncNoMultiple) {
-                                    symbolStr.writeAttribute("soundSync", "start");
-                                } else if (soundInfo.syncStop) {
-                                    symbolStr.writeAttribute("soundSync", "stop");
-                                }
-                                if (soundInfo.hasInPoint) {
-                                    symbolStr.writeAttribute("inPoint44", soundInfo.inPoint);
-                                }
-                                if (soundInfo.hasOutPoint) {
-                                    symbolStr.writeAttribute("outPoint44", soundInfo.outPoint);
-                                }
-                                if (soundInfo.hasEnvelope) {
-
-                                    if (soundInfo.envelopeRecords.length == 1
-                                            && soundInfo.envelopeRecords[0].pos44 == 0
-                                            && soundInfo.envelopeRecords[0].leftLevel == 32768
-                                            && soundInfo.envelopeRecords[0].rightLevel == 0) {
-                                        symbolStr.writeAttribute("soundEffect", "left channel");
-                                    } else if (soundInfo.envelopeRecords.length == 1
-                                            && soundInfo.envelopeRecords[0].pos44 == 0
-                                            && soundInfo.envelopeRecords[0].rightLevel == 32768
-                                            && soundInfo.envelopeRecords[0].leftLevel == 0) {
-                                        symbolStr.writeAttribute("soundEffect", "right channel");
-                                    } else {
-                                        symbolStr.writeAttribute("soundEffect", "custom");
-                                    }
-                                    //other sound Effects
-                                    // "fade left to right", "fade right to left", "fade in", "fade out"
-                                    // cannot be properly detected without knowing real sound length
-
-                                    symbolStr.writeStartElement("SoundEnvelope");
-                                    for (SOUNDENVELOPE envelope : soundInfo.envelopeRecords) {
-                                        symbolStr.writeStartElement("SoundEnvelopePoint");
-                                        if (envelope.pos44 > 0) {
-                                            symbolStr.writeAttribute("mark44", envelope.pos44);
-                                        }
-                                        if (envelope.leftLevel > 0) {
-                                            symbolStr.writeAttribute("level0", envelope.leftLevel);
-                                        }
-                                        if (envelope.rightLevel > 0) {
-                                            symbolStr.writeAttribute("level1", envelope.rightLevel);
-                                        }
-                                        symbolStr.writeEndElement(); //SoundEnvelopePoint
-                                    }
-                                    symbolStr.writeEndElement(); //SoundEnvelope
-                                } else {
-                                    symbolStr.writeStartElement("SoundEnvelope");
-                                    symbolStr.writeEmptyElement("SoundEnvelopePoint", new String[]{"level0", "32768", "level1", "32768"});
-                                    symbolStr.writeEndElement(); //SoundEnvelope
-                                }
+                                convertSoundUsage(symbolStr, sound, soundInfo);
                             }
                             symbolStr.writeStartElement("elements");
                             symbolStr.writeEndElement(); //elements
@@ -2128,6 +2071,104 @@ public class XFLConverter {
         }
     }
 
+    private static void convertSoundUsage(XFLXmlWriter writer, DefineSoundTag sound, SOUNDINFO soundInfo) throws XMLStreamException {
+        String soundName = "sound" + sound.soundId + "." + sound.getExportFormat().toString().toLowerCase();
+        writer.writeAttribute("soundName", soundName);
+        if (soundInfo.hasInPoint) {
+            writer.writeAttribute("inPoint44", soundInfo.inPoint);
+        }
+        if (soundInfo.hasOutPoint) {
+            writer.writeAttribute("outPoint44", soundInfo.outPoint);
+        }
+        if (soundInfo.hasLoops) {
+            if (soundInfo.loopCount == 32767) {
+                writer.writeAttribute("soundLoopMode", "loop");
+            }
+            writer.writeAttribute("soundLoop", soundInfo.loopCount);
+        }
+
+        if (soundInfo.syncStop) {
+            writer.writeAttribute("soundSync", "stop");
+        } else if (soundInfo.syncNoMultiple) {
+            writer.writeAttribute("soundSync", "start");
+        }
+
+        if (soundInfo.hasEnvelope) {
+            SOUNDENVELOPE[] envelopeRecords = soundInfo.envelopeRecords;
+
+            long soundLength44 = 0;
+            switch (sound.soundRate) {
+                case 0: //5.5kHz
+                    soundLength44 = 8 * sound.soundSampleCount;
+                    break;
+                case 1: //11kHz
+                    soundLength44 = 4 * sound.soundSampleCount;
+                    break;
+                case 2: //22kHz
+                    soundLength44 = 2 * sound.soundSampleCount;
+                    break;
+                case 3: //44kHz
+                    soundLength44 = sound.soundSampleCount;
+                    break;
+
+            }
+            if (envelopeRecords.length == 1
+                    && envelopeRecords[0].leftLevel == 32768
+                    && envelopeRecords[0].pos44 == 0
+                    && envelopeRecords[0].rightLevel == 0) {
+                writer.writeAttribute("soundEffect", "left channel");
+            } else if (envelopeRecords.length == 1
+                    && envelopeRecords[0].leftLevel == 0
+                    && envelopeRecords[0].pos44 == 0
+                    && envelopeRecords[0].rightLevel == 32768) {
+                writer.writeAttribute("soundEffect", "right channel");
+            } else if (envelopeRecords.length == 2
+                    && envelopeRecords[0].leftLevel == 32768
+                    && envelopeRecords[0].pos44 == 0
+                    && envelopeRecords[0].rightLevel == 0
+                    && envelopeRecords[1].leftLevel == 0
+                    && envelopeRecords[1].pos44 == soundLength44
+                    && envelopeRecords[1].rightLevel == 32768) {
+                writer.writeAttribute("soundEffect", "fade left to right");
+            } else if (envelopeRecords.length == 2
+                    && envelopeRecords[0].leftLevel == 0
+                    && envelopeRecords[0].pos44 == 0
+                    && envelopeRecords[0].rightLevel == 32768
+                    && envelopeRecords[1].leftLevel == 32768
+                    && envelopeRecords[1].pos44 == soundLength44
+                    && envelopeRecords[1].rightLevel == 0) {
+                writer.writeAttribute("soundEffect", "fade right to left");
+            } else if (envelopeRecords.length == 2
+                    && envelopeRecords[0].leftLevel == 0
+                    && envelopeRecords[0].pos44 == 0
+                    && envelopeRecords[0].rightLevel == 0
+                    && envelopeRecords[1].leftLevel == 32768
+                    && envelopeRecords[1].pos44 == soundLength44 / 4
+                    && envelopeRecords[1].rightLevel == 0) {
+                writer.writeAttribute("soundEffect", "fade in");
+            } else if (envelopeRecords.length == 2
+                    && envelopeRecords[0].leftLevel == 32768
+                    && envelopeRecords[0].pos44 == soundLength44 * 3 / 4
+                    && envelopeRecords[0].rightLevel == 32768
+                    && envelopeRecords[1].leftLevel == 0
+                    && envelopeRecords[1].pos44 == soundLength44
+                    && envelopeRecords[1].rightLevel == 0) {
+                writer.writeAttribute("soundEffect", "fade out");
+            } else {
+                writer.writeAttribute("soundEffect", "custom");
+            }
+
+            writer.writeStartElement("SoundEnvelope");
+            for (SOUNDENVELOPE env : envelopeRecords) {
+                writer.writeEmptyElement("SoundEnvelopePoint", new String[]{"mark44", Long.toString(env.pos44), "level0", Integer.toString(env.leftLevel), "level1", Integer.toString(env.rightLevel)});
+            }
+            writer.writeEndElement(); // SoundEnvelope
+        } else {
+            writer.writeStartElement("SoundEnvelope");
+            writer.writeEmptyElement("SoundEnvelopePoint", new String[]{"level0", "32768", "level1", "32768"});
+            writer.writeEndElement(); // SoundEnvelope
+        }
+    }
     private static void convertFrame(boolean shapeTween, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, int duration, String actionScript, String elements, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
         DefineSoundTag sound = null;
         if (startSound != null) {
@@ -2146,81 +2187,18 @@ public class XFLConverter {
         } else {
             writer.writeAttribute("keyMode", KEY_MODE_NORMAL);
         }
-        XFLXmlWriter soundEnvelopeStr = new XFLXmlWriter();
         if (soundStreamHead != null && startSound == null) {
             String soundName = "sound" + soundStreamHead.getCharacterId() + "." + soundStreamHead.getExportFormat().toString().toLowerCase();
             writer.writeAttribute("soundName", soundName);
             writer.writeAttribute("soundSync", "stream");
-            soundEnvelopeStr.writeStartElement("SoundEnvelope");
-            soundEnvelopeStr.writeEmptyElement("SoundEnvelopePoint", new String[]{"level0", "32768", "level1", "32768"});
-            soundEnvelopeStr.writeEndElement();
+            writer.writeStartElement("SoundEnvelope");
+            writer.writeEmptyElement("SoundEnvelopePoint", new String[]{"level0", "32768", "level1", "32768"});
+            writer.writeEndElement();
         }
         if (startSound != null && sound != null) {
-            String soundName = "sound" + sound.soundId + "." + sound.getExportFormat().toString().toLowerCase();
-            writer.writeAttribute("soundName", soundName);
-            if (startSound.soundInfo.hasInPoint) {
-                writer.writeAttribute("inPoint44", startSound.soundInfo.inPoint);
-            }
-            if (startSound.soundInfo.hasOutPoint) {
-                writer.writeAttribute("outPoint44", startSound.soundInfo.outPoint);
-            }
-            if (startSound.soundInfo.hasLoops) {
-                if (startSound.soundInfo.loopCount == 32767) {
-                    writer.writeAttribute("soundLoopMode", "loop");
-                }
-                writer.writeAttribute("soundLoop", startSound.soundInfo.loopCount);
-            }
-
-            if (startSound.soundInfo.syncStop) {
-                writer.writeAttribute("soundSync", "stop");
-            } else if (startSound.soundInfo.syncNoMultiple) {
-                writer.writeAttribute("soundSync", "start");
-            }
-            soundEnvelopeStr.writeStartElement("SoundEnvelope");
-            if (startSound.soundInfo.hasEnvelope) {
-                SOUNDENVELOPE[] envelopeRecords = startSound.soundInfo.envelopeRecords;
-                for (SOUNDENVELOPE env : envelopeRecords) {
-                    soundEnvelopeStr.writeEmptyElement("SoundEnvelopePoint", new String[]{"mark44", Long.toString(env.pos44), "level0", Integer.toString(env.leftLevel), "level1", Integer.toString(env.rightLevel)});
-                }
-
-                if (envelopeRecords.length == 1
-                        && envelopeRecords[0].leftLevel == 32768
-                        && envelopeRecords[0].pos44 == 0
-                        && envelopeRecords[0].rightLevel == 0) {
-                    writer.writeAttribute("soundEffect", "left channel");
-                } else if (envelopeRecords.length == 1
-                        && envelopeRecords[0].leftLevel == 0
-                        && envelopeRecords[0].pos44 == 0
-                        && envelopeRecords[0].rightLevel == 32768) {
-                    writer.writeAttribute("soundEffect", "right channel");
-                } else if (envelopeRecords.length == 2
-                        && envelopeRecords[0].leftLevel == 32768
-                        && envelopeRecords[0].pos44 == 0
-                        && envelopeRecords[0].rightLevel == 0
-                        && envelopeRecords[1].leftLevel == 0
-                        && envelopeRecords[1].pos44 == sound.soundSampleCount
-                        && envelopeRecords[1].rightLevel == 32768) {
-                    writer.writeAttribute("soundEffect", "fade left to right");
-                } else if (envelopeRecords.length == 2
-                        && envelopeRecords[0].leftLevel == 0
-                        && envelopeRecords[0].pos44 == 0
-                        && envelopeRecords[0].rightLevel == 32768
-                        && envelopeRecords[1].leftLevel == 32768
-                        && envelopeRecords[1].pos44 == sound.soundSampleCount
-                        && envelopeRecords[1].rightLevel == 0) {
-                    writer.writeAttribute("soundEffect", "fade right to left");
-                } else {
-                    writer.writeAttribute("soundEffect", "custom");
-                }
-                //TODO: fade in, fade out
-
-            } else {
-                soundEnvelopeStr.writeEmptyElement("SoundEnvelopePoint", new String[]{"level0", "32768", "level1", "32768"});
-            }
-            soundEnvelopeStr.writeEndElement(); // SoundEnvelope
+            convertSoundUsage(writer, sound, startSound.soundInfo);
         }
 
-        writer.writeCharactersRaw(soundEnvelopeStr.toString());
         if (!actionScript.isEmpty()) {
             writer.writeStartElement("Actionscript");
             writer.writeStartElement("script");
