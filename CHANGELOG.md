@@ -85,7 +85,8 @@ All notable changes to this project will be documented in this file.
 - [#1595] History of script search results per SWF
 - Ignore case and RegExp options displayed on search results dialog
 - [#1611] Warning about initializers has do not show again checkbox
-- Scoped script text search and search across multiple SWFs
+- [#644] Scoped script text search
+- Search across multiple SWFs
 - [#1601] Option to hide AS3 docs panel and traitslist/constants panel
 
 ### Fixed
@@ -2107,6 +2108,7 @@ All notable changes to this project will be documented in this file.
 [#1373]: https://www.free-decompiler.com/flash/issues/1373
 [#1595]: https://www.free-decompiler.com/flash/issues/1595
 [#1611]: https://www.free-decompiler.com/flash/issues/1611
+[#644]: https://www.free-decompiler.com/flash/issues/644
 [#1601]: https://www.free-decompiler.com/flash/issues/1601
 [#1339]: https://www.free-decompiler.com/flash/issues/1339
 [#1467]: https://www.free-decompiler.com/flash/issues/1467
