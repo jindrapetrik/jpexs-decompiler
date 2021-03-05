@@ -281,4 +281,9 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
     public void setPlaceFlagHasClipActions(boolean placeFlagHasClipActions) {
 
     }
+
+    @Override
+    public void setPlaceFlagHasMatrix(boolean placeFlagHasMatrix) {
+
+    }
 }

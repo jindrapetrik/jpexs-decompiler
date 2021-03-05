@@ -803,6 +803,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private void savePlaceTagButtonActionPerformed(ActionEvent evt) {
         MATRIX matrix = placeImagePanel.getNewMatrix();
+        placeTag.setPlaceFlagHasMatrix(true);
         placeTag.setMatrix(matrix);
         placeTag.setModified(true);
         placeImagePanel.selectDepth(placeTag.getDepth());
