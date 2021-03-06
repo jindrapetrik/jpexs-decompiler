@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Exception when switching from nonribbon interface to ribbob
-- #1396, #1254 FLA Export - AS3 frame scripts
+- [#1396], [#1254] FLA Export - AS3 frame scripts
 
 ## [14.1.0] - 2021-03-05
 ### Added
@@ -2078,6 +2078,8 @@ All notable changes to this project will be documented in this file.
 [#1645]: https://www.free-decompiler.com/flash/issues/1645
 [#1639]: https://www.free-decompiler.com/flash/issues/1639
 [#1471]: https://www.free-decompiler.com/flash/issues/1471
+[#1396]: https://www.free-decompiler.com/flash/issues/1396
+[#1254]: https://www.free-decompiler.com/flash/issues/1254
 [#1561]: https://www.free-decompiler.com/flash/issues/1561
 [#1623]: https://www.free-decompiler.com/flash/issues/1623
 [#1622]: https://www.free-decompiler.com/flash/issues/1622
@@ -2187,7 +2189,6 @@ All notable changes to this project will be documented in this file.
 [#1401]: https://www.free-decompiler.com/flash/issues/1401
 [#1402]: https://www.free-decompiler.com/flash/issues/1402
 [#1430]: https://www.free-decompiler.com/flash/issues/1430
-[#1254]: https://www.free-decompiler.com/flash/issues/1254
 [#907]: https://www.free-decompiler.com/flash/issues/907
 [#1311]: https://www.free-decompiler.com/flash/issues/1311
 [#1313]: https://www.free-decompiler.com/flash/issues/1313
