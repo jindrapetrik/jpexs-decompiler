@@ -1055,19 +1055,21 @@ public class Timeline {
                 }
                 ExportRectangle rect = new ExportRectangle(boundRect);
 
+                DefineScalingGridTag scalingGrid = character.getScalingGridTag();
+
                 // TODO: if (layer.filters != null)
-                // TODO: if (layer.blendMode > 1)
+                // TODO: if (layer.blendMode > 1)                                               
                 if (layer.clipDepth > -1) {
                     String clipName = exporter.getUniqueId("clipPath");
                     exporter.createClipPath(new Matrix(), clipName);
                     SvgClip clip = new SvgClip(clipName, layer.clipDepth);
                     clips.add(clip);
                     Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
-                    exporter.addUse(mat, boundRect, assetName, layer.instanceName);
+                    exporter.addUse(mat, boundRect, assetName, layer.instanceName, scalingGrid == null ? null : scalingGrid.splitter);
                     exporter.endGroup();
                 } else {
                     Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
-                    exporter.addUse(mat, boundRect, assetName, layer.instanceName);
+                    exporter.addUse(mat, boundRect, assetName, layer.instanceName, scalingGrid == null ? null : scalingGrid.splitter);
                 }
             }
         }

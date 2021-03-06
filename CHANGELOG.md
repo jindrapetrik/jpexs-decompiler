@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#1645] Scrollbar to recent searches dropdown
 - [#1639] Clearing search results for current file
 - [#1371] Go to character id (Ctrl+G in tag tree)
-- [#1156] FLA Export -  9 slice scaling (DefineScalingGrid)
+- [#1156] FLA Export, SVG Export -  9 slice scaling (DefineScalingGrid)
 
 ### Changed
 - [#1471] Import script menuitem renamed to Import scripts.
