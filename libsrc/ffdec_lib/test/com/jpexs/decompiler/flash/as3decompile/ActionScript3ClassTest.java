@@ -49,7 +49,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
         HighlightedTextWriter writer = null;
         try {
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            scriptPack.toSource(writer, abc.script_info.get(scriptPack.scriptIndex).traits.traits, new ConvertData(), ScriptExportMode.AS, false);
+            scriptPack.toSource(writer, abc.script_info.get(scriptPack.scriptIndex).traits.traits, new ConvertData(), ScriptExportMode.AS, false, false);
         } catch (InterruptedException ex) {
             fail();
         }

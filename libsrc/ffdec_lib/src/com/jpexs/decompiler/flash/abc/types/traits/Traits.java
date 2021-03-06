@@ -161,7 +161,7 @@ public class Traits implements Cloneable, Serializable {
         }
     }
 
-    public GraphTextWriter toString(Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public GraphTextWriter toString(Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, List<Integer> ignoredTraitNames) throws InterruptedException {
 
         List<Trait> ordered = new ArrayList<>(traits);
         loopi:
@@ -220,6 +220,9 @@ public class Traits implements Cloneable, Serializable {
                 }
             }
             if (!trait.isVisible(isStatic, abc)) {
+                continue;
+            }
+            if (ignoredTraitNames.contains(trait.name_index)) {
                 continue;
             }
             writer.newLine();

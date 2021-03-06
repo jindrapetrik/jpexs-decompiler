@@ -121,7 +121,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         par.addScript(str, "Test.as", 0, 0);
 
-        abc.script_info.get(0).getPacks(abc, 0, "", new ArrayList<>()).get(0).toSource(writer, abc.script_info.get(0).traits.traits, new ConvertData(), ScriptExportMode.AS, false);
+        abc.script_info.get(0).getPacks(abc, 0, "", new ArrayList<>()).get(0).toSource(writer, abc.script_info.get(0).traits.traits, new ConvertData(), ScriptExportMode.AS, false, false);
         return writer.toString();
     }
 

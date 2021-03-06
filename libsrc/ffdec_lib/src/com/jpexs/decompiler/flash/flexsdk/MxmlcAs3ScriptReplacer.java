@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.flexsdk;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -293,7 +294,7 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
             //This compiled code won't be used at all in original SWF, 
             //it is used only by Flex to properly compile current script
             AS3ScriptExporter ex = new AS3ScriptExporter();
-            ex.exportActionScript3(swfCopy, null, tempDir.getAbsolutePath(), removedPacks, new ScriptExportSettings(ScriptExportMode.AS_METHOD_STUBS, false), false, null);
+            ex.exportActionScript3(swfCopy, null, tempDir.getAbsolutePath(), removedPacks, new ScriptExportSettings(ScriptExportMode.AS_METHOD_STUBS, false, false), false, null);
 
             //now really remove the classes from SWF copy
             for (ABC a : modAbcs) {

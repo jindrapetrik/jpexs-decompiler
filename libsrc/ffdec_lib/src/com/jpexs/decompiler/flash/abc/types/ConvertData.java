@@ -33,6 +33,8 @@ public class ConvertData {
 
     public boolean thisHasDefaultToPrimitive;
 
+    public boolean ignoreFrameScripts;
+
     public ConvertData() {
         deobfuscationMode = Configuration.autoDeobfuscate.get() ? 1 : 0;
     }
