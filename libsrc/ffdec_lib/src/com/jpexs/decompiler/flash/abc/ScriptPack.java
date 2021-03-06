@@ -241,7 +241,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         }
     }
 
-    public void toSource(GraphTextWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
+    public void toSource(GraphTextWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel, boolean ignoreFrameScripts) throws InterruptedException {
         writer.suspendMeasure();
         int timeout = Configuration.decompilationTimeoutFile.get();
         try {
@@ -295,7 +295,9 @@ public class ScriptPack extends AS3ClassTreeItem {
 
         try (FileTextWriter writer = exportSettings.singleFile ? null : new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(file))) {
             FileTextWriter writer2 = exportSettings.singleFile ? exportSettings.singleFileWriter : writer;
-            toSource(writer2, abc.script_info.get(scriptIndex).traits.traits, new ConvertData(), exportSettings.mode, parallel);
+            ConvertData convertData = new ConvertData();
+            convertData.ignoreFrameScripts = exportSettings.ignoreFrameScripts;
+            toSource(writer2, abc.script_info.get(scriptIndex).traits.traits, convertData, exportSettings.mode, parallel, exportSettings.ignoreFrameScripts);
         } catch (FileNotFoundException ex) {
             logger.log(Level.SEVERE, "The file path is probably too long", ex);
         }

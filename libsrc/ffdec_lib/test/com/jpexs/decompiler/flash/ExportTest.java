@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -107,7 +108,7 @@ public class ExportTest extends FileTestBase {
                     return this;
                 }
 
-            }, fdir.getAbsolutePath(), new ScriptExportSettings(exportMode, false), false, null);
+            }, fdir.getAbsolutePath(), new ScriptExportSettings(exportMode, false, false), false, null);
         } catch (Exception ex) {
             fail("Exception during decompilation: " + filePath + " " + ex.getMessage());
         }

@@ -2535,9 +2535,7 @@ public class XFLConverter {
             int constructorMethodIndex = instanceInfo.iinit_index;
             MethodBody constructorBody = abc.findBody(constructorMethodIndex);
             try {
-                if (constructorBody.convertedItems == null) {
-                    constructorBody.convert(new ConvertData(), "??", ScriptExportMode.AS, true, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
-                }
+                constructorBody.convert(new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
 
                 Map<Integer, Integer> frameToTraitMultiname = new HashMap<>();
 
@@ -2563,12 +2561,12 @@ public class XFLConverter {
                             if (callProp.propertyName instanceof FullMultinameAVM2Item) {
                                 FullMultinameAVM2Item propName = (FullMultinameAVM2Item) callProp.propertyName;
                                 if ("addFrameScript".equals(propName.resolvedMultinameName)) {
-                                    if (callProp.arguments.size() == 2) {
-                                        if (callProp.arguments.get(0) instanceof IntegerValueAVM2Item) {
-                                            IntegerValueAVM2Item frameItem = (IntegerValueAVM2Item) callProp.arguments.get(0);
+                                    for (int i = 0; i < callProp.arguments.size(); i += 2) {
+                                        if (callProp.arguments.get(i) instanceof IntegerValueAVM2Item) {
+                                            IntegerValueAVM2Item frameItem = (IntegerValueAVM2Item) callProp.arguments.get(i);
                                             int frame = frameItem.intValue();
-                                            if (callProp.arguments.get(1) instanceof GetPropertyAVM2Item) {
-                                                GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) callProp.arguments.get(1);
+                                            if (callProp.arguments.get(i + 1) instanceof GetPropertyAVM2Item) {
+                                                GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) callProp.arguments.get(i + 1);
                                                 if (getProp.object instanceof ThisAVM2Item) {
                                                     if (getProp.propertyName instanceof FullMultinameAVM2Item) {
                                                         FullMultinameAVM2Item framePropName = (FullMultinameAVM2Item) getProp.propertyName;
@@ -3790,7 +3788,7 @@ public class XFLConverter {
         }
         if (useAS3 && settings.exportScript) {
             try {
-                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false);
+                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, true);
                 swf.exportActionScript(handler, outDir.getAbsolutePath(), scriptExportSettings, parallel, null);
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, "Error during ActionScript3 export", ex);

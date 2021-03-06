@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -41,7 +42,7 @@ public class AS3ScriptImporter {
         int importCount = 0;
         for (ScriptPack pack : packs) {
             try {
-                File file = pack.getExportFile(scriptsFolder, new ScriptExportSettings(ScriptExportMode.AS, false));
+                File file = pack.getExportFile(scriptsFolder, new ScriptExportSettings(ScriptExportMode.AS, false, false));
                 if (file.exists()) {
                     String fileName = file.getAbsolutePath();
                     String txt = Helper.readTextFile(fileName);

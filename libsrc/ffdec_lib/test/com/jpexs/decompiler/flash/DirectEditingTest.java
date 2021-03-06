@@ -90,7 +90,7 @@ public class DirectEditingTest extends FileTestBase {
 
                         System.out.println("Recompiling:" + classPathString + "...");
                         try {
-                            en.toSource(htw, abc.script_info.get(s).traits.traits, new ConvertData(), ScriptExportMode.AS, false);
+                            en.toSource(htw, abc.script_info.get(s).traits.traits, new ConvertData(), ScriptExportMode.AS, false, false);
                             String original = htw.toString();
                             abc.replaceScriptPack(As3ScriptReplacerFactory.createFFDec() /*TODO: test the otherone*/, en, original);
                         } catch (As3ScriptReplaceException ex) {

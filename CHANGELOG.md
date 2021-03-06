@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Exception when switching from nonribbon interface to ribbob
+- #1396, #1254 FLA Export - AS3 frame scripts
 
 ## [14.1.0] - 2021-03-05
 ### Added

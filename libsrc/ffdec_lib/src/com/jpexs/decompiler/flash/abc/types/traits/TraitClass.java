@@ -17,6 +17,11 @@
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
@@ -33,12 +38,15 @@ import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.search.MethodId;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -51,6 +59,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
     public int class_info;
 
     private boolean classInitializerIsEmpty;
+
+    private List<Integer> frameTraitNames = new ArrayList<>();
 
     @Override
     public void delete(ABC abc, boolean d) {
@@ -127,7 +137,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         //static variables & constants
         ClassInfo classInfo = abc.class_info.get(class_info);
-        classInfo.static_traits.toString(new Class[]{TraitSlotConst.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        classInfo.static_traits.toString(new Class[]{TraitSlotConst.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>());
 
         //static initializer
         int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);
@@ -155,7 +165,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //instance variables
-        instanceInfo.instance_traits.toString(new Class[]{TraitSlotConst.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        instanceInfo.instance_traits.toString(new Class[]{TraitSlotConst.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>());
 
         //instance initializer - constructor
         if (!instanceInfo.isInterface()) {
@@ -195,10 +205,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //static methods
-        classInfo.static_traits.toString(new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        classInfo.static_traits.toString(new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>());
 
         //instance methods
-        instanceInfo.instance_traits.toString(new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        instanceInfo.instance_traits.toString(new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, convertData.ignoreFrameScripts ? frameTraitNames : new ArrayList<>());
 
         writer.endBlock(); // class
         writer.endClass();
@@ -245,7 +255,55 @@ public class TraitClass extends Trait implements TraitWithSlot {
             if (bodyIndex != -1) {
                 List<Traits> ts = new ArrayList<>();
                 ts.add(instanceInfo.instance_traits);
-                abc.bodies.get(bodyIndex).convert(convertData, path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
+                MethodBody constructorBody = abc.bodies.get(bodyIndex);
+                constructorBody.convert(convertData, path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
+
+                if (convertData.ignoreFrameScripts) {
+                    //find all addFrameScript(xx,this.method) in constructor
+                    /*
+                It looks like this:
+                CallPropertyAVM2Item
+                ->propertyName == FullMultinameAVM2Item
+                        -> resolvedMultinameName (String) "addFrameScript"
+                ->arguments
+                        ->0 IntegerValueAVM2Item
+                                ->value (Long) 0    - zero based
+                        ->1 GetPropertyAVM2Item
+                                ->object (ThisAVM2Item)
+                                ->propertyName (FullMultinameAvm2Item)
+                                        ->multinameIndex
+                                        ->resolvedMultinameName (String) "frame1"
+                     */
+                    if (constructorBody.convertedItems != null) {
+                        for (int j = 0; j < constructorBody.convertedItems.size(); j++) {
+                            GraphTargetItem ti = constructorBody.convertedItems.get(j);
+                            if (ti instanceof CallPropertyAVM2Item) {
+                                CallPropertyAVM2Item callProp = (CallPropertyAVM2Item) ti;
+                                if (callProp.propertyName instanceof FullMultinameAVM2Item) {
+                                    FullMultinameAVM2Item propName = (FullMultinameAVM2Item) callProp.propertyName;
+                                    if ("addFrameScript".equals(propName.resolvedMultinameName)) {
+                                        for (int i = 0; i < callProp.arguments.size(); i += 2) {
+                                            if (callProp.arguments.get(i) instanceof IntegerValueAVM2Item) {
+                                                if (callProp.arguments.get(i + 1) instanceof GetPropertyAVM2Item) {
+                                                    GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) callProp.arguments.get(i + 1);
+                                                    if (getProp.object instanceof ThisAVM2Item) {
+                                                        if (getProp.propertyName instanceof FullMultinameAVM2Item) {
+                                                            FullMultinameAVM2Item framePropName = (FullMultinameAVM2Item) getProp.propertyName;
+                                                            int multinameIndex = framePropName.multinameIndex;
+                                                            frameTraitNames.add(multinameIndex);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        constructorBody.convertedItems.remove(j);
+                                        j--;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
