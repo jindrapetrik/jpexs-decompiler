@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Exception when switching from nonribbon interface to ribbon
 - [#1396], [#1254] FLA Export - AS3 frame scripts
+- FLA Export - mutliple FrameLabel layers
 
 ## [14.1.0] - 2021-03-05
 ### Added

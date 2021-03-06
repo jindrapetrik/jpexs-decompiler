@@ -1,0 +1,59 @@
+<DOMSymbolItem xmlns="http://ns.adobe.com/xfl/2008/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Symbol 3" lastModified="1615037102" linkageClassName="MyCircle" linkageExportForAS="true">
+       
+     <timeline>
+              
+          <DOMTimeline name="Symbol 3">
+                     
+               <layers>
+                    <DOMLayer name="Layer 1" color="#b93cfd" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                     
+                                   <elements>
+                                        <DOMShape isFloating="true">
+                                             <fills>
+                                                    
+                                                  <FillStyle index="1">
+                                                           
+                                                       <SolidColor color="#ff0000" alpha="1.0"/>
+                                                         
+                                                  </FillStyle>
+                                                  
+                                             </fills>
+                                             <strokes>
+                                                    
+                                                  <StrokeStyle index="1">
+                                                           
+                                                       <SolidStroke weight="1.0" scaleMode="normal">
+                                                                  
+                                                            <fill>
+                                                                         
+                                                                 <SolidColor color="#000000"/>
+                                                                       
+                                                            </fill>
+                                                                
+                                                       </SolidStroke>
+                                                         
+                                                  </StrokeStyle>
+                                                  
+                                             </strokes>
+                                               
+                                             <edges>
+                                                      
+                                                  <Edge fillStyle1="1" strokeStyle="1" edges="! 1878 1878[ 1556 2200 1100 2200[ 644 2200 322 1878[ 0 1556 0 1100[ 0 644 322 322[ 644 0 1100 0[ 1556 0 1878 322[ 2200 644 2200 1100[ 2200 1556 1878 1878"/>
+                                                    
+                                             </edges>
+                                             
+                                        </DOMShape>
+                                   </elements>
+                                   
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+                   
+          </DOMTimeline>
+            
+     </timeline>
+     
+</DOMSymbolItem>
