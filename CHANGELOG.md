@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 - #1645 Scrollbar to recent searches dropdown
 - #1639 Clearing search results for current file
 
+### Changed
+- #1471 Import script menuitem renamed to Import scripts.
+
 ## [14.1.0] - 2021-03-05
 ### Added
 - [#1561] Font editing - import ascent, descent, leading, kerning
