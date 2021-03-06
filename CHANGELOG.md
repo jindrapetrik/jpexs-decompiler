@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#1645] Scrollbar to recent searches dropdown
 - [#1639] Clearing search results for current file
 - [#1371] Go to character id (Ctrl+G in tag tree)
+- [#1156] FLA Export -  9 slice scaling (DefineScalingGrid)
 
 ### Changed
 - [#1471] Import script menuitem renamed to Import scripts.
@@ -2081,6 +2082,7 @@ All notable changes to this project will be documented in this file.
 [#1645]: https://www.free-decompiler.com/flash/issues/1645
 [#1639]: https://www.free-decompiler.com/flash/issues/1639
 [#1371]: https://www.free-decompiler.com/flash/issues/1371
+[#1156]: https://www.free-decompiler.com/flash/issues/1156
 [#1471]: https://www.free-decompiler.com/flash/issues/1471
 [#1396]: https://www.free-decompiler.com/flash/issues/1396
 [#1254]: https://www.free-decompiler.com/flash/issues/1254
@@ -2211,7 +2213,6 @@ All notable changes to this project will be documented in this file.
 [#1314]: https://www.free-decompiler.com/flash/issues/1314
 [#1320]: https://www.free-decompiler.com/flash/issues/1320
 [#1323]: https://www.free-decompiler.com/flash/issues/1323
-[#1156]: https://www.free-decompiler.com/flash/issues/1156
 [#1171]: https://www.free-decompiler.com/flash/issues/1171
 [#1170]: https://www.free-decompiler.com/flash/issues/1170
 [#1241]: https://www.free-decompiler.com/flash/issues/1241
