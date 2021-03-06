@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.search.ActionSearchResult;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -31,10 +32,13 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import org.pushingpixels.flamingo.api.common.AbstractCommandButton;
 import org.pushingpixels.flamingo.api.common.CommandButtonDisplayState;
 import org.pushingpixels.flamingo.api.common.CommandToggleButtonGroup;
@@ -169,8 +173,13 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
             List<Integer> indices = Main.searchResultsStorage.getIndicesForSwf(swf);
 
+            int height = 0;
+            height = searchHistoryPanel.getInsets().top + searchHistoryPanel.getInsets().bottom + 6/*groupInset top*/ + new JLabel(groupName).getPreferredSize().height + 4 /*layoutGap*/;
+            height += 6/*groupInset bottom*/;
+
             int j = 0;
             for (int i = indices.size() - 1; i >= 0; i--) {
+
                 final int fi = indices.get(i);
                 String searched = Main.searchResultsStorage.getSearchedValueAt(fi);
                 RecentSearchesButton historyButton = new RecentSearchesButton(j + "    " + searched, null);
@@ -194,6 +203,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                 j++;
                 historyButton.setHorizontalAlignment(SwingUtilities.LEFT);
                 searchHistoryPanel.addButtonToLastGroup(historyButton);
+                height += historyButton.getHeight() + 4 /*layoutGap*/;
             }
 
             if (indices.isEmpty()) {
@@ -205,7 +215,17 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
 
             searchHistoryPanel.setMaxButtonColumns(1);
             targetPanel.setLayout(new BorderLayout());
-            targetPanel.add(searchHistoryPanel, BorderLayout.CENTER);
+            JScrollPane scrollPane = new FasterScrollPane(searchHistoryPanel);
+            height += scrollPane.getInsets().top + scrollPane.getInsets().bottom;
+            int maxHeight = Main.getMainFrame().getPanel().getHeight();
+            boolean needsScrollBar = false;
+            if (height > maxHeight) {
+                height = maxHeight;
+                needsScrollBar = true;
+            }
+            int scrollBarSize = ((Integer) UIManager.get("ScrollBar.width")).intValue();
+            scrollPane.setPreferredSize(new Dimension(Math.max(new JLabel(groupName).getPreferredSize().width + 2 * 6 /*groupInset*/ + scrollPane.getInsets().left + scrollPane.getInsets().right + (needsScrollBar ? scrollBarSize : 0), scrollPane.getPreferredSize().width), height));
+            targetPanel.add(scrollPane, BorderLayout.CENTER);
         }
     }
 
