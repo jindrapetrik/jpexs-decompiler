@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -200,29 +201,12 @@ public class DefineScalingGridTag extends Tag implements CharacterIdTag {
         }
 
         for (int i = 0; i < targetRect.length; i++) {
-
-            /*          sourceRect[i].xMax = roundPixels20(sourceRect[i].xMax);
-             sourceRect[i].yMax = roundPixels20(sourceRect[i].yMax);
-             sourceRect[i].xMin = roundPixels20(sourceRect[i].xMin);
-             sourceRect[i].yMin = roundPixels20(sourceRect[i].yMin);
-             */
-            //System.out.println("source[" + i + "]=" + sourceRect[i]);
-            //System.out.println("target[" + i + "]=" + targetRect[i]);
-
-            /*targetRect[i].xMax = roundPixels20(targetRect[i].xMax);
-             targetRect[i].yMax = roundPixels20(targetRect[i].yMax);
-             targetRect[i].xMin = roundPixels20(targetRect[i].xMin);
-             targetRect[i].yMin = roundPixels20(targetRect[i].yMin);
-             */
             transforms[i] = rectToRectMatrix(sourceRect[i], targetRect[i]);
 
             targetRect[i].xMax = Math.rint(targetRect[i].xMax / SWF.unitDivisor);
             targetRect[i].yMax = Math.rint(targetRect[i].yMax / SWF.unitDivisor);
             targetRect[i].xMin = Math.rint(targetRect[i].xMin / SWF.unitDivisor);
             targetRect[i].yMin = Math.rint(targetRect[i].yMin / SWF.unitDivisor);
-
-            //targetRect[i].xMax += maxStroke;
-            //Round to pixel boundary
         }
     }
 }

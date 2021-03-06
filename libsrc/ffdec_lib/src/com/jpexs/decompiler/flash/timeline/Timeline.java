@@ -916,15 +916,32 @@ public class Timeline {
                     DefineScalingGridTag.getSlices(targetBoundsRect, boundsRect, new ExportRectangle(scalingRect), sourceRect, targetRect, transforms);
                     Shape c = g.getClip();
                     AffineTransform origTransform = g.getTransform();
-                    for (int s = 0; s < 9; s++) {
-                        g.setTransform(new AffineTransform());
-                        ExportRectangle p1 = transformation.transform(targetRect[s]);
-                        g.setClip(c);
+                    int s = 0;
+                    for (int sy = 0; sy < 3; sy++) {
+                        for (int sx = 0; sx < 3; sx++) {
+                            g.setTransform(new AffineTransform());
+                            ExportRectangle p1 = transformation.transform(targetRect[s]);
+                            g.setClip(c);
 
-                        Rectangle2D r = new Rectangle2D.Double(p1.xMin, p1.yMin, p1.getWidth(), p1.getHeight());
-                        g.setClip(r);
-                        drawDrawable(strokeTransformation.preConcatenate(layerMatrix), layer, transforms[s], g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans);
+                            if (sx == 0) {
+                                p1.xMin = 0;
+                            }
+                            if (sy == 0) {
+                                p1.yMin = 0;
+                            }
 
+                            if (sx == 2) {
+                                p1.xMax = Integer.MAX_VALUE;
+                            }
+                            if (sy == 2) {
+                                p1.yMax = Integer.MAX_VALUE;
+                            }
+
+                            Rectangle2D r = new Rectangle2D.Double(p1.xMin, p1.yMin, p1.getWidth(), p1.getHeight());
+                            g.setClip(r);
+                            drawDrawable(strokeTransformation.preConcatenate(layerMatrix), layer, transforms[s], g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans);
+                            s++;
+                        }
                     }
                     g.setClip(c);
 
@@ -964,7 +981,8 @@ public class Timeline {
             }
         }
 
-        g.setTransform(new AffineTransform());
+        g.setTransform(
+                new AffineTransform());
         g.setClip(prevClip);
     }
 
