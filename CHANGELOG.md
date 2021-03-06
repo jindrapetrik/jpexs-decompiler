@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 - [#1471] Import script menuitem renamed to Import scripts.
 
 ### Fixed
-- Exception when switching from nonribbon interface to ribbob
+- Exception when switching from nonribbon interface to ribbon
 - [#1396], [#1254] FLA Export - AS3 frame scripts
 
 ## [14.1.0] - 2021-03-05
