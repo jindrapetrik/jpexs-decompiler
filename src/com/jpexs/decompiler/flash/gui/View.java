@@ -67,6 +67,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.QUESTION_MESSAGE;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRootPane;
@@ -568,6 +569,14 @@ public class View {
         final String[] ret = new String[1];
         execInEventDispatch(() -> {
             ret[0] = JOptionPane.showInputDialog(message, initialSelection);
+        });
+        return ret[0];
+    }
+
+    public static String showInputDialog(Component parentComponent, final Object message, final String title, final Object initialSelection) {
+        final String[] ret = new String[1];
+        execInEventDispatch(() -> {
+            ret[0] = (String) JOptionPane.showInputDialog(parentComponent, message, title, JOptionPane.QUESTION_MESSAGE, null, null, initialSelection);
         });
         return ret[0];
     }

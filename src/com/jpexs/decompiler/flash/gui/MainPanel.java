@@ -739,6 +739,37 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     searchPanel.setVisible(true);
                     filterField.requestFocusInWindow();
                 }
+                if ((e.getKeyCode() == 'G') && (e.isControlDown())) {
+                    SWF swf = getCurrentSwf();
+                    if (swf != null) {
+                        String val = "";
+                        boolean valid;
+                        int characterId = -1;
+                        do {
+                            val = View.showInputDialog(MainPanel.this, translate("message.input.gotoCharacter"), translate("message.input.gotoCharacter.title"), val);
+                            if (val == null) {
+                                break;
+                            }
+                            try {
+                                characterId = Integer.parseInt(val);
+                            } catch (NumberFormatException nfe) {
+                                characterId = -1;
+                            }
+                        } while (characterId <= 0);
+
+                        if (characterId > 0) {
+                            CharacterTag tag = swf.getCharacter(characterId);
+                            if (tag == null) {
+                                View.showMessageDialog(MainPanel.this, translate("message.character.notfound").replace("%characterid%", "" + characterId), translate("error"), JOptionPane.ERROR_MESSAGE);
+                            } else {
+                                TreePath path = tagTree.getModel().getTreePath(tag);
+                                if (path != null) {
+                                    tagTree.setSelectionPath(path);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         });
         detailPanel.setVisible(false);

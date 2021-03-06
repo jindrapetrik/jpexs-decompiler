@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#1645] Scrollbar to recent searches dropdown
 - [#1639] Clearing search results for current file
+- [#1371] Go to character id (Ctrl+G in tag tree)
 
 ### Changed
 - [#1471] Import script menuitem renamed to Import scripts.
@@ -2079,6 +2080,7 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1645]: https://www.free-decompiler.com/flash/issues/1645
 [#1639]: https://www.free-decompiler.com/flash/issues/1639
+[#1371]: https://www.free-decompiler.com/flash/issues/1371
 [#1471]: https://www.free-decompiler.com/flash/issues/1471
 [#1396]: https://www.free-decompiler.com/flash/issues/1396
 [#1254]: https://www.free-decompiler.com/flash/issues/1254
