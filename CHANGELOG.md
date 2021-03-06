@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - [#1396], [#1254] FLA Export - AS3 frame scripts
 - FLA Export - mutliple FrameLabel layers
 - [#1636] Nullpointer exception on empty editorpane
+- [#1156] Rendering - 9 slice scaling (DefineScalingGrid) clipping
 
 ## [14.1.0] - 2021-03-05
 ### Added
