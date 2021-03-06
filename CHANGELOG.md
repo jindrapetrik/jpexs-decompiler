@@ -3,11 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
-- #1645 Scrollbar to recent searches dropdown
-- #1639 Clearing search results for current file
+- [#1645] Scrollbar to recent searches dropdown
+- [#1639] Clearing search results for current file
 
 ### Changed
-- #1471 Import script menuitem renamed to Import scripts.
+- [#1471] Import script menuitem renamed to Import scripts.
 
 ## [14.1.0] - 2021-03-05
 ### Added
@@ -1962,6 +1962,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.1.0...Unreleased
 [14.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.0.1...version14.1.0
 [14.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.0.0...version14.0.1
 [14.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version13.0.3...version14.0.0
@@ -2070,6 +2071,9 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1645]: https://www.free-decompiler.com/flash/issues/1645
+[#1639]: https://www.free-decompiler.com/flash/issues/1639
+[#1471]: https://www.free-decompiler.com/flash/issues/1471
 [#1561]: https://www.free-decompiler.com/flash/issues/1561
 [#1623]: https://www.free-decompiler.com/flash/issues/1623
 [#1622]: https://www.free-decompiler.com/flash/issues/1622
