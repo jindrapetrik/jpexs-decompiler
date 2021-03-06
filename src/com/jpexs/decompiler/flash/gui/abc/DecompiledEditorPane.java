@@ -416,6 +416,9 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         Trait currentTrait = null;
         int currentMethod = -1;
         ABC abc = getABC();
+        if (abc == null) {
+            return -1;
+        }
         if (tm != null) {
 
             int mi = (int) tm.getProperties().index;

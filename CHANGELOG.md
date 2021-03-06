@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - Exception when switching from nonribbon interface to ribbon
 - [#1396], [#1254] FLA Export - AS3 frame scripts
 - FLA Export - mutliple FrameLabel layers
+- [#1636] Nullpointer exception on empty editorpane
 
 ## [14.1.0] - 2021-03-05
 ### Added
@@ -2081,6 +2082,7 @@ All notable changes to this project will be documented in this file.
 [#1471]: https://www.free-decompiler.com/flash/issues/1471
 [#1396]: https://www.free-decompiler.com/flash/issues/1396
 [#1254]: https://www.free-decompiler.com/flash/issues/1254
+[#1636]: https://www.free-decompiler.com/flash/issues/1636
 [#1561]: https://www.free-decompiler.com/flash/issues/1561
 [#1623]: https://www.free-decompiler.com/flash/issues/1623
 [#1622]: https://www.free-decompiler.com/flash/issues/1622
@@ -2090,7 +2092,6 @@ All notable changes to this project will be documented in this file.
 [#1633]: https://www.free-decompiler.com/flash/issues/1633
 [#1603]: https://www.free-decompiler.com/flash/issues/1603
 [#1634]: https://www.free-decompiler.com/flash/issues/1634
-[#1636]: https://www.free-decompiler.com/flash/issues/1636
 [#1570]: https://www.free-decompiler.com/flash/issues/1570
 [#1643]: https://www.free-decompiler.com/flash/issues/1643
 [#1328]: https://www.free-decompiler.com/flash/issues/1328
