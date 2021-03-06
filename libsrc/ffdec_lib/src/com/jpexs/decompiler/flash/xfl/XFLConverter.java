@@ -58,6 +58,7 @@ import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
+import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineText2Tag;
@@ -1503,6 +1504,15 @@ public class XFLConverter {
                 if (linkageExportForAS) {
                     symbolStr.writeAttribute("linkageExportForAS", true);
                 }
+
+                DefineScalingGridTag scalingGrid = symbol.getScalingGridTag();
+                if (scalingGrid != null) {
+                    symbolStr.writeAttribute("scaleGridLeft", doubleToString(scalingGrid.splitter.Xmin / SWF.unitDivisor));
+                    symbolStr.writeAttribute("scaleGridRight", doubleToString(scalingGrid.splitter.Xmax / SWF.unitDivisor));
+                    symbolStr.writeAttribute("scaleGridTop", doubleToString(scalingGrid.splitter.Ymin / SWF.unitDivisor));
+                    symbolStr.writeAttribute("scaleGridBottom", doubleToString(scalingGrid.splitter.Ymax / SWF.unitDivisor));
+                }
+
                 symbolStr.writeStartElement("timeline");
                 String itemIcon = null;
                 if (symbol instanceof ButtonTag) {
