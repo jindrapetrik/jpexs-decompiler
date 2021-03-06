@@ -1,0 +1,95 @@
+<DOMSymbolItem xmlns="http://ns.adobe.com/xfl/2008/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Symbol 5" lastModified="1615037102" linkageClassName="MyRectangle" linkageExportForAS="true">
+       
+     <timeline>
+              
+          <DOMTimeline name="Symbol 5">
+                     
+               <layers>
+                            
+                    <DOMLayer name="Script Layer" color="#9b42ce">
+                                   
+                         <frames>
+                                          
+                              <DOMFrame index="0" keyMode="9728">
+                                                 
+                                   <Actionscript>
+                                                        
+                                        <script><![CDATA[trace("myrect frame1");
+]]></script>
+                                                      
+                                   </Actionscript>
+                                                 
+                                   <elements/>
+                                               
+                              </DOMFrame>
+                                          
+                              <DOMFrame index="1" keyMode="9728">
+                                                 
+                                   <Actionscript>
+                                                        
+                                        <script><![CDATA[trace("myrect frame2");
+stop();
+]]></script>
+                                                      
+                                   </Actionscript>
+                                                 
+                                   <elements/>
+                                               
+                              </DOMFrame>
+                                        
+                         </frames>
+                                 
+                    </DOMLayer>
+                    <DOMLayer name="Layer 2" color="#9fe08c" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" duration="2" keyMode="9728">
+                                     
+                                   <elements>
+                                        <DOMShape isFloating="true">
+                                             <fills>
+                                                    
+                                                  <FillStyle index="1">
+                                                           
+                                                       <SolidColor color="#00ff33" alpha="1.0"/>
+                                                         
+                                                  </FillStyle>
+                                                  
+                                             </fills>
+                                             <strokes>
+                                                    
+                                                  <StrokeStyle index="1">
+                                                           
+                                                       <SolidStroke weight="1.0" scaleMode="normal">
+                                                                  
+                                                            <fill>
+                                                                         
+                                                                 <SolidColor color="#000000"/>
+                                                                       
+                                                            </fill>
+                                                                
+                                                       </SolidStroke>
+                                                         
+                                                  </StrokeStyle>
+                                                  
+                                             </strokes>
+                                               
+                                             <edges>
+                                                      
+                                                  <Edge fillStyle1="1" strokeStyle="1" edges="! 3880 2540| 0 2540| 0 0| 3880 0| 3880 2540"/>
+                                                    
+                                             </edges>
+                                             
+                                        </DOMShape>
+                                   </elements>
+                                   
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                          
+               </layers>
+                   
+          </DOMTimeline>
+            
+     </timeline>
+     
+</DOMSymbolItem>

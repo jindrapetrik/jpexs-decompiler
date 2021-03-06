@@ -2169,6 +2169,7 @@ public class XFLConverter {
             writer.writeEndElement(); // SoundEnvelope
         }
     }
+
     private static void convertFrame(boolean shapeTween, SoundStreamHeadTypeTag soundStreamHead, StartSoundTag startSound, int frame, int duration, String actionScript, String elements, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
         DefineSoundTag sound = null;
         if (startSound != null) {
@@ -2696,25 +2697,40 @@ public class XFLConverter {
     private boolean convertLabelsLayer(int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor, XFLXmlWriter writer) throws XMLStreamException {
         boolean hasLabel = false;
 
-        int duration = 0;
+        Map<Integer, List<FrameLabelTag>> frameToLabels = new HashMap<>();
         int frame = 0;
-        String frameLabel = "";
-        boolean isAnchor = false;
+        int layerCount = 0;
         for (Tag t : timeLineTags) {
             if (t instanceof FrameLabelTag) {
-                FrameLabelTag fl = (FrameLabelTag) t;
-                frameLabel = fl.getLabelName();
-                isAnchor = fl.isNamedAnchor();
+                FrameLabelTag frameLabel = (FrameLabelTag) t;
+                if (!frameToLabels.containsKey(frame)) {
+                    frameToLabels.put(frame, new ArrayList<>());
+                }
+                frameToLabels.get(frame).add(frameLabel);
+                if (frameToLabels.get(frame).size() > layerCount) {
+                    layerCount = frameToLabels.get(frame).size();
+                }
             } else if (t instanceof ShowFrameTag) {
-                if (frameLabel.isEmpty()) {
+                frame++;
+            }
+        }
+        int frameCount = frame;
+
+        for (int lay = 0; lay < layerCount; lay++) {
+            writer.writeStartElement("DOMLayer", new String[]{"name", "Labels Layer" + (layerCount > 1 ? " " + (lay + 1) : ""), "color", randomOutlineColor()});
+            writer.writeStartElement("frames");
+            int duration = 0;
+            for (int i = 0; i < frameCount; i++) {
+                List<FrameLabelTag> frameLabels = frameToLabels.get(i);
+                FrameLabelTag frameLabel = null;
+                if (frameLabels != null) {
+                    if (frameLabels.size() > lay) {
+                        frameLabel = frameLabels.get(lay);
+                    }
+                }
+                if (frameLabel == null) {
                     duration++;
                 } else {
-                    if (!hasLabel) {
-                        writer.writeStartElement("DOMLayer", new String[]{"name", "Labels Layer", "color", randomOutlineColor()});
-                        writer.writeStartElement("frames");
-                        hasLabel = true;
-                    }
-
                     if (duration > 0) {
                         writer.writeStartElement("DOMFrame", new String[]{"index", Integer.toString(frame - duration)});
                         if (duration > 1) {
@@ -2724,11 +2740,10 @@ public class XFLConverter {
                         writer.writeElementValue("elements", "");
                         writer.writeEndElement();
                     }
-
                     writer.writeStartElement("DOMFrame", new String[]{"index", Integer.toString(frame)});
                     writer.writeAttribute("keyMode", KEY_MODE_NORMAL);
-                    writer.writeAttribute("name", frameLabel);
-                    if (isAnchor) {
+                    writer.writeAttribute("name", frameLabel.name);
+                    if (frameLabel.namedAnchor) {
                         writer.writeAttribute("labelType", "anchor");
                         writer.writeAttribute("bookmark", true);
                     } else {
@@ -2736,14 +2751,10 @@ public class XFLConverter {
                     }
                     writer.writeElementValue("elements", "");
                     writer.writeEndElement();
-                    frameLabel = "";
                     duration = 0;
                 }
-                frame++;
-            }
-        }
 
-        if (hasLabel) {
+            }
             writer.writeEndElement(); // frames
             writer.writeEndElement(); // DOMLayer
         }
