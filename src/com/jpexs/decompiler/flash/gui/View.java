@@ -110,7 +110,7 @@ import org.pushingpixels.substance.internal.utils.SubstanceColorSchemeUtilities;
 public class View {
 
     public static Color getDefaultBackgroundColor() {
-        if (Configuration.useRibbonInterface.get()) {
+        if (Configuration.useRibbonInterface.get() && SubstanceLookAndFeel.getCurrentSkin() != null) {
             return SubstanceLookAndFeel.getCurrentSkin().getColorScheme(DecorationAreaType.GENERAL, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor();
         } else {
             return SystemColor.control;
