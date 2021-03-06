@@ -211,6 +211,13 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                 emptyLabel.setHorizontalAlignment(SwingUtilities.LEFT);
                 emptyLabel.setEnabled(false);
                 searchHistoryPanel.addButtonToLastGroup(emptyLabel);
+                height += emptyLabel.getHeight() + 4 /*layoutGap*/;
+            } else {
+                JCommandButton clearButton = new JCommandButton(translate("menu.recentSearches.clear"));
+                clearButton.setHorizontalAlignment(SwingUtilities.LEFT);
+                clearButton.addActionListener(this::clearRecentSearchesForCurrentSwfActionPerformed);
+                searchHistoryPanel.addButtonToLastGroup(clearButton);
+                height += clearButton.getHeight() + 4 /*layoutGap*/;
             }
 
             searchHistoryPanel.setMaxButtonColumns(1);

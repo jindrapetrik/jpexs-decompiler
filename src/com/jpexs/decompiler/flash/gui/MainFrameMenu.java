@@ -1177,30 +1177,43 @@ public abstract class MainFrameMenu implements MenuBuilder {
         clearMenu("/tools/" + (supportsMenuAction() ? "search" : "recentsearch"));
         SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
 
-        List<Integer> indices = Main.searchResultsStorage.getIndicesForSwf(swf);
-        for (int i = 0; i < indices.size(); i++) {
-            final int fi = indices.get(i);
-            String searched = Main.searchResultsStorage.getSearchedValueAt(fi);
-            ActionListener a = (ActionEvent e) -> {
-                SearchResultsDialog sr;
-                List<SearchListener<ScriptSearchResult>> listeners = new ArrayList<>();
-                listeners.add(Main.getMainFrame().getPanel().getABCPanel());
-                listeners.add(Main.getMainFrame().getPanel().getActionPanel());
+        if (swf != null) {
+            List<Integer> indices = Main.searchResultsStorage.getIndicesForSwf(swf);
+            int j = 0;
+            for (int i = 0; i < indices.size(); i++) {
+                final int fi = indices.get(i);
+                String searched = Main.searchResultsStorage.getSearchedValueAt(fi);
+                ActionListener a = (ActionEvent e) -> {
+                    SearchResultsDialog sr;
+                    List<SearchListener<ScriptSearchResult>> listeners = new ArrayList<>();
+                    listeners.add(Main.getMainFrame().getPanel().getABCPanel());
+                    listeners.add(Main.getMainFrame().getPanel().getActionPanel());
 
-                if (swf.isAS3()) {
-                    sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
+                    if (swf.isAS3()) {
+                        sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
 
-                } else {
-                    sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
-                }
-                sr.setResults(Main.searchResultsStorage.getSearchResultsAt(mainFrame.getPanel().getAllSwfs(), fi));
-                sr.setVisible(true);
-                Main.getMainFrame().getPanel().searchResultsDialogs.add(sr);
-            };
-            addMenuItem("/tools/" + (supportsMenuAction() ? "search" : "recentsearch") + "/" + i, searched, null, a, 0, null, true, null, false);
+                    } else {
+                        sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
+                    }
+                    sr.setResults(Main.searchResultsStorage.getSearchResultsAt(mainFrame.getPanel().getAllSwfs(), fi));
+                    sr.setVisible(true);
+                    Main.getMainFrame().getPanel().searchResultsDialogs.add(sr);
+                };
+                addMenuItem("/tools/" + (supportsMenuAction() ? "search" : "recentsearch") + "/" + i, j + "    " + searched, null, a, 0, null, true, null, false);
+                j++;
+            }
+            if (indices.size() > 0) {
+                addMenuItem("/tools/" + (supportsMenuAction() ? "search" : "recentsearch") + "/clear", translate("menu.recentSearches.clear"), null, this::clearRecentSearchesForCurrentSwfActionPerformed, 0, null, true, null, false);
+            }
         }
 
         finishMenu("/tools/" + (supportsMenuAction() ? "search" : "recentsearch"));
+    }
+
+    protected void clearRecentSearchesForCurrentSwfActionPerformed(ActionEvent evt) {
+        if (View.showConfirmDialog(mainFrame.getPanel(), translate("message.confirm.recentSearches.clear"), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            Main.searchResultsStorage.clearForSwf(swf);
+        }
     }
 
     protected void loadRecent(ActionEvent evt) {

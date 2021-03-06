@@ -300,6 +300,21 @@ public class SearchResultsStorage {
         unpackedData.clear();
     }
 
+    public void clearForSwf(SWF swf) {
+        String swfId = getSwfId(swf);
+        for (int i = 0; i < swfIds.size(); i++) {
+            if (swfIds.get(i).equals(swfId)) {
+                swfIds.remove(i);
+                searchedValues.remove(i);
+                isIgnoreCase.remove(i);
+                isRegExp.remove(i);
+                groups.remove(i);
+                data.remove(i);
+                unpackedData.remove(i);
+            }
+        }
+    }
+
     private static void writeByteList(ObjectOutputStream os, List<byte[]> data) throws IOException {
         os.writeInt(data.size());
         for (byte[] d : data) {

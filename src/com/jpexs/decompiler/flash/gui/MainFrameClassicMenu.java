@@ -268,9 +268,11 @@ public class MainFrameClassicMenu extends MainFrameMenu {
 
     @Override
     public void setGroupSelection(String group, String selected) {
-        selected = mapping(selected);
+        if (selected != null) {
+            selected = mapping(selected);
+        }
         for (String path : menuGroups.get(group)) {
-            setMenuChecked(path, path.equals(selected));
+            setMenuChecked(path, selected == null ? false : path.equals(selected));
         }
     }
 
