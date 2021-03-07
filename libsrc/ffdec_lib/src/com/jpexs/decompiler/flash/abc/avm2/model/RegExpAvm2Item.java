@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -37,6 +38,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -181,4 +183,34 @@ public class RegExpAvm2Item extends AVM2Item implements Callable {
     public Object call(List<Object> args) {
         return call("exec", args);
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + Objects.hashCode(this.pattern);
+        hash = 89 * hash + Objects.hashCode(this.modifier);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final RegExpAvm2Item other = (RegExpAvm2Item) obj;
+        if (!Objects.equals(this.pattern, other.pattern)) {
+            return false;
+        }
+        if (!Objects.equals(this.modifier, other.modifier)) {
+            return false;
+        }
+        return true;
+    }
+
 }

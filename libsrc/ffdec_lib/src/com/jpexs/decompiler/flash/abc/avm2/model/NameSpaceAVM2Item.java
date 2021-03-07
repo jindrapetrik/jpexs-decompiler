@@ -73,4 +73,30 @@ public class NameSpaceAVM2Item extends AVM2Item {
     public boolean hasReturnValue() {
         return true;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 31 * hash + this.namespaceIndex;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final NameSpaceAVM2Item other = (NameSpaceAVM2Item) obj;
+        if (this.namespaceIndex != other.namespaceIndex) {
+            return false;
+        }
+        return true;
+    }
+
 }

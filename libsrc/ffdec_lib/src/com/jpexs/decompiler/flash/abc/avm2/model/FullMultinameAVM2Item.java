@@ -29,6 +29,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -204,4 +205,42 @@ public class FullMultinameAVM2Item extends AVM2Item {
     public boolean hasReturnValue() {
         return true;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 29 * hash + this.multinameIndex;
+        hash = 29 * hash + Objects.hashCode(this.name);
+        hash = 29 * hash + Objects.hashCode(this.namespace);
+        hash = 29 * hash + (this.property ? 1 : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final FullMultinameAVM2Item other = (FullMultinameAVM2Item) obj;
+        if (this.multinameIndex != other.multinameIndex) {
+            return false;
+        }
+        if (this.property != other.property) {
+            return false;
+        }
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        if (!Objects.equals(this.namespace, other.namespace)) {
+            return false;
+        }
+        return true;
+    }
+
 }

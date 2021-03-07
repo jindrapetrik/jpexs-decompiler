@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -43,6 +44,10 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
     public GraphTargetItem propertyName;
 
     public DeclarationAVM2Item declaration;
+
+    public GraphTargetItem compoundValue;
+
+    public String compoundOperator;
 
     @Override
     public DeclarationAVM2Item getDeclaration() {
@@ -76,6 +81,14 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         formatProperty(writer, object, propertyName, localData);
+
+        if (compoundOperator != null) {
+            writer.append(" ");
+            writer.append(compoundOperator);
+            writer.append("= ");
+            return compoundValue.toString(writer, localData);
+        }
+
         writer.append(" = ");
         if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
             return value.value.toString(writer, localData);
