@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - [#1636] Nullpointer exception on empty editorpane
 - [#1156] Rendering - 9 slice scaling (DefineScalingGrid) clipping
 - [#1647] Copying to clipboard - Transparency support
+- Incorrect placeobject display (tag selection)
 
 ## [14.1.0] - 2021-03-05
 ### Added
