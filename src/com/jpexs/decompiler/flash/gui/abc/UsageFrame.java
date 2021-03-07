@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.usages.ConstVarNameMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.InsideClassMultinameUsageInterface;
 import com.jpexs.decompiler.flash.abc.usages.MethodMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
@@ -64,11 +65,8 @@ public class UsageFrame extends AppDialog implements MouseListener {
         if (m.namespace_index > 0 && abc.constants.getNamespace(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
             for (ABCContainerTag at : abc.getAbcTags()) {
                 ABC a = at.getABC();
-                if (a == abc) {
-                    continue;
-                }
-                int mid = a.constants.getMultinameId(m, false);
-                if (mid > 0) {
+                List<Integer> mids = a.constants.getMultinameIds(m, abc.constants);
+                for (int mid : mids) {
                     usages.addAll(definitions ? a.findMultinameDefinition(mid) : a.findMultinameUsage(mid));
                 }
             }
@@ -105,7 +103,7 @@ public class UsageFrame extends AppDialog implements MouseListener {
             final InsideClassMultinameUsageInterface icu = (InsideClassMultinameUsageInterface) usage;
 
             DecompiledEditorPane decompiledTextArea = abcPanel.decompiledTextArea;
-            ABC abc = abcPanel.abc;
+            ABC newAbc = icu.getAbc();
             Runnable setTrait = new Runnable() {
                 @Override
                 public void run() {
@@ -120,12 +118,12 @@ public class UsageFrame extends AppDialog implements MouseListener {
                             traitIndex = tmu.getTraitIndex();
                         }
                         if (tmu.getTraitsType() == TraitMultinameUsage.TRAITS_TYPE_INSTANCE) {
-                            traitIndex += abc.class_info.get(tmu.getClassIndex()).static_traits.traits.size();
+                            traitIndex += newAbc.class_info.get(tmu.getClassIndex()).static_traits.traits.size();
                         }
                         if (tmu instanceof MethodMultinameUsage) {
                             MethodMultinameUsage mmu = (MethodMultinameUsage) usage;
                             if (mmu.isInitializer() == true) {
-                                traitIndex = abc.class_info.get(mmu.getClassIndex()).static_traits.traits.size() + abc.instance_info.get(mmu.getClassIndex()).instance_traits.traits.size() + (mmu.getTraitsType() == TraitMultinameUsage.TRAITS_TYPE_CLASS ? 1 : 0);
+                                traitIndex = newAbc.class_info.get(mmu.getClassIndex()).static_traits.traits.size() + newAbc.instance_info.get(mmu.getClassIndex()).instance_traits.traits.size() + (mmu.getTraitsType() == TraitMultinameUsage.TRAITS_TYPE_CLASS ? 1 : 0);
                             }
                         }
                         decompiledTextArea.gotoTrait(traitIndex);
@@ -133,7 +131,7 @@ public class UsageFrame extends AppDialog implements MouseListener {
                 }
             };
 
-            if (decompiledTextArea.getClassIndex() == icu.getClassIndex() && abc == icu.getAbc()) {
+            if (decompiledTextArea.getClassIndex() == icu.getClassIndex() && abcPanel.abc == newAbc) {
                 setTrait.run();
             } else {
                 decompiledTextArea.addScriptListener(setTrait);
