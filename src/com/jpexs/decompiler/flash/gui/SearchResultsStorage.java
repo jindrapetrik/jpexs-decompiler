@@ -64,7 +64,7 @@ public class SearchResultsStorage {
     List<Boolean> isRegExp = new ArrayList<>();
     List<Boolean> isIgnoreCase = new ArrayList<>();
     List<byte[]> data = new ArrayList<>();
-    Map<Integer, List<ScriptSearchResult>> unpackedData = new HashMap<>();
+    List<List<ScriptSearchResult>> unpackedData = new ArrayList<>();
     List<Integer> groups = new ArrayList<>();
 
     private int currentGroupId = 0;
@@ -138,18 +138,6 @@ public class SearchResultsStorage {
 
     @SuppressWarnings("unchecked")
     public List<ScriptSearchResult> getSearchResultsAt(Set<SWF> allSwfs, int index) {
-        if (unpackedData.containsKey(index)) {
-
-            List<ScriptSearchResult> unpacked = unpackedData.get(index);
-            List<ScriptSearchResult> res = new ArrayList<>();
-            for (ScriptSearchResult sr : unpacked) {
-                if (allSwfs.contains(sr.getSWF())) {
-                    res.add(sr);
-                }
-            }
-
-            return res;
-        }
         List<ScriptSearchResult> result = new ArrayList<>();
 
         Map<String, SWF> swfIdToSwf = new HashMap<>();
@@ -162,8 +150,18 @@ public class SearchResultsStorage {
                 if (!swfIdToSwf.containsKey(swfIds.get(j))) {
                     continue;
                 }
+                if (unpackedData.get(j) != null) {
+                    List<ScriptSearchResult> unpacked = unpackedData.get(j);
+                    for (ScriptSearchResult sr : unpacked) {
+                        if (allSwfs.contains(sr.getSWF())) {
+                            result.add(sr);
+                        }
+                    }
+                    continue;
+                }
                 SWF swf = swfIdToSwf.get(swfIds.get(j));
                 byte[] itemData = data.get(j);
+                List<ScriptSearchResult> currentResults = new ArrayList<>();
                 try {
                     ByteArrayInputStream bais1 = new ByteArrayInputStream(itemData);
                     int kind = bais1.read();
@@ -174,10 +172,10 @@ public class SearchResultsStorage {
                             ByteArrayInputStream bais = new ByteArrayInputStream(resultData.get(i));
 
                             if (kind == DATA_ABC) {
-                                result.add(new ABCSearchResult(swf, bais));
+                                currentResults.add(new ABCSearchResult(swf, bais));
                             }
                             if (kind == DATA_ACTION) {
-                                result.add(new ActionSearchResult(swf, bais));
+                                currentResults.add(new ActionSearchResult(swf, bais));
                             }
                         } catch (ScriptNotFoundException | IOException ex) {
                             ex.printStackTrace();
@@ -187,7 +185,8 @@ public class SearchResultsStorage {
                 } catch (IOException ex) {
                     Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                unpackedData.put(j, result);
+                unpackedData.set(j, currentResults);
+                result.addAll(currentResults);
             }
         }
         return result;
@@ -217,6 +216,11 @@ public class SearchResultsStorage {
                     }
                 }
                 currentGroupId = maxgroup + 1;
+
+                unpackedData = new ArrayList<>();
+                for (int i = 0; i < data.size(); i++) {
+                    unpackedData.add(null);
+                }
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(SearchResultsStorage.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -244,7 +248,7 @@ public class SearchResultsStorage {
         isIgnoreCase.add(ignoreCase);
         isRegExp.add(regExp);
         groups.add(currentGroupId);
-        unpackedData.put(data.size(), new ArrayList<>(results));
+        unpackedData.add(new ArrayList<>(results));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         baos.write(DATA_ABC);
         try {
@@ -271,7 +275,7 @@ public class SearchResultsStorage {
         isIgnoreCase.add(ignoreCase);
         isRegExp.add(regExp);
         groups.add(currentGroupId);
-        unpackedData.put(data.size(), new ArrayList<>(results));
+        unpackedData.add(new ArrayList<>(results));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         baos.write(DATA_ACTION);
         try {
@@ -311,6 +315,7 @@ public class SearchResultsStorage {
                 groups.remove(i);
                 data.remove(i);
                 unpackedData.remove(i);
+                i--;
             }
         }
     }
@@ -339,7 +344,7 @@ public class SearchResultsStorage {
         String swfId = getSwfId(swf);
         for (int i = 0; i < swfIds.size(); i++) {
             if (swfIds.get(i).equals(swfId)) {
-                unpackedData.remove(i);
+                unpackedData.set(i, null);
             }
         }
     }

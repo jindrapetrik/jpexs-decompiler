@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - [#1332] Flash viewer - Show directly added images when placeFlagHasImage is true on AS3 swfs
 - XML Import - not set SWF and Timelined internal values caused an exception on item display
 - Goto usage exception and incorrect trait position
+- [#1648] Search - loaded search results mixed
 
 ## [14.1.0] - 2021-03-05
 ### Added
@@ -2096,6 +2097,7 @@ All notable changes to this project will be documented in this file.
 [#1636]: https://www.free-decompiler.com/flash/issues/1636
 [#1647]: https://www.free-decompiler.com/flash/issues/1647
 [#1332]: https://www.free-decompiler.com/flash/issues/1332
+[#1648]: https://www.free-decompiler.com/flash/issues/1648
 [#1561]: https://www.free-decompiler.com/flash/issues/1561
 [#1623]: https://www.free-decompiler.com/flash/issues/1623
 [#1622]: https://www.free-decompiler.com/flash/issues/1622
