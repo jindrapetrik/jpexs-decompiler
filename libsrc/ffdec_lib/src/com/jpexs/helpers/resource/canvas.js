@@ -775,7 +775,6 @@ function concatMatrix(m1, m2) {
     return result;
 }
 
-
 var enhanceContext = function (context) {
     var m = [1, 0, 0, 1, 0, 0];
     context._matrix = m;
@@ -883,7 +882,7 @@ var cxform = function (r_add, g_add, b_add, a_add, r_mult, g_mult, b_mult, a_mul
     };
 };
 
-var place = function (obj, canvas, ctx, matrix, ctrans, blendMode, frame, ratio, time) {
+var placeRaw = function (obj, canvas, ctx, matrix, ctrans, blendMode, frame, ratio, time) {
     ctx.save();
     ctx.transform(matrix[0], matrix[1], matrix[2], matrix[3], matrix[4], matrix[5]);
     if (blendMode > 1) {
@@ -904,6 +903,296 @@ var place = function (obj, canvas, ctx, matrix, ctrans, blendMode, frame, ratio,
     }
     ctx.restore();
 }
+
+var transformPoint = function (matrix, p) {
+            var ret = {};
+            ret.x = matrix[0] * p.x + matrix[2] * p.y + matrix[4];
+            ret.y = matrix[1] * p.x + matrix[3] * p.y + matrix[5];
+            return ret;
+        }
+
+var transformRect = function(matrix, rect) {
+      var minX = Number.MAX_VALUE;
+      var minY = Number.MAX_VALUE;
+      var maxX = Number.MIN_VALUE;
+      var maxY = Number.MIN_VALUE;
+      var point = transformPoint(matrix, {x:rect.xMin,y:rect.yMin});
+      if (point.x < minX) {
+          minX = point.x;
+      }
+      if (point.x > maxX) {
+          maxX = point.x;
+      }
+      if (point.y < minY) {
+          minY = point.y;
+      }
+      if (point.y > maxY) {
+          maxY = point.y;
+      }
+      point = transformPoint(matrix, {x:rect.xMax, y:rect.yMin});
+      if (point.x < minX) {
+          minX = point.x;
+      }
+      if (point.x > maxX) {
+          maxX = point.x;
+      }
+      if (point.y < minY) {
+          minY = point.y;
+      }
+      if (point.y > maxY) {
+          maxY = point.y;
+      }
+      point = transformPoint(matrix, {x:rect.xMin, y:rect.yMax});
+      if (point.x < minX) {
+          minX = point.x;
+      }
+      if (point.x > maxX) {
+          maxX = point.x;
+      }
+      if (point.y < minY) {
+          minY = point.y;
+      }
+      if (point.y > maxY) {
+          maxY = point.y;
+      }
+      point = transformPoint(matrix, {x:rect.xMax, y:rect.yMax});
+      if (point.x < minX) {
+          minX = point.x;
+      }
+      if (point.x > maxX) {
+          maxX = point.x;
+      }
+      if (point.y < minY) {
+          minY = point.y;
+      }
+      if (point.y > maxY) {
+          maxY = point.y;
+      }
+      return {xMin:minX, xMax:maxX, yMin:minY, yMax:maxY};
+  }
+
+var getTranslateMatrix = function(translateX,translateY){
+    return [1,0,0,1,translateX,translateY];
+}
+
+var getRectWidth = function (rect) {
+    return rect.xMax - rect.xMin;
+}
+
+var getRectHeight = function (rect) {
+    return rect.yMax - rect.yMin;
+}
+
+var rint = function(v){
+    return Math.round(v);
+}
+
+var scaleMatrix = function(m, factorX, factorY){
+    var scaleX = 0;
+    var rotateSkew0 = 1;
+    var rotateSkew1 = 2;
+    var scaleY = 3;
+    var translateX = 4;
+    var translateY = 5;
+    
+    var m2 = Object.assign({}, m);
+    
+    m2[scaleX] *= factorX;
+    m2[scaleY] *= factorY;
+    m2[rotateSkew0] *= factorX;
+    m2[rotateSkew1] *= factorY;
+    return m2;
+}
+
+var translateMatrix = function(m, x, y) {
+    var m2 = Object.assign({}, m);
+    var scaleX = 0;
+    var rotateSkew0 = 1;
+    var rotateSkew1 = 2;
+    var scaleY = 3;
+    var translateX = 4;
+    var translateY = 5;
+    
+    m2[translateX] = m2[scaleX] * x + m2[rotateSkew1] * y + m2[translateX];
+    m2[translateY] = m2[rotateSkew0] * x + m2[scaleY] * y + m2[translateY];
+    
+    return m2;        
+}
+
+var place = function (obj, canvas, ctx, matrix, ctrans, blendMode, frame, ratio, time) {
+    if ((typeof scalingGrids[obj]) !== "undefined")
+    {
+        var swfScaleMatrix = [1/20,0,0,1/20,0,0];
+        var boundRect = boundRects[obj];
+        var scalingRect = scalingGrids[obj];
+        var exRect = boundRect;
+        var newRect = exRect;
+        var transform = matrix;
+        
+        var transform2;
+        newRect = transformRect(transform, exRect);
+        transform = Object.assign({}, transform);
+
+        transform = getTranslateMatrix(newRect.xMin, newRect.yMin);
+        
+        transform = concatMatrix(swfScaleMatrix, transform);
+
+        var scaleWidth = getRectWidth(newRect)*20 - scalingRect.xMin - (boundRect.xMax - scalingRect.xMax);
+        var originalWidth = getRectWidth(boundRect) - scalingRect.xMin - (boundRect.xMax - scalingRect.xMax);
+        var scaleX = scaleWidth / originalWidth;
+        
+        var scaleHeight = getRectHeight(newRect)*20 - scalingRect.yMin - (boundRect.yMax - scalingRect.yMax);
+        var originalHeight = getRectHeight(boundRect) - scalingRect.yMin - (boundRect.yMax - scalingRect.yMax);
+        var scaleY = scaleHeight / originalHeight;
+
+        
+        //top left
+        ctx.save();
+        drawPath(ctx,""
+                + "M "+ newRect.xMin +" "+ newRect.yMin +" "
+                + "L " + (newRect.xMin + rint(scalingRect.xMin / 20)) + " "+ newRect.yMin +" "
+                + "L " + (newRect.xMin + rint(scalingRect.xMin / 20)) + " " + (newRect.yMin + rint(scalingRect.yMin / 20)) + " "
+                + "L "+ newRect.xMin +" " + (newRect.yMin + rint(scalingRect.yMin / 20)) + " Z"
+                );
+        ctx.clip();
+        placeRaw(obj, canvas, ctx, transform, ctrans, blendMode, frame, ratio, time);
+        
+        ctx.restore();
+        
+        //bottom left
+        transform2 = Object.assign({}, transform);
+        transform2[5] /*translateY*/ += getRectHeight(newRect) - getRectHeight(boundRect)/20;
+                
+        ctx.save();
+        
+        drawPath(ctx, "M "+ newRect.xMin +" " + (newRect.yMax-rint((boundRect.yMax - scalingRect.yMax) / 20)) + " "
+                + "L " + (newRect.xMin+rint(scalingRect.xMin / 20)) + " " + (newRect.yMax-rint((boundRect.yMax - scalingRect.yMax) / 20)) + " "
+                + "L " + (newRect.xMin+rint(scalingRect.xMin / 20)) + " " + newRect.yMax + " "
+                + "L "+ newRect.xMin +" " + newRect.yMax + " Z"
+                )
+        ctx.clip();
+        
+        placeRaw(obj, canvas, ctx, transform2, ctrans, blendMode, frame, ratio, time);        
+        ctx.restore();
+        
+        //top right
+        transform2 = Object.assign({}, transform);
+        transform2[4] /*translateX*/ += getRectWidth(newRect) - getRectWidth(boundRect) / 20;
+        ctx.save();
+        drawPath(ctx, "M " + (newRect.xMax - rint((exRect.xMax - scalingRect.xMax) / 20)) + " "+newRect.yMin+" "
+                + "L " + newRect.xMax + " "+newRect.yMin+" "
+                + "L " + newRect.xMax + " " + (newRect.yMin+rint(scalingRect.yMin / 20)) + " "
+                + "L " + (newRect.xMax - rint((exRect.xMax - scalingRect.xMax) / 20))  + " " + (newRect.yMin+rint(scalingRect.yMin / 20)) + " Z");
+        
+        ctx.clip();
+        
+        placeRaw(obj, canvas, ctx, transform2, ctrans, blendMode, frame, ratio, time);        
+        ctx.restore();
+        
+        //bottom right
+        transform2 = Object.assign({}, transform);
+        transform2[4] /*translateX*/ += getRectWidth(newRect) - getRectWidth(boundRect) / 20;
+        transform2[5] /*translateY*/ += getRectHeight(newRect) - getRectHeight(boundRect)/20;
+        ctx.save();
+        drawPath(ctx, "M " + (newRect.xMax - rint((exRect.xMax - scalingRect.xMax) / 20)) + " " + (newRect.yMax - rint((boundRect.yMax - scalingRect.yMax) / 20)) + " "
+                + "L " + newRect.xMax + " " + (newRect.yMax - rint((boundRect.yMax - scalingRect.yMax) / 20)) + " "
+                + "L " + newRect.xMax + " " + newRect.yMax + " "
+                + "L " + (newRect.xMax - rint((exRect.xMax - scalingRect.xMax) / 20)) + " " + newRect.yMax + " Z");
+        
+        ctx.clip();
+        
+        placeRaw(obj, canvas, ctx, transform2, ctrans, blendMode, frame, ratio, time);        
+        ctx.restore();
+        
+        
+        //top
+        transform2 = Object.assign({}, transform);
+        ctx.save();
+        transform2 = translateMatrix(transform2, scalingRect.xMin, 0);
+        transform2 = scaleMatrix(transform2, scaleX, 1);
+        transform2 = translateMatrix(transform2, -scalingRect.xMin, 0);
+
+        drawPath(ctx, "M " + (newRect.xMin + rint(scalingRect.xMin / 20)) + " " + newRect.yMin + " "
+                + "L " + (newRect.xMax - rint((boundRect.xMax-scalingRect.xMax) / 20)) + " " + newRect.yMin + " "
+                + "L " + (newRect.xMax - rint((boundRect.xMax-scalingRect.xMax) / 20)) + " " + (newRect.yMin + rint(scalingRect.yMin / 20)) + " "
+                + "L " + (newRect.xMin + rint(scalingRect.xMin / 20)) + " " + (newRect.yMin + rint(scalingRect.yMin / 20)) + " Z");
+        
+        ctx.clip();        
+        placeRaw(obj, canvas, ctx, transform2, ctrans, blendMode, frame, ratio, time);        
+        ctx.restore();
+        
+        //left
+        transform2 = Object.assign({}, transform);
+        ctx.save();
+        transform2 = translateMatrix(transform2, 0, scalingRect.yMin);
+        transform2 = scaleMatrix(transform2, 1, scaleY);
+        transform2 = translateMatrix(transform2, 0, -scalingRect.yMin);
+
+        drawPath(ctx, "M " + newRect.xMin + " " + (newRect.yMin + rint(scalingRect.yMin / 20)) + " "
+                + "L " + (newRect.xMin + rint(scalingRect.xMin / 20)) + " " + (newRect.yMin + rint(scalingRect.yMin / 20)) + " "
+                + "L " + (newRect.xMin + rint(scalingRect.xMin / 20)) + " " + (newRect.yMax - rint((boundRect.yMax-scalingRect.yMax) / 20)) + " "
+                + "L " + newRect.xMin + " " + (newRect.yMax - rint((boundRect.yMax-scalingRect.yMax) / 20)) + " Z");
+        
+        ctx.clip();        
+        placeRaw(obj, canvas, ctx, transform2, ctrans, blendMode, frame, ratio, time);        
+        ctx.restore();
+        
+        //bottom
+        transform2 = Object.assign({}, transform);
+        ctx.save();
+        transform2 = translateMatrix(transform2, scalingRect.xMin, 0);
+        transform2 = scaleMatrix(transform2, scaleX, 1);
+        transform2 = translateMatrix(transform2, -scalingRect.xMin, 0);
+        
+        transform2 = translateMatrix(transform2, 0, getRectHeight(newRect)*20 - getRectHeight(boundRect));
+
+        drawPath(ctx, "M " + (newRect.xMin + rint(scalingRect.xMin / 20)) + " " + (newRect.yMax - rint((boundRect.yMax-scalingRect.yMax) / 20)) + " "
+                + "L " + (newRect.xMax - rint((boundRect.xMax-scalingRect.xMax) / 20)) + " " + (newRect.yMax - rint((boundRect.yMax-scalingRect.yMax) / 20)) + " "
+                + "L " + (newRect.xMax - rint((boundRect.xMax-scalingRect.xMax) / 20)) + " " + newRect.yMax + " "
+                + "L " + (newRect.xMin + rint(scalingRect.xMin / 20)) + " " + newRect.yMax + " Z");
+        
+        ctx.clip();        
+        placeRaw(obj, canvas, ctx, transform2, ctrans, blendMode, frame, ratio, time);        
+        ctx.restore();
+        
+        //right
+        transform2 = Object.assign({}, transform);
+        ctx.save();
+        transform2 = translateMatrix(transform2, 0, scalingRect.yMin)
+        transform2 = scaleMatrix(transform2, 1, scaleY);
+        transform2 = translateMatrix(transform2, 0, -scalingRect.yMin); 
+        
+        transform2 = translateMatrix(transform2, getRectWidth(newRect)*20 - getRectWidth(boundRect), 0);       
+
+        drawPath(ctx, "M " + (newRect.xMax - rint((boundRect.xMax - scalingRect.xMax) / 20)) + " " + (newRect.yMin + rint(scalingRect.yMin / 20)) + " "
+                + "L " + newRect.xMax + " " + (newRect.yMin + rint(scalingRect.yMin / 20)) + " "
+                + "L " + newRect.xMax + " " + (newRect.yMax - rint((boundRect.yMax-scalingRect.yMax) / 20)) + " "
+                + "L " + (newRect.xMax - rint((boundRect.xMax - scalingRect.xMax) / 20)) + " " + (newRect.yMax - rint((boundRect.yMax-scalingRect.yMax) / 20)) + " Z");
+        
+        ctx.clip();        
+        placeRaw(obj, canvas, ctx, transform2, ctrans, blendMode, frame, ratio, time);        
+        ctx.restore();
+        
+        //center
+        transform2 = Object.assign({}, transform);
+        ctx.save();
+        transform2 = translateMatrix(transform2, scalingRect.xMin, scalingRect.yMin)
+        transform2 = scaleMatrix(transform2, scaleX, scaleY);
+        transform2 = translateMatrix(transform2, -scalingRect.xMin, -scalingRect.yMin);             
+
+        drawPath(ctx, "M " + (newRect.xMin + rint(scalingRect.xMin / 20)) + " " + (newRect.yMin + rint(scalingRect.yMin / 20)) + " "
+                + "L " + (newRect.xMax - rint((boundRect.xMax-scalingRect.xMax) / 20)) + " " + (newRect.yMin + rint(scalingRect.yMin / 20)) + " "
+                + "L " + (newRect.xMax - rint((boundRect.xMax-scalingRect.xMax) / 20)) + " " + (newRect.yMax - rint((boundRect.yMax-scalingRect.yMax) / 20)) + " "
+                + "L " + (newRect.xMin + rint(scalingRect.xMin / 20)) + " " + (newRect.yMax - rint((boundRect.yMax-scalingRect.yMax) / 20)) + " Z");
+        
+        ctx.clip();        
+        placeRaw(obj, canvas, ctx, transform2, ctrans, blendMode, frame, ratio, time);        
+        ctx.restore();        
+        return;
+    }
+    placeRaw(obj, canvas, ctx, matrix, ctrans, blendMode, frame, ratio, time);
+}
+
 var tocolor = function (c) {
     var r = "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + c[3] + ")";
     return r;
@@ -915,8 +1204,6 @@ window.addEventListener('load', function () {
 
     var wsize = document.getElementById("width_size");
     var hsize = document.getElementById("height_size");
-    //var bsize = document.getElementById("both_size");
-    //bsize.addEventListener('mousedown', initDragBoth, false);
     wsize.addEventListener('mousedown', initDragWidth, false);
     hsize.addEventListener('mousedown', initDragHeight, false);
 });
@@ -1049,6 +1336,7 @@ function useRatio(v1, v2, ratio) {
 }
 
 function drawPath(ctx, p, doStroke, scaleMode) {
+//console.log("drawing "+p)
     var parts = p.split(" ");
     var len = parts.length;
     if (doStroke) {

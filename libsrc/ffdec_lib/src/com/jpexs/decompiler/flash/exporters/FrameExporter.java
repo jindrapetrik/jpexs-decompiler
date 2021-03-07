@@ -264,10 +264,11 @@ public class FrameExporter {
                 int height = (int) (ftim.displayRect.getHeight() * settings.zoom / SWF.unitDivisor);
                 try (final OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                     fos.write(Utf8Helper.getBytes("\r\n"));
+                    fos.write(Utf8Helper.getBytes("var scalingGrids = {};\r\nvar boundRects = {};\r\n"));
                     Set<Integer> library = new HashSet<>();
                     ftim.getNeededCharacters(fframes, library);
 
-                    SWF.writeLibrary(fswf, library, fos);
+                    SWF.libraryToHtmlCanvas(fswf, library, fos);
 
                     String currentName = ftim.id == 0 ? "main" : SWF.getTypePrefix(fswf.getCharacter(ftim.id)) + ftim.id;
 

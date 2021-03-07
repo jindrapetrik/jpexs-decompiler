@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -139,7 +140,7 @@ public class ShapeExporter {
                                 needed.add(st.getCharacterId());
                                 st.getNeededCharactersDeep(needed);
                                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                SWF.writeLibrary(st.getSwf(), needed, baos);
+                                SWF.libraryToHtmlCanvas(st.getSwf(), needed, baos);
                                 fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(st) + st.getCharacterId(), st.getRect())));
                             }
                             break;
