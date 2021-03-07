@@ -72,6 +72,8 @@ public class SVGExporter {
 
     protected int lastPatternId;
 
+    protected int lastClipId;
+
     public Map<Tag, String> exportedTags = new HashMap<>();
 
     public Map<Tag, Map<Integer, String>> exportedChars = new HashMap<>();
@@ -216,6 +218,18 @@ public class SVGExporter {
         attr.setValue("background: " + new RGBA(backGroundColor).toHexARGB());
     }
 
+    private String addClip(String path) {
+        lastClipId++;
+        Element clipPathElement = _svg.createElement("clipPath");
+        clipPathElement.setAttribute("id", "clip" + lastClipId);
+        Element pathElement = _svg.createElement("path");
+        pathElement.setAttribute("d", path);
+        clipPathElement.appendChild(pathElement);
+        _svgGs.peek().appendChild(clipPathElement);
+        return "url(#clip" + lastClipId + ")";
+
+    }
+
     private void addScalingGridUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect) {
         ExportRectangle exRect = new ExportRectangle(boundRect);
         ExportRectangle newRect = exRect;
@@ -239,12 +253,11 @@ public class SVGExporter {
         Element leftTopCorner = _svg.createElement("use");
         leftTopCorner.setAttribute("transform", transform.getSvgTransformationString(SWF.unitDivisor, 1));
 
-        leftTopCorner.setAttribute("clip-path", "path('"
-                + "M 0,0 "
+        leftTopCorner.setAttribute("clip-path", addClip("M 0,0 "
                 + "L " + Math.rint(scalingRect.Xmin / (double) SWF.unitDivisor) + ",0 "
                 + "L " + Math.rint(scalingRect.Xmin / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " "
                 + "L 0," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " Z"
-                + "')");
+        ));
         leftTopCorner.setAttribute("xlink:href", "#" + href);
         _svgGs.peek().appendChild(leftTopCorner);
 
@@ -252,12 +265,12 @@ public class SVGExporter {
         transform2 = transform.clone();
         transform2.translateY += newRect.getHeight() - boundRect.getHeight();
         bottomLeftCorner.setAttribute("transform", transform2.getSvgTransformationString(SWF.unitDivisor, 1));
-        bottomLeftCorner.setAttribute("clip-path", "path('"
-                + "M 0," + Math.rint((boundRect.getHeight() - (boundRect.Ymax - scalingRect.Ymax)) / (double) SWF.unitDivisor) + " "
+        bottomLeftCorner.setAttribute("clip-path", addClip(
+                "M 0," + Math.rint((boundRect.getHeight() - (boundRect.Ymax - scalingRect.Ymax)) / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(scalingRect.Xmin / (double) SWF.unitDivisor) + "," + Math.rint((boundRect.getHeight() - (boundRect.Ymax - scalingRect.Ymax)) / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(scalingRect.Xmin / (double) SWF.unitDivisor) + "," + Math.rint(boundRect.getHeight() / (double) SWF.unitDivisor) + " "
                 + "L 0," + Math.rint(boundRect.getHeight() / (double) SWF.unitDivisor) + " Z"
-                + "')");
+        ));
 
         bottomLeftCorner.setAttribute("xlink:href", "#" + href);
         _svgGs.peek().appendChild(bottomLeftCorner);
@@ -267,12 +280,11 @@ public class SVGExporter {
         transform2.translateX += newRect.getWidth() - boundRect.getWidth();
         topRightCorner.setAttribute("transform", transform2.getSvgTransformationString(SWF.unitDivisor, 1));
 
-        topRightCorner.setAttribute("clip-path", "path('"
-                + "M " + Math.rint((boundRect.getWidth() - (exRect.xMax - scalingRect.Xmax)) / (double) SWF.unitDivisor) + ",0 "
+        topRightCorner.setAttribute("clip-path", addClip("M " + Math.rint((boundRect.getWidth() - (exRect.xMax - scalingRect.Xmax)) / (double) SWF.unitDivisor) + ",0 "
                 + "L " + Math.rint(boundRect.getWidth() / (double) SWF.unitDivisor) + ",0 "
                 + "L " + Math.rint(boundRect.getWidth() / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint((boundRect.getWidth() - (exRect.xMax - scalingRect.Xmax)) / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " Z"
-                + "')");
+        ));
         topRightCorner.setAttribute("xlink:href", "#" + href);
         _svgGs.peek().appendChild(topRightCorner);
 
@@ -282,12 +294,11 @@ public class SVGExporter {
         transform2.translateY += newRect.getHeight() - boundRect.getHeight();
         bottomRightCorner.setAttribute("transform", transform2.getSvgTransformationString(SWF.unitDivisor, 1));
 
-        bottomRightCorner.setAttribute("clip-path", "path('"
-                + "M " + Math.rint((boundRect.getWidth() - (exRect.xMax - scalingRect.Xmax)) / (double) SWF.unitDivisor) + "," + Math.rint((boundRect.getHeight() - (boundRect.Ymax - scalingRect.Ymax)) / (double) SWF.unitDivisor) + " "
+        bottomRightCorner.setAttribute("clip-path", addClip("M " + Math.rint((boundRect.getWidth() - (exRect.xMax - scalingRect.Xmax)) / (double) SWF.unitDivisor) + "," + Math.rint((boundRect.getHeight() - (boundRect.Ymax - scalingRect.Ymax)) / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(boundRect.getWidth() / (double) SWF.unitDivisor) + "," + Math.rint((boundRect.getHeight() - (boundRect.Ymax - scalingRect.Ymax)) / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(boundRect.getWidth() / (double) SWF.unitDivisor) + "," + Math.rint(boundRect.getHeight() / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint((boundRect.getWidth() - (exRect.xMax - scalingRect.Xmax)) / (double) SWF.unitDivisor) + "," + Math.rint(boundRect.getHeight() / (double) SWF.unitDivisor) + " Z"
-                + "')");
+        ));
         bottomRightCorner.setAttribute("xlink:href", "#" + href);
         _svgGs.peek().appendChild(bottomRightCorner);
 
@@ -300,12 +311,12 @@ public class SVGExporter {
 
         top.setAttribute("transform", transform2.getSvgTransformationString(SWF.unitDivisor, 1));
 
-        top.setAttribute("clip-path", "path('"
-                + "M " + Math.rint(scalingRect.Xmin / (double) SWF.unitDivisor) + ",0 "
+        top.setAttribute("clip-path", addClip(
+                "M " + Math.rint(scalingRect.Xmin / (double) SWF.unitDivisor) + ",0 "
                 + "L " + Math.rint(scalingRect.Xmax / (double) SWF.unitDivisor) + ",0 "
                 + "L " + Math.rint(scalingRect.Xmax / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(scalingRect.Xmin / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " Z"
-                + "')");
+        ));
 
         top.setAttribute("xlink:href", "#" + href);
         _svgGs.peek().appendChild(top);
@@ -319,12 +330,11 @@ public class SVGExporter {
 
         left.setAttribute("transform", transform2.getSvgTransformationString(SWF.unitDivisor, 1));
 
-        left.setAttribute("clip-path", "path('"
-                + "M 0," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " "
+        left.setAttribute("clip-path", addClip("M 0," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(scalingRect.Xmin / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(scalingRect.Xmin / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymax / (double) SWF.unitDivisor) + " "
                 + "L 0," + Math.rint(scalingRect.Ymax / (double) SWF.unitDivisor) + " Z"
-                + "')");
+        ));
 
         left.setAttribute("xlink:href", "#" + href);
         _svgGs.peek().appendChild(left);
@@ -340,12 +350,11 @@ public class SVGExporter {
 
         bottom.setAttribute("transform", transform2.getSvgTransformationString(SWF.unitDivisor, 1));
 
-        bottom.setAttribute("clip-path", "path('"
-                + "M " + Math.rint(scalingRect.Xmin / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymax / (double) SWF.unitDivisor) + " "
+        bottom.setAttribute("clip-path", addClip("M " + Math.rint(scalingRect.Xmin / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymax / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(scalingRect.Xmax / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymax / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(scalingRect.Xmax / (double) SWF.unitDivisor) + "," + Math.rint(boundRect.Ymax / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(scalingRect.Xmin / (double) SWF.unitDivisor) + "," + Math.rint(boundRect.Ymax / (double) SWF.unitDivisor) + " Z"
-                + "')");
+        ));
 
         bottom.setAttribute("xlink:href", "#" + href);
         _svgGs.peek().appendChild(bottom);
@@ -361,12 +370,11 @@ public class SVGExporter {
 
         right.setAttribute("transform", transform2.getSvgTransformationString(SWF.unitDivisor, 1));
 
-        right.setAttribute("clip-path", "path('"
-                + "M " + Math.rint(scalingRect.Xmax / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " "
+        right.setAttribute("clip-path", addClip("M " + Math.rint(scalingRect.Xmax / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(boundRect.Xmax / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(boundRect.Xmax / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymax / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(scalingRect.Xmax / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymax / (double) SWF.unitDivisor) + " Z"
-                + "')");
+        ));
 
         right.setAttribute("xlink:href", "#" + href);
         _svgGs.peek().appendChild(right);
@@ -381,12 +389,12 @@ public class SVGExporter {
 
         center.setAttribute("transform", transform2.getSvgTransformationString(SWF.unitDivisor, 1));
 
-        center.setAttribute("clip-path", "path('"
-                + "M " + Math.rint(scalingRect.Xmin / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " "
+        center.setAttribute("clip-path", addClip(
+                "M " + Math.rint(scalingRect.Xmin / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(scalingRect.Xmax / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(scalingRect.Xmax / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymax / (double) SWF.unitDivisor) + " "
                 + "L " + Math.rint(scalingRect.Xmin / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymax / (double) SWF.unitDivisor) + " Z"
-                + "')");
+        ));
 
         center.setAttribute("xlink:href", "#" + href);
         _svgGs.peek().appendChild(center);
