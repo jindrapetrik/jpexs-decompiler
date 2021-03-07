@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - [#1156] Rendering - 9 slice scaling (DefineScalingGrid) clipping
 - [#1647] Copying to clipboard - Transparency support
 - Incorrect placeobject display (tag selection)
+- Generic tag saving problem - timelined exception
 
 ## [14.1.0] - 2021-03-05
 ### Added

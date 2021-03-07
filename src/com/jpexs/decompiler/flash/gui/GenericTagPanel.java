@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
 import com.jpexs.decompiler.flash.gui.helpers.SpringUtilities;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -514,9 +515,11 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
             }
         }
         SWF swf = tag.getSwf();
+        Timelined tim = tag.getTimelined();
         assignTag(tag, editedTag);
         tag.setModified(true);
         tag.setSwf(swf);
+        tag.setTimelined(tim);
         setTagText(tag);
         return true;
     }
