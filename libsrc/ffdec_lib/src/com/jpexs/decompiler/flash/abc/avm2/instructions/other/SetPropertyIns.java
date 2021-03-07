@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.AddAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
@@ -337,8 +338,12 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         }
 
         SetPropertyAVM2Item result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value);
+        handleCompound(obj, multiname, value, output, result);
 
-        /*
+        SetTypeIns.handleResult(value, stack, output, localData, result, -1);
+    }
+
+    public static void handleCompound(GraphTargetItem obj, FullMultinameAVM2Item multiname, GraphTargetItem value, List<GraphTargetItem> output, SetTypeAVM2Item result) {
         if (value instanceof LocalRegAVM2Item) {
             LocalRegAVM2Item locVal = (LocalRegAVM2Item) value;
             if (multiname.name instanceof LocalRegAVM2Item) {
@@ -356,8 +361,8 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                                             GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) binaryOp.getLeftSide();
                                             if (((FullMultinameAVM2Item) getProp.propertyName).compareSame(multiname) && Objects.equals(getProp.object, obj)) {
                                                 multiname.name = setLocName.value;
-                                                result.compoundValue = binaryOp.getRightSide();
-                                                result.compoundOperator = binaryOp.getOperator();
+                                                result.setCompoundValue(binaryOp.getRightSide());
+                                                result.setCompoundOperator(binaryOp.getOperator());
                                                 output.remove(output.size() - 2);
                                                 output.remove(output.size() - 1);
                                             }
@@ -369,8 +374,20 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                     }
                 }
             }
-        }*/
-        SetTypeIns.handleResult(value, stack, output, localData, result, -1);
+        }
+
+        if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOp) {
+            if (!obj.hasSideEffect() && !multiname.hasSideEffect()) {
+                CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoercedNoDup();
+                if (binaryOp.getLeftSide() instanceof GetPropertyAVM2Item) {
+                    GetPropertyAVM2Item propItem = (GetPropertyAVM2Item) binaryOp.getLeftSide();
+                    if (Objects.equals(obj, propItem.object.getThroughDuplicate()) && Objects.equals(multiname, propItem.propertyName)) {
+                        result.setCompoundValue(binaryOp.getRightSide());
+                        result.setCompoundOperator(binaryOp.getOperator());
+                    }
+                }
+            }
+        }
     }
 
     @Override

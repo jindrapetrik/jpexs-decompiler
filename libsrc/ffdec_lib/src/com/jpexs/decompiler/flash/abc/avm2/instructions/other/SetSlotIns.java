@@ -39,9 +39,11 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.helpers.Reference;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
 
 /**
@@ -140,7 +142,21 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
             }
         }
 
-        GraphTargetItem result = new SetSlotAVM2Item(ins, localData.lineStartInstruction, obj, objnoreg, slotIndex, slotname, value);
+        SetSlotAVM2Item result = new SetSlotAVM2Item(ins, localData.lineStartInstruction, obj, objnoreg, slotIndex, slotname, value);
+
+        if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOp) {
+            if (!obj.hasSideEffect()) {
+                CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoercedNoDup();
+                if (binaryOp.getLeftSide() instanceof GetSlotAVM2Item) {
+                    GetSlotAVM2Item getSlot = (GetSlotAVM2Item) binaryOp.getLeftSide();
+                    if (Objects.equals(obj, getSlot.scope.getThroughDuplicate()) && slotIndex == getSlot.slotIndex) {
+                        result.compoundValue = binaryOp.getRightSide();
+                        result.compoundOperator = binaryOp.getOperator();
+                    }
+                }
+            }
+        }
+
         SetTypeIns.handleResult(value, stack, output, localData, result, -1);
     }
 

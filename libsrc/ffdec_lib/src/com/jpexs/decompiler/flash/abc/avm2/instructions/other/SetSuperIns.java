@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetSuperAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetSuperAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -31,9 +32,11 @@ import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
 
 /**
@@ -54,7 +57,21 @@ public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
 
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
-        GraphTargetItem result = new SetSuperAVM2Item(ins, localData.lineStartInstruction, value, obj, multiname);
+        SetSuperAVM2Item result = new SetSuperAVM2Item(ins, localData.lineStartInstruction, value, obj, multiname);
+
+        if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOp) {
+            if (!obj.hasSideEffect() && !multiname.hasSideEffect()) {
+                CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoercedNoDup();
+                if (binaryOp.getLeftSide() instanceof GetSuperAVM2Item) {
+                    GetSuperAVM2Item getSuper = (GetSuperAVM2Item) binaryOp.getLeftSide();
+                    if (Objects.equals(obj, getSuper.object.getThroughDuplicate()) && Objects.equals(multiname, getSuper.propertyName)) {
+                        result.setCompoundValue(binaryOp.getRightSide());
+                        result.setCompoundOperator(binaryOp.getOperator());
+                    }
+                }
+            }
+        }
+
         SetTypeIns.handleResult(value, stack, output, localData, result, -1);
     }
 
