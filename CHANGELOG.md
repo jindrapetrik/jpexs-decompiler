@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - FLA Export - mutliple FrameLabel layers
 - [#1636] Nullpointer exception on empty editorpane
 - [#1156] Rendering - 9 slice scaling (DefineScalingGrid) clipping
+- [#1647] Copying to clipboard - Transparency support
 
 ## [14.1.0] - 2021-03-05
 ### Added
@@ -2088,6 +2089,7 @@ All notable changes to this project will be documented in this file.
 [#1396]: https://www.free-decompiler.com/flash/issues/1396
 [#1254]: https://www.free-decompiler.com/flash/issues/1254
 [#1636]: https://www.free-decompiler.com/flash/issues/1636
+[#1647]: https://www.free-decompiler.com/flash/issues/1647
 [#1561]: https://www.free-decompiler.com/flash/issues/1561
 [#1623]: https://www.free-decompiler.com/flash/issues/1623
 [#1622]: https://www.free-decompiler.com/flash/issues/1622
