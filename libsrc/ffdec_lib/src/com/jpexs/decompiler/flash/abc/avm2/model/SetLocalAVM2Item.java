@@ -41,6 +41,10 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
 
     public DeclarationAVM2Item declaration;
 
+    public GraphTargetItem compoundValue;
+
+    public String compoundOperator;
+
     @Override
     public DeclarationAVM2Item getDeclaration() {
         return declaration;
@@ -60,7 +64,14 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         String localName = localRegName(localData.localRegNames, regIndex);
         getSrcData().localName = localName;
-        writer.append(localName).append(" = ");
+        writer.append(localName);
+        if (compoundOperator != null) {
+            writer.append(" ");
+            writer.append(compoundOperator);
+            writer.append("= ");
+            return compoundValue.toString(writer, localData);
+        }
+        writer.append(" = ");
         if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
             return value.value.toString(writer, localData);
         }
@@ -167,4 +178,23 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         return true;
     }
 
+    @Override
+    public GraphTargetItem getCompoundValue() {
+        return compoundValue;
+    }
+
+    @Override
+    public void setCompoundValue(GraphTargetItem value) {
+        this.compoundValue = value;
+    }
+
+    @Override
+    public void setCompoundOperator(String operator) {
+        compoundOperator = operator;
+    }
+
+    @Override
+    public String getCompoundOperator() {
+        return compoundOperator;
+    }
 }

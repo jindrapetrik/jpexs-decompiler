@@ -120,4 +120,9 @@ public class ReturnActionItem extends ActionItem implements ExitItem {
         int hash = 3;
         return hash;
     }
+
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
 }

@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
-import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
@@ -33,14 +32,11 @@ import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
-import com.jpexs.decompiler.flash.abc.types.MethodBody;
-import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.PopItem;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 /**
  *
@@ -128,10 +124,17 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
             }
         }
 
-        /*if (localData.getSetLocalUsages(localData.code.adr2pos(ins.getAddress())).isEmpty() && (value instanceof DuplicateItem)) {
-            return;
+        SetLocalAVM2Item result = new SetLocalAVM2Item(ins, localData.lineStartInstruction, regId, value);
+        /*if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOp) {
+            CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoercedNoDup();
+            if (binaryOp.getLeftSide() instanceof LocalRegAVM2Item) {
+                LocalRegAVM2Item loc = (LocalRegAVM2Item) binaryOp.getLeftSide();
+                if (loc.regIndex == regId) {
+                    result.setCompoundValue(binaryOp.getRightSide());
+                    result.setCompoundOperator(binaryOp.getOperator());
+                }
+            }
         }*/
-        GraphTargetItem result = new SetLocalAVM2Item(ins, localData.lineStartInstruction, regId, value);
 
         SetTypeIns.handleResult(value, stack, output, localData, result, regId);
     }

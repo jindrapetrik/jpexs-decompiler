@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
@@ -31,4 +32,12 @@ public interface SetTypeAVM2Item {
     public DeclarationAVM2Item getDeclaration();
 
     public void setDeclaration(DeclarationAVM2Item dec);
+
+    public GraphTargetItem getCompoundValue();
+
+    public void setCompoundValue(GraphTargetItem value);
+
+    public void setCompoundOperator(String operator);
+
+    public String getCompoundOperator();
 }

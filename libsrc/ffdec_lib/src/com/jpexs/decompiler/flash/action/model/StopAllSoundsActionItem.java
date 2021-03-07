@@ -71,4 +71,9 @@ public class StopAllSoundsActionItem extends ActionItem {
         int hash = 3;
         return hash;
     }
+
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
 }

@@ -38,6 +38,10 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
 
     public DeclarationAVM2Item declaration;
 
+    public GraphTargetItem compoundValue;
+
+    public String compoundOperator;
+
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
         visitor.visit(object);
@@ -64,6 +68,13 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         formatProperty(writer, object, propertyName, localData);
+
+        if (compoundOperator != null) {
+            writer.append(" ");
+            writer.append(compoundOperator);
+            writer.append("= ");
+            return compoundValue.toString(writer, localData);
+        }
         writer.append(" = ");
         return value.toString(writer, localData);
     }
@@ -117,4 +128,23 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
         return true;
     }
 
+    @Override
+    public GraphTargetItem getCompoundValue() {
+        return compoundValue;
+    }
+
+    @Override
+    public void setCompoundValue(GraphTargetItem value) {
+        this.compoundValue = value;
+    }
+
+    @Override
+    public void setCompoundOperator(String operator) {
+        compoundOperator = operator;
+    }
+
+    @Override
+    public String getCompoundOperator() {
+        return compoundOperator;
+    }
 }

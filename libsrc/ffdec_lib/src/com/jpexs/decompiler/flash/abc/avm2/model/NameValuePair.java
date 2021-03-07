@@ -97,4 +97,8 @@ public class NameValuePair extends AVM2Item {
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        return name.hasSideEffect() || value.hasSideEffect();
+    }
 }

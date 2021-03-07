@@ -87,4 +87,10 @@ public class CallActionItem extends ActionItem {
         int hash = 3;
         return hash;
     }
+
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
+
 }

@@ -162,4 +162,8 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
 }

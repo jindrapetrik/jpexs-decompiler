@@ -267,4 +267,9 @@ public class CallAVM2Item extends AVM2Item {
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
+
 }

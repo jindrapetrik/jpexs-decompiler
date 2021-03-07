@@ -83,4 +83,9 @@ public class ThrowAVM2Item extends AVM2Item implements ExitItem {
         int hash = 3;
         return hash;
     }
+
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
 }

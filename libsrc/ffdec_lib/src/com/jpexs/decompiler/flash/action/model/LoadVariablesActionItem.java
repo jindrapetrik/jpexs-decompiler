@@ -114,4 +114,8 @@ public class LoadVariablesActionItem extends ActionItem {
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
 }

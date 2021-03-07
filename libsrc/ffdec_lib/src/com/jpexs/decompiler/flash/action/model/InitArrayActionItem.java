@@ -103,4 +103,15 @@ public class InitArrayActionItem extends ActionItem {
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        for (GraphTargetItem v : values) {
+            if (v.hasSideEffect()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }

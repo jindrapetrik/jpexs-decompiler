@@ -155,4 +155,14 @@ public class NewObjectAVM2Item extends AVM2Item {
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        for (NameValuePair p : pairs) {
+            if (p.hasSideEffect()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

@@ -127,4 +127,24 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
     public boolean hasReturnValue() {
         return false;
     }
+
+    @Override
+    public GraphTargetItem getCompoundValue() {
+        return compoundValue;
+    }
+
+    @Override
+    public void setCompoundValue(GraphTargetItem value) {
+        this.compoundValue = value;
+    }
+
+    @Override
+    public void setCompoundOperator(String operator) {
+        compoundOperator = operator;
+    }
+
+    @Override
+    public String getCompoundOperator() {
+        return compoundOperator;
+    }
 }

@@ -38,6 +38,10 @@ public class SetSuperAVM2Item extends AVM2Item implements SetTypeAVM2Item {
 
     public DeclarationAVM2Item declaration;
 
+    public GraphTargetItem compoundValue;
+
+    public String compoundOperator;
+
     @Override
     public DeclarationAVM2Item getDeclaration() {
         return declaration;
@@ -78,6 +82,12 @@ public class SetSuperAVM2Item extends AVM2Item implements SetTypeAVM2Item {
         }
         writer.append("super.");
         propertyName.toString(writer, localData);
+        if (compoundOperator != null) {
+            writer.append(" ");
+            writer.append(compoundOperator);
+            writer.append("= ");
+            return compoundValue.toString(writer, localData);
+        }
         writer.append(" = ");
         return value.toString(writer, localData);
     }
@@ -139,4 +149,23 @@ public class SetSuperAVM2Item extends AVM2Item implements SetTypeAVM2Item {
         return true;
     }
 
+    @Override
+    public GraphTargetItem getCompoundValue() {
+        return compoundValue;
+    }
+
+    @Override
+    public void setCompoundValue(GraphTargetItem value) {
+        this.compoundValue = value;
+    }
+
+    @Override
+    public void setCompoundOperator(String operator) {
+        compoundOperator = operator;
+    }
+
+    @Override
+    public String getCompoundOperator() {
+        return compoundOperator;
+    }
 }

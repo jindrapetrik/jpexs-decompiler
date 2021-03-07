@@ -115,4 +115,9 @@ public class NewObjectActionItem extends ActionItem {
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
+
 }
