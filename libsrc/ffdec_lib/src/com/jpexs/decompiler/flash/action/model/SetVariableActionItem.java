@@ -46,6 +46,10 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
 
     private int tempRegister = -1;
 
+    public GraphTargetItem compoundValue;
+
+    public String compoundOperator;
+
     @Override
     public GraphPart getFirstPart() {
         return value.getFirstPart();
@@ -84,6 +88,12 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
             HighlightData srcData = getSrcData();
             srcData.localName = name.toStringNoQuotes(localData);
             stripQuotes(name, localData, writer);
+            if (compoundOperator != null) {
+                writer.append(" ");
+                writer.append(compoundOperator);
+                writer.append("= ");
+                return compoundValue.toString(writer, localData);
+            }
             writer.append(" = ");
             return value.toString(writer, localData);
         } else {
@@ -174,4 +184,23 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
         return true;
     }
 
+    @Override
+    public GraphTargetItem getCompoundValue() {
+        return compoundValue;
+    }
+
+    @Override
+    public void setCompoundValue(GraphTargetItem value) {
+        this.compoundValue = value;
+    }
+
+    @Override
+    public void setCompoundOperator(String operator) {
+        this.compoundOperator = operator;
+    }
+
+    @Override
+    public String getCompoundOperator() {
+        return compoundOperator;
+    }
 }

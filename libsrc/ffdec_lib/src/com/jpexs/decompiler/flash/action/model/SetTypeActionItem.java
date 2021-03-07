@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -32,4 +33,12 @@ public interface SetTypeActionItem {
     public int getTempRegister();
 
     public void setValue(GraphTargetItem value);
+
+    public GraphTargetItem getCompoundValue();
+
+    public void setCompoundValue(GraphTargetItem value);
+
+    public void setCompoundOperator(String operator);
+
+    public String getCompoundOperator();
 }

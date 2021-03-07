@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -36,9 +37,11 @@ import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -111,7 +114,21 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
             }
         }
 
-        GraphTargetItem ret = new SetVariableActionItem(this, lineStartAction, name, value);
+        SetVariableActionItem setVar = new SetVariableActionItem(this, lineStartAction, name, value);
+        GraphTargetItem ret = setVar;
+
+        if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOp) {
+            if (!name.hasSideEffect()) {
+                CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoercedNoDup();
+                if (binaryOp.getLeftSide() instanceof GetVariableActionItem) {
+                    GetVariableActionItem getVar = (GetVariableActionItem) binaryOp.getLeftSide();
+                    if (Objects.equals(name, getVar.name)) {
+                        setVar.setCompoundValue(binaryOp.getRightSide());
+                        setVar.setCompoundOperator(binaryOp.getOperator());
+                    }
+                }
+            }
+        }
 
         if (value instanceof StoreRegisterActionItem) {
             StoreRegisterActionItem sr = (StoreRegisterActionItem) value;
