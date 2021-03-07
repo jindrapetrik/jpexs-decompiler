@@ -231,6 +231,9 @@ public class SVGExporter {
     }
 
     private void addScalingGridUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect) {
+
+        Element image = _svg.createElement("g");
+
         ExportRectangle exRect = new ExportRectangle(boundRect);
         ExportRectangle newRect = exRect;
         if (transform == null) {
@@ -259,7 +262,7 @@ public class SVGExporter {
                 + "L 0," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " Z"
         ));
         leftTopCorner.setAttribute("xlink:href", "#" + href);
-        _svgGs.peek().appendChild(leftTopCorner);
+        image.appendChild(leftTopCorner);
 
         Element bottomLeftCorner = _svg.createElement("use");
         transform2 = transform.clone();
@@ -273,7 +276,7 @@ public class SVGExporter {
         ));
 
         bottomLeftCorner.setAttribute("xlink:href", "#" + href);
-        _svgGs.peek().appendChild(bottomLeftCorner);
+        image.appendChild(bottomLeftCorner);
 
         Element topRightCorner = _svg.createElement("use");
         transform2 = transform.clone();
@@ -286,7 +289,7 @@ public class SVGExporter {
                 + "L " + Math.rint((boundRect.getWidth() - (exRect.xMax - scalingRect.Xmax)) / (double) SWF.unitDivisor) + "," + Math.rint(scalingRect.Ymin / (double) SWF.unitDivisor) + " Z"
         ));
         topRightCorner.setAttribute("xlink:href", "#" + href);
-        _svgGs.peek().appendChild(topRightCorner);
+        image.appendChild(topRightCorner);
 
         Element bottomRightCorner = _svg.createElement("use");
         transform2 = transform.clone();
@@ -300,7 +303,7 @@ public class SVGExporter {
                 + "L " + Math.rint((boundRect.getWidth() - (exRect.xMax - scalingRect.Xmax)) / (double) SWF.unitDivisor) + "," + Math.rint(boundRect.getHeight() / (double) SWF.unitDivisor) + " Z"
         ));
         bottomRightCorner.setAttribute("xlink:href", "#" + href);
-        _svgGs.peek().appendChild(bottomRightCorner);
+        image.appendChild(bottomRightCorner);
 
         Element top = _svg.createElement("use");
         transform2 = transform.clone();
@@ -319,7 +322,7 @@ public class SVGExporter {
         ));
 
         top.setAttribute("xlink:href", "#" + href);
-        _svgGs.peek().appendChild(top);
+        image.appendChild(top);
 
         Element left = _svg.createElement("use");
         transform2 = transform.clone();
@@ -337,7 +340,7 @@ public class SVGExporter {
         ));
 
         left.setAttribute("xlink:href", "#" + href);
-        _svgGs.peek().appendChild(left);
+        image.appendChild(left);
 
         Element bottom = _svg.createElement("use");
         transform2 = transform.clone();
@@ -357,7 +360,7 @@ public class SVGExporter {
         ));
 
         bottom.setAttribute("xlink:href", "#" + href);
-        _svgGs.peek().appendChild(bottom);
+        image.appendChild(bottom);
 
         Element right = _svg.createElement("use");
         transform2 = transform.clone();
@@ -377,7 +380,7 @@ public class SVGExporter {
         ));
 
         right.setAttribute("xlink:href", "#" + href);
-        _svgGs.peek().appendChild(right);
+        image.appendChild(right);
 
         Element center = _svg.createElement("use");
 
@@ -397,9 +400,12 @@ public class SVGExporter {
         ));
 
         center.setAttribute("xlink:href", "#" + href);
-        _svgGs.peek().appendChild(center);
+        image.appendChild(center);
 
-        //TODO: how to include instance name
+        if (instanceName != null) {
+            image.setAttribute("id", instanceName);
+        }
+        _svgGs.peek().appendChild(image);
     }
 
     public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect) {
