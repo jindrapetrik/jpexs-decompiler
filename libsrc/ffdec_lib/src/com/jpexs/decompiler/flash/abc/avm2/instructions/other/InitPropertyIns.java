@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -43,7 +44,9 @@ public class InitPropertyIns extends InstructionDefinition {
         GraphTargetItem val = stack.pop();
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
-        output.add(new InitPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, val));
+        InitPropertyAVM2Item result = new InitPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, val);
+        SetPropertyIns.handleCompound(obj, multiname, val, output, result);
+        output.add(result);
     }
 
     @Override

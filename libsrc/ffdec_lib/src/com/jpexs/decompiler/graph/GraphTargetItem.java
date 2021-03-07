@@ -41,8 +41,10 @@ import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
+import com.jpexs.helpers.Reference;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -372,7 +374,16 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     }
 
     public boolean hasSideEffect() {
-        return false;
+        Reference<Boolean> ref = new Reference<>(false);
+        visitRecursively(new AbstractGraphTargetVisitor() {
+            @Override
+            public void visit(GraphTargetItem item) {
+                if (item.hasSideEffect()) {
+                    ref.setVal(Boolean.TRUE);
+                }
+            }
+        });
+        return ref.getVal();
     }
 
     public boolean isVariableComputed() {
