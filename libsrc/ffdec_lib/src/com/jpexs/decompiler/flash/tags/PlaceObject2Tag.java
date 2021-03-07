@@ -472,4 +472,9 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
     public void setPlaceFlagHasMatrix(boolean placeFlagHasMatrix) {
         this.placeFlagHasMatrix = placeFlagHasMatrix;
     }
+
+    @Override
+    public boolean hasImage() {
+        return false;
+    }
 }

@@ -1509,7 +1509,7 @@ public class CommandLineArgumentParser {
                             } else {
                                 pt4 = new PlaceObject4Tag(
                                         pt.getSwf(), pt.flagMove(), pt.getDepth(), pt.getClassName(), pt.getCharacterId(), pt.getMatrix(), pt.getColorTransform() == null ? null : new CXFORMWITHALPHA(pt.getColorTransform()), pt.getRatio(),
-                                        pt.getInstanceName(), pt.getClipDepth(), pt.getFilters(), pt.getBlendMode(), pt.getBitmapCache(), pt.getVisible(), pt.getBackgroundColor(), pt.getClipActions(), pt.getAmfData());
+                                        pt.getInstanceName(), pt.getClipDepth(), pt.getFilters(), pt.getBlendMode(), pt.getBitmapCache(), pt.getVisible(), pt.getBackgroundColor(), pt.getClipActions(), pt.getAmfData(), pt.hasImage());
                                 tim.replaceTag(i, pt4);
                             }
 

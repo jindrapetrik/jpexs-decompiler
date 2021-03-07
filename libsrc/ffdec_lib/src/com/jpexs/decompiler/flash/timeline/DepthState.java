@@ -81,6 +81,8 @@ public class DepthState {
 
     public boolean motionTween = false;
 
+    public boolean hasImage = false;
+
     private static AtomicLong lastInstanceId = new AtomicLong(0);
 
     public static long getNewInstanceId() {
@@ -138,10 +140,10 @@ public class DepthState {
             return new PlaceObject2Tag(swf, false, depth, characterId, matrix, cxForm, ratio, instanceName, clipDepth, clipActions);
         } else if (minPlaceObjectNum == 3) {
             CXFORMWITHALPHA cxForm = colorTransForm == null ? null : new CXFORMWITHALPHA(colorTransForm);
-            return new PlaceObject3Tag(swf, false, depth, null/*todo: className*/, characterId, matrix, cxForm, ratio, instanceName, clipDepth, filters, blendMode, cacheAsBitmap ? 1 : 0, isVisible ? 1 : 0, backGroundColor, clipActions);
+            return new PlaceObject3Tag(swf, false, depth, null/*todo: className*/, characterId, matrix, cxForm, ratio, instanceName, clipDepth, filters, blendMode, cacheAsBitmap ? 1 : 0, isVisible ? 1 : 0, backGroundColor, clipActions, hasImage);
         }
 
         CXFORMWITHALPHA cxForm = colorTransForm == null ? null : new CXFORMWITHALPHA(colorTransForm);
-        return new PlaceObject4Tag(swf, false, depth, null/*todo: className*/, characterId, matrix, cxForm, ratio, instanceName, clipDepth, filters, blendMode, cacheAsBitmap ? 1 : 0, isVisible ? 1 : 0, backGroundColor, clipActions, null);
+        return new PlaceObject4Tag(swf, false, depth, null/*todo: className*/, characterId, matrix, cxForm, ratio, instanceName, clipDepth, filters, blendMode, cacheAsBitmap ? 1 : 0, isVisible ? 1 : 0, backGroundColor, clipActions, null, hasImage);
     }
 }

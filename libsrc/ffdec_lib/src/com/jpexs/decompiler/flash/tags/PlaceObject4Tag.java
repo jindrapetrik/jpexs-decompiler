@@ -245,7 +245,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         super(swf, ID, NAME, null);
     }
 
-    public PlaceObject4Tag(SWF swf, boolean placeFlagMove, int depth, String className, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, List<FILTER> surfaceFilterList, int blendMode, Integer bitmapCache, Integer visible, RGBA backgroundColor, CLIPACTIONS clipActions, Amf3Value amfData) {
+    public PlaceObject4Tag(SWF swf, boolean placeFlagMove, int depth, String className, int characterId, MATRIX matrix, CXFORMWITHALPHA colorTransform, int ratio, String name, int clipDepth, List<FILTER> surfaceFilterList, int blendMode, Integer bitmapCache, Integer visible, RGBA backgroundColor, CLIPACTIONS clipActions, Amf3Value amfData, boolean placeFlagHasImage) {
         super(swf, ID, NAME, null);
         this.placeFlagHasClassName = className != null;
         this.placeFlagHasFilterList = surfaceFilterList != null;
@@ -276,6 +276,7 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
         this.backgroundColor = backgroundColor;
         this.clipActions = clipActions;
         this.amfData = amfData;
+        this.placeFlagHasImage = placeFlagHasImage;
     }
 
     /**
@@ -677,5 +678,10 @@ public class PlaceObject4Tag extends PlaceObjectTypeTag implements ASMSourceCont
     @Override
     public void setPlaceFlagHasMatrix(boolean placeFlagHasMatrix) {
         this.placeFlagHasMatrix = placeFlagHasMatrix;
+    }
+
+    @Override
+    public boolean hasImage() {
+        return placeFlagHasImage;
     }
 }

@@ -305,6 +305,7 @@ public class Timeline {
                 int characterId = po.getCharacterId();
                 if (characterId != -1) {
                     fl.characterId = characterId;
+                    fl.hasImage = po.hasImage();
                 }
                 CharacterTag character = swf.getCharacter(characterId);
                 if (character instanceof DefineSpriteTag) {
@@ -701,8 +702,7 @@ public class Timeline {
             img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
             img.fillTransparent();
 
-            if (!(drawable instanceof ImageTag)) {
-                // image tags are not rendered, they should be embedded in shape tags
+            if (!(drawable instanceof ImageTag) || (swf.isAS3() && layer.hasImage)) {
                 drawable.toImage(dframe, time, ratio, renderContext, img, isClip || clipDepth > -1, m, strokeTransform, absMat, clrTrans);
             } else {
                 // todo: show one time warning
