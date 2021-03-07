@@ -473,7 +473,7 @@
 
     </target>
          
-    <target name="all" depends="clean,build,test,javadoc,release">    
+    <target name="all" depends="clean,build,test,release">    
         
     </target>                         
         
