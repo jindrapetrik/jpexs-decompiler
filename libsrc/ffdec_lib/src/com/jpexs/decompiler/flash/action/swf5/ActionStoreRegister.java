@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -26,6 +27,7 @@ import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumeratedValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumerationAssignmentValueActionItem;
+import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.IncrementActionItem;
 import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.PostIncrementActionItem;
@@ -39,9 +41,11 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -160,7 +164,21 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
         if ((value instanceof EnumeratedValueActionItem)) {
             variables.put("__register" + registerNumber, new TemporaryRegister(registerNumber, new EnumerationAssignmentValueActionItem()));
         }
-        stack.push(new StoreRegisterActionItem(this, lineStartAction, rn, value, define));
+        StoreRegisterActionItem ret = new StoreRegisterActionItem(this, lineStartAction, rn, value, define);
+        if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOp) {
+            CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoercedNoDup();
+            if (binaryOp.getLeftSide() instanceof DirectValueActionItem) {
+                DirectValueActionItem directValue = (DirectValueActionItem) binaryOp.getLeftSide();
+                if (directValue.value instanceof RegisterNumber) {
+                    if (((RegisterNumber) directValue.value).number == registerNumber) {
+                        ret.setCompoundValue(binaryOp.getRightSide());
+                        ret.setCompoundOperator(binaryOp.getOperator());
+                    }
+                }
+            }
+        }
+
+        stack.push(ret);
     }
 
     @Override

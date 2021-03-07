@@ -47,6 +47,10 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
 
     private int tempRegister = -1;
 
+    public GraphTargetItem compoundValue;
+
+    public String compoundOperator;
+
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
         visitor.visit(object);
@@ -96,6 +100,12 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
         } else {
             writer.append(".");
             stripQuotes(objectName, localData, writer);
+        }
+        if (compoundOperator != null) {
+            writer.append(" ");
+            writer.append(compoundOperator);
+            writer.append("= ");
+            return compoundValue.toString(writer, localData);
         }
         writer.append(" = ");
         return value.toString(writer, localData);
@@ -172,6 +182,26 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
             return false;
         }
         return true;
+    }
+
+    @Override
+    public GraphTargetItem getCompoundValue() {
+        return compoundValue;
+    }
+
+    @Override
+    public void setCompoundValue(GraphTargetItem value) {
+        this.compoundValue = value;
+    }
+
+    @Override
+    public void setCompoundOperator(String operator) {
+        this.compoundOperator = operator;
+    }
+
+    @Override
+    public String getCompoundOperator() {
+        return compoundOperator;
     }
 
 }

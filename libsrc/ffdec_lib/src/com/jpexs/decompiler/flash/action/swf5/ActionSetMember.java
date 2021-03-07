@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf5;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -33,8 +34,10 @@ import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -110,7 +113,23 @@ public class ActionSetMember extends Action {
                 }
             }
         }
-        GraphTargetItem ret = new SetMemberActionItem(this, lineStartAction, object, memberName, value);
+
+        SetMemberActionItem setMem = new SetMemberActionItem(this, lineStartAction, object, memberName, value);
+
+        if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOp) {
+            if (!object.hasSideEffect() && !memberName.hasSideEffect()) {
+                CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoercedNoDup();
+                if (binaryOp.getLeftSide() instanceof GetMemberActionItem) {
+                    GetMemberActionItem getMember = (GetMemberActionItem) binaryOp.getLeftSide();
+                    if (Objects.equals(object, getMember.object.getThroughDuplicate()) && Objects.equals(memberName, getMember.memberName)) {
+                        setMem.setCompoundValue(binaryOp.getRightSide());
+                        setMem.setCompoundOperator(binaryOp.getOperator());
+                    }
+                }
+            }
+        }
+
+        GraphTargetItem ret = setMem;
         if (value instanceof StoreRegisterActionItem) {
             StoreRegisterActionItem sr = (StoreRegisterActionItem) value;
             if (sr.define) {

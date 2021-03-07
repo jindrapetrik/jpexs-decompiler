@@ -45,6 +45,10 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
 
     public boolean temporary = false;
 
+    public GraphTargetItem compoundValue;
+
+    public String compoundOperator;
+
     @Override
     public GraphPart getFirstPart() {
         return value.getFirstPart();
@@ -92,7 +96,15 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
                 srcData.declaredType = DottedChain.ALL;
                 writer.append("var ");
             }
-            writer.append(register.translate()).append(" = ");
+            writer.append(register.translate());
+
+            if (compoundOperator != null) {
+                writer.append(" ");
+                writer.append(compoundOperator);
+                writer.append("= ");
+                return compoundValue.toString(writer, localData);
+            }
+            writer.append(" = ");
             value.toString(writer, localData);
         }
         return writer;
@@ -165,5 +177,25 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
     @Override
     public boolean hasSideEffect() {
         return true;
+    }
+
+    @Override
+    public GraphTargetItem getCompoundValue() {
+        return compoundValue;
+    }
+
+    @Override
+    public void setCompoundValue(GraphTargetItem value) {
+        this.compoundValue = value;
+    }
+
+    @Override
+    public void setCompoundOperator(String operator) {
+        this.compoundOperator = operator;
+    }
+
+    @Override
+    public String getCompoundOperator() {
+        return compoundOperator;
     }
 }

@@ -174,4 +174,23 @@ public class PostIncrementActionItem extends ActionItem implements SetTypeAction
         return true;
     }
 
+    @Override
+    public GraphTargetItem getCompoundValue() {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+
+    @Override
+    public void setCompoundValue(GraphTargetItem value) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+
+    @Override
+    public void setCompoundOperator(String operator) {
+        throw new UnsupportedOperationException("Not supported.");
+    }
+
+    @Override
+    public String getCompoundOperator() {
+        throw new UnsupportedOperationException("Not supported.");
+    }
 }
