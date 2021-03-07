@@ -37,16 +37,20 @@ import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.AddAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.BinaryOpItem;
+import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
 
 /**
@@ -332,7 +336,40 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
             }
         }
 
-        GraphTargetItem result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value);
+
+        SetPropertyAVM2Item result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value);
+
+        /*if (value instanceof LocalRegAVM2Item) {
+            LocalRegAVM2Item locVal = (LocalRegAVM2Item) value;
+            if (multiname.name instanceof LocalRegAVM2Item) {
+                LocalRegAVM2Item locName = (LocalRegAVM2Item) multiname.name;
+                if (output.size() > 2) {
+                    if (output.get(output.size() - 1) instanceof SetLocalAVM2Item) {
+                        SetLocalAVM2Item setLocVal = (SetLocalAVM2Item) output.get(output.size() - 1);
+                        if (setLocVal.regIndex == locVal.regIndex) {
+                            if (output.get(output.size() - 2) instanceof SetLocalAVM2Item) {
+                                SetLocalAVM2Item setLocName = (SetLocalAVM2Item) output.get(output.size() - 2);
+                                if (setLocName.regIndex == locName.regIndex) {
+                                    if (setLocVal.value instanceof CompoundableBinaryOp) {
+                                        CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) setLocVal.value;
+                                        if (binaryOp.getLeftSide() instanceof GetPropertyAVM2Item) {
+                                            GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) binaryOp.getLeftSide();
+                                            if (((FullMultinameAVM2Item) getProp.propertyName).compareSame(multiname) && Objects.equals(getProp.object, obj)) {
+                                                multiname.name = setLocName.value;
+                                                result.compoundValue = binaryOp.getRightSide();
+                                                result.compoundOperator = binaryOp.getOperator();
+                                                output.remove(output.size() - 2);
+                                                output.remove(output.size() - 1);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }*/
         SetTypeIns.handleResult(value, stack, output, localData, result, -1);
     }
 

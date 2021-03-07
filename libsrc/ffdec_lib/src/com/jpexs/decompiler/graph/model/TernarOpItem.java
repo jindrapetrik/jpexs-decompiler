@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -94,4 +95,38 @@ public class TernarOpItem extends GraphTargetItem {
     public GraphTargetItem returnType() {
         return onTrue.returnType();
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 61 * hash + Objects.hashCode(this.expression);
+        hash = 61 * hash + Objects.hashCode(this.onTrue);
+        hash = 61 * hash + Objects.hashCode(this.onFalse);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final TernarOpItem other = (TernarOpItem) obj;
+        if (!Objects.equals(this.expression, other.expression)) {
+            return false;
+        }
+        if (!Objects.equals(this.onTrue, other.onTrue)) {
+            return false;
+        }
+        if (!Objects.equals(this.onFalse, other.onFalse)) {
+            return false;
+        }
+        return true;
+    }
+
 }

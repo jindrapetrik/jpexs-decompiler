@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -25,6 +26,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -115,4 +117,54 @@ public class StartDragActionItem extends ActionItem {
     public boolean hasReturnValue() {
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 29 * hash + Objects.hashCode(this.target);
+        hash = 29 * hash + Objects.hashCode(this.lockCenter);
+        hash = 29 * hash + Objects.hashCode(this.constrain);
+        hash = 29 * hash + Objects.hashCode(this.y2);
+        hash = 29 * hash + Objects.hashCode(this.x2);
+        hash = 29 * hash + Objects.hashCode(this.y1);
+        hash = 29 * hash + Objects.hashCode(this.x1);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final StartDragActionItem other = (StartDragActionItem) obj;
+        if (!Objects.equals(this.target, other.target)) {
+            return false;
+        }
+        if (!Objects.equals(this.lockCenter, other.lockCenter)) {
+            return false;
+        }
+        if (!Objects.equals(this.constrain, other.constrain)) {
+            return false;
+        }
+        if (!Objects.equals(this.y2, other.y2)) {
+            return false;
+        }
+        if (!Objects.equals(this.x2, other.x2)) {
+            return false;
+        }
+        if (!Objects.equals(this.y1, other.y1)) {
+            return false;
+        }
+        if (!Objects.equals(this.x1, other.x1)) {
+            return false;
+        }
+        return true;
+    }
+
 }

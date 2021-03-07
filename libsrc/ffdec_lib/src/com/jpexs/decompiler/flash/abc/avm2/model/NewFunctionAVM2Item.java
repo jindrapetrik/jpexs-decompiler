@@ -31,6 +31,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -109,4 +110,34 @@ public class NewFunctionAVM2Item extends AVM2Item {
     public boolean hasReturnValue() {
         return true;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 37 * hash + Objects.hashCode(this.functionName);
+        hash = 37 * hash + this.methodIndex;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final NewFunctionAVM2Item other = (NewFunctionAVM2Item) obj;
+        if (this.methodIndex != other.methodIndex) {
+            return false;
+        }
+        if (!Objects.equals(this.functionName, other.functionName)) {
+            return false;
+        }
+        return true;
+    }
+
 }

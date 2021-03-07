@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -28,14 +29,13 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
  * @author JPEXS
  */
 public class FSCommand2ActionItem extends ActionItem {
-
-    public String target;
 
     public List<GraphTargetItem> arguments;
 
@@ -92,4 +92,34 @@ public class FSCommand2ActionItem extends ActionItem {
     public boolean hasReturnValue() {
         return true; //FIXME ?
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 71 * hash + Objects.hashCode(this.arguments);
+        hash = 71 * hash + Objects.hashCode(this.command);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final FSCommand2ActionItem other = (FSCommand2ActionItem) obj;
+        if (!Objects.equals(this.arguments, other.arguments)) {
+            return false;
+        }
+        if (!Objects.equals(this.command, other.command)) {
+            return false;
+        }
+        return true;
+    }
+
 }
