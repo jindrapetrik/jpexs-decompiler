@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - Incorrect placeobject display (tag selection)
 - Generic tag saving problem - timelined exception
 - [#1332] Flash viewer - Show directly added images when placeFlagHasImage is true on AS3 swfs
+- XML Import - not set SWF and Timelined internal values caused an exception on item display
 
 ## [14.1.0] - 2021-03-05
 ### Added

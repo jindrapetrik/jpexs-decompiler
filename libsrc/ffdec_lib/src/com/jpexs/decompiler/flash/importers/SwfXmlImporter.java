@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.importers;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -37,6 +38,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagTypeInfo;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
@@ -143,8 +145,23 @@ public class SwfXmlImporter {
             Document doc = docBuilder.parse(new InputSource(new StringReader(xml)));
             processElement(doc.getDocumentElement(), swf, swf, null);
             swf.clearAllCache();
+            setSwfAndTimelined(swf);
         } catch (ParserConfigurationException | SAXException ex) {
             logger.log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void setSwfAndTimelined(SWF swf) {
+        for (Tag t : swf.getTags()) {
+            t.setSwf(swf);
+            t.setTimelined(swf);
+            if (t instanceof DefineSpriteTag) {
+                DefineSpriteTag s = (DefineSpriteTag) t;
+                for (Tag st : s.getTags()) {
+                    st.setSwf(swf);
+                    st.setTimelined(s);
+                }
+            }
         }
     }
 
