@@ -286,4 +286,9 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
     public void setPlaceFlagHasMatrix(boolean placeFlagHasMatrix) {
 
     }
+
+    @Override
+    public boolean hasImage() {
+        return false;
+    }
 }
