@@ -149,4 +149,10 @@ public class CallFunctionActionItem extends ActionItem {
     public boolean hasReturnValue() {
         return true;
     }
+
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
+
 }

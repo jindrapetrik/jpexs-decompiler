@@ -85,4 +85,9 @@ public class CloneSpriteActionItem extends ActionItem {
     public boolean hasReturnValue() {
         return false;
     }
+
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
 }

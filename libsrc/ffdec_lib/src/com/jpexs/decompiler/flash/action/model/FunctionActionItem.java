@@ -411,5 +411,9 @@ public class FunctionActionItem extends ActionItem {
         return false; //function actually returns itself, but here is false for generator to not add Pop
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        return true; //??
+    }
     //What about hashcode and equals? Probably not.
 }

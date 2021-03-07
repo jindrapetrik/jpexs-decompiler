@@ -103,4 +103,8 @@ public class PrintActionItem extends ActionItem {
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
 }

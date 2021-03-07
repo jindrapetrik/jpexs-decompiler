@@ -87,4 +87,9 @@ public class TraceActionItem extends ActionItem {
         int hash = 3;
         return hash;
     }
+
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
 }

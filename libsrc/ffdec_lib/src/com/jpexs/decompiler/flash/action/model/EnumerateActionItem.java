@@ -100,4 +100,8 @@ public class EnumerateActionItem extends ActionItem {
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
 }

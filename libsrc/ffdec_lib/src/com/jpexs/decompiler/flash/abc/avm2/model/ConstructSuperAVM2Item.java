@@ -115,4 +115,8 @@ public class ConstructSuperAVM2Item extends AVM2Item {
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
 }

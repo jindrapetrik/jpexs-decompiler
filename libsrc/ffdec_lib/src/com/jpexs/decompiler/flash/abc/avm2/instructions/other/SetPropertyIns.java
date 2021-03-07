@@ -336,10 +336,10 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
             }
         }
 
-
         SetPropertyAVM2Item result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value);
 
-        /*if (value instanceof LocalRegAVM2Item) {
+        /*
+        if (value instanceof LocalRegAVM2Item) {
             LocalRegAVM2Item locVal = (LocalRegAVM2Item) value;
             if (multiname.name instanceof LocalRegAVM2Item) {
                 LocalRegAVM2Item locName = (LocalRegAVM2Item) multiname.name;

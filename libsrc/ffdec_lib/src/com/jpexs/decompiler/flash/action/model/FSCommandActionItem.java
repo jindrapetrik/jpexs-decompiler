@@ -91,4 +91,8 @@ public class FSCommandActionItem extends ActionItem {
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
 }

@@ -136,4 +136,14 @@ public class NewArrayAVM2Item extends AVM2Item {
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        for (GraphTargetItem v : values) {
+            if (v.hasSideEffect()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

@@ -132,4 +132,19 @@ public class InitObjectActionItem extends ActionItem {
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        for (GraphTargetItem n : names) {
+            if (n.hasSideEffect()) {
+                return true;
+            }
+        }
+        for (GraphTargetItem v : values) {
+            if (v.hasSideEffect()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

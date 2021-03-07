@@ -151,4 +151,9 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
+
 }

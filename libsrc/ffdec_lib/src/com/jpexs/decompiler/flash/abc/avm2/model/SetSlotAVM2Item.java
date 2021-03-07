@@ -44,6 +44,10 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
 
     public int slotIndex;
 
+    public GraphTargetItem compoundValue;
+
+    public String compoundOperator;
+
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
         visitor.visit(scope);
@@ -81,6 +85,13 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
             return writer;
         }
         getName(writer, localData);
+
+        if (compoundOperator != null) {
+            writer.append(" ");
+            writer.append(compoundOperator);
+            writer.append("= ");
+            return compoundValue.toString(writer, localData);
+        }
         writer.append(" = ");
         if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
             return value.value.toString(writer, localData);
@@ -157,4 +168,23 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
         return true;
     }
 
+    @Override
+    public GraphTargetItem getCompoundValue() {
+        return compoundValue;
+    }
+
+    @Override
+    public void setCompoundValue(GraphTargetItem value) {
+        this.compoundValue = value;
+    }
+
+    @Override
+    public void setCompoundOperator(String operator) {
+        compoundOperator = operator;
+    }
+
+    @Override
+    public String getCompoundOperator() {
+        return compoundOperator;
+    }
 }

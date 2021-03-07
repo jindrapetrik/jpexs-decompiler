@@ -149,4 +149,9 @@ public class NewMethodActionItem extends ActionItem {
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
+
 }

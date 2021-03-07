@@ -81,4 +81,8 @@ public class SetTargetActionItem extends ActionItem {
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
 }

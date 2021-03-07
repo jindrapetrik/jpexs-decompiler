@@ -82,4 +82,8 @@ public class GotoFrameActionItem extends ActionItem {
         return true;
     }
 
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
 }
