@@ -92,6 +92,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DebugIDTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
@@ -1976,7 +1977,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         return "character";
     }
 
-    public static void writeLibrary(SWF fswf, Set<Integer> library, OutputStream fos) throws IOException {
+    public static void libraryToHtmlCanvas(SWF fswf, Set<Integer> library, OutputStream fos) throws IOException {
         for (int c : library) {
             CharacterTag ch = fswf.getCharacter(c);
             if (ch instanceof FontTag) {
@@ -2000,6 +2001,24 @@ public final class SWF implements SWFContainerItem, Timelined {
                     fos.write(Utf8Helper.getBytes(sb.toString()));
                 }
                 fos.write(Utf8Helper.getBytes("}\r\n\r\n"));
+                DefineScalingGridTag scalingGrid = ch.getScalingGridTag();
+                if (scalingGrid != null && (ch instanceof BoundedTag)) {
+                    BoundedTag bt = (BoundedTag) ch;
+                    RECT bounds = bt.getRect();
+                    fos.write(Utf8Helper.getBytes("boundRects[\"" + (getTypePrefix(ch) + c) + "\"] = {"
+                            + "xMin:" + bounds.Xmin + ","
+                            + "xMax:" + bounds.Xmax + ","
+                            + "yMin:" + bounds.Ymin + ","
+                            + "yMax:" + bounds.Ymax
+                            + "};\r\n\r\n"));
+                    RECT grid = scalingGrid.splitter;
+                    fos.write(Utf8Helper.getBytes("scalingGrids[\"" + (getTypePrefix(ch) + c) + "\"] = {"
+                            + "xMin:" + grid.Xmin + ","
+                            + "xMax:" + grid.Xmax + ","
+                            + "yMin:" + grid.Ymin + ","
+                            + "yMax:" + grid.Ymax
+                            + "};\r\n\r\n"));
+                }
             }
         }
     }
