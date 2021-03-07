@@ -42,6 +42,8 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
@@ -587,20 +589,24 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
             return;
         }
 
-        //Copy to clipboard does not support transparency
-        BufferedImage newImage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = newImage.createGraphics();
-        g.setColor(display.getBackgroundColor());
-        g.fillRect(0, 0, img.getWidth(), img.getHeight());
-        g.drawImage(img, 0, 0, null);
-        g.dispose();
+        //If the image contains transparency,
+        //exception stack trace is printed to stderr in java internals
+        //see https://stackoverflow.com/questions/59140881/error-copying-an-image-object-to-the-clipboard
+        //we handle this by ignoring System.err
+        final PrintStream originalErr = System.err;
+        System.setErr(new PrintStream(new OutputStream() {
+            @Override
+            public void write(int b) throws IOException {
 
-        TransferableImage trans = new TransferableImage(newImage);
+            }
+        }));
+        TransferableImage trans = new TransferableImage(img);
         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
         c.setContents(trans, new ClipboardOwner() {
             @Override
             public void lostOwnership(Clipboard clipboard, Transferable contents) {
             }
         });
+        System.setErr(originalErr); //Reset system.err back to normal state
     }
 }
