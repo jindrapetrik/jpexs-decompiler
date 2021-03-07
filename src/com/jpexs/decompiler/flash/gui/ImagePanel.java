@@ -264,6 +264,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         hideMouseSelection();
+        redraw();
     }
 
     public synchronized void freeTransformDepth(int depth) {

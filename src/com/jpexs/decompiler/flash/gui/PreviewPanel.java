@@ -631,6 +631,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         showCardLeft(PLACE_TAG_CARD);
         placeTag = tag;
         oldMatrix = tag.getMatrix();
+        placeImagePanel.selectDepth(-1);
         placeImagePanel.setTimelined(((Tag) tag).getTimelined(), ((Tag) tag).getSwf(), frame);
         placeImagePanel.selectDepth(tag.getDepth());
         parametersPanel.setVisible(false);
