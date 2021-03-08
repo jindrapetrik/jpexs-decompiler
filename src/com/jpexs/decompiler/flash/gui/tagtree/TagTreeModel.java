@@ -231,6 +231,7 @@ public class TagTreeModel implements TreeModel {
                     binaryData.add(t);
                     break;
                 case AS:
+                case AS_FRAME:
                     break;
                 default:
                     if (t.getId() != ShowFrameTag.ID && !ShowFrameTag.isNestedTagType(t.getId())) {

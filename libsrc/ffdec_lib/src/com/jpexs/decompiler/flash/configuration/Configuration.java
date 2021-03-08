@@ -693,6 +693,10 @@ public final class Configuration {
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> displayAs3TraitsListAndConstantsPanel = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> useAsTypeIcons = null;
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
