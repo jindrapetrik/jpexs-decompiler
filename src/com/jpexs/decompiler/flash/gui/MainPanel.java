@@ -155,6 +155,7 @@ import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.ProgressListener;
+import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -2219,7 +2220,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         FileAttributesTag fileAttributes = swf.getFileAttributes();
         if (fileAttributes != null && fileAttributes.actionScript3) {
-            final int multiName = getABCPanel().decompiledTextArea.getMultinameUnderCaret();
+            final int multiName = getABCPanel().decompiledTextArea.getMultinameUnderCaret(new Reference<ABC>(null));
             final List<ABCContainerTag> abcList = swf.getAbcList();
             if (multiName > 0) {
                 new CancellableWorker() {

@@ -23,7 +23,7 @@ All notable changes to this project will be documented in this file.
 - Generic tag saving problem - timelined exception
 - [#1332] Flash viewer - Show directly added images when placeFlagHasImage is true on AS3 swfs
 - XML Import - not set SWF and Timelined internal values caused an exception on item display
-- Goto usage exception and incorrect trait position
+- [#1636] Goto usage exception and incorrect trait position
 - [#1648] Search - loaded search results mixed
 - [#1650] Empty search results from history after reloading SWF file
 
