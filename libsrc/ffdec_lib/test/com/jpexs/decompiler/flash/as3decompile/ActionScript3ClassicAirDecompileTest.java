@@ -79,7 +79,14 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     public void testComplexExpressions() {
         decompileMethod("classic_air", "testComplexExpressions", "var i:int = 0;\r\n"
                 + "var j:int = 0;\r\n"
-                + "j = i = i + (i = i + i++);\r\n",
+                + "j = i += i += i++;\r\n",
+                false);
+    }
+
+    @Test
+    public void testCompoundAssignments() {
+        decompileMethod("classic_air", "testCompoundAssignments", "var a:int = 0;\r\n"
+                + "trace(a += 10);\r\n",
                 false);
     }
 
@@ -106,7 +113,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "{\r\n"
                 + "break loop3;\r\n"
                 + "}\r\n"
-                + "b = b + 1;\r\n"
+                + "b += 1;\r\n"
                 + "}\r\n"
                 + "break;\r\n"
                 + "case 13:\r\n"
@@ -121,7 +128,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "trace(\"default clause\");\r\n"
                 + "}\r\n"
                 + "loop1:\r\n"
-                + "for(c = 0; c < 8; c = c + 1)\r\n"
+                + "for(c = 0; c < 8; c += 1)\r\n"
                 + "{\r\n"
                 + "for(d = 0; d < 25; d++)\r\n"
                 + "{\r\n"
@@ -153,7 +160,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     public void testDecl2() {
         decompileMethod("classic_air", "testDecl2", "var k:int = 0;\r\n"
                 + "var i:int = 5;\r\n"
-                + "i = i + 7;\r\n"
+                + "i += 7;\r\n"
                 + "if(i == 5)\r\n"
                 + "{\r\n"
                 + "if(i < 8)\r\n"
@@ -306,7 +313,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
         decompileMethod("classic_air", "testExpressions", "var arr:Array = null;\r\n"
                 + "var i:int = 5;\r\n"
                 + "var j:int = 5;\r\n"
-                + "if((i = i = i / 2) == 1 || i == 2)\r\n"
+                + "if((i = i /= 2) == 1 || i == 2)\r\n"
                 + "{\r\n"
                 + "arguments.concat(i);\r\n"
                 + "}\r\n"
@@ -399,7 +406,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     @Test
     public void testForContinue() {
         decompileMethod("classic_air", "testForContinue", "var a:* = undefined;\r\n"
-                + "for(a = 0; a < 10; a = a + 1)\r\n"
+                + "for(a = 0; a < 10; a += 1)\r\n"
                 + "{\r\n"
                 + "if(a == 9)\r\n"
                 + "{\r\n"
