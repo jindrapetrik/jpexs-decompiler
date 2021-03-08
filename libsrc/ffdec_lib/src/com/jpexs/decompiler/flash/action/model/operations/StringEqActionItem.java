@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -24,6 +25,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -64,5 +66,12 @@ public class StringEqActionItem extends BinaryOpItem implements Inverted {
     @Override
     public GraphTargetItem invert(GraphSourceItem negSrc) {
         return new StringNeActionItem(getSrc(), getLineStartItem(), leftSide, rightSide);
+    }
+
+    @Override
+    public List<GraphSourceItem> getOperatorInstruction() {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ret.add(new ActionStringEquals());
+        return ret;
     }
 }

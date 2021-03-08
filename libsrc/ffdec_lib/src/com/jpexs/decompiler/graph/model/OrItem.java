@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -58,5 +59,10 @@ public class OrItem extends BinaryOpItem {
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.BOOLEAN;
+    }
+
+    @Override
+    public List<GraphSourceItem> getOperatorInstruction() {
+        return new ArrayList<>(); //???
     }
 }
