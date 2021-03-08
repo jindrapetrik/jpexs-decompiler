@@ -1264,6 +1264,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (nodeType == TreeNodeType.AS) {
                         as12scripts.add(d);
                     }
+                    if (nodeType == TreeNodeType.AS_FRAME) {
+                        as12scripts.add(d);
+                    }
                     if (nodeType == TreeNodeType.MOVIE) {
                         movies.add((Tag) d);
                     }

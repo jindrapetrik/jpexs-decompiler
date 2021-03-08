@@ -122,6 +122,17 @@ public class ScriptPack extends AS3ClassTreeItem {
         return packageName;
     }
 
+    public Trait getPublicTrait() {
+        for (int t : traitIndices) {
+            Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
+            Namespace ns = name.getNamespace(abc.constants);
+            if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
+                return abc.script_info.get(scriptIndex).traits.traits.get(t);
+            }
+        }
+        return null;
+    }
+
     public String getPathScriptName() {
         String scriptName = "";
         for (int t : traitIndices) {

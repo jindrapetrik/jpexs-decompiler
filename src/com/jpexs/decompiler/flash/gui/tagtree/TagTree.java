@@ -20,6 +20,12 @@ import com.jpexs.decompiler.flash.SWC;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.ZippedSWFBundle;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.View;
@@ -114,6 +120,8 @@ import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
+import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -324,11 +332,61 @@ public class TagTree extends JTree {
             return TreeNodeType.BINARY_DATA;
         }
 
+        if (Configuration.useAsTypeIcons.get()) {
+            if (t instanceof DoInitActionTag) {
+                DoInitActionTag doInit = (DoInitActionTag) t;
+                if (doInit.getSwf().getExportName(doInit.spriteId) != null) {
+                    return TreeNodeType.AS_CLASS;
+                }
+                return TreeNodeType.AS_INIT;
+            }
+
+            if (t instanceof CLIPACTIONRECORD) {
+                return TreeNodeType.AS_CLIP;
+            }
+
+            if (t instanceof BUTTONCONDACTION) {
+                return TreeNodeType.AS_BUTTON;
+            }
+
+            if (t instanceof DoActionTag) {
+                return TreeNodeType.AS_FRAME;
+            }
+        }
+
         if (t instanceof ASMSource) {
             return TreeNodeType.AS;
         }
 
         if (t instanceof ScriptPack) {
+            if (Configuration.useAsTypeIcons.get()) {
+                ScriptPack pack = (ScriptPack) t;
+                Trait trait = pack.getPublicTrait();
+                if (trait == null) {
+                    return TreeNodeType.AS;
+                }
+                if (trait instanceof TraitFunction) {
+                    return TreeNodeType.AS_FUNCTION;
+                }
+                if (trait instanceof TraitMethodGetterSetter) {
+                    return TreeNodeType.AS_FUNCTION;
+                }
+                if (trait instanceof TraitSlotConst) {
+                    TraitSlotConst traitSlotConst = (TraitSlotConst) trait;
+                    if (traitSlotConst.isConst()) {
+                        return TreeNodeType.AS_CONST;
+                    } else {
+                        return TreeNodeType.AS_VAR;
+                    }
+                }
+                if (trait instanceof TraitClass) {
+                    TraitClass traitClass = (TraitClass) trait;
+                    if (pack.abc.instance_info.get(traitClass.class_info).isInterface()) {
+                        return TreeNodeType.AS_INTERFACE;
+                    }
+                    return TreeNodeType.AS_CLASS;
+                }
+            }
             return TreeNodeType.AS;
         }
 
@@ -583,6 +641,9 @@ public class TagTree extends JTree {
                     ret.add(d);
                 }
                 if (nodeType == TreeNodeType.AS) {
+                    ret.add(d);
+                }
+                if (nodeType == TreeNodeType.AS_FRAME) {
                     ret.add(d);
                 }
                 if (nodeType == TreeNodeType.MOVIE) {
