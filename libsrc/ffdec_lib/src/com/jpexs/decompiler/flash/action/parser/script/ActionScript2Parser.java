@@ -1544,7 +1544,13 @@ public class ActionScript2Parser {
                             break;
                     }
                     if (lhs instanceof VariableActionItem) {
-                        lhs = new VariableActionItem(((VariableActionItem) lhs).getVariableName(), assigned, false);
+                        if (assigned != rhs) {
+                            lhs = new VariableActionItem(((VariableActionItem) lhs).getVariableName(), assigned, false);
+                            variables.add((VariableActionItem) lhs);
+                        } else {
+                            ((VariableActionItem) lhs).setStoreValue(assigned);
+                            ((VariableActionItem) lhs).setDefinition(false);
+                        }
                     } else if (lhs instanceof GetMemberActionItem) {
                         lhs = new SetMemberActionItem(null, null, ((GetMemberActionItem) lhs).object, ((GetMemberActionItem) lhs).memberName, assigned);
                     } else {
