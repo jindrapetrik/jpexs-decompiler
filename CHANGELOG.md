@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - [#1639] Clearing search results for current file
 - [#1371] Go to character id (Ctrl+G in tag tree)
 - [#1156] FLA, SVG, Canvas Export -  9 slice scaling (DefineScalingGrid)
+- [#843] Compound assignments (like +=) decompilation and direct editation
 
 ### Changed
 - [#1471] Import script menuitem renamed to Import scripts.
@@ -2092,6 +2093,7 @@ All notable changes to this project will be documented in this file.
 [#1639]: https://www.free-decompiler.com/flash/issues/1639
 [#1371]: https://www.free-decompiler.com/flash/issues/1371
 [#1156]: https://www.free-decompiler.com/flash/issues/1156
+[#843]: https://www.free-decompiler.com/flash/issues/843
 [#1471]: https://www.free-decompiler.com/flash/issues/1471
 [#1396]: https://www.free-decompiler.com/flash/issues/1396
 [#1254]: https://www.free-decompiler.com/flash/issues/1254
