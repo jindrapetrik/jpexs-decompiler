@@ -1505,7 +1505,7 @@ public class ActionScript2Parser {
                 case ASSIGN_USHIFT_RIGHT:
                 case ASSIGN_XOR:
                     GraphTargetItem assigned = rhs;
-                    switch (lookahead.type) {
+                    switch (op.type) {
                         case ASSIGN:
                             //assigned = assigned;
                             break;
@@ -1544,9 +1544,7 @@ public class ActionScript2Parser {
                             break;
                     }
                     if (lhs instanceof VariableActionItem) {
-                        ((VariableActionItem) lhs).setStoreValue(assigned);
-                        ((VariableActionItem) lhs).setDefinition(false);
-                        lhs = lhs;
+                        lhs = new VariableActionItem(((VariableActionItem) lhs).getVariableName(), assigned, false);
                     } else if (lhs instanceof GetMemberActionItem) {
                         lhs = new SetMemberActionItem(null, null, ((GetMemberActionItem) lhs).object, ((GetMemberActionItem) lhs).memberName, assigned);
                     } else {
