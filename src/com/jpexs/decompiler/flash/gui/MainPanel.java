@@ -825,6 +825,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void loadSwfAtPos(SWFList newSwfs, int index) {
         View.checkAccess();
 
+        SWFList oldSwfList = swfs.get(index);
+
+        List<SWF> allSwfs = new ArrayList<>();
+        for (SWF s : oldSwfList.swfs) {
+            allSwfs.add(s);
+            Main.populateSwfs(s, allSwfs);
+        }
+
+        for (SWF s : allSwfs) {
+            s.clearTagSwfs();
+            Main.searchResultsStorage.destroySwf(s);
+        }
+
         List<List<String>> expandedNodes = View.getExpandedNodes(tagTree);
         previewPanel.clear();
         swfs.set(index, newSwfs);
@@ -1007,7 +1020,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         List<SWF> swfsToClose = new ArrayList<>();
         swfsToClose.addAll(swfList);
         for (SWF swf : swfList) {
-            populateSwfs(swf, swfsToClose);
+            Main.populateSwfs(swf, swfsToClose);
         }
 
         for (int i = 0; i < searchResultsDialogs.size(); i++) {
@@ -1805,24 +1818,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    private void populateSwfs(SWF swfParent, List<SWF> output) {
-        for (Tag t : swfParent.getTags()) {
-            if (t instanceof DefineBinaryDataTag) {
-                DefineBinaryDataTag b = (DefineBinaryDataTag) t;
-                if (b.innerSwf != null) {
-                    output.add(b.innerSwf);
-                    populateSwfs(b.innerSwf, output);
-                }
-            }
-        }
-    }
 
     public Set<SWF> getAllSwfs() {
         List<SWF> allSwfs = new ArrayList<>();
         for (SWFList slist : getSwfs()) {
             for (SWF s : slist.swfs) {
                 allSwfs.add(s);
-                populateSwfs(s, allSwfs);
+                Main.populateSwfs(s, allSwfs);
             }
         }
         return new LinkedHashSet<>(allSwfs);

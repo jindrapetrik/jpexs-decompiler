@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - XML Import - not set SWF and Timelined internal values caused an exception on item display
 - Goto usage exception and incorrect trait position
 - [#1648] Search - loaded search results mixed
+- [#1650] Empty search results from history after reloading SWF file
 
 ## [14.1.0] - 2021-03-05
 ### Added
@@ -2098,6 +2099,7 @@ All notable changes to this project will be documented in this file.
 [#1647]: https://www.free-decompiler.com/flash/issues/1647
 [#1332]: https://www.free-decompiler.com/flash/issues/1332
 [#1648]: https://www.free-decompiler.com/flash/issues/1648
+[#1650]: https://www.free-decompiler.com/flash/issues/1650
 [#1561]: https://www.free-decompiler.com/flash/issues/1561
 [#1623]: https://www.free-decompiler.com/flash/issues/1623
 [#1622]: https://www.free-decompiler.com/flash/issues/1622
