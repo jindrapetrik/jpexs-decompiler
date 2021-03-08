@@ -247,12 +247,12 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         reset = false;
     }
 
-    public int getMultinameUnderMouseCursor(Point pt) {
-        return getMultinameAtPos(viewToModel(pt));
+    public int getMultinameUnderMouseCursor(Point pt, Reference<ABC> abcUsed) {
+        return getMultinameAtPos(viewToModel(pt), abcUsed);
     }
 
-    public int getMultinameUnderCaret() {
-        return getMultinameAtPos(getCaretPosition());
+    public int getMultinameUnderCaret(Reference<ABC> abcUsed) {
+        return getMultinameAtPos(getCaretPosition(), abcUsed);
     }
 
     public int getLocalDeclarationOfPos(int pos, Reference<DottedChain> type) {
@@ -310,9 +310,9 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         return -1;
     }
 
-    public boolean getPropertyTypeAtPos(int pos, Reference<Integer> abcIndex, Reference<Integer> classIndex, Reference<Integer> traitIndex, Reference<Boolean> classTrait, Reference<Integer> multinameIndex) {
+    public boolean getPropertyTypeAtPos(int pos, Reference<Integer> abcIndex, Reference<Integer> classIndex, Reference<Integer> traitIndex, Reference<Boolean> classTrait, Reference<Integer> multinameIndex, Reference<ABC> abcUsed) {
 
-        int m = getMultinameAtPos(pos, true);
+        int m = getMultinameAtPos(pos, true, abcUsed);
         if (m <= 0) {
             return false;
         }
@@ -345,7 +345,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         while (!currentType.equals(DottedChain.ALL)) {
             String ident = t.getString(sd);
             found = false;
-            List<ABCContainerTag> abcList = getABC().getSwf().getAbcList();
+            List<ABCContainerTag> abcList = abcUsed.getVal().getSwf().getAbcList();
             loopi:
             for (int i = 0; i < abcList.size(); i++) {
                 ABC a = abcList.get(i).getABC();
@@ -398,27 +398,29 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         return true;
     }
 
-    public int getMultinameAtPos(int pos) {
-        return getMultinameAtPos(pos, false);
+    public int getMultinameAtPos(int pos, Reference<ABC> abcUsed) {
+        return getMultinameAtPos(pos, false, abcUsed);
     }
 
-    private int getMultinameAtPos(int pos, boolean codeOnly) {
-        int multinameIndex = _getMultinameAtPos(pos, codeOnly);
+    private int getMultinameAtPos(int pos, boolean codeOnly, Reference<ABC> abcUsed) {
+        int multinameIndex = _getMultinameAtPos(pos, codeOnly, abcUsed);
         if (multinameIndex > -1) {
-            ABC abc = getABC();
+            ABC abc = abcUsed.getVal();
             multinameIndex = abc.constants.convertToQname(abc.constants, multinameIndex);
         }
         return multinameIndex;
     }
 
-    public int _getMultinameAtPos(int pos, boolean codeOnly) {
+    public int _getMultinameAtPos(int pos, boolean codeOnly, Reference<ABC> abcUsed) {
         Highlighting tm = Highlighting.searchPos(highlightedText.getMethodHighlights(), pos);
         Trait currentTrait = null;
         int currentMethod = -1;
         ABC abc = getABC();
+        abcUsed.setVal(abc);
         if (abc == null) {
             return -1;
         }
+
         if (tm != null) {
 
             int mi = (int) tm.getProperties().index;

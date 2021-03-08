@@ -1012,9 +1012,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         View.addEditorAction(decompiledTextArea, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int multinameIndex = decompiledTextArea.getMultinameUnderCaret();
+                Reference<ABC> usedAbc = new Reference<>(null);
+                int multinameIndex = decompiledTextArea.getMultinameUnderCaret(usedAbc);
                 if (multinameIndex > -1) {
-                    UsageFrame usageFrame = new UsageFrame(abc, multinameIndex, ABCPanel.this, false);
+                    UsageFrame usageFrame = new UsageFrame(usedAbc.getVal(), multinameIndex, ABCPanel.this, false);
                     usageFrame.setVisible(true);
                 }
             }
@@ -1120,30 +1121,31 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         Reference<Integer> traitIndex = new Reference<>(0);
         Reference<Integer> multinameIndexRef = new Reference<>(0);
         Reference<Boolean> classTrait = new Reference<>(false);
-
-        if (decompiledTextArea.getPropertyTypeAtPos(pos, abcIndex, classIndex, traitIndex, classTrait, multinameIndexRef)) {
+        Reference<ABC> usedAbcRef = new Reference<>(null);
+        if (decompiledTextArea.getPropertyTypeAtPos(pos, abcIndex, classIndex, traitIndex, classTrait, multinameIndexRef, usedAbcRef)) {
             return true;
         }
-        int multinameIndex = decompiledTextArea.getMultinameAtPos(pos);
+        ABC usedAbc = usedAbcRef.getVal();
+        int multinameIndex = decompiledTextArea.getMultinameAtPos(pos, usedAbcRef);
         if (multinameIndex > -1) {
             if (multinameIndex == 0) {
                 return false;
             }
-            List<MultinameUsage> usages = abc.findMultinameDefinition(multinameIndex);
+            List<MultinameUsage> usages = usedAbcRef.getVal().findMultinameDefinition(multinameIndex);
 
-            Multiname m = abc.constants.getMultiname(multinameIndex);
+            Multiname m = usedAbc.constants.getMultiname(multinameIndex);
             if (m == null) {
                 return false;
             }
             //search other ABC tags if this is not private multiname
-            if (m.getSingleNamespaceIndex(abc.constants) > 0 && abc.constants.getNamespace(m.getSingleNamespaceIndex(abc.constants)).kind != Namespace.KIND_PRIVATE) {
+            if (m.getSingleNamespaceIndex(usedAbc.constants) > 0 && usedAbc.constants.getNamespace(m.getSingleNamespaceIndex(usedAbc.constants)).kind != Namespace.KIND_PRIVATE) {
                 for (ABCContainerTag at : getAbcList()) {
                     ABC a = at.getABC();
-                    if (a == abc) {
+                    if (a == usedAbc) {
                         continue;
                     }
 
-                    List<Integer> mids = a.constants.getMultinameIds(m, abc.constants);
+                    List<Integer> mids = a.constants.getMultinameIds(m, usedAbc.constants);
                     for (int mid : mids) {
                         usages.addAll(a.findMultinameDefinition(mid));
                     }
@@ -1167,25 +1169,26 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         Reference<Integer> traitIndex = new Reference<>(0);
         Reference<Boolean> classTrait = new Reference<>(false);
         Reference<Integer> multinameIndexRef = new Reference<>(0);
-
-        if (decompiledTextArea.getPropertyTypeAtPos(pos, abcIndex, classIndex, traitIndex, classTrait, multinameIndexRef)) {
+        Reference<ABC> usedAbcRef = new Reference<>(null);
+        if (decompiledTextArea.getPropertyTypeAtPos(pos, abcIndex, classIndex, traitIndex, classTrait, multinameIndexRef, usedAbcRef)) {
             UsageFrame.gotoUsage(ABCPanel.this, new TraitMultinameUsage(getAbcList().get(abcIndex.getVal()).getABC(), multinameIndexRef.getVal(), decompiledTextArea.getScriptLeaf().scriptIndex, classIndex.getVal(), traitIndex.getVal(), classTrait.getVal() ? TraitMultinameUsage.TRAITS_TYPE_CLASS : TraitMultinameUsage.TRAITS_TYPE_INSTANCE, null, -1) {
             });
             return;
         }
-        int multinameIndex = decompiledTextArea.getMultinameAtPos(pos);
+        int multinameIndex = decompiledTextArea.getMultinameAtPos(pos, usedAbcRef);
+        ABC usedAbc = usedAbcRef.getVal();
         if (multinameIndex > -1) {
             List<MultinameUsage> usages = abc.findMultinameDefinition(multinameIndex);
 
-            Multiname m = abc.constants.getMultiname(multinameIndex);
+            Multiname m = usedAbc.constants.getMultiname(multinameIndex);
             //search other ABC tags if this is not private multiname
-            if (m.getSingleNamespaceIndex(abc.constants) > 0 && m.getSingleNamespace(abc.constants).kind != Namespace.KIND_PRIVATE) {
+            if (m.getSingleNamespaceIndex(usedAbc.constants) > 0 && m.getSingleNamespace(usedAbc.constants).kind != Namespace.KIND_PRIVATE) {
                 for (ABCContainerTag at : getAbcList()) {
                     ABC a = at.getABC();
-                    if (a == abc) {
+                    if (a == usedAbc) {
                         continue;
                     }
-                    List<Integer> mids = a.constants.getMultinameIds(m, abc.constants);
+                    List<Integer> mids = a.constants.getMultinameIds(m, usedAbc.constants);
                     for (int mid : mids) {
                         usages.addAll(a.findMultinameDefinition(mid));
                     }
@@ -1194,7 +1197,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
             //more than one? display list
             if (usages.size() > 1) {
-                UsageFrame usageFrame = new UsageFrame(abc, multinameIndex, ABCPanel.this, true);
+                UsageFrame usageFrame = new UsageFrame(usedAbc, multinameIndex, ABCPanel.this, true);
                 usageFrame.setVisible(true);
                 return;
             } else if (!usages.isEmpty()) { //one
@@ -1206,7 +1209,6 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         int dpos = decompiledTextArea.getLocalDeclarationOfPos(pos, new Reference<>(null));
         if (dpos > -1) {
             decompiledTextArea.setCaretPosition(dpos);
-
         }
 
     }
