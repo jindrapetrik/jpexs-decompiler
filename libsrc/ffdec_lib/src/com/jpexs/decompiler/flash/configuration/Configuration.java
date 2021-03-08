@@ -697,6 +697,10 @@ public final class Configuration {
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> useAsTypeIcons = null;
 
+    @ConfigurationDefaultInt(20000)
+    @ConfigurationCategory("limit")
+    public static ConfigurationItem<Integer> limitAs3PCodeOffsetMatching = null;
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

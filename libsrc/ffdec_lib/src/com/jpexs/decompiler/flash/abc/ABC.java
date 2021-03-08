@@ -890,7 +890,9 @@ public class ABC {
     }
 
     public boolean isStaticTraitId(int classIndex, int traitId) {
-        if (traitId < class_info.get(classIndex).static_traits.traits.size()) {
+        if (classIndex == -1) {
+            return true;
+        } else if (traitId < class_info.get(classIndex).static_traits.traits.size()) {
             return true;
         } else if (traitId < class_info.get(classIndex).static_traits.traits.size() + instance_info.get(classIndex).instance_traits.traits.size()) {
             return false;

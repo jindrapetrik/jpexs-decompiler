@@ -1314,7 +1314,7 @@ public class AVM2Code implements Cloneable {
         }
         writer.newLine();
         int ip = 0;
-        int largeLimit = 20000;
+        int largeLimit = Configuration.limitAs3PCodeOffsetMatching.get();
         boolean markOffsets = code.size() <= largeLimit;
 
         if (exportMode == ScriptExportMode.HEX) {
