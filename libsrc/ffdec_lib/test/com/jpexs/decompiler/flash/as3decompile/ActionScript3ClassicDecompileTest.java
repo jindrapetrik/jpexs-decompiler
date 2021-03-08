@@ -84,6 +84,13 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testCompoundAssignments() {
+        decompileMethod("classic", "testCompoundAssignments", "var a:int = 0;\r\n"
+                + "trace(a = a + 10);\r\n",
+                false);
+    }
+
+    @Test
     public void testContinueLevels() {
         decompileMethod("classic", "testContinueLevels", "var b:* = undefined;\r\n"
                 + "var c:* = undefined;\r\n"
@@ -106,7 +113,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "{\r\n"
                 + "break loop3;\r\n"
                 + "}\r\n"
-                + "b = b + 1;\r\n"
+                + "b += 1;\r\n"
                 + "}\r\n"
                 + "break;\r\n"
                 + "case 13:\r\n"
@@ -121,7 +128,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "trace(\"default clause\");\r\n"
                 + "}\r\n"
                 + "loop1:\r\n"
-                + "for(c = 0; c < 8; c = c + 1)\r\n"
+                + "for(c = 0; c < 8; c += 1)\r\n"
                 + "{\r\n"
                 + "for(d = 0; d < 25; d++)\r\n"
                 + "{\r\n"
@@ -151,7 +158,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     public void testDecl2() {
         decompileMethod("classic", "testDecl2", "var k:int = 0;\r\n"
                 + "var i:int = 5;\r\n"
-                + "i = i + 7;\r\n"
+                + "i += 7;\r\n"
                 + "if(i == 5)\r\n"
                 + "{\r\n"
                 + "if(i < 8)\r\n"
@@ -394,7 +401,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testForContinue() {
-        decompileMethod("classic", "testForContinue", "for(var a:* = 0; a < 10; a = a + 1)\r\n"
+        decompileMethod("classic", "testForContinue", "for(var a:* = 0; a < 10; a += 1)\r\n"
                 + "{\r\n"
                 + "if(a == 9)\r\n"
                 + "{\r\n"
@@ -911,7 +918,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "{\r\n"
                 + "var second:String = null;\r\n"
                 + "second = \"value2\";\r\n"
-                + "second = second + \"cc\";\r\n"
+                + "second += \"cc\";\r\n"
                 + "var traceParam2:Function = function(bParam:String):String\r\n"
                 + "{\r\n"
                 + "trace(bParam + \",\" + aParam);\r\n"

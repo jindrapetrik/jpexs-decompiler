@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
@@ -109,7 +110,7 @@ public class ActionDefineFunctionPushRegisterCleanerTest extends ActionScript2Te
                 + "{\r\n"
                 + "return _loc2_ + 7;\r\n"
                 + "}\r\n"
-                + "_loc1_ = _loc1_ + 27;\r\n"
+                + "_loc1_ += 27;\r\n"
                 + "_loc1_ = _loc1_ + 1;\r\n"
                 + "}\r\n"
                 + "}\r\n"
