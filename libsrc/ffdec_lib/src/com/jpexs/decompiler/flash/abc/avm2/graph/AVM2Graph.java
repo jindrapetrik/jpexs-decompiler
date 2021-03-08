@@ -413,6 +413,9 @@ public class AVM2Graph extends Graph {
                 }
 
                 for (GraphPart r : finallyPart.refs) {
+                    if (r.start < 0) {
+                        continue;
+                    }
                     GraphPart rr = r;
                     boolean needsPrev = true;
                     while (true) {
