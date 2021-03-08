@@ -26,6 +26,7 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,5 +56,12 @@ public class BitAndActionItem extends BinaryOpItem implements CompoundableBinary
     @Override
     public GraphTargetItem returnType() {
         return new UnboundedTypeItem();
+    }
+
+    @Override
+    public List<GraphSourceItem> getOperatorInstruction() {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ret.add(new ActionBitAnd());
+        return ret;
     }
 }

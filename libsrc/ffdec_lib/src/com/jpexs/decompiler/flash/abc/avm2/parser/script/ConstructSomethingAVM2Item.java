@@ -98,4 +98,9 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
         }
         return toSourceMerge(localData, generator, resname, arguments, ins(AVM2Instructions.Construct, arguments.size()));
     }
+
+    @Override
+    public boolean hasSideEffect() {
+        return true;
+    }
 }

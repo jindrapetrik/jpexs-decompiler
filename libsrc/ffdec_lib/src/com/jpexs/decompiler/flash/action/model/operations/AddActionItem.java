@@ -30,6 +30,7 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -90,5 +91,12 @@ public class AddActionItem extends BinaryOpItem implements CompoundableBinaryOp 
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.BOOLEAN;
+    }
+
+    @Override
+    public List<GraphSourceItem> getOperatorInstruction() {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ret.add(new ActionAdd2());
+        return ret;
     }
 }

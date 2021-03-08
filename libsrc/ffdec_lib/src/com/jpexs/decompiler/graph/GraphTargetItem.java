@@ -585,7 +585,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public abstract GraphTargetItem returnType();
 
     @Override
-    protected GraphTargetItem clone() {
+    public GraphTargetItem clone() {
         try {
             return (GraphTargetItem) super.clone();
         } catch (CloneNotSupportedException ex) {

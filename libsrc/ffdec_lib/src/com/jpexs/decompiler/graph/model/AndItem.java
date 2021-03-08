@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.graph.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -22,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,5 +59,10 @@ public class AndItem extends BinaryOpItem {
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.BOOLEAN;
+    }
+
+    @Override
+    public List<GraphSourceItem> getOperatorInstruction() {
+        return new ArrayList<>(); //???
     }
 }

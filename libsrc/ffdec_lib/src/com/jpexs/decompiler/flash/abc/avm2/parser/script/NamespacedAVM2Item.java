@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.helpers.Reference;
@@ -32,6 +33,7 @@ import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -214,4 +216,50 @@ public class NamespacedAVM2Item extends AssignableAVM2Item {
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, false, false, new ArrayList<>(), false, false);
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 59 * hash + Objects.hashCode(this.ns);
+        hash = 59 * hash + Objects.hashCode(this.name);
+        hash = 59 * hash + Objects.hashCode(this.nameItem);
+        hash = 59 * hash + Objects.hashCode(this.obj);
+        hash = 59 * hash + (this.attr ? 1 : 0);
+        hash = 59 * hash + Objects.hashCode(this.openedNamespaces);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final NamespacedAVM2Item other = (NamespacedAVM2Item) obj;
+        if (this.attr != other.attr) {
+            return false;
+        }
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        if (!Objects.equals(this.ns, other.ns)) {
+            return false;
+        }
+        if (!Objects.equals(this.nameItem, other.nameItem)) {
+            return false;
+        }
+        if (!Objects.equals(this.obj, other.obj)) {
+            return false;
+        }
+        if (!Objects.equals(this.openedNamespaces, other.openedNamespaces)) {
+            return false;
+        }
+        return true;
+    }
+
 }

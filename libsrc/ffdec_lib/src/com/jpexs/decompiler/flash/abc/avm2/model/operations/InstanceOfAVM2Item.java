@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
@@ -25,6 +26,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,5 +49,12 @@ public class InstanceOfAVM2Item extends BinaryOpItem {
     @Override
     public GraphTargetItem returnType() {
         return new TypeItem(DottedChain.BOOLEAN);
+    }
+
+    @Override
+    public List<GraphSourceItem> getOperatorInstruction() {
+        List<GraphSourceItem> ret = new ArrayList<>();
+        ret.add(new AVM2Instruction(0, AVM2Instructions.InstanceOf, null));
+        return ret;
     }
 }

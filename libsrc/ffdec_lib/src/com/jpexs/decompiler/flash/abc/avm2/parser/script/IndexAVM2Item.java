@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.helpers.Reference;
@@ -25,10 +26,12 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -112,6 +115,34 @@ public class IndexAVM2Item extends AssignableAVM2Item {
         Reference<Integer> ret_temp = new Reference<>(-1);
 
         if (assignedValue != null) {
+
+            if (assignedValue instanceof CompoundableBinaryOp) {
+                CompoundableBinaryOp comp = (CompoundableBinaryOp) assignedValue;
+                if (comp.getLeftSide() instanceof IndexAVM2Item) {
+                    IndexAVM2Item left = (IndexAVM2Item) comp.getLeftSide();
+                    if (left.assignedValue == null && Objects.equals(left.object, object) && Objects.equals(left.index, index) && index.hasSideEffect()) {
+                        Reference<Integer> val_temp = new Reference<>(-1);
+                        Reference<Integer> index_temp = new Reference<>(-1);
+                        return toSourceMerge(localData, generator,
+                                index,
+                                setTemp(localData, generator, index_temp),
+                                object,
+                                getTemp(localData, generator, index_temp),
+                                ins(AVM2Instructions.GetProperty, indexPropIndex),
+                                comp.getRightSide(),
+                                comp.getOperatorInstruction(),
+                                setTemp(localData, generator, val_temp),
+                                object,
+                                getTemp(localData, generator, index_temp),
+                                getTemp(localData, generator, val_temp),
+                                needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
+                                ins(AVM2Instructions.SetProperty, indexPropIndex),
+                                needsReturn ? getTemp(localData, generator, ret_temp) : null,
+                                killTemp(localData, generator, Arrays.asList(index_temp, val_temp, ret_temp)));
+                    }
+                }
+            }
+
             return toSourceMerge(localData, generator,
                     object,
                     index,
@@ -143,4 +174,38 @@ public class IndexAVM2Item extends AssignableAVM2Item {
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSource(localData, generator, false, false, new ArrayList<>(), false, false);
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 89 * hash + Objects.hashCode(this.object);
+        hash = 89 * hash + Objects.hashCode(this.index);
+        hash = 89 * hash + (this.attr ? 1 : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final IndexAVM2Item other = (IndexAVM2Item) obj;
+        if (this.attr != other.attr) {
+            return false;
+        }
+        if (!Objects.equals(this.object, other.object)) {
+            return false;
+        }
+        if (!Objects.equals(this.index, other.index)) {
+            return false;
+        }
+        return true;
+    }
+
 }
