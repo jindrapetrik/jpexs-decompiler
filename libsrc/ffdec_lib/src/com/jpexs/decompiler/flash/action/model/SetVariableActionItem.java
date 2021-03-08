@@ -185,6 +185,27 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SetVariableActionItem other = (SetVariableActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.name, other.name)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.value, other.value)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public GraphTargetItem getCompoundValue() {
         return compoundValue;
     }

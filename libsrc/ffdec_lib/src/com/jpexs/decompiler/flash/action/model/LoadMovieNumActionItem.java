@@ -124,6 +124,29 @@ public class LoadMovieNumActionItem extends ActionItem {
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final LoadMovieNumActionItem other = (LoadMovieNumActionItem) obj;
+        if (this.method != other.method) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.urlString, other.urlString)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.num, other.num)) {
+            return false;
+        }
+        return true;
+    }
+    @Override
     public boolean hasSideEffect() {
         return true;
     }

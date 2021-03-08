@@ -27,6 +27,7 @@ import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -90,4 +91,62 @@ public class CloneSpriteActionItem extends ActionItem {
     public boolean hasSideEffect() {
         return true;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 17 * hash + Objects.hashCode(this.source);
+        hash = 17 * hash + Objects.hashCode(this.target);
+        hash = 17 * hash + Objects.hashCode(this.depth);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CloneSpriteActionItem other = (CloneSpriteActionItem) obj;
+        if (!Objects.equals(this.source, other.source)) {
+            return false;
+        }
+        if (!Objects.equals(this.target, other.target)) {
+            return false;
+        }
+        if (!Objects.equals(this.depth, other.depth)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CloneSpriteActionItem other = (CloneSpriteActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.source, other.source)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.target, other.target)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.depth, other.depth)) {
+            return false;
+        }
+        return true;
+    }
+
 }

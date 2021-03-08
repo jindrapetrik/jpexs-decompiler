@@ -152,6 +152,27 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DefineLocalActionItem other = (DefineLocalActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.name, other.name)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.value, other.value)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean hasSideEffect() {
         return true;
     }

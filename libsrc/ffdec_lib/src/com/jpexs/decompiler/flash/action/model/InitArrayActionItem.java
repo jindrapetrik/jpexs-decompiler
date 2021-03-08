@@ -104,6 +104,24 @@ public class InitArrayActionItem extends ActionItem {
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final InitArrayActionItem other = (InitArrayActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.values, other.values)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean hasSideEffect() {
         for (GraphTargetItem v : values) {
             if (v.hasSideEffect()) {

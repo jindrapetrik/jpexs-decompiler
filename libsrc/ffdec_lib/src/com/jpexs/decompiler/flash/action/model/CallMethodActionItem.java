@@ -171,6 +171,30 @@ public class CallMethodActionItem extends ActionItem {
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CallMethodActionItem other = (CallMethodActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.methodName, other.methodName)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.scriptObject, other.scriptObject)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.arguments, other.arguments)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean hasSideEffect() {
         return true;
     }

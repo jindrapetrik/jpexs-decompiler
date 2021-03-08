@@ -128,6 +128,27 @@ public class DeleteActionItem extends ActionItem {
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DeleteActionItem other = (DeleteActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.object, other.object)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.propertyName, other.propertyName)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean hasSideEffect() {
         return true;
     }

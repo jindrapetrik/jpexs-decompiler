@@ -120,4 +120,22 @@ public class IncrementActionItem extends ActionItem {
         return true;
     }
 
+    @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final IncrementActionItem other = (IncrementActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.object, other.object)) {
+            return false;
+        }
+        return true;
+    }
+
 }

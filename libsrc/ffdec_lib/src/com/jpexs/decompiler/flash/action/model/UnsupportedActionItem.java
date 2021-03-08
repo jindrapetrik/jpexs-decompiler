@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.model;
 import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.Objects;
 
@@ -65,6 +66,24 @@ public class UnsupportedActionItem extends ActionItem {
         }
         final UnsupportedActionItem other = (UnsupportedActionItem) obj;
         if (!Objects.equals(this.value, other.value)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final UnsupportedActionItem other = (UnsupportedActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.value, other.value)) {
             return false;
         }
         return true;

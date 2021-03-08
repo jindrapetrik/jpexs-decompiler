@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
+import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
@@ -88,6 +89,27 @@ public class GetURLActionItem extends ActionItem {
             return false;
         }
         if (!Objects.equals(this.targetString, other.targetString)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final GetURLActionItem other = (GetURLActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.urlString, other.urlString)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.targetString, other.targetString)) {
             return false;
         }
         return true;

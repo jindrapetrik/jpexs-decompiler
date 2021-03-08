@@ -131,6 +131,33 @@ public class GotoFrame2ActionItem extends ActionItem {
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final GotoFrame2ActionItem other = (GotoFrame2ActionItem) obj;
+        if (this.sceneBiasFlag != other.sceneBiasFlag) {
+            return false;
+        }
+        if (this.playFlag != other.playFlag) {
+            return false;
+        }
+        if (this.sceneBias != other.sceneBias) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.frame, other.frame)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean hasSideEffect() {
         return true;
     }

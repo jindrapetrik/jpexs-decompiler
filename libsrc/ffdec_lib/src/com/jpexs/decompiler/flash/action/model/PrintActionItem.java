@@ -104,6 +104,27 @@ public class PrintActionItem extends ActionItem {
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PrintActionItem other = (PrintActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.target, other.target)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.boundingBox, other.boundingBox)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean hasSideEffect() {
         return true;
     }

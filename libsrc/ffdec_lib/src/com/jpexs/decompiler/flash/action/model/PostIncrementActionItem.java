@@ -175,6 +175,24 @@ public class PostIncrementActionItem extends ActionItem implements SetTypeAction
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PostIncrementActionItem other = (PostIncrementActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.object, other.object)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public GraphTargetItem getCompoundValue() {
         throw new UnsupportedOperationException("Not supported.");
     }
