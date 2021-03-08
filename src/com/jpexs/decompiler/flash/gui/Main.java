@@ -46,6 +46,7 @@ import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
+import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
@@ -718,6 +719,18 @@ public class Main {
                 loadingDialog.setDetail("");
             }
         });
+    }
+
+    public static void populateSwfs(SWF swfParent, List<SWF> output) {
+        for (Tag t : swfParent.getTags()) {
+            if (t instanceof DefineBinaryDataTag) {
+                DefineBinaryDataTag b = (DefineBinaryDataTag) t;
+                if (b.innerSwf != null) {
+                    output.add(b.innerSwf);
+                    populateSwfs(b.innerSwf, output);
+                }
+            }
+        }
     }
 
     public static SWFList parseSWF(SWFSourceInfo sourceInfo) throws Exception {
