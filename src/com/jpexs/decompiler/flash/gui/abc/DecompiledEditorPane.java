@@ -113,6 +113,12 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     }
 
     public Trait getCurrentTrait() {
+        if (lastTraitIndex < 0) {
+            return null;
+        }
+        if (classIndex == -1) {
+            return script.abc.script_info.get(script.scriptIndex).traits.traits.get(lastTraitIndex);
+        }
         return script.abc.findTraitByTraitId(classIndex, lastTraitIndex);
     }
 
@@ -550,12 +556,11 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 currentTraitHighlight = Highlighting.searchPos(highlightedText.getTraitHighlights(), pos);
                 if (currentTraitHighlight != null) {
                     lastTraitIndex = (int) currentTraitHighlight.getProperties().index;
-                    if (classIndex != -1) {
-                        currentTrait = getCurrentTrait();
-                        isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
-                        if (currentTrait != null) {
-                            name += ":" + currentTrait.getName(abc).getName(abc.constants, null, false, true);
-                        }
+
+                    currentTrait = getCurrentTrait();
+                    isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
+                    if (currentTrait != null) {
+                        name += ":" + currentTrait.getName(abc).getName(abc.constants, null, false, true);
                     }
                 }
 
@@ -566,8 +571,8 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
 
             if (classIndex == -1) {
                 abcPanel.navigator.setClassIndex(-1, script.scriptIndex);
-                setNoTrait();
-                return;
+                //setNoTrait();
+                //return;
             }
             Trait currentTrait;
             currentTraitHighlight = Highlighting.searchPos(highlightedText.getTraitHighlights(), pos);
@@ -595,14 +600,23 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 }
                 currentMethodHighlight = null;
                 //currentTrait = null;
-                String name = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, true).toPrintableString(true);
+                String name = classIndex == -1 ? "" : abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, true).toPrintableString(true);
                 currentTrait = getCurrentTrait();
                 isStatic = abc.isStaticTraitId(classIndex, lastTraitIndex);
                 if (currentTrait != null) {
-                    name += ":" + currentTrait.getName(abc).getName(abc.constants, null, false, true);
+                    if (!name.isEmpty()) {
+                        name += ":";
+                    }
+                    name += currentTrait.getName(abc).getName(abc.constants, null, false, true);
                 }
 
-                displayMethod(pos, abc.findMethodIdByTraitId(classIndex, lastTraitIndex), name, currentTrait, lastTraitIndex, isStatic);
+                int methodId;
+                if (classIndex > -1) {
+                    methodId = abc.findMethodIdByTraitId(classIndex, lastTraitIndex);
+                } else {
+                    methodId = ((TraitMethodGetterSetter) abc.script_info.get(script.scriptIndex).traits.traits.get(lastTraitIndex)).method_info;
+                }
+                displayMethod(pos, methodId, name, currentTrait, lastTraitIndex, isStatic);
                 return;
             }
             setNoTrait();

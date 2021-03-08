@@ -240,6 +240,10 @@ public class ScriptPack extends AS3ClassTreeItem {
             }
 
             Trait trait = traits.get(t);
+
+            if (!(trait instanceof TraitClass)) {
+                writer.startTrait(t);
+            }
             Multiname name = trait.getName(abc);
             Namespace ns = name.getNamespace(abc.constants);
             if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
@@ -247,7 +251,9 @@ public class ScriptPack extends AS3ClassTreeItem {
             } else {
                 trait.toString(null, convertData, "", abc, false, exportMode, scriptIndex, -1, writer, new ArrayList<>(), parallel);
             }
-
+            if (!(trait instanceof TraitClass)) {
+                writer.endTrait();
+            }
             first = false;
         }
     }
