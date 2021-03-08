@@ -833,14 +833,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             Main.populateSwfs(s, allSwfs);
         }
 
+        List<List<String>> expandedNodes = View.getExpandedNodes(tagTree);
+        previewPanel.clear();
+        swfs.set(index, newSwfs);
+
         for (SWF s : allSwfs) {
             s.clearTagSwfs();
             Main.searchResultsStorage.destroySwf(s);
         }
-
-        List<List<String>> expandedNodes = View.getExpandedNodes(tagTree);
-        previewPanel.clear();
-        swfs.set(index, newSwfs);
         SWF swf = newSwfs.size() > 0 ? newSwfs.get(0) : null;
         if (swf != null) {
             updateUi(swf);
