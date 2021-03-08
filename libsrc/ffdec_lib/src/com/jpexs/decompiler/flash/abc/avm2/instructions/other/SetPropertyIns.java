@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConstructAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
@@ -338,12 +339,12 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         }
 
         SetPropertyAVM2Item result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value);
-        handleCompound(obj, multiname, value, output, result);
+        handleCompound(localData, obj, multiname, value, output, result);
 
         SetTypeIns.handleResult(value, stack, output, localData, result, -1);
     }
 
-    public static void handleCompound(GraphTargetItem obj, FullMultinameAVM2Item multiname, GraphTargetItem value, List<GraphTargetItem> output, SetTypeAVM2Item result) {
+    public static void handleCompound(AVM2LocalData localData, GraphTargetItem obj, FullMultinameAVM2Item multiname, GraphTargetItem value, List<GraphTargetItem> output, SetTypeAVM2Item result) {
         if (value instanceof LocalRegAVM2Item) {
             LocalRegAVM2Item locVal = (LocalRegAVM2Item) value;
             if (multiname.name instanceof LocalRegAVM2Item) {
@@ -379,7 +380,14 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         if (value.getNotCoerced() instanceof CompoundableBinaryOp) {
             if (!obj.hasSideEffect() && !multiname.hasSideEffect()) {
                 CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoerced();
-                if (binaryOp.getLeftSide() instanceof GetPropertyAVM2Item) {
+                if (binaryOp.getLeftSide() instanceof GetLexAVM2Item) {
+                    GetLexAVM2Item getLex = (GetLexAVM2Item) binaryOp.getLeftSide();
+                    if ((obj instanceof FindPropertyAVM2Item) && localData.abc.constants.getMultiname(multiname.multinameIndex).equals(getLex.propertyName)) {
+                        result.setCompoundValue(binaryOp.getRightSide());
+                        result.setCompoundOperator(binaryOp.getOperator());
+                    }
+                }
+                else if (binaryOp.getLeftSide() instanceof GetPropertyAVM2Item) {
                     GetPropertyAVM2Item propItem = (GetPropertyAVM2Item) binaryOp.getLeftSide();
                     if (Objects.equals(obj, propItem.object.getThroughDuplicate()) && Objects.equals(multiname, propItem.propertyName)) {
                         result.setCompoundValue(binaryOp.getRightSide());

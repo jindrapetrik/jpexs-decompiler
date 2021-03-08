@@ -45,7 +45,7 @@ public class InitPropertyIns extends InstructionDefinition {
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
         InitPropertyAVM2Item result = new InitPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, val);
-        SetPropertyIns.handleCompound(obj, multiname, val, output, result);
+        SetPropertyIns.handleCompound(localData, obj, multiname, val, output, result);
         output.add(result);
     }
 
