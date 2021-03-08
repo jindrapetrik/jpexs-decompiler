@@ -116,9 +116,13 @@ public class ActionSetMember extends Action {
 
         SetMemberActionItem setMem = new SetMemberActionItem(this, lineStartAction, object, memberName, value);
 
-        if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOp) {
+        GraphTargetItem inside = value.getNotCoercedNoDup();
+        if (inside instanceof StoreRegisterActionItem) {
+            inside = inside.value;
+        }
+        if (inside instanceof CompoundableBinaryOp) {
             if (!object.hasSideEffect() && !memberName.hasSideEffect()) {
-                CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoercedNoDup();
+                CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) inside;
                 if (binaryOp.getLeftSide() instanceof GetMemberActionItem) {
                     GetMemberActionItem getMember = (GetMemberActionItem) binaryOp.getLeftSide();
                     if (GraphTargetItem.objectsValueEquals(object, getMember.object.getThroughDuplicate()) && GraphTargetItem.objectsValueEquals(memberName, getMember.memberName)) {

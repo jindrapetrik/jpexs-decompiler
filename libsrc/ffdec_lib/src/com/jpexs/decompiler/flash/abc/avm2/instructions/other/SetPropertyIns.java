@@ -376,9 +376,9 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
             }
         }
 
-        if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOp) {
+        if (value.getNotCoerced() instanceof CompoundableBinaryOp) {
             if (!obj.hasSideEffect() && !multiname.hasSideEffect()) {
-                CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoercedNoDup();
+                CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoerced();
                 if (binaryOp.getLeftSide() instanceof GetPropertyAVM2Item) {
                     GetPropertyAVM2Item propItem = (GetPropertyAVM2Item) binaryOp.getLeftSide();
                     if (Objects.equals(obj, propItem.object.getThroughDuplicate()) && Objects.equals(multiname, propItem.propertyName)) {

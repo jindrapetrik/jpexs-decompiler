@@ -144,9 +144,9 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
 
         SetSlotAVM2Item result = new SetSlotAVM2Item(ins, localData.lineStartInstruction, obj, objnoreg, slotIndex, slotname, value);
 
-        if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOp) {
+        if (value.getNotCoerced() instanceof CompoundableBinaryOp) {
             if (!obj.hasSideEffect()) {
-                CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoercedNoDup();
+                CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoerced();
                 if (binaryOp.getLeftSide() instanceof GetSlotAVM2Item) {
                     GetSlotAVM2Item getSlot = (GetSlotAVM2Item) binaryOp.getLeftSide();
                     if (Objects.equals(obj, getSlot.scope.getThroughDuplicate()) && slotIndex == getSlot.slotIndex) {

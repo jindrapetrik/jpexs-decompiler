@@ -117,9 +117,13 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
         SetVariableActionItem setVar = new SetVariableActionItem(this, lineStartAction, name, value);
         GraphTargetItem ret = setVar;
 
-        if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOp) {
+        GraphTargetItem inside = value.getNotCoercedNoDup();
+        if (inside instanceof StoreRegisterActionItem) {
+            inside = inside.value;
+        }
+        if (inside instanceof CompoundableBinaryOp) {
             if (!name.hasSideEffect()) {
-                CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoercedNoDup();
+                CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) inside;
                 if (binaryOp.getLeftSide() instanceof GetVariableActionItem) {
                     GetVariableActionItem getVar = (GetVariableActionItem) binaryOp.getLeftSide();
                     if (GraphTargetItem.objectsValueEquals(name, getVar.name)) {
