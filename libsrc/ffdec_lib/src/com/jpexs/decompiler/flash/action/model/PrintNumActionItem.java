@@ -110,6 +110,27 @@ public class PrintNumActionItem extends ActionItem {
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PrintNumActionItem other = (PrintNumActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.num, other.num)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.boundingBox, other.boundingBox)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean hasSideEffect() {
         return true;
     }

@@ -645,4 +645,32 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
     public boolean isIdentical(GraphTargetItem other) {
         return this == other;
     }
+
+    public static boolean objectsValueEquals(Object o1, Object o2) {
+        if (o1 == null && o2 == null) {
+            return true;
+        }
+        if (o1 == null || o2 == null) {
+            return false;
+        }
+        if ((o1 instanceof GraphTargetItem) && (o2 instanceof GraphTargetItem)) {
+            GraphTargetItem gt1 = (GraphTargetItem) o1;
+            GraphTargetItem gt2 = (GraphTargetItem) o2;
+            return gt1.valueEquals(gt2);
+        }
+        if ((o1 instanceof List) && (o2 instanceof List)) {
+            List l1 = (List) o1;
+            List l2 = (List) o2;
+
+            if (l1.size() != l2.size()) {
+                return false;
+            }
+            for (int i = 0; i < l1.size(); i++) {
+                if (!objectsValueEquals(l1.get(i), l2.get(i))) {
+                    return false;
+                }
+            }
+        }
+        return o1.equals(o2);
+    }
 }

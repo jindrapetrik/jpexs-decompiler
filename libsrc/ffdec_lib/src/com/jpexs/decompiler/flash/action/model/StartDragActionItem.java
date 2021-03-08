@@ -168,6 +168,42 @@ public class StartDragActionItem extends ActionItem {
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final StartDragActionItem other = (StartDragActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.target, other.target)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.lockCenter, other.lockCenter)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.constrain, other.constrain)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.y2, other.y2)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.x2, other.x2)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.y1, other.y1)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.x1, other.x1)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean hasSideEffect() {
         return true;
     }

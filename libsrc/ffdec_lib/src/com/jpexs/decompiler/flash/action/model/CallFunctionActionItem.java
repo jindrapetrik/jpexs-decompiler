@@ -141,6 +141,24 @@ public class CallFunctionActionItem extends ActionItem {
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CallFunctionActionItem other = (CallFunctionActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(functionName, other.functionName)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.arguments, other.arguments)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, toSourceCall(localData, generator, arguments), functionName, new ActionCallFunction());
     }

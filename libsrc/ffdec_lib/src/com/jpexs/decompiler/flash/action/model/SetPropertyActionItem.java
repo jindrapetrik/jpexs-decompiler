@@ -168,6 +168,30 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SetPropertyActionItem other = (SetPropertyActionItem) obj;
+        if (this.propertyIndex != other.propertyIndex) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.target, other.target)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.value, other.value)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public GraphTargetItem getCompoundValue() {
         throw new UnsupportedOperationException("Not supported.");
     }

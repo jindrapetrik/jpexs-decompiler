@@ -121,7 +121,7 @@ public class ActionSetMember extends Action {
                 CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoercedNoDup();
                 if (binaryOp.getLeftSide() instanceof GetMemberActionItem) {
                     GetMemberActionItem getMember = (GetMemberActionItem) binaryOp.getLeftSide();
-                    if (Objects.equals(object, getMember.object.getThroughDuplicate()) && Objects.equals(memberName, getMember.memberName)) {
+                    if (GraphTargetItem.objectsValueEquals(object, getMember.object.getThroughDuplicate()) && GraphTargetItem.objectsValueEquals(memberName, getMember.memberName)) {
                         setMem.setCompoundValue(binaryOp.getRightSide());
                         setMem.setCompoundOperator(binaryOp.getOperator());
                     }

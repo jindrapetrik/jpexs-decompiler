@@ -111,6 +111,24 @@ public class GetMemberActionItem extends ActionItem {
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final GetMemberActionItem other = (GetMemberActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(object, other.object)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(memberName, other.memberName)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return toSourceMerge(localData, generator, object, memberName, new ActionGetMember());
     }

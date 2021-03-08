@@ -97,4 +97,25 @@ public class ImplementsOpActionItem extends ActionItem {
         return true;
     }
 
+    @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final ImplementsOpActionItem other = (ImplementsOpActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.subclass, other.subclass)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.superclasses, other.superclasses)) {
+            return false;
+        }
+        return true;
+    }
+
 }

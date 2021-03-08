@@ -109,4 +109,25 @@ public class TemporaryRegister extends ActionItem {
         return true;
     }
 
+    @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final TemporaryRegister other = (TemporaryRegister) obj;
+        if (this.regId != other.regId) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.value, other.value)) {
+            return false;
+        }
+        return true;
+    }
+
 }

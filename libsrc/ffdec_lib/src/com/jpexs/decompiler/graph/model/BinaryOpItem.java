@@ -168,6 +168,24 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         return (Objects.equals(operator, other.operator));
     }
 
+    @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final BinaryOpItem other = (BinaryOpItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(leftSide, other.leftSide)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(rightSide, other.rightSide)) {
+            return false;
+        }
+        return GraphTargetItem.objectsValueEquals(operator, other.operator);
+    }
+
     /*@Override
      public boolean toBoolean() {
      double val=toNumber();

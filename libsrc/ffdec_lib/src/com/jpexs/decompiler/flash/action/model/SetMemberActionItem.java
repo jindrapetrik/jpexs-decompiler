@@ -185,6 +185,30 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SetMemberActionItem other = (SetMemberActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.object, other.object)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.objectName, other.objectName)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.value, other.value)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public GraphTargetItem getCompoundValue() {
         return compoundValue;
     }

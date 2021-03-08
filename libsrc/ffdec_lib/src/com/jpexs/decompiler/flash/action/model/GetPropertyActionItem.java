@@ -107,6 +107,27 @@ public class GetPropertyActionItem extends ActionItem {
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final GetPropertyActionItem other = (GetPropertyActionItem) obj;
+        if (this.propertyIndex != other.propertyIndex) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.target, other.target)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public List<GraphSourceItemPos> getNeededSources() {
         List<GraphSourceItemPos> ret = super.getNeededSources();
         ret.addAll(target.getNeededSources());

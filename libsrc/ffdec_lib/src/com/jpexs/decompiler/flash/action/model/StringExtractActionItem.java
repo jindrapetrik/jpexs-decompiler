@@ -137,4 +137,27 @@ public class StringExtractActionItem extends ActionItem {
         return true;
     }
 
+    @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final StringExtractActionItem other = (StringExtractActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.index, other.index)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.count, other.count)) {
+            return false;
+        }
+        if (!GraphTargetItem.objectsValueEquals(this.value, other.value)) {
+            return false;
+        }
+        return true;
+    }
 }

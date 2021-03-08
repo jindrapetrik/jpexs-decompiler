@@ -92,6 +92,24 @@ public class FSCommandActionItem extends ActionItem {
     }
 
     @Override
+    public boolean valueEquals(GraphTargetItem obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final FSCommandActionItem other = (FSCommandActionItem) obj;
+        if (!GraphTargetItem.objectsValueEquals(this.command, other.command)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public boolean hasSideEffect() {
         return true;
     }

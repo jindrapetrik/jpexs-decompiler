@@ -122,7 +122,7 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
                 CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoercedNoDup();
                 if (binaryOp.getLeftSide() instanceof GetVariableActionItem) {
                     GetVariableActionItem getVar = (GetVariableActionItem) binaryOp.getLeftSide();
-                    if (Objects.equals(name, getVar.name)) {
+                    if (GraphTargetItem.objectsValueEquals(name, getVar.name)) {
                         setVar.setCompoundValue(binaryOp.getRightSide());
                         setVar.setCompoundOperator(binaryOp.getOperator());
                     }
