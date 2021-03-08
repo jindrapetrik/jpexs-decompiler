@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - [#1156] FLA, SVG, Canvas Export -  9 slice scaling (DefineScalingGrid)
 - [#843] Compound assignments (like +=) decompilation and direct editation
 - [#1221] Separate icons for different actionscript objects (class/interface/frame/)
+- AS3 P-code - hilight and edit traits outside classes
 
 ### Changed
 - [#1471] Import script menuitem renamed to Import scripts.
