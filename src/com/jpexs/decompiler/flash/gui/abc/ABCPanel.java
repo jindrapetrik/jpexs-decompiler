@@ -1131,12 +1131,17 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             if (multinameIndex == 0) {
                 return false;
             }
-            List<MultinameUsage> usages = usedAbcRef.getVal().findMultinameDefinition(multinameIndex);
 
             Multiname m = usedAbc.constants.getMultiname(multinameIndex);
             if (m == null) {
                 return false;
             }
+            if (m.kind == Multiname.TYPENAME) {  //Assuming it's a Vector with single parameter
+                multinameIndex = m.params[0];
+                m = usedAbc.constants.getMultiname(multinameIndex);
+            }
+            List<MultinameUsage> usages = usedAbc.findMultinameDefinition(multinameIndex);
+
             //search other ABC tags if this is not private multiname
             if (m.getSingleNamespaceIndex(usedAbc.constants) > 0 && usedAbc.constants.getNamespace(m.getSingleNamespaceIndex(usedAbc.constants)).kind != Namespace.KIND_PRIVATE) {
                 for (ABCContainerTag at : getAbcList()) {
@@ -1178,9 +1183,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         int multinameIndex = decompiledTextArea.getMultinameAtPos(pos, usedAbcRef);
         ABC usedAbc = usedAbcRef.getVal();
         if (multinameIndex > -1) {
-            List<MultinameUsage> usages = abc.findMultinameDefinition(multinameIndex);
 
             Multiname m = usedAbc.constants.getMultiname(multinameIndex);
+            if (m.kind == Multiname.TYPENAME) { //Assuming it's a Vector with single parameter
+                multinameIndex = m.params[0];
+                m = usedAbc.constants.getMultiname(multinameIndex);
+            }
+
+            List<MultinameUsage> usages = usedAbc.findMultinameDefinition(multinameIndex);
+
             //search other ABC tags if this is not private multiname
             if (m.getSingleNamespaceIndex(usedAbc.constants) > 0 && m.getSingleNamespace(usedAbc.constants).kind != Namespace.KIND_PRIVATE) {
                 for (ABCContainerTag at : getAbcList()) {
