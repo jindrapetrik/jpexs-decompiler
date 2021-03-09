@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
-import com.jpexs.decompiler.flash.abc.usages.ConstVarNameMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.InsideClassMultinameUsageInterface;
 import com.jpexs.decompiler.flash.abc.usages.MethodMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
@@ -39,7 +38,6 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 /**
  *

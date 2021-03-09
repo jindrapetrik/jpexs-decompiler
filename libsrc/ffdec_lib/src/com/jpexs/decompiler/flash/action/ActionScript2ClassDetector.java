@@ -12,11 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.action.model.CallFunctionActionItem;
-import com.jpexs.helpers.Reference;
 import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.ExtendsActionItem;
@@ -40,6 +40,7 @@ import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;

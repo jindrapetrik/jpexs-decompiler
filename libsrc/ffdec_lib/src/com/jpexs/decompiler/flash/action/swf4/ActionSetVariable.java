@@ -41,7 +41,6 @@ import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 /**
  *

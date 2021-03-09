@@ -1,19 +1,15 @@
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
-import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import static com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item.ins;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import static com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item.dupSetTemp;
 import static com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item.getTemp;
 import static com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item.killTemp;
 import static com.jpexs.decompiler.flash.abc.avm2.parser.script.AssignableAVM2Item.setTemp;
-import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;

@@ -19,19 +19,16 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.TagInfo;
 import java.awt.BorderLayout;
+import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.MissingResourceException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.ArrayList;
-import java.util.Collections;
-
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JEditorPane;
-
-import java.awt.Font;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;

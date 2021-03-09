@@ -16,13 +16,9 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import static com.jpexs.decompiler.flash.gui.AppDialog.CANCEL_OPTION;
-import static com.jpexs.decompiler.flash.gui.AppDialog.ERROR_OPTION;
-import static com.jpexs.decompiler.flash.gui.AppDialog.OK_OPTION;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -31,13 +27,11 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.Objects;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 /**

@@ -12,18 +12,19 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.iggy.conversion;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SWFInputStream;
-import com.jpexs.decompiler.flash.iggy.IggyShape;
-import com.jpexs.decompiler.flash.iggy.IggyCharKerning;
 import com.jpexs.decompiler.flash.iggy.IggyCharAdvances;
+import com.jpexs.decompiler.flash.iggy.IggyCharKerning;
 import com.jpexs.decompiler.flash.iggy.IggyDeclStrings;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
 import com.jpexs.decompiler.flash.iggy.IggyFont;
+import com.jpexs.decompiler.flash.iggy.IggyShape;
 import com.jpexs.decompiler.flash.iggy.IggySwf;
 import com.jpexs.decompiler.flash.iggy.IggyText;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;

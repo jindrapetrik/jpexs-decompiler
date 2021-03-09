@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.action.swf5.ActionBitRShift;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitURShift;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
