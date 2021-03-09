@@ -2241,7 +2241,7 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
-    private static void convertFrames(String prevStr, String afterStr, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
+    private static void convertFrames(List<Integer> onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
         XFLXmlWriter writer2 = new XFLXmlWriter();
         prevStr += "<frames>";
         int frame = -1;
@@ -2372,42 +2372,54 @@ public class XFLConverter {
             }
 
             if (t instanceof ShowFrameTag) {
-                XFLXmlWriter elementsWriter = new XFLXmlWriter();
-                if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId) || shapeTweener != null)) {
-                    ShapeTag shape = (ShapeTag) character;
-                    convertShape(characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, elementsWriter);
-                    shapeTween = false;
-                    shapeTweener = null;
-                } else if (character != null) {
-                    if (character instanceof MorphShapeTag) {
-                        MorphShapeTag m = (MorphShapeTag) character;
-                        convertShape(characters, matrix, 3, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false, elementsWriter);
-                        shapeTween = true;
-                    } else {
-                        shapeTween = false;
-                        if (character instanceof TextTag) {
-                            convertText(instanceName, (TextTag) character, matrix, filters, clipActions, elementsWriter);
-                        } else if (character instanceof DefineVideoStreamTag) {
-                            convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, clipActions, elementsWriter);
-                        } else {
-                            convertSymbolInstance(instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, characters, tags, flaVersion, elementsWriter);
+                if (frame + 1 >= startFrame && (onlyFrames == null || onlyFrames.contains(frame + 1))) {
+
+                    XFLXmlWriter elementsWriter = new XFLXmlWriter();
+
+                    if (frame + 1 <= endFrame) {
+                        if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId) || shapeTweener != null)) {
+                            ShapeTag shape = (ShapeTag) character;
+                            convertShape(characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, elementsWriter);
+                            shapeTween = false;
+                            shapeTweener = null;
+                        } else if (character != null) {
+                            if (character instanceof MorphShapeTag) {
+                                MorphShapeTag m = (MorphShapeTag) character;
+                                convertShape(characters, matrix, 3, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false, elementsWriter);
+                                shapeTween = true;
+                            } else {
+                                shapeTween = false;
+                                if (character instanceof TextTag) {
+                                    convertText(instanceName, (TextTag) character, matrix, filters, clipActions, elementsWriter);
+                                } else if (character instanceof DefineVideoStreamTag) {
+                                    convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, clipActions, elementsWriter);
+                                } else {
+                                    convertSymbolInstance(instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, characters, tags, flaVersion, elementsWriter);
+                                }
+                            }
                         }
                     }
-                }
+                    frame++;
+                    String elements = elementsWriter.toString();
+                    if (!elements.equals(lastElements) && frame > 0) {
+                        convertFrame(lastShapeTween, null, null, frame - duration, duration, "", lastElements, files, writer2);
+                        duration = 1;
+                    } else if (frame == 0) {
+                        duration = 1;
+                    } else {
+                        duration++;
+                    }
 
-                frame++;
-                String elements = elementsWriter.toString();
-                if (!elements.equals(lastElements) && frame > 0) {
-                    convertFrame(lastShapeTween, null, null, frame - duration, duration, "", lastElements, files, writer2);
-                    duration = 1;
-                } else if (frame == 0) {
-                    duration = 1;
+                    lastShapeTween = shapeTween;
+                    lastElements = elements;
                 } else {
-                    duration++;
+                    frame++;
+                    if (frame == 0) {
+                        duration = 1;
+                    } else {
+                        duration++;
+                    }
                 }
-
-                lastShapeTween = shapeTween;
-                lastElements = elements;
             }
         }
         if (!lastElements.isEmpty()) {
@@ -2878,26 +2890,89 @@ public class XFLConverter {
         }
 
         int layerCount = getLayerCount(timelineTags);
-        Stack<Integer> parentLayers = new Stack<>();
 
-        for (int d = layerCount; d >= 1; d--, index++) {
-            for (Tag t : timelineTags) {
-                if (t instanceof PlaceObjectTypeTag) {
-                    PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
-                    if (po.getClipDepth() == d) {
-                        for (int m = po.getDepth(); m < po.getClipDepth(); m++) {
-                            parentLayers.push(index);
+        List<Integer> clipFrameSplitters = new ArrayList<>();
+        List<PlaceObjectTypeTag> clipPlaces = new ArrayList<>();
+        int f = 0;
+
+        Map<Integer, PlaceObjectTypeTag> depthToClipPlace = new HashMap<>();
+        Map<PlaceObjectTypeTag, Integer> clipFinishFrames = new HashMap<>();
+        for (Tag t : timelineTags) {
+            if (t instanceof ShowFrameTag) {
+                f++;
+            }
+            if (t instanceof PlaceObjectTypeTag) {
+                PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
+                if (po.getClipDepth() > -1) {
+                    clipFrameSplitters.add(f);
+                    clipPlaces.add(po);
+                    depthToClipPlace.put(po.getDepth(), po);
+                } else {
+                    if (!po.flagMove() && depthToClipPlace.containsKey(po.getDepth())) {
+                        clipFinishFrames.put(depthToClipPlace.get(po.getDepth()), f - 1);
+                        depthToClipPlace.remove(po.getDepth());
+                    }
+                }
+            }
+            if (t instanceof RemoveTag) {
+                RemoveTag re = (RemoveTag) t;
+                if (depthToClipPlace.containsKey(re.getDepth())) {
+                    clipFinishFrames.put(depthToClipPlace.get(re.getDepth()), f - 1);
+                    depthToClipPlace.remove(re.getDepth());
+                }
+            }
+        }
+
+        int frameCount = f;
+
+        if (!depthToClipPlace.isEmpty()) {
+            for (PlaceObjectTypeTag po : depthToClipPlace.values()) {
+                clipFinishFrames.put(po, frameCount - 1);
+            }
+        }
+
+        if (clipFrameSplitters.isEmpty() || clipFrameSplitters.get(0) != 0) {
+            clipFrameSplitters.add(0, 0);
+            clipPlaces.add(0, null);
+        }
+
+        clipFrameSplitters.add(frameCount);
+        clipPlaces.add(null);
+
+        Map<Integer, List<Integer>> depthToFramesList = new HashMap<>();
+        for (int d = layerCount; d >= 1; d--) {
+            depthToFramesList.put(d, new ArrayList<>());
+            for (int i = 0; i < frameCount; i++) {
+                depthToFramesList.get(d).add(i);
+            }
+        }
+        for (int d = layerCount; d >= 1; d--) {
+
+            for (int p = 0; p < clipPlaces.size() - 1; p++) {
+                PlaceObjectTypeTag po = clipPlaces.get(p);
+                if (po != null && po.getClipDepth() == d) {
+                    int clipFrame = clipFrameSplitters.get(p);
+                    int nextFrame = clipFinishFrames.get(po);
+                    writer.writeStartElement("DOMLayer", new String[]{
+                        "name", "Layer " + (index + 1),
+                        "color", randomOutlineColor(),
+                        "layerType", "mask",
+                        "locked", "true"});
+                    convertFrames(null, clipFrame, nextFrame, "", "", nonLibraryShapes, tags, timelineTags, characters, po.getDepth(), flaVersion, files, writer);
+                    writer.writeEndElement();
+
+                    int parentIndex = index;
+                    index++;
+                    int nd = d;
+                    for (int m = po.getDepth() + 1; m < po.getClipDepth(); m++) {
+                        nd--;
+                        boolean nonEmpty = writeLayer(index, depthToFramesList.get(nd), nd, clipFrame, nextFrame, parentIndex, writer, nonLibraryShapes, tags, timelineTags, characters, flaVersion, files);
+                        for (int i = clipFrame; i <= nextFrame; i++) {
+                            depthToFramesList.get(nd).remove((Integer) i);
                         }
-
-                        writer.writeStartElement("DOMLayer", new String[]{
-                            "name", "Layer " + (index + 1),
-                            "color", randomOutlineColor(),
-                            "layerType", "mask",
-                            "locked", "true"});
-                        convertFrames("", "", nonLibraryShapes, tags, timelineTags, characters, po.getDepth(), flaVersion, files, writer);
-                        writer.writeEndElement();
-                        index++;
-                        break;
+                        if (nonEmpty) {
+                            index++;
+                        }
                     }
                 }
             }
@@ -2915,35 +2990,12 @@ public class XFLConverter {
                 }
             }
             if (hasClipDepth) {
-                index--;
                 continue;
             }
-            int parentLayer = -1;
-            if (!parentLayers.isEmpty()) {
-                parentLayer = parentLayers.pop();
-            }
 
-            XFLXmlWriter layerPrev = new XFLXmlWriter();
-            layerPrev.writeStartElement("DOMLayer", new String[]{
-                "name", "Layer " + (index + 1),
-                "color", randomOutlineColor()
-            });
-            if (d == 1) {
-                layerPrev.writeAttribute("current", true);
-                layerPrev.writeAttribute("isSelected", true);
-            }
-            if (parentLayer != -1) {
-                if (parentLayer != d) {
-                    layerPrev.writeAttribute("parentLayerIndex", parentLayer);
-                    layerPrev.writeAttribute("locked", true);
-                }
-            }
-            layerPrev.writeCharacters(""); // todo honfika: hack to close start tag
-            String layerAfter = "</DOMLayer>";
-            int prevLength = writer.length();
-            convertFrames(layerPrev.toString(), layerAfter, nonLibraryShapes, tags, timelineTags, characters, d, flaVersion, files, writer);
-            if (writer.length() == prevLength) {
-                index--;
+            boolean nonEmpty = writeLayer(index, depthToFramesList.get(d), d, 0, Integer.MAX_VALUE, -1, writer, nonLibraryShapes, tags, timelineTags, characters, flaVersion, files);
+            if (nonEmpty) {
+                index++;
             }
         }
 
@@ -2952,6 +3004,29 @@ public class XFLConverter {
         convertSoundLayer(soundLayerIndex, timelineTags, files, writer);
         writer.writeEndElement();
         writer.writeEndElement();
+    }
+
+    private boolean writeLayer(int index, List<Integer> onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, FLAVersion flaVersion, HashMap<String, byte[]> files) throws XMLStreamException {
+        XFLXmlWriter layerPrev = new XFLXmlWriter();
+        layerPrev.writeStartElement("DOMLayer", new String[]{
+            "name", "Layer " + (index + 1),
+            "color", randomOutlineColor()
+        });
+        if (d == 1) {
+            layerPrev.writeAttribute("current", true);
+            layerPrev.writeAttribute("isSelected", true);
+        }
+        if (parentLayer != -1) {
+            if (parentLayer != d) {
+                layerPrev.writeAttribute("parentLayerIndex", parentLayer);
+                layerPrev.writeAttribute("locked", true);
+            }
+        }
+        layerPrev.writeCharacters(""); // todo honfika: hack to close start tag
+        String layerAfter = "</DOMLayer>";
+        int prevLength = writer.length();
+        convertFrames(onlyFrames, startFrame, endFrame, layerPrev.toString(), layerAfter, nonLibraryShapes, tags, timelineTags, characters, d, flaVersion, files, writer);
+        return writer.length() != prevLength;
     }
 
     private static void writeFile(AbortRetryIgnoreHandler handler, final byte[] data, final String file) throws IOException, InterruptedException {
