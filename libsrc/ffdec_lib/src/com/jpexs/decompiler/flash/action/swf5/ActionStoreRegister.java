@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumeratedValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumerationAssignmentValueActionItem;
-import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.IncrementActionItem;
 import com.jpexs.decompiler.flash.action.model.PostDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.PostIncrementActionItem;
@@ -45,7 +44,6 @@ import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 /**
  *

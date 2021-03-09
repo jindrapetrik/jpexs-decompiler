@@ -37,7 +37,6 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 /**
  *

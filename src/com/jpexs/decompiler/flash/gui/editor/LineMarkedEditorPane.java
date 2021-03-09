@@ -16,9 +16,9 @@
  */
 package com.jpexs.decompiler.flash.gui.editor;
 
-import com.jpexs.helpers.Reference;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.helpers.Reference;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.FontMetrics;

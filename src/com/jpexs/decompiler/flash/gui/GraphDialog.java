@@ -17,8 +17,6 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.exporters.script.PcodeGraphVizExporter;
-import com.jpexs.decompiler.flash.gui.AppDialog;
-import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.graph.AbstractGraphPanel;
 import com.jpexs.decompiler.flash.gui.graph.GraphPanelSimple;
 import com.jpexs.decompiler.flash.gui.graph.GraphVizGraphPanel;

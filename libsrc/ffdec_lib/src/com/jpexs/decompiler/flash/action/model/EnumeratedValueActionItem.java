@@ -28,7 +28,6 @@ import com.jpexs.decompiler.graph.model.BranchStackResistant;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  *
