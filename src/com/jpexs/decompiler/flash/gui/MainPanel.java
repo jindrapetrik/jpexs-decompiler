@@ -1101,9 +1101,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         View.checkAccess();
 
         List<TreeItem> nodes = getASTreeNodes(tagTree);
+        tagTree.clearSelection();
         for (TreeItem n : nodes) {
             if (n instanceof ClassesListTreeModel) {
-                String filterText = filterField.getText();
+                String filterText = filterField.getText();                
                 ((ClassesListTreeModel) n).setFilter(filterText);
                 TagTreeModel tm = tagTree.getModel();
                 TreePath path = tm.getTreePath(n);
