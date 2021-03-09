@@ -562,6 +562,9 @@ public class TagTreeModel implements TreeModel {
 
     @Override
     public TreeItem getChild(Object parent, int index) {
+        if(getChildCount(parent) == 0) {
+            return null;
+        }
         TreeItem parentNode = (TreeItem) parent;
 
         if (parentNode instanceof CharacterTag) {
