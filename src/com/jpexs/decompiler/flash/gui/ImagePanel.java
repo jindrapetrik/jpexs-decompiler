@@ -1201,7 +1201,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private void showSelectedName() {
-        if (selectedDepth > -1 && frame > -1) {
+        if (selectedDepth > -1 && frame > -1 && timelined != null) {
             DepthState ds = timelined.getTimeline().getFrame(frame).layers.get(selectedDepth);
             if (ds != null) {
                 CharacterTag cht = timelined.getTimeline().swf.getCharacter(ds.characterId);
@@ -1573,7 +1573,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         textTag = null;
         newTextTag = null;
-        displayObjectCache.clear();
+        displayObjectCache.clear();        
     }
 
     private void nextFrame(Timer thisTimer, final int cnt, final int timeShouldBe) {
