@@ -27,7 +27,13 @@ import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.helpers.ImmediateFuture;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -43,6 +49,8 @@ import java.util.logging.Logger;
 public class DecompilerPool {
 
     private final ThreadPoolExecutor executor;
+
+    private Map<SWF, List<Future<HighlightedText>>> swfToFutures = new WeakHashMap<>();
 
     public DecompilerPool() {
         int threadCount = Configuration.getParallelThreadCount();
@@ -148,6 +156,11 @@ public class DecompilerPool {
 
     public HighlightedText decompile(ASMSource src, ActionList actions) throws InterruptedException {
         Future<HighlightedText> future = submitTask(src, actions, null);
+        SWF swf = src.getSwf();
+        if (!swfToFutures.containsKey(swf)) {
+            swfToFutures.put(swf, new ArrayList<>());
+        }
+        swfToFutures.get(swf).add(future);
         try {
             return future.get();
         } catch (InterruptedException ex) {
@@ -155,6 +168,11 @@ public class DecompilerPool {
             throw ex;
         } catch (ExecutionException ex) {
             Logger.getLogger(DecompilerPool.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            List<Future<HighlightedText>> futures = swfToFutures.get(swf);
+            if (futures != null) {
+                futures.remove(future);
+            }
         }
 
         return null;
@@ -162,6 +180,12 @@ public class DecompilerPool {
 
     public HighlightedText decompile(ScriptPack pack) throws InterruptedException {
         Future<HighlightedText> future = submitTask(pack, null);
+
+        SWF swf = pack.getSwf();
+        if (!swfToFutures.containsKey(swf)) {
+            swfToFutures.put(swf, new ArrayList<>());
+        }
+        swfToFutures.get(swf).add(future);
         try {
             return future.get();
         } catch (InterruptedException ex) {
@@ -169,6 +193,11 @@ public class DecompilerPool {
             throw ex;
         } catch (ExecutionException ex) {
             Logger.getLogger(DecompilerPool.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            List<Future<HighlightedText>> futures = swfToFutures.get(swf);
+            if (futures != null) {
+                futures.remove(future);
+            }
         }
 
         return null;
@@ -177,6 +206,15 @@ public class DecompilerPool {
     public void shutdown() throws InterruptedException {
         executor.shutdown();
         if (!executor.awaitTermination(100, TimeUnit.SECONDS)) {
+        }
+    }
+    
+    public void destroySwf(SWF swf){
+        List<Future<HighlightedText>> futures = swfToFutures.get(swf);
+        if(futures!=null){
+           for(Future<HighlightedText> future:futures){
+               future.cancel(true);
+           }
         }
     }
 }

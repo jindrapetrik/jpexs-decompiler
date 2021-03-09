@@ -989,8 +989,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         swfs.clear();
         oldItem = null;
         clear();
-        updateUi();
-
+        updateUi();      
+        
         for (SWFList swfList : swfsLists) {
             List<SWF> swfs2 = new ArrayList<>(swfList);
             for (SWF swf : swfs2) {

@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.event.CaretEvent;
@@ -752,8 +753,16 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                         } catch (CancellationException ex) {
                             setText("// " + AppStrings.translate("work.canceled"));
                         } catch (Exception ex) {
-                            logger.log(Level.SEVERE, "Error", ex);
-                            setText("// " + AppStrings.translate("decompilationError") + ": " + ex);
+                            Throwable cause = ex;
+                            if (ex instanceof ExecutionException) {
+                                cause = ex.getCause();
+                            }
+                            if (cause instanceof CancellationException) {
+                                setText("// " + AppStrings.translate("work.canceled"));
+                            } else {
+                                logger.log(Level.SEVERE, "Error", cause);
+                                setText("// " + AppStrings.translate("decompilationError") + ": " + cause);
+                            }
                         }
                     });
                 }

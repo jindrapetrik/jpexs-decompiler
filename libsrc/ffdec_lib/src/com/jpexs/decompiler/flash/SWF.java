@@ -375,6 +375,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public void clearTagSwfs() {
+        decompilerPool.destroySwf(this);
         resetTimelines(this);
         updateCharacters();
 
@@ -408,7 +409,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             for (ABCContainerTag c : abcList) {
                 c.getABC().free();
             }
-            abcList.clear();
+            abcList = null;
         }
 
         if (swfList != null) {
