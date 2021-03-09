@@ -27,7 +27,6 @@ import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 /**
  *
@@ -59,31 +58,5 @@ public class NewActivationAVM2Item extends AVM2Item {
     @Override
     public boolean hasReturnValue() {
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 29 * hash + Objects.hashCode(this.slots);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final NewActivationAVM2Item other = (NewActivationAVM2Item) obj;
-        if (!Objects.equals(this.slots, other.slots)) {
-            return false;
-        }
-        return true;
-    }
-
+    }  
 }
