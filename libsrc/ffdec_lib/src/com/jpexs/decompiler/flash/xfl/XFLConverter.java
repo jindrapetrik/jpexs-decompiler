@@ -197,6 +197,11 @@ public class XFLConverter {
 
     private final Random random = new Random(123); // predictable random
 
+    /**
+     * Adds "(depht xxx)" to layer name
+     */
+    private final boolean DEBUG_EXPORT_LAYER_DEPTHS = false;
+
     private static void convertShapeEdge(MATRIX mat, SHAPERECORD record, int x, int y, StringBuilder ret) {
         if (record instanceof StyleChangeRecord) {
             StyleChangeRecord scr = (StyleChangeRecord) record;
@@ -2241,6 +2246,7 @@ public class XFLConverter {
     }
 
     private static void convertFrames(List<Integer> onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
+        boolean lastIn = true;
         XFLXmlWriter writer2 = new XFLXmlWriter();
         prevStr += "<frames>";
         int frame = -1;
@@ -2376,6 +2382,7 @@ public class XFLConverter {
                     XFLXmlWriter elementsWriter = new XFLXmlWriter();
 
                     if (frame + 1 <= endFrame) {
+                        lastIn = true;
                         if ((character instanceof ShapeTag) && (nonLibraryShapes.contains(characterId) || shapeTweener != null)) {
                             ShapeTag shape = (ShapeTag) character;
                             convertShape(characters, matrix, shape.getShapeNum(), shape.getShapes().shapeRecords, shape.getShapes().fillStyles, shape.getShapes().lineStyles, false, false, elementsWriter);
@@ -2411,7 +2418,19 @@ public class XFLConverter {
 
                     lastShapeTween = shapeTween;
                     lastElements = elements;
+                    if (frame > endFrame) {
+                        if (lastIn) {
+                            lastElements = "";
+                            lastShapeTween = false;
+                            lastIn = false;
+                        }
+                    }
                 } else {
+                    if (lastIn) {
+                        lastElements = "";
+                        lastShapeTween = false;
+                        lastIn = false;
+                    }
                     frame++;
                     if (frame == 0) {
                         duration = 1;
@@ -2953,7 +2972,7 @@ public class XFLConverter {
                     int clipFrame = clipFrameSplitters.get(p);
                     int nextFrame = clipFinishFrames.get(po);
                     writer.writeStartElement("DOMLayer", new String[]{
-                        "name", "Layer " + (index + 1),
+                        "name", "Layer " + (index + 1) + (DEBUG_EXPORT_LAYER_DEPTHS ? " (depth " + po.getDepth() + " clipdepth:" + po.getClipDepth() + ")" : ""),
                         "color", randomOutlineColor(),
                         "layerType", "mask",
                         "locked", "true"});
@@ -2962,9 +2981,7 @@ public class XFLConverter {
 
                     int parentIndex = index;
                     index++;
-                    int nd = d;
-                    for (int m = po.getDepth() + 1; m < po.getClipDepth(); m++) {
-                        nd--;
+                    for (int nd = po.getClipDepth() - 1; nd > po.getDepth(); nd--) {
                         boolean nonEmpty = writeLayer(index, depthToFramesList.get(nd), nd, clipFrame, nextFrame, parentIndex, writer, nonLibraryShapes, tags, timelineTags, characters, flaVersion, files);
                         for (int i = clipFrame; i <= nextFrame; i++) {
                             depthToFramesList.get(nd).remove((Integer) i);
@@ -2973,10 +2990,13 @@ public class XFLConverter {
                             index++;
                         }
                     }
+                    for (int i = clipFrame; i <= nextFrame; i++) {
+                        depthToFramesList.get(po.getDepth()).remove((Integer) i);
+                    }
                 }
             }
 
-            boolean hasClipDepth = false;
+            /*boolean hasClipDepth = false;
             for (Tag t : timelineTags) {
                 if (t instanceof PlaceObjectTypeTag) {
                     PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
@@ -2990,7 +3010,7 @@ public class XFLConverter {
             }
             if (hasClipDepth) {
                 continue;
-            }
+            }*/
 
             boolean nonEmpty = writeLayer(index, depthToFramesList.get(d), d, 0, Integer.MAX_VALUE, -1, writer, nonLibraryShapes, tags, timelineTags, characters, flaVersion, files);
             if (nonEmpty) {
@@ -3008,7 +3028,7 @@ public class XFLConverter {
     private boolean writeLayer(int index, List<Integer> onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, FLAVersion flaVersion, HashMap<String, byte[]> files) throws XMLStreamException {
         XFLXmlWriter layerPrev = new XFLXmlWriter();
         layerPrev.writeStartElement("DOMLayer", new String[]{
-            "name", "Layer " + (index + 1),
+            "name", "Layer " + (index + 1) + (DEBUG_EXPORT_LAYER_DEPTHS ? " (depth " + d + ")" : ""),
             "color", randomOutlineColor()
         });
         if (d == 1) {
