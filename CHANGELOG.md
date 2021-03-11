@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 - AS3 P-code - hilight and edit traits outside classes
 - [#1585] SVG import - support for style tag (CSS)
 - [#1585] SVG import - support for switch tag
-- [#1122] SVG import - relative coordinates in gradients (tests coords-units-01-b, pservers-grad-12-b)
+- [#1122] SVG import - relative coordinates (tests coords-units-01-b, coords-units-02-b, pservers-grad-12-b)
 - Preview in image file selection dialogs
 
 ### Changed

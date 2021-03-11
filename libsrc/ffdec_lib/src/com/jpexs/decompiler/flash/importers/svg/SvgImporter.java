@@ -847,7 +847,7 @@ public class SvgImporter {
         double cy = attr.length() > 0 ? parseCoordinate(attr, viewBox.height) : 0;
 
         attr = childElement.getAttribute("r");
-        double r = attr.length() > 0 ? parseLength(attr, viewBox.width/* todo: how much is 100%? */) : 0;
+        double r = attr.length() > 0 ? parseLength(attr, (viewBox.width + viewBox.height) / 2) : 0;
 
         processEllipse(shapeNum, shapes, transform, style, cx, cy, r, r);
     }
