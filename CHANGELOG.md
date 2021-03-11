@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - AS3 P-code - hilight and edit traits outside classes
 - [#1585] SVG import - support for style tag (CSS)
 - [#1585] SVG import - support for switch tag
+- Preview in image file selection dialogs
 
 ### Changed
 - [#1471] Import script menuitem renamed to Import scripts.
