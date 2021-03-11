@@ -84,7 +84,7 @@ public class BinaryDataEditor extends JButton implements GenericTagEditor {
     }
 
     private void buttonActionPerformed(ActionEvent evt) {
-        File selectedFile = mainPanel.showImportFileChooser("");
+        File selectedFile = mainPanel.showImportFileChooser("", false);
         if (selectedFile != null) {
             File selfile = Helper.fixDialogFile(selectedFile);
             byte[] data = Helper.readFile(selfile.getAbsolutePath());

@@ -163,6 +163,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;
@@ -230,9 +231,11 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.plaf.metal.MetalFileChooserUI;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
+import org.pushingpixels.substance.internal.ui.SubstanceFileChooserUI;
 
 /**
  *
@@ -2639,7 +2642,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         for (SWF swf : swfs) {
-            File selectedFile = showImportFileChooser("filter.xml|*.xml");
+            File selectedFile = showImportFileChooser("filter.xml|*.xml", false);
             if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
                 String xml = Helper.readTextFile(selfile.getPath());
@@ -2956,16 +2959,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         TreeItem ti0 = items.get(0);
         File file = null;
         if (ti0 instanceof DefineSoundTag) {
-            file = showImportFileChooser("filter.sounds|*.mp3;*.wav|filter.sounds.mp3|*.mp3|filter.sounds.wav|*.wav");
+            file = showImportFileChooser("filter.sounds|*.mp3;*.wav|filter.sounds.mp3|*.mp3|filter.sounds.wav|*.wav", false);
         }
         if (ti0 instanceof ImageTag) {
-            file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp");
+            file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp", true);
         }
         if (ti0 instanceof ShapeTag) {
-            file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg");
+            file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true);
         }
         if (ti0 instanceof DefineBinaryDataTag) {
-            file = showImportFileChooser("");
+            file = showImportFileChooser("", false);
         }
         for (TreeItem ti : items) {
             doReplaceAction(ti, file);
@@ -3064,7 +3067,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (item instanceof ShapeTag) {
             ShapeTag st = (ShapeTag) item;
             String filter = "filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg";
-            File selectedFile = showImportFileChooser(filter);
+            File selectedFile = showImportFileChooser(filter, true);
             if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
                 byte[] data = null;
@@ -3106,7 +3109,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (item instanceof DefineBitsJPEG3Tag || item instanceof DefineBitsJPEG4Tag) {
             ImageTag it = (ImageTag) item;
             if (it.importSupported()) {
-                File selectedFile = showImportFileChooser("");
+                File selectedFile = showImportFileChooser("", false);
                 if (selectedFile != null) {
                     File selfile = Helper.fixDialogFile(selectedFile);
                     byte[] data = Helper.readFile(selfile.getAbsolutePath());
@@ -3157,11 +3160,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         export(true);
     }
 
-    public File showImportFileChooser(String filter) {
+    public File showImportFileChooser(String filter, boolean imagePreview) {
         String[] filterArray = filter.length() > 0 ? filter.split("\\|") : new String[0];
 
         JFileChooser fc = new JFileChooser();
+        System.err.println("" + fc.getPreferredSize().width);
+        // SubstanceFileChooserUI s = new SubstanceFileChooserUI(fc);
+        //MetalFileChooserUI f;
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
+        if (imagePreview) {
+            fc.setAccessory(new FileChooserImagePreview(fc));
+            Dimension prefferedSize = new Dimension(fc.getPreferredSize());
+            prefferedSize.width += FileChooserImagePreview.PREVIEW_SIZE;
+            fc.setPreferredSize(prefferedSize);
+        }
         boolean first = true;
         for (int i = 0; i < filterArray.length; i += 2) {
             final String filterName = filterArray[i];
