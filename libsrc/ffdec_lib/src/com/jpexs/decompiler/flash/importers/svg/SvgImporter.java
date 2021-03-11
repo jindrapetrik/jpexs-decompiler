@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.importers.svg;
 
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
@@ -24,6 +25,9 @@ import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.BitmapExporter;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
+import com.jpexs.decompiler.flash.importers.svg.css.CssParseException;
+import com.jpexs.decompiler.flash.importers.svg.css.CssParser;
+import com.jpexs.decompiler.flash.importers.svg.css.CssSelectorToXPath;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -66,8 +70,13 @@ import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -211,6 +220,55 @@ public class SvgImporter {
         }
     }
 
+    private void processStyle(Element element) {
+        String styleSheet = element.getTextContent().trim();
+        CssParser cssParser = new CssParser(styleSheet);
+        CssSelectorToXPath selectorToXPath = new CssSelectorToXPath();
+        Document doc = element.getOwnerDocument();
+        try {
+            cssParser.styleshet();
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            for (int i = 0; i < cssParser.getCountRulesets(); i++) {
+                String selector = cssParser.getSelector(i);
+                String xPathExpression = selectorToXPath.css2xpath(selector);
+                try {
+                    NodeList nodeList = (NodeList) xPath.compile(xPathExpression).evaluate(doc, XPathConstants.NODESET);
+                    for (int j = 0; j < nodeList.getLength(); j++) {
+                        Node node = nodeList.item(j);
+                        NamedNodeMap attrs = node.getAttributes();
+                        Node styleAttr = attrs.getNamedItem("ffdec-style");
+                        if (styleAttr != null) {
+                            styleAttr.setNodeValue(styleAttr.getNodeValue() + ";" + "{" + cssParser.getSpecifity(i) + "}" + cssParser.getDeclarations(i));
+                            attrs.setNamedItem(styleAttr);
+                        } else {
+                            Node styleNode = doc.createAttribute("ffdec-style");
+                            styleNode.setNodeValue("{" + cssParser.getSpecifity(i) + "}" + cssParser.getDeclarations(i));
+                            attrs.setNamedItem(styleNode);
+                        }
+                    }
+                } catch (XPathExpressionException ex) {
+                    Logger.getLogger(SvgImporter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } catch (IOException | CssParseException ex) {
+            showWarning("CannotParseCSSStyle", "Cannot parse CSS style: " + ex.getMessage());
+        }
+    }
+
+    private void processDefs(Element element) {
+        for (int i = 0; i < element.getChildNodes().getLength(); i++) {
+            Node childNode = element.getChildNodes().item(i);
+            if (childNode instanceof Element) {
+                Element childElement = (Element) childNode;
+                String tagName = childElement.getTagName();
+                if ("style".equals(tagName)) {
+                    processStyle(childElement);
+                } else if ("defs".equals(tagName)) {
+                    processDefs(childElement);
+                }
+            }
+        }
+    }
     private void processSvgObject(Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Element element, Matrix transform, SvgStyle style) {
         for (int i = 0; i < element.getChildNodes().getLength(); i++) {
             Node childNode = element.getChildNodes().item(i);
@@ -220,7 +278,9 @@ public class SvgImporter {
                 SvgStyle newStyle = new SvgStyle(this, idMap, childElement);
                 Matrix m = Matrix.parseSvgMatrix(childElement.getAttribute("transform"), 1, 1);
                 Matrix m2 = m == null ? transform : transform.concatenate(m);
-                if ("g".equals(tagName)) {
+                if ("style".equals(tagName)) {
+                    processStyle(childElement);
+                } else if ("g".equals(tagName)) {
                     processSvgObject(idMap, shapeNum, shapes, childElement, m2, newStyle);
                 } else if ("path".equals(tagName)) {
                     processPath(shapeNum, shapes, childElement, m2, newStyle);
@@ -236,7 +296,9 @@ public class SvgImporter {
                     processPolyline(shapeNum, shapes, childElement, m2, newStyle);
                 } else if ("polygon".equals(tagName)) {
                     processPolygon(shapeNum, shapes, childElement, m2, newStyle);
-                } else if ("defs".equals(tagName) || "title".equals(tagName) || "desc".equals(tagName)
+                } else if ("defs".equals(tagName)) {
+                    processDefs(childElement);
+                } else if ("title".equals(tagName) || "desc".equals(tagName)
                         || "radialGradient".equals(tagName) || "linearGradient".equals(tagName)) {
                     // ignore
                 } else {
@@ -1035,6 +1097,7 @@ public class SvgImporter {
 
     //Stub for w3 test. TODO: refactor and move to test directory. It's here because of easy access - compiling single file
     private static void svgTest(String name) throws IOException, InterruptedException {
+        System.err.println("running test " + name);
         if (!new File(name + ".original.svg").exists()) {
             URL svgUrl = new URL("http://www.w3.org/Graphics/SVG/Test/20061213/svggen/" + name + ".svg");
             byte[] svgData = Helper.readStream(svgUrl.openStream());
@@ -1048,7 +1111,7 @@ public class SvgImporter {
         String svgDataS = Helper.readTextFile(name + ".orig.svg");
         SWF swf = new SWF();
         DefineShape4Tag st = new DefineShape4Tag(swf);
-        st = (DefineShape4Tag) (new SvgImporter().importSvg(st, svgDataS));
+        st = (DefineShape4Tag) (new SvgImporter().importSvg(st, svgDataS, false));
         swf.addTag(st);
         SerializableImage si = new SerializableImage(480, 360, BufferedImage.TYPE_4BYTE_ABGR);
         BitmapExporter.export(swf, st.shapes, Color.yellow, si, new Matrix(), new Matrix(), null);
@@ -1301,13 +1364,13 @@ public class SvgImporter {
 //        svgTest("struct-use-01-t");
 //        svgTest("struct-use-03-t");
 //        svgTest("struct-use-05-b");
-//        svgTest("styling-css-01-b");
-//        svgTest("styling-css-02-b");
-//        svgTest("styling-css-03-b");
-//        svgTest("styling-css-04-f");
+        svgTest("styling-css-01-b");
+        svgTest("styling-css-02-b");
+        svgTest("styling-css-03-b");
+        svgTest("styling-css-04-f");
 //        svgTest("styling-css-05-b");
 //        svgTest("styling-css-06-b");
-//        svgTest("styling-inherit-01-b");
+        svgTest("styling-inherit-01-b");
 //        svgTest("styling-pres-01-t");
 //        svgTest("text-align-01-b");
 //        svgTest("text-align-02-b");
@@ -1341,7 +1404,7 @@ public class SvgImporter {
 //        svgTest("text-tspan-01-b");
 //        svgTest("text-ws-01-t");
 //        svgTest("text-ws-02-t");
-//        svgTest("types-basicDOM-01-b");
+//        svgTest("types-basicDOM-01-b");            
     }
 
     private void applyFillGradients(SvgFill fill, FILLSTYLE fillStyle, RECT bounds, StyleChangeRecord scr, Matrix transform, int shapeNum, SvgStyle style) {

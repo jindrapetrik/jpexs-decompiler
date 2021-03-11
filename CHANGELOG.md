@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - [#843] Compound assignments (like +=) decompilation and direct editation
 - [#1221] Separate icons for different actionscript objects (class/interface/frame/)
 - AS3 P-code - hilight and edit traits outside classes
+- [#1585] SVG import - support for style tag (CSS)
 
 ### Changed
 - [#1471] Import script menuitem renamed to Import scripts.
@@ -2098,6 +2099,7 @@ All notable changes to this project will be documented in this file.
 [#1156]: https://www.free-decompiler.com/flash/issues/1156
 [#843]: https://www.free-decompiler.com/flash/issues/843
 [#1221]: https://www.free-decompiler.com/flash/issues/1221
+[#1585]: https://www.free-decompiler.com/flash/issues/1585
 [#1471]: https://www.free-decompiler.com/flash/issues/1471
 [#1396]: https://www.free-decompiler.com/flash/issues/1396
 [#1254]: https://www.free-decompiler.com/flash/issues/1254
