@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.importers.svg;
 
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
@@ -21,6 +22,8 @@ import com.jpexs.helpers.Helper;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,9 +59,42 @@ class SvgStyle {
 
     private Map<String, String> getStyleAttributeValues(Element element) {
         // todo: cache
+
         Map<String, String> styleValues = new HashMap<>();
+        String styleStr = "";
+        if (element.hasAttribute("ffdec-style")) {
+            styleStr += element.getAttribute("ffdec-style");
+        }
         if (element.hasAttribute("style")) {
-            String[] styleDefs = element.getAttribute("style").split(";");
+            styleStr += "{1000}" + element.getAttribute("style");
+        }
+
+        if (!styleStr.isEmpty()) {
+            String[] rulesBySpec = styleStr.split("\\{");
+            List<String> rulesBySpecList = Arrays.asList(rulesBySpec);
+            List<String> rulesBySpecListUnordered = new ArrayList<>(rulesBySpecList);
+            rulesBySpecList.sort(new Comparator<String>() {
+                @Override
+                public int compare(String o1, String o2) {
+                    if (o1.isEmpty()) {
+                        return -1;
+                    }
+                    if (o2.isEmpty()) {
+                        return 1;
+                    }
+                    int r1 = Integer.parseInt(o1.substring(0, o1.indexOf("}")));
+                    int r2 = Integer.parseInt(o2.substring(0, o2.indexOf("}")));
+                    if (r1 == r2) {
+                        return rulesBySpecListUnordered.indexOf(r1) - rulesBySpecListUnordered.indexOf(r2);
+                    }
+                    return r1 - r2;
+                }
+            });
+            for (int i = 0; i < rulesBySpecList.size(); i++) {
+                rulesBySpecList.set(i, rulesBySpecList.get(i).substring(rulesBySpecList.get(i).indexOf("}") + 1));
+            }
+            styleStr = String.join(";", rulesBySpecList) + ";";
+            String[] styleDefs = styleStr.split(";");
             for (String styleDef : styleDefs) {
                 if (!styleDef.contains(":")) {
                     continue;
@@ -75,7 +111,6 @@ class SvgStyle {
                 }
             }
         }
-
         return styleValues;
     }
 
