@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - AS3 P-code - hilight and edit traits outside classes
 - [#1585] SVG import - support for style tag (CSS)
 - [#1585] SVG import - support for switch tag
+- [#1122] SVG import - relative coordinates in gradients (tests coords-units-01-b, pservers-grad-12-b)
 - Preview in image file selection dialogs
 
 ### Changed
@@ -2102,6 +2103,7 @@ All notable changes to this project will be documented in this file.
 [#843]: https://www.free-decompiler.com/flash/issues/843
 [#1221]: https://www.free-decompiler.com/flash/issues/1221
 [#1585]: https://www.free-decompiler.com/flash/issues/1585
+[#1122]: https://www.free-decompiler.com/flash/issues/1122
 [#1471]: https://www.free-decompiler.com/flash/issues/1471
 [#1396]: https://www.free-decompiler.com/flash/issues/1396
 [#1254]: https://www.free-decompiler.com/flash/issues/1254

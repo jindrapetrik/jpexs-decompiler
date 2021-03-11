@@ -1451,24 +1451,26 @@ public class SvgImporter {
                 SvgLinearGradient lgfill = (SvgLinearGradient) fill;
                 fillStyle.fillStyleType = FILLSTYLE.LINEAR_GRADIENT;
                 fillStyle.gradient = new GRADIENT();
-                double x1 = parseCoordinate(lgfill.x1, 1/* todo: how much is 100%? */);
-                double y1 = parseCoordinate(lgfill.y1, 1/* todo: how much is 100%? */);
-                double x2 = parseCoordinate(lgfill.x2, 1/* todo: how much is 100%? */);
-                double y2 = parseCoordinate(lgfill.y2, 1/* todo: how much is 100%? */);
+                double x1 = parseCoordinate(lgfill.x1, 1);
+                double y1 = parseCoordinate(lgfill.y1, 1);
+                double x2 = parseCoordinate(lgfill.x2, 1);
+                double y2 = parseCoordinate(lgfill.y2, 1);
 
                 x1 = x1 * SWF.unitDivisor;
                 y1 = y1 * SWF.unitDivisor;
                 x2 = x2 * SWF.unitDivisor;
                 y2 = y2 * SWF.unitDivisor;
 
-                Matrix boundingBoxMatrix = new Matrix();
+                Matrix gmatrix = new Matrix();
                 if (lgfill.gradientUnits == SvgGradientUnits.OBJECT_BOUNDING_BOX) {
-                    boundingBoxMatrix.scaleX = (bounds.Xmax - bounds.Xmin) / SWF.unitDivisor;
-                    boundingBoxMatrix.rotateSkew0 = 0;
-                    boundingBoxMatrix.rotateSkew1 = 0;
-                    boundingBoxMatrix.scaleY = (bounds.Ymax - bounds.Ymin) / SWF.unitDivisor;
-                    boundingBoxMatrix.translateX = bounds.Xmin;
-                    boundingBoxMatrix.translateY = bounds.Ymin;
+                    gmatrix.scaleX = (bounds.Xmax - bounds.Xmin) / SWF.unitDivisor;
+                    gmatrix.rotateSkew0 = 0;
+                    gmatrix.rotateSkew1 = 0;
+                    gmatrix.scaleY = (bounds.Ymax - bounds.Ymin) / SWF.unitDivisor;
+                    gmatrix.translateX = bounds.Xmin;
+                    gmatrix.translateY = bounds.Ymin;
+                } else {
+                    gmatrix = new Matrix(fillStyle.gradientMatrix);
                 }
 
                 Matrix xyMatrix = new Matrix();
@@ -1477,7 +1479,7 @@ public class SvgImporter {
                 xyMatrix.rotateSkew1 = -xyMatrix.rotateSkew0;
                 xyMatrix.scaleY = xyMatrix.scaleX;
 
-                xyMatrix = xyMatrix.preConcatenate(boundingBoxMatrix);
+                xyMatrix = xyMatrix.preConcatenate(gmatrix);
 
                 Matrix zeroStartMatrix = Matrix.getTranslateInstance(0.5, 0);
 
@@ -1490,31 +1492,33 @@ public class SvgImporter {
                 tMatrix = tMatrix.preConcatenate(xyMatrix);
 
                 tMatrix = tMatrix.preConcatenate(transMatrix);
-                Point p1 = tMatrix.transform(new Point(-16384, 0));
-                Point p2 = tMatrix.transform(new Point(16384, 0));
-
-                tMatrix = tMatrix.preConcatenate(new Matrix(fillStyle.gradientMatrix));
                 fillStyle.gradientMatrix = tMatrix.toMATRIX();
             } else if (fill instanceof SvgRadialGradient) {
                 SvgRadialGradient rgfill = (SvgRadialGradient) fill;
-                double cx = parseCoordinate(rgfill.cx, 1/* todo: how much is 100%? */);
-                double cy = parseCoordinate(rgfill.cy, 1/* todo: how much is 100%? */);
-                double r = parseLength(rgfill.r, 1/* todo: how much is 100%? */);
+                double cx = parseCoordinate(rgfill.cx, 1);
+                double cy = parseCoordinate(rgfill.cy, 1);
+                double r = parseLength(rgfill.r, 1);
 
-                Matrix boundingBoxMatrix = new Matrix();
+                Matrix gmatrix;
                 if (rgfill.gradientUnits == SvgGradientUnits.OBJECT_BOUNDING_BOX) {
-                    boundingBoxMatrix.scaleX = (bounds.Xmax - bounds.Xmin) / SWF.unitDivisor;
-                    boundingBoxMatrix.rotateSkew0 = 0;
-                    boundingBoxMatrix.rotateSkew1 = 0;
-                    boundingBoxMatrix.scaleY = (bounds.Ymax - bounds.Ymin) / SWF.unitDivisor;
-                    boundingBoxMatrix.translateX = bounds.Xmin;
-                    boundingBoxMatrix.translateY = bounds.Ymin;
+                    gmatrix = new Matrix();
+                    gmatrix.scaleX = (bounds.Xmax - bounds.Xmin) / SWF.unitDivisor;
+                    gmatrix.rotateSkew0 = 0;
+                    gmatrix.rotateSkew1 = 0;
+                    gmatrix.scaleY = 1 / SWF.unitDivisor;
+                    gmatrix.scaleY = (bounds.Ymax - bounds.Ymin) / SWF.unitDivisor;
+                    gmatrix.translateX = bounds.Xmin;
+                    gmatrix.translateY = bounds.Ymin;
+                } else {
+                    gmatrix = new Matrix(fillStyle.gradientMatrix);
                 }
+                gmatrix.translate(SWF.unitDivisor * cx, SWF.unitDivisor * cy);
+                gmatrix = gmatrix.concatenate(Matrix.getScaleInstance(r / 819.2));
 
-                fillStyle.gradientMatrix = Matrix.getTranslateInstance(SWF.unitDivisor * cx, SWF.unitDivisor * cy).concatenate(new Matrix(fillStyle.gradientMatrix)).concatenate(Matrix.getScaleInstance(r / 819.2)).preConcatenate(boundingBoxMatrix).toMATRIX();
+                fillStyle.gradientMatrix = gmatrix.toMATRIX();
 
-                double fx = parseCoordinate(rgfill.fx, 1/* todo: how much is 100%? */);
-                double fy = parseCoordinate(rgfill.fy, 1/* todo: how much is 100%? */);
+                double fx = parseCoordinate(rgfill.fx, 1);
+                double fy = parseCoordinate(rgfill.fy, 1);
                 if (!rgfill.fx.equals(rgfill.cx) || !rgfill.fy.equals(rgfill.cy)) {
                     fillStyle.fillStyleType = FILLSTYLE.FOCAL_RADIAL_GRADIENT;
                     fillStyle.gradient = new FOCALGRADIENT();
