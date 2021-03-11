@@ -269,41 +269,72 @@ public class SvgImporter {
             }
         }
     }
+
+    private void processSwitch(Element element, Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Matrix transform, SvgStyle style) {
+        for (int i = 0; i < element.getChildNodes().getLength(); i++) {
+            Node childNode = element.getChildNodes().item(i);
+            if (childNode instanceof Element) {
+                Element childElement = (Element) childNode;
+                if (childElement.hasAttribute("requiredExtensions") && !childElement.getAttribute("requiredExtensions").isEmpty()) {
+                    continue;
+                }
+                if (childElement.hasAttribute("systemLanguage")) {
+                    String systemLanguage = childElement.getAttribute("systemLanguage");
+                    if (systemLanguage.equals("en-us") || systemLanguage.equals("en")) {
+                        processElement(childElement, idMap, shapeNum, shapes, transform, style);
+                        return;
+                    }
+                    continue;
+                }
+                processElement(childElement, idMap, shapeNum, shapes, transform, style);
+                return;
+            }
+        }
+    }
+
+    private void processElement(Element element, Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Matrix transform, SvgStyle style) {
+        if (element.hasAttribute("requiredExtensions") && !element.getAttribute("requiredExtensions").isEmpty()) {
+            return;
+        }
+        String tagName = element.getTagName();
+        SvgStyle newStyle = new SvgStyle(this, idMap, element);
+        Matrix m = Matrix.parseSvgMatrix(element.getAttribute("transform"), 1, 1);
+        Matrix m2 = m == null ? transform : transform.concatenate(m);
+        if ("switch".equals(tagName)) {
+            processSwitch(element, idMap, shapeNum, shapes, transform, style);
+        } else if ("style".equals(tagName)) {
+            processStyle(element);
+        } else if ("g".equals(tagName)) {
+            processSvgObject(idMap, shapeNum, shapes, element, m2, newStyle);
+        } else if ("path".equals(tagName)) {
+            processPath(shapeNum, shapes, element, m2, newStyle);
+        } else if ("circle".equals(tagName)) {
+            processCircle(shapeNum, shapes, element, m2, newStyle);
+        } else if ("ellipse".equals(tagName)) {
+            processEllipse(shapeNum, shapes, element, m2, newStyle);
+        } else if ("rect".equals(tagName)) {
+            processRect(shapeNum, shapes, element, m2, newStyle);
+        } else if ("line".equals(tagName)) {
+            processLine(shapeNum, shapes, element, m2, newStyle);
+        } else if ("polyline".equals(tagName)) {
+            processPolyline(shapeNum, shapes, element, m2, newStyle);
+        } else if ("polygon".equals(tagName)) {
+            processPolygon(shapeNum, shapes, element, m2, newStyle);
+        } else if ("defs".equals(tagName)) {
+            processDefs(element);
+        } else if ("title".equals(tagName) || "desc".equals(tagName)
+                || "radialGradient".equals(tagName) || "linearGradient".equals(tagName)) {
+            // ignore
+        } else {
+            showWarning(tagName + "tagNotSupported", "The SVG tag '" + tagName + "' is not supported.");
+        }
+    }
     private void processSvgObject(Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Element element, Matrix transform, SvgStyle style) {
         for (int i = 0; i < element.getChildNodes().getLength(); i++) {
             Node childNode = element.getChildNodes().item(i);
             if (childNode instanceof Element) {
                 Element childElement = (Element) childNode;
-                String tagName = childElement.getTagName();
-                SvgStyle newStyle = new SvgStyle(this, idMap, childElement);
-                Matrix m = Matrix.parseSvgMatrix(childElement.getAttribute("transform"), 1, 1);
-                Matrix m2 = m == null ? transform : transform.concatenate(m);
-                if ("style".equals(tagName)) {
-                    processStyle(childElement);
-                } else if ("g".equals(tagName)) {
-                    processSvgObject(idMap, shapeNum, shapes, childElement, m2, newStyle);
-                } else if ("path".equals(tagName)) {
-                    processPath(shapeNum, shapes, childElement, m2, newStyle);
-                } else if ("circle".equals(tagName)) {
-                    processCircle(shapeNum, shapes, childElement, m2, newStyle);
-                } else if ("ellipse".equals(tagName)) {
-                    processEllipse(shapeNum, shapes, childElement, m2, newStyle);
-                } else if ("rect".equals(tagName)) {
-                    processRect(shapeNum, shapes, childElement, m2, newStyle);
-                } else if ("line".equals(tagName)) {
-                    processLine(shapeNum, shapes, childElement, m2, newStyle);
-                } else if ("polyline".equals(tagName)) {
-                    processPolyline(shapeNum, shapes, childElement, m2, newStyle);
-                } else if ("polygon".equals(tagName)) {
-                    processPolygon(shapeNum, shapes, childElement, m2, newStyle);
-                } else if ("defs".equals(tagName)) {
-                    processDefs(childElement);
-                } else if ("title".equals(tagName) || "desc".equals(tagName)
-                        || "radialGradient".equals(tagName) || "linearGradient".equals(tagName)) {
-                    // ignore
-                } else {
-                    showWarning(tagName + "tagNotSupported", "The SVG tag '" + tagName + "' is not supported.");
-                }
+                processElement(childElement, idMap, shapeNum, shapes, transform, style);
             }
         }
     }
