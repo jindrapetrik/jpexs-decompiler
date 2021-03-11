@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 - [#1221] Separate icons for different actionscript objects (class/interface/frame/)
 - AS3 P-code - hilight and edit traits outside classes
 - [#1585] SVG import - support for style tag (CSS)
-- [#1585] SVG import - switch tag support
+- [#1585] SVG import - support for switch tag
 
 ### Changed
 - [#1471] Import script menuitem renamed to Import scripts.
