@@ -121,6 +121,7 @@ import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagInfo;
+import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -151,6 +152,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
@@ -2970,6 +2972,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (ti0 instanceof DefineBinaryDataTag) {
             file = showImportFileChooser("", false);
         }
+        if (ti0 instanceof UnknownTag) {
+            file = showImportFileChooser("", false);
+        }
         for (TreeItem ti : items) {
             doReplaceAction(ti, file);
         }
@@ -3054,6 +3059,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             byte[] data = Helper.readFile(selfile.getAbsolutePath());
             new BinaryDataImporter().importData(bt, data);
             refreshTree(bt.getSwf());
+            reload(true);
+        }
+
+        if (item instanceof UnknownTag) {
+            UnknownTag ut = (UnknownTag) item;
+            File selfile = Helper.fixDialogFile(selectedFile);
+            byte[] data = Helper.readFile(selfile.getAbsolutePath());
+            ut.unknownData = new ByteArrayRange(data);
+            ut.setModified(true);
+            refreshTree(ut.getSwf());
             reload(true);
         }
     }
@@ -3164,9 +3179,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         String[] filterArray = filter.length() > 0 ? filter.split("\\|") : new String[0];
 
         JFileChooser fc = new JFileChooser();
-        System.err.println("" + fc.getPreferredSize().width);
-        // SubstanceFileChooserUI s = new SubstanceFileChooserUI(fc);
-        //MetalFileChooserUI f;
         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
         if (imagePreview) {
             fc.setAccessory(new FileChooserImagePreview(fc));
@@ -3534,6 +3546,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof DefineBinaryDataTag) {
             DefineBinaryDataTag binaryTag = (DefineBinaryDataTag) treeItem;
             previewPanel.showBinaryPanel(binaryTag);
+        } else if (treeItem instanceof UnknownTag) {
+            UnknownTag unknownTag = (UnknownTag) treeItem;
+            previewPanel.showUnknownPanel(unknownTag);
         } else if (treeItem instanceof ImageTag) {
             ImageTag imageTag = (ImageTag) treeItem;
             previewPanel.setImageReplaceButtonVisible(!((Tag) imageTag).isReadOnly() && imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag);
@@ -3683,6 +3698,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showPreview(treeItem, previewPanel);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof DefineBinaryDataTag) {
+            showPreview(treeItem, previewPanel);
+            showCard(CARDPREVIEWPANEL);
+        } else if (treeItem instanceof UnknownTag) {
             showPreview(treeItem, previewPanel);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof ASMSource && (!(treeItem instanceof DrawableTag) || preferScript)) {

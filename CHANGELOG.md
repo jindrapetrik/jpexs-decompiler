@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
 - [#1122] SVG import - relative coordinates
 (tests coords-units-01-b, coords-units-02-b, pservers-grad-10-b, pservers-grad-12-b)
 - Preview in image file selection dialogs
+- [#1541] XML Import/Export of Unknown tags
+- Unknown tags display and binary contents replace
 
 ### Changed
 - [#1471] Import script menuitem renamed to Import scripts.
@@ -2105,6 +2107,7 @@ All notable changes to this project will be documented in this file.
 [#1221]: https://www.free-decompiler.com/flash/issues/1221
 [#1585]: https://www.free-decompiler.com/flash/issues/1585
 [#1122]: https://www.free-decompiler.com/flash/issues/1122
+[#1541]: https://www.free-decompiler.com/flash/issues/1541
 [#1471]: https://www.free-decompiler.com/flash/issues/1471
 [#1396]: https://www.free-decompiler.com/flash/issues/1396
 [#1254]: https://www.free-decompiler.com/flash/issues/1254

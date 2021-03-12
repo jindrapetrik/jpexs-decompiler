@@ -12,13 +12,16 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.swf;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.helpers.InternalClass;
 import com.jpexs.decompiler.flash.helpers.LazyObject;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Multiline;
 import com.jpexs.helpers.ByteArrayRange;
@@ -182,6 +185,9 @@ public class SwfXmlExporter {
             List<Field> fields = getSwfFieldsCached(obj.getClass());
             Element objNode = doc.createElement(name);
             objNode.setAttribute("type", className);
+            if (obj instanceof UnknownTag) {
+                objNode.setAttribute("tagId", "" + ((Tag) obj).getId());
+            }
             node.appendChild(objNode);
 
             if (level == 0) {

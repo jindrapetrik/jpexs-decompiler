@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.exporters.PreviewExporter;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
+import com.jpexs.decompiler.flash.gui.hexview.HexView;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
@@ -31,6 +32,7 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -86,6 +88,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private static final String BINARY_TAG_CARD = "BINARYTAG";
 
+    private static final String UNKNOWN_TAG_CARD = "UNKNOWNTAG";
+
     private static final String METADATA_TAG_CARD = "METADATATAG";
 
     private static final String EMPTY_CARD = "EMPTY";
@@ -130,6 +134,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     // Binary tag buttons
     private JButton replaceBinaryButton;
 
+    // Unknown tag buttons
+    private JButton replaceUnknownButton;
+
     // Metadata editor buttons
     private JButton metadataEditButton;
 
@@ -170,6 +177,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private MATRIX oldMatrix;
 
+    private HexView unknownHexView;
+
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
         setDividerSize(this.readOnly ? 0 : dividerSize);
@@ -189,6 +198,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         viewerCards.add(createFlashPlayerPanel(flashPanel), FLASH_VIEWER_CARD);
         viewerCards.add(createImagesCard(), DRAW_PREVIEW_CARD);
         viewerCards.add(createBinaryCard(), BINARY_TAG_CARD);
+        viewerCards.add(createUnknownCard(), UNKNOWN_TAG_CARD);
         viewerCards.add(createMetadataCard(), METADATA_TAG_CARD);
         viewerCards.add(createGenericTagCard(), GENERIC_TAG_CARD);
         viewerCards.add(createPlaceTagCard(), PLACE_TAG_CARD);
@@ -264,6 +274,16 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         ButtonsPanel binaryButtonsPanel = new ButtonsPanel();
         binaryButtonsPanel.add(replaceBinaryButton);
         return binaryButtonsPanel;
+    }
+
+    private JPanel createUnknownButtonsPanel() {
+        replaceUnknownButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("edit16"));
+        replaceUnknownButton.setMargin(new Insets(3, 3, 3, 10));
+        replaceUnknownButton.addActionListener(mainPanel::replaceButtonActionPerformed);
+
+        ButtonsPanel unknownButtonsPanel = new ButtonsPanel();
+        unknownButtonsPanel.add(replaceBinaryButton);
+        return unknownButtonsPanel;
     }
 
     private JPanel createGenericTagButtonsPanel() {
@@ -409,6 +429,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         binaryCard.add(binaryPanel, BorderLayout.CENTER);
         binaryCard.add(createBinaryButtonsPanel(), BorderLayout.SOUTH);
         return binaryCard;
+    }
+
+    private JPanel createUnknownCard() {
+        JPanel unknownCard = new JPanel(new BorderLayout());
+        unknownHexView = new HexView();
+        unknownCard.add(unknownHexView, BorderLayout.CENTER);
+        unknownCard.add(createUnknownButtonsPanel(), BorderLayout.SOUTH);
+        return unknownCard;
     }
 
     private JPanel createGenericTagCard() {
@@ -613,6 +641,16 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     public void showBinaryPanel(DefineBinaryDataTag binaryDataTag) {
         showCardLeft(BINARY_TAG_CARD);
         binaryPanel.setBinaryData(binaryDataTag);
+        parametersPanel.setVisible(false);
+    }
+
+    public void showUnknownPanel(UnknownTag unknownTag) {
+        showCardLeft(UNKNOWN_TAG_CARD);
+        if (unknownTag == null) {
+            unknownHexView.setData(new byte[0], null, null);
+        } else {
+            unknownHexView.setData(unknownTag.unknownData.getRangeData(), null, null);
+        }
         parametersPanel.setVisible(false);
     }
 
