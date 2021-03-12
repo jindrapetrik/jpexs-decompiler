@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [14.2.0] - 2021-03-12
 ### Added
 - [#1645] Scrollbar to recent searches dropdown
 - [#1639] Clearing search results for current file
