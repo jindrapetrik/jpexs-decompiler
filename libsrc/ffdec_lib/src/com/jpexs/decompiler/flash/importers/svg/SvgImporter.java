@@ -1456,10 +1456,11 @@ public class SvgImporter {
                 double x2 = parseCoordinate(lgfill.x2, 1);
                 double y2 = parseCoordinate(lgfill.y2, 1);
 
-                x1 = x1 * SWF.unitDivisor;
-                y1 = y1 * SWF.unitDivisor;
-                x2 = x2 * SWF.unitDivisor;
-                y2 = y2 * SWF.unitDivisor;
+                Matrix xyMatrix = new Matrix();
+                xyMatrix.scaleX = (x2 - x1) * SWF.unitDivisor;
+                xyMatrix.rotateSkew0 = (y2 - y1) * SWF.unitDivisor;
+                xyMatrix.rotateSkew1 = -xyMatrix.rotateSkew0;
+                xyMatrix.scaleY = xyMatrix.scaleX;
 
                 Matrix gmatrix = new Matrix();
                 if (lgfill.gradientUnits == SvgGradientUnits.OBJECT_BOUNDING_BOX) {
@@ -1469,29 +1470,25 @@ public class SvgImporter {
                     gmatrix.scaleY = (bounds.Ymax - bounds.Ymin) / SWF.unitDivisor;
                     gmatrix.translateX = bounds.Xmin;
                     gmatrix.translateY = bounds.Ymin;
+                    x1 *= bounds.getWidth();
+                    y1 *= bounds.getHeight();
                 } else {
                     gmatrix = new Matrix(fillStyle.gradientMatrix);
+                    x1 *= SWF.unitDivisor;
+                    y1 *= SWF.unitDivisor;
                 }
 
-                Matrix xyMatrix = new Matrix();
-                xyMatrix.scaleX = x2 - x1;
-                xyMatrix.rotateSkew0 = y2 - y1;
-                xyMatrix.rotateSkew1 = -xyMatrix.rotateSkew0;
-                xyMatrix.scaleY = xyMatrix.scaleX;
-
-                xyMatrix = xyMatrix.preConcatenate(gmatrix);
-
                 Matrix zeroStartMatrix = Matrix.getTranslateInstance(0.5, 0);
-
                 Matrix scaleMatrix = Matrix.getScaleInstance(1 / 16384.0 / 2);
                 Matrix transMatrix = Matrix.getTranslateInstance(x1, y1);
 
                 Matrix tMatrix = new Matrix();
-                tMatrix = tMatrix.preConcatenate(scaleMatrix);
-                tMatrix = tMatrix.preConcatenate(zeroStartMatrix);
-                tMatrix = tMatrix.preConcatenate(xyMatrix);
-
-                tMatrix = tMatrix.preConcatenate(transMatrix);
+                tMatrix = tMatrix
+                        .concatenate(transMatrix)
+                        .concatenate(gmatrix)
+                        .concatenate(xyMatrix)
+                        .concatenate(zeroStartMatrix)
+                        .concatenate(scaleMatrix);
                 fillStyle.gradientMatrix = tMatrix.toMATRIX();
             } else if (fill instanceof SvgRadialGradient) {
                 SvgRadialGradient rgfill = (SvgRadialGradient) fill;
