@@ -41,6 +41,7 @@ import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagTypeInfo;
+import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.types.ALPHABITMAPDATA;
 import com.jpexs.decompiler.flash.types.ALPHACOLORMAPDATA;
 import com.jpexs.decompiler.flash.types.ARGB;
@@ -216,6 +217,9 @@ public class SwfXmlImporter {
         for (int i = 0; i < element.getAttributes().getLength(); i++) {
             Attr attr = (Attr) element.getAttributes().item(i);
             String name = attr.getName();
+            if (name.equals("tagId") && "UnknownTag".equals(element.getAttribute("type"))) {
+                continue;
+            }
             if (!name.equals("type")) {
                 try {
                     Field field = getField(cls, name);
@@ -277,10 +281,17 @@ public class SwfXmlImporter {
 
     private Object processObject(Element element, Class requiredType, SWF swf, Tag tag) throws IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
         String type = element.getAttribute("type");
+        String tagTypeIdStr = element.getAttribute("tagId");
+        int tagTypeId = -1;
+        try {
+            tagTypeId = Integer.parseInt(tagTypeIdStr);
+        } catch (NumberFormatException nfe) {
+            //ignore
+        }
         if ("String".equals(type)) {
             return element.getTextContent();
         } else if (type != null && !type.isEmpty()) {
-            Object childObj = createObject(type, swf, tag);
+            Object childObj = createObject(type, tagTypeId, swf, tag);
             if (childObj instanceof Tag) {
                 tag = (Tag) childObj;
             }
@@ -297,7 +308,7 @@ public class SwfXmlImporter {
         }
     }
 
-    private Object createObject(String type, SWF swf, Tag tag) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    private Object createObject(String type, int tagTypeId, SWF swf, Tag tag) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         if (swfTags == null) {
             Map<String, Class> tags = new HashMap<>();
             Map<Integer, TagTypeInfo> knownTags = Tag.getKnownClasses();
@@ -310,6 +321,10 @@ public class SwfXmlImporter {
             }
 
             swfTags = tags;
+        }
+
+        if ("UnknownTag".equals(type)) {
+            return new UnknownTag(swf, tagTypeId);
         }
 
         Class cls = swfTags.get(type);

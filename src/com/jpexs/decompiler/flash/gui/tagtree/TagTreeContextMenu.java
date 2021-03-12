@@ -48,6 +48,7 @@ import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -478,6 +479,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
 
         if (canReplace.test(it -> it instanceof DefineSoundTag)) {
+            replaceMenuItem.setVisible(true);
+        }
+
+        if (canReplace.test(it -> it instanceof UnknownTag)) {
             replaceMenuItem.setVisible(true);
         }
 
