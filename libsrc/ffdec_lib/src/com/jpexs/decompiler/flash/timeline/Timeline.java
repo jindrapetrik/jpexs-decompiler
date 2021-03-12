@@ -48,6 +48,7 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
+import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -702,8 +703,21 @@ public class Timeline {
             img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
             img.fillTransparent();
 
+            ColorTransform clrTrans2 = clrTrans;
+            if (clipDepth > -1) {
+                //Make transparent colors opaque, mask should be only made by shapes
+                CXFORMWITHALPHA clrMask = new CXFORMWITHALPHA();
+                clrMask.hasAddTerms = true;
+                clrMask.hasMultTerms = true;
+                clrMask.alphaAddTerm = 255;
+                clrMask.redMultTerm = 0;
+                clrMask.greenMultTerm = 0;
+                clrMask.blueMultTerm = 0;
+                clrTrans2 = clrMask;
+            }
+
             if (!(drawable instanceof ImageTag) || (swf.isAS3() && layer.hasImage)) {
-                drawable.toImage(dframe, time, ratio, renderContext, img, isClip || clipDepth > -1, m, strokeTransform, absMat, clrTrans);
+                drawable.toImage(dframe, time, ratio, renderContext, img, isClip || clipDepth > -1, m, strokeTransform, absMat, clrTrans2);
             } else {
                 // todo: show one time warning
             }
