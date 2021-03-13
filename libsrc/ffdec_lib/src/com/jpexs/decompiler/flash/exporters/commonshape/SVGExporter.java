@@ -167,10 +167,8 @@ public class SVGExporter {
 
     public final Element createClipPath(Matrix transform, String id) {
         Element group = createSubGroup(id, "clipPath");
-        Node parent = group.getParentNode();
-        if (parent instanceof Element) {
-            Element parentElement = (Element) parent;
-            group.setAttribute("transform", parentElement.getAttribute("transform"));
+        if (transform != null) {
+            group.setAttribute("transform", transform.getSvgTransformationString(SWF.unitDivisor, 1));
         }
         return group;
     }
