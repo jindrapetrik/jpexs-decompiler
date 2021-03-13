@@ -1023,6 +1023,7 @@ public class Timeline {
             if (clipChanged) {
                 if (clipGroup != null) {
                     exporter.endGroup();
+                    clipGroup = null;
                 }
 
                 if (clips.size() > 0) {
