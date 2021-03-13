@@ -120,6 +120,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private GenericTagPanel genericTagPanel;
 
+    private GenericTagPanel placeGenericPanel;
+
+    private JSplitPane placeSplitPane;
+
     private JPanel displayWithPreview;
 
     // Image tag buttons
@@ -151,6 +155,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private JButton genericCancelButton;
 
+    private JButton placeFreeTransformButton;
+
     private JButton placeEditButton;
 
     private JButton placeSaveButton;
@@ -178,6 +184,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private MATRIX oldMatrix;
 
     private HexView unknownHexView;
+
+    private final int PLACE_EDIT_FREETRANSFORM = 1;
+    private final int PLACE_EDIT_RAW = 2;
+    private int placeEditMode = 0;
 
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
@@ -464,13 +474,20 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         prevIntLabel.setHorizontalAlignment(SwingConstants.CENTER);
         previewPanel.add(prevIntLabel, BorderLayout.NORTH);
 
-        placeTagCard.add(previewPanel, BorderLayout.CENTER);
+        placeGenericPanel = new GenericTagTreePanel(mainPanel);
+        placeSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, previewPanel, placeGenericPanel);
+
+        placeTagCard.add(placeSplitPane, BorderLayout.CENTER);
+        //placeSplitPane.setDividerLocation(800);
         placeTagCard.add(createPlaceTagButtonsPanel(), BorderLayout.SOUTH);
 
         return placeTagCard;
     }
 
     private JPanel createPlaceTagButtonsPanel() {
+        placeFreeTransformButton = new JButton(mainPanel.translate("button.freetransform"), View.getIcon("freetransform16"));
+        placeFreeTransformButton.setMargin(new Insets(3, 3, 3, 10));
+        placeFreeTransformButton.addActionListener(this::freeTransformPlaceTagButtonActionPerformed);
         placeEditButton = new JButton(mainPanel.translate("button.edit"), View.getIcon("edit16"));
         placeEditButton.setMargin(new Insets(3, 3, 3, 10));
         placeEditButton.addActionListener(this::editPlaceTagButtonActionPerformed);
@@ -484,6 +501,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeCancelButton.setVisible(false);
 
         ButtonsPanel placeTagButtonsPanel = new ButtonsPanel();
+        placeTagButtonsPanel.add(placeFreeTransformButton);
         placeTagButtonsPanel.add(placeEditButton);
         placeTagButtonsPanel.add(placeSaveButton);
         placeTagButtonsPanel.add(placeCancelButton);
@@ -668,6 +686,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         showCardLeft(PLACE_TAG_CARD);
         placeTag = tag;
         oldMatrix = tag.getMatrix();
+        placeSplitPane.setDividerLocation((int) (0.6 * this.getWidth()));
+        placeGenericPanel.setEditMode(false, tag);
         placeImagePanel.selectDepth(-1);
         placeImagePanel.setTimelined(((Tag) tag).getTimelined(), ((Tag) tag).getSwf(), frame);
         placeImagePanel.selectDepth(tag.getDepth());
@@ -840,13 +860,26 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void savePlaceTagButtonActionPerformed(ActionEvent evt) {
-        MATRIX matrix = placeImagePanel.getNewMatrix();
-        placeTag.setPlaceFlagHasMatrix(true);
-        placeTag.setMatrix(matrix);
-        placeTag.setModified(true);
-        placeImagePanel.selectDepth(placeTag.getDepth());
-        placeImagePanel.freeTransformDepth(-1);
-        placeTag.getTimelined().resetTimeline();
+        if (placeEditMode == PLACE_EDIT_FREETRANSFORM) {
+            MATRIX matrix = placeImagePanel.getNewMatrix();
+            placeTag.setPlaceFlagHasMatrix(true);
+            placeTag.setMatrix(matrix);
+            placeTag.setModified(true);
+            placeImagePanel.selectDepth(placeTag.getDepth());
+            placeImagePanel.freeTransformDepth(-1);
+            placeTag.getTimelined().resetTimeline();
+        }
+        if (placeEditMode == PLACE_EDIT_RAW) {
+            if (placeGenericPanel.save()) {
+                Tag tag = placeGenericPanel.getTag();
+                SWF swf = tag.getSwf();
+                tag.getTimelined().resetTimeline();
+                mainPanel.refreshTree(swf);
+                mainPanel.setTagTreeSelectedNode(tag);
+            }
+            placeGenericPanel.setEditMode(false, null);
+        }
+        placeFreeTransformButton.setVisible(true);
         placeEditButton.setVisible(true);
         placeSaveButton.setVisible(false);
         placeCancelButton.setVisible(false);
@@ -854,24 +887,40 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void editPlaceTagButtonActionPerformed(ActionEvent evt) {
+        placeEditMode = PLACE_EDIT_RAW;
+        placeGenericPanel.setEditMode(true, placeTag);
+        placeEditButton.setVisible(false);
+        placeFreeTransformButton.setVisible(false);
+        placeSaveButton.setVisible(true);
+        placeCancelButton.setVisible(true);
+    }
+
+    private void freeTransformPlaceTagButtonActionPerformed(ActionEvent evt) {
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         if (item == null) {
             return;
         }
+        placeEditMode = PLACE_EDIT_FREETRANSFORM;
         placeImagePanel.selectDepth(-1);
         placeImagePanel.freeTransformDepth(placeTag.getDepth());
         placeEditButton.setVisible(false);
+        placeFreeTransformButton.setVisible(false);
         placeSaveButton.setVisible(true);
         placeCancelButton.setVisible(true);
     }
 
     private void cancelPlaceTagButtonActionPerformed(ActionEvent evt) {
-        placeImagePanel.selectDepth(placeTag.getDepth());
-        placeImagePanel.freeTransformDepth(-1);
-        placeTag.setMatrix(oldMatrix);
-        placeTag.getTimelined().resetTimeline();
-
+        if (placeEditMode == PLACE_EDIT_FREETRANSFORM) {
+            placeImagePanel.selectDepth(placeTag.getDepth());
+            placeImagePanel.freeTransformDepth(-1);
+            placeTag.setMatrix(oldMatrix);
+            placeTag.getTimelined().resetTimeline();
+        }
+        if (placeEditMode == PLACE_EDIT_RAW) {
+            placeGenericPanel.setEditMode(false, null);
+        }
         placeEditButton.setVisible(true);
+        placeFreeTransformButton.setVisible(true);
         placeSaveButton.setVisible(false);
         placeCancelButton.setVisible(false);
     }
