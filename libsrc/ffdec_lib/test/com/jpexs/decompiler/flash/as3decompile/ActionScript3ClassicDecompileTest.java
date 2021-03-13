@@ -85,8 +85,31 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testCompoundAssignments() {
-        decompileMethod("classic", "testCompoundAssignments", "var a:int = 0;\r\n"
-                + "trace(a = a + 10);\r\n",
+        decompileMethod("classic", "testCompoundAssignments", "var b:* = [10,20,30];\r\n"
+                + "var a:int = 0;\r\n"
+                + "trace(\"a += 5\");\r\n"
+                + "a += 5;\r\n"
+                + "trace(\"arr[call()] = arr[call()] + 2;\");\r\n"
+                + "b[this.calc()] = b[this.calc()] + 2;\r\n"
+                + "var t:MyTest = new MyTest();\r\n"
+                + "trace(\"t.attr *= 10\");\r\n"
+                + "t.attr *= 10;\r\n"
+                + "trace(\"attr -= 5\");\r\n"
+                + "this.attr -= 5;\r\n"
+                + "trace(\"arr[2] += 5\");\r\n"
+                + "b[2] += 5;\r\n"
+                + "trace(\"arr[call()] /= 5\");\r\n"
+                + "b[this.calc()] = b[this.calc()] / 5;\r\n"
+                + "trace(\"arr[call()][call()] &= 10;\");\r\n"
+                + "b[this.calc()][this.calc()] = b[this.calc()][this.calc()] & 10;\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(e.message);\r\n"
+                + "}\r\n",
                 false);
     }
 
