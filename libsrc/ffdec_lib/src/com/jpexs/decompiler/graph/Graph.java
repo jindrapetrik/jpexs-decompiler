@@ -1411,12 +1411,6 @@ public class Graph {
         }
         checkGetLoopsPart(part);
 
-        for (ThrowState ts : throwStates) {
-            if (ts.throwingParts.contains(part)) {
-                ts.state = 1;
-            }
-        }
-
         if (debugGetLoops) {
             System.err.println("getloops: " + part);
         }
@@ -1443,24 +1437,32 @@ public class Graph {
                 }
             }
         }
-        if (lastP1 != null && canBeCandidate && canBeBreakCandidate(localData, part, throwStates)) {
-            if (lastP1.breakCandidates.contains(part)) {
-                lastP1.breakCandidates.add(part);
-                lastP1.breakCandidatesLevels.add(level);
-                return;
-            } else {
-                List<Loop> loops2 = new ArrayList<>(loops);
-                loops2.remove(lastP1);
-                if (!part.leadsTo(localData, this, code, lastP1.loopContinue, loops2, throwStates, true)) {
-                    if (lastP1.breakCandidatesLocked == 0) {
-                        if (debugGetLoops) {
-                            System.err.println("added breakCandidate " + part + " to " + lastP1);
-                        }
+        try {
+            if (lastP1 != null && canBeCandidate && canBeBreakCandidate(localData, part, throwStates)) {
+                if (lastP1.breakCandidates.contains(part)) {
+                    lastP1.breakCandidates.add(part);
+                    lastP1.breakCandidatesLevels.add(level);
+                    return;
+                } else {
+                    List<Loop> loops2 = new ArrayList<>(loops);
+                    loops2.remove(lastP1);
+                    if (!part.leadsTo(localData, this, code, lastP1.loopContinue, loops2, throwStates, true)) {
+                        if (lastP1.breakCandidatesLocked == 0) {
+                            if (debugGetLoops) {
+                                System.err.println("added breakCandidate " + part + " to " + lastP1);
+                            }
 
-                        lastP1.breakCandidates.add(part);
-                        lastP1.breakCandidatesLevels.add(level);
-                        return;
+                            lastP1.breakCandidates.add(part);
+                            lastP1.breakCandidatesLevels.add(level);
+                            return;
+                        }
                     }
+                }
+            }
+        } finally {
+            for (ThrowState ts : throwStates) {
+                if (ts.throwingParts.contains(part)) {
+                    ts.state = 1;
                 }
             }
         }
@@ -1586,7 +1588,7 @@ public class Graph {
                 GraphPart cand = currentLoop.breakCandidates.get(c);
                 List<Integer> candThrowStates = new ArrayList<>();
                 for (ThrowState ts : throwStates) {
-                    if (ts.throwingParts.contains(cand)) {
+                    if (ts.throwingParts.contains(cand) && ts.startPart != cand) {
                         if (contThrowStates.equals(candThrowStates)) {
                             //adding new ts
                             //this means breakcandidate is in nested try

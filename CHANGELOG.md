@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - [#1584] SVG Import - paths with horizontal/vertical lines and rotation
 - [#1572] SVG Export - clipping must not use groups
 - [#270] AS decompilation - switch in loop
+- [#270] AS decompilation - loop followed by try
 
 ## [14.2.0] - 2021-03-12
 ### Added
