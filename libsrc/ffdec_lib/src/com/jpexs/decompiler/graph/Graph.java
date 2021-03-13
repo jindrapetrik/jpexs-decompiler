@@ -1825,6 +1825,15 @@ public class Graph {
         return true;
     }
 
+    protected boolean canBeCommaised(List<GraphTargetItem> list) {
+        for (GraphTargetItem item : list) {
+            if (item instanceof Block) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     protected List<GraphTargetItem> printGraph(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel) throws InterruptedException {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
@@ -2133,6 +2142,14 @@ public class Graph {
                                 caseCommaCommands.put(cpos, commaCommands);
                                 commaCommands = new ArrayList<>();
                                 it = to.onFalse;
+                                if (it instanceof CommaExpressionItem) {
+                                    commaCommands = new ArrayList<>();
+                                    CommaExpressionItem ce = (CommaExpressionItem) it;
+                                    for (int f = 0; f < ce.commands.size() - 1; f++) {
+                                        commaCommands.add(ce.commands.get(f));
+                                    }
+                                    it = ce.commands.get(ce.commands.size() - 1);
+                                }
                             } else {
                                 break;
                             }
@@ -2307,8 +2324,25 @@ public class Graph {
                     List<GraphTargetItem> filteredOnTrue = onTrue;
                     List<GraphTargetItem> filteredOnFalse = onFalse;
 
-                    if (!isEmpty(filteredOnTrue) && !isEmpty(filteredOnFalse) && filteredOnTrue.size() == 1 && filteredOnFalse.size() == 1 && (filteredOnTrue.get(0) instanceof PushItem) && (filteredOnFalse.get(0) instanceof PushItem)) {
-                        stack.push(new TernarOpItem(null, localData.lineStartInstruction, expr.invert(null), ((PushItem) filteredOnTrue.get(0)).value, ((PushItem) filteredOnFalse.get(0)).value));
+                    if (!isEmpty(filteredOnTrue) && !isEmpty(filteredOnFalse)
+                            && (filteredOnTrue.get(filteredOnTrue.size() - 1) instanceof PushItem)
+                            && (filteredOnFalse.get(filteredOnFalse.size() - 1) instanceof PushItem)
+                            && canBeCommaised(filteredOnTrue) && canBeCommaised(filteredOnFalse)) {
+                        GraphTargetItem ternarOnTrue;
+                        if (filteredOnTrue.size() > 1) {
+                            filteredOnTrue.set(filteredOnTrue.size() - 1, filteredOnTrue.get(filteredOnTrue.size() - 1).value); // replace Pushitem with its value
+                            ternarOnTrue = new CommaExpressionItem(null, null, filteredOnTrue);
+                        } else {
+                            ternarOnTrue = filteredOnTrue.get(0).value;
+                        }
+                        GraphTargetItem ternarOnFalse;
+                        if (filteredOnFalse.size() > 1) {
+                            filteredOnFalse.set(filteredOnFalse.size() - 1, filteredOnFalse.get(filteredOnFalse.size() - 1).value); // replace Pushitem with its value                            
+                            ternarOnFalse = new CommaExpressionItem(null, null, filteredOnFalse);
+                        } else {
+                            ternarOnFalse = filteredOnFalse.get(0).value;
+                        }
+                        stack.push(new TernarOpItem(null, localData.lineStartInstruction, expr.invert(null), ternarOnTrue, ternarOnFalse));
                     } else {
                         boolean isIf = true;
                         //If the ontrue is empty, switch ontrue and onfalse
