@@ -433,7 +433,11 @@ public class SvgImporter {
 
                     p = transform2.transform(x, y);
                     serh.deltaX = (int) Math.round(p.x - prevPoint.x);
-                    prevPoint = new Point(prevPoint.x + serh.deltaX, prevPoint.y/* + serh.deltaY*/);
+                    //deltaX is not enough as transformation can make deltaY difference
+                    serh.deltaY = (int) Math.round(p.y - prevPoint.y);
+                    prevPoint = new Point(prevPoint.x + serh.deltaX, prevPoint.y + serh.deltaY);
+                    serh.generalLineFlag = true;
+                    serh.simplify();
                     newRecords.add(serh);
                     break;
                 case 'V':
@@ -441,9 +445,13 @@ public class SvgImporter {
                     y = command.params[0];
 
                     p = transform2.transform(x, y);
+
+                    //deltaY is not enough as transformation can make deltaX difference
+                    serv.deltaX = (int) Math.round(p.x - prevPoint.x);
                     serv.deltaY = (int) Math.round(p.y - prevPoint.y);
-                    prevPoint = new Point(prevPoint.x/* + serv.deltaX*/, prevPoint.y + serv.deltaY);
-                    serv.vertLineFlag = true;
+                    prevPoint = new Point(prevPoint.x + serv.deltaX, prevPoint.y + serv.deltaY);
+                    serv.generalLineFlag = true;
+                    serv.simplify();
                     newRecords.add(serv);
                     break;
                 case 'Q':
@@ -487,11 +495,6 @@ public class SvgImporter {
 
                     p = transform2.transform(x, y);
 
-                    //StraightEdgeRecord serc = new StraightEdgeRecord();
-                    //serc.generalLineFlag = true;
-                    //serc.deltaX = (int) Math.round(p.x - prevPoint.x);
-                    //serc.deltaY = (int) Math.round(p.y - prevPoint.y);
-                    //newRecords.add(serc);
                     List<Double> quadCoordinates = new CubicToQuad().cubicToQuad(pStart.x, pStart.y, pControl1.x, pControl1.y, pControl2.x, pControl2.y, p.x, p.y, 1);
                     for (int i = 2; i < quadCoordinates.size();) {
                         CurvedEdgeRecord cerc = new CurvedEdgeRecord();

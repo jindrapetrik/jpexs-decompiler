@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - AS3 hilight and edit XML based on CData or comment only
 - [#1435] Adding DefineScalingGrid to DefineSprite
 - [#1488] SVG Export - EmptyStackException when clipping used
+- [#1584] SVG Import - paths with horizontal/vertical lines and rotation
 
 ## [14.2.0] - 2021-03-12
 ### Added
@@ -2112,6 +2113,7 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1435]: https://www.free-decompiler.com/flash/issues/1435
 [#1488]: https://www.free-decompiler.com/flash/issues/1488
+[#1584]: https://www.free-decompiler.com/flash/issues/1584
 [#1645]: https://www.free-decompiler.com/flash/issues/1645
 [#1639]: https://www.free-decompiler.com/flash/issues/1639
 [#1371]: https://www.free-decompiler.com/flash/issues/1371
