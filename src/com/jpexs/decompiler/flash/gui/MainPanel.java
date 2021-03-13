@@ -2837,6 +2837,28 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         refreshTree(new SWF[0]);
     }
 
+    public void treeOperation(Runnable runnable) {
+        TreeItem treeItem = tagTree.getCurrentTreeItem();
+        tagTree.clearSelection();
+        runnable.run();
+        clear();
+        showCard(CARDEMPTYPANEL);
+
+        tagTree.updateSwfs(new SWF[0]);
+
+        if (treeItem != null) {
+            SWF swf = treeItem.getSwf();
+            if (swf != null) {
+                SWF treeItemSwf = swf.getRootSwf();
+                if (this.swfs.contains(treeItemSwf.swfList)) {
+                    setTagTreeSelectedNode(treeItem);
+                }
+            }
+        }
+
+        reload(true);
+    }
+
     public void refreshTree(SWF swf) {
         refreshTree(new SWF[]{swf});
     }
