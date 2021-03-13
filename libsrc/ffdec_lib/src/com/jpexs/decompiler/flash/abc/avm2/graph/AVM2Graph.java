@@ -2189,6 +2189,7 @@ public class AVM2Graph extends Graph {
             ts.targetPart = searchPart(code.adr2pos(body.exceptions[e].target), allParts);
             int startIp = code.adr2pos(body.exceptions[e].start, true);
             int endIp = code.adr2pos(body.exceptions[e].end, true);
+            ts.startPart = searchPart(startIp, allParts);
             for (GraphPart p : allParts) {
                 if (p.start >= startIp && p.start < endIp) {
                     ts.throwingParts.add(p);
