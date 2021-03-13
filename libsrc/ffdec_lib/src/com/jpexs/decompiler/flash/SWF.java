@@ -3150,7 +3150,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         ReadOnlyTagList tags = timelined.getTags();
 
         int index;
-        if (frame != null) {
+        if ((tag instanceof DefineScalingGridTag) && (timelined instanceof DefineSpriteTag)) {
+            index = this.tags.indexOf(timelined) + 1;
+        } else if (frame != null) {
             if (frame.showFrameTag != null) {
                 index = tags.indexOf(frame.showFrameTag);
             } else {
@@ -3177,20 +3179,25 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
 
-        if (index > -1) {
-            timelined.addTag(index, tag);
+        if ((tag instanceof DefineScalingGridTag) && (timelined instanceof DefineSpriteTag)) {
+            DefineScalingGridTag scalingGrid = (DefineScalingGridTag) tag;
+            scalingGrid.characterId = ((DefineSpriteTag) timelined).spriteId;
+            this.addTag(index, tag);
         } else {
-            timelined.addTag(tag);
-        }
+            if (index > -1) {
+                timelined.addTag(index, tag);
+            } else {
+                timelined.addTag(tag);
+            }
+            timelined.resetTimeline();
 
-        timelined.resetTimeline();
-
-        if (timelined instanceof DefineSpriteTag) {
-            DefineSpriteTag sprite = (DefineSpriteTag) timelined;
-            sprite.frameCount = timelined.getTimeline().getFrameCount();
-        }
-        if (timelined == this) {
-            frameCount = getTimeline().getFrameCount();
+            if (timelined instanceof DefineSpriteTag) {
+                DefineSpriteTag sprite = (DefineSpriteTag) timelined;
+                sprite.frameCount = timelined.getTimeline().getFrameCount();
+            }
+            if (timelined == this) {
+                frameCount = getTimeline().getFrameCount();
+            }
         }
     }
 

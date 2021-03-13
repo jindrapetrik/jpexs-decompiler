@@ -490,12 +490,11 @@ public class TagTree extends JTree {
                 ret = Arrays.asList(DefineBinaryDataTag.ID);
                 break;
             case TagTreeModel.FOLDER_FRAMES:
-                // same as nested tags of DefineSpriteTag?
+                // same as nested tags of DefineSpriteTag but without DefineScalingGrid
                 ret = Arrays.asList(PlaceObjectTag.ID, PlaceObject2Tag.ID, PlaceObject3Tag.ID, PlaceObject4Tag.ID,
                         RemoveObjectTag.ID, RemoveObject2Tag.ID, ShowFrameTag.ID, FrameLabelTag.ID,
                         StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
-                        SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID,
-                        DefineScalingGridTag.ID);
+                        SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID);
                 break;
             case TagTreeModel.FOLDER_OTHERS:
                 ret = Arrays.asList(
