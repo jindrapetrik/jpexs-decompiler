@@ -2241,6 +2241,8 @@ public class ActionScript3Parser {
 
                 break;
             case XML_STARTTAG_BEGIN:
+            case XML_CDATA:
+            case XML_COMMENT:
                 lexer.pushback(s);
                 ret = xml(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables);
                 break;

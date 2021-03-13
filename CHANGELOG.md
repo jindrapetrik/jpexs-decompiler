@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Placeobject display and edit - raw editor on right side
 
+### Fixed
+- AS3 hilight and edit XML based on CData or comment only
+
 ## [14.2.0] - 2021-03-12
 ### Added
 - [#1645] Scrollbar to recent searches dropdown
