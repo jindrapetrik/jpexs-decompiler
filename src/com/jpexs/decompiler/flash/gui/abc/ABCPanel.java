@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
@@ -1530,33 +1531,64 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             return;
         }
 
+        boolean scriptTraitsUsed = false;
         Traits traits = null;
         int traitIndex = -1;
-        if (classIndex < 0) {
-            return;
-        }
-        Traits staticTraits = abc.class_info.get(classIndex).static_traits;
-        Traits instanceTraits = abc.instance_info.get(classIndex).instance_traits;
-        if (traitId >= 0 && traitId < abc.class_info.get(classIndex).static_traits.traits.size()) {
+        if (traitId == GraphTextWriter.TRAIT_UNKNOWN && classIndex >= 0) {
+            traits = abc.script_info.get(decompiledTextArea.getScriptLeaf().scriptIndex).traits;
+            for (int i = 0; i < traits.traits.size(); i++) {
+                if (traits.traits.get(i) instanceof TraitClass) {
+                    TraitClass tc = (TraitClass) traits.traits.get(i);
+                    if (tc.class_info == classIndex) {
+                        traitIndex = i;
+                        break;
+                    }
+                }
+            }
+            scriptTraitsUsed = true;
+        } else if (classIndex < 0) {
+            traits = abc.script_info.get(decompiledTextArea.getScriptLeaf().scriptIndex).traits;
             traitIndex = traitId;
-            traits = staticTraits;
+            scriptTraitsUsed = true;
         } else {
-            if (traitId >= 0 && traitId < staticTraits.traits.size() + instanceTraits.traits.size()) {
-                traitIndex = traitId - staticTraits.traits.size();
-                traits = instanceTraits;
+            Traits staticTraits = abc.class_info.get(classIndex).static_traits;
+            Traits instanceTraits = abc.instance_info.get(classIndex).instance_traits;
+            if (traitId >= 0 && traitId < abc.class_info.get(classIndex).static_traits.traits.size()) {
+                traitIndex = traitId;
+                traits = staticTraits;
             } else {
-                traits = null;
+                if (traitId >= 0 && traitId < staticTraits.traits.size() + instanceTraits.traits.size()) {
+                    traitIndex = traitId - staticTraits.traits.size();
+                    traits = instanceTraits;
+                } else {
+                    traits = null;
+                }
             }
         }
 
-        if (traits == null) {
+        if (traits == null || traitIndex < 0) {
             return;
         }
 
         if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.removetrait"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
-            traits.traits.remove(traitIndex);
-            ((Tag) abc.parentTag).setModified(true);
-            reload();
+
+            if (scriptTraitsUsed) {
+                final int fTraitIndex = traitIndex;
+                final Traits fTraits = traits;
+                Main.getMainFrame().getPanel().treeOperation(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((Tag) abc.parentTag).getSwf().clearScriptCache();
+                        fTraits.traits.remove(fTraitIndex);
+                        ((Tag) abc.parentTag).setModified(true);
+                    }
+                });
+            } else {
+                traits.traits.remove(traitIndex);
+                ((Tag) abc.parentTag).setModified(true);
+                reload();
+            }
+
         }
     }
 
