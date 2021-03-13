@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- Placeobject display and edit - raw editor on right side
+
 ## [14.2.0] - 2021-03-12
 ### Added
 - [#1645] Scrollbar to recent searches dropdown

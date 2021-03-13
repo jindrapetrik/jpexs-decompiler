@@ -228,33 +228,35 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public MATRIX getNewMatrix() {
-        DepthState ds = null;
-        Timeline timeline = timelined.getTimeline();
-        if (freeTransformDepth > -1 && timeline.getFrameCount() > frame) {
-            ds = timeline.getFrame(frame).layers.get(freeTransformDepth);
-        }
+        synchronized (lock) {
+            DepthState ds = null;
+            Timeline timeline = timelined.getTimeline();
+            if (freeTransformDepth > -1 && timeline.getFrameCount() > frame) {
+                ds = timeline.getFrame(frame).layers.get(freeTransformDepth);
+            }
 
-        if (ds != null) {
-            CharacterTag cht = swf.getCharacter(ds.characterId);
-            if (cht != null) {
-                if (cht instanceof DrawableTag) {
-                    RECT rect = timelined.getRect();
-                    Matrix m = new Matrix();
-                    double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
-                    if (lowQuality) {
-                        zoomDouble /= LQ_FACTOR;
+            if (ds != null) {
+                CharacterTag cht = swf.getCharacter(ds.characterId);
+                if (cht != null) {
+                    if (cht instanceof DrawableTag) {
+                        RECT rect = timelined.getRect();
+                        Matrix m = new Matrix();
+                        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+                        if (lowQuality) {
+                            zoomDouble /= LQ_FACTOR;
+                        }
+                        double zoom = zoomDouble;
+                        m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
+                        m.scale(zoom);
+
+                        Matrix eMatrix = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).inverse();
+
+                        return transform.preConcatenate(eMatrix).toMATRIX();
                     }
-                    double zoom = zoomDouble;
-                    m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
-                    m.scale(zoom);
-
-                    Matrix eMatrix = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).inverse();
-
-                    return transform.preConcatenate(eMatrix).toMATRIX();
                 }
             }
+            return null;
         }
-        return null;
     }
 
     public synchronized void selectDepth(int depth) {
@@ -1573,7 +1575,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         textTag = null;
         newTextTag = null;
-        displayObjectCache.clear();        
+        displayObjectCache.clear();
     }
 
     private void nextFrame(Timer thisTimer, final int cnt, final int timeShouldBe) {
@@ -1645,7 +1647,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         timeline.toImage(frame, time, renderContext, image, false, m, m, m, null);
-
 
         Graphics2D gg = (Graphics2D) image.getGraphics();
         gg.setStroke(new BasicStroke(3));
