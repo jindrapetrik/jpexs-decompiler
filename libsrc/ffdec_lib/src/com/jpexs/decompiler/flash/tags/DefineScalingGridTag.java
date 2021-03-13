@@ -209,4 +209,10 @@ public class DefineScalingGridTag extends Tag implements CharacterIdTag {
             targetRect[i].yMin = Math.rint(targetRect[i].yMin / SWF.unitDivisor);
         }
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + " (" + characterId + ")";
+    }
+
 }
