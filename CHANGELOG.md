@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - [#1488] SVG Export - EmptyStackException when clipping used
 - [#1584] SVG Import - paths with horizontal/vertical lines and rotation
 - [#1572] SVG Export - clipping must not use groups
+- [#270] AS decompilation - switch in loop
 
 ## [14.2.0] - 2021-03-12
 ### Added
@@ -2116,6 +2117,7 @@ All notable changes to this project will be documented in this file.
 [#1488]: https://www.free-decompiler.com/flash/issues/1488
 [#1584]: https://www.free-decompiler.com/flash/issues/1584
 [#1572]: https://www.free-decompiler.com/flash/issues/1572
+[#270]: https://www.free-decompiler.com/flash/issues/270
 [#1645]: https://www.free-decompiler.com/flash/issues/1645
 [#1639]: https://www.free-decompiler.com/flash/issues/1639
 [#1371]: https://www.free-decompiler.com/flash/issues/1371

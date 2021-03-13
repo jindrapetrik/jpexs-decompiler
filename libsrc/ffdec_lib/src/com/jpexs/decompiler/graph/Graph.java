@@ -556,11 +556,145 @@ public class Graph {
             }
         }
         expandGotos(ret);
+        //processSwitches(ret);
         processIfs(ret);
         finalProcessStack(stack, ret, path);
         makeAllCommands(ret, stack);
         finalProcessAll(ret, 0, getFinalData(localData, loops, throwStates), path);
         return ret;
+    }
+
+    protected void processSwitches(List<GraphTargetItem> list) {
+        processSwitches(list, -1);
+    }
+
+    /*
+    
+    while(something){
+        switch(xx){
+            case 1:
+                trace("1");
+                continue;
+            case 2:
+                trace("2");
+                continue;
+            case 3:
+                break;
+            default:
+                continue;
+        }
+        item
+    }
+    
+    =>
+    
+    while(something){
+        switch(xx){
+            case 1:
+                trace("1");
+                break;
+            case 2:
+                trace("2");
+                break;
+            case 3:
+                item
+                break;
+            default:
+                break;
+        }        
+    }
+    
+    This will fix precontinue handler which detects multiple continues
+     */
+    protected void processSwitches(List<GraphTargetItem> list, long lastLoopId) {
+        loopi:
+        for (int i = 0; i < list.size(); i++) {
+            GraphTargetItem item = list.get(i);
+            if (item instanceof SwitchItem) {
+                SwitchItem swi = (SwitchItem) item;
+
+                Set<GraphTargetItem> allItems = swi.getAllSubItemsRecursively();
+                int breakCount = 0;
+                for (GraphTargetItem it : allItems) {
+                    if (it instanceof BreakItem) {
+                        BreakItem br = (BreakItem) it;
+                        if (br.loopId == swi.loop.id) {
+                            breakCount++;
+                            if (breakCount > 1) {
+                                continue loopi;
+                            }
+                        }
+                    }
+                }
+                if (!swi.caseCommands.isEmpty()) {
+                    List<GraphTargetItem> lastCommands = swi.caseCommands.get(swi.caseCommands.size() - 1);
+                    if (lastCommands.isEmpty() && breakCount == 1) {
+                        continue loopi;
+                    }
+
+                    if (breakCount == 1 && !(lastCommands.get(lastCommands.size() - 1) instanceof ContinueItem)
+                            && !(lastCommands.get(lastCommands.size() - 1) instanceof ExitItem)) {
+                        continue loopi;
+                    }
+                }
+
+                int breakCaseIndex = -1;
+                for (int c = 0; c < swi.caseCommands.size(); c++) {
+                    List<GraphTargetItem> commands = swi.caseCommands.get(c);
+                    if (!commands.isEmpty()) {
+                        if (commands.get(commands.size() - 1) instanceof BreakItem) {
+                            BreakItem br = (BreakItem) commands.get(commands.size() - 1);
+                            if (br.loopId == swi.loop.id) {
+                                breakCaseIndex = c;
+                                break;
+                            }
+                        }
+                    }
+                    if (c == swi.caseCommands.size() - 1) {
+                        if (commands.isEmpty()) {
+                            breakCaseIndex = c;
+                            break;
+                        }
+                        if (!(commands.get(commands.size() - 1) instanceof ContinueItem)
+                                && !(commands.get(commands.size() - 1) instanceof ExitItem)) {
+                            breakCaseIndex = c;
+                            break;
+                        }
+                    }
+                }
+
+                boolean hasContinues = false;
+                for (int c = 0; c < swi.caseCommands.size(); c++) {
+                    List<GraphTargetItem> commands = swi.caseCommands.get(c);
+                    if (!commands.isEmpty()) {
+                        if (commands.get(commands.size() - 1) instanceof ContinueItem) {
+                            ContinueItem cnt = (ContinueItem) commands.get(commands.size() - 1);
+                            if (cnt.loopId == lastLoopId) {
+                                hasContinues = true;
+                                commands.set(commands.size() - 1, new BreakItem(null, null, swi.loop.id));
+                                if (c == swi.caseCommands.size() - 1) {
+                                    if (commands.size() == 1) {
+                                        commands.remove(0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (hasContinues && breakCaseIndex > -1 && i + 1 < list.size() && (list.get(list.size() - 1) instanceof ContinueItem)) {
+                    List<GraphTargetItem> toAdd = new ArrayList<>();
+                    for (int j = i + 1; j < list.size() - 1; j++) {
+                        toAdd.add(list.remove(i + 1));
+                    }
+                    List<GraphTargetItem> targetCommands = swi.caseCommands.get(breakCaseIndex);
+                    if (!targetCommands.isEmpty() && (targetCommands.get(targetCommands.size() - 1) instanceof BreakItem)) {
+                        targetCommands.remove(targetCommands.size() - 1);
+                    }
+                    targetCommands.addAll(toAdd);
+                    targetCommands.add(new BreakItem(null, null, swi.loop.id));
+                }
+            }
+        }
     }
 
     protected FinalProcessLocalData getFinalData(BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) {
@@ -844,6 +978,7 @@ public class Graph {
         }
         alreadyProcessedBlocks.add(list);
     }
+
     /**
      * if (xxx) { y ; goto a } else { z ; goto a }
      *
@@ -1002,6 +1137,21 @@ public class Graph {
                             list.addAll(i + 2, ifi.onTrue);
                             ifi.onTrue.clear();
                             ifi.onTrue.add(list.remove(i + 1));
+                        }
+                    }
+                }
+
+                if (i < list.size() - 1) {
+                    if ((list.get(list.size() - 1) instanceof ExitItem) || (list.get(list.size() - 1) instanceof BreakItem)) {
+                        if (onFalse.isEmpty() && !onTrue.isEmpty() && (onTrue.get(onTrue.size() - 1) instanceof ContinueItem)) {
+                            ifi.expression = ifi.expression.invert(null);
+                            List<GraphTargetItem> onTrueItems = new ArrayList<>();
+                            for (int j = i + 1; j < list.size(); j++) {
+                                onTrueItems.add(list.remove(i + 1));
+                            }
+                            list.addAll(i + 1, ifi.onTrue);
+                            ifi.onTrue.clear();
+                            ifi.onTrue.addAll(onTrueItems);
                         }
                     }
                 }
@@ -2263,6 +2413,8 @@ public class Graph {
 
             boolean hasContinue = false;
             processIfs(loopItem.commands);
+            processSwitches(loopItem.commands, currentLoop.id);
+
             checkContinueAtTheEnd(loopItem.commands, currentLoop);
             List<ContinueItem> continues = loopItem.getContinues();
             for (ContinueItem c : continues) {

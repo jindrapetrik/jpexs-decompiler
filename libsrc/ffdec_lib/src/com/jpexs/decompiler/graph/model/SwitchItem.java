@@ -99,6 +99,26 @@ public class SwitchItem extends LoopItem implements Block {
         switchedObject.toString(writer, localData);
         writer.append(")").startBlock();
         for (int i = 0; i < caseCommands.size(); i++) {
+
+            //if last is default and is empty, ignore it
+            if (i == caseCommands.size() - 1) {
+                if (caseCommands.get(i).isEmpty()) {
+                    boolean hasDefault = false;
+                    boolean hasNonDefault = false;
+                    for (int k = 0; k < valuesMapping.size(); k++) {
+                        if (valuesMapping.get(k) == i) {
+                            if (caseValues.get(k) instanceof DefaultItem) {
+                                hasDefault = true;
+                            } else {
+                                hasNonDefault = true;
+                            }
+                        }
+                    }
+                    if (hasDefault && !hasNonDefault) {
+                        continue;
+                    }
+                }
+            }
             for (int k = 0; k < valuesMapping.size(); k++) {
                 if (valuesMapping.get(k) == i) {
                     if (!(caseValues.get(k) instanceof DefaultItem)) {
