@@ -1545,6 +1545,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     @Test
     public void testXml() {
         decompileMethod("classic", "testXml", "var g:XML = null;\r\n"
+                + "var testCdata:XML = null;\r\n"
+                + "var testComment:XML = null;\r\n"
                 + "var name:String = \"ahoj\";\r\n"
                 + "var myXML:XML = <order id=\"604\">\r\n"
                 + "<book isbn=\"12345\">\r\n"
@@ -1654,7 +1656,14 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "};\r\n"
                 + "}\r\n"
                 + "]]>\r\n"
-                + "</script>;\r\n",
+                + "</script>;\r\n"
+                + "testCdata =  <![CDATA[\r\n"
+                + "hello from cdata;\r\n"
+                + "function(){\r\n"
+                + "here some code;\r\n"
+                + "}\r\n"
+                + "]]>;\r\n"
+                + "testComment =  <!-- myXML comment-->;\r\n",
                 false);
     }
 }

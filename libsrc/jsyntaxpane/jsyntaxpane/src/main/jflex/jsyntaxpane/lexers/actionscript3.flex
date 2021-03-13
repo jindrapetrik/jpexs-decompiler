@@ -91,6 +91,11 @@ EndOfLineComment = "//" {InputCharacter}* {LineTerminator}?
 IdentFirst = [\p{Lu}\p{Ll}\p{Lt}\p{Lm}\p{Lo}_$]
 IdentNext = {IdentFirst} | [\p{Nl}\p{Mn}\p{Mc}\p{Nd}\p{Pc}]
 
+XmlCommentStart = "<!--"
+XmlCommentEnd = "-->"
+
+XmlCDataStart = "<![CDATA["
+XmlCDataEnd   = "]]>"
 
 /* identifiers */
 Identifier = {IdentFirst}{IdentNext}*
@@ -143,7 +148,7 @@ NamespaceSuffix = "#" {DecIntegerLiteral}
 
 RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
-%state STRING, CHARLITERAL, XMLSTARTTAG, XML, OIDENTIFIER
+%state STRING, CHARLITERAL, XMLSTARTTAG, XML, OIDENTIFIER, XMLCOMMENT, XMLCDATA
 
 %%
 
@@ -209,6 +214,15 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                         // divide "/" operator
                                         return token(TokenType.OPERATOR,ch,1);
                                     }
+                                 }
+
+  {XmlCommentStart}                 {
+                                     yybegin(XMLCOMMENT);
+                                     return token(TokenType.STRING);
+                                 }
+  {XmlCDataStart}                   {
+                                     yybegin(XMLCDATA);
+                                     return token(TokenType.STRING);
                                  }
 
   /* operators */
@@ -322,12 +336,6 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                     }
                                     xmlTagName = s;
                                  }
-  /*{XMLBeginTag}                  {  yybegin(XMLSTARTTAG);
-                                    tokenStart = yychar;
-                                    tokenLength = yylength();
-                                    String s=yytext();
-                                    xmlTagName = s.substring(1);
-                                 }*/
   /* identifiers */
   {Identifier}{NamespaceSuffix}  { return token(TokenType.REGEX); }
   {Identifier}                   { return token(TokenType.IDENTIFIER); }
@@ -404,6 +412,28 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
   \\.                            { tokenLength += 2; }
   {LineTerminator}               { yybegin(YYINITIAL);  }
+}
+
+<XMLCOMMENT> {
+  {XmlCommentEnd}                   {
+                                     yybegin(YYINITIAL);
+                                     return token(TokenType.STRING);
+                                 }
+   ~{XmlCommentEnd}                 {
+                                     yypushback(3);
+                                     return token(TokenType.STRING);
+                                 }
+}
+
+<XMLCDATA> {
+  {XmlCDataEnd}                     {
+                                     yybegin(YYINITIAL);
+                                     return token(TokenType.STRING);
+                                 }
+  ~{XmlCDataEnd}                    {
+                                     yypushback(3);
+                                     return token(TokenType.STRING);
+                                 }
 }
 
 /* error fallback */

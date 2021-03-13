@@ -207,7 +207,7 @@ NamespaceSuffix = "#" {DecIntegerLiteral}
 
 RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
-%state STRING, CHARLITERAL,XMLOPENTAG,XMLOPENTAGATTRIB,XMLINSTROPENTAG,XMLINSTRATTRIB,XMLCDATA,XMLCOMMENT,XML,OIDENTIFIER
+%state STRING, CHARLITERAL,XMLOPENTAG,XMLOPENTAGATTRIB,XMLINSTROPENTAG,XMLINSTRATTRIB,XMLCDATA,XMLCOMMENT,XML,OIDENTIFIER,XMLCDATAALONE,XMLCOMMENTALONE
 
 %%
 
@@ -368,6 +368,12 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                     string.setLength(0);
                                     return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTTAG_BEGIN, yytext());
                                  }
+  {XmlCommentStart}              {
+                                       string.setLength(0); string.append(yytext() ); yybegin(XMLCOMMENTALONE);
+                                 }
+  {XmlCDataStart}                {
+                                       string.setLength(0); string.append(yytext() ); yybegin(XMLCDATAALONE);
+                                 }
   "<{"                           {  return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTVARTAG_BEGIN, yytext()); }
   /* identifiers */
   {Identifier}                   { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, yytext()); }
@@ -412,7 +418,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                        string.setLength(0);
                                     }
                                     return lex();
-                                  }
+                                  }   
    {LineTerminator}               { string.append(yytext());  yyline++;}
    {WhiteSpace}                   { string.append(yytext()); }
 }
@@ -480,7 +486,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
 
 <XMLCDATA> {
-    {XmlCDataEnd}                         {
+    {XmlCDataEnd}                 {
                                      string.append(yytext());
                                      yybegin(XML);
                                      String ret = string.toString();
@@ -491,8 +497,20 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
     [^]                           { string.append(yytext()); }
 }
 
+<XMLCDATAALONE> {
+    {XmlCDataEnd}                 {
+                                     string.append(yytext());
+                                     yybegin(YYINITIAL);
+                                     String ret = string.toString();
+                                     string.setLength(0);
+                                     return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_CDATA, ret);
+                                  }
+ {LineTerminator}                 { string.append(yytext());  yyline++;}
+    [^]                           { string.append(yytext()); }
+}
+
 <XMLCOMMENT> {
-   {XmlCommentEnd}                          {
+   {XmlCommentEnd}                {
                                      string.append(yytext());
                                      yybegin(XML);
                                      String ret = string.toString();
@@ -503,8 +521,20 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
    [^]                            { string.append(yytext());}
 }
 
+<XMLCOMMENTALONE> {
+   {XmlCommentEnd}                {
+                                     string.append(yytext());
+                                     yybegin(YYINITIAL);
+                                     String ret = string.toString();
+                                     string.setLength(0);
+                                     return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_COMMENT, ret);
+                                  }
+   {LineTerminator}               { string.append(yytext()); yyline++;}
+   [^]                            { string.append(yytext());}
+}
+
 <XML> {
-   {XmlCDataStart}                    {
+   {XmlCDataStart}                {
                                     String ret = string.toString(); string.setLength(0); string.append(yytext() ); yybegin(XMLCDATA);
                                     if (!ret.isEmpty()) return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, ret);
                                   }

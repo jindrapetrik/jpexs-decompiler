@@ -1666,7 +1666,14 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "};\r\n"
                 + "}\r\n"
                 + "]]>\r\n"
-                + "</script>;\r\n",
+                + "</script>;\r\n"
+                + "var testCdata:XML = <![CDATA[\r\n"
+                + "hello from cdata;\r\n"
+                + "function(){\r\n"
+                + "here some code;\r\n"
+                + "}\r\n"
+                + "]]>;\r\n"
+                + "var testComment:XML = <!-- myXML comment-->;\r\n",
                 false);
     }
 }
