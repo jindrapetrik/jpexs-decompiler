@@ -35,7 +35,7 @@ public class CommaExpressionItem extends GraphTargetItem {
     public List<GraphTargetItem> commands;
 
     public CommaExpressionItem(GraphSourceItem src, GraphSourceItem lineStartIns, List<GraphTargetItem> commands) {
-        super(src, lineStartIns, PRECEDENCE_PRIMARY);
+        super(src, lineStartIns, PRECEDENCE_COMMA);
         this.commands = commands;
     }
 

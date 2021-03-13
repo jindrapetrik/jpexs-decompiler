@@ -53,31 +53,31 @@ public class TernarOpItem extends GraphTargetItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if (expression.getPrecedence() >= precedence){
+        if (expression.getPrecedence() >= precedence) {
             writer.append("(");
         }
         expression.toString(writer, localData);
-        if (expression.getPrecedence() >= precedence){
+        if (expression.getPrecedence() >= precedence) {
             writer.append(")");
         }
         writer.append(" ? ");
-        
-        if (onTrue instanceof TernarOpItem){  //ternar in ternar better in parenthesis
+
+        if (onTrue.getPrecedence() >= precedence && onTrue.getPrecedence() != GraphTargetItem.NOPRECEDENCE) {  // >= ternar in ternar better in parenthesis
             writer.append("(");
         }
         onTrue.toString(writer, localData);
-        if (onTrue instanceof TernarOpItem){
+        if (onTrue.getPrecedence() >= precedence && onTrue.getPrecedence() != GraphTargetItem.NOPRECEDENCE) {
             writer.append(")");
-        }                
+        }
         writer.append(" : ");
-        if (onFalse instanceof TernarOpItem){ 
-             writer.append("(");
+        if (onFalse.getPrecedence() >= precedence && onFalse.getPrecedence() != GraphTargetItem.NOPRECEDENCE) {
+            writer.append("(");
         }
         onFalse.toString(writer, localData);
-        if (onFalse instanceof TernarOpItem){ 
-             writer.append(")");
+        if (onFalse.getPrecedence() >= precedence && onFalse.getPrecedence() != GraphTargetItem.NOPRECEDENCE) {
+            writer.append(")");
         }
-        
+
         return writer;
     }
 

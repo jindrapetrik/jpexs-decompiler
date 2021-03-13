@@ -21,6 +21,7 @@ package
 		TestChainedAssignments;
 		TestComplexExpressions;
 		TestContinueLevels;
+		TestComma;
 		TestCompoundAssignments;
 		TestDecl2;
 		TestDeclarations;
