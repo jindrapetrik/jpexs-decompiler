@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [14.2.1] - 2021-03-13
 ### Added
 - Placeobject display and edit - raw editor on right side
 
