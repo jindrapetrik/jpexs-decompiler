@@ -43,7 +43,9 @@ package
 		TestForEachReturn;
 		TestForGoto;
 		TestForIn;
+		TestForInIf;
 		TestForInReturn;
+		TestForInSwitch;
 		TestForXml;
 		TestGotos;
 		TestGotos2;
@@ -56,6 +58,7 @@ package
 		TestIf;
 		TestIfElse;
 		TestIfInIf;
+		TestIfTry;
 		TestIgnoreAndOr;
 		TestImportedVar;
 		TestInc2;
