@@ -1059,14 +1059,13 @@ public class Timeline {
                 String assetName;
                 Tag drawableTag = (Tag) drawable;
                 RECT boundRect = drawable.getRect();
+                boolean createNew = false;
                 if (exporter.exportedTags.containsKey(drawableTag)) {
                     assetName = exporter.exportedTags.get(drawableTag);
                 } else {
                     assetName = getTagIdPrefix(drawableTag, exporter);
                     exporter.exportedTags.put(drawableTag, assetName);
-                    exporter.createDefGroup(new ExportRectangle(boundRect), assetName);
-                    drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1);
-                    exporter.endGroup();
+                    createNew = true;
                 }
                 ExportRectangle rect = new ExportRectangle(boundRect);
 
@@ -1076,13 +1075,18 @@ public class Timeline {
                 // TODO: if (layer.blendMode > 1)                                               
                 if (layer.clipDepth > -1) {
                     String clipName = exporter.getUniqueId("clipPath");
-                    exporter.createClipPath(new Matrix(), clipName);
+                    Matrix mat = new Matrix(layer.matrix);
+                    exporter.createClipPath(mat, clipName);
                     SvgClip clip = new SvgClip(clipName, layer.clipDepth);
                     clips.add(clip);
-                    Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
-                    exporter.addUse(mat, boundRect, assetName, layer.instanceName, scalingGrid == null ? null : scalingGrid.splitter);
+                    drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1);
                     exporter.endGroup();
                 } else {
+                    if (createNew) {
+                        exporter.createDefGroup(new ExportRectangle(boundRect), assetName);
+                        drawable.toSVG(exporter, layer.ratio, clrTrans, level + 1);
+                        exporter.endGroup();
+                    }
                     Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
                     exporter.addUse(mat, boundRect, assetName, layer.instanceName, scalingGrid == null ? null : scalingGrid.splitter);
                 }
