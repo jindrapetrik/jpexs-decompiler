@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 - [#1435] Adding DefineScalingGrid to DefineSprite
 - [#1488] SVG Export - EmptyStackException when clipping used
 - [#1584] SVG Import - paths with horizontal/vertical lines and rotation
-- [#1572] SVG Export - clipping does not use groups
+- [#1572] SVG Export - clipping must not use groups
 
 ## [14.2.0] - 2021-03-12
 ### Added
