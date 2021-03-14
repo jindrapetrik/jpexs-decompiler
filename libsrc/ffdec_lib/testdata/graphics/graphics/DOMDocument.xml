@@ -28,7 +28,7 @@
           <Include href="Tween 2.xml" itemIcon="1" loadImmediate="false" itemID="604dcf92-00000243" lastModified="1615712146"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="42">
+          <DOMTimeline name="Scene 1" currentFrame="43">
                <layers>
                     <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
@@ -115,7 +115,7 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Graphics layer" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+                    <DOMLayer name="Graphics layer" color="#4FFF4F" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" keyMode="9728">
                                    <elements>
@@ -1314,14 +1314,14 @@
                                                        </SolidStroke>
                                                   </StrokeStyle>
                                                   <StrokeStyle index="5">
-                                                       <SolidStroke scaleMode="normal" weight="20" joints="miter" miterLimit="2">
+                                                       <SolidStroke scaleMode="normal" weight="20" joints="bevel">
                                                             <fill>
                                                                  <SolidColor color="#FF0000"/>
                                                             </fill>
                                                        </SolidStroke>
                                                   </StrokeStyle>
                                                   <StrokeStyle index="6">
-                                                       <SolidStroke scaleMode="normal" weight="20" joints="bevel">
+                                                       <SolidStroke scaleMode="normal" weight="20" joints="miter" miterLimit="6">
                                                             <fill>
                                                                  <SolidColor color="#FF0000"/>
                                                             </fill>
@@ -1329,18 +1329,18 @@
                                                   </StrokeStyle>
                                              </strokes>
                                              <edges>
-                                                  <Edge strokeStyle="6" edges="
+                                                  <Edge strokeStyle="5" edges="
 !5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
                                                   <Edge strokeStyle="2" edges="
 !3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
                                                   <Edge strokeStyle="1" edges="
 !2000 1000|2000 2000!2000 2000|1000 2000!1000 2000|1000 1000"/>
-                                                  <Edge strokeStyle="5" edges="
-!2500 4000/2600 4242!2600 4242/2910 5000!2910 5000/3209 4242!3209 4242/3300 4012"/>
                                                   <Edge strokeStyle="4" edges="
-!1000 4000/1100 4242!1100 4242/1410 5000!1410 5000/1709 4242!1709 4242/1800 4012"/>
+!1000 3660/1295 4670!1295 4670/1372 3660"/>
                                                   <Edge strokeStyle="3" edges="
-!4000 4000/4037 4090!4037 4090/4100 4242!4100 4242/4410 5000!4410 5000/4709 4242!4709 4242/4800 4012"/>
+!2553 3660/2848 4670!2848 4670/2925 3660"/>
+                                                  <Edge strokeStyle="6" edges="
+!4647 3660/4942 4670!4942 4670/5019 3660"/>
                                                   <Edge cubics="!5000 2000(;5000,2000 4000,2000 4000,2000q5000 2000 4000 2000);"/>
                                                   <Edge cubics="!4000 2000(4000,2000;4000,2000 4000,1000 4000,1000q4000 2000 4000 1000);"/>
                                                   <Edge cubics="!5000 1000(;5000,1000 5000,2000 5000,2000q5000 1000 5000 2000);"/>
@@ -1350,19 +1350,12 @@
                                                   <Edge cubics="!1000 2000(;1000,2000 1000,1000 1000,1000q1000 2000 1000 1000);"/>
                                                   <Edge cubics="!2000 1000(;2000,1000 2000,2000 2000,2000q2000 1000 2000 2000);"/>
                                                   <Edge cubics="!3500 2000(3500,2000;3500,2000 2500,2000 2500,2000q3500 2000 2500 2000);"/>
-                                                  <Edge cubics="!1000 4000(1000,4000;1000,4000 1100,4242 1100,4242q1000 4000 1100 4242);"/>
-                                                  <Edge cubics="!1100 4242(;1100,4242 1410,5000 1410,5000q1100 4242 1410 5000);"/>
-                                                  <Edge cubics="!1410 5000(1410,5000;1410,5000 1709,4242 1709,4242q1410 5000 1709 4242);"/>
-                                                  <Edge cubics="!1709 4242(;1709,4242 1800,4012 1800,4012q1709 4242 1800 4012);"/>
-                                                  <Edge cubics="!2500 4000(2500,4000;2500,4000 2600,4242 2600,4242q2500 4000 2600 4242);"/>
-                                                  <Edge cubics="!2600 4242(;2600,4242 2910,5000 2910,5000q2600 4242 2910 5000);"/>
-                                                  <Edge cubics="!2910 5000(2910,5000;2910,5000 3209,4242 3209,4242q2910 5000 3209 4242);"/>
-                                                  <Edge cubics="!3209 4242(;3209,4242 3300,4012 3300,4012q3209 4242 3300 4012);"/>
-                                                  <Edge cubics="!4000 4000(;4000,4000 4037,4090 4037,4090q4000 4000 4037 4090)4037,4090;"/>
-                                                  <Edge cubics="!4037 4090(4037,4090;4037,4090 4100,4242 4100,4242q4037 4090 4100 4242)4100,4242;"/>
-                                                  <Edge cubics="!4100 4242(;4100,4242 4410,5000 4410,5000q4100 4242 4410 5000);"/>
-                                                  <Edge cubics="!4410 5000(4410,5000;4410,5000 4709,4242 4709,4242q4410 5000 4709 4242);"/>
-                                                  <Edge cubics="!4709 4242(;4709,4242 4800,4012 4800,4012q4709 4242 4800 4012);"/>
+                                                  <Edge cubics="!4942 4670(;4942,4670 5019,3660 5019,3660q4942 4670 5019 3660);"/>
+                                                  <Edge cubics="!4647 3660(4647,3660;4647,3660 4942,4670 4942,4670q4647 3660 4942 4670);"/>
+                                                  <Edge cubics="!2848 4670(;2848,4670 2925,3660 2925,3660q2848 4670 2925 3660);"/>
+                                                  <Edge cubics="!2553 3660(2553,3660;2553,3660 2848,4670 2848,4670q2553 3660 2848 4670);"/>
+                                                  <Edge cubics="!1295 4670(;1295,4670 1372,3660 1372,3660q1295 4670 1372 3660);"/>
+                                                  <Edge cubics="!1000 3660(1000,3660;1000,3660 1295,4670 1295,4670q1000 3660 1295 4670);"/>
                                              </edges>
                                         </DOMShape>
                                    </elements>
@@ -1948,7 +1941,7 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Texts inside layer" color="#FF800A" autoNamed="false">
+                    <DOMLayer name="Texts inside layer" color="#FF800A" current="true" isSelected="true" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" duration="16" keyMode="9728">
                                    <elements/>
@@ -2107,7 +2100,7 @@
                                         </DOMStaticText>
                                         <DOMStaticText width="74.8" height="35.2" autoExpand="true" isSelectable="false">
                                              <matrix>
-                                                  <Matrix tx="33.6" ty="290"/>
+                                                  <Matrix tx="27.6" ty="292"/>
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
@@ -2120,11 +2113,11 @@
                                         </DOMStaticText>
                                         <DOMStaticText width="74.8" height="35.2" autoExpand="true" isSelectable="false">
                                              <matrix>
-                                                  <Matrix tx="117.05" ty="288.65"/>
+                                                  <Matrix tx="117.05" ty="292"/>
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>cap round&#xD;join miter=2</characters>
+                                                       <characters>cap round&#xD;join miter=3</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
@@ -2133,11 +2126,11 @@
                                         </DOMStaticText>
                                         <DOMStaticText width="74.8" height="35.2" autoExpand="true" isSelectable="false">
                                              <matrix>
-                                                  <Matrix tx="214.55" ty="289.65"/>
+                                                  <Matrix tx="214.55" ty="292"/>
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>cap round&#xD;join miter=3</characters>
+                                                       <characters>cap round&#xD;join miter=6</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
@@ -3144,6 +3137,15 @@
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="100331" publishTime="1615755207"/>
+          <PublishItem publishSize="100395" publishTime="1615755150"/>
+          <PublishItem publishSize="100329" publishTime="1615755064"/>
+          <PublishItem publishSize="100331" publishTime="1615755045"/>
+          <PublishItem publishSize="100331" publishTime="1615755001"/>
+          <PublishItem publishSize="100352" publishTime="1615753742"/>
+          <PublishItem publishSize="100333" publishTime="1615752295"/>
+          <PublishItem publishSize="100334" publishTime="1615752260"/>
+          <PublishItem publishSize="100313" publishTime="1615750221"/>
           <PublishItem publishSize="100247" publishTime="1615749769"/>
           <PublishItem publishSize="100245" publishTime="1615749071"/>
           <PublishItem publishSize="100042" publishTime="1615748561"/>
@@ -3155,14 +3157,5 @@
           <PublishItem publishSize="95971" publishTime="1615735695"/>
           <PublishItem publishSize="95745" publishTime="1615735637"/>
           <PublishItem publishSize="94171" publishTime="1615735588"/>
-          <PublishItem publishSize="89640" publishTime="1615733449"/>
-          <PublishItem publishSize="89775" publishTime="1615733190"/>
-          <PublishItem publishSize="89775" publishTime="1615732990"/>
-          <PublishItem publishSize="89776" publishTime="1615732750"/>
-          <PublishItem publishSize="89976" publishTime="1615732580"/>
-          <PublishItem publishSize="1509" publishTime="1615732559"/>
-          <PublishItem publishSize="1509" publishTime="1615732559"/>
-          <PublishItem publishSize="1509" publishTime="1615732559"/>
-          <PublishItem publishSize="1509" publishTime="1615732559"/>
      </publishHistory>
 </DOMDocument>
