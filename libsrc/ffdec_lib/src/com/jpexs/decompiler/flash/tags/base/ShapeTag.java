@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -27,9 +28,12 @@ import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.helpers.LazyObject;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
@@ -122,6 +126,39 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
     public RECT getRect() {
         return getRect(null); // parameter not used
     }
+
+    @Override
+    public RECT getRectWithStrokes() {
+
+
+        int maxWidth = 0;
+        for (LINESTYLE ls : getShapes().lineStyles.lineStyles) {
+            if (ls.width > maxWidth) {
+                maxWidth = ls.width;
+            }
+        }
+        for (SHAPERECORD sr : getShapes().shapeRecords) {
+            if (sr instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) sr;
+                if (scr.stateNewStyles) {
+                    for (LINESTYLE ls : scr.lineStyles.lineStyles) {
+                        if (ls.width > maxWidth) {
+                            maxWidth = ls.width;
+                        }
+                    }
+                }
+            }
+        }
+
+        RECT r = getRect();
+        r.Xmin -= maxWidth;
+        r.Ymin -= maxWidth;
+        r.Xmax += maxWidth;
+        r.Ymax += maxWidth;
+
+        return r;
+    }
+
 
     @Override
     public int getUsedParameters() {

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
@@ -428,5 +429,10 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     public void replaceTag(int index, Tag newTag) {
         removeTag(index);
         addTag(index, newTag);
+    }
+
+    @Override
+    public RECT getRectWithStrokes() {
+        return getRect(); //?
     }
 }

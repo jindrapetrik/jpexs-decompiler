@@ -905,6 +905,11 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
+    public RECT getRectWithStrokes() {
+        return getRect();
+    }
+
+    @Override
     public int getCharacterId() {
         return characterID;
     }

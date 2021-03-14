@@ -1,6 +1,6 @@
-<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Stroke 2" itemID="604dda1d-00000278" symbolType="graphic" lastModified="1615749968">
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Stroke 4" itemID="604e5f54-00000425" symbolType="graphic" lastModified="1615749946">
   <timeline>
-    <DOMTimeline name="Stroke 2">
+    <DOMTimeline name="Stroke 4">
       <layers>
         <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
           <frames>
@@ -9,9 +9,9 @@
                 <DOMShape>
                   <strokes>
                     <StrokeStyle index="1">
-                      <SolidStroke weight="20">
+                      <SolidStroke scaleMode="vertical" weight="20">
                         <fill>
-                          <SolidColor color="#0000FF"/>
+                          <SolidColor color="#FF00FF"/>
                         </fill>
                       </SolidStroke>
                     </StrokeStyle>

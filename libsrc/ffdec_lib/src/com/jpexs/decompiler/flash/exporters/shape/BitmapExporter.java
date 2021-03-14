@@ -391,6 +391,9 @@ public class BitmapExporter extends ShapeExporterBase {
             case "NORMAL":
                 thickness *= Math.max(strokeTransformation.scaleX, strokeTransformation.scaleY);
                 break;
+            case "NONE":
+                thickness /= SWF.unitDivisor;
+                break;
         }
 
         if (thickness < 0) {
@@ -405,8 +408,7 @@ public class BitmapExporter extends ShapeExporterBase {
 
         // Do not scale strokes automatically:
         try {
-            AffineTransform t = (AffineTransform) graphics.getTransform().clone();
-            t.translate(-0.5, -0.5);
+            AffineTransform t = (AffineTransform) strokeTransformation.toTransform().clone();//(AffineTransform) graphics.getTransform().clone();
             lineStroke = new TransformedStroke(lineStroke, t);
         } catch (NoninvertibleTransformException net) {
             // ignore

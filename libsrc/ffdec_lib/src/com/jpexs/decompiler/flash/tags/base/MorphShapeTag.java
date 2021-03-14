@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -27,6 +28,8 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLE;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLE2;
 import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
@@ -77,6 +80,38 @@ public abstract class MorphShapeTag extends DrawableTag {
     @Override
     public RECT getRect() {
         return getRect(new HashSet<>());
+    }
+
+    @Override
+    public RECT getRectWithStrokes() {
+        int shapeNum = getShapeNum();
+        int maxWidth = 0;
+        if (shapeNum == 1) {
+            for (MORPHLINESTYLE ls : morphLineStyles.lineStyles) {
+                if (ls.startWidth > maxWidth) {
+                    maxWidth = ls.startWidth;
+                }
+                if (ls.endWidth > maxWidth) {
+                    maxWidth = ls.endWidth;
+                }
+            }
+        }
+        if (shapeNum == 2) {
+            for (MORPHLINESTYLE2 ls : morphLineStyles.lineStyles2) {
+                if (ls.startWidth > maxWidth) {
+                    maxWidth = ls.startWidth;
+                }
+                if (ls.endWidth > maxWidth) {
+                    maxWidth = ls.endWidth;
+                }
+            }
+        }
+        RECT r = getRect();
+        r.Xmin -= maxWidth;
+        r.Ymin -= maxWidth;
+        r.Xmax += maxWidth;
+        r.Ymax += maxWidth;
+        return r;
     }
 
     @Override

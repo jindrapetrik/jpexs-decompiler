@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.types.RECT;
@@ -25,6 +26,8 @@ import java.util.Set;
 public interface BoundedTag {
 
     public RECT getRect();
+
+    public RECT getRectWithStrokes();
 
     public RECT getRect(Set<BoundedTag> added);
 }

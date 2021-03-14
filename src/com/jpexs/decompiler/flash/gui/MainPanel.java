@@ -3981,6 +3981,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             @Override
             public void replaceTag(int index, Tag newTag) {
             }
+
+            @Override
+            public RECT getRectWithStrokes() {
+                return getRect();
+            }
         };
     }
 
