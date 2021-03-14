@@ -518,6 +518,27 @@ public class BitmapExporter extends ShapeExporterBase {
     }
 
     @Override
+    public void lineBitmapStyle(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
+        ImageTag imageTag = swf.getImage(bitmapId);
+        if (imageTag != null) {
+            SerializableImage img = imageTag.getImageCached();
+            if (img != null) {
+                if (colorTransform != null) {
+                    img = colorTransform.apply(img);
+                }
+
+                linePaint = new TexturePaint(img.getBufferedImage(), new java.awt.Rectangle(img.getWidth(), img.getHeight()));
+                lineTransform = matrix.toTransform();
+                return;
+            }
+        }
+
+        // fill with red in case any error
+        linePaint = Color.RED;
+        lineTransform = matrix.toTransform();
+    }
+
+    @Override
     public void moveTo(double x, double y) {
         path.moveTo(x, y);
     }
@@ -673,7 +694,7 @@ public class BitmapExporter extends ShapeExporterBase {
                 graphics.setPaint(linePaint);
 
                 if (inverse != null) {
-                    ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
+                    ExportRectangle rect = inverse.transform(new ExportRectangle(strokedShape.getBounds2D()));
                     double minX = rect.xMin;
                     double minY = rect.yMin;
                     graphics.fill(new Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
