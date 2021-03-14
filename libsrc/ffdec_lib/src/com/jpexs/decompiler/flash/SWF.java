@@ -420,7 +420,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         soundCache.clear();
 
         timeline = null;
-        clearDumpInfo(dumpInfo);
+        if (dumpInfo != null) {
+            clearDumpInfo(dumpInfo);
+        }
         dumpInfo = null;
         jtt = null;
         binaryData = null;
