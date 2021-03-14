@@ -400,6 +400,16 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                                             (fillStyle.gradient instanceof FOCALGRADIENT) ? ((FOCALGRADIENT) fillStyle.gradient).focalPoint : 0
                                     );
                                     break;
+                                case FILLSTYLE.CLIPPED_BITMAP:
+                                case FILLSTYLE.REPEATING_BITMAP:
+                                case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
+                                case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
+                                    lineBitmapStyle(fillStyle.bitmapId,
+                                            fillStyle.bitmapMatrix,
+                                            (fillStyle.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fillStyle.fillStyleType == FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP),
+                                            (fillStyle.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fillStyle.fillStyleType == FILLSTYLE.CLIPPED_BITMAP),
+                                            colorTransform);
+                                    break;
                             }
                         }
                     } else {
