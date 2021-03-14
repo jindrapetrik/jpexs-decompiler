@@ -1646,7 +1646,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             timeline.getFrame(frame).layers.get(freeTransformDepth).matrix = newMatrix;
         }
 
-        timeline.toImage(frame, time, renderContext, image, false, m, m, m, null);
+        timeline.toImage(frame, time, renderContext, image, false, m, new Matrix(), m, null);
 
         Graphics2D gg = (Graphics2D) image.getGraphics();
         gg.setStroke(new BasicStroke(3));

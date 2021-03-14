@@ -3,8 +3,8 @@
           <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
      </fonts>
      <media>
-          <DOMBitmapItem name="bitmapfill.png" itemID="604dcb84-00000229" sourceExternalFilepath="./LIBRARY/bitmapfill.png" sourceLastImported="1615711005" externalFileSize="1931" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill.png" bitmapDataHRef="M 2 1615711026.dat" frameRight="640" frameBottom="1280"/>
-          <DOMBitmapItem name="pony.jpg" itemID="604de7c7-000002d8" sourceExternalFilepath="./LIBRARY/pony.jpg" sourceLastImported="1615718230" externalFileSize="222138" quality="50" href="pony.jpg" bitmapDataHRef="M 4 1615718240.dat" frameRight="16000" frameBottom="10680" isJPEG="true"/>
+          <DOMBitmapItem name="bitmapfill.png" itemID="604dcb84-00000229" sourceLastImported="1615711005" externalFileSize="1931" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill.png" bitmapDataHRef="M 2 1615711026.dat" frameRight="640" frameBottom="1280"/>
+          <DOMBitmapItem name="pony.jpg" itemID="604de7c7-000002d8" sourceLastImported="1615718230" externalFileSize="222138" quality="50" href="pony.jpg" bitmapDataHRef="M 4 1615718240.dat" frameRight="16000" frameBottom="10680" isJPEG="true"/>
      </media>
      <symbols>
           <Include href="BlueSquare.xml" itemIcon="1" loadImmediate="false" itemID="604e0a22-000002e1" lastModified="1615730090"/>
@@ -20,13 +20,15 @@
           <Include href="RedRect.xml" itemIcon="1" loadImmediate="false" itemID="604e0e4c-0000033d" lastModified="1615730227"/>
           <Include href="ScaledRect.xml" loadImmediate="false" itemID="604df0ee-0000024d" lastModified="1615720686"/>
           <Include href="Sprite1.xml" loadImmediate="false" itemID="604dbfb7-00000201" lastModified="1615732383"/>
-          <Include href="Stroke 1.xml" itemIcon="1" loadImmediate="false" itemID="604dd9d9-0000026d" lastModified="1615715053"/>
-          <Include href="Stroke 2.xml" itemIcon="1" loadImmediate="false" itemID="604dda1d-00000278" lastModified="1615715107"/>
+          <Include href="Stroke 1.xml" itemIcon="1" loadImmediate="false" itemID="604dd9d9-0000026d" lastModified="1615749975"/>
+          <Include href="Stroke 2.xml" itemIcon="1" loadImmediate="false" itemID="604dda1d-00000278" lastModified="1615749968"/>
+          <Include href="Stroke 3.xml" itemIcon="1" loadImmediate="false" itemID="604e5e55-0000041a" lastModified="1615749962"/>
+          <Include href="Stroke 4.xml" itemIcon="1" loadImmediate="false" itemID="604e5f54-00000425" lastModified="1615749946"/>
           <Include href="Tween 1.xml" itemIcon="1" loadImmediate="false" itemID="604dcf92-00000241" lastModified="1615712146"/>
           <Include href="Tween 2.xml" itemIcon="1" loadImmediate="false" itemID="604dcf92-00000243" lastModified="1615712146"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="16">
+          <DOMTimeline name="Scene 1" currentFrame="42">
                <layers>
                     <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
@@ -38,7 +40,7 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Prev next buttons" color="#4FFF4F" locked="true" current="true" isSelected="true" autoNamed="false">
+                    <DOMLayer name="Prev next buttons" color="#4FFF4F" locked="true" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" duration="53" keyMode="9728">
                                    <elements>
@@ -113,7 +115,7 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Graphics layer" color="#4FFF4F" autoNamed="false">
+                    <DOMLayer name="Graphics layer" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" keyMode="9728">
                                    <elements>
@@ -1128,7 +1130,7 @@
                                    <elements>
                                         <DOMSymbolInstance libraryItemName="Stroke 1" symbolType="graphic" loop="loop">
                                              <matrix>
-                                                  <Matrix tx="100" ty="100"/>
+                                                  <Matrix tx="25" ty="25"/>
                                              </matrix>
                                              <transformationPoint>
                                                   <Point x="62.5" y="50"/>
@@ -1136,7 +1138,7 @@
                                         </DOMSymbolInstance>
                                         <DOMSymbolInstance libraryItemName="Stroke 2" symbolType="graphic" loop="loop">
                                              <matrix>
-                                                  <Matrix tx="300" ty="100"/>
+                                                  <Matrix tx="143.45" ty="25"/>
                                              </matrix>
                                              <transformationPoint>
                                                   <Point x="62.5" y="50"/>
@@ -1144,7 +1146,7 @@
                                         </DOMSymbolInstance>
                                         <DOMSymbolInstance libraryItemName="Stroke 2" symbolType="graphic" loop="loop">
                                              <matrix>
-                                                  <Matrix a="0.399993896484375" d="0.400009155273438" tx="300" ty="225"/>
+                                                  <Matrix a="0.399993896484375" d="0.400009155273438" tx="143.45" ty="131"/>
                                              </matrix>
                                              <transformationPoint>
                                                   <Point x="62.5" y="50"/>
@@ -1152,7 +1154,126 @@
                                         </DOMSymbolInstance>
                                         <DOMSymbolInstance libraryItemName="Stroke 1" symbolType="graphic" loop="loop">
                                              <matrix>
-                                                  <Matrix a="0.399993896484375" d="0.400009155273438" tx="100" ty="225"/>
+                                                  <Matrix a="0.399993896484375" d="0.400009155273438" tx="25" ty="137"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="62.5" y="50"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                        <DOMStaticText width="76.75" height="16.6" autoExpand="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="27.95" ty="305.1"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>scale:normal</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMStaticText width="63.45" height="16.6" autoExpand="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="131" ty="308.9"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="19.7" y="8.3"/>
+                                             </transformationPoint>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>scale:none</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMSymbolInstance libraryItemName="Stroke 3" symbolType="graphic" loop="loop">
+                                             <matrix>
+                                                  <Matrix tx="260" ty="25"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="40" y="50"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                        <DOMStaticText width="95.05" height="16.6" autoExpand="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="248.55" ty="317.1"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>scale:horizontal</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMSymbolInstance libraryItemName="Stroke 3" symbolType="graphic" loop="loop">
+                                             <matrix>
+                                                  <Matrix a="1.6519775390625" d="0.941574096679688" tx="218.8" ty="134.1"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="40.1" y="50"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="Stroke 4" symbolType="graphic" loop="loop">
+                                             <matrix>
+                                                  <Matrix tx="370" ty="25"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="40" y="50"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="Stroke 4" symbolType="graphic" loop="loop">
+                                             <matrix>
+                                                  <Matrix d="0.269927978515625" tx="378" ty="121"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                        <DOMStaticText width="79.2" height="16.6" autoExpand="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="366" ty="330"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>scale:vertical</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMSymbolInstance libraryItemName="Stroke 1" symbolType="graphic" loop="loop">
+                                             <matrix>
+                                                  <Matrix a="1.33747863769531" d="0.488235473632813" tx="16" ty="193"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="Stroke 4" symbolType="graphic" loop="loop">
+                                             <matrix>
+                                                  <Matrix a="0.574996948242188" d="1.48590087890625" tx="395" ty="167.8"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="40" y="50"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="Stroke 3" symbolType="graphic" loop="loop">
+                                             <matrix>
+                                                  <Matrix a="0.350006103515625" tx="216.55" ty="233"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="Stroke 2" symbolType="graphic" loop="loop">
+                                             <matrix>
+                                                  <Matrix a="0.399993896484375" d="1.24119567871094" tx="151" ty="188.95"/>
                                              </matrix>
                                              <transformationPoint>
                                                   <Point x="62.5" y="50"/>
@@ -1827,7 +1948,7 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Texts inside layer" color="#FF800A" locked="true" autoNamed="false">
+                    <DOMLayer name="Texts inside layer" color="#FF800A" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" duration="16" keyMode="9728">
                                    <elements/>
@@ -3023,6 +3144,12 @@
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="100247" publishTime="1615749769"/>
+          <PublishItem publishSize="100245" publishTime="1615749071"/>
+          <PublishItem publishSize="100042" publishTime="1615748561"/>
+          <PublishItem publishSize="100051" publishTime="1615745804"/>
+          <PublishItem publishSize="100035" publishTime="1615739201"/>
+          <PublishItem publishSize="99679" publishTime="1615738567"/>
           <PublishItem publishSize="99681" publishTime="1615735902"/>
           <PublishItem publishSize="99678" publishTime="1615735809"/>
           <PublishItem publishSize="95971" publishTime="1615735695"/>
@@ -3037,11 +3164,5 @@
           <PublishItem publishSize="1509" publishTime="1615732559"/>
           <PublishItem publishSize="1509" publishTime="1615732559"/>
           <PublishItem publishSize="1509" publishTime="1615732559"/>
-          <PublishItem publishSize="89984" publishTime="1615732502"/>
-          <PublishItem publishSize="89794" publishTime="1615732010"/>
-          <PublishItem publishSize="89833" publishTime="1615731995"/>
-          <PublishItem publishSize="88871" publishTime="1615730237"/>
-          <PublishItem publishSize="1484" publishTime="1615724059"/>
-          <PublishItem publishSize="1483" publishTime="1615724059"/>
      </publishHistory>
 </DOMDocument>

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -276,5 +277,10 @@ public abstract class ImageTag extends DrawableTag {
     @Override
     public void setCharacterId(int characterId) {
         this.characterID = characterId;
+    }
+
+    @Override
+    public RECT getRectWithStrokes() {
+        return getRect();
     }
 }

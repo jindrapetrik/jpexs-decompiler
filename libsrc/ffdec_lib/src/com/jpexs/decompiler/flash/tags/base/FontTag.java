@@ -463,6 +463,11 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     @Override
+    public RECT getRectWithStrokes() {
+        return getRect();
+    }
+
+    @Override
     public RECT getRect(Set<BoundedTag> added) {
         return new RECT(0, (int) (PREVIEWSIZE * SWF.unitDivisor), 0, (int) (PREVIEWSIZE * SWF.unitDivisor));
     }

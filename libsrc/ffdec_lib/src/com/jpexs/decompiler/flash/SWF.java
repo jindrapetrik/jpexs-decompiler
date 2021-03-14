@@ -2903,7 +2903,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         RenderContext renderContext = new RenderContext();
         renderContext.cursorPosition = cursorPosition;
         renderContext.mouseButton = mouseButton;
-        timeline.toImage(frame, time, renderContext, image, false, m, transformation, m, colorTransform);
+        timeline.toImage(frame, time, renderContext, image, false, m, new Matrix(), m, colorTransform);
 
         return image;
     }
@@ -3829,5 +3829,10 @@ public final class SWF implements SWFContainerItem, Timelined {
     public void replaceTag(int index, Tag newTag) {
         removeTag(index);
         addTag(index, newTag);
+    }
+
+    @Override
+    public RECT getRectWithStrokes() {
+        return getRect();
     }
 }

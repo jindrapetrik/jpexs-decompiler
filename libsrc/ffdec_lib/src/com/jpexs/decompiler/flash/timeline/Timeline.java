@@ -612,11 +612,13 @@ public class Timeline {
             drawableFrameCount = 1;
         }
 
-        RECT boundRect = drawable.getRect();
+        RECT boundRect = drawable.getRectWithStrokes();
 
         ExportRectangle rect = new ExportRectangle(boundRect);
         Matrix mat = transformation.concatenate(layerMatrix);
         rect = mat.transform(rect);
+
+        strokeTransform = strokeTransform.concatenate(layerMatrix);
 
         boolean cacheAsBitmap = layer.cacheAsBitmap() && layer.placeObjectTag != null && drawable.isSingleFrame();
         /* // draw bounds
@@ -682,6 +684,8 @@ public class Timeline {
             }
 
             Matrix m = mat.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
+
+            //strokeTransform = strokeTransform.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
             //strokeTransform = strokeTransform.clone();
             //strokeTransform.translate(-rect.xMin, -rect.yMin);
 

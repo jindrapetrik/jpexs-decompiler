@@ -529,4 +529,9 @@ public final class DefineCompactedFont extends FontTag {
     public boolean isLeadingEditable() {
         return true;
     }
+
+    @Override
+    public RECT getRectWithStrokes() {
+        return getRect();
+    }
 }
