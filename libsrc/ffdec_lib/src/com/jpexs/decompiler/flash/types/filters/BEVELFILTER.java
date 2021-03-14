@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -101,14 +102,14 @@ public class BEVELFILTER extends FILTER {
     }
 
     @Override
-    public SerializableImage apply(SerializableImage src) {
+    public SerializableImage apply(SerializableImage src, double zoom) {
         int type = Filtering.INNER;
         if (onTop && !innerShadow) {
             type = Filtering.FULL;
         } else if (!innerShadow) {
             type = Filtering.OUTER;
         }
-        return Filtering.bevel(src, (int) blurX, (int) blurY, strength, type, highlightColor.toInt(), shadowColor.toInt(), (int) (angle * 180 / Math.PI), (float) distance, knockout, passes);
+        return Filtering.bevel(src, (int) Math.round(blurX * zoom), (int) Math.round(blurY * zoom), strength, type, highlightColor.toInt(), shadowColor.toInt(), (int) (angle * 180 / Math.PI), (float) (distance * zoom), knockout, passes);
     }
 
     @Override

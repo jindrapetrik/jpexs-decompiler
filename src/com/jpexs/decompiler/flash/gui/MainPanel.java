@@ -1344,7 +1344,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             if (export.isOptionEnabled(ShapeExportMode.class)) {
                 ret.addAll(new ShapeExporter().exportShapes(handler, selFile2 + File.separator + ShapeExportSettings.EXPORT_FOLDER_NAME, swf, new ReadOnlyTagList(shapes),
-                        new ShapeExportSettings(export.getValue(ShapeExportMode.class), export.getZoom()), evl));
+                        new ShapeExportSettings(export.getValue(ShapeExportMode.class), export.getZoom()), evl, export.getZoom()));
             }
 
             if (export.isOptionEnabled(MorphShapeExportMode.class)) {
@@ -1456,7 +1456,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (export.isOptionEnabled(ShapeExportMode.class)) {
             new ShapeExporter().exportShapes(handler, Path.combine(selFile, ShapeExportSettings.EXPORT_FOLDER_NAME), swf, swf.getTags(),
-                    new ShapeExportSettings(export.getValue(ShapeExportMode.class), export.getZoom()), evl);
+                    new ShapeExportSettings(export.getValue(ShapeExportMode.class), export.getZoom()), evl, export.getZoom());
         }
 
         if (export.isOptionEnabled(MorphShapeExportMode.class)) {
@@ -1550,7 +1550,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (export.isOptionEnabled(ShapeExportMode.class)) {
             for (ShapeExportMode exportMode : ShapeExportMode.values()) {
                 new ShapeExporter().exportShapes(handler, Path.combine(selFile, ShapeExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf, swf.getTags(),
-                        new ShapeExportSettings(exportMode, export.getZoom()), evl);
+                        new ShapeExportSettings(exportMode, export.getZoom()), evl, export.getZoom());
             }
         }
 

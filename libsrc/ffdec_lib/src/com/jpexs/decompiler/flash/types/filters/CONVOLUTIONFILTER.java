@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -85,7 +86,7 @@ public class CONVOLUTIONFILTER extends FILTER {
     }
 
     @Override
-    public SerializableImage apply(SerializableImage src) {
+    public SerializableImage apply(SerializableImage src, double zoom) {
         int height = matrix.length;
         int width = matrix[0].length;
         float[] matrix2 = new float[width * height];

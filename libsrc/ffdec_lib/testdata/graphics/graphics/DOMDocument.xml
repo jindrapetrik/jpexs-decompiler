@@ -1,5 +1,6 @@
 <DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" viewAngle3D="50.6510299754819" nextSceneIdentifier="21" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
      <fonts>
+          <DOMFontItem name="Font 2" itemID="604e7a9e-00000444" font="TimesNewRomanPS-BoldMT" size="30" id="2" sourceLastImported="1615755934" embedRanges="1|2"/>
           <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
      </fonts>
      <media>
@@ -28,7 +29,7 @@
           <Include href="Tween 2.xml" itemIcon="1" loadImmediate="false" itemID="604dcf92-00000243" lastModified="1615712146"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="43">
+          <DOMTimeline name="Scene 1" currentFrame="50">
                <layers>
                     <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
@@ -42,7 +43,7 @@
                     </DOMLayer>
                     <DOMLayer name="Prev next buttons" color="#4FFF4F" locked="true" autoNamed="false">
                          <frames>
-                              <DOMFrame index="0" duration="53" keyMode="9728">
+                              <DOMFrame index="0" duration="54" keyMode="9728">
                                    <elements>
                                         <DOMSymbolInstance libraryItemName="btnNext" selected="true" symbolType="button">
                                              <matrix>
@@ -1866,7 +1867,7 @@
                               </DOMFrame>
                               <DOMFrame index="52" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="121.05" height="33.25" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="121.05" height="33.25" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="27" ty="52"/>
                                              </matrix>
@@ -1879,7 +1880,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMDynamicText width="183.95" height="39.15" isSelectable="false">
+                                        <DOMDynamicText width="183.95" height="39.15" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="27" ty="102"/>
                                              </matrix>
@@ -1892,7 +1893,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMDynamicText>
-                                        <DOMInputText width="199" height="42.75">
+                                        <DOMInputText width="199" height="42.75" includeOutlines="true">
                                              <matrix>
                                                   <Matrix tx="27" ty="177"/>
                                              </matrix>
@@ -1905,7 +1906,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMInputText>
-                                        <DOMDynamicText width="183.95" height="39.15" isSelectable="false" border="true">
+                                        <DOMDynamicText width="183.95" height="39.15" includeOutlines="true" isSelectable="false" border="true">
                                              <matrix>
                                                   <Matrix tx="266" ty="102"/>
                                              </matrix>
@@ -1918,7 +1919,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMDynamicText>
-                                        <DOMDynamicText width="207.95" height="68.5" isSelectable="false" renderAsHTML="true">
+                                        <DOMDynamicText width="207.95" height="68.5" includeOutlines="true" isSelectable="false" renderAsHTML="true">
                                              <matrix>
                                                   <Matrix tx="266" ty="177"/>
                                              </matrix>
@@ -1937,6 +1938,61 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMDynamicText>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="53" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <LinearGradient interpolationMethod="linearRGB">
+                                                            <matrix>
+                                                                 <Matrix a="0.244140625" d="0.06103515625" tx="250" ty="100"/>
+                                                            </matrix>
+                                                            <GradientEntry color="#FF0000" ratio="0"/>
+                                                            <GradientEntry color="#00FF00" ratio="0.250980392156863"/>
+                                                            <GradientEntry color="#FF00FF" ratio="0.501960784313725"/>
+                                                            <GradientEntry color="#0000FF" ratio="0.749019607843137"/>
+                                                            <GradientEntry color="#FFFF00" ratio="1"/>
+                                                       </LinearGradient>
+                                                  </FillStyle>
+                                                  <FillStyle index="2">
+                                                       <LinearGradient>
+                                                            <matrix>
+                                                                 <Matrix a="0.244140625" d="0.0610198974609375" tx="250" ty="250"/>
+                                                            </matrix>
+                                                            <GradientEntry color="#FF0000" ratio="0"/>
+                                                            <GradientEntry color="#00FF00" ratio="0.250980392156863"/>
+                                                            <GradientEntry color="#FF00FF" ratio="0.501960784313725"/>
+                                                            <GradientEntry color="#0000FF" ratio="0.749019607843137"/>
+                                                            <GradientEntry color="#FFFF00" ratio="1"/>
+                                                       </LinearGradient>
+                                                  </FillStyle>
+                                             </fills>
+                                             <strokes>
+                                                  <StrokeStyle index="1">
+                                                       <SolidStroke scaleMode="normal" weight="0.1">
+                                                            <fill>
+                                                                 <SolidColor/>
+                                                            </fill>
+                                                       </SolidStroke>
+                                                  </StrokeStyle>
+                                             </strokes>
+                                             <edges>
+                                                  <Edge fillStyle1="1" strokeStyle="1" edges="
+!9000 3000|1000 3000!1000 3000|1000 1000!1000 1000|9000 1000!9000 1000|9000 3000"/>
+                                                  <Edge fillStyle1="2" strokeStyle="1" edges="
+!9000 6000|1000 6000!1000 6000|1000 4000!1000 4000|9000 4000!9000 4000|9000 6000"/>
+                                                  <Edge cubics="!1000 1000(;1000,1000 9000,1000 9000,1000q1000 1000 9000 1000);"/>
+                                                  <Edge cubics="!9000 1000(;9000,1000 9000,3000 9000,3000q9000 1000 9000 3000);"/>
+                                                  <Edge cubics="!9000 3000(;9000,3000 1000,3000 1000,3000q9000 3000 1000 3000);"/>
+                                                  <Edge cubics="!1000 3000(;1000,3000 1000,1000 1000,1000q1000 3000 1000 1000);"/>
+                                                  <Edge cubics="!1000 4000(;1000,4000 9000,4000 9000,4000q1000 4000 9000 4000);"/>
+                                                  <Edge cubics="!9000 4000(;9000,4000 9000,6000 9000,6000q9000 4000 9000 6000);"/>
+                                                  <Edge cubics="!9000 6000(;9000,6000 1000,6000 1000,6000q9000 6000 1000 6000);"/>
+                                                  <Edge cubics="!1000 6000(;1000,6000 1000,4000 1000,4000q1000 6000 1000 4000);"/>
+                                             </edges>
+                                        </DOMShape>
                                    </elements>
                               </DOMFrame>
                          </frames>
@@ -2317,7 +2373,7 @@
                               </DOMFrame>
                               <DOMFrame index="50" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="73.55" height="16.6" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="73.55" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="26.55" ty="96.5"/>
                                              </matrix>
@@ -2330,7 +2386,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="73.55" height="35.2" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="73.55" height="35.2" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="108.9" ty="96.5"/>
                                              </matrix>
@@ -2343,7 +2399,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="76.85" height="35.2" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="76.85" height="35.2" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="198.9" ty="97"/>
                                              </matrix>
@@ -2356,7 +2412,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="73.55" height="35.2" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="73.55" height="35.2" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="292.55" ty="97"/>
                                              </matrix>
@@ -2369,7 +2425,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="24.35" height="16.6" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="24.35" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="23.9" ty="200.5"/>
                                              </matrix>
@@ -2382,7 +2438,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="30.2" height="16.6" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="30.2" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="106.35" ty="200.5"/>
                                              </matrix>
@@ -2395,7 +2451,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="56" height="35.2" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="56" height="35.2" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="204.6" ty="200.1"/>
                                              </matrix>
@@ -2408,7 +2464,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="31" height="35.2" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="31" height="35.2" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="304.5" ty="200.1"/>
                                              </matrix>
@@ -2421,7 +2477,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="32.65" height="16.6" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="32.65" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="23.9" ty="317"/>
                                              </matrix>
@@ -2434,7 +2490,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="56" height="35.2" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="56" height="35.2" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="106.35" ty="305.8"/>
                                              </matrix>
@@ -2447,7 +2503,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="32.65" height="35.2" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="32.65" height="35.2" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="198.9" ty="305.8"/>
                                              </matrix>
@@ -2460,7 +2516,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="32.65" height="35.2" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="32.65" height="35.2" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="288.9" ty="305.8"/>
                                              </matrix>
@@ -2473,7 +2529,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="66.8" height="16.6" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="66.8" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="386.55" ty="98.5"/>
                                              </matrix>
@@ -2486,7 +2542,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="83.05" height="16.6" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="83.05" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="378" ty="207.8"/>
                                              </matrix>
@@ -2499,7 +2555,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="85.5" height="16.6" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="85.5" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="378" ty="312.9"/>
                                              </matrix>
@@ -2529,6 +2585,39 @@
                                                   </GradientBevelFilter>
                                              </filters>
                                         </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="51" duration="2" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="53" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText width="34.3" height="16.6" autoExpand="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="237.4" ty="159"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>linear</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMStaticText width="56.8" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="224.6" ty="315.9"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>nonlinear</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
                                    </elements>
                               </DOMFrame>
                          </frames>
@@ -3115,13 +3204,30 @@
                               </DOMFrame>
                               <DOMFrame index="52" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" isSelectable="false">
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
                                                        <characters>053 Text</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="53" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="22" ty="342"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>054 Linear RGB gradient</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
@@ -3137,6 +3243,9 @@
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="108418" publishTime="1615756125"/>
+          <PublishItem publishSize="108418" publishTime="1615756115"/>
+          <PublishItem publishSize="100326" publishTime="1615755435"/>
           <PublishItem publishSize="100331" publishTime="1615755207"/>
           <PublishItem publishSize="100395" publishTime="1615755150"/>
           <PublishItem publishSize="100329" publishTime="1615755064"/>
@@ -3154,8 +3263,5 @@
           <PublishItem publishSize="99679" publishTime="1615738567"/>
           <PublishItem publishSize="99681" publishTime="1615735902"/>
           <PublishItem publishSize="99678" publishTime="1615735809"/>
-          <PublishItem publishSize="95971" publishTime="1615735695"/>
-          <PublishItem publishSize="95745" publishTime="1615735637"/>
-          <PublishItem publishSize="94171" publishTime="1615735588"/>
      </publishHistory>
 </DOMDocument>

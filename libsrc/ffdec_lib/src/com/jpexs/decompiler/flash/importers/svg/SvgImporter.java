@@ -1159,7 +1159,7 @@ public class SvgImporter {
         swf.assignExportNamesToSymbols();
         st.shapeBounds.Xmax = (int) (si.getWidth() * SWF.unitDivisor);
         st.shapeBounds.Ymax = (int) (si.getHeight() * SWF.unitDivisor);
-        new ShapeExporter().exportShapes(null, "./outex/", swf, new ReadOnlyTagList(li), new ShapeExportSettings(ShapeExportMode.SVG, 1), null);
+        new ShapeExporter().exportShapes(null, "./outex/", swf, new ReadOnlyTagList(li), new ShapeExportSettings(ShapeExportMode.SVG, 1), null, 1);
     }
 
     //Test for SVG

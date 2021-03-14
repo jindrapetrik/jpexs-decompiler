@@ -659,23 +659,23 @@ public class Timeline {
                 deltaXMax = Math.max(x, deltaXMax);
                 deltaYMax = Math.max(y, deltaYMax);
             }
-            rect.xMin -= deltaXMax * unzoom;
-            rect.xMax += deltaXMax * unzoom;
-            rect.yMin -= deltaYMax * unzoom;
-            rect.yMax += deltaYMax * unzoom;
+            rect.xMin -= deltaXMax * unzoom * SWF.unitDivisor;
+            rect.xMax += deltaXMax * unzoom * SWF.unitDivisor;
+            rect.yMin -= deltaYMax * unzoom * SWF.unitDivisor;
+            rect.yMax += deltaYMax * unzoom * SWF.unitDivisor;
         }
 
-        rect.xMin -= unzoom;
-        rect.yMin -= unzoom;
+        rect.xMin -= SWF.unitDivisor;
+        rect.yMin -= SWF.unitDivisor;
         rect.xMin = Math.max(0, rect.xMin);
         rect.yMin = Math.max(0, rect.yMin);
         drawMatrix.translate(rect.xMin, rect.yMin);
 
         if (img == null) {
-            int newWidth = (int) (rect.getWidth() / unzoom);
-            int newHeight = (int) (rect.getHeight() / unzoom);
-            int deltaX = (int) (rect.xMin / unzoom);
-            int deltaY = (int) (rect.yMin / unzoom);
+            int newWidth = (int) (rect.getWidth() / SWF.unitDivisor);
+            int newHeight = (int) (rect.getHeight() / SWF.unitDivisor);
+            int deltaX = (int) (rect.xMin / SWF.unitDivisor);
+            int deltaY = (int) (rect.yMin / SWF.unitDivisor);
             newWidth = Math.min(image.getWidth() - deltaX, newWidth) + 1;
             newHeight = Math.min(image.getHeight() - deltaY, newHeight) + 1;
 
@@ -721,14 +721,14 @@ public class Timeline {
             }
 
             if (!(drawable instanceof ImageTag) || (swf.isAS3() && layer.hasImage)) {
-                drawable.toImage(dframe, time, ratio, renderContext, img, isClip || clipDepth > -1, m, strokeTransform, absMat, clrTrans2);
+                drawable.toImage(dframe, time, ratio, renderContext, img, isClip || clipDepth > -1, m, strokeTransform, absMat, clrTrans2, unzoom);
             } else {
                 // todo: show one time warning
             }
 
             if (filters != null) {
                 for (FILTER filter : filters) {
-                    img = filter.apply(img);
+                    img = filter.apply(img, unzoom);
                 }
             }
             if (blendMode > 1) {
@@ -742,8 +742,8 @@ public class Timeline {
             }
         }
 
-        drawMatrix.translateX /= unzoom;
-        drawMatrix.translateY /= unzoom;
+        drawMatrix.translateX /= SWF.unitDivisor;
+        drawMatrix.translateY /= SWF.unitDivisor;
         AffineTransform trans = drawMatrix.toTransform();
 
         switch (blendMode) {
@@ -835,8 +835,9 @@ public class Timeline {
         }
     }
 
-    public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform) {
-        double unzoom = SWF.unitDivisor;
+    public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom) {
+        //double unzoom = SWF.unitDivisor;
+        //unzoom = SWF.unitDivisor;
         if (getFrameCount() <= frame) {
             return;
         }
