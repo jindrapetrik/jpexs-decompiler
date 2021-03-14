@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Flash viewer - bitmap stroke style, strokes scaling, cropped strokes
+- Flash viewer - filters zooming
 
 ## [14.2.1] - 2021-03-13
 ### Added

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -40,7 +41,7 @@ public class COLORMATRIXFILTER extends FILTER {
     }
 
     @Override
-    public SerializableImage apply(SerializableImage src) {
+    public SerializableImage apply(SerializableImage src, double zoom) {
         float[][] matrix2 = new float[4][5];
         for (int y = 0; y < 4; y++) {
             for (int x = 0; x < 5; x++) {

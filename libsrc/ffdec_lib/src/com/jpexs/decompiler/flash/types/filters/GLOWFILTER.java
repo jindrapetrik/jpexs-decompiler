@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -79,8 +80,8 @@ public class GLOWFILTER extends FILTER {
     }
 
     @Override
-    public SerializableImage apply(SerializableImage src) {
-        return Filtering.glow(src, (int) blurX, (int) blurY, strength, glowColor.toColor(), innerGlow, knockout, passes);
+    public SerializableImage apply(SerializableImage src, double zoom) {
+        return Filtering.glow(src, (int) Math.round(blurX * zoom), (int) Math.round(blurY * zoom), strength, glowColor.toColor(), innerGlow, knockout, passes);
     }
 
     @Override

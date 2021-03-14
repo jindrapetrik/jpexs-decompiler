@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.filters;
 
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -106,7 +107,7 @@ public class GRADIENTGLOWFILTER extends FILTER {
     }
 
     @Override
-    public SerializableImage apply(SerializableImage src) {
+    public SerializableImage apply(SerializableImage src, double zoom) {
         List<Color> colors = new ArrayList<>();
         List<Float> ratios = new ArrayList<>();
         for (int i = 0; i < gradientColors.length; i++) {
@@ -127,7 +128,7 @@ public class GRADIENTGLOWFILTER extends FILTER {
         for (int i = 0; i < ratios.size(); i++) {
             ratiosAr[i] = ratios.get(i);
         }
-        return Filtering.gradientGlow(src, (int) blurX, (int) blurY, (int) (angle * 180 / Math.PI), distance, colors.toArray(new Color[colors.size()]), ratiosAr, type, passes, strength, knockout);
+        return Filtering.gradientGlow(src, (int) Math.round(blurX * zoom), (int) Math.round(blurY * zoom), (int) (angle * 180 / Math.PI), distance * zoom, colors.toArray(new Color[colors.size()]), ratiosAr, type, passes, strength, knockout);
     }
 
     @Override

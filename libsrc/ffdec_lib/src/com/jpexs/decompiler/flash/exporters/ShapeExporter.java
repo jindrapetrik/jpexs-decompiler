@@ -62,7 +62,7 @@ import java.util.logging.Logger;
  */
 public class ShapeExporter {
 
-    public List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, final SWF swf, ReadOnlyTagList tags, final ShapeExportSettings settings, EventListener evl) throws IOException, InterruptedException {
+    public List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, final SWF swf, ReadOnlyTagList tags, final ShapeExportSettings settings, EventListener evl, double unzoom) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
         if (tags.isEmpty()) {
             return ret;
@@ -122,7 +122,7 @@ public class ShapeExporter {
                             }
                             Matrix m = Matrix.getScaleInstance(settings.zoom);
                             m.translate(-rect.Xmin, -rect.Ymin);
-                            st.toImage(0, 0, 0, new RenderContext(), img, false, m, m, m, new CXFORMWITHALPHA());
+                            st.toImage(0, 0, 0, new RenderContext(), img, false, m, m, m, new CXFORMWITHALPHA(), unzoom);
                             if (settings.mode == ShapeExportMode.PNG) {
                                 ImageHelper.write(img.getBufferedImage(), ImageFormat.PNG, file);
                             } else {
