@@ -100,9 +100,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         exporter.addToDefs(gradient);
     }
 
-    @Override
-    public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
-        finalizePath();
+    private String getPattern(int bitmapId, Matrix matrix, ColorTransform colorTransform) {
         ImageTag image = swf.getImage(bitmapId);
         if (image != null) {
             SerializableImage img = image.getImageCached();
@@ -118,7 +116,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 ImageFormat format = image.getImageFormat();
                 byte[] imageData = Helper.readStream(image.getImageData());
                 String base64ImgData = Helper.byteArrayToBase64String(imageData);
-                path.setAttribute("style", "fill:url(#" + patternId + ")");
+
                 Element pattern = exporter.createElement("pattern");
                 pattern.setAttribute("id", patternId);
                 pattern.setAttribute("patternUnits", "userSpaceOnUse");
@@ -135,10 +133,20 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 imageElement.setAttribute("xlink:href", "data:image/" + format + ";base64," + base64ImgData);
                 pattern.appendChild(imageElement);
                 exporter.addToGroup(pattern);
-                return;
+                return patternId;
             }
         }
+        return null;
+    }
 
+    @Override
+    public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
+        finalizePath();
+        String patternId = getPattern(bitmapId, matrix, colorTransform);
+        if (patternId != null) {
+            path.setAttribute("style", "fill:url(#" + patternId + ")");
+            return;
+        }
         path.setAttribute("fill", "#ff0000");
     }
 
@@ -205,7 +213,11 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
 
     @Override
     public void lineBitmapStyle(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
-        //TODO
+        String patternId = getPattern(bitmapId, matrix, colorTransform);
+        if (patternId != null) {
+            path.setAttribute("stroke", "url(#" + patternId + ")");
+            return;
+        }
     }
 
     @Override
