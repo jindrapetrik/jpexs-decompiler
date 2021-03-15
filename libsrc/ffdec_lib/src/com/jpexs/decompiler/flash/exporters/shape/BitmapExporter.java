@@ -401,7 +401,7 @@ public class BitmapExporter extends ShapeExporterBase {
         }
 
         if (joinStyle == BasicStroke.JOIN_MITER) {
-            lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle, miterLimit);
+            lineStroke = new MiterClipBasicStroke(new BasicStroke((float) thickness, capStyle, joinStyle, miterLimit));
         } else {
             lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle);
         }

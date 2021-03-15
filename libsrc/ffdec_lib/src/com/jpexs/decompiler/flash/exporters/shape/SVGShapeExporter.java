@@ -176,8 +176,8 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 path.setAttribute("stroke-linejoin", "round");
                 break;
             default:
-                path.setAttribute("stroke-linejoin", "miter");
-                if (miterLimit >= 1 && miterLimit != 4f) {
+                path.setAttribute("stroke-linejoin", "miter-clip");
+                if (miterLimit >= 1) {
                     path.setAttribute("stroke-miterlimit", Double.toString(miterLimit));
                 }
                 break;
