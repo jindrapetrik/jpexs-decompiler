@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Flash viewer - filters zooming
 - Flash viewer - miter strokes
 - SVG export - miter strokes as miter-clip style
+- [#1660] Thumbnail view context menu Remove
 
 ## [14.2.1] - 2021-03-13
 ### Added
@@ -2015,7 +2016,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.2.0...Unreleased
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.2.1...Unreleased
+[14.2.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.2.0...version14.2.1
 [14.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.1.0...version14.2.0
 [14.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.0.1...version14.1.0
 [14.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.0.0...version14.0.1
@@ -2125,6 +2127,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1660]: https://www.free-decompiler.com/flash/issues/1660
 [#1435]: https://www.free-decompiler.com/flash/issues/1435
 [#1488]: https://www.free-decompiler.com/flash/issues/1488
 [#1584]: https://www.free-decompiler.com/flash/issues/1584

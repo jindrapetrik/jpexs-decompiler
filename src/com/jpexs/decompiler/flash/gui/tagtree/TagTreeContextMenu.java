@@ -1364,11 +1364,30 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void removeItemActionPerformed(ActionEvent evt, boolean removeDependencies) {
 
-        TreePath[] tpsArr = tagTree.getSelectionModel().getSelectionPaths();
-        if (tpsArr == null) {
-            return;
+        TreePath[] tpsArr;
+        List<TreePath> tps;
+        if (mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
+            tpsArr = tagTree.getSelectionModel().getSelectionPaths();
+            if (tpsArr == null) {
+                return;
+            }
+            tps = new ArrayList<>(Arrays.asList(tpsArr));
+        } else {
+            List<TreeItem> sel = new ArrayList<>();
+            for (TreeItem treeItem : mainPanel.folderPreviewPanel.selectedItems.values()) {
+                sel.add(treeItem);
+                tagTree.getAllSubs(treeItem, sel);
+            }
+            tps = new ArrayList<>();
+            for (TreeItem treeItem : sel) {
+                tps.add(new TreePath(treeItem));
+                //Following code needs TreePath, so convert it without real reason
+                //Let's hope nobody gets parent of such path
+            }
+            if (tps.isEmpty()) {
+                return;
+            }
         }
-        List<TreePath> tps = new ArrayList<>(Arrays.asList(tpsArr));
 
         List<Tag> tagsToRemove = new ArrayList<>();
         List<Object> itemsToRemove = new ArrayList<>();
