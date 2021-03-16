@@ -59,6 +59,8 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
     private Image img;
     private String name;
 
+    private String mask;
+
     /**
      * Creates a new <code>PDFImage</code> instance.
      *
@@ -72,9 +74,14 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
      *
      * @param img an <code>Image</code> value
      */
-    public PDFImage(Image img) {
+    public PDFImage(Image img, String mask) {
         this();
+        this.mask = mask;
         setImage(img, 0, 0, img.getWidth(this), img.getHeight(this), this);
+    }
+
+    public PDFImage(Image img) {
+        this(img, null);
     }
 
     /**
@@ -87,11 +94,16 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
      * @param h an <code>int</code> value
      * @param obs an <code>ImageObserver</code> value
      */
-    public PDFImage(Image img, int x, int y, int w, int h, ImageObserver obs) {
+    public PDFImage(Image img, int x, int y, int w, int h, ImageObserver obs, String mask) {
         this();
         objwidth = w;
         objheight = h;
+        this.mask = mask;
         setImage(img, x, y, img.getWidth(this), img.getHeight(this), obs);
+    }
+
+    public PDFImage(Image img, int x, int y, int w, int h, ImageObserver obs) {
+        this(img, x, y, w, h, obs, null);
     }
 
     /**
@@ -297,6 +309,9 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
         os.write("\n/Height ".getBytes());
         os.write(Integer.toString(height).getBytes());
         os.write("\n/BitsPerComponent 8\n/ColorSpace /DeviceRGB\n".getBytes());
+        if (mask != null) {
+            os.write(("\n/SMask " + mask + "\n").getBytes());
+        }
 
         // write the pixels to the stream
         //System.err.println("Processing image "+width+"x"+height+" pixels");
