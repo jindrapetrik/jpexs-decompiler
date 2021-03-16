@@ -36,11 +36,14 @@ import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DefineText2Tag;
+import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
@@ -65,13 +68,33 @@ import com.jpexs.decompiler.flash.types.filters.GRADIENTBEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.GRADIENTGLOWFILTER;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
+import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import gnu.jpdf.PDFGraphics;
 import gnu.jpdf.PDFJob;
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
+import java.awt.image.ImageObserver;
+import java.awt.image.RenderedImage;
+import java.awt.image.renderable.RenderableImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
 import java.io.BufferedOutputStream;
@@ -80,6 +103,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.AttributedCharacterIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -469,13 +493,18 @@ public class FrameExporter {
                         PageFormat pf = new PageFormat();
                         pf.setOrientation(PageFormat.PORTRAIT);
                         Paper p = new Paper();
-                        BufferedImage img = frameImages.next();
-                        p.setSize(img.getWidth() + 10, img.getHeight() + 10);
-                        pf.setPaper(p);
+                        /*BufferedImage img = frameImages.next();
+                        p.setSize(img.getWidth() + 10, img.getHeight() + 10);*/
+
 
 
                         int pos = 0;
                         RECT rect = tim.displayRect;
+
+                        double w = (rect.getWidth() * settings.zoom / SWF.unitDivisor);
+                        double h = (rect.getHeight() * settings.zoom / SWF.unitDivisor);
+                        p.setSize(w + 10, h + 10);
+                        pf.setPaper(p);
                         double zoom = settings.zoom;
                         Matrix m = new Matrix();
                         m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
@@ -483,19 +512,59 @@ public class FrameExporter {
                         Matrix transformation = m;
                         Map<Integer, Font> existingFonts = new HashMap<>();
 
-                        while (true) {
+                        while (pos < fframes.size()) {
                             int fframe = fframes.get(pos);
-                            Graphics2D g = (Graphics2D) job.getGraphics(pf);
-                            g.drawImage(img, 5, 5, img.getWidth(), img.getHeight(), null);
+                            final Graphics2D g = (Graphics2D) job.getGraphics(pf);
+                            //g.drawImage(img, 5, 5, img.getWidth(), img.getHeight(), null);
 
-                            printStringsToImage(existingFonts, g, fframe, swf, tim, transformation);
+                            SerializableImage image = new SerializableImage((int) w + 1, (int) h + 1, SerializableImage.TYPE_INT_ARGB_PRE) {
+
+                                private Graphics2D compositeGraphics;
+
+                                @Override
+                                public Graphics getGraphics() {
+                                    if (compositeGraphics != null) {
+                                        return compositeGraphics;
+                                    }
+                                    final Graphics2D parentGraphics = (Graphics2D) super.getGraphics();
+                                    compositeGraphics = new DualGraphics2D(parentGraphics, g);
+                                    return compositeGraphics;
+                                }
+
+                                @Override
+                                public void fillTransparent() {
+
+                                }
+
+                            };
+                            //if (backGroundColor == null) {
+                            //    image.fillTransparent();
+                            int imgWidth = (int) (rect.getWidth() * zoom / SWF.unitDivisor) + 1;
+                            int imgHeight = (int) (rect.getHeight() * zoom / SWF.unitDivisor) + 1;
+                            if (!fusesTransparency && fbackgroundColor != null) {
+                                g.setComposite(AlphaComposite.Src);
+                                g.setColor(fbackgroundColor);
+                                g.fill(new Rectangle(imgWidth, imgHeight));
+                            }
+
+                            RenderContext renderContext = new RenderContext();
+                            renderContext.cursorPosition = new Point(-1, -1);
+                            renderContext.mouseButton = 0;
+                            renderContext.stateUnderCursor = new ArrayList<>();
+
+                            try {
+                                tim.toImage(fframe, fframe, renderContext, image, false, m, new Matrix(), m, null, zoom, true);
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                            //printStringsToImage(existingFonts, g, fframe, swf, tim, transformation);
 
                             g.dispose();
-                            if (frameImages.hasNext()) {
+                            /*if (frameImages.hasNext()) {
                                 img = frameImages.next();
                             } else {
                                 break;
-                            }
+                            }*/
                             pos++;
                         }
 
@@ -538,12 +607,12 @@ public class FrameExporter {
             Matrix layerMatrix = new Matrix(layer.matrix);
             Matrix absMat = absoluteTransformation.concatenate(layerMatrix);
             if (character instanceof DrawableTag) {
-                printStringsDrawDrawable(existingFonts, g, swf, layerMatrix, transformation, absMat, time, layer.ratio, (DrawableTag) character, unzoom);
+                printStringsDrawDrawable(existingFonts, g, swf, layerMatrix, transformation, absMat, time, layer.ratio, (DrawableTag) character, unzoom, layer.colorTransForm);
             }
         }
     }
 
-    private static void printStringsDrawDrawable(Map<Integer, Font> existingFonts, Graphics2D g, SWF swf, Matrix layerMatrix, Matrix transformation, Matrix absMat, int time, int ratio, DrawableTag drawable, double unzoom) {
+    private static void printStringsDrawDrawable(Map<Integer, Font> existingFonts, Graphics2D g, SWF swf, Matrix layerMatrix, Matrix transformation, Matrix absMat, int time, int ratio, DrawableTag drawable, double unzoom, ColorTransform colorTransform) {
         int drawableFrameCount = drawable.getNumFrames();
         if (drawableFrameCount == 0) {
             drawableFrameCount = 1;
@@ -555,8 +624,7 @@ public class FrameExporter {
         Matrix m = mat; //mat.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
         if (drawable instanceof DefineSpriteTag) {
             printStringsToImage(existingFonts, g, dframe, swf, ((Timelined) drawable).getTimeline(), m);
-        }
-        if (drawable instanceof TextTag) {
+        } else if (drawable instanceof TextTag) {
             TextTag textTag = (TextTag) drawable;
 
             List<TEXTRECORD> textRecords = new ArrayList<>();
@@ -579,7 +647,21 @@ public class FrameExporter {
             int textHeight = 12;
             int x = 0;
             int y = 0;
+            int textColor = 0;
             for (TEXTRECORD rec : textRecords) {
+
+                if (rec.styleFlagsHasColor) {
+                    if (!(textTag instanceof DefineTextTag)) {
+                        textColor = rec.textColorA.toInt();
+                    } else {
+                        textColor = rec.textColor.toInt();
+                    }
+
+                    if (colorTransform != null) {
+                        textColor = colorTransform.apply(textColor);
+                    }
+                }
+
                 if (rec.styleFlagsHasFont) {
                     font = swf.getFont(rec.fontId);
                     textHeight = rec.textHeight;
@@ -621,8 +703,12 @@ public class FrameExporter {
                 }
 
                 g2.setTransform(trans.toTransform());
-                g2.drawTransparentString(text.toString(), (float) x, (float) y);
+                Color textColor2 = new Color(textColor, true);
+                g2.setColor(textColor2);
+                g2.drawString(text.toString(), (float) x, (float) y);
             }
+        } else {
+
         }
 
     }

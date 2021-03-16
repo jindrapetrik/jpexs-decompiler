@@ -97,8 +97,8 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom) {
-        getTimeline().toImage(frame, time, renderContext, image, isClip, transformation, strokeTransformation, absoluteTransformation, colorTransform, unzoom);
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage) {
+        getTimeline().toImage(frame, time, renderContext, image, isClip, transformation, strokeTransformation, absoluteTransformation, colorTransform, unzoom, sameImage);
     }
 
     @Override
