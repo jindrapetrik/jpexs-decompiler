@@ -417,7 +417,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom) {
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage) {
         SHAPERECORD.shapeListToImage(swf, getGlyphShapeTable(), image, frame, Color.black, colorTransform);
     }
 

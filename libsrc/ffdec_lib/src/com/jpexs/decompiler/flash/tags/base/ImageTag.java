@@ -230,7 +230,7 @@ public abstract class ImageTag extends DrawableTag {
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom) {
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage) {
         BitmapExporter.export(swf, getShape(), null, image, transformation, strokeTransformation, colorTransform);
     }
 
