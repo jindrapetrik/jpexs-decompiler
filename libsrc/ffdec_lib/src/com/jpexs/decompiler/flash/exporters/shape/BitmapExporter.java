@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.SerializableImage;
@@ -155,9 +156,10 @@ public class BitmapExporter extends ShapeExporterBase {
 
     private void exportTo(SerializableImage image, Matrix transformation, Matrix strokeTransformation) {
         this.image = image;
-        this.strokeTransformation = strokeTransformation.clone();
-        this.strokeTransformation.scaleX /= SWF.unitDivisor;
-        this.strokeTransformation.scaleY /= SWF.unitDivisor;
+        ExportRectangle bounds = new ExportRectangle(shape.getBounds());
+        ExportRectangle transformedBounds = strokeTransformation.transform(bounds);
+
+        this.strokeTransformation = Matrix.getScaleInstance(transformedBounds.getWidth() / bounds.getWidth(), transformedBounds.getHeight() / bounds.getHeight());
 
         graphics = (Graphics2D) image.getGraphics();
         AffineTransform at = transformation.toTransform();
@@ -395,7 +397,6 @@ public class BitmapExporter extends ShapeExporterBase {
                 thickness *= Math.max(strokeTransformation.scaleX, strokeTransformation.scaleY);
                 break;
             case "NONE":
-                thickness /= SWF.unitDivisor;
                 break;
         }
 
