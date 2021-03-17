@@ -1,7 +1,7 @@
-<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" viewAngle3D="50.6510299754819" nextSceneIdentifier="21" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" viewAngle3D="50.6510299754819" nextSceneIdentifier="25" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
      <fonts>
-          <DOMFontItem name="Font 2" itemID="604e7a9e-00000444" font="TimesNewRomanPS-BoldMT" size="30" id="2" sourceLastImported="1615755934" embedRanges="1|2"/>
           <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
+          <DOMFontItem name="Font 2" itemID="604e7a9e-00000444" font="TimesNewRomanPS-BoldMT" size="30" id="2" sourceLastImported="1615755934" embedRanges="1|2"/>
      </fonts>
      <media>
           <DOMBitmapItem name="bitmapfill.png" itemID="604dcb84-00000229" sourceLastImported="1615711005" externalFileSize="1931" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill.png" bitmapDataHRef="M 2 1615711026.dat" frameRight="640" frameBottom="1280"/>
@@ -29,7 +29,7 @@
           <Include href="Tween 2.xml" itemIcon="1" loadImmediate="false" itemID="604dcf92-00000243" lastModified="1615712146"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="50">
+          <DOMTimeline name="Scene 1" currentFrame="51">
                <layers>
                     <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
@@ -45,7 +45,7 @@
                          <frames>
                               <DOMFrame index="0" duration="54" keyMode="9728">
                                    <elements>
-                                        <DOMSymbolInstance libraryItemName="btnNext" selected="true" symbolType="button">
+                                        <DOMSymbolInstance libraryItemName="btnNext" symbolType="button">
                                              <matrix>
                                                   <Matrix tx="450"/>
                                              </matrix>
@@ -72,6 +72,46 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
+                    <DOMLayer name="Mask layer2" color="#9933CC" locked="true" autoNamed="false" layerType="mask">
+                         <frames>
+                              <DOMFrame index="0" duration="51" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="51" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <edges>
+                                                  <Edge fillStyle1="1" edges="!7950 4500|5950 4500!5950 4500|5950 2500!5950 2500|7950 2500!7950 2500|7950 4500"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Masked layer 2" color="#4FFF4F" parentLayerIndex="2" locked="true" current="true" isSelected="true" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" duration="51" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="51" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Sprite1" selected="true" centerPoint3DX="362.5" centerPoint3DY="175">
+                                             <matrix>
+                                                  <Matrix tx="275" ty="100"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="87.5" y="75"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
                     <DOMLayer name="Mask layer" color="#9933CC" locked="true" autoNamed="false" layerType="mask">
                          <frames>
                               <DOMFrame index="0" duration="51" keyMode="9728">
@@ -79,40 +119,43 @@
                               </DOMFrame>
                               <DOMFrame index="51" keyMode="9728">
                                    <elements>
-                                        <DOMShape selected="true" isFloating="true">
-                                             <matrix>
-                                                  <Matrix a="1.03092956542969" d="1.01626586914063" tx="-14.65" ty="-4.1"/>
-                                             </matrix>
+                                        <DOMShape>
                                              <fills>
                                                   <FillStyle index="1">
                                                        <SolidColor/>
                                                   </FillStyle>
                                              </fills>
                                              <edges>
-                                                  <Edge fillStyle1="1" edges="!4649 2540S2[5051 2540 5335 2900!5335 2900[5619 3260 5619 3770!5619 3770[5619 4280 5335 4640!5335 4640[5051 5000 4649 5000!4649 5000[4247 5000 3963 4640!3963 4640[3679 4280 3679 3770!3679 3770[3679 3260 3963 2900!3963 2900[4247 2540 4649
- 2540"/>
+                                                  <Edge fillStyle1="1" edges="!3207 2865[3500 3231 3500 3749!3500 3749[3500 4268 3207 4633!3207 4633[2914 4999 2500 4999!2500 4999[2085 4999 1793 4633!1793 4633[1500 4268 1500 3749!1500 3749[1500 3231 1793 2865!1793 2865[2085 2499 2500 2499!2500 2499[2914 2499 3207
+ 2865"/>
                                              </edges>
                                         </DOMShape>
                                    </elements>
                               </DOMFrame>
+                              <DOMFrame index="52" duration="2" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Masked layer" color="#4FFF4F" parentLayerIndex="2" locked="true" autoNamed="false">
+                    <DOMLayer name="Masked layer" color="#4FFF4F" parentLayerIndex="4" locked="true" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" duration="51" keyMode="9728">
                                    <elements/>
                               </DOMFrame>
                               <DOMFrame index="51" keyMode="9728">
                                    <elements>
-                                        <DOMSymbolInstance libraryItemName="Sprite1" centerPoint3DX="237.5" centerPoint3DY="175">
+                                        <DOMSymbolInstance libraryItemName="Sprite1" centerPoint3DX="137.5" centerPoint3DY="175">
                                              <matrix>
-                                                  <Matrix tx="150" ty="100"/>
+                                                  <Matrix tx="50" ty="100"/>
                                              </matrix>
                                              <transformationPoint>
                                                   <Point x="87.5" y="75"/>
                                              </transformationPoint>
                                         </DOMSymbolInstance>
                                    </elements>
+                              </DOMFrame>
+                              <DOMFrame index="52" duration="2" keyMode="9728">
+                                   <elements/>
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
@@ -728,10 +771,10 @@
 !3980 1990|2980 1990!2980 1990|2980 990!2980 990|3980 990!3980 990|3980 1990"/>
                                                   <Edge strokeStyle="5" edges="
 !1960 990|1960 1990!1960 1990|960 1990!960 1990|960 990!960 990|1960 990"/>
-                                                  <Edge strokeStyle="6" edges="
-!2980 3990|3980 3990!3980 3990|3980 4990!3980 4990|2980 4990!2980 4990|2980 3990"/>
                                                   <Edge strokeStyle="7" edges="
 !1980 4990|980 4990!980 4990|980 3990!980 3990|1980 3990!1980 3990|1980 4990"/>
+                                                  <Edge strokeStyle="6" edges="
+!2980 3990|3980 3990!3980 3990|3980 4990!3980 4990|2980 4990!2980 4990|2980 3990"/>
                                                   <Edge strokeStyle="8" edges="
 !5980 3990|5980 4990!5980 4990|4980 4990!4980 4990|4980 3990!4980 3990|5980 3990"/>
                                                   <Edge cubics="!1960 990(;1960,990 1960,1990 1960,1990q1960 990 1960 1990);"/>
@@ -1250,7 +1293,7 @@
                                         </DOMStaticText>
                                         <DOMSymbolInstance libraryItemName="Stroke 1" symbolType="graphic" loop="loop">
                                              <matrix>
-                                                  <Matrix a="1.33747863769531" d="0.488235473632813" tx="16" ty="193"/>
+                                                  <Matrix a="1.33746337890625" d="0.488235473632813" tx="16" ty="193"/>
                                              </matrix>
                                              <transformationPoint>
                                                   <Point/>
@@ -1330,18 +1373,18 @@
                                                   </StrokeStyle>
                                              </strokes>
                                              <edges>
-                                                  <Edge strokeStyle="5" edges="
-!5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
                                                   <Edge strokeStyle="2" edges="
 !3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
+                                                  <Edge strokeStyle="5" edges="
+!5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
                                                   <Edge strokeStyle="1" edges="
 !2000 1000|2000 2000!2000 2000|1000 2000!1000 2000|1000 1000"/>
-                                                  <Edge strokeStyle="4" edges="
-!1000 3660/1295 4670!1295 4670/1372 3660"/>
-                                                  <Edge strokeStyle="3" edges="
-!2553 3660/2848 4670!2848 4670/2925 3660"/>
                                                   <Edge strokeStyle="6" edges="
 !4647 3660/4942 4670!4942 4670/5019 3660"/>
+                                                  <Edge strokeStyle="3" edges="
+!2553 3660/2848 4670!2848 4670/2925 3660"/>
+                                                  <Edge strokeStyle="4" edges="
+!1000 3660/1295 4670!1295 4670/1372 3660"/>
                                                   <Edge cubics="!5000 2000(;5000,2000 4000,2000 4000,2000q5000 2000 4000 2000);"/>
                                                   <Edge cubics="!4000 2000(4000,2000;4000,2000 4000,1000 4000,1000q4000 2000 4000 1000);"/>
                                                   <Edge cubics="!5000 1000(;5000,1000 5000,2000 5000,2000q5000 1000 5000 2000);"/>
@@ -1947,7 +1990,7 @@
                                                   <FillStyle index="1">
                                                        <LinearGradient interpolationMethod="linearRGB">
                                                             <matrix>
-                                                                 <Matrix a="0.244140625" d="0.06103515625" tx="250" ty="100"/>
+                                                                 <Matrix a="0.244140625" d="0.0610198974609375" tx="250" ty="100"/>
                                                             </matrix>
                                                             <GradientEntry color="#FF0000" ratio="0"/>
                                                             <GradientEntry color="#00FF00" ratio="0.250980392156863"/>
@@ -1997,7 +2040,7 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Texts inside layer" color="#FF800A" current="true" isSelected="true" autoNamed="false">
+                    <DOMLayer name="Texts inside layer" color="#FF800A" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" duration="16" keyMode="9728">
                                    <elements/>
@@ -3243,6 +3286,16 @@
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="108381" publishTime="1615971629"/>
+          <PublishItem publishSize="1483" publishTime="1615971614"/>
+          <PublishItem publishSize="1483" publishTime="1615971614"/>
+          <PublishItem publishSize="1483" publishTime="1615971614"/>
+          <PublishItem publishSize="1483" publishTime="1615971614"/>
+          <PublishItem publishSize="108489" publishTime="1615970100"/>
+          <PublishItem publishSize="108320" publishTime="1615968777"/>
+          <PublishItem publishSize="108352" publishTime="1615967837"/>
+          <PublishItem publishSize="108339" publishTime="1615967290"/>
+          <PublishItem publishSize="108324" publishTime="1615966926"/>
           <PublishItem publishSize="108418" publishTime="1615756125"/>
           <PublishItem publishSize="108418" publishTime="1615756115"/>
           <PublishItem publishSize="100326" publishTime="1615755435"/>
@@ -3253,15 +3306,5 @@
           <PublishItem publishSize="100331" publishTime="1615755001"/>
           <PublishItem publishSize="100352" publishTime="1615753742"/>
           <PublishItem publishSize="100333" publishTime="1615752295"/>
-          <PublishItem publishSize="100334" publishTime="1615752260"/>
-          <PublishItem publishSize="100313" publishTime="1615750221"/>
-          <PublishItem publishSize="100247" publishTime="1615749769"/>
-          <PublishItem publishSize="100245" publishTime="1615749071"/>
-          <PublishItem publishSize="100042" publishTime="1615748561"/>
-          <PublishItem publishSize="100051" publishTime="1615745804"/>
-          <PublishItem publishSize="100035" publishTime="1615739201"/>
-          <PublishItem publishSize="99679" publishTime="1615738567"/>
-          <PublishItem publishSize="99681" publishTime="1615735902"/>
-          <PublishItem publishSize="99678" publishTime="1615735809"/>
      </publishHistory>
 </DOMDocument>
