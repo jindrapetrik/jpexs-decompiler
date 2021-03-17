@@ -73,6 +73,8 @@ public class BitmapExporter extends ShapeExporterBase {
 
     private Paint fillPaint;
 
+    private boolean fillRepeat;
+
     private AffineTransform fillTransform;
 
     private Paint linePaint;
@@ -336,6 +338,7 @@ public class BitmapExporter extends ShapeExporterBase {
 
                 fillPaint = new TexturePaint(img.getBufferedImage(), new java.awt.Rectangle(img.getWidth(), img.getHeight()));
                 fillTransform = matrix.toTransform();
+                fillRepeat = repeat;
                 return;
             }
         }
@@ -597,32 +600,38 @@ public class BitmapExporter extends ShapeExporterBase {
                 AffineTransform oldAf = graphics.getTransform();
                 graphics.setClip(path);
                 Matrix inverse = null;
-                try {
-                    double scx = fillTransform.getScaleX();
-                    double scy = fillTransform.getScaleY();
-                    double shx = fillTransform.getShearX();
-                    double shy = fillTransform.getShearY();
-                    double det = scx * scy - shx * shy;
-                    if (Math.abs(det) <= Double.MIN_VALUE) {
-                        // use only the translate values
-                        // todo: make it better
-                        fillTransform.setToTranslation(fillTransform.getTranslateX(), fillTransform.getTranslateY());
+                if (fillRepeat) {
+                    try {
+                        double scx = fillTransform.getScaleX();
+                        double scy = fillTransform.getScaleY();
+                        double shx = fillTransform.getShearX();
+                        double shy = fillTransform.getShearY();
+                        double det = scx * scy - shx * shy;
+                        if (Math.abs(det) <= Double.MIN_VALUE) {
+                            // use only the translate values
+                            // todo: make it better
+                            fillTransform.setToTranslation(fillTransform.getTranslateX(), fillTransform.getTranslateY());
+                        }
+
+                        inverse = new Matrix(new AffineTransform(fillTransform).createInverse());
+                    } catch (NoninvertibleTransformException ex) {
+                        // it should never happen as we already checked the determinant of the matrix
                     }
-
-                    inverse = new Matrix(new AffineTransform(fillTransform).createInverse());
-                } catch (NoninvertibleTransformException ex) {
-                    // it should never happen as we already checked the determinant of the matrix
                 }
-
                 fillTransform.preConcatenate(oldAf);
                 graphics.setTransform(fillTransform);
                 graphics.setPaint(fillPaint);
 
-                if (inverse != null) {
-                    ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
-                    double minX = rect.xMin;
-                    double minY = rect.yMin;
-                    graphics.fill(new Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
+                if (fillRepeat) {
+                    if (inverse != null) {
+
+                        ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
+                        double minX = rect.xMin;
+                        double minY = rect.yMin;
+                        graphics.fill(new Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
+                    }
+                } else {
+                    graphics.drawImage(((TexturePaint) fillPaint).getImage(), 0, 0, null);
                 }
 
                 graphics.setTransform(oldAf);
