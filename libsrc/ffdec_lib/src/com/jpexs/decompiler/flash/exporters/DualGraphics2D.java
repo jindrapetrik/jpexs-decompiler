@@ -325,9 +325,6 @@ public class DualGraphics2D extends Graphics2D {
     @Override
     public void setClip(Shape clip) {
         first.setClip(clip);
-        if (clip == null) {
-            clip = new Rectangle2D.Double(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE); //?
-        }
         second.setClip(clip);
     }
 
