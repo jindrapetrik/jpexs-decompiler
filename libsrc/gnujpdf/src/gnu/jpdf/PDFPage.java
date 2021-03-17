@@ -95,6 +95,8 @@ public class PDFPage extends PDFObject implements Serializable {
 
     protected Vector<String> shadingResources;
 
+    protected Vector<String> extGStateResources;
+
     /**
      * The fonts associated with this page
      */
@@ -134,6 +136,7 @@ public class PDFPage extends PDFObject implements Serializable {
         imageResources = new Vector<String>();
         patternResources = new Vector<>();
         shadingResources = new Vector<>();
+        extGStateResources = new Vector<>();
         fonts = new Vector<PDFFont>();
         procset = null;
     }
@@ -450,6 +453,10 @@ public class PDFPage extends PDFObject implements Serializable {
         shadingResources.add(resource);
     }
 
+    public void addExtGStateResource(String resource) {
+        extGStateResources.add(resource);
+    }
+
     /**
      * This adds an object that describes a thumbnail for this page.
      * <p>
@@ -584,6 +591,15 @@ public class PDFPage extends PDFObject implements Serializable {
         if (shadingResources.size() > 0) {
             os.write("/Shading << ".getBytes());
             for (String str : shadingResources) {
+                os.write(str.getBytes());
+                os.write(" ".getBytes());
+            }
+            os.write(" >> ".getBytes());
+        }
+
+        if (extGStateResources.size() > 0) {
+            os.write("/ExtGState << ".getBytes());
+            for (String str : extGStateResources) {
                 os.write(str.getBytes());
                 os.write(" ".getBytes());
             }
