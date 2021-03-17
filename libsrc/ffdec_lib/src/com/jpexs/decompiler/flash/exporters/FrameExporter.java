@@ -503,7 +503,7 @@ public class FrameExporter {
 
                         double w = (rect.getWidth() * settings.zoom / SWF.unitDivisor);
                         double h = (rect.getHeight() * settings.zoom / SWF.unitDivisor);
-                        p.setSize(w + 10, h + 10);
+                        p.setSize(w, h);
                         pf.setPaper(p);
                         double zoom = settings.zoom;
                         Matrix m = new Matrix();
@@ -557,7 +557,7 @@ public class FrameExporter {
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }
-                            //printStringsToImage(existingFonts, g, fframe, swf, tim, transformation);
+                            printStringsToImage(existingFonts, g, fframe, swf, tim, transformation);
 
                             g.dispose();
                             /*if (frameImages.hasNext()) {
@@ -642,7 +642,7 @@ public class FrameExporter {
             
             Matrix mat0 = mat.concatenate(textMatrix);
             Matrix trans = mat0.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor));
-            trans = trans.preConcatenate(Matrix.getTranslateInstance(5, 5));
+            //trans = trans.preConcatenate(Matrix.getTranslateInstance(5, 5));
             FontTag font = null;
             int textHeight = 12;
             int x = 0;
@@ -705,7 +705,7 @@ public class FrameExporter {
                 g2.setTransform(trans.toTransform());
                 Color textColor2 = new Color(textColor, true);
                 g2.setColor(textColor2);
-                g2.drawString(text.toString(), (float) x, (float) y);
+                g2.drawTransparentString(text.toString(), (float) x, (float) y);
             }
         } else {
 
