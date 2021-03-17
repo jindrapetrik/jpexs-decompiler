@@ -962,8 +962,6 @@ public class Timeline {
                         for (int sx = 0; sx < 3; sx++) {
                             g.setTransform(new AffineTransform());
                             ExportRectangle p1 = transformation.transform(targetRect[s]);
-                            g.setClip(c);
-
                             if (sx == 0) {
                                 p1.xMin = 0;
                             }
@@ -972,10 +970,10 @@ public class Timeline {
                             }
 
                             if (sx == 2) {
-                                p1.xMax = Integer.MAX_VALUE;
+                                p1.xMax = unzoom * swf.getRect().getWidth() / SWF.unitDivisor;
                             }
                             if (sy == 2) {
-                                p1.yMax = Integer.MAX_VALUE;
+                                p1.yMax = unzoom * swf.getRect().getHeight() / SWF.unitDivisor;
                             }
 
                             Rectangle2D r = new Rectangle2D.Double(p1.xMin, p1.yMin, p1.getWidth(), p1.getHeight());
