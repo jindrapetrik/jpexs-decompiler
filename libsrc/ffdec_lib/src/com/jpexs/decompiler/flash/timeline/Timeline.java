@@ -352,6 +352,8 @@ public class Timeline {
                     if (clipDepth2 > -1) {
                         fl.clipDepth = clipDepth2;
                     }
+
+                    fl.isVisible = po.isVisible();
                 } else {
                     fl.matrix = po.getMatrix();
                     fl.instanceName = po.getInstanceName();
@@ -362,6 +364,7 @@ public class Timeline {
                     fl.ratio = po.getRatio();
                     fl.clipActions = po.getClipActions();
                     fl.clipDepth = po.getClipDepth();
+                    fl.isVisible = po.isVisible();
                 }
                 fl.key = characterId != -1;
             } else if (t instanceof RemoveTag) {
