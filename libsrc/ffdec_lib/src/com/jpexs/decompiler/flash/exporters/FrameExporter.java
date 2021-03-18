@@ -513,6 +513,12 @@ public class FrameExporter {
                         Map<Integer, Font> existingFonts = new HashMap<>();
 
                         while (pos < fframes.size()) {
+
+                            if (evl != null) {
+                                Tag parentTag = tim.getParentTag();
+                                String tagName = parentTag == null ? "" : parentTag.getName();
+                                evl.handleExportingEvent("frame", pos + 1, fframes.size(), tagName);
+                            }
                             int fframe = fframes.get(pos);
                             final Graphics2D g = (Graphics2D) job.getGraphics(pf);
                             //g.drawImage(img, 5, 5, img.getWidth(), img.getHeight(), null);
