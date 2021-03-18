@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - SVG export - miter strokes as miter-clip style
 - [#1660] Thumbnail view context menu Remove
 - SVG export - bitmap stroke style
+- Flash viewer - is visible flag
 
 ## [14.2.1] - 2021-03-13
 ### Added
