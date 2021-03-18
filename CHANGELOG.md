@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - AS3 - Remove trait which is outside class
+- PDF vector export
 
 ### Fixed
 - Flash viewer - bitmap stroke style, strokes scaling, cropped strokes
