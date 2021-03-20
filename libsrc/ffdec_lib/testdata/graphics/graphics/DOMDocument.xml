@@ -25,11 +25,12 @@
           <Include href="Stroke 2.xml" itemIcon="1" loadImmediate="false" itemID="604dda1d-00000278" lastModified="1615749968"/>
           <Include href="Stroke 3.xml" itemIcon="1" loadImmediate="false" itemID="604e5e55-0000041a" lastModified="1615749962"/>
           <Include href="Stroke 4.xml" itemIcon="1" loadImmediate="false" itemID="604e5f54-00000425" lastModified="1615749946"/>
+          <Include href="TransparentGradient.xml" itemIcon="1" loadImmediate="false" itemID="6053c836-0000020a" lastModified="1616103522"/>
           <Include href="Tween 1.xml" itemIcon="1" loadImmediate="false" itemID="604dcf92-00000241" lastModified="1615712146"/>
           <Include href="Tween 2.xml" itemIcon="1" loadImmediate="false" itemID="604dcf92-00000243" lastModified="1615712146"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="51">
+          <DOMTimeline name="Scene 1" currentFrame="54">
                <layers>
                     <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
@@ -43,7 +44,7 @@
                     </DOMLayer>
                     <DOMLayer name="Prev next buttons" color="#4FFF4F" locked="true" autoNamed="false">
                          <frames>
-                              <DOMFrame index="0" duration="54" keyMode="9728">
+                              <DOMFrame index="0" duration="55" keyMode="9728">
                                    <elements>
                                         <DOMSymbolInstance libraryItemName="btnNext" symbolType="button">
                                              <matrix>
@@ -100,7 +101,7 @@
                               </DOMFrame>
                               <DOMFrame index="51" keyMode="9728">
                                    <elements>
-                                        <DOMSymbolInstance libraryItemName="Sprite1" selected="true" centerPoint3DX="362.5" centerPoint3DY="175">
+                                        <DOMSymbolInstance libraryItemName="Sprite1" centerPoint3DX="362.5" centerPoint3DY="175">
                                              <matrix>
                                                   <Matrix tx="275" ty="100"/>
                                              </matrix>
@@ -241,8 +242,8 @@
 !5000 2500|6500 2500!6500 2500|6500 5500!6500 5500|3500 5500!3500 5500|3500 4001"/>
                                                   <Edge fillStyle1="1" edges="
 !3500 4001|2000 4001!2000 4001|2000 1001!2000 1001|5000 1001!5000 1001|5000 2500"/>
-                                                  <Edge fillStyle0="1" fillStyle1="2" edges="
-!3500 4001|3500 2500!3500 2500|5000 2500"/>
+                                                  <Edge fillStyle0="2" fillStyle1="1" edges="
+!5000 2500|3500 2500!3500 2500|3500 4001"/>
                                              </edges>
                                         </DOMShape>
                                    </elements>
@@ -2038,6 +2039,26 @@
                                         </DOMShape>
                                    </elements>
                               </DOMFrame>
+                              <DOMFrame index="54" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Sprite1" centerPoint3DX="161" centerPoint3DY="157">
+                                             <matrix>
+                                                  <Matrix tx="73.5" ty="82"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="87.5" y="75"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="TransparentGradient" symbolType="graphic" loop="loop">
+                                             <matrix>
+                                                  <Matrix tx="101" ty="104"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="100" y="50"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
                          </frames>
                     </DOMLayer>
                     <DOMLayer name="Texts inside layer" color="#FF800A" autoNamed="false">
@@ -3271,6 +3292,23 @@
                                              <textRuns>
                                                   <DOMTextRun>
                                                        <characters>054 Linear RGB gradient</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="54" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="22" ty="342"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>055 Transparent gradient</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
