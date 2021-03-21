@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.BlendModeSetable;
 import com.jpexs.decompiler.flash.exporters.FrameExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -694,7 +695,6 @@ public class Timeline {
             //strokeTransform = strokeTransform.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
             //strokeTransform = strokeTransform.clone();
             //strokeTransform.translate(-rect.xMin, -rect.yMin);
-
             if (drawable instanceof ButtonTag) {
                 dframe = ButtonTag.FRAME_UP;
                 if (renderContext.cursorPosition != null) {
@@ -709,7 +709,6 @@ public class Timeline {
                     }
                 }
             }
-
 
             if (filters != null && !filters.isEmpty()) {
                 canUseSameImage = false;
@@ -767,55 +766,58 @@ public class Timeline {
 
         AffineTransform trans = drawMatrix.toTransform();
 
-        switch (blendMode) {
-            case 0:
-            case 1:
-                g.setComposite(AlphaComposite.SrcOver);
-                break;
-            case 2: // Layer
-                g.setComposite(AlphaComposite.SrcOver);
-                break;
-            case 3:
-                g.setComposite(BlendComposite.Multiply);
-                break;
-            case 4:
-                g.setComposite(BlendComposite.Screen);
-                break;
-            case 5:
-                g.setComposite(BlendComposite.Lighten);
-                break;
-            case 6:
-                g.setComposite(BlendComposite.Darken);
-                break;
-            case 7:
-                g.setComposite(BlendComposite.Difference);
-                break;
-            case 8:
-                g.setComposite(BlendComposite.Add);
-                break;
-            case 9:
-                g.setComposite(BlendComposite.Subtract);
-                break;
-            case 10:
-                g.setComposite(BlendComposite.Invert);
-                break;
-            case 11:
-                g.setComposite(BlendComposite.Alpha);
-                break;
-            case 12:
-                g.setComposite(BlendComposite.Erase);
-                break;
-            case 13:
-                g.setComposite(BlendComposite.Overlay);
-                break;
-            case 14:
-                g.setComposite(BlendComposite.HardLight);
-                break;
-            default: // Not implemented
-                g.setComposite(AlphaComposite.SrcOver);
-                break;
+        if (g instanceof BlendModeSetable) {
+            ((BlendModeSetable) g).setBlendMode(blendMode);
+        } else {
+            switch (blendMode) {
+                case 0:
+                case 1:
+                    g.setComposite(AlphaComposite.SrcOver);
+                    break;
+                case 2: // Layer
+                    g.setComposite(AlphaComposite.SrcOver);
+                    break;
+                case 3:
+                    g.setComposite(BlendComposite.Multiply);
+                    break;
+                case 4:
+                    g.setComposite(BlendComposite.Screen);
+                    break;
+                case 5:
+                    g.setComposite(BlendComposite.Lighten);
+                    break;
+                case 6:
+                    g.setComposite(BlendComposite.Darken);
+                    break;
+                case 7:
+                    g.setComposite(BlendComposite.Difference);
+                    break;
+                case 8:
+                    g.setComposite(BlendComposite.Add);
+                    break;
+                case 9:
+                    g.setComposite(BlendComposite.Subtract);
+                    break;
+                case 10:
+                    g.setComposite(BlendComposite.Invert);
+                    break;
+                case 11:
+                    g.setComposite(BlendComposite.Alpha);
+                    break;
+                case 12:
+                    g.setComposite(BlendComposite.Erase);
+                    break;
+                case 13:
+                    g.setComposite(BlendComposite.Overlay);
+                    break;
+                case 14:
+                    g.setComposite(BlendComposite.HardLight);
+                    break;
+                default: // Not implemented
+                    g.setComposite(AlphaComposite.SrcOver);
+                    break;
+            }
         }
-
         if (clipDepth > -1) {
             BufferedImage mask = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
             Graphics2D gm = (Graphics2D) mask.getGraphics();
@@ -854,6 +856,9 @@ public class Timeline {
             if (!(sameImage && canUseSameImage)) {
                 g.setTransform(drawMatrix.toTransform());
                 g.drawImage(img.getBufferedImage(), 0, 0, null);
+            }
+            if (g instanceof BlendModeSetable) {
+                ((BlendModeSetable) g).setBlendMode(0);
             }
         }
     }
