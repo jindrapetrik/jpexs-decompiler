@@ -1,7 +1,7 @@
 <DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" viewAngle3D="50.6510299754819" nextSceneIdentifier="25" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
      <fonts>
-          <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
           <DOMFontItem name="Font 2" itemID="604e7a9e-00000444" font="TimesNewRomanPS-BoldMT" size="30" id="2" sourceLastImported="1615755934" embedRanges="1|2"/>
+          <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
      </fonts>
      <media>
           <DOMBitmapItem name="bitmapfill.png" itemID="604dcb84-00000229" sourceLastImported="1615711005" externalFileSize="1931" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill.png" bitmapDataHRef="M 2 1615711026.dat" frameRight="640" frameBottom="1280"/>
@@ -30,7 +30,7 @@
           <Include href="Tween 2.xml" itemIcon="1" loadImmediate="false" itemID="604dcf92-00000243" lastModified="1615712146"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="54">
+          <DOMTimeline name="Scene 1" currentFrame="53">
                <layers>
                     <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
@@ -94,7 +94,7 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Masked layer 2" color="#4FFF4F" parentLayerIndex="2" locked="true" current="true" isSelected="true" autoNamed="false">
+                    <DOMLayer name="Masked layer 2" color="#4FFF4F" parentLayerIndex="2" locked="true" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" duration="51" keyMode="9728">
                                    <elements/>
@@ -240,10 +240,10 @@
                                              <edges>
                                                   <Edge fillStyle1="2" edges="
 !5000 2500|6500 2500!6500 2500|6500 5500!6500 5500|3500 5500!3500 5500|3500 4001"/>
-                                                  <Edge fillStyle1="1" edges="
-!3500 4001|2000 4001!2000 4001|2000 1001!2000 1001|5000 1001!5000 1001|5000 2500"/>
-                                                  <Edge fillStyle0="2" fillStyle1="1" edges="
-!5000 2500|3500 2500!3500 2500|3500 4001"/>
+                                                  <Edge fillStyle0="1" fillStyle1="2" edges="
+!3500 4001|3500 2500!3500 2500|5000 2500"/>
+                                                  <Edge fillStyle0="1" edges="
+!5000 2500|5000 1001!5000 1001|2000 1001!2000 1001|2000 4001!2000 4001|3500 4001"/>
                                              </edges>
                                         </DOMShape>
                                    </elements>
@@ -772,10 +772,10 @@
 !3980 1990|2980 1990!2980 1990|2980 990!2980 990|3980 990!3980 990|3980 1990"/>
                                                   <Edge strokeStyle="5" edges="
 !1960 990|1960 1990!1960 1990|960 1990!960 1990|960 990!960 990|1960 990"/>
-                                                  <Edge strokeStyle="7" edges="
-!1980 4990|980 4990!980 4990|980 3990!980 3990|1980 3990!1980 3990|1980 4990"/>
                                                   <Edge strokeStyle="6" edges="
 !2980 3990|3980 3990!3980 3990|3980 4990!3980 4990|2980 4990!2980 4990|2980 3990"/>
+                                                  <Edge strokeStyle="7" edges="
+!1980 4990|980 4990!980 4990|980 3990!980 3990|1980 3990!1980 3990|1980 4990"/>
                                                   <Edge strokeStyle="8" edges="
 !5980 3990|5980 4990!5980 4990|4980 4990!4980 4990|4980 3990!4980 3990|5980 3990"/>
                                                   <Edge cubics="!1960 990(;1960,990 1960,1990 1960,1990q1960 990 1960 1990);"/>
@@ -1374,18 +1374,18 @@
                                                   </StrokeStyle>
                                              </strokes>
                                              <edges>
-                                                  <Edge strokeStyle="2" edges="
-!3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
                                                   <Edge strokeStyle="5" edges="
 !5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
+                                                  <Edge strokeStyle="2" edges="
+!3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
                                                   <Edge strokeStyle="1" edges="
 !2000 1000|2000 2000!2000 2000|1000 2000!1000 2000|1000 1000"/>
-                                                  <Edge strokeStyle="6" edges="
-!4647 3660/4942 4670!4942 4670/5019 3660"/>
-                                                  <Edge strokeStyle="3" edges="
-!2553 3660/2848 4670!2848 4670/2925 3660"/>
                                                   <Edge strokeStyle="4" edges="
 !1000 3660/1295 4670!1295 4670/1372 3660"/>
+                                                  <Edge strokeStyle="3" edges="
+!2553 3660/2848 4670!2848 4670/2925 3660"/>
+                                                  <Edge strokeStyle="6" edges="
+!4647 3660/4942 4670!4942 4670/5019 3660"/>
                                                   <Edge cubics="!5000 2000(;5000,2000 4000,2000 4000,2000q5000 2000 4000 2000);"/>
                                                   <Edge cubics="!4000 2000(4000,2000;4000,2000 4000,1000 4000,1000q4000 2000 4000 1000);"/>
                                                   <Edge cubics="!5000 1000(;5000,1000 5000,2000 5000,2000q5000 1000 5000 2000);"/>
@@ -1991,7 +1991,7 @@
                                                   <FillStyle index="1">
                                                        <LinearGradient interpolationMethod="linearRGB">
                                                             <matrix>
-                                                                 <Matrix a="0.244140625" d="0.0610198974609375" tx="250" ty="100"/>
+                                                                 <Matrix a="0.1220703125" d="0.0610198974609375" tx="150" ty="100"/>
                                                             </matrix>
                                                             <GradientEntry color="#FF0000" ratio="0"/>
                                                             <GradientEntry color="#00FF00" ratio="0.250980392156863"/>
@@ -2003,7 +2003,7 @@
                                                   <FillStyle index="2">
                                                        <LinearGradient>
                                                             <matrix>
-                                                                 <Matrix a="0.244140625" d="0.0610198974609375" tx="250" ty="250"/>
+                                                                 <Matrix a="0.1220703125" d="0.0610198974609375" tx="150" ty="250"/>
                                                             </matrix>
                                                             <GradientEntry color="#FF0000" ratio="0"/>
                                                             <GradientEntry color="#00FF00" ratio="0.250980392156863"/>
@@ -2011,6 +2011,30 @@
                                                             <GradientEntry color="#0000FF" ratio="0.749019607843137"/>
                                                             <GradientEntry color="#FFFF00" ratio="1"/>
                                                        </LinearGradient>
+                                                  </FillStyle>
+                                                  <FillStyle index="3">
+                                                       <RadialGradient spreadMethod="repeat" interpolationMethod="linearRGB">
+                                                            <matrix>
+                                                                 <Matrix a="0.061279296875" d="0.061279296875" tx="375" ty="100"/>
+                                                            </matrix>
+                                                            <GradientEntry color="#FF0000" ratio="0"/>
+                                                            <GradientEntry color="#00FF00" ratio="0.250980392156863"/>
+                                                            <GradientEntry color="#FF00FF" ratio="0.501960784313725"/>
+                                                            <GradientEntry color="#0000FF" ratio="0.749019607843137"/>
+                                                            <GradientEntry color="#FFFF00" ratio="1"/>
+                                                       </RadialGradient>
+                                                  </FillStyle>
+                                                  <FillStyle index="4">
+                                                       <RadialGradient spreadMethod="repeat">
+                                                            <matrix>
+                                                                 <Matrix a="0.0608673095703125" d="0.0608673095703125" tx="375" ty="250"/>
+                                                            </matrix>
+                                                            <GradientEntry color="#FF0000" ratio="0"/>
+                                                            <GradientEntry color="#00FF00" ratio="0.250980392156863"/>
+                                                            <GradientEntry color="#FF00FF" ratio="0.501960784313725"/>
+                                                            <GradientEntry color="#0000FF" ratio="0.749019607843137"/>
+                                                            <GradientEntry color="#FFFF00" ratio="1"/>
+                                                       </RadialGradient>
                                                   </FillStyle>
                                              </fills>
                                              <strokes>
@@ -2023,18 +2047,30 @@
                                                   </StrokeStyle>
                                              </strokes>
                                              <edges>
+                                                  <Edge fillStyle1="3" strokeStyle="1" edges="
+!9500 3000|5500 3000!5500 3000|5500 1000!5500 1000|9500 1000!9500 1000|9500 3000"/>
+                                                  <Edge fillStyle1="4" strokeStyle="1" edges="
+!9500 6000|5500 6000!5500 6000|5500 4000!5500 4000|9500 4000!9500 4000|9500 6000"/>
                                                   <Edge fillStyle1="1" strokeStyle="1" edges="
-!9000 3000|1000 3000!1000 3000|1000 1000!1000 1000|9000 1000!9000 1000|9000 3000"/>
+!5000 3000|1000 3000!1000 3000|1000 1000!1000 1000|5000 1000!5000 1000|5000 3000"/>
                                                   <Edge fillStyle1="2" strokeStyle="1" edges="
-!9000 6000|1000 6000!1000 6000|1000 4000!1000 4000|9000 4000!9000 4000|9000 6000"/>
-                                                  <Edge cubics="!1000 1000(;1000,1000 9000,1000 9000,1000q1000 1000 9000 1000);"/>
-                                                  <Edge cubics="!9000 1000(;9000,1000 9000,3000 9000,3000q9000 1000 9000 3000);"/>
-                                                  <Edge cubics="!9000 3000(;9000,3000 1000,3000 1000,3000q9000 3000 1000 3000);"/>
+!1000 4000|5000 4000!5000 4000|5000 6000!5000 6000|1000 6000!1000 6000|1000 4000"/>
                                                   <Edge cubics="!1000 3000(;1000,3000 1000,1000 1000,1000q1000 3000 1000 1000);"/>
-                                                  <Edge cubics="!1000 4000(;1000,4000 9000,4000 9000,4000q1000 4000 9000 4000);"/>
-                                                  <Edge cubics="!9000 4000(;9000,4000 9000,6000 9000,6000q9000 4000 9000 6000);"/>
-                                                  <Edge cubics="!9000 6000(;9000,6000 1000,6000 1000,6000q9000 6000 1000 6000);"/>
                                                   <Edge cubics="!1000 6000(;1000,6000 1000,4000 1000,4000q1000 6000 1000 4000);"/>
+                                                  <Edge cubics="!1000 1000(;1000,1000 5000,1000 5000,1000q1000 1000 5000 1000);"/>
+                                                  <Edge cubics="!5000 1000(;5000,1000 5000,3000 5000,3000q5000 1000 5000 3000);"/>
+                                                  <Edge cubics="!5000 3000(;5000,3000 1000,3000 1000,3000q5000 3000 1000 3000);"/>
+                                                  <Edge cubics="!1000 4000(;1000,4000 5000,4000 5000,4000q1000 4000 5000 4000);"/>
+                                                  <Edge cubics="!5000 4000(;5000,4000 5000,6000 5000,6000q5000 4000 5000 6000);"/>
+                                                  <Edge cubics="!5000 6000(;5000,6000 1000,6000 1000,6000q5000 6000 1000 6000);"/>
+                                                  <Edge cubics="!5500 3000(;5500,3000 5500,1000 5500,1000q5500 3000 5500 1000);"/>
+                                                  <Edge cubics="!5500 1000(;5500,1000 9500,1000 9500,1000q5500 1000 9500 1000);"/>
+                                                  <Edge cubics="!9500 1000(;9500,1000 9500,3000 9500,3000q9500 1000 9500 3000);"/>
+                                                  <Edge cubics="!9500 3000(;9500,3000 5500,3000 5500,3000q9500 3000 5500 3000);"/>
+                                                  <Edge cubics="!5500 6000(;5500,6000 5500,4000 5500,4000q5500 6000 5500 4000);"/>
+                                                  <Edge cubics="!5500 4000(;5500,4000 9500,4000 9500,4000q5500 4000 9500 4000);"/>
+                                                  <Edge cubics="!9500 4000(;9500,4000 9500,6000 9500,6000q9500 4000 9500 6000);"/>
+                                                  <Edge cubics="!9500 6000(;9500,6000 5500,6000 5500,6000q9500 6000 5500 6000);"/>
                                              </edges>
                                         </DOMShape>
                                    </elements>
@@ -2061,7 +2097,7 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Texts inside layer" color="#FF800A" autoNamed="false">
+                    <DOMLayer name="Texts inside layer" color="#FF800A" current="true" isSelected="true" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" duration="16" keyMode="9728">
                                    <elements/>
@@ -2658,7 +2694,7 @@
                                    <elements>
                                         <DOMStaticText width="34.3" height="16.6" autoExpand="true" isSelectable="false">
                                              <matrix>
-                                                  <Matrix tx="237.4" ty="159"/>
+                                                  <Matrix tx="246.4" ty="159"/>
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
@@ -2669,13 +2705,13 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="56.8" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
+                                        <DOMStaticText width="36.9" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
-                                                  <Matrix tx="224.6" ty="315.9"/>
+                                                  <Matrix tx="240.1" ty="315.9"/>
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>nonlinear</characters>
+                                                       <characters>sRGB</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="15" bitmapSize="300" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
