@@ -290,7 +290,7 @@ public class BitmapExporter extends ShapeExporterBase {
                     cm = MultipleGradientPaint.CycleMethod.REPEAT;
                 }
 
-                fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, ratiosArr, colorsArr, cm);
+                fillPaint = new RadialGradientPaint(new java.awt.Point(0, 0), 16384, new java.awt.Point(0, 0), ratiosArr, colorsArr, cm, cstype, new AffineTransform());
                 fillTransform = matrix.toTransform();
             }
             break;

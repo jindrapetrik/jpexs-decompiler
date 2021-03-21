@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - [#1660] Thumbnail view context menu Remove
 - SVG export - bitmap stroke style
 - Flash viewer - is visible flag
+- Flash viewer - linear colorspace radial gradient
 
 ## [14.2.1] - 2021-03-13
 ### Added
