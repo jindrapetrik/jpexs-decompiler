@@ -533,7 +533,7 @@ public class FrameExporter {
                                         return compositeGraphics;
                                     }
                                     final Graphics2D parentGraphics = (Graphics2D) super.getGraphics();
-                                    compositeGraphics = new DualGraphics2D(parentGraphics, g);
+                                    compositeGraphics = new DualPdfGraphics2D(parentGraphics, (PDFGraphics) g);
                                     return compositeGraphics;
                                 }
 
