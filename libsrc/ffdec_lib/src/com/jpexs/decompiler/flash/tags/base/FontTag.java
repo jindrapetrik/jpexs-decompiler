@@ -147,6 +147,8 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
 
     private static Map<String, Map<String, File>> installedFontFilesByFamily;
 
+    private static Map<String, File> installedFontFilesByName;
+
     private static Map<String, Font> installedFontsByName;
 
     private static Map<Font, File> customFontToFile;
@@ -159,6 +161,12 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
 
     private static Map<Font, Map<Integer, List<FontHelper.KerningPair>>> customFontKerningPairs;
 
+    public static File fontNameToFile(String fontName) {
+        if (installedFontFilesByName.containsKey(fontName)) {
+            return installedFontFilesByName.get(fontName);
+        }
+        return null;
+    }
 
     private static void ensureLoaded() {
         if (!firstLoaded) {
@@ -344,12 +352,19 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         installedFontsByFamily = FontHelper.getInstalledFonts();
         installedFontFilesByFamily = FontHelper.getInstalledFontFiles();
         installedFontsByName = new HashMap<>();
+        installedFontFilesByName = new HashMap<>();
         customFontToFile = new HashMap<>();
         customFontKerningPairs = new HashMap<>();
 
         for (String fam : installedFontsByFamily.keySet()) {
             for (String nam : installedFontsByFamily.get(fam).keySet()) {
                 installedFontsByName.put(nam, installedFontsByFamily.get(fam).get(nam));
+            }
+        }
+
+        for (String fam : installedFontFilesByFamily.keySet()) {
+            for (String nam : installedFontFilesByFamily.get(fam).keySet()) {
+                installedFontFilesByName.put(nam, installedFontFilesByFamily.get(fam).get(nam));
             }
         }
 
