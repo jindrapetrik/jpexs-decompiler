@@ -1,6 +1,16 @@
 package com.jpexs.decompiler.flash.exporters;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
+import com.jpexs.decompiler.flash.tags.DefineTextTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
+import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.DynamicTextGlyphEntry;
+import com.jpexs.decompiler.flash.types.GLYPHENTRY;
+import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import gnu.jpdf.PDFGraphics;
 import java.awt.Color;
 import java.awt.Composite;
@@ -24,22 +34,29 @@ import java.awt.image.BufferedImageOp;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
+import java.io.File;
+import java.io.IOException;
 import java.text.AttributedCharacterIterator;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author JPEXS
  */
-public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, GraphicsGroupable {
+public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, GraphicsGroupable, GraphicsTextDrawable {
 
     private final Graphics2D imageGraphics;
 
     private final PDFGraphics pdfGraphics;
+    private final Map<Integer, Font> existingFonts;
 
-    public DualPdfGraphics2D(Graphics2D first, PDFGraphics second) {
+    public DualPdfGraphics2D(Graphics2D first, PDFGraphics second, Map<Integer, Font> existingFonts) {
         this.imageGraphics = first;
         this.pdfGraphics = second;
+        this.existingFonts = existingFonts;
     }
 
     @Override
@@ -523,4 +540,125 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
         pdfGraphics.drawXObject(g);
     }
 
+    @Override
+    public void drawTextRecords(SWF swf, List<TEXTRECORD> textRecords, int numText, MATRIX textMatrixM, Matrix transformation, ColorTransform colorTransform) {
+        Matrix textMatrix = new Matrix(textMatrixM);
+        Matrix mat = transformation.clone();
+        Matrix mat0 = mat.concatenate(textMatrix);
+        Matrix trans = mat0.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor));
+        FontTag font = null;
+        int textHeight = 12;
+        int x = 0;
+        int y = 0;
+        int textColor = 0;
+        for (TEXTRECORD rec : textRecords) {
+
+            if (rec.styleFlagsHasColor) {
+                if (numText > 1) {
+                    textColor = rec.textColorA.toInt();
+                } else {
+                    textColor = rec.textColor.toInt();
+                }
+
+                if (colorTransform != null) {
+                    textColor = colorTransform.apply(textColor);
+                }
+            }
+
+            if (rec.styleFlagsHasFont) {
+                font = swf.getFont(rec.fontId);
+                textHeight = rec.textHeight;
+            }
+            if (rec.styleFlagsHasXOffset) {
+                int offsetX = rec.xOffset;
+                x = offsetX;
+            }
+            if (rec.styleFlagsHasYOffset) {
+                int offsetY = rec.yOffset;
+                y = offsetY;
+            }
+            StringBuilder text = new StringBuilder();
+            int deltaX = 0;
+            setColor(Color.green);
+            for (int i = 0; i < rec.glyphEntries.size(); i++) {
+                GLYPHENTRY entry = rec.glyphEntries.get(i);
+                GLYPHENTRY nextEntry = i < rec.glyphEntries.size() - 1 ? rec.glyphEntries.get(i + 1) : null;
+                if (entry.glyphIndex != -1) {
+                    Character currentChar = font.glyphToChar(entry.glyphIndex);
+                    Character nextChar = nextEntry == null ? null : font.glyphToChar(nextEntry.glyphIndex);
+
+                    int calcAdvance = StaticTextTag.getAdvance(font, entry.glyphIndex, textHeight, currentChar, nextChar);
+                    int spacing = entry.glyphAdvance - calcAdvance;
+                    char ch = font.glyphToChar(entry.glyphIndex);
+                    if (spacing != 0) {
+                        if (!text.isEmpty()) {
+                            drawText(x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, pdfGraphics);
+                        }
+                        drawText(x + deltaX, y, trans, textColor, existingFonts, font, "" + currentChar, textHeight, pdfGraphics);
+
+                        text = new StringBuilder();
+                        x = x + deltaX + entry.glyphAdvance;
+                        deltaX = 0;
+                    } else {
+                        text.append(ch);
+                        deltaX += entry.glyphAdvance;
+                    }
+
+                } else if (entry instanceof DynamicTextGlyphEntry) {
+                    DynamicTextGlyphEntry dynamicEntry = (DynamicTextGlyphEntry) entry;
+                    text.append(dynamicEntry.character);
+                    deltaX += entry.glyphAdvance;
+                }
+
+            }
+            if (!text.isEmpty()) {
+                drawText(x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, pdfGraphics);
+            }
+        }
+    }
+
+    private static void drawText(float x, float y, Matrix trans, int textColor, Map<Integer, Font> existingFonts, FontTag font, String text, int textHeight, PDFGraphics g) {
+        int fontId = font.getFontId();
+        if (existingFonts.containsKey(fontId)) {
+            g.setExistingTtfFont(existingFonts.get(fontId).deriveFont((float) textHeight));
+        } else {
+            if (font.getCharacterCount() < 1) {
+                String fontName = font.getFontName();
+                File fontFile = FontTag.fontNameToFile(fontName);
+                if (fontFile == null) {
+                    fontFile = FontTag.fontNameToFile("Times New Roman");
+                }
+                if (fontFile == null) {
+                    fontFile = FontTag.fontNameToFile("Arial");
+                }
+                if (fontFile == null) {
+                    throw new RuntimeException("Font " + fontName + " not found in your system");
+                }
+                Font f = new Font("/MYFONT" + fontId, font.getFontStyle(), textHeight);
+                existingFonts.put(fontId, f);
+                try {
+                    g.setTtfFont(f, fontFile);
+                } catch (IOException ex) {
+                    Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                FontExporter fe = new FontExporter();
+                File tempFile;
+                try {
+                    tempFile = File.createTempFile("ffdec_font_export_", ".ttf");
+                    fe.exportFont(font, FontExportMode.TTF, tempFile);
+                    Font f = new Font("/MYFONT" + fontId, font.getFontStyle(), textHeight);
+                    existingFonts.put(fontId, f);
+                    g.setTtfFont(f, tempFile);
+                } catch (IOException ex) {
+                    Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        g.setTransform(trans.toTransform());
+        Color textColor2 = new Color(textColor, true);
+        g.setColor(textColor2);
+        g.drawString(text, (float) x, (float) y);
+    }
 }

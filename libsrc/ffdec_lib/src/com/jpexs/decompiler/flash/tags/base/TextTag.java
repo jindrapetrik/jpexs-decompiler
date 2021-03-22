@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.base;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.FontExporter;
+import com.jpexs.decompiler.flash.exporters.GraphicsTextDrawable;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
@@ -444,6 +445,11 @@ public abstract class TextTag extends DrawableTag {
     }
 
     public static void staticTextToImage(SWF swf, List<TEXTRECORD> textRecords, int numText, SerializableImage image, MATRIX textMatrix, Matrix transformation, ColorTransform colorTransform) {
+        if (image.getGraphics() instanceof GraphicsTextDrawable) {
+            //custom drawing
+            ((GraphicsTextDrawable) image.getGraphics()).drawTextRecords(swf, textRecords, numText, textMatrix, transformation, colorTransform);
+            return;
+        }
         int textColor = 0;
         FontTag font = null;
         int textHeight = 12;
