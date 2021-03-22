@@ -532,7 +532,7 @@ public class FrameExporter {
                                         return compositeGraphics;
                                     }
                                     final Graphics2D parentGraphics = (Graphics2D) super.getGraphics();
-                                    compositeGraphics = new DualPdfGraphics2D(parentGraphics, (PDFGraphics) g);
+                                    compositeGraphics = new DualPdfGraphics2D(parentGraphics, (PDFGraphics) g, existingFonts);
                                     return compositeGraphics;
                                 }
 
@@ -562,8 +562,6 @@ public class FrameExporter {
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }
-                            printStringsToImage(existingFonts, g, fframe, swf, tim, transformation);
-
                             g.dispose();
                             /*if (frameImages.hasNext()) {
                                 img = frameImages.next();
@@ -590,134 +588,6 @@ public class FrameExporter {
         return ret;
     }
 
-    private static void printStringsToImage(Map<Integer, Font> existingFonts, Graphics2D g, int frame, SWF swf, Timeline tim, Matrix transformation) {
-        double unzoom = SWF.unitDivisor;
-        Matrix absoluteTransformation = transformation;
-
-        int maxDepth = tim.getMaxDepth();
-        int time = frame;
-        Frame frameObj = tim.getFrame(frame);
-        for (int i = 1; i <= maxDepth; i++) {
-            if (!frameObj.layers.containsKey(i)) {
-                continue;
-            }
-            DepthState layer = frameObj.layers.get(i);
-            if (!swf.getCharacters().containsKey(layer.characterId)) {
-                continue;
-            }
-            if (!layer.isVisible) {
-                continue;
-            }
-            CharacterTag character = swf.getCharacter(layer.characterId);
-            Matrix layerMatrix = new Matrix(layer.matrix);
-            Matrix absMat = absoluteTransformation.concatenate(layerMatrix);
-            if (character instanceof DrawableTag) {
-                printStringsDrawDrawable(existingFonts, g, swf, layerMatrix, transformation, absMat, time, layer.ratio, (DrawableTag) character, unzoom, layer.colorTransForm);
-            }
-        }
-    }
-
-    private static void printStringsDrawDrawable(Map<Integer, Font> existingFonts, Graphics2D g, SWF swf, Matrix layerMatrix, Matrix transformation, Matrix absMat, int time, int ratio, DrawableTag drawable, double unzoom, ColorTransform colorTransform) {
-        int drawableFrameCount = drawable.getNumFrames();
-        if (drawableFrameCount == 0) {
-            drawableFrameCount = 1;
-        }
-
-        Matrix mat = transformation.concatenate(layerMatrix);
-        int dframe = time % drawableFrameCount;
-
-        Matrix m = mat; //mat.preConcatenate(Matrix.getTranslateInstance(-rect.xMin, -rect.yMin));
-        if (drawable instanceof DefineSpriteTag) {
-            printStringsToImage(existingFonts, g, dframe, swf, ((Timelined) drawable).getTimeline(), m);
-        } else if (drawable instanceof TextTag) {
-            TextTag textTag = (TextTag) drawable;
-
-            List<TEXTRECORD> textRecords = new ArrayList<>();
-
-            if (textTag instanceof StaticTextTag) {
-                textRecords = ((StaticTextTag) textTag).textRecords;
-            } else if (textTag instanceof DefineEditTextTag) {
-                DefineEditTextTag editText = (DefineEditTextTag) textTag;
-                if (editText.hasText) {
-                    textRecords = editText.getTextRecords();
-                }
-            }
-
-            Matrix textMatrix = new Matrix(textTag.getTextMatrix());
-
-            Matrix mat0 = mat.concatenate(textMatrix);
-            Matrix trans = mat0.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor));
-            FontTag font = null;
-            int textHeight = 12;
-            int x = 0;
-            int y = 0;
-            int textColor = 0;
-            for (TEXTRECORD rec : textRecords) {
-
-                if (rec.styleFlagsHasColor) {
-                    if (!(textTag instanceof DefineTextTag)) {
-                        textColor = rec.textColorA.toInt();
-                    } else {
-                        textColor = rec.textColor.toInt();
-                    }
-
-                    if (colorTransform != null) {
-                        textColor = colorTransform.apply(textColor);
-                    }
-                }
-
-                if (rec.styleFlagsHasFont) {
-                    font = swf.getFont(rec.fontId);
-                    textHeight = rec.textHeight;
-                }
-                if (rec.styleFlagsHasXOffset) {
-                    int offsetX = rec.xOffset;
-                    x = offsetX;
-                }
-                if (rec.styleFlagsHasYOffset) {
-                    int offsetY = rec.yOffset;
-                    y = offsetY;
-                }
-                StringBuilder text = new StringBuilder();
-                int deltaX = 0;
-                g.setColor(Color.green);
-                for (int i = 0; i < rec.glyphEntries.size(); i++) {
-                    GLYPHENTRY entry = rec.glyphEntries.get(i);
-                    GLYPHENTRY nextEntry = i < rec.glyphEntries.size() - 1 ? rec.glyphEntries.get(i + 1) : null;
-                    Character currentChar = font.glyphToChar(entry.glyphIndex);
-                    Character nextChar = nextEntry == null ? null : font.glyphToChar(nextEntry.glyphIndex);
-                    if (entry.glyphIndex != -1) {
-                        int calcAdvance = StaticTextTag.getAdvance(font, entry.glyphIndex, textHeight, currentChar, nextChar);
-                        int spacing = entry.glyphAdvance - calcAdvance;
-                        char ch = font.glyphToChar(entry.glyphIndex);
-                        if (spacing != 0) {
-                            if (!text.isEmpty()) {
-                                drawText(x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, g);
-                            }
-                            drawText(x + deltaX, y, trans, textColor, existingFonts, font, "" + currentChar, textHeight, g);
-
-                            text = new StringBuilder();
-                            x = x + deltaX + entry.glyphAdvance;
-                            deltaX = 0;
-                        }
-                        else {
-                            text.append(ch);
-                            deltaX += entry.glyphAdvance;
-                        }
-
-                    } else if (entry instanceof DynamicTextGlyphEntry) {
-                        DynamicTextGlyphEntry dynamicEntry = (DynamicTextGlyphEntry) entry;
-                        text.append(dynamicEntry.character);
-                        deltaX += entry.glyphAdvance;
-                    }
-
-                }
-                if (!text.isEmpty()) {
-                    drawText(x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, g);
-                }
-            }
-        }
-    }
 
     private static void drawText(float x, float y, Matrix trans, int textColor, Map<Integer, Font> existingFonts, FontTag font, String text, int textHeight, Graphics g) {
         int fontId = font.getFontId();
