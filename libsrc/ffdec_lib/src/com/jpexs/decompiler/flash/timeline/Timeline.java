@@ -725,6 +725,8 @@ public class Timeline {
             if (canUseSameImage && sameImage) {
                 img = image;
                 m = mat.clone();
+                g.setTransform(new AffineTransform());
+                //g.setClip(null);
                 //m = m.concatenate(drawMatrix);
             }
 
