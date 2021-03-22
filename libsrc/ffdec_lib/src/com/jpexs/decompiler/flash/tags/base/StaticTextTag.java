@@ -570,7 +570,7 @@ public abstract class StaticTextTag extends TextTag {
         return true;
     }
 
-    private int getAdvance(FontTag font, int glyphIndex, int textHeight, char c, Character nextChar) {
+    public static int getAdvance(FontTag font, int glyphIndex, int textHeight, char c, Character nextChar) {
         int advance;
         if (font.hasLayout()) {
             int kerningAdjustment = 0;
@@ -586,7 +586,7 @@ public abstract class StaticTextTag extends TextTag {
         return advance;
     }
 
-    private int detectLetterSpacing(TEXTRECORD textRecord, FontTag font, int textHeight) {
+    public static int detectLetterSpacing(TEXTRECORD textRecord, FontTag font, int textHeight) {
         int totalLetterSpacing = 0;
         List<GLYPHENTRY> glyphEntries = textRecord.glyphEntries;
         for (int i = 0; i < glyphEntries.size(); i++) {

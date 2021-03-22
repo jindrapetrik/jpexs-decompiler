@@ -647,7 +647,6 @@ public class FrameExporter {
 
             Matrix mat0 = mat.concatenate(textMatrix);
             Matrix trans = mat0.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor));
-            //trans = trans.preConcatenate(Matrix.getTranslateInstance(5, 5));
             FontTag font = null;
             int textHeight = 12;
             int x = 0;
@@ -680,63 +679,90 @@ public class FrameExporter {
                     y = offsetY;
                 }
                 StringBuilder text = new StringBuilder();
-                for (GLYPHENTRY entry : rec.glyphEntries) {
+                int deltaX = 0;
+                g.setColor(Color.green);
+                for (int i = 0; i < rec.glyphEntries.size(); i++) {
+                    GLYPHENTRY entry = rec.glyphEntries.get(i);
+                    GLYPHENTRY nextEntry = i < rec.glyphEntries.size() - 1 ? rec.glyphEntries.get(i + 1) : null;
+                    Character currentChar = font.glyphToChar(entry.glyphIndex);
+                    Character nextChar = nextEntry == null ? null : font.glyphToChar(nextEntry.glyphIndex);
                     if (entry.glyphIndex != -1) {
+                        int calcAdvance = StaticTextTag.getAdvance(font, entry.glyphIndex, textHeight, currentChar, nextChar);
+                        int spacing = entry.glyphAdvance - calcAdvance;
                         char ch = font.glyphToChar(entry.glyphIndex);
-                        text.append(ch);
+                        if (spacing != 0) {
+                            if (!text.isEmpty()) {
+                                drawText(x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, g);
+                            }
+                            drawText(x + deltaX, y, trans, textColor, existingFonts, font, "" + currentChar, textHeight, g);
+
+                            text = new StringBuilder();
+                            x = x + deltaX + entry.glyphAdvance;
+                            deltaX = 0;
+                        }
+                        else {
+                            text.append(ch);
+                            deltaX += entry.glyphAdvance;
+                        }
+
                     } else if (entry instanceof DynamicTextGlyphEntry) {
                         DynamicTextGlyphEntry dynamicEntry = (DynamicTextGlyphEntry) entry;
                         text.append(dynamicEntry.character);
+                        deltaX += entry.glyphAdvance;
                     }
-                }
 
-                PDFGraphics g2 = (PDFGraphics) g;
-                if (existingFonts.containsKey(rec.fontId)) {
-                    g2.setExistingTtfFont(existingFonts.get(rec.fontId).deriveFont((float) textHeight));
-                } else {
-                    if (font.getCharacterCount() < 1) {
-                        String fontName = font.getFontName();
-                        File fontFile = FontTag.fontNameToFile(fontName);
-                        if (fontFile == null) {
-                            fontFile = FontTag.fontNameToFile("Times New Roman");
-                        }
-                        if (fontFile == null) {
-                            fontFile = FontTag.fontNameToFile("Arial");
-                        }
-                        if (fontFile == null) {
-                            throw new RuntimeException("Font " + fontName + " not found in your system");
-                        }
-                        Font f = new Font("/MYFONT" + rec.fontId, font.getFontStyle(), textHeight);
-                        existingFonts.put(rec.fontId, f);
-                        try {
-                            g2.setTtfFont(f, fontFile);
-                        } catch (IOException ex) {
-                            Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    } else {
-                        FontExporter fe = new FontExporter();
-                        File tempFile;
-                        try {
-                            tempFile = File.createTempFile("ffdec_font_export_", ".ttf");
-                            fe.exportFont(font, FontExportMode.TTF, tempFile);
-                            Font f = new Font("/MYFONT" + rec.fontId, font.getFontStyle(), textHeight);
-                            existingFonts.put(rec.fontId, f);
-                            g2.setTtfFont(f, tempFile);
-                        } catch (IOException ex) {
-                            Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
                 }
-
-                g2.setTransform(trans.toTransform());
-                Color textColor2 = new Color(textColor, true);
-                g2.setColor(textColor2);
-                g2.drawTransparentString(text.toString(), (float) x, (float) y);
+                if (!text.isEmpty()) {
+                    drawText(x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, g);
+                }
             }
-        } else {
+        }
+    }
 
+    private static void drawText(float x, float y, Matrix trans, int textColor, Map<Integer, Font> existingFonts, FontTag font, String text, int textHeight, Graphics g) {
+        int fontId = font.getFontId();
+        PDFGraphics g2 = (PDFGraphics) g;
+        if (existingFonts.containsKey(fontId)) {
+            g2.setExistingTtfFont(existingFonts.get(fontId).deriveFont((float) textHeight));
+        } else {
+            if (font.getCharacterCount() < 1) {
+                String fontName = font.getFontName();
+                File fontFile = FontTag.fontNameToFile(fontName);
+                if (fontFile == null) {
+                    fontFile = FontTag.fontNameToFile("Times New Roman");
+                }
+                if (fontFile == null) {
+                    fontFile = FontTag.fontNameToFile("Arial");
+                }
+                if (fontFile == null) {
+                    throw new RuntimeException("Font " + fontName + " not found in your system");
+                }
+                Font f = new Font("/MYFONT" + fontId, font.getFontStyle(), textHeight);
+                existingFonts.put(fontId, f);
+                try {
+                    g2.setTtfFont(f, fontFile);
+                } catch (IOException ex) {
+                    Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                FontExporter fe = new FontExporter();
+                File tempFile;
+                try {
+                    tempFile = File.createTempFile("ffdec_font_export_", ".ttf");
+                    fe.exportFont(font, FontExportMode.TTF, tempFile);
+                    Font f = new Font("/MYFONT" + fontId, font.getFontStyle(), textHeight);
+                    existingFonts.put(fontId, f);
+                    g2.setTtfFont(f, tempFile);
+                } catch (IOException ex) {
+                    Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
 
+        g2.setTransform(trans.toTransform());
+        Color textColor2 = new Color(textColor, true);
+        g2.setColor(textColor2);
+        g2.drawTransparentString(text, (float) x, (float) y);
     }
 
     private static String jsArrColor(RGB rgb) {
