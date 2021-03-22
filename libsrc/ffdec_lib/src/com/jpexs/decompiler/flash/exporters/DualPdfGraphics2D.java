@@ -31,7 +31,7 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable {
+public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, GraphicsGroupable {
 
     private final Graphics2D imageGraphics;
 
@@ -511,6 +511,16 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable {
                 pdfGraphics.setBlendMode("Normal");
                 break;
         }
+    }
+
+    @Override
+    public Graphics createGroup() {
+        return pdfGraphics.createXObject();
+    }
+
+    @Override
+    public void drawGroup(Graphics g) {
+        pdfGraphics.drawXObject(g);
     }
 
 }

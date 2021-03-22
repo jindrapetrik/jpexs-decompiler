@@ -541,6 +541,41 @@ public class PDFPage extends PDFObject implements Serializable {
 //            os.write(Integer.toString(rotate).getBytes());
 //            os.write("\n".getBytes());
 //        }
+        writeResources(os);
+
+        // The thumbnail
+        if (thumbnail != null) {
+            os.write("/Thumb ".getBytes());
+            os.write(thumbnail.toString().getBytes());
+            os.write("\n".getBytes());
+        }
+
+        // the /Contents pages object
+        if (contents.size() > 0) {
+            if (contents.size() == 1) {
+                PDFObject ob = (PDFObject) contents.elementAt(0);
+                os.write("/Contents ".getBytes());
+                os.write(ob.toString().getBytes());
+                os.write("\n".getBytes());
+            } else {
+                os.write("/Contents [".getBytes());
+                os.write(PDFObject.toArray(contents).getBytes());
+                os.write("\n".getBytes());
+            }
+        }
+
+        // The /Annots object
+        if (annotations.size() > 0) {
+            os.write("/Annots ".getBytes());
+            os.write(PDFObject.toArray(annotations).getBytes());
+            os.write("\n".getBytes());
+        }
+
+        // finish off with its footer
+        writeEnd(os);
+    }
+
+    public void writeResources(OutputStream os) throws IOException {
         // Now the resources
         os.write("/Resources << ".getBytes());
         // fonts
@@ -605,39 +640,7 @@ public class PDFPage extends PDFObject implements Serializable {
             }
             os.write(" >> ".getBytes());
         }
-
         os.write(">>\n".getBytes());
-
-        // The thumbnail
-        if (thumbnail != null) {
-            os.write("/Thumb ".getBytes());
-            os.write(thumbnail.toString().getBytes());
-            os.write("\n".getBytes());
-        }
-
-        // the /Contents pages object
-        if (contents.size() > 0) {
-            if (contents.size() == 1) {
-                PDFObject ob = (PDFObject) contents.elementAt(0);
-                os.write("/Contents ".getBytes());
-                os.write(ob.toString().getBytes());
-                os.write("\n".getBytes());
-            } else {
-                os.write("/Contents [".getBytes());
-                os.write(PDFObject.toArray(contents).getBytes());
-                os.write("\n".getBytes());
-            }
-        }
-
-        // The /Annots object
-        if (annotations.size() > 0) {
-            os.write("/Annots ".getBytes());
-            os.write(PDFObject.toArray(annotations).getBytes());
-            os.write("\n".getBytes());
-        }
-
-        // finish off with its footer
-        writeEnd(os);
     }
 
     /**

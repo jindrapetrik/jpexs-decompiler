@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.timeline;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.BlendModeSetable;
 import com.jpexs.decompiler.flash.exporters.FrameExporter;
+import com.jpexs.decompiler.flash.exporters.GraphicsGroupable;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
@@ -60,6 +61,7 @@ import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -726,8 +728,17 @@ public class Timeline {
                 img = image;
                 m = mat.clone();
                 g.setTransform(new AffineTransform());
-                //g.setClip(null);
-                //m = m.concatenate(drawMatrix);
+
+                /*if (g instanceof GraphicsGroupable) {
+                    Graphics subG = ((GraphicsGroupable) g).createGroup();
+
+                    img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE) {
+                        @Override
+                        public Graphics getGraphics() {
+                            return subG;
+                        }
+                    };
+                }*/
             }
 
             ColorTransform clrTrans2 = clrTrans;
@@ -854,6 +865,11 @@ public class Timeline {
                 g2.draw(shape);
             }
 
+            /*if (sameImage && canUseSameImage) {
+                if (g instanceof GraphicsGroupable) {
+                    ((GraphicsGroupable) g).drawGroup(img.getGraphics());
+                }
+            }*/
             if (!(sameImage && canUseSameImage)) {
                 g.setTransform(drawMatrix.toTransform());
                 g.drawImage(img.getBufferedImage(), 0, 0, null);
