@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
-import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.SerializableImage;
@@ -564,7 +563,8 @@ public class BitmapExporter extends ShapeExporterBase {
             graphics.setComposite(AlphaComposite.SrcOver);
             if (fillPaint instanceof MultipleGradientPaint) {
                 AffineTransform oldAf = graphics.getTransform();
-                graphics.setClip(path);
+                Shape prevClip = graphics.getClip();
+                graphics.clip(path);
                 Matrix inverse = null;
                 try {
                     double scx = fillTransform.getScaleX();
@@ -596,10 +596,11 @@ public class BitmapExporter extends ShapeExporterBase {
                 }
 
                 graphics.setTransform(oldAf);
-                graphics.setClip(null);
+                graphics.setClip(prevClip);
             } else if (fillPaint instanceof TexturePaint) {
                 AffineTransform oldAf = graphics.getTransform();
-                graphics.setClip(path);
+                Shape prevClip = graphics.getClip();
+                graphics.clip(path);
                 Matrix inverse = null;
                 if (fillRepeat) {
                     try {
@@ -636,7 +637,7 @@ public class BitmapExporter extends ShapeExporterBase {
                 }
 
                 graphics.setTransform(oldAf);
-                graphics.setClip(null);
+                graphics.setClip(prevClip);
             } else {
                 graphics.setPaint(fillPaint);
                 graphics.fill(path);
@@ -647,7 +648,8 @@ public class BitmapExporter extends ShapeExporterBase {
             graphics.setComposite(AlphaComposite.SrcOver);
             if (linePaint instanceof MultipleGradientPaint) {
                 AffineTransform oldAf = graphics.getTransform();
-                graphics.setClip(strokedShape);
+                Shape prevClip = graphics.getClip();
+                graphics.clip(strokedShape);
                 Matrix inverse = null;
                 try {
                     double scx = lineTransform.getScaleX();
@@ -679,10 +681,11 @@ public class BitmapExporter extends ShapeExporterBase {
                 }
 
                 graphics.setTransform(oldAf);
-                graphics.setClip(null);
+                graphics.setClip(prevClip);
             } else if (linePaint instanceof TexturePaint) {
                 AffineTransform oldAf = graphics.getTransform();
-                graphics.setClip(strokedShape);
+                Shape prevClip = graphics.getClip();
+                graphics.clip(strokedShape);
                 Matrix inverse = null;
                 try {
                     double scx = lineTransform.getScaleX();
@@ -713,7 +716,7 @@ public class BitmapExporter extends ShapeExporterBase {
                 }
 
                 graphics.setTransform(oldAf);
-                graphics.setClip(null);
+                graphics.setClip(prevClip);
             } else {
                 graphics.setPaint(linePaint);
                 graphics.fill(strokedShape);

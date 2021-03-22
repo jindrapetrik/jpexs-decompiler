@@ -1,5 +1,6 @@
 package com.jpexs.decompiler.flash.exporters;
 
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import gnu.jpdf.PDFGraphics;
 import java.awt.Color;
 import java.awt.Composite;
@@ -17,6 +18,7 @@ import java.awt.Stroke;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ImageObserver;
@@ -215,7 +217,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable {
 
     @Override
     public AffineTransform getTransform() {
-        return imageGraphics.getTransform();
+        return pdfGraphics.getTransform();
     }
 
     @Override
@@ -318,7 +320,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable {
 
     @Override
     public Shape getClip() {
-        return imageGraphics.getClip();
+        return pdfGraphics.getClip();
     }
 
     @Override
