@@ -591,7 +591,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
                     int spacing = entry.glyphAdvance - calcAdvance;
                     char ch = font.glyphToChar(entry.glyphIndex);
                     if (spacing != 0) {
-                        if (!text.isEmpty()) {
+                        if (text.length() > 0) {
                             drawText(x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, pdfGraphics);
                         }
                         drawText(x + deltaX, y, trans, textColor, existingFonts, font, "" + currentChar, textHeight, pdfGraphics);
@@ -611,7 +611,7 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
                 }
 
             }
-            if (!text.isEmpty()) {
+            if (text.length() > 0) {
                 drawText(x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, pdfGraphics);
             }
         }
