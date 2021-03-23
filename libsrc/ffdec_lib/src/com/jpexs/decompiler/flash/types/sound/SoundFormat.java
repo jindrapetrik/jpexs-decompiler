@@ -12,10 +12,12 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.sound;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
+import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
@@ -198,7 +200,7 @@ public class SoundFormat {
         }
     }
 
-    public boolean createWav(List<ByteArrayRange> dataRanges, OutputStream os) throws IOException {
+    public boolean createWav(SOUNDINFO soundInfo, List<ByteArrayRange> dataRanges, OutputStream os) throws IOException {
         ensureFormat();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SoundDecoder decoder = getDecoder();
@@ -208,8 +210,56 @@ public class SoundFormat {
             decoder.decode(sis, baos);
         }
 
+        /*
+        System.err.println("sampling rate:" + samplingRate);
+        System.err.println("len:" + baos.toByteArray().length);
+         */
+        boolean convertedStereo = stereo;
+
+        ByteArrayOutputStream baosFiltered;
+        if (soundInfo == null) {
+            baosFiltered = baos;
+        } else {
+            int inPoint = (soundInfo.hasInPoint ? (int) Math.round(soundInfo.inPoint * samplingRate / 44100.0) : 0);
+            int outPoint = (soundInfo.hasOutPoint ? (int) Math.round(soundInfo.outPoint * samplingRate / 44100.0) : Integer.MAX_VALUE);
+            byte data[] = baos.toByteArray();
+            baosFiltered = new ByteArrayOutputStream();
+            int inPointBytes = inPoint * 2 /*16bit*/ * (stereo ? 2 : 1);
+            int outPointBytes = soundInfo.hasOutPoint ? outPoint * 2 /*16bit*/ * (stereo ? 2 : 1) : data.length;
+            for (int i = inPointBytes; i < outPointBytes; i += (stereo ? 4 : 2)) {
+                int left = ((data[i] & 0xff) + ((data[i + 1] & 0xff) << 8)) << 16 >> 16;
+                int right = left;
+                if (stereo) {
+                    right = ((data[i + 2] & 0xff) + ((data[i + 3] & 0xff) << 8)) << 16 >> 16;
+                }
+
+                if (soundInfo.hasEnvelope) {
+                    for (int e = 0; e < soundInfo.envelopeRecords.length - 1; e++) {
+                        int envPosBytes = inPointBytes + (int) (soundInfo.envelopeRecords[e].pos44 * samplingRate / 44100.0 * 2 * (stereo ? 2 : 1));
+                        int envNextPosBytes = inPointBytes + (int) (soundInfo.envelopeRecords[e + 1].pos44 * samplingRate / 44100.0 * 2 * (stereo ? 2 : 1));
+                        if (i >= envPosBytes && i <= envNextPosBytes) {
+                            double pos = (i - envPosBytes) / (double) (envNextPosBytes - envPosBytes);
+
+                            int leftLevel = (int) (soundInfo.envelopeRecords[e].leftLevel + (soundInfo.envelopeRecords[e + 1].leftLevel - soundInfo.envelopeRecords[e].leftLevel) * pos);
+                            int rightLevel = (int) (soundInfo.envelopeRecords[e].rightLevel + (soundInfo.envelopeRecords[e + 1].rightLevel - soundInfo.envelopeRecords[e].rightLevel) * pos);
+                            double leftMultiplier = leftLevel / 32768.0;
+                            double rightMultiplier = rightLevel / 32768.0;
+
+                            left = (int) Math.round(left * leftMultiplier);
+                            right = (int) Math.round(right * rightMultiplier);
+                            break;
+                        }
+                    }
+                }
+
+                writeLE(baosFiltered, left, 2);
+                writeLE(baosFiltered, right, 2);
+            }
+            convertedStereo = true;
+        }
+
         try {
-            createWavFromPcmData(os, samplingRate, true, stereo, baos.toByteArray());
+            createWavFromPcmData(os, samplingRate, true, convertedStereo, baosFiltered.toByteArray());
             return true;
         } catch (IOException ex) {
             return false;

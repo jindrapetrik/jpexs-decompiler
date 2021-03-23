@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
@@ -156,7 +157,7 @@ public class SoundExporter {
             }
         } else {
             List<ByteArrayRange> soundData = st.getRawSoundData();
-            fmt.createWav(soundData, fos);
+            fmt.createWav(null, soundData, fos);
         }
     }
 }
