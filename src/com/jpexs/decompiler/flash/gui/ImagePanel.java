@@ -110,6 +110,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private volatile Timer timer;
 
     private int frame = -1;
+    private int prevFrame = -1;
 
     private boolean loop;
 
@@ -1437,6 +1438,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 this.frame = 0;
                 this.stillFrame = false;
             }
+            this.prevFrame = -1;
 
             loaded = true;
 
@@ -1849,9 +1851,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             lastMouseEvent = this.lastMouseEvent;
         }
 
+        boolean shownAgain = false;
+
         synchronized (ImagePanel.class) {
             frame = this.frame;
             time = this.time;
+            if (this.frame == this.prevFrame) {
+                shownAgain = true;
+            }
+            this.prevFrame = this.frame;
             cursorPosition = this.cursorPosition;
             if (cursorPosition != null) {
                 cursorPosition = iconPanel.toImagePoint(cursorPosition);
@@ -1917,26 +1925,28 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
 
-            List<Integer> sounds = new ArrayList<>();
-            List<String> soundClasses = new ArrayList<>();
-            timeline.getSounds(frame, time, renderContext.mouseOverButton, mouseButton, sounds, soundClasses);
-            for (int cid : swf.getCharacters().keySet()) {
-                CharacterTag c = swf.getCharacter(cid);
-                for (String cls : soundClasses) {
-                    if (cls.equals(c.getClassName())) {
-                        sounds.add(cid);
+            if (!shownAgain) {
+                List<Integer> sounds = new ArrayList<>();
+                List<String> soundClasses = new ArrayList<>();
+                timeline.getSounds(frame, time, renderContext.mouseOverButton, mouseButton, sounds, soundClasses);
+                for (int cid : swf.getCharacters().keySet()) {
+                    CharacterTag c = swf.getCharacter(cid);
+                    for (String cls : soundClasses) {
+                        if (cls.equals(c.getClassName())) {
+                            sounds.add(cid);
+                        }
                     }
                 }
-            }
 
-            for (int sndId : sounds) {
-                CharacterTag c = swf.getCharacter(sndId);
-                if (c instanceof SoundTag) {
-                    SoundTag st = (SoundTag) c;
-                    playSound(st, null, thisTimer);
+                for (int sndId : sounds) {
+                    CharacterTag c = swf.getCharacter(sndId);
+                    if (c instanceof SoundTag) {
+                        SoundTag st = (SoundTag) c;
+                        playSound(st, null, thisTimer);
+                    }
                 }
+                executeFrame(frame);
             }
-            executeFrame(frame);
         } catch (Throwable ex) {
             // swf was closed during the rendering probably
             return;
@@ -2070,6 +2080,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             Timeline timeline = timelined.getTimeline();
             if (!stillFrame && frame == timeline.getFrameCount() - 1) {
                 frame = 0;
+                prevFrame = -1;
             }
 
             startTimer(timeline, true);
@@ -2236,6 +2247,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     @Override
     public synchronized void rewind() {
         frame = 0;
+        prevFrame = -1;
         fireMediaDisplayStateChanged();
     }
 
@@ -2267,6 +2279,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         this.frame = frame;
+        this.prevFrame = -1;
         stopInternal();
         redraw();
         fireMediaDisplayStateChanged();
