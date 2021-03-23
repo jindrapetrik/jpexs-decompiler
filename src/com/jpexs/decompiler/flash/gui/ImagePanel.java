@@ -1928,21 +1928,30 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (!shownAgain) {
                 List<Integer> sounds = new ArrayList<>();
                 List<String> soundClasses = new ArrayList<>();
-                timeline.getSounds(frame, time, renderContext.mouseOverButton, mouseButton, sounds, soundClasses);
+                List<SOUNDINFO> soundInfos = new ArrayList<>();
+                timeline.getSounds(frame, time, renderContext.mouseOverButton, mouseButton, sounds, soundClasses, soundInfos);
                 for (int cid : swf.getCharacters().keySet()) {
                     CharacterTag c = swf.getCharacter(cid);
-                    for (String cls : soundClasses) {
+                    for (int k = 0; k < soundClasses.size(); k++) {
+                        String cls = soundClasses.get(k);
+                        if (cls == null) {
+                            continue;
+                        }
                         if (cls.equals(c.getClassName())) {
-                            sounds.add(cid);
+                            sounds.set(k, cid);
                         }
                     }
                 }
 
-                for (int sndId : sounds) {
+                for (int s = 0; s < sounds.size(); s++) {
+                    int sndId = sounds.get(s);
+                    if (sndId == -1) {
+                        continue;
+                    }
                     CharacterTag c = swf.getCharacter(sndId);
                     if (c instanceof SoundTag) {
                         SoundTag st = (SoundTag) c;
-                        playSound(st, null, thisTimer);
+                        playSound(st, soundInfos.get(s), thisTimer);
                     }
                 }
                 executeFrame(frame);
