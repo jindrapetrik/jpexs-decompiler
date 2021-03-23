@@ -1907,7 +1907,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 sw.stop();
                 if (sw.getElapsedMilliseconds() > 100) {
-                    logger.log(Level.WARNING, "Slow rendering. {0}. frame, time={1}, {2}ms", new Object[]{frame, time, sw.getElapsedMilliseconds()});
+                    if (Configuration.showSlowRenderingWarning.get()) {
+                        logger.log(Level.WARNING, "Slow rendering. {0}. frame, time={1}, {2}ms", new Object[]{frame, time, sw.getElapsedMilliseconds()});
+                    }
                 }
 
                 if (renderContext.borderImage != null) {

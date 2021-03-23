@@ -701,6 +701,10 @@ public final class Configuration {
     @ConfigurationCategory("limit")
     public static ConfigurationItem<Integer> limitAs3PCodeOffsetMatching = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationInternal
+    public static ConfigurationItem<Boolean> showSlowRenderingWarning = null;
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
