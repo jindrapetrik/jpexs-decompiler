@@ -198,15 +198,84 @@ public class TtfParser {
         int version = readUnsignedShort(input);
         int numberSubtables = readUnsignedShort(input);
 
-        for (int i = 0; i < numberSubtables; i++) {
-            int platFormId = readUnsignedShort(input);
-            int platFormSpecificId = readUnsignedShort(input);
-            long offset = readUnsignedLong(input);
-            seek(input, tableOffsets.get("cmap") + offset);
+        List<Integer> platFormIds = new ArrayList<>();
+        List<Integer> platFormSpecificIds = new ArrayList<>();
+        List<Long> offsets = new ArrayList<>();
 
+        for (int i = 0; i < numberSubtables; i++) {
+            platFormIds.add(readUnsignedShort(input));
+            platFormSpecificIds.add(readUnsignedShort(input));
+            offsets.add(readUnsignedLong(input));
+        }
+
+        for (int i = 0; i < numberSubtables; i++) {
+            long offset = offsets.get(i);
+            seek(input, tableOffsets.get("cmap") + offset);
             int format = readUnsignedShort(input);
             switch (format) {
-                case 4:
+                case 0: //byte enconding table
+                {
+                    int length = readUnsignedShort(input);
+                    int languageCode = readUnsignedShort(input);
+                    for (int c = 0; c < 256; c++) {
+                        ctg.put(c, readUnsignedByte(input));
+                    }
+                    break;
+                }
+                case 2: //high byte mapping through table
+                {
+                    int length = readUnsignedShort(input);
+                    int languageCode = readUnsignedShort(input);
+                    int subHeaderKeys[] = new int[256];
+                    int maxSubHeaderIndex = 0;
+                    for (int c = 0; c < 256; c++) {
+                        subHeaderKeys[c] = readUnsignedShort(input);
+                        maxSubHeaderIndex = Math.max(maxSubHeaderIndex, subHeaderKeys[i] / 8);
+                    }
+
+                    List<Integer> firstCodes = new ArrayList<>();
+                    List<Integer> entryCountCodes = new ArrayList<>();
+                    List<Short> idDeltas = new ArrayList<>();
+                    List<Integer> idRangeOffsets = new ArrayList<>();
+
+                    for (int c = 0; c <= maxSubHeaderIndex; c++) {
+                        firstCodes.add(readUnsignedShort(input));
+                        entryCountCodes.add(readUnsignedShort(input));
+                        idDeltas.add(readShort(input));
+                        idRangeOffsets.add(readUnsignedShort(input) - (maxSubHeaderIndex + 1 - i - 1) * 8 - 2);
+                    }
+
+                    long startGlyphIndexOffset = input.getFilePointer();
+                    for (int c = 0; c <= maxSubHeaderIndex; c++) {
+                        int firstCode = firstCodes.get(c);
+                        int idRangeOffset = idRangeOffsets.get(c);
+                        int idDelta = idDeltas.get(c);
+                        int entryCount = entryCountCodes.get(c);
+                        input.seek(startGlyphIndexOffset + idRangeOffset);
+                        for (int j = 0; j < entryCount; ++j) {
+                            int charCode = i;
+                            charCode = (charCode << 8) + (firstCode + j);
+
+                            int p = readUnsignedShort(input);
+                            if (p > 0) {
+                                p = (p + idDelta) % 65536;
+                                if (p < 0) {
+                                    p += 65536;
+                                }
+                            }
+
+                            if (p >= numGlyphs) {
+                                continue;
+                            }
+
+                            ctg.put(charCode, p);
+                        }
+                    }
+
+                    break;
+                }
+                case 4: //segment mapping to delta values
+                {
                     int length = readUnsignedShort(input);
                     int languageCode = readUnsignedShort(input);
                     int segCountX2 = readUnsignedShort(input);
@@ -263,9 +332,172 @@ public class TtfParser {
                         }
                     }
                     break;
-            }
+                }
+                case 6: {
+                    int length = readUnsignedShort(input);
+                    int languageCode = readUnsignedShort(input);
+                    int firstCode = readUnsignedShort(input);
+                    int entryCount = readUnsignedShort(input);
+                    if (entryCount == 0) {
+                        break;
+                    }
+                    int[] glyphIdArray = readUnsignedShortArray(entryCount, input);
+                    for (int c = 0; c < entryCount; c++) {
+                        ctg.put(firstCode + c, glyphIdArray[c]);
+                    }
+                    break;
+                }
+                case 8: { //mixed 16-bit and 32-bit coverage
+                    readUnsignedShort(input); //reserved, set to 0
+                    long length = readUnsignedLong(input);
+                    long languageCode = readUnsignedLong(input);
+                    final long LEAD_OFFSET = 0xD800l - (0x10000 >> 10);
+                    final long SURROGATE_OFFSET = 0x10000l - (0xD800 << 10) - 0xDC00;
+                    int[] is32 = readUnsignedByteArray(8192, input);
+                    long nbGroups = readUnsignedLong(input);
 
-            break;
+                    if (nbGroups > 65536) {
+                        throw new IOException("CMap ( Subtype8 ) is invalid");
+                    }
+
+                    for (long c = 0; c < nbGroups; c++) {
+                        long firstCode = readUnsignedLong(input);
+                        long endCode = readUnsignedLong(input);
+                        long startGlyph = readUnsignedLong(input);
+
+                        if (firstCode > endCode || 0 > firstCode) {
+                            throw new IOException("Range invalid");
+                        }
+
+                        for (long j = firstCode; j <= endCode; ++j) {
+                            // -- Convert the Character code in decimal
+                            if (j > Integer.MAX_VALUE) {
+                                throw new IOException("[Sub Format 8] Invalid character code " + j);
+                            }
+                            if ((int) j / 8 >= is32.length) {
+                                throw new IOException("[Sub Format 8] Invalid character code " + j);
+                            }
+
+                            int currentCharCode;
+                            if ((is32[(int) j / 8] & (1 << ((int) j % 8))) == 0) {
+                                currentCharCode = (int) j;
+                            } else {
+                                long lead = LEAD_OFFSET + (j >> 10);
+                                long trail = 0xDC00 + (j & 0x3FF);
+
+                                long codepoint = (lead << 10) + trail + SURROGATE_OFFSET;
+                                if (codepoint > Integer.MAX_VALUE) {
+                                    throw new IOException("[Sub Format 8] Invalid character code " + codepoint);
+                                }
+                                currentCharCode = (int) codepoint;
+                            }
+
+                            long glyphIndex = startGlyph + (j - firstCode);
+                            if (glyphIndex > numGlyphs || glyphIndex > Integer.MAX_VALUE) {
+                                throw new IOException("CMap contains an invalid glyph index");
+                            }
+
+                            ctg.put(currentCharCode, (int) glyphIndex);
+                        }
+                    }
+                    break;
+                }
+                case 10: { //trimmed array
+                    readUnsignedShort(input); //reserved, set to 10
+                    long length = readUnsignedLong(input);
+                    long languageCode = readUnsignedLong(input);
+                    long startCode = readUnsignedLong(input);
+                    long numChars = readUnsignedLong(input);
+                    if (numChars > Integer.MAX_VALUE) {
+                        //throw new IOException("Invalid number of Characters");
+                    }
+
+                    if (startCode < 0 || startCode > 0x0010FFFF || (startCode + numChars) > 0x0010FFFF
+                            || ((startCode + numChars) >= 0x0000D800 && (startCode + numChars) <= 0x0000DFFF)) {
+                        //throw new IOException("Invalid Characters codes");
+                    }
+                    for (long c = startCode; c < startCode + numChars; c++) {
+                        ctg.put((int) c, readUnsignedShort(input));
+                    }
+                    break;
+                }
+                case 12: { //segmented coverage
+                    readUnsignedShort(input); //reserved, set to 0
+                    long length = readUnsignedLong(input);
+                    long languageCode = readUnsignedLong(input);
+                    long nbGroups = readUnsignedLong(input);
+                    for (long c = 0; c < nbGroups; ++c) {
+                        long firstCode = readUnsignedLong(input);
+                        long endCode = readUnsignedLong(input);
+                        long startGlyph = readUnsignedLong(input);
+
+                        if (firstCode < 0 || firstCode > 0x0010FFFF
+                                || firstCode >= 0x0000D800 && firstCode <= 0x0000DFFF) {
+                            throw new IOException("Invalid characters codes");
+                        }
+
+                        if (endCode > 0 && endCode < firstCode
+                                || endCode > 0x0010FFFF
+                                || endCode >= 0x0000D800 && endCode <= 0x0000DFFF) {
+                            throw new IOException("Invalid characters codes");
+                        }
+
+                        for (long j = 0; j <= endCode - firstCode; ++j) {
+                            long glyphIndex = startGlyph + j;
+                            if (glyphIndex >= numGlyphs) {
+                                //warn("Format 12 cmap contains an invalid glyph index");
+                                break;
+                            }
+
+                            if (firstCode + j > 0x10FFFF) {
+                                //warn("Format 12 cmap contains character beyond UCS-4");
+                            }
+
+                            ctg.put((int) (firstCode + j), (int) glyphIndex);
+                        }
+                    }
+                    break;
+                }
+                case 13: {  //many-to-one mappings
+
+                    readUnsignedShort(input); //reserved, set to 0
+                    long length = readUnsignedLong(input);
+                    long languageCode = readUnsignedLong(input);
+                    long nbGroups = readUnsignedLong(input);
+                    for (long c = 0; c < nbGroups; c++) {
+                        long firstCode = readUnsignedLong(input);
+                        long endCode = readUnsignedLong(input);
+                        long glyphId = readUnsignedLong(input);
+
+                        if (glyphId > numGlyphs) {
+                            //warn("Format 13 cmap contains an invalid glyph index");
+                            break;
+                        }
+
+                        if (firstCode < 0 || firstCode > 0x0010FFFF || (firstCode >= 0x0000D800 && firstCode <= 0x0000DFFF)) {
+                            throw new IOException("Invalid Characters codes");
+                        }
+
+                        if ((endCode > 0 && endCode < firstCode) || endCode > 0x0010FFFF
+                                || (endCode >= 0x0000D800 && endCode <= 0x0000DFFF)) {
+                            throw new IOException("Invalid Characters codes");
+                        }
+
+                        for (long j = 0; j <= endCode - firstCode; ++j) {
+                            if (firstCode + j > Integer.MAX_VALUE) {
+                                throw new IOException("Character Code greater than Integer.MAX_VALUE");
+                            }
+
+                            if (firstCode + j > 0x10FFFF) {
+                                //warn("Format 13 cmap contains character beyond UCS-4");
+                            }
+
+                            ctg.put((int) (firstCode + j), (int) glyphId);
+                        }
+                    }
+                    break;
+                }
+            }
         }
         if (!ctg.containsKey(0)) {
             ctg.put(0, 0);
@@ -469,6 +701,22 @@ public class TtfParser {
             throw new EOFException("Unexpected end of file.");
         }
         return b;
+    }
+
+    private int[] readUnsignedByteArray(int size, RandomAccessFile input) throws IOException {
+        int ret[] = new int[size];
+        for (int i = 0; i < size; i++) {
+            ret[i] = readUnsignedByte(input);
+        }
+        return ret;
+    }
+
+    private int[] readUnsignedShortArray(int size, RandomAccessFile input) throws IOException {
+        int ret[] = new int[size];
+        for (int i = 0; i < size; i++) {
+            ret[i] = readUnsignedShort(input);
+        }
+        return ret;
     }
 
     private byte readByte(RandomAccessFile input) throws IOException {
