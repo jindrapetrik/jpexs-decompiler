@@ -17,6 +17,9 @@ All notable changes to this project will be documented in this file.
 - Flash viewer - linear colorspace radial gradient
 - Folder preview of frames with time increasing
 
+### Changed
+- [#1661] Slow rendering warning is optional with default to not display
+
 ## [14.2.1] - 2021-03-13
 ### Added
 - Placeobject display and edit - raw editor on right side
@@ -2133,6 +2136,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1660]: https://www.free-decompiler.com/flash/issues/1660
+[#1661]: https://www.free-decompiler.com/flash/issues/1661
 [#1435]: https://www.free-decompiler.com/flash/issues/1435
 [#1488]: https://www.free-decompiler.com/flash/issues/1488
 [#1584]: https://www.free-decompiler.com/flash/issues/1584
