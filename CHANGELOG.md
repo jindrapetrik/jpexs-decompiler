@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - SVG export - bitmap stroke style
 - Flash viewer - is visible flag
 - Flash viewer - linear colorspace radial gradient
+- Folder preview of frames with time increasing
 
 ## [14.2.1] - 2021-03-13
 ### Added
