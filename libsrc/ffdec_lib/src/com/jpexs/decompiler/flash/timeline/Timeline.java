@@ -54,6 +54,7 @@ import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.decompiler.flash.types.filters.FILTER;
 import com.jpexs.helpers.Helper;
@@ -289,9 +290,13 @@ public class Timeline {
             } else if (t instanceof StartSoundTag) {
                 newFrameNeeded = true;
                 frame.sounds.add(((StartSoundTag) t).soundId);
+                frame.soundClasses.add(null);
+                frame.soundInfos.add(((StartSoundTag) t).soundInfo);
             } else if (t instanceof StartSound2Tag) {
                 newFrameNeeded = true;
+                frame.sounds.add(-1);
                 frame.soundClasses.add(((StartSound2Tag) t).soundClassName);
+                frame.soundInfos.add(((StartSoundTag) t).soundInfo);
             } else if (t instanceof SetBackgroundColorTag) {
                 newFrameNeeded = true;
                 frame.backgroundColor = ((SetBackgroundColorTag) t).backgroundColor;
@@ -1178,10 +1183,11 @@ public class Timeline {
         FrameExporter.framesToHtmlCanvas(result, unitDivisor, this, frames, 0, null, 0, displayRect, null, null);
     }
 
-    public void getSounds(int frame, int time, ButtonTag mouseOverButton, int mouseButton, List<Integer> sounds, List<String> soundClasses) {
+    public void getSounds(int frame, int time, ButtonTag mouseOverButton, int mouseButton, List<Integer> sounds, List<String> soundClasses, List<SOUNDINFO> soundInfos) {
         Frame fr = getFrame(frame);
         sounds.addAll(fr.sounds);
         soundClasses.addAll(fr.soundClasses);
+        soundInfos.addAll(fr.soundInfos);
         for (int d = maxDepth; d >= 0; d--) {
             DepthState ds = fr.layers.get(d);
             if (ds != null) {
@@ -1202,7 +1208,7 @@ public class Timeline {
                             }
                         }
                     }
-                    ((Timelined) c).getTimeline().getSounds(dframe, time, mouseOverButton, mouseButton, sounds, soundClasses);
+                    ((Timelined) c).getTimeline().getSounds(dframe, time, mouseOverButton, mouseButton, sounds, soundClasses, soundInfos);
                 }
             }
         }
