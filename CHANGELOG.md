@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - Folder preview of frames with time increasing
 - Flash viewer - Do not play StartSoundTag all over again on single frame
 - Flash viewer - StartSoundTag loops
+- Flash viewer - Sound envelope handling
 
 ### Changed
 - [#1661] Slow rendering warning is optional with default to not display

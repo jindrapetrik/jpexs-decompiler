@@ -144,8 +144,11 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
+import com.jpexs.decompiler.flash.types.SOUNDENVELOPE;
+import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
+import com.jpexs.decompiler.flash.types.sound.SoundInfoSoundCacheEntry;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.decompiler.flash.xfl.XFLConverter;
 import com.jpexs.decompiler.flash.xfl.XFLExportSettings;
@@ -341,7 +344,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     private final Cache<SHAPE, ShapeExportData> shapeExportDataCache = Cache.getInstance(true, true, "shapeExportData");
 
     @Internal
-    private final Cache<SoundTag, byte[]> soundCache = Cache.getInstance(false, false, "sound");
+    private final Cache<SoundInfoSoundCacheEntry, byte[]> soundCache = Cache.getInstance(false, false, "sound");
 
     @Internal
     public final AS2Cache as2Cache = new AS2Cache();
@@ -2577,9 +2580,10 @@ public final class SWF implements SWFContainerItem, Timelined {
         return null;
     }
 
-    public byte[] getFromCache(SoundTag soundTag) {
-        if (soundCache.contains(soundTag)) {
-            return soundCache.get(soundTag);
+    public byte[] getFromCache(SOUNDINFO soundInfo, SoundTag soundTag) {
+        SoundInfoSoundCacheEntry key = new SoundInfoSoundCacheEntry(soundInfo, soundTag);
+        if (soundCache.contains(key)) {
+            return soundCache.get(key);
         }
         return null;
     }
@@ -2590,8 +2594,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-    public void putToCache(SoundTag soundTag, byte[] data) {
-        soundCache.put(soundTag, data);
+    public void putToCache(SOUNDINFO soundInfo, SoundTag soundTag, byte[] data) {
+        SoundInfoSoundCacheEntry key = new SoundInfoSoundCacheEntry(soundInfo, soundTag);
+        soundCache.put(key, data);
     }
 
     public void clearImageCache() {

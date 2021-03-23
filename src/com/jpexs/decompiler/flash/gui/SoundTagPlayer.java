@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.gui.player.MediaDisplayListener;
 import com.jpexs.decompiler.flash.gui.player.Zoom;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.helpers.ByteArrayRange;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -88,7 +89,7 @@ public class SoundTagPlayer implements MediaDisplay {
 
     private static final int FRAME_DIVISOR = 8000;
 
-    public SoundTagPlayer(final SoundTag tag, int loops, boolean async) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+    public SoundTagPlayer(final SOUNDINFO soundInfo, final SoundTag tag, int loops, boolean async) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
         this.tag = tag;
         this.loopCount = loops;
         clip = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
@@ -135,13 +136,13 @@ public class SoundTagPlayer implements MediaDisplay {
 
         if (!async) {
             paused = true;
-            openSound(tag);
+            openSound(soundInfo, tag);
         } else {
             new Thread() {
                 @Override
                 public void run() {
                     try {
-                        openSound(tag);
+                        openSound(soundInfo, tag);
                     } catch (IOException | LineUnavailableException | UnsupportedAudioFileException ex) {
                         Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -155,15 +156,15 @@ public class SoundTagPlayer implements MediaDisplay {
         }
     }
 
-    private void openSound(SoundTag tag) throws IOException, LineUnavailableException, UnsupportedAudioFileException {
+    private void openSound(SOUNDINFO soundInfo, SoundTag tag) throws IOException, LineUnavailableException, UnsupportedAudioFileException {
         SWF swf = ((Tag) tag).getSwf();
-        byte[] wavData = swf.getFromCache(tag);
+        byte[] wavData = swf.getFromCache(soundInfo, tag);
         if (wavData == null) {
             List<ByteArrayRange> soundData = tag.getRawSoundData();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            tag.getSoundFormat().createWav(soundData, baos);
+            tag.getSoundFormat().createWav(soundInfo, soundData, baos);
             wavData = baos.toByteArray();
-            swf.putToCache(tag, wavData);
+            swf.putToCache(soundInfo, tag, wavData);
         }
 
         synchronized (playLock) {

@@ -2039,7 +2039,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 loopCount = Math.max(1, soundInfo.loopCount);
             }
 
-            sp = new SoundTagPlayer(st, loopCount, false);
+            sp = new SoundTagPlayer(soundInfo, st, loopCount, false);
             sp.addEventListener(new MediaDisplayListener() {
                 @Override
                 public void mediaDisplayStateChanged(MediaDisplay source) {
