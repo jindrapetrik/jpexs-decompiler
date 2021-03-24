@@ -44,9 +44,12 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -121,7 +124,8 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                         GraphTargetItem notCoerced = duplicated.getNotCoerced();
                         if (notCoerced instanceof GetLexAVM2Item) {
                             GetLexAVM2Item getLex = (GetLexAVM2Item) notCoerced;
-                            if (localData.abc.constants.getMultiname(multinameIndex).equals(getLex.propertyName)) {
+                            if (localData.abc.constants.getMultiname(multinameIndex).equals(getLex.propertyName)
+                                    && (obj instanceof FindPropertyAVM2Item)) {
                                 stack.pop();
                                 if (isIncrement) {
                                     stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getLex));
@@ -141,13 +145,15 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                                     }
                                 }
 
-                                stack.pop();
-                                if (isIncrement) {
-                                    stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
-                                } else {
-                                    stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                                if (Objects.equals(obj, getProp.object)) {
+                                    stack.pop();
+                                    if (isIncrement) {
+                                        stack.push(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                                    } else {
+                                        stack.push(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                                    }
+                                    return;
                                 }
-                                return;
                             }
                         }
                     }
@@ -161,7 +167,8 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
             boolean hasConvert = value.value instanceof ConvertAVM2Item;
             if (value.value.getNotCoercedNoDup() instanceof GetLexAVM2Item) {
                 GetLexAVM2Item getLex = (GetLexAVM2Item) value.value.getNotCoercedNoDup();
-                if (localData.abc.constants.getMultiname(multinameIndex).equals(getLex.propertyName)) {
+                if (localData.abc.constants.getMultiname(multinameIndex).equals(getLex.propertyName)
+                        && (obj instanceof FindPropertyAVM2Item)) {
                     if (hasConvert) {
                         if (isIncrement) {
                             output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getLex));
@@ -188,24 +195,25 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                             getProp.object = obj;
                         }
                     }
-                    if (hasConvert) {
-                        if (isIncrement) {
-                            output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                    if (Objects.equals(getProp.object, obj)) {
+                        if (hasConvert) {
+                            if (isIncrement) {
+                                output.add(new PostIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                            } else {
+                                output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                            }
                         } else {
-                            output.add(new PostDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                            if (isIncrement) {
+                                output.add(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                            } else {
+                                output.add(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
+                            }
                         }
-                    } else {
-                        if (isIncrement) {
-                            output.add(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
-                        } else {
-                            output.add(new PreDecrementAVM2Item(ins, localData.lineStartInstruction, getProp));
-                        }
+                        return;
                     }
-                    return;
                 }
             }
         }
-
         //assembled/TestIncrement2
         if (value instanceof DuplicateItem) {
             GraphTargetItem duplicated = value.value;
@@ -216,7 +224,8 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                         GraphTargetItem incrementedProp = duplicated.value;
                         if (incrementedProp instanceof GetLexAVM2Item) {
                             GetLexAVM2Item getLex = (GetLexAVM2Item) incrementedProp;
-                            if (localData.abc.constants.getMultiname(multinameIndex).equals(getLex.propertyName)) {
+                            if (localData.abc.constants.getMultiname(multinameIndex).equals(getLex.propertyName)
+                                    && (obj instanceof FindPropertyAVM2Item)) {
                                 stack.pop();
                                 if (isIncrement) {
                                     stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getLex));
@@ -228,7 +237,8 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                         }
                         if (incrementedProp instanceof GetPropertyAVM2Item) {
                             GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) incrementedProp;
-                            if (((FullMultinameAVM2Item) getProp.propertyName).compareSame(multiname)) {
+                            if (((FullMultinameAVM2Item) getProp.propertyName).compareSame(multiname)
+                                    && (Objects.equals(getProp.object, obj))) {
                                 stack.pop();
                                 if (isIncrement) {
                                     stack.push(new PreIncrementAVM2Item(ins, localData.lineStartInstruction, getProp));
@@ -379,8 +389,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                         result.setCompoundValue(binaryOp.getRightSide());
                         result.setCompoundOperator(binaryOp.getOperator());
                     }
-                }
-                else if (binaryOp.getLeftSide() instanceof GetPropertyAVM2Item) {
+                } else if (binaryOp.getLeftSide() instanceof GetPropertyAVM2Item) {
                     GetPropertyAVM2Item propItem = (GetPropertyAVM2Item) binaryOp.getLeftSide();
                     if (Objects.equals(obj, propItem.object.getThroughDuplicate()) && Objects.equals(multiname, propItem.propertyName)) {
                         result.setCompoundValue(binaryOp.getRightSide());
