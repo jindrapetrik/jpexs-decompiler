@@ -511,6 +511,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private void showCardLeft(String card) {
         CardLayout cl = (CardLayout) (viewerCards.getLayout());
         cl.show(viewerCards, card);
+
+        //stop sounds when switching panels
+        imagePanel.stop();
+        placeImagePanel.stop();
     }
 
     private void showCardRight(String card) {

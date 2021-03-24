@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - Flash viewer - StartSoundTag loops
 - Flash viewer - Sound envelope handling
 - AS3 decompilation - inc/decrements handling - hiding some items
+- Flash viewer - stop sounds when switching panels
 
 ### Changed
 - [#1661] Slow rendering warning is optional with default to not display
