@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [14.3.1] - 2021-03-25
 ### Fixed
 - "protected", "const", "namespace", "package" are not reserved keywords in AS1/2
 - Not counting newlines in comments
