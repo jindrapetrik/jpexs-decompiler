@@ -106,6 +106,9 @@ import java.util.Stack;
         return ret;
     }
 
+    private int count(String str, String target) {
+        return (str.length() - str.replace(target, "").length()) / target.length();
+    }
 %}
 
 /* main character classes */
@@ -357,7 +360,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   {DoubleLiteral}                { return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble((yytext()))); }
 
   /* comments */
-  {Comment}                      { /*ignore*/ }
+  {Comment}                      { yyline += count(yytext(),"\n"); }
 
   {LineTerminator}               { yyline++;}
   /* whitespace */

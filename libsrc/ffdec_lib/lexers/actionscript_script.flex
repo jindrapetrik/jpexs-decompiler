@@ -74,6 +74,10 @@ import java.util.Stack;
         informListenersPushBack(symb);
     }
 
+    private int count(String str, String target) {
+        return (str.length() - str.replace(target, "").length()) / target.length();
+    }
+
     ParsedSymbol last;
     public ParsedSymbol lex() throws java.io.IOException, ActionParseException{
         ParsedSymbol ret = null;
@@ -162,18 +166,14 @@ Preprocessor = \u00A7\u00A7 {Identifier}
   "with"                         { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.WITH, yytext()); }
   "dynamic"                      { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.DYNAMIC, yytext()); }
   "private"                      { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.PRIVATE, yytext()); }
-  "protected"                    { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.PROTECTED, yytext()); }
   "public"                       { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.PUBLIC, yytext()); }
   "static"                       { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.STATIC, yytext()); }
   "class"                        { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.CLASS, yytext()); }
-  "const"                        { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.CONST, yytext()); }
   "extends"                      { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.EXTENDS, yytext()); }
   "function"                     { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.FUNCTION, yytext()); }
   "get"                          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.GET, yytext()); }
   "implements"                   { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.IMPLEMENTS, yytext()); }
   "interface"                    { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.INTERFACE, yytext()); }
-  "namespace"                    { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.NAMESPACE, yytext()); }
-  "package"                      { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.PACKAGE, yytext()); }
   "set"                          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.SET, yytext()); }
   "var"                          { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.VAR, yytext()); }
   "import"                       { return new ParsedSymbol(SymbolGroup.KEYWORD, SymbolType.IMPORT, yytext()); }
@@ -371,7 +371,7 @@ Preprocessor = \u00A7\u00A7 {Identifier}
   {DoubleLiteral}                { return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble((yytext()))); }
 
   /* comments */
-  {Comment}                      { /*ignore*/ }
+  {Comment}                      { yyline += count(yytext(),"\n"); }
 
   {LineTerminator}               { yyline++;}
   /* whitespace */
