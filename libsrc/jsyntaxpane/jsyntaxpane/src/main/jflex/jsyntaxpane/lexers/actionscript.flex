@@ -164,28 +164,21 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   "while"                        |
   "with"                         |
   "dynamic"                      |
-  "final"                        |
   "internal"                     |
-  "native"                       |
   "override"                     |
   "private"                      |
-  "protected"                    |
   "public"                       |
   "static"                       |
   "class"                        |
-  "const"                        |
   "extends"                      |
   "function"                     |
   "get"                          |
   "implements"                   |
   "interface"                    |
-  "namespace"                    |
-  "package"                      |
   "set"                          |
   "var"                          |
   "import"                       |
   "include"                      |
-  "use"                          |
   "false"                        |
   "null"                         |
   "this"                         |

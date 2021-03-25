@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- "protected", "const", "namespace", "package" are not reserved keywords in AS1/2
+- Not counting newlines in comments
+
 ## [14.3.0] - 2021-03-24
 ### Added
 - AS3 - Remove trait which is outside class
