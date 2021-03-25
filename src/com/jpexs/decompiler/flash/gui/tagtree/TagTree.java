@@ -639,10 +639,16 @@ public class TagTree extends JTree {
                 if (nodeType == TreeNodeType.BUTTON) {
                     ret.add(d);
                 }
-                if (nodeType == TreeNodeType.AS) {
-                    ret.add(d);
-                }
-                if (nodeType == TreeNodeType.AS_FRAME) {
+                if (nodeType == TreeNodeType.AS
+                        || nodeType == TreeNodeType.AS_BUTTON
+                        || nodeType == TreeNodeType.AS_CLASS
+                        || nodeType == TreeNodeType.AS_CLIP
+                        || nodeType == TreeNodeType.AS_CONST
+                        || nodeType == TreeNodeType.AS_FRAME
+                        || nodeType == TreeNodeType.AS_FUNCTION
+                        || nodeType == TreeNodeType.AS_INIT
+                        || nodeType == TreeNodeType.AS_INTERFACE
+                        || nodeType == TreeNodeType.AS_VAR) {
                     ret.add(d);
                 }
                 if (nodeType == TreeNodeType.MOVIE) {

@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - "protected", "const", "namespace", "package" are not reserved keywords in AS1/2
 - Not counting newlines in comments
+- [#1665] Export selection not working for AS1/2 scripts other than frame scripts
 
 ## [14.3.0] - 2021-03-24
 ### Added
@@ -2034,7 +2035,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.2.1...Unreleased
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.3.0...Unreleased
+[14.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.2.1...version14.3.0
 [14.2.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.2.0...version14.2.1
 [14.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.1.0...version14.2.0
 [14.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.0.1...version14.1.0
@@ -2145,6 +2147,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1665]: https://www.free-decompiler.com/flash/issues/1665
 [#1660]: https://www.free-decompiler.com/flash/issues/1660
 [#1661]: https://www.free-decompiler.com/flash/issues/1661
 [#1435]: https://www.free-decompiler.com/flash/issues/1435
