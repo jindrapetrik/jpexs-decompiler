@@ -159,9 +159,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 try {
                     Main.saveFile(swf, swf.getFile());
                     saved = true;
-                } catch (IOException ex) {
-                    Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
-                    View.showMessageDialog(null, translate("error.file.save"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
+                    Main.handleSaveError(ex);
                 }
             }
             if (saved) {

@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+-  [#1015], [#1466], [#1513] Better error messages during saving, display message on out of memory
+
 ## [14.3.1] - 2021-03-25
 ### Fixed
 - "protected", "const", "namespace", "package" are not reserved keywords in AS1/2
@@ -2035,7 +2039,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.3.0...Unreleased
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.3.1...Unreleased
+[14.3.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.3.0...version14.3.1
 [14.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.2.1...version14.3.0
 [14.2.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.2.0...version14.2.1
 [14.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.1.0...version14.2.0
@@ -2147,6 +2152,9 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1015]: https://www.free-decompiler.com/flash/issues/1015
+[#1466]: https://www.free-decompiler.com/flash/issues/1466
+[#1513]: https://www.free-decompiler.com/flash/issues/1513
 [#1665]: https://www.free-decompiler.com/flash/issues/1665
 [#1660]: https://www.free-decompiler.com/flash/issues/1660
 [#1661]: https://www.free-decompiler.com/flash/issues/1661

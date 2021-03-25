@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+# Set following to higher value if you want more memory
+# You need 64 bit OS and 64 bit java to set it to higher values
+MEMORY=1024m
+
 # Based on Freerapid Downloader startup script - created by Petris 2009
 
 # FFDec requires Oracle Java 8
@@ -9,7 +14,6 @@ REQ_JVER1=1
 REQ_JVER2=8
 REQ_JVER3=0
 REQ_JVER4=0
-MEMORY=1024m
 
 search_jar_file() {
     JAR_FILE_CANDIDATES='./ffdec.jar ../dist/ffdec.jar /usr/share/java/ffdec.jar /usr/share/java/ffdec/ffdec.jar /usr/share/java/jpexs-decompiler/ffdec.jar'

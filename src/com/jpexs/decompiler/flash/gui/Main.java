@@ -1072,6 +1072,12 @@ public class Main {
                         bos.write((swfSize >> 24) & 0xff);
                 }
             }
+        } catch (Throwable t) {
+            stopSaving(savedFile);
+            if (tmpFile.exists()) {
+                tmpFile.delete();
+            }
+            throw t;
         }
         if (tmpFile.exists()) {
             if (tmpFile.length() > 0) {
@@ -1534,11 +1540,34 @@ public class Main {
                 Main.saveFile(swf, fileName, mode, exeExportMode);
                 Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
                 return true;
-            } catch (IOException ex) {
-                View.showMessageDialog(null, AppStrings.translate("error.file.write"));
+            } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
+                handleSaveError(ex);
             }
         }
         return false;
+    }
+
+    public static void handleSaveError(Throwable ex) {
+        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Error saving file", ex);
+        if (ex instanceof OutOfMemoryError) {
+            String errorMessage = AppStrings.translate("error.file.save") + ".";
+            errorMessage += " ";
+            long heapMaxSize = Runtime.getRuntime().maxMemory();
+            long heapMaxSizeMb = heapMaxSize / 1024 / 1024;
+            String currentMaxHeap = "" + heapMaxSizeMb + "m";
+            errorMessage += AppStrings.translate("error.outOfMemory").replace("%maxheap%", currentMaxHeap);
+            errorMessage += "\n";
+            if (Platform.isWindows()) {
+                errorMessage += AppStrings.translate("error.outOfMemory.windows");
+            } else {
+                errorMessage += AppStrings.translate("error.outOfMemory.unixmac");
+            }
+            errorMessage += "\n";
+            errorMessage += AppStrings.translate("error.outOfMemory.64bit");
+            View.showMessageDialog(null, errorMessage, AppStrings.translate("error.outOfMemory.title"), JOptionPane.ERROR_MESSAGE);
+        } else {
+            View.showMessageDialog(null, AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public static boolean openFileDialog() {
