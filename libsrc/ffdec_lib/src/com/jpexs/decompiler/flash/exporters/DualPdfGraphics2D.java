@@ -577,6 +577,11 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
                 int offsetY = rec.yOffset;
                 y = offsetY;
             }
+
+            if (font == null) {
+                continue;
+            }
+
             StringBuilder text = new StringBuilder();
             int deltaX = 0;
             setColor(Color.green);
