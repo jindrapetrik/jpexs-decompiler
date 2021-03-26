@@ -10,6 +10,9 @@ before_install:
     - "./travis/before_install.sh"
 install: "./travis/install.sh"
 script: "source ./travis/script.sh"
+cache:
+  directories:
+    - /home/travis/tools    
 notifications:
   email:
     recipients:
