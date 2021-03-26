@@ -17,13 +17,15 @@ php --version
 
 tools_dir=/home/travis/tools
 
-if [ ! -d "$tools_dir" ]; then
+if [ ! -f "$tools_dir/cached.txt" ]; then    
     sudo apt-get install -y scons
     #For unpacking unzip :-)
     sudo apt-get install -y unzip
 
     # create directory where tools will be downloaded and installed
-    mkdir $tools_dir
+    mkdir -p $tools_dir
+
+    echo "cached">$tools_dir/cached.txt
 
     cp ./travis/tools/nsis-3.0-src.tar.bz2 ./
     #Unpack NSIS sources - Tool for making windows installers
