@@ -614,11 +614,11 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
                     text.append(dynamicEntry.character);
                     deltaX += entry.glyphAdvance;
                 }
-
             }
             if (text.length() > 0) {
                 drawText(x, y, trans, textColor, existingFonts, font, text.toString(), textHeight, pdfGraphics);
             }
+            x = x + deltaX;
         }
     }
 
