@@ -2047,7 +2047,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.3.1...Unreleased
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.3.1...dev
 [14.3.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.3.0...version14.3.1
 [14.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.2.1...version14.3.0
 [14.2.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.2.0...version14.2.1
