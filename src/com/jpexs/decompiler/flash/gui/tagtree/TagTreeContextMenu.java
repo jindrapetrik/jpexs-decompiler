@@ -1476,7 +1476,9 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             if (View.showConfirmDialog(this, confirmationMessage, mainPanel.translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                tagTree.clearSelection();
+                if (mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
+                    tagTree.clearSelection();
+                }
                 Map<SWF, List<Tag>> tagsToRemoveBySwf = new HashMap<>();
                 Set<SWF> swfsToClearCache = new HashSet<>();
 
