@@ -2599,6 +2599,7 @@ public class SWFInputStream implements AutoCloseable {
         } else {
             ret.color = readRGB("color");
         }
+        ret.inShape3 = shapeNum >= 3;
         endDumpLevel();
         return ret;
     }
@@ -2668,6 +2669,7 @@ public class SWFInputStream implements AutoCloseable {
                 ret.color = readRGB("color");
             }
         }
+        ret.inShape3 = shapeNum >= 3;
         if ((ret.fillStyleType == FILLSTYLE.LINEAR_GRADIENT)
                 || (ret.fillStyleType == FILLSTYLE.RADIAL_GRADIENT)
                 || (ret.fillStyleType == FILLSTYLE.FOCAL_RADIAL_GRADIENT)) {
