@@ -64,6 +64,8 @@ public class ChangelogUpdater {
                 tagName = "version" + versionName;
             } else if (updateMatcher.matches()) {
                 tagName = "version" + updateMatcher.group(1) + "u" + updateMatcher.group(2);
+            } else if (versionName.equals("Unreleased")) {
+                tagName = "dev";
             } else {
                 tagName = versionName.replace(" ", "");
             }
