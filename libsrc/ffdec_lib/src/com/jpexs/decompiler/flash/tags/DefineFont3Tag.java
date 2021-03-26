@@ -289,8 +289,8 @@ public class DefineFont3Tag extends FontTag {
             }
         }
         if (fontFlagsHasLayout) {
-            sos.writeSI16(fontAscent);
-            sos.writeSI16(fontDescent);
+            sos.writeUI16(fontAscent);
+            sos.writeUI16(fontDescent);
             sos.writeSI16(fontLeading);
             for (int i = 0; i < numGlyphs; i++) {
                 sos.writeSI16(fontAdvanceTable.get(i));

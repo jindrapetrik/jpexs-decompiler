@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - PDF Export - NullPointer when font of text is missing
 - PDF Export - Text position on font change
+- Writing DefineFont2/3 ascent/descent as SI16 - it's UI16
 
 ## [14.3.1] - 2021-03-25
 ### Fixed
