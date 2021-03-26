@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Writing DefineFont2/3 ascent/descent as SI16 - it's UI16
 - [#1660] Empty thumbnail view on remove item
 - [#1669] FILLSTYLE color handling in DefineShape3/4
+- [#1668] Not removing SymbolClass/ExportAssets entry on character remove
 
 ## [14.3.1] - 2021-03-25
 ### Fixed
@@ -2164,6 +2165,7 @@ All notable changes to this project will be documented in this file.
 [#1513]: https://www.free-decompiler.com/flash/issues/1513
 [#1660]: https://www.free-decompiler.com/flash/issues/1660
 [#1669]: https://www.free-decompiler.com/flash/issues/1669
+[#1668]: https://www.free-decompiler.com/flash/issues/1668
 [#1665]: https://www.free-decompiler.com/flash/issues/1665
 [#1661]: https://www.free-decompiler.com/flash/issues/1661
 [#1435]: https://www.free-decompiler.com/flash/issues/1435
