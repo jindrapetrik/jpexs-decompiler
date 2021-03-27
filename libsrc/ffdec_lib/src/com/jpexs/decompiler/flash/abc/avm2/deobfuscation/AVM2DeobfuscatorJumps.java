@@ -31,9 +31,8 @@ import java.util.Map;
 
 /**
  *
- * AVM2 Deobfuscator removing single assigned local registers.
+ * AVM2 Deobfuscator replacing jumps/ifs targeting other jumps.
  *
- * Example: var a = true; var b = false; ... if(a){ ...ok }else{ not executed }
  *
  * @author JPEXS
  */
@@ -57,22 +56,36 @@ public class AVM2DeobfuscatorJumps extends SWFDecompilerAdapter {
             for (int i = 0; i < code.code.size(); i++) {
                 AVM2Instruction ins = code.code.get(i);
                 if (ins.definition instanceof JumpIns) {
+                    long srcAddr = ins.getAddress();
                     long targetAddr = ins.getTargetAddress();
-                    {
-                        //We do not want exception start to be redirected somewhere else
-                        if (exceptionStarts.contains(i)) {
-                            continue;
-                        }
-                        for (int r : refs.get(i)) {
-                            if (r >= 0) { //Not Exception start/end
-                                AVM2Instruction srcIns = code.code.get(r);
 
-                                if ((srcIns.definition instanceof JumpIns) || ((srcIns.definition instanceof IfTypeIns) && (r != i - 1))) {
-                                    int oldop = srcIns.operands[0];
-                                    srcIns.operands[0] = (int) (targetAddr - (srcIns.getAddress() + srcIns.getBytesLength()));
-                                    if (srcIns.operands[0] != oldop) {
-                                        found = true;
-                                    }
+                    //source and target must be in the same try..catch block
+                    boolean exceptionMismatch = false;
+                    for (int e = 0; e < body.exceptions.length; e++) {
+                        boolean sourceMatch = srcAddr >= body.exceptions[e].start && srcAddr < body.exceptions[e].end;
+                        boolean targetMatch = targetAddr >= body.exceptions[e].start && targetAddr < body.exceptions[e].end;
+                        if (sourceMatch != targetMatch) {
+                            exceptionMismatch = true;
+                            break;
+                        }
+                    }
+                    if (!exceptionMismatch) {
+                        continue;
+                    }
+
+                    //We do not want exception start to be redirected somewhere else
+                    if (exceptionStarts.contains(i)) {
+                        continue;
+                    }
+                    for (int r : refs.get(i)) {
+                        if (r >= 0) { //Not Exception start/end
+                            AVM2Instruction srcIns = code.code.get(r);
+
+                            if ((srcIns.definition instanceof JumpIns) || ((srcIns.definition instanceof IfTypeIns) && (r != i - 1))) {
+                                int oldop = srcIns.operands[0];
+                                srcIns.operands[0] = (int) (targetAddr - (srcIns.getAddress() + srcIns.getBytesLength()));
+                                if (srcIns.operands[0] != oldop) {
+                                    found = true;
                                 }
                             }
                         }
