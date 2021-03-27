@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - AS decompilation - Gotos handling vs and/or
 - AS decompilation - certain combinations of ifs and switch
 - AS3 jump deobfuscator - fix for try..catch clauses
+- [#1669] DefineBitsJPEG3/4 alpha premultiplied
 
 ## [14.3.1] - 2021-03-25
 ### Fixed
