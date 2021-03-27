@@ -1,0 +1,123 @@
+class
+ refid "tests:TestTryWhile"
+ instance QName(PackageNamespace("tests"), "TestTryWhile")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestTryWhile")
+  iinit
+   refid "tests:TestTryWhile/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestTryWhile/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     trait slot QName(PackageInternalNs(""),"a")
+         slotid 1
+         type QName(PackageNamespace(""),"String")
+      end ; trait
+      trait slot QName(PackageInternalNs(""),"b")
+         slotid 2
+         type QName(PackageNamespace(""),"String")
+      end ; trait
+      trait slot QName(PackageInternalNs(""),"c")
+         slotid 3
+         type QName(PackageNamespace(""),"String")
+      end ; trait
+      
+      code
+         getlocal0
+         pushscope
+         newactivation
+         dup
+         setlocal1
+         pushscope
+ofs0006:
+         getscopeobject 1
+         pushstring "aa"
+         setslot 3
+         jump ofs0030
+ofs0011:
+         label
+         getscopeobject 1
+         getslot 2
+         iffalse ofs0022
+         jump ofs0038
+;         jump ofs0022
+ofs0022:
+         getscopeobject 1
+         getscopeobject 1
+         getslot 3
+         getproperty QName(PackageNamespace("x"),"Object")
+         setslot 3
+ofs0030:
+         getscopeobject 1
+         getslot 3
+         iftrue ofs0011
+ofs0038:
+         jump ofs0054
+ofs003c:
+         getlocal0
+         pushscope
+         getlocal1
+         pushscope
+         newcatch 0
+         dup
+         setlocal2
+         dup
+         pushscope
+         swap
+         setslot 1
+         findproperty QName(PrivateNamespace("*","242"),"browserMode")
+         pushfalse
+         initproperty QName(PrivateNamespace("*","242"),"browserMode")
+         returnvoid
+         popscope
+         kill 2
+ofs0054:
+         findpropstrict QName(PackageNamespace(""),"trace")
+         pushstring "finish"
+         callpropvoid QName(PackageNamespace(""),"trace"), 1
+         returnvoid
+      end ; code
+      try from ofs0006 to ofs0038 target ofs003c type QName(PackageNamespace(""),"Error") name QName(PackageNamespace(""),"e") end     
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestTryWhile/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

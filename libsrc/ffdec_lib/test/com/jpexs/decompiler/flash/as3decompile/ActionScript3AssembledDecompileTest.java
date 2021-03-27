@@ -334,6 +334,29 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     }
 
     @Test
+    public void testTryWhile() {
+        decompileMethod("assembled", "testTryWhile", "try\r\n"
+                + "{\r\n"
+                + "var c:String = \"aa\";\r\n"
+                + "while(c)\r\n"
+                + "{\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "c = c.Object;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "browserMode = false;\r\n"
+                + "return;\r\n"
+                + "}\r\n"
+                + "trace(\"finish\");\r\n",
+                false);
+    }
+
+    @Test
     public void testUnnamedException() {
         decompileMethod("assembled", "testUnnamedException", "var _loc5_:int = 5;\r\n"
                 + "try\r\n"
