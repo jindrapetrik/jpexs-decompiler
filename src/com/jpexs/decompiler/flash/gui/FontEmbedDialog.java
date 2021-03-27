@@ -390,9 +390,7 @@ public class FontEmbedDialog extends AppDialog {
         };
         fc.setFileFilter(ttfFilter);
         fc.setAcceptAllFileFilterUsed(true);
-        JFrame f = new JFrame();
-        View.setWindowIcon(f);
-        int returnVal = fc.showOpenDialog(f);
+        int returnVal = fc.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
             File selfile = Helper.fixDialogFile(fc.getSelectedFile());

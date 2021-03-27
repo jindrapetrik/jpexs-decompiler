@@ -398,9 +398,7 @@ public class LoadFromMemoryFrame extends AppFrame {
                 });
             }
             fc.setAcceptAllFileFilterUsed(false);
-            JFrame f = new JFrame();
-            View.setWindowIcon(f);
-            if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
+            if (fc.showSaveDialog(LoadFromMemoryFrame.this) == JFileChooser.APPROVE_OPTION) {
                 File file = Helper.fixDialogFile(fc.getSelectedFile());
                 try {
                     if (selected.length == 1) {

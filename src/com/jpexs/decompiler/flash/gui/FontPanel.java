@@ -751,9 +751,7 @@ public class FontPanel extends JPanel {
             fc.setFileFilter(ttfFilter);
 
             fc.setAcceptAllFileFilterUsed(false);
-            JFrame fr = new JFrame();
-            View.setWindowIcon(fr);
-            int returnVal = fc.showOpenDialog(fr);
+            int returnVal = fc.showOpenDialog(Main.getDefaultMessagesComponent());
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
                 File selfile = Helper.fixDialogFile(fc.getSelectedFile());

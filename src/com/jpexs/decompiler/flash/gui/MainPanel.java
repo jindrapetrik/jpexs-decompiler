@@ -2349,9 +2349,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         fc.setAcceptAllFileFilterUsed(false);
-        JFrame f = new JFrame();
-        View.setWindowIcon(f);
-        if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
+        if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
             File sf = Helper.fixDialogFile(fc.getSelectedFile());
 
@@ -3267,9 +3265,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             first = false;
         }
 
-        JFrame f = new JFrame();
-        View.setWindowIcon(f);
-        if (fc.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
+        if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File result = fc.getSelectedFile();
             Configuration.lastOpenDir.set(Helper.fixDialogFile(result).getParentFile().getAbsolutePath());
             return result;
