@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#1669] FILLSTYLE color handling in DefineShape3/4
 - [#1668] Not removing SymbolClass/ExportAssets entry on character remove
 - [#1670] Parent component/window of dialogs not properly set
+- AS decompilation - Gotos handling vs and/or
 
 ## [14.3.1] - 2021-03-25
 ### Fixed

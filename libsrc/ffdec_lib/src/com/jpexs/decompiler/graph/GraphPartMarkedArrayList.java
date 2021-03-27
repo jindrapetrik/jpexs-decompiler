@@ -10,19 +10,19 @@ import java.util.List;
  */
 public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
 
-    private List<GraphPart> listParts = new ArrayList<>();
-    private GraphPart currentPart = null;
+    private List<List<GraphPart>> listParts = new ArrayList<>();
+    private List<GraphPart> currentParts = new ArrayList<>();
 
     public GraphPartMarkedArrayList(Collection<? extends E> collection) {
         super(collection);
         if (collection instanceof GraphPartMarkedArrayList) {
             for (int i = 0; i < collection.size(); i++) {
-                listParts.add((GraphPart) ((GraphPartMarkedArrayList) collection).listParts.get(i));
+                listParts.add((List<GraphPart>) ((GraphPartMarkedArrayList) collection).listParts.get(i));
             }
-            currentPart = ((GraphPartMarkedArrayList) collection).currentPart;
+            currentParts = ((GraphPartMarkedArrayList) collection).currentParts;
         } else {
             for (int i = 0; i < collection.size(); i++) {
-                listParts.add(currentPart);
+                listParts.add(currentParts);
             }
         }
     }
@@ -31,38 +31,48 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
     }
 
     public void startPart(GraphPart part) {
-        currentPart = part;
+        currentParts.add(part);
+    }
+
+    public void clearCurrentParts() {
+        currentParts = new ArrayList<>();
     }
 
     @Override
     public boolean add(E e) {
-        listParts.add(currentPart);
+        listParts.add(currentParts);
         return super.add(e);
     }
 
     @Override
     public void add(int index, E element) {
-        listParts.add(index, currentPart);
+        listParts.add(index, currentParts);
         super.add(index, element);
     }
 
-    public GraphPart getPartAt(int index) {
+    public List<GraphPart> getPartsAt(int index) {
         return listParts.get(index);
     }
 
     public int indexOfPart(GraphPart part) {
-        return listParts.indexOf(part);
+        for (int i = 0; i < listParts.size(); i++) {
+            List<GraphPart> list = listParts.get(i);
+            if (list.indexOf(part) > -1) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
         if (c instanceof GraphPartMarkedArrayList) {
             for (int i = 0; i < c.size(); i++) {
-                listParts.add((GraphPart) ((GraphPartMarkedArrayList) c).listParts.get(i));
+                listParts.add((List<GraphPart>) ((GraphPartMarkedArrayList) c).listParts.get(i));
             }
         } else {
             for (int i = 0; i < c.size(); i++) {
-                listParts.add(currentPart);
+                listParts.add(currentParts);
             }
         }
         return super.addAll(c);
@@ -72,11 +82,11 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
     public boolean addAll(int index, Collection<? extends E> c) {
         if (c instanceof GraphPartMarkedArrayList) {
             for (int i = 0; i < c.size(); i++) {
-                listParts.add(index + i, (GraphPart) ((GraphPartMarkedArrayList) c).listParts.get(i));
+                listParts.add(index + i, (List<GraphPart>) ((GraphPartMarkedArrayList) c).listParts.get(i));
             }
         } else {
             for (int i = 0; i < c.size(); i++) {
-                listParts.add(index + i, currentPart);
+                listParts.add(index + i, currentParts);
             }
         }
         return super.addAll(index, c);
