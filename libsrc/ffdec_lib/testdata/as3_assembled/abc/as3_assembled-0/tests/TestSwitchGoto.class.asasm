@@ -1,0 +1,195 @@
+class
+ refid "tests:TestSwitchGoto"
+ instance QName(PackageNamespace("tests"), "TestSwitchGoto")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestSwitchGoto")
+  iinit
+   refid "tests:TestSwitchGoto/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestSwitchGoto/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+      getlocal0
+      pushscope
+
+            getlocal0
+      pushscope
+
+      debug               1, "i", 0, 8
+      debug               1, "a", 1, 9
+      debug               1, "b", 2, 10
+
+      pushbyte            5
+      convert_i
+      setlocal1
+
+
+      pushtrue
+      convert_b
+      setlocal2
+
+
+      pushfalse
+      convert_b
+      setlocal3
+
+      jump                L66
+
+L20:
+      label
+
+      findpropstrict      QName(PackageNamespace(""), "trace")
+      pushstring          "case0"
+      callproperty        QName(PackageNamespace(""), "trace"), 1
+      pop
+
+      jump                L94
+
+L28:
+      label
+
+      getlocal2
+      iffalse             L44
+
+
+      getlocal3      
+      not
+      iftrue              L94
+      jump L38
+      ;iffalse             L38
+
+
+      ;jump                L94
+;LXX:
+;    jump L94
+L38:
+
+      findpropstrict      QName(PackageNamespace(""), "trace")
+      pushstring          "a"
+      callproperty        QName(PackageNamespace(""), "trace"), 1
+      pop
+      jump                L49
+
+L44:
+
+      findpropstrict      QName(PackageNamespace(""), "trace")
+      pushstring          "b"
+      callproperty        QName(PackageNamespace(""), "trace"), 1
+      pop
+L49:
+; 40-44
+      findpropstrict      QName(PackageNamespace(""), "trace")
+      pushstring          "c"
+      callproperty        QName(PackageNamespace(""), "trace"), 1
+      pop
+
+      jump                L94
+
+L56:
+      label
+
+      findpropstrict      QName(PackageNamespace(""), "trace")
+      pushstring          "case2"
+      callproperty        QName(PackageNamespace(""), "trace"), 1
+      pop
+
+      jump                L94
+
+L64:
+      label
+      jump                L94
+
+L66:
+
+      getlocal1
+      setlocal            4
+
+
+      pushbyte            0
+      getlocal            4
+      ifstrictne          L75
+
+      pushshort           0
+      jump                L92
+
+L75:
+
+      pushbyte            1
+      getlocal            4
+      ifstrictne          L81
+
+      pushshort           1
+      jump                L92
+
+L81:
+
+      pushbyte            2
+      getlocal            4
+      ifstrictne          L87
+
+      pushshort           2
+      jump                L92
+
+L87:
+      pushfalse
+      iffalse             L91
+
+      pushshort           3
+      jump                L92
+
+L91:
+      pushshort           3
+L92:
+      kill                4
+      lookupswitch        L64, [L20, L28, L56, L64]
+
+L94:
+
+      returnvoid
+      
+      returnvoid
+     end ; code
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestSwitchGoto/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

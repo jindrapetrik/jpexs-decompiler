@@ -1963,6 +1963,7 @@ public class Graph {
         if (stopPart.contains(part)) {
 
             boolean hasBlockClosesAfter = false;
+            //this weird stuff handles some goto problems:            
             loopi:
             for (int i = 0; i < stopPartKind.size(); i++) {
                 if (stopPart.get(i) == part) {
@@ -2294,8 +2295,10 @@ public class Graph {
                     List<StopPartKind> stopPartKind2 = new ArrayList<>(stopPartKind);
 
                     if ((!isEmpty) && (next != null)) {
-                        stopPart2.add(next);
-                        stopPartKind2.add(StopPartKind.BLOCK_CLOSE);
+                        if (!stopPart2.contains(next)) { //?? might be a break or something
+                            stopPart2.add(next);
+                            stopPartKind2.add(StopPartKind.BLOCK_CLOSE);
+                        }
                     }
 
                     List<GraphTargetItem> onTrue = new ArrayList<>();

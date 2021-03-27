@@ -191,6 +191,34 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     }
 
     @Test
+    public void testSwitchGoto() {
+        decompileMethod("assembled", "testSwitchGoto", "var i:int = 5;\r\n"
+                + "var a:Boolean = true;\r\n"
+                + "var b:Boolean = false;\r\n"
+                + "switch(i)\r\n"
+                + "{\r\n"
+                + "case 0:\r\n"
+                + "trace(\"case0\");\r\n"
+                + "break;\r\n"
+                + "case 1:\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "if(b)\r\n"
+                + "{\r\n"
+                + "trace(\"a\");\r\n"
+                + "}\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "trace(\"b\");\r\n"
+                + "trace(\"c\");\r\n"
+                + "break;\r\n"
+                + "case 2:\r\n"
+                + "trace(\"case2\");\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
     public void testSwitchJoin() {
         decompileMethod("assembled", "testSwitchJoin", "trace(\"before\");\r\n"
                 + "var _loc2_:int = 57;\r\n"
