@@ -213,7 +213,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
             int width = img.getWidth();
             int height = img.getHeight();
-            SerializableImage img2 = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB_PRE);
+            SerializableImage img2 = new SerializableImage(width, height, SerializableImage.TYPE_INT_ARGB);
             int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
             int[] pixels2 = ((DataBufferInt) img2.getRaster().getDataBuffer()).getData();
             for (int i = 0; i < pixels.length; i++) {
