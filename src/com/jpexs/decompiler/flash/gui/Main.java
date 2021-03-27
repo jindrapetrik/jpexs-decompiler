@@ -63,12 +63,14 @@ import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinReg;
 import java.awt.AWTException;
+import java.awt.Component;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -469,7 +471,7 @@ public class Main {
         String flashVars = "";//key=val&key2=val2
         String playerLocation = Configuration.playerLocation.get();
         if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
-            View.showMessageDialog(null, AppStrings.translate("message.playerpath.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("message.playerpath.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
             advancedSettings("paths");
             return;
         }
@@ -505,7 +507,7 @@ public class Main {
         String flashVars = "";//key=val&key2=val2
         String playerLocation = Configuration.playerDebugLocation.get();
         if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
-            View.showMessageDialog(null, AppStrings.translate("message.playerpath.debug.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("message.playerpath.debug.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
             Main.advancedSettings("paths");
             return;
         }
@@ -626,6 +628,20 @@ public class Main {
 
     public static MainFrame getMainFrame() {
         return mainFrame;
+    }
+
+    public static Component getDefaultMessagesComponent() {
+        if (mainFrame != null) {
+            return mainFrame.getPanel();
+        }
+        return null;
+    }
+
+    public static Window getDefaultDialogsOwner() {
+        if (mainFrame != null) {
+            return mainFrame.getWindow();
+        }
+        return null;
     }
 
     public static void loadFromCache() {
@@ -805,7 +821,7 @@ public class Main {
                         public SWF resolveUrl(final String url) {
                             int opt = -1;
                             if (!(yestoall || notoall)) {
-                                opt = View.showOptionDialog(null, AppStrings.translate("message.imported.swf").replace("%url%", url), AppStrings.translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, yesno, AppStrings.translate("button.yes"));
+                                opt = ViewMessages.showOptionDialog(getDefaultMessagesComponent(), AppStrings.translate("message.imported.swf").replace("%url%", url), AppStrings.translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, yesno, AppStrings.translate("button.yes"));
                                 if (opt == 2) {
                                     yestoall = true;
                                 }
@@ -847,7 +863,7 @@ public class Main {
                                 @Override
                                 public void run() {
 
-                                    while (JOptionPane.YES_OPTION == View.showConfirmDialog(null, AppStrings.translate("message.imported.swf.manually").replace("%url%", url), AppStrings.translate("error"), JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE)) {
+                                    while (JOptionPane.YES_OPTION == ViewMessages.showConfirmDialog(getDefaultMessagesComponent(), AppStrings.translate("message.imported.swf.manually").replace("%url%", url), AppStrings.translate("error"), JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE)) {
 
                                         JFileChooser fc = new JFileChooser();
                                         fc.setCurrentDirectory(new File(Configuration.lastOpenDir.get()));
@@ -1160,15 +1176,15 @@ public class Main {
                     }
                 } catch (OutOfMemoryError ex) {
                     logger.log(Level.SEVERE, null, ex);
-                    View.showMessageDialog(null, "Cannot load SWF file. Out of memory.");
+                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), "Cannot load SWF file. Out of memory.");
                     continue;
                 } catch (SwfOpenException ex) {
                     logger.log(Level.SEVERE, null, ex);
-                    View.showMessageDialog(null, ex.getMessage());
+                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), ex.getMessage());
                     continue;
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, null, ex);
-                    View.showMessageDialog(null, "Cannot load SWF file.");
+                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), "Cannot load SWF file.");
                     continue;
                 }
 
@@ -1300,7 +1316,7 @@ public class Main {
         try {
             File file = new File(swfFile);
             if (!file.exists()) {
-                View.showMessageDialog(null, AppStrings.translate("open.error.fileNotFound"), AppStrings.translate("open.error"), JOptionPane.ERROR_MESSAGE);
+                ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("open.error.fileNotFound"), AppStrings.translate("open.error"), JOptionPane.ERROR_MESSAGE);
                 return OpenFileResult.NOT_FOUND;
             }
             swfFile = file.getCanonicalPath();
@@ -1308,7 +1324,7 @@ public class Main {
             OpenFileResult openResult = openFile(sourceInfo);
             return openResult;
         } catch (IOException ex) {
-            View.showMessageDialog(null, AppStrings.translate("open.error.cannotOpen"), AppStrings.translate("open.error"), JOptionPane.ERROR_MESSAGE);
+            ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("open.error.cannotOpen"), AppStrings.translate("open.error"), JOptionPane.ERROR_MESSAGE);
             return OpenFileResult.ERROR;
         }
     }
@@ -1564,9 +1580,9 @@ public class Main {
             }
             errorMessage += "\n";
             errorMessage += AppStrings.translate("error.outOfMemory.64bit");
-            View.showMessageDialog(null, errorMessage, AppStrings.translate("error.outOfMemory.title"), JOptionPane.ERROR_MESSAGE);
+            ViewMessages.showMessageDialog(getDefaultMessagesComponent(), errorMessage, AppStrings.translate("error.outOfMemory.title"), JOptionPane.ERROR_MESSAGE);
         } else {
-            View.showMessageDialog(null, AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -1756,7 +1772,7 @@ public class Main {
 
             autoCheckForUpdates();
             offerAssociation();
-            loadingDialog = new LoadingDialog();
+            loadingDialog = new LoadingDialog(getDefaultDialogsOwner());
 
             if (Configuration.checkForModifications.get()) {
                 try {
@@ -1934,7 +1950,7 @@ public class Main {
         boolean offered = Configuration.offeredAssociation.get();
         if (!offered) {
             if (Platform.isWindows()) {
-                if ((!ContextMenuTools.isAddedToContextMenu()) && View.showConfirmDialog(null, "Do you want to add FFDec to context menu of SWF files?\n(Can be changed later from main menu)", "Context menu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                if ((!ContextMenuTools.isAddedToContextMenu()) && ViewMessages.showConfirmDialog(getDefaultMessagesComponent(), "Do you want to add FFDec to context menu of SWF files?\n(Can be changed later from main menu)", "Context menu", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                     ContextMenuTools.addToContextMenu(true, false);
                 }
             }
@@ -2343,7 +2359,7 @@ public class Main {
     }
 
     public static void about() {
-        (new AboutDialog()).setVisible(true);
+        (new AboutDialog(mainFrame.getWindow())).setVisible(true);
     }
 
     public static void advancedSettings() {
@@ -2351,7 +2367,7 @@ public class Main {
     }
 
     public static void advancedSettings(String category) {
-        (new AdvancedSettingsDialog(category)).setVisible(true);
+        (new AdvancedSettingsDialog(mainFrame.getWindow(), category)).setVisible(true);
     }
 
     public static void autoCheckForUpdates() {
@@ -2464,7 +2480,7 @@ public class Main {
 
         if (!versions.isEmpty()) {
             View.execInEventDispatch(() -> {
-                NewVersionDialog newVersionDialog = new NewVersionDialog(versions);
+                NewVersionDialog newVersionDialog = new NewVersionDialog(mainFrame.getWindow(), versions);
                 newVersionDialog.setVisible(true);
                 Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
             });
@@ -2529,7 +2545,7 @@ public class Main {
             public void uncaughtException(Thread t, Throwable e) {
                 logger.log(Level.SEVERE, "Uncaught exception in thread: " + t.getName(), e);
                 if (e instanceof OutOfMemoryError && !Helper.is64BitJre() && Helper.is64BitOs()) {
-                    View.showMessageDialog(null, AppStrings.translate("message.warning.outOfMemory32BitJre"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE);
+                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("message.warning.outOfMemory32BitJre"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE);
                 }
             }
         });

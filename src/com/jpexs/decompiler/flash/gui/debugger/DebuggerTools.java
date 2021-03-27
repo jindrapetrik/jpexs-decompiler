@@ -240,7 +240,7 @@ public class DebuggerTools {
     public static void debuggerShowLog() {
         initDebugger();
         if (Main.debugDialog == null) {
-            Main.debugDialog = new DebugLogDialog(debugger);
+            Main.debugDialog = new DebugLogDialog(Main.getDefaultDialogsOwner(), debugger);
         }
         Main.debugDialog.setVisible(true);
     }

@@ -43,7 +43,7 @@ public class FontPreviewDialog extends AppDialog {
      * @param modal Will show as modal?
      */
     public FontPreviewDialog(java.awt.Frame parent, boolean modal, Font font) {
-        super();
+        super(parent);
         setModal(true);
         initComponents();
         View.setWindowIcon(this);

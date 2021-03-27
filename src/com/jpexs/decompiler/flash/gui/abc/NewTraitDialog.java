@@ -21,10 +21,12 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.ViewMessages;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -86,7 +88,8 @@ public class NewTraitDialog extends AppDialog {
         return nameField.getText();
     }
 
-    public NewTraitDialog() {
+    public NewTraitDialog(Window owner) {
+        super(owner);
         setSize(500, 300);
         setTitle(translate("dialog.title"));
         View.centerScreen(this);
@@ -165,7 +168,7 @@ public class NewTraitDialog extends AppDialog {
     private void okButtonActionPerformed(ActionEvent evt) {
         result = OK_OPTION;
         if (nameField.getText().trim().isEmpty()) {
-            View.showMessageDialog(null, translate("error.name"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            ViewMessages.showMessageDialog(this, translate("error.name"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
             return;
         }
 

@@ -23,6 +23,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.Hashtable;
 import javax.swing.BoxLayout;
@@ -45,7 +46,8 @@ public class DeobfuscationDialog extends AppDialog {
     private int result = ERROR_OPTION;
 
     @SuppressWarnings("unchecked")
-    public DeobfuscationDialog() {
+    public DeobfuscationDialog(Window owner) {
+        super(owner);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setSize(new Dimension(330, 270));
         setTitle(translate("dialog.title"));

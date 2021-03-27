@@ -99,7 +99,7 @@ public class FilesChangedDialog extends AppDialog {
     @Override
     public void setVisible(boolean b) {
         if (b && !onTopInited) {
-            Main.getMainFrame().getWindow().addWindowListener(new WindowAdapter() {
+            Main.getDefaultDialogsOwner().addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowDeactivated(WindowEvent e) {
                     Window wnd = e.getOppositeWindow();

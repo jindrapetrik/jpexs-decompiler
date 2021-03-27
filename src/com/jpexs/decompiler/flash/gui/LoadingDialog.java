@@ -22,6 +22,7 @@ import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -70,8 +71,8 @@ public class LoadingDialog extends AppDialog {
      * Constructor
      *
      */
-    public LoadingDialog() {
-        super();
+    public LoadingDialog(Window owner) {
+        super(owner);
         setResizable(false);
         setTitle(ApplicationInfo.shortApplicationVerName);
         Container cntp = getContentPane();

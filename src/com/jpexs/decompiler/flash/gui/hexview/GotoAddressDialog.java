@@ -22,6 +22,7 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
@@ -43,7 +44,8 @@ public class GotoAddressDialog extends AppDialog {
     private final JCheckBox hexCheckBox;
     private boolean okPressed = false;
 
-    public GotoAddressDialog() {
+    public GotoAddressDialog(Window owner) {
+        super(owner);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setTitle(translate("dialog.title"));
         lineTextField = new JTextField(10);

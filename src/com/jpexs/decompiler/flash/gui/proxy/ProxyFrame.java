@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.gui.GuiAbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainFrame;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8InputStreamReader;
@@ -420,7 +421,7 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
                 try {
                     Files.copy(new File(r.targetFile).toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException ex) {
-                    View.showMessageDialog(this, translate("error.save.as") + "\r\n" + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    ViewMessages.showMessageDialog(this, translate("error.save.as") + "\r\n" + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
             }
         } else {
@@ -492,7 +493,7 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
                     Files.copy(file.toPath(), new File(r.targetFile).toPath(), StandardCopyOption.REPLACE_EXISTING);
                     tableModel.fireTableCellUpdated(sel[0], 1/*size*/);
                 } catch (IOException ex) {
-                    View.showMessageDialog(f, translate("error.replace") + "\r\n" + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    ViewMessages.showMessageDialog(f, translate("error.replace") + "\r\n" + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
@@ -520,7 +521,7 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
         int[] sel = getSelectedRows();
         if (sel.length > 0) {
             Replacement r = replacements.get(sel[0]);
-            String s = View.showInputDialog("URL", r.urlPattern);
+            String s = ViewMessages.showInputDialog(this, "URL", r.urlPattern);
             if (s != null) {
                 r.urlPattern = s;
                 tableModel.setValueAt(s, sel[0], 2/*url*/);
@@ -575,7 +576,7 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
             } catch (NumberFormatException nfe) {
             }
             if ((port <= 0) || (port > 65535)) {
-                View.showMessageDialog(this, translate("error.port"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                ViewMessages.showMessageDialog(this, translate("error.port"), translate("error"), JOptionPane.ERROR_MESSAGE);
                 started = false;
                 return;
             }

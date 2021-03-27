@@ -23,6 +23,7 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -41,7 +42,8 @@ public class DebugLogDialog extends AppDialog {
 
     private final Debugger debug;
 
-    public DebugLogDialog(Debugger debug) {
+    public DebugLogDialog(Window owner, Debugger debug) {
+        super(owner);
         setSize(800, 600);
         this.debug = debug;
         setTitle(translate("dialog.title"));

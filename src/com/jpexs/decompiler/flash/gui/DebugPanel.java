@@ -186,19 +186,19 @@ public class DebugPanel extends JPanel {
                 JMenuItem watchReadMenuItem = new JMenuItem(AppStrings.translate("debug.watch.add.read"));
                 watchReadMenuItem.addActionListener((ActionEvent e1) -> {
                     if (!Main.addWatch(v, watchParentId, true, false)) {
-                        View.showMessageDialog(DebugPanel.this, AppStrings.translate("error.debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                        ViewMessages.showMessageDialog(DebugPanel.this, AppStrings.translate("error.debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                 });
                 JMenuItem watchWriteMenuItem = new JMenuItem(AppStrings.translate("debug.watch.add.write"));
                 watchWriteMenuItem.addActionListener((ActionEvent e1) -> {
                     if (!Main.addWatch(v, watchParentId, false, true)) {
-                        View.showMessageDialog(DebugPanel.this, AppStrings.translate("error.debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                        ViewMessages.showMessageDialog(DebugPanel.this, AppStrings.translate("error.debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                 });
                 JMenuItem watchReadWriteMenuItem = new JMenuItem(AppStrings.translate("debug.watch.add.readwrite"));
                 watchReadWriteMenuItem.addActionListener((ActionEvent e1) -> {
                     if (!Main.addWatch(v, watchParentId, true, true)) {
-                        View.showMessageDialog(DebugPanel.this, AppStrings.translate("error.debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                        ViewMessages.showMessageDialog(DebugPanel.this, AppStrings.translate("error.debug.watch.add"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                 });
 

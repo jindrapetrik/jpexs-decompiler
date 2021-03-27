@@ -500,7 +500,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                 disconnect();
                 Main.stopRun();
                 Main.stopWork();
-                View.showMessageDialog(Main.getMainFrame().getPanel(), AppStrings.translate("error.debug.listen").replace("%port%", "" + Debugger.DEBUG_PORT));
+                ViewMessages.showMessageDialog(Main.getMainFrame().getPanel(), AppStrings.translate("error.debug.listen").replace("%port%", "" + Debugger.DEBUG_PORT));
                 Main.getMainFrame().getPanel().updateMenu();
             }
         });

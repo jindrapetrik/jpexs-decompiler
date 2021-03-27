@@ -420,7 +420,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected void debuggerReplaceTraceCallsActionPerformed(ActionEvent evt) {
-        ReplaceTraceDialog rtd = new ReplaceTraceDialog(Configuration.lastDebuggerReplaceFunction.get());
+        ReplaceTraceDialog rtd = new ReplaceTraceDialog(Main.getDefaultDialogsOwner(), Configuration.lastDebuggerReplaceFunction.get());
         rtd.setVisible(true);
         if (rtd.getValue() != null) {
             String fname = rtd.getValue();
@@ -507,7 +507,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
 
         if (!Main.checkForUpdates()) {
-            View.showMessageDialog(null, translate("update.check.nonewversion"), translate("update.check.title"), JOptionPane.INFORMATION_MESSAGE);
+            ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), translate("update.check.nonewversion"), translate("update.check.title"), JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -518,7 +518,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         String helpUsURL = ApplicationInfo.PROJECT_PAGE;
         if (!View.navigateUrl(helpUsURL)) {
-            View.showMessageDialog(null, translate("message.helpus").replace("%url%", helpUsURL));
+            ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), translate("message.helpus").replace("%url%", helpUsURL));
         }
     }
 
@@ -529,7 +529,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         String homePageURL = ApplicationInfo.PROJECT_PAGE;
         if (!View.navigateUrl(homePageURL)) {
-            View.showMessageDialog(null, translate("message.homepage").replace("%url%", homePageURL));
+            ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), translate("message.homepage").replace("%url%", homePageURL));
         }
     }
 
@@ -543,7 +543,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     protected boolean reloadActionPerformed(ActionEvent evt) {
         if (swf != null) {
-            if (!Configuration.showCloseConfirmation.get() || View.showConfirmDialog(null, translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+            if (!Configuration.showCloseConfirmation.get() || ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                 Main.reloadFile(swf.swfList);
             }
         }
@@ -552,7 +552,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     protected boolean reloadAllActionPerformed(ActionEvent evt) {
         if (swf != null) {
-            if (!Configuration.showCloseConfirmation.get() || View.showConfirmDialog(null, translate("message.confirm.reloadAll"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+            if (!Configuration.showCloseConfirmation.get() || ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.reloadAll"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                 Main.reloadApp();
             }
 
@@ -608,7 +608,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
      }
      }*/
     protected void setLanguageActionPerformed(ActionEvent evt) {
-        new SelectLanguageDialog().display();
+        new SelectLanguageDialog(Main.getDefaultDialogsOwner()).display();
     }
 
     protected void disableDecompilationActionPerformed(ActionEvent evt) {
@@ -651,7 +651,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         } else {
             confStr += " " + translate("message.confirm.off");
         }
-        if (View.showConfirmDialog(null, confStr, translate("message.parallel"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+        if (ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), confStr, translate("message.parallel"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
             Configuration.parallelSpeedUp.set(selected);
         } else {
             button.setSelected(Configuration.parallelSpeedUp.get());
@@ -678,7 +678,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         AbstractButton button = (AbstractButton) evt.getSource();
         boolean selected = button.isSelected();
 
-        if (View.showConfirmDialog(mainFrame.getPanel(), translate("message.confirm.autodeobfuscate") + "\r\n" + (selected ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+        if (ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.autodeobfuscate") + "\r\n" + (selected ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
             Configuration.autoDeobfuscate.set(selected);
             mainFrame.getPanel().autoDeobfuscateChanged();
         } else {
@@ -1079,7 +1079,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                         + "Max: " + (runtime.maxMemory() / 1024 / 1024) + "MB" + Helper.newLine
                         + "Used: " + (runtime.totalMemory() / 1024 / 1024) + "MB" + Helper.newLine
                         + "Free: " + (runtime.freeMemory() / 1024 / 1024) + "MB";
-                View.showMessageDialog(null, info);
+                ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), info);
                 SWF nswf = mainFrame.getPanel().getCurrentSwf();
                 if (nswf != null) {
                     nswf.clearAllCache();
@@ -1134,7 +1134,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         Configuration.dumpView.set(true);
         MainPanel mainPanel = mainFrame.getPanel();
         if (mainPanel.isModified()) {
-            View.showMessageDialog(null, translate("message.warning.hexViewNotUpToDate"), translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningHexViewNotUpToDate);
+            ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), translate("message.warning.hexViewNotUpToDate"), translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningHexViewNotUpToDate);
         }
 
         mainPanel.showView(MainPanel.VIEW_DUMP);
@@ -1144,7 +1144,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     private void debuggerSwitchActionPerformed(ActionEvent evt) {
         boolean debuggerOn = isMenuChecked("/tools/debugger/debuggerSwitch");
-        if (!debuggerOn || View.showConfirmDialog((Component) mainFrame, translate("message.debugger"), translate("dialog.message.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, Configuration.displayDebuggerInfo, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
+        if (!debuggerOn || ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.debugger"), translate("dialog.message.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, Configuration.displayDebuggerInfo, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
             switchDebugger();
             mainFrame.getPanel().refreshDecompiled();
         } else {
@@ -1188,10 +1188,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
                     listeners.add(Main.getMainFrame().getPanel().getActionPanel());
 
                     if (swf.isAS3()) {
-                        sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
+                        sr = new SearchResultsDialog<>(Main.getDefaultDialogsOwner(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
 
                     } else {
-                        sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
+                        sr = new SearchResultsDialog<>(Main.getDefaultDialogsOwner(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
                     }
                     sr.setResults(Main.searchResultsStorage.getSearchResultsAt(mainFrame.getPanel().getAllSwfs(), fi));
                     sr.setVisible(true);
@@ -1209,7 +1209,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected void clearRecentSearchesForCurrentSwfActionPerformed(ActionEvent evt) {
-        if (View.showConfirmDialog(mainFrame.getPanel(), translate("message.confirm.recentSearches.clear"), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+        if (ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.recentSearches.clear"), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
             Main.searchResultsStorage.clearForSwf(swf);
         }
     }
@@ -1223,7 +1223,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             final String f = recentFiles.get(i);
             ActionListener a = (ActionEvent e) -> {
                 if (Main.openFile(f, null) == OpenFileResult.NOT_FOUND) {
-                    if (View.showConfirmDialog(null, translate("message.confirm.recentFileNotFound"), translate("message.confirm"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
+                    if (ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.recentFileNotFound"), translate("message.confirm"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
                         Configuration.removeRecentFile(f);
                     }
                 }

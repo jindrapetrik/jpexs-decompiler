@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -45,7 +46,8 @@ public class RenameDialog extends AppDialog {
 
     private int result = ERROR_OPTION;
 
-    public RenameDialog() {
+    public RenameDialog(Window owner) {
+        super(owner);
         setSize(300, 150);
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         int renameType = Configuration.lastRenameType.get();

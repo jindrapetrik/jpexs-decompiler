@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.Version;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -46,7 +47,8 @@ public class NewVersionDialog extends AppDialog {
 
     private Version latestVersion;
 
-    public NewVersionDialog(List<Version> versions) {
+    public NewVersionDialog(Window owner, List<Version> versions) {
+        super(owner);
         setSize(new Dimension(300, 150));
         Container cnt = getContentPane();
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.PAGE_AXIS));
@@ -146,7 +148,7 @@ public class NewVersionDialog extends AppDialog {
         if (View.navigateUrl(url)) {
             Main.exit();
         } else {
-            View.showMessageDialog(null, translate("newvermessage").replace("%oldAppName%", ApplicationInfo.SHORT_APPLICATION_NAME).replace("%newAppName%", latestVersion.versionName).replace("%projectPage%", ApplicationInfo.PROJECT_PAGE), translate("newversion"), JOptionPane.INFORMATION_MESSAGE);
+            ViewMessages.showMessageDialog(this, translate("newvermessage").replace("%oldAppName%", ApplicationInfo.SHORT_APPLICATION_NAME).replace("%newAppName%", latestVersion.versionName).replace("%projectPage%", ApplicationInfo.PROJECT_PAGE), translate("newversion"), JOptionPane.INFORMATION_MESSAGE);
         }
 
         setVisible(false);

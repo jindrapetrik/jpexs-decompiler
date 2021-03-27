@@ -33,6 +33,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.lang.reflect.Field;
@@ -91,7 +92,8 @@ public class AdvancedSettingsDialog extends AppDialog {
 
     private JButton resetButton;
 
-    public AdvancedSettingsDialog(String selectedCategory) {
+    public AdvancedSettingsDialog(Window owner, String selectedCategory) {
+        super(owner);
         initComponents(selectedCategory);
         View.centerScreen(this);
         View.setWindowIcon(this);
@@ -491,7 +493,7 @@ public class AdvancedSettingsDialog extends AppDialog {
     }
 
     private void showRestartConfirmDialog() {
-        if (View.showConfirmDialog(this, translate("advancedSettings.restartConfirmation"), AppStrings.translate("message.warning"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+        if (ViewMessages.showConfirmDialog(this, translate("advancedSettings.restartConfirmation"), AppStrings.translate("message.warning"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
             try {
                 // todo: honfika: why?
                 Thread.sleep(1000);
