@@ -26,5 +26,6 @@ program
  #include "tests/TestSlots.script.asasm"
  #include "tests/TestSlots.init/inline_method.method.asasm"
  #include "tests/TestDecrementPrecedence.script.asasm"
+ #include "tests/TestSwitchGoto.script.asasm"
  ; place to add next
 end ; program
