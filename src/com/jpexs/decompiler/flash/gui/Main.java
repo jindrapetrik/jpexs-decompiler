@@ -1176,7 +1176,7 @@ public class Main {
                     }
                 } catch (OutOfMemoryError ex) {
                     logger.log(Level.SEVERE, null, ex);
-                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), "Cannot load SWF file. Out of memory.");
+                    handleOutOfMemory("Cannot load SWF file.");
                     continue;
                 } catch (SwfOpenException ex) {
                     logger.log(Level.SEVERE, null, ex);
@@ -1184,7 +1184,7 @@ public class Main {
                     continue;
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, null, ex);
-                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), "Cannot load SWF file.");
+                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), "Cannot load SWF file: " + ex.getLocalizedMessage());
                     continue;
                 }
 
@@ -1563,24 +1563,36 @@ public class Main {
         return false;
     }
 
+    public static void handleOutOfMemory(String actionMessage) {
+        String errorMessage = actionMessage;
+        if (!errorMessage.isEmpty()) {
+            errorMessage += " ";
+        }
+        long heapMaxSize = Runtime.getRuntime().maxMemory();
+        long heapMaxSizeMb = heapMaxSize / 1024 / 1024;
+        String currentMaxHeap = "" + heapMaxSizeMb + "m";
+        errorMessage += AppStrings.translate("error.outOfMemory").replace("%maxheap%", currentMaxHeap);
+        errorMessage += "\n";
+        if (Platform.isWindows()) {
+            errorMessage += AppStrings.translate("error.outOfMemory.windows");
+        } else {
+            errorMessage += AppStrings.translate("error.outOfMemory.unixmac");
+        }
+        errorMessage += "\n";
+        if (Helper.is64BitOs() && !Helper.is64BitJre()) {
+            errorMessage += AppStrings.translate("error.outOfMemory.32BitJreOn64bitOs");
+            errorMessage += "\n";
+        }
+
+        errorMessage += AppStrings.translate("error.outOfMemory.64bit");
+        ViewMessages.showMessageDialog(getDefaultMessagesComponent(), errorMessage, AppStrings.translate("error.outOfMemory.title"), JOptionPane.ERROR_MESSAGE);
+    }
+
     public static void handleSaveError(Throwable ex) {
         Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Error saving file", ex);
         if (ex instanceof OutOfMemoryError) {
             String errorMessage = AppStrings.translate("error.file.save") + ".";
-            errorMessage += " ";
-            long heapMaxSize = Runtime.getRuntime().maxMemory();
-            long heapMaxSizeMb = heapMaxSize / 1024 / 1024;
-            String currentMaxHeap = "" + heapMaxSizeMb + "m";
-            errorMessage += AppStrings.translate("error.outOfMemory").replace("%maxheap%", currentMaxHeap);
-            errorMessage += "\n";
-            if (Platform.isWindows()) {
-                errorMessage += AppStrings.translate("error.outOfMemory.windows");
-            } else {
-                errorMessage += AppStrings.translate("error.outOfMemory.unixmac");
-            }
-            errorMessage += "\n";
-            errorMessage += AppStrings.translate("error.outOfMemory.64bit");
-            ViewMessages.showMessageDialog(getDefaultMessagesComponent(), errorMessage, AppStrings.translate("error.outOfMemory.title"), JOptionPane.ERROR_MESSAGE);
+            handleOutOfMemory(errorMessage);
         } else {
             ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("error.file.save") + ": " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
         }
@@ -2544,8 +2556,8 @@ public class Main {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
                 logger.log(Level.SEVERE, "Uncaught exception in thread: " + t.getName(), e);
-                if (e instanceof OutOfMemoryError && !Helper.is64BitJre() && Helper.is64BitOs()) {
-                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("message.warning.outOfMemory32BitJre"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE);
+                if (e instanceof OutOfMemoryError) {
+                    handleOutOfMemory("");
                 }
             }
         });
