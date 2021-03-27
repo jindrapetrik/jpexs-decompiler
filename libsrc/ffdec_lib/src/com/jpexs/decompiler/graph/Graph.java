@@ -2048,8 +2048,11 @@ public class Graph {
         boolean parseNext = true;
 
         //****************************DECOMPILING PART*************
-        GraphPartMarkedArrayList<GraphTargetItem> output = new GraphPartMarkedArrayList<>();
+        if (stack.isEmpty() && (currentRet instanceof GraphPartMarkedArrayList)) {
+            ((GraphPartMarkedArrayList) currentRet).clearCurrentParts();
+        }
 
+        GraphPartMarkedArrayList<GraphTargetItem> output = new GraphPartMarkedArrayList<>();
         output.startPart(part);
         if (currentRet instanceof GraphPartMarkedArrayList) {
             ((GraphPartMarkedArrayList) currentRet).startPart(part);
