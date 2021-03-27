@@ -414,9 +414,7 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
             };
             fc.setFileFilter(swfFilter);
             fc.setAcceptAllFileFilterUsed(true);
-            JFrame f = new JFrame();
-            View.setWindowIcon(f);
-            if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
+            if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
                 File file = Helper.fixDialogFile(fc.getSelectedFile());
                 try {
                     Files.copy(new File(r.targetFile).toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -485,15 +483,13 @@ public class ProxyFrame extends AppFrame implements CatchedListener, MouseListen
             };
             fc.setFileFilter(swfFilter);
             fc.setAcceptAllFileFilterUsed(true);
-            JFrame f = new JFrame();
-            View.setWindowIcon(f);
-            if (fc.showOpenDialog(f) == JFileChooser.APPROVE_OPTION) {
+            if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 File file = Helper.fixDialogFile(fc.getSelectedFile());
                 try {
                     Files.copy(file.toPath(), new File(r.targetFile).toPath(), StandardCopyOption.REPLACE_EXISTING);
                     tableModel.fireTableCellUpdated(sel[0], 1/*size*/);
                 } catch (IOException ex) {
-                    ViewMessages.showMessageDialog(f, translate("error.replace") + "\r\n" + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    ViewMessages.showMessageDialog(this, translate("error.replace") + "\r\n" + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
             }
         }

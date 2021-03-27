@@ -395,9 +395,7 @@ public class DumpTree extends JTree {
         JFileChooser fc = new JFileChooser();
         String selDir = Configuration.lastOpenDir.get();
         fc.setCurrentDirectory(new File(selDir));
-        JFrame f = new JFrame();
-        View.setWindowIcon(f);
-        if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
+        if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             File sf = Helper.fixDialogFile(fc.getSelectedFile());
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(sf))) {
                 byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;

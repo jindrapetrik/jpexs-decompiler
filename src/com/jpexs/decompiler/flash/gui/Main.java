@@ -914,9 +914,7 @@ public class Main {
                                         };
                                         fc.addChoosableFileFilter(gfxFilter);
                                         fc.setAcceptAllFileFilterUsed(false);
-                                        JFrame f = new JFrame();
-                                        View.setWindowIcon(f);
-                                        int returnVal = fc.showOpenDialog(f);
+                                        int returnVal = fc.showOpenDialog(getDefaultMessagesComponent());
                                         if (returnVal == JFileChooser.APPROVE_OPTION) {
                                             Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
                                             File selFile = Helper.fixDialogFile(fc.getSelectedFile());
@@ -1534,9 +1532,7 @@ public class Main {
         }
         final String extension = ext;
         fc.setAcceptAllFileFilterUsed(false);
-        JFrame f = new JFrame();
-        View.setWindowIcon(f);
-        if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
+        if (fc.showSaveDialog(getDefaultMessagesComponent()) == JFileChooser.APPROVE_OPTION) {
             File file = Helper.fixDialogFile(fc.getSelectedFile());
             FileFilter selFilter = fc.getFileFilter();
             try {
@@ -1706,9 +1702,7 @@ public class Main {
         fc.addChoosableFileFilter(binaryFilter);
 
         fc.setAcceptAllFileFilterUsed(false);
-        JFrame f = new JFrame();
-        View.setWindowIcon(f);
-        int returnVal = fc.showOpenDialog(f);
+        int returnVal = fc.showOpenDialog(getDefaultMessagesComponent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             Configuration.lastOpenDir.set(Helper.fixDialogFile(fc.getSelectedFile()).getParentFile().getAbsolutePath());
             File[] selFiles = fc.getSelectedFiles();

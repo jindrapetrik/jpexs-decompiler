@@ -291,9 +291,7 @@ public class AdvancedSettingsDialog extends AppDialog {
         fc.setFileFilter(allSupportedFilter);
 
         fc.setAcceptAllFileFilterUsed(false);
-        JFrame f = new JFrame();
-        View.setWindowIcon(f);
-        int returnVal = fc.showOpenDialog(f);
+        int returnVal = fc.showOpenDialog(Main.getDefaultMessagesComponent());
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             return Helper.fixDialogFile(fc.getSelectedFile()).getAbsolutePath();
         } else {

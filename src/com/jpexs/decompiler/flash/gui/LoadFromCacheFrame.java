@@ -262,9 +262,7 @@ public class LoadFromCacheFrame extends AppFrame {
                 });
             }
             fc.setAcceptAllFileFilterUsed(false);
-            JFrame f = new JFrame();
-            View.setWindowIcon(f);
-            if (fc.showSaveDialog(f) == JFileChooser.APPROVE_OPTION) {
+            if (fc.showSaveDialog(LoadFromCacheFrame.this) == JFileChooser.APPROVE_OPTION) {
                 File file = Helper.fixDialogFile(fc.getSelectedFile());
                 try {
                     if (selected.size() == 1) {
