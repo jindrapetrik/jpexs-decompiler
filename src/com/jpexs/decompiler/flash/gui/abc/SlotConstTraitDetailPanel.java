@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
@@ -115,7 +116,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
                 return false;
             }
         } catch (AVM2ParseException ex) {
-            View.showMessageDialog(slotConstEditor, ex.text, AppStrings.translate("error.slotconst.typevalue"), JOptionPane.ERROR_MESSAGE);
+            ViewMessages.showMessageDialog(slotConstEditor, ex.text, AppStrings.translate("error.slotconst.typevalue"), JOptionPane.ERROR_MESSAGE);
             return false;
         } catch (IOException ex) {
             Logger.getLogger(SlotConstTraitDetailPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -130,7 +131,7 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
     @Override
     public void setEditMode(boolean val) {
         if (val && active) {
-            View.showMessageDialog(null, AppStrings.translate("warning.initializers"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningInitializers);
+            ViewMessages.showMessageDialog(this, AppStrings.translate("warning.initializers"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningInitializers);
         }
         slotConstEditor.setEditable(val);
         if (val) {

@@ -170,7 +170,7 @@ public class FontPanel extends JPanel {
                 if (!font.canDisplay(c)) {
                     String msg = translate("error.font.nocharacter").replace("%char%", "" + c);
                     Logger.getLogger(FontPanel.class.getName()).log(Level.SEVERE, msg);
-                    View.showMessageDialog(null, msg, translate("error"), JOptionPane.ERROR_MESSAGE);
+                    ViewMessages.showMessageDialog(FontPanel.this, msg, translate("error"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
             }
@@ -185,7 +185,7 @@ public class FontPanel extends JPanel {
             if (oldchars.indexOf((int) c) > -1) {
                 int opt = -1;
                 if (!(yestoall || notoall)) {
-                    opt = View.showOptionDialog(null, translate("message.font.add.exists").replace("%char%", "" + c), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, yesno, translate("button.yes"));
+                    opt = ViewMessages.showOptionDialog(FontPanel.this, translate("message.font.add.exists").replace("%char%", "" + c), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, yesno, translate("button.yes"));
                     if (opt == 2) {
                         yestoall = true;
                     }
@@ -212,7 +212,7 @@ public class FontPanel extends JPanel {
         }
 
         if (replaced) {
-            if (View.showConfirmDialog(null, translate("message.font.replace.updateTexts"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) {
+            if (ViewMessages.showConfirmDialog(FontPanel.this, translate("message.font.replace.updateTexts"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE) == JOptionPane.YES_OPTION) {
                 int fontId = ft.getFontId();
                 SWF swf = ft.getSwf();
                 for (Tag tag : swf.getTags()) {
@@ -603,7 +603,7 @@ public class FontPanel extends JPanel {
         TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
         if (item instanceof FontTag) {
             FontTag ft = (FontTag) item;
-            FontEmbedDialog fed = new FontEmbedDialog(ft.hasLayout() || ft.getCharacterCount() == 0, (FontFace) fontFaceSelection.getSelectedItem(), fontAddCharactersField.getText());
+            FontEmbedDialog fed = new FontEmbedDialog(Main.getDefaultDialogsOwner(), ft.hasLayout() || ft.getCharacterCount() == 0, (FontFace) fontFaceSelection.getSelectedItem(), fontAddCharactersField.getText());
             if (fed.showDialog() == AppDialog.OK_OPTION) {
                 Set<Integer> selChars = fed.getSelectedChars();
                 if (!selChars.isEmpty() || fed.isImportAscentDescentLeading()) {
@@ -721,7 +721,7 @@ public class FontPanel extends JPanel {
     }
 
     private void buttonSetAdvanceValuesActionPerformed(ActionEvent evt) {
-        if (View.showConfirmDialog(null, AppStrings.translate("message.font.setadvancevalues"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.showSetAdvanceValuesMessage, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
+        if (ViewMessages.showConfirmDialog(FontPanel.this, AppStrings.translate("message.font.setadvancevalues"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.showSetAdvanceValuesMessage, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
             fontTag.setAdvanceValues(((FontFace) fontFaceSelection.getSelectedItem()).font);
         }
     }

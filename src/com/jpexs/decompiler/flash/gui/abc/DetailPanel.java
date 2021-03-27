@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -319,7 +320,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
                             decompiledTextArea.gotoTrait(lastTrait);
                         }
                         setEditMode(false);
-                        View.showMessageDialog(null, AppStrings.translate("message.trait.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showTraitSavedMessage);
+                        ViewMessages.showMessageDialog(DetailPanel.this, AppStrings.translate("message.trait.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showTraitSavedMessage);
                     }
                 };
 

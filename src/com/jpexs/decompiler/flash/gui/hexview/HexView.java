@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.hexview;
 
 import com.jpexs.decompiler.flash.gui.AppDialog;
+import com.jpexs.decompiler.flash.gui.Main;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -164,7 +165,7 @@ public class HexView extends JTable {
             gotoAddressMenuItem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    Long value = new GotoAddressDialog().showDialog();
+                    Long value = new GotoAddressDialog(Main.getDefaultDialogsOwner()).showDialog();
                     if (value != null) {
                         selectByte(value);
                     }
@@ -253,7 +254,7 @@ public class HexView extends JTable {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.isControlDown() && e.getKeyCode() == 'G') {
-                    Long value = new GotoAddressDialog().showDialog();
+                    Long value = new GotoAddressDialog(Main.getDefaultDialogsOwner()).showDialog();
                     if (value != null) {
                         selectByte(value);
                     }

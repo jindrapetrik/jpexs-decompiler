@@ -40,6 +40,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -120,7 +121,8 @@ public class AddScriptDialog extends AppDialog {
     private List<String> existingClasses = new ArrayList<>();
     private List<Integer> spriteIdsWithDoInitAction;
 
-    public AddScriptDialog(SWF swf) {
+    public AddScriptDialog(Window owner, SWF swf) {
+        super(owner);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setTitle(translate("dialog.title"));
 

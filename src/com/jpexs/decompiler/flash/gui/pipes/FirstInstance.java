@@ -94,7 +94,7 @@ public class FirstInstance {
                                             View.execInEventDispatch(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    Window wnd = Main.getMainFrame().getWindow();
+                                                    Window wnd = Main.getDefaultDialogsOwner();
                                                     wnd.setAlwaysOnTop(true);
                                                     wnd.toFront();
                                                     wnd.requestFocus();

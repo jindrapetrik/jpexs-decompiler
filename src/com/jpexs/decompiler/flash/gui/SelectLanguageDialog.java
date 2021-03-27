@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -43,7 +44,8 @@ public class SelectLanguageDialog extends AppDialog {
 
     protected static final String[] languages = new String[]{"en", "ca", "cs", "zh", "de", "es", "fr", "hu", "it", "ja", "nl", "pl", "pt", "pt-BR", "ru", "sv", "tr", "uk"};
 
-    public SelectLanguageDialog() {
+    public SelectLanguageDialog(Window owner) {
+        super(owner);
         setSize(350, 130);
         Container cnt1 = getContentPane();
         JPanel cnt = new JPanel();

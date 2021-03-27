@@ -418,7 +418,7 @@ public class LoadFromMemoryFrame extends AppFrame {
                     }
                     Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
                 } catch (IOException ex) {
-                    View.showMessageDialog(null, translate("error.file.write"));
+                    ViewMessages.showMessageDialog(this, translate("error.file.write"));
                 }
             }
         }

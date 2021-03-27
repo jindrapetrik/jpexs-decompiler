@@ -45,6 +45,7 @@ import com.jpexs.decompiler.flash.gui.SearchListener;
 import com.jpexs.decompiler.flash.gui.SearchPanel;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.controls.NoneSelectedButtonGroup;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
@@ -1045,7 +1046,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                 try {
                     Action.setConstantPools(src, constantPools, true);
                 } catch (ConstantPoolTooBigException ex) {
-                    View.showMessageDialog(this, AppStrings.translate("error.constantPoolTooBig").replace("%index%", Integer.toString(ex.index)).replace("%size%", Integer.toString(ex.size)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                    ViewMessages.showMessageDialog(this, AppStrings.translate("error.constantPoolTooBig").replace("%index%", Integer.toString(ex.index)).replace("%size%", Integer.toString(ex.size)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
             } else {
                 src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
@@ -1054,7 +1055,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             SWF.uncache(src);
             src.setModified();
             setSource(this.src, false);
-            View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
+            ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
             saveButton.setVisible(false);
             cancelButton.setVisible(false);
             editButton.setVisible(true);
@@ -1065,14 +1066,14 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         } catch (ActionParseException ex) {
             editor.gotoLine((int) ex.line);
             editor.markError();
-            View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
         } catch (Throwable ex) {
             logger.log(Level.SEVERE, null, ex);
         }
     }
 
     private void editDecompiledButtonActionPerformed(ActionEvent evt) {
-        if (View.showConfirmDialog(null, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS12Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
+        if (ViewMessages.showConfirmDialog(this, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS12Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
             setDecompiledEditMode(true);
         }
     }
@@ -1089,18 +1090,18 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             src.setModified();
             setSource(src, false);
 
-            View.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
+            ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
             setDecompiledEditMode(false);
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "IOException during action compiling", ex);
         } catch (ActionParseException ex) {
             decompiledEditor.gotoLine((int) ex.line);
             decompiledEditor.markError();
-            View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
         } catch (CompilationException ex) {
             decompiledEditor.gotoLine((int) ex.line);
             decompiledEditor.markError();
-            View.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
         } catch (Throwable ex) {
             logger.log(Level.SEVERE, null, ex);
         }

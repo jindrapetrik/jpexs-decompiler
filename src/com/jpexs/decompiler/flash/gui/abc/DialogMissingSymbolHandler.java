@@ -20,7 +20,9 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.MissingSymbolHandler;
 import com.jpexs.decompiler.flash.abc.types.Decimal;
 import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.ViewMessages;
 import javax.swing.JOptionPane;
 
 /**
@@ -31,22 +33,22 @@ public class DialogMissingSymbolHandler implements MissingSymbolHandler {
 
     @Override
     public boolean missingString(String value) {
-        return View.showConfirmDialog(null, AppStrings.translate("message.constant.new.string").replace("%value%", value), AppStrings.translate("message.constant.new.string.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
+        return ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("message.constant.new.string").replace("%value%", value), AppStrings.translate("message.constant.new.string.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
     }
 
     @Override
     public boolean missingInt(long value) {
-        return View.showConfirmDialog(null, AppStrings.translate("message.constant.new.integer").replace("%value%", Long.toString(value)), AppStrings.translate("message.constant.new.integer.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
+        return ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("message.constant.new.integer").replace("%value%", Long.toString(value)), AppStrings.translate("message.constant.new.integer.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
     }
 
     @Override
     public boolean missingUInt(long value) {
-        return View.showConfirmDialog(null, AppStrings.translate("message.constant.new.unsignedinteger").replace("%value%", Long.toString(value)), AppStrings.translate("message.constant.new.unsignedinteger.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
+        return ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("message.constant.new.unsignedinteger").replace("%value%", Long.toString(value)), AppStrings.translate("message.constant.new.unsignedinteger.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
     }
 
     @Override
     public boolean missingDouble(double value) {
-        return View.showConfirmDialog(null, AppStrings.translate("message.constant.new.double").replace("%value%", Double.toString(value)), AppStrings.translate("message.constant.new.double.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
+        return ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("message.constant.new.double").replace("%value%", Double.toString(value)), AppStrings.translate("message.constant.new.double.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.OK_OPTION;
     }
 
     @Override

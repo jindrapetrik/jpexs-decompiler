@@ -602,7 +602,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             Path.createDirectorySafe(fTempDir);
 
                             File ftemp = new File(tempDir);
-                            ExportDialog exd = new ExportDialog(null);
+                            ExportDialog exd = new ExportDialog(Main.getDefaultDialogsOwner(), null);
                             try {
                                 files = exportSelection(new GuiAbortRetryIgnoreHandler(), tempDir, exd);
                             } catch (InterruptedException ex) {
@@ -751,7 +751,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         boolean valid;
                         int characterId = -1;
                         do {
-                            val = View.showInputDialog(MainPanel.this, translate("message.input.gotoCharacter"), translate("message.input.gotoCharacter.title"), val);
+                            val = ViewMessages.showInputDialog(MainPanel.this, translate("message.input.gotoCharacter"), translate("message.input.gotoCharacter.title"), val);
                             if (val == null) {
                                 break;
                             }
@@ -765,7 +765,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         if (characterId > 0) {
                             CharacterTag tag = swf.getCharacter(characterId);
                             if (tag == null) {
-                                View.showMessageDialog(MainPanel.this, translate("message.character.notfound").replace("%characterid%", "" + characterId), translate("error"), JOptionPane.ERROR_MESSAGE);
+                                ViewMessages.showMessageDialog(MainPanel.this, translate("message.character.notfound").replace("%characterid%", "" + characterId), translate("error"), JOptionPane.ERROR_MESSAGE);
                             } else {
                                 TreePath path = tagTree.getModel().getTreePath(tag);
                                 if (path != null) {
@@ -958,7 +958,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 ? translate("message.confirm.closeAll")
                 : translate("message.confirm.close").replace("{swfName}", swfList.toString());
 
-        return View.showConfirmDialog(this, message, translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION;
+        return ViewMessages.showConfirmDialog(this, message, translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, Configuration.showCloseConfirmation, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION;
     }
 
     public boolean isModified() {
@@ -1132,11 +1132,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void renameIdentifier(SWF swf, String identifier) throws InterruptedException {
         String oldName = identifier;
-        String newName = View.showInputDialog(translate("rename.enternew"), oldName);
+        String newName = ViewMessages.showInputDialog(this, translate("rename.enternew"), oldName);
         if (newName != null) {
             if (!oldName.equals(newName)) {
                 swf.renameAS2Identifier(oldName, newName);
-                View.showMessageDialog(null, translate("rename.finished.identifier"));
+                ViewMessages.showMessageDialog(this, translate("rename.finished.identifier"));
                 updateClassesList();
                 reload(true);
             }
@@ -1150,7 +1150,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             oldName = constants.getString(constants.getMultiname(multiNameIndex).name_index);
         }
 
-        String newName = View.showInputDialog(translate("rename.enternew"), oldName);
+        String newName = ViewMessages.showInputDialog(this, translate("rename.enternew"), oldName);
         if (newName != null) {
             if (!oldName.equals(newName)) {
                 int mulCount = 0;
@@ -1171,7 +1171,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 int fmulCount = mulCount;
                 View.execInEventDispatch(() -> {
-                    View.showMessageDialog(null, translate("rename.finished.multiname").replace("%count%", Integer.toString(fmulCount)));
+                    ViewMessages.showMessageDialog(this, translate("rename.finished.multiname").replace("%count%", Integer.toString(fmulCount)));
                     if (abcPanel != null) {
                         abcPanel.reload();
                     }
@@ -1212,7 +1212,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public boolean confirmExperimental() {
         View.checkAccess();
 
-        return View.showConfirmDialog(null, translate("message.confirm.experimental"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
+        return ViewMessages.showConfirmDialog(this, translate("message.confirm.experimental"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
     }
 
     public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException, InterruptedException {
@@ -2001,7 +2001,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 sr.setVisible(true);
                                 searchResultsDialogs.add(sr);
                                 if (!found) {
-                                    View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                                    ViewMessages.showMessageDialog(MainPanel.this, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                                 }
 
                                 Main.stopWork();
@@ -2033,7 +2033,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 textSearchPanel.setSearchText(txt);
                                 boolean found = textSearchPanel.setResults(fTextResult);
                                 if (!found) {
-                                    View.showMessageDialog(null, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                                    ViewMessages.showMessageDialog(MainPanel.this, translate("message.search.notfound").replace("%searchtext%", txt), translate("message.search.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
                                 }
 
                                 Main.stopWork();
@@ -2210,7 +2210,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         try {
                             int cnt = get();
                             Main.stopWork();
-                            View.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", Integer.toString(cnt)));
+                            ViewMessages.showMessageDialog(MainPanel.this, translate("message.rename.renamed").replace("%count%", Integer.toString(cnt)));
                             swf.assignClassesToSymbols();
                             swf.clearScriptCache();
                             if (abcPanel != null) {
@@ -2221,7 +2221,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         } catch (Exception ex) {
                             logger.log(Level.SEVERE, "Error during renaming identifiers", ex);
                             Main.stopWork();
-                            View.showMessageDialog(null, translate("error.occured").replace("%error%", ex.getClass().getSimpleName()));
+                            ViewMessages.showMessageDialog(MainPanel.this, translate("error.occured").replace("%error%", ex.getClass().getSimpleName()));
                         }
                     });
                 }
@@ -2260,7 +2260,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }.execute();
 
             } else {
-                View.showMessageDialog(null, translate("message.rename.notfound.multiname"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                ViewMessages.showMessageDialog(MainPanel.this, translate("message.rename.notfound.multiname"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
             final String identifier = getActionPanel().getStringUnderCursor();
@@ -2287,7 +2287,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
                 }.execute();
             } else {
-                View.showMessageDialog(null, translate("message.rename.notfound.identifier"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
+                ViewMessages.showMessageDialog(MainPanel.this, translate("message.rename.notfound.identifier"), translate("message.rename.notfound.title"), JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }
@@ -2377,7 +2377,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         }
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, "FLA export error", ex);
-                        View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
+                        ViewMessages.showMessageDialog(MainPanel.this, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
                     Helper.freeMem();
                     return null;
@@ -2432,14 +2432,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 public boolean handle(TextTag textTag) {
                     String msg = translate("error.text.import");
                     logger.log(Level.SEVERE, "{0}{1}", new Object[]{msg, getTextTagInfo(textTag)});
-                    return View.showConfirmDialog(MainPanel.this, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainImportError, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION;
+                    return ViewMessages.showConfirmDialog(MainPanel.this, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainImportError, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION;
                 }
 
                 @Override
                 public boolean handle(TextTag textTag, String message, long line) {
                     String msg = translate("error.text.invalid.continue").replace("%text%", message).replace("%line%", Long.toString(line));
                     logger.log(Level.SEVERE, "{0}{1}", new Object[]{msg, getTextTagInfo(textTag)});
-                    return View.showConfirmDialog(MainPanel.this, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainInvalidText, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION;
+                    return ViewMessages.showConfirmDialog(MainPanel.this, msg, translate("error"), JOptionPane.OK_CANCEL_OPTION, showAgainInvalidText, JOptionPane.OK_OPTION) != JOptionPane.OK_OPTION;
                 }
             });
 
@@ -2465,16 +2465,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         As3ScriptReplacerInterface r = As3ScriptReplacerFactory.createByConfig();
         if (!r.isAvailable()) {
             if (r instanceof MxmlcAs3ScriptReplacer) {
-                if (View.showConfirmDialog(null, AppStrings.translate("message.flexpath.notset"), AppStrings.translate("error"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+                if (ViewMessages.showConfirmDialog(this, AppStrings.translate("message.flexpath.notset"), AppStrings.translate("error"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
                     Main.advancedSettings("paths");
                 }
             } else if (r instanceof FFDecAs3ScriptReplacer) {
-                if (View.showConfirmDialog(this, AppStrings.translate("message.playerpath.lib.notset"), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+                if (ViewMessages.showConfirmDialog(this, AppStrings.translate("message.playerpath.lib.notset"), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
                     Main.advancedSettings("paths");
                 }
             } else {
                 //Not translated yet - just in case there are more Script replacers in the future. Unused now.
-                View.showConfirmDialog(this, "Current script replacer is not available", "Script replacer not available", JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);
+                ViewMessages.showConfirmDialog(this, "Current script replacer is not available", "Script replacer not available", JOptionPane.OK_OPTION, JOptionPane.ERROR_MESSAGE);
             }
             return null;
         }
@@ -2503,7 +2503,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 updateClassesList();
             }
 
-            View.showMessageDialog(this, translate("import.script.result").replace("%count%", Integer.toString(countAs2 + countAs3)));
+            ViewMessages.showMessageDialog(this, translate("import.script.result").replace("%count%", Integer.toString(countAs2 + countAs3)));
             if (countAs2 != 0 || countAs3 != 0) {
                 reload(true);
             }
@@ -2551,7 +2551,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (sel.isEmpty()) {
             return;
         }
-        final ExportDialog export = new ExportDialog(sel);
+        final ExportDialog export = new ExportDialog(Main.getDefaultDialogsOwner(), sel);
         if (export.showExportDialog() == AppDialog.OK_OPTION) {
             final String selFile = selectExportDir();
             if (selFile != null) {
@@ -2569,7 +2569,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             }
                         } catch (Exception ex) {
                             logger.log(Level.SEVERE, "Error during export", ex);
-                            View.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage());
+                            ViewMessages.showMessageDialog(null, translate("error.export") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage());
                         }
                         return null;
                     }
@@ -2678,7 +2678,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
         if (confirmExperimental()) {
-            RenameDialog renameDialog = new RenameDialog();
+            RenameDialog renameDialog = new RenameDialog(Main.getDefaultDialogsOwner());
             if (renameDialog.showRenameDialog() == AppDialog.OK_OPTION) {
                 final RenameType renameType = renameDialog.getRenameType();
                 new CancellableWorker<Integer>() {
@@ -2699,7 +2699,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             try {
                                 int cnt = get();
                                 Main.stopWork();
-                                View.showMessageDialog(null, translate("message.rename.renamed").replace("%count%", Integer.toString(cnt)));
+                                ViewMessages.showMessageDialog(MainPanel.this, translate("message.rename.renamed").replace("%count%", Integer.toString(cnt)));
                                 swf.assignClassesToSymbols();
                                 swf.clearScriptCache();
                                 if (abcPanel != null) {
@@ -2710,7 +2710,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             } catch (Exception ex) {
                                 logger.log(Level.SEVERE, "Error during renaming identifiers", ex);
                                 Main.stopWork();
-                                View.showMessageDialog(null, translate("error.occured").replace("%error%", ex.getClass().getSimpleName()));
+                                ViewMessages.showMessageDialog(MainPanel.this, translate("error.occured").replace("%error%", ex.getClass().getSimpleName()));
                             }
                         });
                     }
@@ -2722,7 +2722,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void deobfuscate() {
         View.checkAccess();
 
-        DeobfuscationDialog deobfuscationDialog = new DeobfuscationDialog();
+        DeobfuscationDialog deobfuscationDialog = new DeobfuscationDialog(Main.getDefaultDialogsOwner());
         if (deobfuscationDialog.showDialog() == AppDialog.OK_OPTION) {
             DeobfuscationLevel level = DeobfuscationLevel.getByLevel(deobfuscationDialog.codeProcessingLevel.getValue());
             new CancellableWorker() {
@@ -2762,7 +2762,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 protected void done() {
                     View.execInEventDispatch(() -> {
                         Main.stopWork();
-                        View.showMessageDialog(null, translate("work.deobfuscating.complete"));
+                        ViewMessages.showMessageDialog(MainPanel.this, translate("work.deobfuscating.complete"));
 
                         clearAllScriptCache();
                         getABCPanel().reload();
@@ -2915,7 +2915,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 if (f == null || !f.canDisplay(character)) {
                     String msg = translate("error.font.nocharacter").replace("%char%", "" + character);
                     logger.log(Level.SEVERE, "{0} FontId: {1} TextId: {2}", new Object[]{msg, font.getCharacterId(), textTag.getCharacterId()});
-                    ignoreMissingCharacters = View.showConfirmDialog(null, msg, translate("error"),
+                    ignoreMissingCharacters = ViewMessages.showConfirmDialog(MainPanel.this, msg, translate("error"),
                             JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE,
                             showAgainIgnoreMissingCharacters,
                             ignoreMissingCharacters ? JOptionPane.OK_OPTION : JOptionPane.CANCEL_OPTION) == JOptionPane.OK_OPTION;
@@ -2940,7 +2940,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 editor.markError();
             }
 
-            View.showMessageDialog(null, translate("error.text.invalid").replace("%text%", ex.text).replace("%line%", Long.toString(ex.line)), translate("error"), JOptionPane.ERROR_MESSAGE);
+            ViewMessages.showMessageDialog(MainPanel.this, translate("error.text.invalid").replace("%text%", ex.text).replace("%line%", Long.toString(ex.line)), translate("error"), JOptionPane.ERROR_MESSAGE);
         }
 
         return false;
@@ -3033,7 +3033,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             if (!ok) {
-                View.showMessageDialog(null, translate("error.sound.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                ViewMessages.showMessageDialog(this, translate("error.sound.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
             } else {
                 reload(true);
             }
@@ -3053,7 +3053,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     swf.clearImageCache();
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, "Invalid image", ex);
-                    View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                    ViewMessages.showMessageDialog(this, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
 
                 reload(true);
@@ -3081,7 +3081,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 swf.clearImageCache();
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, "Invalid image", ex);
-                View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                ViewMessages.showMessageDialog(MainPanel.this, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
             }
             reload(true);
         }
@@ -3136,7 +3136,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     swf.clearImageCache();
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, "Invalid image", ex);
-                    View.showMessageDialog(null, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                    ViewMessages.showMessageDialog(this, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
                 reload(true);
             }
@@ -3144,7 +3144,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private void showSvgImportWarning() {
-        View.showMessageDialog(null, AppStrings.translate("message.warning.svgImportExperimental"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningSvgImport);
+        ViewMessages.showMessageDialog(this, AppStrings.translate("message.warning.svgImportExperimental"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningSvgImport);
     }
 
     public void replaceAlphaButtonActionPerformed(ActionEvent evt) {
@@ -3166,7 +3166,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         swf.clearImageCache();
                     } catch (IOException ex) {
                         logger.log(Level.SEVERE, "Invalid alpha channel data", ex);
-                        View.showMessageDialog(null, translate("error.image.alpha.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
+                        ViewMessages.showMessageDialog(this, translate("error.image.alpha.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
 
                     reload(true);

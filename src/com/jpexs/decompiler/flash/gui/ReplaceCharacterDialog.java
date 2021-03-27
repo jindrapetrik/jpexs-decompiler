@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.Map;
 import javax.swing.JButton;
@@ -43,7 +44,8 @@ public class ReplaceCharacterDialog extends AppDialog {
 
     private int result = ERROR_OPTION;
 
-    public ReplaceCharacterDialog() {
+    public ReplaceCharacterDialog(Window owner) {
+        super(owner);
         setSize(400, 150);
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         setLayout(new BorderLayout());

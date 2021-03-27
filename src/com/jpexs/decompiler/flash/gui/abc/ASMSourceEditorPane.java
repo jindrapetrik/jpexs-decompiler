@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
@@ -258,7 +259,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         args.put(1, 466561L); //param1
         try {
             Object o = abc.bodies.get(bodyIndex).getCode().execute(args, abc.constants);
-            View.showMessageDialog(this, "Returned object:" + o.toString());
+            ViewMessages.showMessageDialog(this, "Returned object:" + o.toString());
         } catch (AVM2ExecutionException ex) {
             Logger.getLogger(ASMSourceEditorPane.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -324,7 +325,7 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         } catch (AVM2ParseException ex) {
             gotoLine((int) ex.line);
             markError();
-            View.showMessageDialog(Main.getMainFrame().getPanel(), (ex.text + " on line " + ex.line), Main.getMainFrame().translate("error"), JOptionPane.ERROR_MESSAGE);
+            ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), (ex.text + " on line " + ex.line), Main.getMainFrame().translate("error"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
         return true;

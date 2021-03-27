@@ -190,9 +190,9 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                     listeners.add(Main.getMainFrame().getPanel().getActionPanel());
                     SearchResultsDialog sr;
                     if (swf.isAS3()) {
-                        sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
+                        sr = new SearchResultsDialog<>(Main.getDefaultDialogsOwner(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
                     } else {
-                        sr = new SearchResultsDialog<>(Main.getMainFrame().getWindow(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
+                        sr = new SearchResultsDialog<>(Main.getDefaultDialogsOwner(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
                     }
                     sr.setResults(Main.searchResultsStorage.getSearchResultsAt(Main.getMainFrame().getPanel().getAllSwfs(), fi));
                     sr.setVisible(true);
@@ -251,7 +251,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                 historyButton.addActionListener((ActionEvent ae) -> {
                     RecentFilesButton source = (RecentFilesButton) ae.getSource();
                     if (Main.openFile(source.fileName, null) == OpenFileResult.NOT_FOUND) {
-                        if (View.showConfirmDialog(null, translate("message.confirm.recentFileNotFound"), translate("message.confirm"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
+                        if (ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.recentFileNotFound"), translate("message.confirm"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
                             Configuration.removeRecentFile(source.fileName);
                         }
                     }

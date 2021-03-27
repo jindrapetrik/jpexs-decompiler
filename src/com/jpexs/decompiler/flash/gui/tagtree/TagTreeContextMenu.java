@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.ReplaceCharacterDialog;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -797,7 +798,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         SWF swf = itemr.getSwf();
         CharacterTag characterTag = (CharacterTag) itemr;
         int characterId = characterTag.getCharacterId();
-        ReplaceCharacterDialog replaceCharacterDialog = new ReplaceCharacterDialog();
+        ReplaceCharacterDialog replaceCharacterDialog = new ReplaceCharacterDialog(Main.getDefaultDialogsOwner());
         if (replaceCharacterDialog.showDialog(swf, characterId) == AppDialog.OK_OPTION) {
             int newCharacterId = replaceCharacterDialog.getCharacterId();
             swf.replaceCharacterTags(characterTag, newCharacterId);
@@ -846,7 +847,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 String parts[];
                 loopinput:
                 while (true) {
-                    className = View.showInputDialog(AppDialog.translateForDialog("classname", AddScriptDialog.class), className);
+                    className = ViewMessages.showInputDialog(mainPanel, AppDialog.translateForDialog("classname", AddScriptDialog.class), className);
                     if (className == null || className.isEmpty()) {
                         return;
                     }
@@ -856,7 +857,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     DottedChain classNameDc = new DottedChain(parts, "");
                     for (ABCContainerTag ct : swf.getAbcList()) {
                         if (ct.getABC().findClassByName(classNameDc) > -1) {
-                            View.showMessageDialog(mainPanel, AppDialog.translateForDialog("message.classexists", AddScriptDialog.class), mainPanel.translate("error"), JOptionPane.ERROR_MESSAGE);
+                            ViewMessages.showMessageDialog(mainPanel, AppDialog.translateForDialog("message.classexists", AddScriptDialog.class), mainPanel.translate("error"), JOptionPane.ERROR_MESSAGE);
                             continue loopinput;
                         }
                     }
@@ -946,7 +947,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 FolderItem folder = (FolderItem) sel.get(0);
                 SWF swf = folder.getSwf();
 
-                AddScriptDialog addScriptDialog = new AddScriptDialog(swf);
+                AddScriptDialog addScriptDialog = new AddScriptDialog(Main.getDefaultDialogsOwner(), swf);
                 if (addScriptDialog.showDialog() == JOptionPane.OK_OPTION) {
                     if ((addScriptDialog.getScriptType() == AddScriptDialog.TYPE_FRAME)
                             || (addScriptDialog.getScriptType() == AddScriptDialog.TYPE_SPRITE_FRAME)) {
@@ -1475,7 +1476,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 confirmationMessage = mainPanel.translate("message.confirm.removemultiple" + (removeDependencies ? "" : ".nodep")).replace("%count%", Integer.toString(tagsToRemove.size() + itemsToRemove.size() + itemCountFix));
             }
 
-            if (View.showConfirmDialog(this, confirmationMessage, mainPanel.translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+            if (ViewMessages.showConfirmDialog(mainPanel, confirmationMessage, mainPanel.translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
                 if (mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
                     tagTree.clearSelection();
                 }
