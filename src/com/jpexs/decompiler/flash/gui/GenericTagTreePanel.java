@@ -344,8 +344,19 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                         JMenu mBefore = new JMenu(AppStrings.translate("generictag.array.insertbefore").replace("%item%", itemStr));
                                         p.add(mBefore);
                                         mi = new JMenuItem(AppStrings.translate("generictag.array.remove").replace("%item%", itemStr));
-                                        mi.addActionListener((ActionEvent e1) -> {
-                                            removeItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index);
+                                        mi.addActionListener(new ActionListener() {
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                TreePath tps[] = tree.getSelectionPaths();
+                                                for (int t = tps.length - 1; t >= 0; t--) {
+                                                    TreePath tp = tps[t];
+                                                    Object selObject = tp.getLastPathComponent();
+                                                    if (selObject instanceof FieldNode) {
+                                                        final FieldNode fnode = (FieldNode) selObject;
+                                                        removeItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index);
+                                                    }
+                                                }
+                                            }
                                         });
                                         p.add(mi);
                                         JMenu mAfter = new JMenu(AppStrings.translate("generictag.array.insertafter").replace("%item%", itemStr));
@@ -410,7 +421,15 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                             mi.addActionListener(new ActionListener() {
                                                 @Override
                                                 public void actionPerformed(ActionEvent e) {
-                                                    removeItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index);
+                                                    TreePath tps[] = tree.getSelectionPaths();
+                                                    for (int t = tps.length - 1; t >= 0; t--) {
+                                                        TreePath tp = tps[t];
+                                                        Object selObject = tp.getLastPathComponent();
+                                                        if (selObject instanceof FieldNode) {
+                                                            final FieldNode fnode = (FieldNode) selObject;
+                                                            removeItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index);
+                                                        }
+                                                    }
                                                 }
                                             });
                                             p.add(mi);
