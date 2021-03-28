@@ -227,7 +227,23 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
             int[] pixels2 = ((DataBufferInt) img2.getRaster().getDataBuffer()).getData();
             for (int i = 0; i < pixels.length; i++) {
                 int a = alphaData[i] & 0xff;
-                pixels2[i] = (pixels[i] & 0xffffff) | (a << 24);
+                int b = (pixels[i] >> 16) & 0xff;
+                int g = (pixels[i] >> 8) & 0xff;
+                int r = (pixels[i]) & 0xff;
+                r = (int) Math.floor(r * 255.0 / a);
+                g = (int) Math.floor(g * 255.0 / a);
+                b = (int) Math.floor(b * 255.0 / a);
+                if (r > 255) {
+                    r = 255;
+                }
+                if (g > 255) {
+                    g = 255;
+                }
+                if (b > 255) {
+                    b = 255;
+                }
+
+                pixels2[i] = (a << 24) | (b << 16) | (g << 8) | r;
             }
 
             return img2;
