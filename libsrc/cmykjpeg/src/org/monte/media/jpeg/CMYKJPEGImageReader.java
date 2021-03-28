@@ -210,8 +210,8 @@ public class CMYKJPEGImageReader extends ImageReader {
         if (numberOfComponentsInFrame != 4) {
             // Read image with YCC color encoding.
             in.seek(0);
-//            img = readImageFromYCCorGray(in);
-            img = readRGBImageFromYCC(new ImageInputStreamAdapter(in), null);
+            img = ImageIO.read(in); // JPEXS: It's not CMYK, then do Java do it's job
+            //img = readRGBImageFromYCC(new ImageInputStreamAdapter(in), null);
         } else if (numberOfComponentsInFrame == 4) {
 
             // Try to instantiate an ICC_Profile from the app2ICCProfile

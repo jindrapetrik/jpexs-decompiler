@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - AS decompilation - certain combinations of ifs and switch
 - AS3 jump deobfuscator - fix for try..catch clauses
 - [#1669] DefineBitsJPEG3/4 alpha premultiplied
+- [#1671] JPEG images display when not CMYK
 
 ## [14.3.1] - 2021-03-25
 ### Fixed
@@ -2172,6 +2173,7 @@ All notable changes to this project will be documented in this file.
 [#1669]: https://www.free-decompiler.com/flash/issues/1669
 [#1668]: https://www.free-decompiler.com/flash/issues/1668
 [#1670]: https://www.free-decompiler.com/flash/issues/1670
+[#1671]: https://www.free-decompiler.com/flash/issues/1671
 [#1665]: https://www.free-decompiler.com/flash/issues/1665
 [#1661]: https://www.free-decompiler.com/flash/issues/1661
 [#1435]: https://www.free-decompiler.com/flash/issues/1435
