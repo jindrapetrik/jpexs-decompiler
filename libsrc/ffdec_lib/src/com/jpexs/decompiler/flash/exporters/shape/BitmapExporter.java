@@ -38,6 +38,7 @@ import java.awt.Paint;
 import java.awt.Point;
 import java.awt.RadialGradientPaint;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
@@ -77,6 +78,8 @@ public class BitmapExporter extends ShapeExporterBase {
     private Paint fillPaint;
 
     private boolean fillRepeat;
+
+    private boolean fillSmooth;
 
     private AffineTransform fillTransform;
 
@@ -343,6 +346,7 @@ public class BitmapExporter extends ShapeExporterBase {
                 fillPaint = new TexturePaint(img.getBufferedImage(), new java.awt.Rectangle(img.getWidth(), img.getHeight()));
                 fillTransform = matrix.toTransform();
                 fillRepeat = repeat;
+                fillSmooth = smooth;
                 return;
             }
         }
@@ -627,6 +631,12 @@ public class BitmapExporter extends ShapeExporterBase {
                 graphics.setTransform(fillTransform);
                 graphics.setPaint(fillPaint);
 
+                Object interpolationBefore = graphics.getRenderingHint(RenderingHints.KEY_INTERPOLATION);
+                if (fillSmooth) {
+                    graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                } else {
+                    graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                }
                 if (fillRepeat) {
                     if (inverse != null) {
 
@@ -638,6 +648,7 @@ public class BitmapExporter extends ShapeExporterBase {
                 } else {
                     graphics.drawImage(((TexturePaint) fillPaint).getImage(), 0, 0, null);
                 }
+                graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, interpolationBefore);
 
                 graphics.setTransform(oldAf);
                 graphics.setClip(prevClip);
