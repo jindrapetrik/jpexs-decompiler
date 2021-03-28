@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - [#1669] DefineBitsJPEG3/4 alpha premultiplied
 - [#1671] JPEG images display when not CMYK
 - Generic tag editor - remove more items at once
+- [#1669] Flash viewer - Smoothed vs non-smoothed bitmaps
 
 ## [14.3.1] - 2021-03-25
 ### Fixed
