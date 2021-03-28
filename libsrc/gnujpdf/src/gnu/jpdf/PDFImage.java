@@ -61,6 +61,8 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
 
     private String mask;
 
+    private boolean interpolate;
+
     /**
      * Creates a new <code>PDFImage</code> instance.
      *
@@ -74,14 +76,15 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
      *
      * @param img an <code>Image</code> value
      */
-    public PDFImage(Image img, String mask) {
+    public PDFImage(Image img, String mask, boolean interpolate) {
         this();
         this.mask = mask;
+        this.interpolate = interpolate;
         setImage(img, 0, 0, img.getWidth(this), img.getHeight(this), this);
     }
 
     public PDFImage(Image img) {
-        this(img, null);
+        this(img, null, false);
     }
 
     /**
@@ -94,16 +97,17 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
      * @param h an <code>int</code> value
      * @param obs an <code>ImageObserver</code> value
      */
-    public PDFImage(Image img, int x, int y, int w, int h, ImageObserver obs, String mask) {
+    public PDFImage(Image img, int x, int y, int w, int h, ImageObserver obs, String mask, boolean interpolate) {
         this();
         objwidth = w;
         objheight = h;
         this.mask = mask;
+        this.interpolate = interpolate;
         setImage(img, x, y, img.getWidth(this), img.getHeight(this), obs);
     }
 
     public PDFImage(Image img, int x, int y, int w, int h, ImageObserver obs) {
-        this(img, x, y, w, h, obs, null);
+        this(img, x, y, w, h, obs, null, false);
     }
 
     /**
@@ -310,7 +314,10 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
         os.write(Integer.toString(height).getBytes());
         os.write("\n/BitsPerComponent 8\n/ColorSpace /DeviceRGB\n".getBytes());
         if (mask != null) {
-            os.write(("\n/SMask " + mask + "\n").getBytes());
+            os.write(("/SMask " + mask + "\n").getBytes());
+        }
+        if (interpolate) {
+            os.write("/Interpolate true\n".getBytes());
         }
 
         // write the pixels to the stream

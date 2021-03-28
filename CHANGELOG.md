@@ -6,8 +6,8 @@ All notable changes to this project will be documented in this file.
 -  [#1015], [#1466], [#1513] Better error messages during saving, display message on out of memory
 
 ### Fixed
-- PDF Export - NullPointer when font of text is missing
-- PDF Export - Text position on font change
+- PDF export - NullPointer when font of text is missing
+- PDF export - Text position on font change
 - Writing DefineFont2/3 ascent/descent as SI16 - it's UI16
 - [#1660] Empty thumbnail view on remove item
 - [#1669] FILLSTYLE color handling in DefineShape3/4
@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - [#1671] JPEG images display when not CMYK
 - Generic tag editor - remove more items at once
 - [#1669] Flash viewer - Smoothed vs non-smoothed bitmaps
+- PDF export - Smoothed bitmaps
 
 ## [14.3.1] - 2021-03-25
 ### Fixed
