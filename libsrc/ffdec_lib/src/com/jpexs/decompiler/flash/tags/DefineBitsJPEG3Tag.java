@@ -193,9 +193,14 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     protected SerializableImage getImage() {
         try {
             int errorLength = hasErrorHeader(imageData) ? 4 : 0;
-            ByteArrayInputStream bis = new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + errorLength, imageData.getLength() - errorLength);
-
-            BufferedImage image = ImageHelper.read(bis);
+            JpegFixer jpegFixer = new JpegFixer();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                jpegFixer.fixJpeg(new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + errorLength, imageData.getLength() - errorLength), baos);
+            } catch (IOException ex) {
+                Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            BufferedImage image = ImageHelper.read(new ByteArrayInputStream(baos.toByteArray()));
             if (image == null) {
                 Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, "Failed to load image");
                 return null;
