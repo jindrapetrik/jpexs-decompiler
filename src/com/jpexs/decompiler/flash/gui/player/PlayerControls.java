@@ -123,6 +123,8 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
 
     private final int zeroCharacterWidth;
 
+    private final double MAX_ZOOM = 1.0e6; //in larger zooms, flash viewer stops working
+
     static {
         Font font = new JLabel().getFont();
         notUnderlinedFont = font;
@@ -498,7 +500,11 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
     }
 
     private void zoomInButtonActionPerformed(ActionEvent evt) {
-        realZoom = getRealZoom() * ZOOM_MULTIPLIER;
+        double currentRealZoom = getRealZoom();
+        if (currentRealZoom >= MAX_ZOOM) {
+            return;
+        }
+        realZoom = currentRealZoom * ZOOM_MULTIPLIER;
         zoomToFit = false;
         updateZoom();
     }

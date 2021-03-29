@@ -1096,7 +1096,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         private synchronized void calcRect() {
-            if (_img != null) {
+            if (timelined != null) {
                 //int w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
                 //int h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
                 double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
@@ -1130,8 +1130,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 setAllowMove(h > h2 || w > w2);
                 Rectangle r2 = new Rectangle(getWidth() / 2 - w / 2 + offsetPoint.x, getHeight() / 2 - h / 2 + offsetPoint.y, w, h);
                 _rect = r2;
-            } else {
-                _rect = null;
             }
         }
 
@@ -1325,19 +1323,23 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     @Override
     public synchronized void zoom(Zoom zoom) {
+        double zoomDoubleBefore = this.zoom.fit ? getZoomToFit() : this.zoom.value;
+
         boolean modified = this.zoom.value != zoom.value || this.zoom.fit != zoom.fit;
         if (modified) {
             this.zoom = zoom;
             displayObjectCache.clear();
+            if (_rect != null) {
+                double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+                offsetPoint.x = (int) (offsetPoint.x * zoomDouble / zoomDoubleBefore);
+                offsetPoint.y = (int) (offsetPoint.y * zoomDouble / zoomDoubleBefore);
+            }
             redraw();
             if (textTag != null) {
                 setText(textTag, newTextTag);
             }
 
             fireMediaDisplayStateChanged();
-            iconPanel.calcRect();
-            iconPanel.render();
-            iconPanel.repaint();
         }
     }
 
@@ -1896,6 +1898,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return;
         }
 
+        iconPanel.calcRect();
+
         RenderContext renderContext = new RenderContext();
         renderContext.displayObjectCache = displayObjectCache;
         if (cursorPosition != null && freeTransformDepth == -1) {
@@ -2033,6 +2037,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
         } catch (Throwable ex) {
             // swf was closed during the rendering probably
+            ex.printStackTrace();
             return;
         }
         if (display) {
@@ -2240,12 +2245,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     long delay = getMsPerFrame();
                     if (isSingleFrame) {
                         drawFrame(thisTimer, true);
-                        synchronized (ImagePanel.class) {
+                        /*synchronized (ImagePanel.class) {
                             thisTimer.cancel();
                             if (timer == thisTimer) {
                                 timer = null;
                             }
-                        }
+                        }*/
 
                         fireMediaDisplayStateChanged();
                     } else {
