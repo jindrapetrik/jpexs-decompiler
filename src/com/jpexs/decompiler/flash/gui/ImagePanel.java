@@ -45,6 +45,7 @@ import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Reference;
@@ -204,6 +205,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static Cursor shearXCursor;
     private static Cursor shearYCursor;
 
+    private Point offsetPoint = new Point(0, 0);
+    private Rectangle _rect = null;
+
     private static Cursor loadCursor(String name, int x, int y) throws IOException {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Image image = ImageIO.read(MainPanel.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/cursors/" + name + ".png"));
@@ -336,7 +340,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         private SerializableImage _img;
 
-        private Rectangle _rect = null;
 
         private ButtonTag mouseOverButton = null;
 
@@ -346,7 +349,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         private Point dragStart = null;
 
-        private Point offsetPoint = new Point(0, 0);
 
         private synchronized SerializableImage getImg() {
             return _img;
@@ -393,7 +395,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                     g2.setComposite(AlphaComposite.SrcOver);
                     if (rect != null && img != null) {
-                        g2.drawImage(img.getBufferedImage(), rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, 0, 0, img.getWidth(), img.getHeight(), null);
+                        int x = rect.x < 0 ? 0 : rect.x;
+                        int y = rect.y < 0 ? 0 : rect.y;
+                        //x = rect.x;
+                        //y = rect.y;
+                        //System.err.println("rect:" + rect);
+                        g2.drawImage(img.getBufferedImage(), x, y, x + img.getWidth(), y + img.getHeight(), 0, 0, img.getWidth(), img.getHeight(), null);
+
+//rect.x + rect.width, rect.y + rect.height, 0, 0, img.getWidth(), img.getHeight(), null);
+                        //g2.setColor(Color.black);
+                        //g2.drawRect(rect.x, rect.y, rect.width, rect.height);
                     }
                 } finally {
                     if (g2 != null) {
@@ -1087,8 +1098,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         private synchronized void calcRect() {
             if (_img != null) {
-                int w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
-                int h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
+                //int w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
+                //int h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
+                double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+                int w1 = (int) (timelined.getRect().getWidth() * zoomDouble / SWF.unitDivisor);
+                int h1 = (int) (timelined.getRect().getHeight() * zoomDouble / SWF.unitDivisor);
 
                 int w2 = getWidth();
                 int h2 = getHeight();
@@ -1115,7 +1129,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
 
                 setAllowMove(h > h2 || w > w2);
-                _rect = new Rectangle(getWidth() / 2 - w / 2 + offsetPoint.x, getHeight() / 2 - h / 2 + offsetPoint.y, w, h);
+                Rectangle r2 = new Rectangle(getWidth() / 2 - w / 2 + offsetPoint.x, getHeight() / 2 - h / 2 + offsetPoint.y, w, h);
+                _rect = r2;
             } else {
                 _rect = null;
             }
@@ -1321,6 +1336,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
 
             fireMediaDisplayStateChanged();
+            iconPanel.calcRect();
+            iconPanel.render();
+            iconPanel.repaint();
         }
     }
 
@@ -1509,10 +1527,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         image.fillTransparent();
         Matrix m = Matrix.getTranslateInstance(-rect.Xmin * zoomDouble, -rect.Ymin * zoomDouble);
         m.scale(zoomDouble);
-        textTag.toImage(0, 0, 0, new RenderContext(), image, false, m, m, m, new ConstantColorColorTransform(0xFFC0C0C0), zoomDouble, false);
+        textTag.toImage(0, 0, 0, new RenderContext(), image, false, m, m, m, m, new ConstantColorColorTransform(0xFFC0C0C0), zoomDouble, false, new ExportRectangle(rect));
 
         if (newTextTag != null) {
-            newTextTag.toImage(0, 0, 0, new RenderContext(), image, false, m, m, m, new ConstantColorColorTransform(0xFF000000), zoomDouble, false);
+            newTextTag.toImage(0, 0, 0, new RenderContext(), image, false, m, m, m, m, new ConstantColorColorTransform(0xFF000000), zoomDouble, false, new ExportRectangle(rect));
         }
 
         iconPanel.setImg(image);
@@ -1616,7 +1634,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         fireMediaDisplayStateChanged();
     }
 
-    private static SerializableImage getFrame(SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, int selectedDepth, int freeTransformDepth, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix) {
+    private static SerializableImage getFrame(ExportRectangle viewRect, SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, int selectedDepth, int freeTransformDepth, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix) {
         Timeline timeline = drawable.getTimeline();
         //int mouseButton = renderContext.mouseButton;
         //Point cursorPosition = renderContext.cursorPosition;
@@ -1627,16 +1645,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         //boolean shouldCache = timeline.isSingleFrame(frame);
         RECT rect = drawable.getRect();
 
-        int width = (int) (rect.getWidth() * zoom);
-        int height = (int) (rect.getHeight() * zoom);
+        int width = (int) (viewRect.getWidth() * zoom); //int) (rect.getWidth() * zoom);
+        int height = (int) (viewRect.getHeight() * zoom);//(int) (rect.getHeight() * zoom);(int) (rect.getHeight() * zoom);
         SerializableImage image = new SerializableImage((int) Math.ceil(width / SWF.unitDivisor),
                 (int) Math.ceil(height / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB);
         //renderContext.borderImage = new SerializableImage(image.getWidth(), image.getHeight(), SerializableImage.TYPE_INT_ARGB);
         image.fillTransparent();
 
         Matrix m = new Matrix();
-        m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
+        //m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
+        m.translate(-viewRect.xMin * zoom, -viewRect.yMin * zoom);
         m.scale(zoom);
+
+        Matrix fullM = m.clone();
+        //fullM.translate(viewRect.xMin * zoom, viewRect.yMin * zoom);
         MATRIX oldMatrix = null;
         if (freeTransformDepth > -1) {
 
@@ -1648,7 +1670,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             timeline.getFrame(frame).layers.get(freeTransformDepth).matrix = newMatrix;
         }
 
-        timeline.toImage(frame, time, renderContext, image, false, m, new Matrix(), m, null, zoom, false);
+        timeline.toImage(frame, time, renderContext, image, false, m, new Matrix(), m, null, zoom, false, viewRect, fullM);
 
         Graphics2D gg = (Graphics2D) image.getGraphics();
         gg.setStroke(new BasicStroke(3));
@@ -1908,7 +1930,61 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 synchronized (lock) {
                     Reference<Point2D> registrationPointRef = new Reference<>(registrationPoint);
                     Reference<Rectangle2D> boundsRef = new Reference<>(bounds);
-                    img = getFrame(swf, frame, time, timelined, renderContext, selectedDepth, freeTransformDepth, zoomDouble, registrationPointRef, boundsRef, transform, transformUpdated == null ? null : new Matrix(transformUpdated));
+
+                    ExportRectangle aRect;
+                    if (_rect == null) {
+                        aRect = new ExportRectangle(timelined.getRectWithStrokes());
+                        aRect.xMin /= SWF.unitDivisor;
+                        aRect.xMax /= SWF.unitDivisor;
+                        aRect.yMin /= SWF.unitDivisor;
+                        aRect.yMax /= SWF.unitDivisor;
+                        aRect.xMin *= zoomDouble;
+                        aRect.xMax *= zoomDouble;
+                        aRect.yMin *= zoomDouble;
+                        aRect.yMax *= zoomDouble;
+                    } else {
+                        aRect = new ExportRectangle(_rect);
+                    }
+
+                    ExportRectangle viewRect = new ExportRectangle(new RECT());
+
+
+                    if (aRect.xMin >= 0) {
+                        viewRect.xMin = 0;
+                    } else {
+                        viewRect.xMin = -aRect.xMin;
+                    }
+                    double w = timelined.getRect().getWidth() * zoomDouble / SWF.unitDivisor;
+                    if (w - viewRect.xMin > iconPanel.getWidth()) {
+                        viewRect.xMax = viewRect.xMin + iconPanel.getWidth();
+                    } else {
+                        viewRect.xMax = w;
+                    }
+
+                    if (aRect.yMin >= 0) {
+                        viewRect.yMin = 0;
+                    } else {
+                        viewRect.yMin = -aRect.yMin;
+                    }
+                    double h = timelined.getRect().getHeight() * zoomDouble / SWF.unitDivisor;
+
+                    if (h - viewRect.yMin > iconPanel.getHeight()) {
+                        viewRect.yMax = viewRect.yMin + iconPanel.getHeight();
+                    } else {
+                        viewRect.yMax = h;
+                    }
+
+                    viewRect.xMin *= SWF.unitDivisor;
+                    viewRect.xMax *= SWF.unitDivisor;
+                    viewRect.yMin *= SWF.unitDivisor;
+                    viewRect.yMax *= SWF.unitDivisor;
+
+                    viewRect.xMin /= zoomDouble;
+                    viewRect.xMax /= zoomDouble;
+                    viewRect.yMin /= zoomDouble;
+                    viewRect.yMax /= zoomDouble;
+
+                    img = getFrame(viewRect, swf, frame, time, timelined, renderContext, selectedDepth, freeTransformDepth, zoomDouble, registrationPointRef, boundsRef, transform, transformUpdated == null ? null : new Matrix(transformUpdated));
                     bounds = boundsRef.getVal();
                     registrationPoint = registrationPointRef.getVal();
                 }

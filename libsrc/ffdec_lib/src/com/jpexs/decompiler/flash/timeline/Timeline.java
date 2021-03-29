@@ -616,7 +616,7 @@ public class Timeline {
      toImage(frame, time, renderContext, image, isClip, transforms[i], absoluteTransformation, colorTransform, targetRect[i]);
      }
      }*/
-    private void drawDrawable(Matrix strokeTransform, DepthState layer, Matrix layerMatrix, Graphics2D g, ColorTransform colorTransForm, int blendMode, List<Clip> clips, Matrix transformation, boolean isClip, int clipDepth, Matrix absMat, int time, int ratio, RenderContext renderContext, SerializableImage image, DrawableTag drawable, List<FILTER> filters, double unzoom, ColorTransform clrTrans, boolean sameImage) {
+    private void drawDrawable(Matrix strokeTransform, DepthState layer, Matrix layerMatrix, Graphics2D g, ColorTransform colorTransForm, int blendMode, List<Clip> clips, Matrix transformation, boolean isClip, int clipDepth, Matrix absMat, int time, int ratio, RenderContext renderContext, SerializableImage image, DrawableTag drawable, List<FILTER> filters, double unzoom, ColorTransform clrTrans, boolean sameImage, ExportRectangle viewRect, Matrix fullTransformation) {
         Matrix drawMatrix = new Matrix();
         int drawableFrameCount = drawable.getNumFrames();
         if (drawableFrameCount == 0) {
@@ -628,6 +628,32 @@ public class Timeline {
         ExportRectangle rect = new ExportRectangle(boundRect);
         Matrix mat = transformation.concatenate(layerMatrix);
         rect = mat.transform(rect);
+
+
+        ExportRectangle viewRectZoom = new ExportRectangle(viewRect);
+        viewRectZoom.xMin *= unzoom;
+        viewRectZoom.xMax *= unzoom;
+        viewRectZoom.yMin *= unzoom;
+        viewRectZoom.yMax *= unzoom;
+
+        viewRectZoom.xMax -= viewRectZoom.xMin;
+        viewRectZoom.xMin = 0;
+        viewRectZoom.yMax -= viewRectZoom.yMin;
+        viewRectZoom.yMin = 0;
+
+        /*viewRectZoom.yMin += 5;
+        viewRectZoom.xMin += 5;
+        viewRectZoom.xMax -= 5;
+        viewRectZoom.yMax -= 5;*/
+
+        g.setColor(Color.green);
+        g.setTransform(drawMatrix.toTransform());
+
+        ExportRectangle fullRect = fullTransformation.concatenate(layerMatrix).transform(new ExportRectangle(boundRect));
+        if (!viewRectZoom.intersects(fullRect)) {
+            //System.err.println("hidden " + layer.characterId);
+            return;
+        }
 
         strokeTransform = strokeTransform.concatenate(layerMatrix);
 
@@ -729,6 +755,7 @@ public class Timeline {
             img = new SerializableImage(newWidth, newHeight, SerializableImage.TYPE_INT_ARGB_PRE);
             img.fillTransparent();
 
+            Matrix mfull = mat.clone();
             if (canUseSameImage && sameImage) {
                 img = image;
                 m = mat.clone();
@@ -760,7 +787,7 @@ public class Timeline {
             }
 
             if (!(drawable instanceof ImageTag) || (swf.isAS3() && layer.hasImage)) {
-                drawable.toImage(dframe, time, ratio, renderContext, img, isClip || clipDepth > -1, m, strokeTransform, absMat, clrTrans2, unzoom, sameImage);
+                drawable.toImage(dframe, time, ratio, renderContext, img, isClip || clipDepth > -1, m, strokeTransform, absMat, mfull, clrTrans2, unzoom, sameImage, viewRect);
             } else {
                 // todo: show one time warning
             }
@@ -885,7 +912,7 @@ public class Timeline {
         }
     }
 
-    public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage) {
+    public void toImage(int frame, int time, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, Matrix fullTransformation) {
         //double unzoom = SWF.unitDivisor;
         //unzoom = SWF.unitDivisor;
         if (getFrameCount() <= frame) {
@@ -1015,26 +1042,15 @@ public class Timeline {
 
                                 Rectangle2D r = new Rectangle2D.Double(p1.xMin, p1.yMin, p1.getWidth(), p1.getHeight());
                                 g.setClip(r);
-                                drawDrawable(strokeTransformation.preConcatenate(layerMatrix), layer, transforms[s], g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage);
+                                drawDrawable(strokeTransformation.preConcatenate(layerMatrix), layer, transforms[s], g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, fullTransformation);
                                 s++;
                             }
                         }
                         g.setClip(c);
 
-                        /*
-                     for (int s = 0; s < 9; s++) {
-                     g.setTransform(new AffineTransform());
-                     ExportRectangle p1 = transformation.transform(targetRect[s]);
-                     g.setClip(c);
-
-                     Rectangle2D r = new Rectangle2D.Double(p1.xMin, p1.yMin, p1.getWidth(), p1.getHeight());
-                     g.setColor(Color.blue);
-                     g.draw(r);
-
-                     }*/
                         g.setTransform(origTransform);
                     } else {
-                        drawDrawable(strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage);
+                        drawDrawable(strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, fullTransformation);
                     }
                 } else if (character instanceof BoundedTag) {
                     showPlaceholder = true;

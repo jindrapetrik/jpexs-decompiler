@@ -13,6 +13,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
     private List<List<GraphPart>> listParts = new ArrayList<>();
     private List<GraphPart> currentParts = new ArrayList<>();
 
+    @SuppressWarnings("unchecked")
     public GraphPartMarkedArrayList(Collection<? extends E> collection) {
         super(collection);
         if (collection instanceof GraphPartMarkedArrayList) {
@@ -64,6 +65,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
         return -1;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean addAll(Collection<? extends E> c) {
         if (c instanceof GraphPartMarkedArrayList) {
@@ -78,6 +80,7 @@ public class GraphPartMarkedArrayList<E> extends ArrayList<E> {
         return super.addAll(c);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
         if (c instanceof GraphPartMarkedArrayList) {

@@ -76,6 +76,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
 import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.script.AS2ScriptExporter;
@@ -2908,7 +2909,8 @@ public final class SWF implements SWFContainerItem, Timelined {
         RenderContext renderContext = new RenderContext();
         renderContext.cursorPosition = cursorPosition;
         renderContext.mouseButton = mouseButton;
-        timeline.toImage(frame, time, renderContext, image, false, m, new Matrix(), m, colorTransform, zoom, false);
+        ExportRectangle viewRect = new ExportRectangle(rect);
+        timeline.toImage(frame, time, renderContext, image, false, m, new Matrix(), m, colorTransform, zoom, false, viewRect, m);
 
         return image;
     }

@@ -558,7 +558,7 @@ public class FrameExporter {
                             renderContext.stateUnderCursor = new ArrayList<>();
 
                             try {
-                                tim.toImage(fframe, fframe, renderContext, image, false, m, new Matrix(), m, null, zoom, true);
+                                tim.toImage(fframe, fframe, renderContext, image, false, m, new Matrix(), m, null, zoom, true, new ExportRectangle(rect), m);
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }
