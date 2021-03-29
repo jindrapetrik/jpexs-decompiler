@@ -64,6 +64,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
@@ -877,13 +878,16 @@ public class Timeline {
             clips.add(clip);
         } else {
             if (renderContext.cursorPosition != null) {
+                int dx = (int) (viewRect.xMin * unzoom);
+                int dy = (int) (viewRect.yMin * unzoom);
+                Point cursorPositionInView = new Point(renderContext.cursorPosition.x - dx, renderContext.cursorPosition.y - dy);
                 if (drawable instanceof DefineSpriteTag) {
                     if (renderContext.stateUnderCursor.size() > stateCount) {
                         renderContext.stateUnderCursor.add(layer);
                     }
-                } else if (absMat.transform(new ExportRectangle(boundRect)).contains(renderContext.cursorPosition)) {
+                } else if (absMat.transform(new ExportRectangle(boundRect)).contains(cursorPositionInView)) {
                     Shape shape = drawable.getOutline(dframe, time, layer.ratio, renderContext, absMat, true);
-                    if (shape.contains(renderContext.cursorPosition)) {
+                    if (shape.contains(cursorPositionInView)) {
                         renderContext.stateUnderCursor.add(layer);
                     }
                 }

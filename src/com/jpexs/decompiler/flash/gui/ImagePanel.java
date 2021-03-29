@@ -1085,8 +1085,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (_img == null) {
                 return null;
             }
-
-            return new Point((p.x - _rect.x) * _img.getWidth() / _rect.width, (p.y - _rect.y) * _img.getHeight() / _rect.height);
+            return new Point((p.x - _rect.x), (p.y - _rect.y));
         }
 
         private void setAllowMove(boolean allowMove) {
