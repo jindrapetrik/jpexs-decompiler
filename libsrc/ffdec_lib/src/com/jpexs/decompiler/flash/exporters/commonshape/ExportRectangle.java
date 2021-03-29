@@ -12,11 +12,14 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.commonshape;
 
 import com.jpexs.decompiler.flash.types.RECT;
 import java.awt.geom.Rectangle2D;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -44,6 +47,13 @@ public class ExportRectangle {
         this.yMin = rect.Ymin;
         this.xMax = rect.Xmax;
         this.yMax = rect.Ymax;
+    }
+
+    public ExportRectangle(ExportRectangle rect) {
+        this.xMin = rect.xMin;
+        this.yMin = rect.yMin;
+        this.xMax = rect.xMax;
+        this.yMax = rect.yMax;
     }
 
     public ExportRectangle(Rectangle2D rect) {
@@ -96,4 +106,19 @@ public class ExportRectangle {
         return "[ExportRectangle x=" + xMin + ",y=" + yMin + ", w=" + getWidth() + ", h=" + getHeight() + "]";
     }
 
+    public boolean intersects(ExportRectangle rect) {
+        if (xMax < rect.xMin) {
+            return false;
+        }
+        if (yMax < rect.yMin) {
+            return false;
+        }
+        if (xMin > rect.xMax) {
+            return false;
+        }
+        if (yMin > rect.yMax) {
+            return false;
+        }
+        return true; //?
+    }
 }

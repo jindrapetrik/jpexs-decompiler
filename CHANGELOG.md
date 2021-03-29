@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - Generic tag editor - remove more items at once
 - [#1669] Flash viewer - Smoothed vs non-smoothed bitmaps
 - PDF export - Smoothed bitmaps
+- Flash viewer - slow on larger zooms (now only diplayed rect is rendered)
 
 ## [14.3.1] - 2021-03-25
 ### Fixed

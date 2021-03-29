@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -45,7 +46,7 @@ public abstract class DrawableTag extends CharacterTag implements BoundedTag {
 
     public abstract Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked);
 
-    public abstract void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage);
+    public abstract void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect);
 
     public abstract void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException;
 

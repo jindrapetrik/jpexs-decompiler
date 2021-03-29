@@ -961,7 +961,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage) {
+    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect) {
         render(TextRenderMode.BITMAP, image, null, null, transformation, colorTransform, 1);
     }
 
