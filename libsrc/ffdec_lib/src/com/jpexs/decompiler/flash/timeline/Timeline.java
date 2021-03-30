@@ -732,8 +732,12 @@ public class Timeline {
             if (drawable instanceof ButtonTag) {
                 dframe = ButtonTag.FRAME_UP;
                 if (renderContext.cursorPosition != null) {
+                    int dx = (int) (viewRect.xMin * unzoom);
+                    int dy = (int) (viewRect.yMin * unzoom);
+                    Point cursorPositionInView = new Point(renderContext.cursorPosition.x - dx, renderContext.cursorPosition.y - dy);
+
                     Shape buttonShape = drawable.getOutline(ButtonTag.FRAME_HITTEST, time, ratio, renderContext, absMat, true);
-                    if (buttonShape.contains(renderContext.cursorPosition)) {
+                    if (buttonShape.contains(cursorPositionInView)) {
                         renderContext.mouseOverButton = (ButtonTag) drawable;
                         if (renderContext.mouseButton > 0) {
                             dframe = ButtonTag.FRAME_DOWN;
