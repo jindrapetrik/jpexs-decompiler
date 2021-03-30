@@ -218,6 +218,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private ExportRectangle _viewRect = new ExportRectangle(0, 0, 1, 1);
 
+    private boolean playing = false;
+
     private static Cursor loadCursor(String name, int x, int y) throws IOException {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Image image = ImageIO.read(MainPanel.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/cursors/" + name + ".png"));
@@ -1650,6 +1652,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     public void pause() {
         stopInternal();
         redraw();
+        fireMediaDisplayStateChanged();
     }
 
     @Override
@@ -1657,6 +1660,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         stopInternal();
         rewind();
         redraw();
+        fireMediaDisplayStateChanged();
     }
 
     @Override
@@ -2396,6 +2400,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             delay = nextFrameOverMaxTimeMsShouldBe - afterDrawFrameTimeMsIs;
                         }
                     }
+                    synchronized (ImagePanel.class) {
+                        if (timer != thisTimer) {
+                            return;
+                        }
+                    }
                     //schedule next run of the task
                     scheduleTask(isSingleFrame, delay);
 
@@ -2411,6 +2420,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private synchronized void startTimer(Timeline timeline, boolean playing) {
 
+        this.playing = playing;
         startRun = System.currentTimeMillis();
         startFrame = frame;
         float frameRate = timeline.frameRate;
@@ -2448,7 +2458,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return false;
         }
 
-        return (timelined.getTimeline().getFrameCount() <= 1) || (timer != null);
+        return this.playing;
     }
 
     @Override
