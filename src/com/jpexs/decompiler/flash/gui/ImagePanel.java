@@ -1121,6 +1121,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (_img == null) {
                 return null;
             }
+
+            if (timelined != null) {
+                double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+                int w1 = (int) (timelined.getRect().Xmin * zoomDouble / SWF.unitDivisor);
+                int h1 = (int) (timelined.getRect().Ymin * zoomDouble / SWF.unitDivisor);
+                return new Point((p.x - _rect.x + w1), (p.y - _rect.y + h1));
+            }
             return new Point((p.x - _rect.x), (p.y - _rect.y));
         }
 
@@ -1136,7 +1143,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         private synchronized Rectangle calcRect(Zoom z) {
-            if (_img != null) {
+            if (_img != null || timelined != null) {
                 //int w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
                 //int h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
                 double zoomDouble = z.fit ? getZoomToFit() : z.value;
@@ -1982,18 +1989,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                     ExportRectangle aRect;
                     if (_rect == null) {
-                        aRect = new ExportRectangle(timelined.getRectWithStrokes());
-                        aRect.xMin /= SWF.unitDivisor;
-                        aRect.xMax /= SWF.unitDivisor;
-                        aRect.yMin /= SWF.unitDivisor;
-                        aRect.yMax /= SWF.unitDivisor;
-                        aRect.xMin *= zoomDouble;
-                        aRect.xMax *= zoomDouble;
-                        aRect.yMin *= zoomDouble;
-                        aRect.yMax *= zoomDouble;
-                    } else {
-                        aRect = new ExportRectangle(_rect);
+                        iconPanel.calcRect();
                     }
+                    aRect = new ExportRectangle(_rect);
+
 
                     ExportRectangle viewRect = new ExportRectangle(new RECT());
 
@@ -2002,7 +2001,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     } else {
                         viewRect.xMin = -aRect.xMin;
                     }
-                    double w = timelined.getRect().Xmax * zoomDouble / SWF.unitDivisor;
+
+                    RECT timRect = timelined.getRectWithStrokes();
+
+                    double w = timRect.Xmax * zoomDouble / SWF.unitDivisor;
                     if (w - viewRect.xMin > iconPanel.getWidth()) {
                         viewRect.xMax = viewRect.xMin + iconPanel.getWidth();
                     } else {
@@ -2014,7 +2016,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     } else {
                         viewRect.yMin = -aRect.yMin;
                     }
-                    double h = timelined.getRect().Ymax * zoomDouble / SWF.unitDivisor;
+                    double h = timRect.Xmax * zoomDouble / SWF.unitDivisor;
 
                     if (h - viewRect.yMin > iconPanel.getHeight()) {
                         viewRect.yMax = viewRect.yMin + iconPanel.getHeight();
@@ -2031,6 +2033,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     viewRect.xMax /= zoomDouble;
                     viewRect.yMin /= zoomDouble;
                     viewRect.yMax /= zoomDouble;
+
+                    viewRect.xMin += timRect.Xmin;
+                    viewRect.yMin += timRect.Ymin;
 
                     if (viewRect.getHeight() < 0 || viewRect.getWidth() < 0) {
                         img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
