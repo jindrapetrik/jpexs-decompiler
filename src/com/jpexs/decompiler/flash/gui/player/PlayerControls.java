@@ -48,6 +48,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -334,7 +335,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         }
 
         View.execInEventDispatchLater(() -> {
-            updateZoom();
+            //updateZoom();
             int totalFrames = display.getTotalFrames();
             int currentFrame = display.getCurrentFrame();
             if (currentFrame >= totalFrames) {
@@ -344,6 +345,15 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
             Zoom zoom = display.getZoom();
             zoomFitButton.setVisible(zoom != null);
             percentLabel.setVisible(zoom != null);
+            Zoom currentZoom = new Zoom();
+            currentZoom.fit = zoomToFit;
+            currentZoom.value = realZoom;
+            if (zoom != null && !Objects.equals(zoom, currentZoom)) {
+                zoomToFit = zoom.fit;
+                realZoom = zoom.value;
+                updateZoomDisplay();
+            }
+
             zoomPanel.setVisible(display.zoomAvailable());
             boolean screenAvailable = display.screenAvailable();
             snapshotButton.setVisible(screenAvailable);
@@ -400,10 +410,9 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         return bd.doubleValue();
     }
 
-    private void updateZoom() {
+    private void updateZoomDisplay() {
         double pctzoom = roundZoom(getRealZoom() * 100, 3);
         String r = Double.toString(pctzoom);
-        double zoom = pctzoom / 100.0;
         if (r.endsWith(".0")) {
             r = r.substring(0, r.length() - 2);
         }
@@ -416,6 +425,12 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
             percentLabel.setText(r);
         }
 
+    }
+
+    private void updateZoom() {
+        updateZoomDisplay();
+        double pctzoom = roundZoom(getRealZoom() * 100, 3);
+        double zoom = pctzoom / 100.0;
         Zoom zoomObj = new Zoom();
         zoomObj.value = zoom;
         zoomObj.fit = zoomToFit;

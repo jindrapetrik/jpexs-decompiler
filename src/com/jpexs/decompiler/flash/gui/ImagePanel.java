@@ -59,19 +59,26 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.Transparency;
+import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
@@ -81,6 +88,7 @@ import java.awt.image.VolatileImage;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -340,7 +348,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         private SerializableImage _img;
 
-
         private ButtonTag mouseOverButton = null;
 
         private boolean autoFit = false;
@@ -348,7 +355,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         private boolean allowMove = true;
 
         private Point dragStart = null;
-
 
         private synchronized SerializableImage getImg() {
             return _img;
@@ -415,7 +421,21 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             } while (ri.contentsLost());
         }
 
+        private boolean ctrlDown = false;
+
         public IconPanel() {
+
+            KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+            manager.addKeyEventDispatcher(new KeyEventDispatcher() {
+                @Override
+                public boolean dispatchKeyEvent(KeyEvent e) {
+                    if ((e.getID() == KeyEvent.KEY_PRESSED) || (e.getID() == KeyEvent.KEY_RELEASED)) {
+                        ctrlDown = ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) == InputEvent.CTRL_DOWN_MASK);
+                    }
+                    return false;
+                }
+            });
+
             addComponentListener(new ComponentAdapter() {
                 @Override
                 public void componentResized(ComponentEvent e) {
@@ -439,6 +459,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (e.getButton() == MouseEvent.BUTTON1) {
                         dragStart = e.getPoint();
                     }
+                    requestFocusInWindow();
                 }
 
                 @Override
@@ -1057,9 +1078,24 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
                 }
 
+                @Override
+                public void mouseWheelMoved(MouseWheelEvent e) {
+                    if (ctrlDown) {
+                        if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+                            int rotation = e.getWheelRotation();
+                            if (rotation < 0) {
+                                zoomIn();
+                            } else {
+                                zoomOut();
+                            }
+                        }
+                    }
+                }
+
             };
             addMouseListener(mouseInputAdapter);
             addMouseMotionListener(mouseInputAdapter);
+            addMouseWheelListener(mouseInputAdapter);
         }
 
         public void setAutoFit(boolean autoFit) {
@@ -1096,12 +1132,23 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         private synchronized void calcRect() {
-            if (timelined != null) {
+            _rect = calcRect(zoom);
+        }
+
+        private synchronized Rectangle calcRect(Zoom z) {
+            if (_img != null) {
                 //int w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
                 //int h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
-                double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
-                int w1 = (int) (timelined.getRect().getWidth() * zoomDouble / SWF.unitDivisor);
-                int h1 = (int) (timelined.getRect().getHeight() * zoomDouble / SWF.unitDivisor);
+                double zoomDouble = z.fit ? getZoomToFit() : z.value;
+                int w1;
+                int h1;
+                if (timelined != null) {
+                    w1 = (int) (timelined.getRect().Xmax * zoomDouble / SWF.unitDivisor);
+                    h1 = (int) (timelined.getRect().Ymax * zoomDouble / SWF.unitDivisor);
+                } else {
+                    w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
+                    h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
+                }
 
                 int w2 = getWidth();
                 int h2 = getHeight();
@@ -1129,8 +1176,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 setAllowMove(h > h2 || w > w2);
                 Rectangle r2 = new Rectangle(getWidth() / 2 - w / 2 + offsetPoint.x, getHeight() / 2 - h / 2 + offsetPoint.y, w, h);
-                _rect = r2;
+                return r2;
             }
+            return null;
         }
 
         @Override
@@ -1329,11 +1377,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (modified) {
             this.zoom = zoom;
             displayObjectCache.clear();
-            if (_rect != null) {
-                double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
-                offsetPoint.x = (int) (offsetPoint.x * zoomDouble / zoomDoubleBefore);
-                offsetPoint.y = (int) (offsetPoint.y * zoomDouble / zoomDoubleBefore);
-            }
+            double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+            //offsetPoint.x = (int) (offsetPoint.x * zoomDouble / zoomDoubleBefore);
+            //offsetPoint.y = (int) (offsetPoint.y * zoomDouble / zoomDoubleBefore);
             redraw();
             if (textTag != null) {
                 setText(textTag, newTextTag);
@@ -1521,8 +1567,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
 
         RECT rect = textTag.getRect();
-        int width = (int) (rect.getWidth() * zoomDouble);
-        int height = (int) (rect.getHeight() * zoomDouble);
+        int width = (int) (rect.Xmax * zoomDouble);
+        int height = (int) (rect.Ymax * zoomDouble);
         SerializableImage image = new SerializableImage((int) (width / SWF.unitDivisor) + 1,
                 (int) (height / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB);
         image.fillTransparent();
@@ -1951,13 +1997,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                     ExportRectangle viewRect = new ExportRectangle(new RECT());
 
-
                     if (aRect.xMin >= 0) {
                         viewRect.xMin = 0;
                     } else {
                         viewRect.xMin = -aRect.xMin;
                     }
-                    double w = timelined.getRect().getWidth() * zoomDouble / SWF.unitDivisor;
+                    double w = timelined.getRect().Xmax * zoomDouble / SWF.unitDivisor;
                     if (w - viewRect.xMin > iconPanel.getWidth()) {
                         viewRect.xMax = viewRect.xMin + iconPanel.getWidth();
                     } else {
@@ -1969,7 +2014,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     } else {
                         viewRect.yMin = -aRect.yMin;
                     }
-                    double h = timelined.getRect().getHeight() * zoomDouble / SWF.unitDivisor;
+                    double h = timelined.getRect().Ymax * zoomDouble / SWF.unitDivisor;
 
                     if (h - viewRect.yMin > iconPanel.getHeight()) {
                         viewRect.yMax = viewRect.yMin + iconPanel.getHeight();
@@ -1987,7 +2032,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     viewRect.yMin /= zoomDouble;
                     viewRect.yMax /= zoomDouble;
 
-                    img = getFrame(viewRect, swf, frame, time, timelined, renderContext, selectedDepth, freeTransformDepth, zoomDouble, registrationPointRef, boundsRef, transform, transformUpdated == null ? null : new Matrix(transformUpdated));
+                    if (viewRect.getHeight() < 0 || viewRect.getWidth() < 0) {
+                        img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+                    } else {
+                        img = getFrame(viewRect, swf, frame, time, timelined, renderContext, selectedDepth, freeTransformDepth, zoomDouble, registrationPointRef, boundsRef, transform, transformUpdated == null ? null : new Matrix(transformUpdated));
+                    }
                     bounds = boundsRef.getVal();
                     registrationPoint = registrationPointRef.getVal();
                 }
@@ -2403,5 +2452,58 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     @Override
     public synchronized Zoom getZoom() {
         return zoom;
+    }
+
+    private static final int ZOOM_DECADE_STEPS = 10;
+
+    private static final double ZOOM_MULTIPLIER = Math.pow(10, 1.0 / ZOOM_DECADE_STEPS);
+
+    private double getRealZoom() {
+        if (zoom.fit) {
+            return getZoomToFit();
+        }
+
+        return zoom.value;
+    }
+
+    private final double MAX_ZOOM = 1.0e6; //in larger zooms, flash viewer stops working
+
+    private synchronized void zoomIn() {
+        double currentRealZoom = getRealZoom();
+        if (currentRealZoom >= MAX_ZOOM) {
+            return;
+        }
+        Zoom newZoom = new Zoom();
+        newZoom.value = currentRealZoom * ZOOM_MULTIPLIER;
+        newZoom.fit = false;
+
+        if (cursorPosition != null) {
+            Point aCursor = iconPanel.toImagePoint(cursorPosition);
+
+            Rectangle curRect = iconPanel.calcRect(zoom);
+            Rectangle newRect = iconPanel.calcRect(newZoom);
+
+            offsetPoint.x = (int) (aCursor.x + curRect.x + offsetPoint.x - aCursor.x * newZoom.value / zoom.value - newRect.x);
+            offsetPoint.y = (int) (aCursor.y + curRect.y + offsetPoint.y - aCursor.y * newZoom.value / zoom.value - newRect.y);
+
+        }
+        zoom(newZoom);
+    }
+
+    private synchronized void zoomOut() {
+        Zoom newZoom = new Zoom();
+        newZoom.value = getRealZoom() / ZOOM_MULTIPLIER;
+        newZoom.fit = false;
+
+        if (cursorPosition != null) {
+            Point aCursor = iconPanel.toImagePoint(cursorPosition);
+
+            Rectangle curRect = iconPanel.calcRect(zoom);
+            Rectangle newRect = iconPanel.calcRect(newZoom);
+
+            offsetPoint.x = (int) (aCursor.x + curRect.x + offsetPoint.x - aCursor.x * newZoom.value / zoom.value - newRect.x);
+            offsetPoint.y = (int) (aCursor.y + curRect.y + offsetPoint.y - aCursor.y * newZoom.value / zoom.value - newRect.y);
+        }
+        zoom(newZoom);
     }
 }
