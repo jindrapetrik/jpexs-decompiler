@@ -338,8 +338,8 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
             //updateZoom();
             int totalFrames = display.getTotalFrames();
             int currentFrame = display.getCurrentFrame();
-            if (currentFrame >= totalFrames) {
-                currentFrame = totalFrames - 1;
+            if (currentFrame > totalFrames) {
+                currentFrame = totalFrames;
             }
             float frameRate = display.getFrameRate();
             Zoom zoom = display.getZoom();
@@ -373,13 +373,13 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
             } else {
                 progress.setMaximum(totalFrames - 1);
                 progress.setMinimum(0);
-                progress.setValue(currentFrame);
+                progress.setValue(currentFrame - 1);
                 progress.setIndeterminate(false);
             }
-            frameLabel.setText(Integer.toString(currentFrame + 1));
+            frameLabel.setText(Integer.toString(currentFrame));
             totalFrameLabel.setText(Integer.toString(totalFrames));
             if (frameRate != 0) {
-                timeLabel.setText("(" + formatMs((int) (currentFrame * 1000.0 / frameRate)) + ")");
+                timeLabel.setText("(" + formatMs((int) ((currentFrame - 1) * 1000.0 / frameRate)) + ")");
                 totalTimeLabel.setText("(" + formatMs((int) (totalFrames * 1000.0 / frameRate)) + ")");
             }
             if (totalFrames <= 1 && playbackControls.isVisible()) {

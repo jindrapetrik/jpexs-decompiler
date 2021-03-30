@@ -46,6 +46,9 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
+import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
+import com.jpexs.decompiler.flash.tags.DefineButtonTag;
+import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Reference;
@@ -1329,6 +1332,32 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         if (sounds != null && sounds.buttonSoundChar2 != 0) { // OverUpToOverDown
                             playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar2), sounds.buttonSoundInfo2, timer);
                         }
+                        List<ByteArrayRange> actions = new ArrayList<>();
+                        if (button instanceof DefineButton2Tag) {
+                            DefineButton2Tag button2 = (DefineButton2Tag) button;
+                            for (BUTTONCONDACTION ca : button2.actions) {
+                                if (ca.condOverUpToOverDown) { //press
+                                    actions.add(ca.actionBytes);
+                                }
+                            }
+                        }
+                        if (button instanceof DefineButtonTag) {
+                            DefineButtonTag button1 = (DefineButtonTag) button;
+                            actions.add(button1.actionBytes);
+                        }
+
+                        for (ByteArrayRange actionBytes : actions) {
+                            try {
+                                int prevLength = actionBytes.getPos();
+                                SWFInputStream rri = new SWFInputStream(swf, actionBytes.getArray(), 0, prevLength + actionBytes.getLength());
+                                if (prevLength != 0) {
+                                    rri.seek(prevLength);
+                                }
+                                execute(rri);
+                            } catch (IOException ex) {
+                                Logger.getLogger(ImagePanel.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
                     }
                 }
             }
@@ -1634,7 +1663,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     @Override
     public synchronized int getCurrentFrame() {
-        return frame;
+        return frame + 1;
     }
 
     @Override
@@ -2472,14 +2501,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return;
         }
         Timeline timeline = timelined.getTimeline();
-        if (frame >= timeline.getFrameCount()) {
+        if (frame > timeline.getFrameCount()) {
             return;
         }
-        if (frame < 0) {
+        if (frame < 1) {
             return;
         }
 
-        this.frame = frame;
+        this.frame = frame - 1;
         this.prevFrame = -1;
         stopInternal();
         redraw();
