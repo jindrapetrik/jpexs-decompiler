@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.shaperecords;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -218,7 +219,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
 
                 Matrix transformation = Matrix.getTranslateInstance(px, py);
                 transformation.scale(ratio);
-                BitmapExporter.export(swf, shape, color, image, transformation, transformation, colorTransform);
+                BitmapExporter.export(swf, shape, color, image, transformation, transformation, colorTransform, true);
 
                 // draw bounding boxes
                 if (DRAW_BOUNDING_BOX) {

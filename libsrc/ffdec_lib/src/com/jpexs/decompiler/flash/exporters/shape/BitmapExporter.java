@@ -97,6 +97,8 @@ public class BitmapExporter extends ShapeExporterBase {
 
     private static boolean linearGradientColorWarnignShown = false;
 
+    private boolean scaleStrokes;
+
     private class TransformedStroke implements Stroke {
 
         /**
@@ -148,9 +150,9 @@ public class BitmapExporter extends ShapeExporterBase {
         }
     }
 
-    public static void export(SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform) {
+    public static void export(SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform, boolean scaleStrokes) {
         BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor, colorTransform);
-        exporter.exportTo(image, transformation, strokeTransformation);
+        exporter.exportTo(image, transformation, strokeTransformation, scaleStrokes);
     }
 
     private BitmapExporter(SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
@@ -159,8 +161,9 @@ public class BitmapExporter extends ShapeExporterBase {
         this.defaultColor = defaultColor;
     }
 
-    private void exportTo(SerializableImage image, Matrix transformation, Matrix strokeTransformation) {
+    private void exportTo(SerializableImage image, Matrix transformation, Matrix strokeTransformation, boolean scaleStrokes) {
         this.image = image;
+        this.scaleStrokes = scaleStrokes;
         ExportRectangle bounds = new ExportRectangle(shape.getBounds());
         ExportRectangle transformedBounds = strokeTransformation.transform(bounds);
 
@@ -392,18 +395,20 @@ public class BitmapExporter extends ShapeExporterBase {
                 joinStyle = BasicStroke.JOIN_ROUND;
                 break;
         }
-        switch (scaleMode) {
-            case "VERTICAL":
-                thickness *= strokeTransformation.scaleY;
-                break;
-            case "HORIZONTAL":
-                thickness *= strokeTransformation.scaleX;
-                break;
-            case "NORMAL":
-                thickness *= Math.max(strokeTransformation.scaleX, strokeTransformation.scaleY);
-                break;
-            case "NONE":
-                break;
+        if (scaleStrokes) {
+            switch (scaleMode) {
+                case "VERTICAL":
+                    thickness *= strokeTransformation.scaleY;
+                    break;
+                case "HORIZONTAL":
+                    thickness *= strokeTransformation.scaleX;
+                    break;
+                case "NORMAL":
+                    thickness *= Math.max(strokeTransformation.scaleX, strokeTransformation.scaleY);
+                    break;
+                case "NONE":
+                    break;
+            }
         }
 
         if (thickness < 0) {
