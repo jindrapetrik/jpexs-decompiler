@@ -107,7 +107,7 @@ public abstract class MorphShapeTag extends DrawableTag {
                 }
             }
         }
-        RECT r = getRect();
+        RECT r = new RECT(getRect());
         r.Xmin -= maxWidth;
         r.Ymin -= maxWidth;
         r.Xmax += maxWidth;

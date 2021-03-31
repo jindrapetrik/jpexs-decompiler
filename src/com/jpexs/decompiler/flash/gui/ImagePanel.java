@@ -305,7 +305,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (drawableFrameCount == 0) {
                         drawableFrameCount = 1;
                     }
-                    RECT rect = timelined.getRect();
                     Matrix m = new Matrix();
                     double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                     if (lowQuality) {
