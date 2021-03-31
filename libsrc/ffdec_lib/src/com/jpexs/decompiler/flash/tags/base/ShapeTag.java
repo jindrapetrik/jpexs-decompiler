@@ -151,7 +151,7 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
             }
         }
 
-        RECT r = getRect();
+        RECT r = new RECT(getRect());
         r.Xmin -= maxWidth;
         r.Ymin -= maxWidth;
         r.Xmax += maxWidth;
