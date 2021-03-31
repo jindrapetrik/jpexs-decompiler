@@ -203,10 +203,10 @@ public class DefineScalingGridTag extends Tag implements CharacterIdTag {
         for (int i = 0; i < targetRect.length; i++) {
             transforms[i] = rectToRectMatrix(sourceRect[i], targetRect[i]);
 
-            targetRect[i].xMax = Math.rint(targetRect[i].xMax / SWF.unitDivisor);
+            /*targetRect[i].xMax = Math.rint(targetRect[i].xMax / SWF.unitDivisor);
             targetRect[i].yMax = Math.rint(targetRect[i].yMax / SWF.unitDivisor);
             targetRect[i].xMin = Math.rint(targetRect[i].xMin / SWF.unitDivisor);
-            targetRect[i].yMin = Math.rint(targetRect[i].yMin / SWF.unitDivisor);
+            targetRect[i].yMin = Math.rint(targetRect[i].yMin / SWF.unitDivisor);*/
         }
     }
 
