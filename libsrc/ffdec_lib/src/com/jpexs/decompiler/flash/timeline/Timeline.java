@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.timeline;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.exporters.BlendModeSetable;
 import com.jpexs.decompiler.flash.exporters.FrameExporter;
-import com.jpexs.decompiler.flash.exporters.GraphicsGroupable;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
@@ -62,7 +61,6 @@ import com.jpexs.helpers.SerializableImage;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -72,7 +70,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,9 +77,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import org.w3c.dom.Element;
 
 /**
@@ -1041,9 +1035,6 @@ public class Timeline {
                         ExportRectangle[] sourceRect = new ExportRectangle[9];
                         ExportRectangle[] targetRect = new ExportRectangle[9];
                         Matrix[] transforms = new Matrix[9];
-                        //mat => image
-                        //t =>
-                        //Matrix tx = transformation.concatenate(layerMatrix);
                         DrawableTag dr = (DrawableTag) character;
                         ExportRectangle boundsRect = new ExportRectangle(dr.getRect());
                         ExportRectangle targetBoundsRect = layerMatrix.transform(boundsRect);
@@ -1056,25 +1047,27 @@ public class Timeline {
                                 g.setTransform(new AffineTransform());
                                 ExportRectangle p1 = transformation.transform(targetRect[s]);
                                 if (sx == 0) {
-                                    p1.xMin = viewRect.xMin;
+                                    p1.xMin = 0;
                                 }
                                 if (sy == 0) {
-                                    p1.yMin = viewRect.yMin;
+                                    p1.yMin = 0;
                                 }
 
                                 if (sx == 2) {
-                                    p1.xMax = unzoom * viewRect.getWidth() / SWF.unitDivisor;
+                                    p1.xMax = unzoom * viewRect.getWidth();
                                 }
                                 if (sy == 2) {
-                                    p1.yMax = unzoom * viewRect.getHeight() / SWF.unitDivisor;
+                                    p1.yMax = unzoom * viewRect.getHeight();
                                 }
 
+                                p1.xMin /= SWF.unitDivisor;
+                                p1.xMax /= SWF.unitDivisor;
+                                p1.yMin /= SWF.unitDivisor;
+                                p1.yMax /= SWF.unitDivisor;
+
                                 Rectangle2D r = new Rectangle2D.Double(p1.xMin, p1.yMin, p1.getWidth(), p1.getHeight());
+
                                 g.setClip(r);
-                                if (sx == 1 && sy == 1) {
-                                    //System.err.println("xxx");
-                                }
-                                //Matrix.getScaleInstance(SWF.unitDivisor).concatenate(strokeTransformation).concatenate(transforms[s].inverse())
                                 drawDrawable(strokeTransformation, layer, transforms[s], g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, fullTransformation, false, DRAW_MODE_SHAPES);
                                 s++;
                             }
@@ -1082,6 +1075,8 @@ public class Timeline {
                         g.setClip(c);
 
                         g.setTransform(origTransform);
+
+                        //draw all nonshapes (normally scaled) next
                         drawDrawable(strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, time, layer.ratio, renderContext, image, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, fullTransformation, scaleStrokes, DRAW_MODE_SPRITES);
                     } else {
                         boolean subScaleStrokes = scaleStrokes;

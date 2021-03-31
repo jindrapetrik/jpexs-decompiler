@@ -1,0 +1,39 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="pinkSquare" itemID="606495f2-0000026b" lastModified="1617204862">
+  <timeline>
+    <DOMTimeline name="pinkSquare">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FF00FF"/>
+                    </FillStyle>
+                  </fills>
+                  <strokes>
+                    <StrokeStyle index="1">
+                      <SolidStroke scaleMode="normal" weight="5">
+                        <fill>
+                          <SolidColor color="#0000FF"/>
+                        </fill>
+                      </SolidStroke>
+                    </StrokeStyle>
+                  </strokes>
+                  <edges>
+                    <Edge fillStyle1="1" strokeStyle="1" edges="!500 500|0 500!0 500|0 0!0 0|500 0!500 0|500 500"/>
+                    <Edge cubics="!0 0(;0,0 500,0 500,0q0 0 500 0)500,0;"/>
+                    <Edge cubics="!500 500(;500,500 0,500 0,500q500 500 0 500);"/>
+                    <Edge cubics="!0 500(;0,500 0,0 0,0q0 500 0 0);"/>
+                    <Edge cubics="!500 0(;500,0 500,500 500,500q500 0 500 500);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

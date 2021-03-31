@@ -70,11 +70,9 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.Toolkit;
 import java.awt.Transparency;
-import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -91,7 +89,6 @@ import java.awt.image.VolatileImage;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -1772,7 +1769,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         image.fillTransparent();
 
         Matrix m = new Matrix();
-        //m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
         m.translate(-viewRect.xMin * zoom, -viewRect.yMin * zoom);
         m.scale(zoom);
 

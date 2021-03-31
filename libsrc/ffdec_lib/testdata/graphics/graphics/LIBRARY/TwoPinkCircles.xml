@@ -1,0 +1,29 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="TwoPinkCircles" itemID="60617ea0-00000200" lastModified="1617002233">
+  <timeline>
+    <DOMTimeline name="TwoPinkCircles">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="PinkCircle" centerPoint3DX="25" centerPoint3DY="25">
+                  <transformationPoint>
+                    <Point x="25" y="25"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="PinkCircle" centerPoint3DX="100" centerPoint3DY="25">
+                  <matrix>
+                    <Matrix tx="75"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="25" y="25"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>
