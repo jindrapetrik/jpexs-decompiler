@@ -705,6 +705,22 @@ public final class Configuration {
     @ConfigurationInternal
     public static ConfigurationItem<Boolean> showSlowRenderingWarning = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> autoCloseQuotes = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> autoCloseDoubleQuotes = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> autoCloseBrackets = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> autoCloseParenthesis = null;
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

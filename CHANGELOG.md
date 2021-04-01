@@ -3,7 +3,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
--  [#1015], [#1466], [#1513] Better error messages during saving, display message on out of memory
+- [#1015], [#1466], [#1513] Better error messages during saving, display message on out of memory
+- [#1657] Option to disable adding second quote/bracket/parenthesis
 
 ### Fixed
 - PDF export - NullPointer when font of text is missing
@@ -23,7 +24,7 @@ All notable changes to this project will be documented in this file.
 - PDF export - Smoothed bitmaps
 - Flash viewer - slow on larger zooms (now only diplayed rect is rendered)
 - Flash viewer - scaling grid - ignore nonshapes when scaling
-- #1672 Raw editor - digits grouping causing incorrect cursor movement
+- [#1672] Raw editor - digits grouping causing incorrect cursor movement
 - Rename invalid identifiers renames identifiers with a dollar sign
 
 ## [14.3.1] - 2021-03-25
@@ -2176,11 +2177,13 @@ All notable changes to this project will be documented in this file.
 [#1015]: https://www.free-decompiler.com/flash/issues/1015
 [#1466]: https://www.free-decompiler.com/flash/issues/1466
 [#1513]: https://www.free-decompiler.com/flash/issues/1513
+[#1657]: https://www.free-decompiler.com/flash/issues/1657
 [#1660]: https://www.free-decompiler.com/flash/issues/1660
 [#1669]: https://www.free-decompiler.com/flash/issues/1669
 [#1668]: https://www.free-decompiler.com/flash/issues/1668
 [#1670]: https://www.free-decompiler.com/flash/issues/1670
 [#1671]: https://www.free-decompiler.com/flash/issues/1671
+[#1672]: https://www.free-decompiler.com/flash/issues/1672
 [#1665]: https://www.free-decompiler.com/flash/issues/1665
 [#1661]: https://www.free-decompiler.com/flash/issues/1661
 [#1435]: https://www.free-decompiler.com/flash/issues/1435

@@ -29,11 +29,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JEditorPane;
+import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
+import javax.swing.text.JTextComponent;
 import jsyntaxpane.SyntaxDocument;
 
 /**
@@ -92,6 +94,30 @@ public class UndoFixedEditorPane extends JEditorPane {
             setContentType(type);
             setFont(oldFont);
             addDocumentListener();
+        }
+
+        if (!Configuration.autoCloseQuotes.get()) {
+            getActionMap().remove("quotes");
+            KeyStroke ks = KeyStroke.getKeyStroke("typed '");
+            getInputMap(JTextComponent.WHEN_FOCUSED).remove(ks);
+        }
+
+        if (!Configuration.autoCloseDoubleQuotes.get()) {
+            getActionMap().remove("double-quotes");
+            KeyStroke ks = KeyStroke.getKeyStroke("typed \"");
+            getInputMap(JTextComponent.WHEN_FOCUSED).remove(ks);
+        }
+
+        if (!Configuration.autoCloseBrackets.get()) {
+            getActionMap().remove("brackets");
+            KeyStroke ks = KeyStroke.getKeyStroke("typed [");
+            getInputMap(JTextComponent.WHEN_FOCUSED).remove(ks);
+        }
+
+        if (!Configuration.autoCloseParenthesis.get()) {
+            getActionMap().remove("parenthesis");
+            KeyStroke ks = KeyStroke.getKeyStroke("typed (");
+            getInputMap(JTextComponent.WHEN_FOCUSED).remove(ks);
         }
     }
 
