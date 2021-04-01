@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - Flash viewer - slow on larger zooms (now only diplayed rect is rendered)
 - Flash viewer - scaling grid - ignore nonshapes when scaling
 - #1672 Raw editor - digits grouping causing incorrect cursor movement
+- Rename invalid identifiers renames identifiers with a dollar sign
 
 ## [14.3.1] - 2021-03-25
 ### Fixed

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
@@ -35,11 +36,11 @@ public class AVM2Deobfuscation {
 
     private static final int DEFAULT_FOO_SIZE = 10;
 
-    public static final String VALID_FIRST_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+    public static final String VALID_FIRST_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$";
 
     public static final String VALID_NEXT_CHARACTERS = VALID_FIRST_CHARACTERS + "0123456789";
 
-    public static final String VALID_NS_CHARACTERS = ".:$";
+    public static final String VALID_NS_CHARACTERS = ".:";
 
     private final SWF swf;
 
