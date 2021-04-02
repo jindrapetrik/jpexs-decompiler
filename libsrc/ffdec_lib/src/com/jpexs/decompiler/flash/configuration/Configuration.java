@@ -721,6 +721,10 @@ public final class Configuration {
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> autoCloseParenthesis = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationInternal
+    public static ConfigurationItem<Boolean> showDialogOnError = null;
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
