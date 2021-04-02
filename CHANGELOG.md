@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#1015], [#1466], [#1513] Better error messages during saving, display message on out of memory
 - [#1657] Option to disable adding second quote/bracket/parenthesis
 - Option to automatically show error dialog on every error
+- [#1676] View video tags in external flash projector
 
 ### Fixed
 - PDF export - NullPointer when font of text is missing

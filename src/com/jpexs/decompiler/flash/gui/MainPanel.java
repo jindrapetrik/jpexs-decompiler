@@ -3559,10 +3559,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 previewPanel.showImagePanel(swf, swf, -1);
             } else {
                 previewPanel.setParametersPanelVisible(false);
-                if (flashPanel != null) { //same for flashPanel2
-                    previewPanel.showFlashViewerPanel();
-                    previewPanel.showSwf(swf);
-                }
+                //if (flashPanel != null) { //same for flashPanel2
+                previewPanel.showFlashViewerPanel();
+                previewPanel.showSwf(swf);
+
+                //}                
             }
         } else if ((treeItem instanceof PlaceObjectTypeTag) && (previewPanel != dumpPreviewPanel)) {
             TreePath path = tagTree.getModel().getTreePath(treeItem);
