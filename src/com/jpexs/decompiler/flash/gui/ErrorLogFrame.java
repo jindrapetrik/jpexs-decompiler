@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -319,6 +320,10 @@ public class ErrorLogFrame extends AppFrame {
             ex.printStackTrace(new PrintWriter(sw));
         }
         log(level, msg, sw.toString());
+
+        if (!this.isVisible() && Configuration.showDialogOnError.get()) {
+            setVisible(true);
+        }
     }
 
     @Override
