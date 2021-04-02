@@ -48,8 +48,12 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -189,6 +193,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private final int PLACE_EDIT_FREETRANSFORM = 1;
     private final int PLACE_EDIT_RAW = 2;
     private int placeEditMode = 0;
+
+    //used only for flash player
+    private TreeItem currentItem;
 
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
@@ -355,8 +362,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             flashPlayPanel2.add(new PlayerControls(mainPanel, flashPanel), BorderLayout.SOUTH);
             leftComponent = flashPlayPanel2;
         } else {
-            JPanel swtPanel = new JPanel(new BorderLayout());
-            String labelStr = "";
+            JPanel swtPanel = new JPanel(new GridBagLayout());
+            /*String labelStr = "";
             if (!Platform.isWindows()) {
                 labelStr = mainPanel.translate("notavailonthisplatform");
             } else {
@@ -368,12 +375,26 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
             String htmlLabelStr = "<html><center>" + labelStr.replace("\n", "<br>") + "</center></html>";
             swtPanel.add(new JLabel(htmlLabelStr, JLabel.CENTER), BorderLayout.CENTER);
-            swtPanel.setBackground(View.getDefaultBackgroundColor());
+            swtPanel.setBackground(View.getDefaultBackgroundColor());*/
+
+            JPanel buttonsPanel = new JPanel(new FlowLayout());
+            JButton flashProjectorButton = new JButton(mainPanel.translate("button.showin.flashprojector"));
+            flashProjectorButton.addActionListener(this::flashProjectorActionPerformed);
+            buttonsPanel.add(flashProjectorButton);
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.anchor = GridBagConstraints.CENTER;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            swtPanel.add(buttonsPanel, gbc);
+
             leftComponent = swtPanel;
         }
 
         pan.add(leftComponent, BorderLayout.CENTER);
         return pan;
+    }
+
+    private void flashProjectorActionPerformed(ActionEvent e) {
+        createAndRunTempSwf(currentItem);
     }
 
     private JPanel createImagesCard() {
@@ -716,6 +737,46 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         nextFontsButton.setVisible(false);
     }
 
+    private void createAndRunTempSwf(TreeItem treeItem) {
+        try {
+            File extTempFile = File.createTempFile("ffdec_viewext_", ".swf");
+            extTempFile.deleteOnExit();
+
+            if (treeItem instanceof SWF) {
+                SWF swf = (SWF) treeItem;
+                try (FileOutputStream fos = new FileOutputStream(extTempFile)) {
+                    swf.saveTo(fos);
+                }
+            } else {
+                Color backgroundColor = View.getSwfBackgroundColor();
+
+                if (treeItem instanceof Tag) {
+                    Tag tag = (Tag) treeItem;
+                    if (tag instanceof FontTag) { //Fonts are always black on white
+                        backgroundColor = View.getDefaultBackgroundColor();
+                    }
+                } else if (treeItem instanceof Frame) {
+                    Frame fn = (Frame) treeItem;
+                    SWF sourceSwf = fn.getSwf();
+                    if (fn.timeline.timelined == sourceSwf) {
+                        SetBackgroundColorTag setBgColorTag = sourceSwf.getBackgroundColor();
+                        if (setBgColorTag != null) {
+                            backgroundColor = setBgColorTag.backgroundColor.toColor();
+                        }
+                    }
+                }
+
+                SWFHeader header;
+                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(extTempFile))) {
+                    header = new PreviewExporter().exportSwf(fos, treeItem, backgroundColor, fontPageNum, true);
+                }
+            }
+            Main.runAsync(extTempFile);
+        } catch (IOException | ActionParseException ex) {
+            Logger.getLogger(PreviewPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public void createAndShowTempSwf(TreeItem treeItem) {
         try {
             if (tempFile != null) {
@@ -745,12 +806,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
             SWFHeader header;
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
-                header = new PreviewExporter().exportSwf(fos, treeItem, backgroundColor, fontPageNum);
+                header = new PreviewExporter().exportSwf(fos, treeItem, backgroundColor, fontPageNum, false);
             }
 
             if (flashPanel != null) {
                 flashPanel.displaySWF(tempFile.getAbsolutePath(), backgroundColor, header.frameRate);
             }
+
+            this.currentItem = treeItem;
 
             showFlashViewerPanel();
         } catch (IOException | ActionParseException ex) {
@@ -759,6 +822,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     public void showSwf(SWF swf) {
+        currentItem = swf;
+        if (flashPanel == null) {
+            return;
+        }
         Color backgroundColor = View.getDefaultBackgroundColor();
         SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
         if (setBgColorTag != null) {

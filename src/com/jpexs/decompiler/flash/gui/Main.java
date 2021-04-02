@@ -467,6 +467,28 @@ public class Main {
         }
     }
 
+    public static void runAsync(File swfFile) {
+        String playerLocation = Configuration.playerLocation.get();
+        if (playerLocation.isEmpty() || (!new File(playerLocation).exists())) {
+            ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("message.playerpath.notset"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+            advancedSettings("paths");
+            return;
+        }
+        try {
+            final Process process = Runtime.getRuntime().exec(new String[]{playerLocation, swfFile.getAbsolutePath()});
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
+                public void run() {
+                    if (process.isAlive()) {
+                        process.destroyForcibly();
+                    }
+                }
+            });
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+    }
+
     public static void run(SWF swf) {
         String flashVars = "";//key=val&key2=val2
         String playerLocation = Configuration.playerLocation.get();

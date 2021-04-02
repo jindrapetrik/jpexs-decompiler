@@ -121,7 +121,7 @@ public class MorphShapeExporter {
                         case SWF:
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                                 try {
-                                    new PreviewExporter().exportSwf(fos, mst, null, 0);
+                                    new PreviewExporter().exportSwf(fos, mst, null, 0, false);
                                 } catch (ActionParseException ex) {
                                     Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
                                 }

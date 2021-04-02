@@ -1,0 +1,38 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="VideoSprite" itemID="60672f60-00000201" lastModified="1617375202">
+  <timeline>
+    <DOMTimeline name="VideoSprite">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" duration="702" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <strokes>
+                    <StrokeStyle index="1">
+                      <SolidStroke scaleMode="normal" weight="10">
+                        <fill>
+                          <SolidColor color="#FF0000"/>
+                        </fill>
+                      </SolidStroke>
+                    </StrokeStyle>
+                  </strokes>
+                  <edges>
+                    <Edge strokeStyle="1" edges="!8009 4221|9 4221!9 4221|9 0!9 0|8009 0!8009 0|8009 4221"/>
+                  </edges>
+                </DOMShape>
+                <DOMVideoInstance libraryItemName="Cute Cat - 3092.flv" frameRight="12800" frameBottom="7200">
+                  <matrix>
+                    <Matrix a="0.625732421875" d="0.58624267578125"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="0.7"/>
+                  </transformationPoint>
+                </DOMVideoInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

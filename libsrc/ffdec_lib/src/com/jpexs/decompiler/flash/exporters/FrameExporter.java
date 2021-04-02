@@ -389,7 +389,7 @@ public class FrameExporter {
 
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                         try {
-                            new PreviewExporter().exportSwf(fos, swf.getCharacter(containerId), fBackgroundColor, 0);
+                            new PreviewExporter().exportSwf(fos, swf.getCharacter(containerId), fBackgroundColor, 0, false);
                         } catch (ActionParseException ex) {
                             Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -405,7 +405,7 @@ public class FrameExporter {
 
                         try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(f))) {
                             try {
-                                new PreviewExporter().exportSwf(fos, fn, fBackgroundColor, 0);
+                                new PreviewExporter().exportSwf(fos, fn, fBackgroundColor, 0, false);
                             } catch (ActionParseException ex) {
                                 Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
                             }
