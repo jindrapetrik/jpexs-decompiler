@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - Flash viewer - scaling grid - ignore nonshapes when scaling
 - [#1672] Raw editor - digits grouping causing incorrect cursor movement
 - Rename invalid identifiers renames identifiers with a dollar sign
+- [#1676] Messages on movie tags when Flash Player ActiveX not available
 
 ## [14.3.1] - 2021-03-25
 ### Fixed
@@ -2185,6 +2186,7 @@ All notable changes to this project will be documented in this file.
 [#1670]: https://www.free-decompiler.com/flash/issues/1670
 [#1671]: https://www.free-decompiler.com/flash/issues/1671
 [#1672]: https://www.free-decompiler.com/flash/issues/1672
+[#1676]: https://www.free-decompiler.com/flash/issues/1676
 [#1665]: https://www.free-decompiler.com/flash/issues/1665
 [#1661]: https://www.free-decompiler.com/flash/issues/1661
 [#1435]: https://www.free-decompiler.com/flash/issues/1435

@@ -43,6 +43,7 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.SerializableImage;
+import com.sun.jna.Platform;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -349,22 +350,24 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             JPanel flashPlayPanel = new JPanel(new BorderLayout());
             flashPlayPanel.add(flashPanel, BorderLayout.CENTER);
 
-            /*JPanel bottomPanel = new JPanel(new BorderLayout());
-             JPanel buttonsPanel = new JPanel(new FlowLayout());
-             JButton selectColorButton = new JButton(View.getIcon("color16"));
-             selectColorButton.addActionListener(mainPanel::selectBkColor);
-             selectColorButton.setToolTipText(AppStrings.translate("button.selectbkcolor.hint"));
-             buttonsPanel.add(selectColorButton);
-             bottomPanel.add(buttonsPanel, BorderLayout.EAST);
-
-             flashPlayPanel.add(bottomPanel, BorderLayout.SOUTH);*/
             JPanel flashPlayPanel2 = new JPanel(new BorderLayout());
             flashPlayPanel2.add(flashPlayPanel, BorderLayout.CENTER);
             flashPlayPanel2.add(new PlayerControls(mainPanel, flashPanel), BorderLayout.SOUTH);
             leftComponent = flashPlayPanel2;
         } else {
             JPanel swtPanel = new JPanel(new BorderLayout());
-            swtPanel.add(new JLabel("<html><center>" + mainPanel.translate("notavailonthisplatform") + "</center></html>", JLabel.CENTER), BorderLayout.CENTER);
+            String labelStr = "";
+            if (!Platform.isWindows()) {
+                labelStr = mainPanel.translate("notavailonthisplatform");
+            } else {
+                if (Configuration.useAdobeFlashPlayerForPreviews.get()) {
+                    labelStr = mainPanel.translate("notavailable.activex") + "\n" + mainPanel.translate("notavailable.activex.disable");
+                } else {
+                    labelStr = mainPanel.translate("notavailable.internalviewer");
+                }
+            }
+            String htmlLabelStr = "<html><center>" + labelStr.replace("\n", "<br>") + "</center></html>";
+            swtPanel.add(new JLabel(htmlLabelStr, JLabel.CENTER), BorderLayout.CENTER);
             swtPanel.setBackground(View.getDefaultBackgroundColor());
             leftComponent = swtPanel;
         }
