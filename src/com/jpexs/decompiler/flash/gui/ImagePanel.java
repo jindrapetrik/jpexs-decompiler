@@ -89,6 +89,7 @@ import java.awt.image.VolatileImage;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -410,6 +411,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         int x = rect.x < 0 ? 0 : rect.x;
                         int y = rect.y < 0 ? 0 : rect.y;
                         g2.drawImage(img.getBufferedImage(), x, y, x + img.getWidth(), y + img.getHeight(), 0, 0, img.getWidth(), img.getHeight(), null);
+
+                        /*g2.setColor(Color.red);
+                        g2.drawRect(x, y, img.getWidth(), img.getHeight());*/
                     }
                 } finally {
                     if (g2 != null) {
@@ -1147,8 +1151,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 int w1;
                 int h1;
                 if (timelined != null) {
-                    w1 = (int) (timelined.getRect().Xmax * zoomDouble / SWF.unitDivisor);
-                    h1 = (int) (timelined.getRect().Ymax * zoomDouble / SWF.unitDivisor);
+                    w1 = (int) (timelined.getRectWithStrokes().getWidth() * zoomDouble / SWF.unitDivisor);
+                    h1 = (int) (timelined.getRectWithStrokes().getHeight() * zoomDouble / SWF.unitDivisor);
                 } else {
                     w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
                     h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
@@ -1464,12 +1468,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     @Override
     public synchronized double getZoomToFit() {
         if (timelined != null) {
-            RECT bounds = timelined.getRect();
+            RECT bounds = timelined.getRectWithStrokes();
             double w1 = bounds.getWidth() / SWF.unitDivisor;
             double h1 = bounds.getHeight() / SWF.unitDivisor;
 
-            double w2 = getWidth();
-            double h2 = getHeight();
+            double w2 = iconPanel.getWidth();
+            double h2 = iconPanel.getHeight();
 
             double w;
             double h;
@@ -1977,6 +1981,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Zoom zoom;
         synchronized (ImagePanel.class) {
             zoom = this.zoom;
+
+            if (timelined == null) {
+                return new ExportRectangle(0, 0, 1, 1);
+            }
         }
 
         double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
@@ -1990,6 +1998,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         aRect = new ExportRectangle(_rect);
 
         ExportRectangle viewRect = new ExportRectangle(new RECT());
+        RECT timRect = timelined.getRectWithStrokes();
+
+        double w = timRect.getWidth() * zoomDouble / SWF.unitDivisor;
 
         if (aRect.xMin >= 0) {
             viewRect.xMin = 0;
@@ -1997,27 +2008,25 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             viewRect.xMin = -aRect.xMin;
         }
 
-        RECT timRect = timelined.getRectWithStrokes();
-
-        double w = timRect.Xmax * zoomDouble / SWF.unitDivisor;
-        if (w - viewRect.xMin > iconPanel.getWidth()) {
-            viewRect.xMax = viewRect.xMin + iconPanel.getWidth();
-        } else {
-            viewRect.xMax = w;
+        if (w + aRect.xMin > iconPanel.getWidth()) {
+            w = -aRect.xMin + iconPanel.getWidth();
         }
+
+        viewRect.xMax = w;
+
+        double h = timRect.getHeight() * zoomDouble / SWF.unitDivisor;
 
         if (aRect.yMin >= 0) {
             viewRect.yMin = 0;
         } else {
             viewRect.yMin = -aRect.yMin;
         }
-        double h = timRect.Ymax * zoomDouble / SWF.unitDivisor;
 
-        if (h - viewRect.yMin > iconPanel.getHeight()) {
-            viewRect.yMax = viewRect.yMin + iconPanel.getHeight();
-        } else {
-            viewRect.yMax = h;
+        if (h + aRect.yMin > iconPanel.getHeight()) {
+            h = -aRect.yMin + iconPanel.getHeight();
         }
+
+        viewRect.yMax = h;
 
         viewRect.xMin *= SWF.unitDivisor;
         viewRect.xMax *= SWF.unitDivisor;
@@ -2031,6 +2040,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         viewRect.xMin += timRect.Xmin;
         viewRect.yMin += timRect.Ymin;
+        viewRect.xMax += timRect.Xmin;
+        viewRect.yMax += timRect.Ymin;
         return viewRect;
     }
 
@@ -2538,6 +2549,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     @Override
     public synchronized Zoom getZoom() {
+        if (zoom.fit) {
+            zoom.value = getZoomToFit();
+        }
         return zoom;
     }
 
