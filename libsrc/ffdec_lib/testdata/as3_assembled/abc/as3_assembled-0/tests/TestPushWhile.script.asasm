@@ -1,0 +1,29 @@
+script
+ sinit
+  refid "tests:TestPushWhile/init"
+  body
+   maxstack 2
+   localcount 1
+   initscopedepth 1
+   maxscopedepth 3
+   code
+    getlocal0
+    pushscope
+
+    findpropstrict      Multiname("TestPushWhile", [PackageNamespace("tests")])
+    getlex              QName(PackageNamespace(""), "Object")
+    pushscope
+
+    getlex              Multiname("Object", [PrivateNamespace(null, "tests:TestPushWhile"), PackageNamespace(""), PackageNamespace("tests"), PackageInternalNs("tests"), Namespace("http://adobe.com/AS3/2006/builtin")])
+    newclass            "tests:TestPushWhile"
+    popscope
+    initproperty        QName(PackageNamespace("tests"), "TestPushWhile")
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+ trait class QName(PackageNamespace("tests"), "TestPushWhile")
+  #include "TestPushWhile.class.asasm"
+ end ; trait
+end ; script

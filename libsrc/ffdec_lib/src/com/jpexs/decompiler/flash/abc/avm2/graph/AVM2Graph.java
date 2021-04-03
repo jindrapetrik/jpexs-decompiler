@@ -1611,7 +1611,7 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected GraphTargetItem checkLoop(List<GraphTargetItem> output, LoopItem loopItem, BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) {
+    protected GraphTargetItem checkLoop(List<GraphTargetItem> output, LoopItem loopItem, BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates, TranslateStack stack) {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         if (loopItem instanceof WhileItem) {
             WhileItem w = (WhileItem) loopItem;
@@ -1620,6 +1620,22 @@ public class AVM2Graph extends Graph {
                 HasNextAVM2Item hn = (HasNextAVM2Item) w.expression.get(w.expression.size() - 1);
                 if (hn.obj != null) {
                     if (hn.obj.getNotCoerced().getThroughRegister().getNotCoerced() instanceof FilteredCheckAVM2Item) {
+
+                        //All items are moved from stack to output before entering while,
+                        // this code block moves them back to stack
+                        int pushnum = 0;
+                        for (int i = output.size() - 2 /*last is loop*/; i >= 0; i--) {
+                            if (output.get(i) instanceof PushItem) {
+                                pushnum++;
+                            } else {
+                                break;
+                            }
+                        }
+                        int rem = output.size() - 1 - pushnum;
+                        for (int i = output.size() - 1 - pushnum; i <= output.size() - 2; i++) {
+                            stack.push(((PushItem) output.remove(rem)).value);
+                        }
+                        //---------- end moving back to stack
                         if (w.commands.size() >= 3) {
                             int pos = 0;
                             Set<Integer> localRegsToKill = new HashSet<>();

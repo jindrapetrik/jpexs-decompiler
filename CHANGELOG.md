@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 - Rename invalid identifiers renames identifiers with a dollar sign
 - [#1676] Messages on movie tags when Flash Player ActiveX not available
 - [#1677] DefineFont2/3 - missing codeTableOffset if numGlyphs is zero and font has layout
+- AS decompilation - §§push before loop
 
 ## [14.3.1] - 2021-03-25
 ### Fixed
