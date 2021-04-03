@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - [#1672] Raw editor - digits grouping causing incorrect cursor movement
 - Rename invalid identifiers renames identifiers with a dollar sign
 - [#1676] Messages on movie tags when Flash Player ActiveX not available
+- [#1677] DefineFont2/3 - missing codeTableOffset if numGlyphs is zero
 
 ## [14.3.1] - 2021-03-25
 ### Fixed
@@ -2181,13 +2182,14 @@ All notable changes to this project will be documented in this file.
 [#1466]: https://www.free-decompiler.com/flash/issues/1466
 [#1513]: https://www.free-decompiler.com/flash/issues/1513
 [#1657]: https://www.free-decompiler.com/flash/issues/1657
+[#1676]: https://www.free-decompiler.com/flash/issues/1676
 [#1660]: https://www.free-decompiler.com/flash/issues/1660
 [#1669]: https://www.free-decompiler.com/flash/issues/1669
 [#1668]: https://www.free-decompiler.com/flash/issues/1668
 [#1670]: https://www.free-decompiler.com/flash/issues/1670
 [#1671]: https://www.free-decompiler.com/flash/issues/1671
 [#1672]: https://www.free-decompiler.com/flash/issues/1672
-[#1676]: https://www.free-decompiler.com/flash/issues/1676
+[#1677]: https://www.free-decompiler.com/flash/issues/1677
 [#1665]: https://www.free-decompiler.com/flash/issues/1665
 [#1661]: https://www.free-decompiler.com/flash/issues/1661
 [#1435]: https://www.free-decompiler.com/flash/issues/1435

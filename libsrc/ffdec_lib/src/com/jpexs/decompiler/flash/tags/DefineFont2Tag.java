@@ -152,12 +152,11 @@ public class DefineFont2Tag extends FontTag {
                 offsetTable[i] = sis.readUI16("offset");
             }
         }
-        if (numGlyphs > 0) { //codeTableOffset
-            if (fontFlagsWideOffsets) {
-                sis.readUI32("codeTableOffset");
-            } else {
-                sis.readUI16("codeTableOffset");
-            }
+
+        if (fontFlagsWideOffsets) {
+            sis.readUI32("codeTableOffset");
+        } else {
+            sis.readUI16("codeTableOffset");
         }
 
         glyphShapeTable = new ArrayList<>();
@@ -280,23 +279,24 @@ public class DefineFont2Tag extends FontTag {
                 sos.writeUI16((int) (long) offset);
             }
         }
-        if (numGlyphs > 0) {
-            long offset = (glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + baGlyphShapes.length;
-            if (fontFlagsWideOffsets) {
-                sos.writeUI32(offset);
-            } else {
-                sos.writeUI16((int) offset);
-            }
-            sos.write(baGlyphShapes);
 
-            for (int i = 0; i < numGlyphs; i++) {
-                if (fontFlagsWideCodes) {
-                    sos.writeUI16(codeTable.get(i));
-                } else {
-                    sos.writeUI8(codeTable.get(i));
-                }
+        long offset = (glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + baGlyphShapes.length;
+        if (fontFlagsWideOffsets) {
+            sos.writeUI32(offset);
+        } else {
+            sos.writeUI16((int) offset);
+        }
+        if (numGlyphs > 0) {
+            sos.write(baGlyphShapes);
+        }
+        for (int i = 0; i < numGlyphs; i++) {
+            if (fontFlagsWideCodes) {
+                sos.writeUI16(codeTable.get(i));
+            } else {
+                sos.writeUI8(codeTable.get(i));
             }
         }
+
         if (fontFlagsHasLayout) {
             sos.writeUI16(fontAscent);
             sos.writeUI16(fontDescent);
