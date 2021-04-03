@@ -175,6 +175,7 @@ public class AS3Generator {
         Configuration.autoDeobfuscate.set(false);
         Configuration.showMethodBodyId.set(false);
         Configuration.simplifyExpressions.set(false);
+        Configuration.displayDupInstructions.set(true);
 
 
         useFile("ActionScript3ClassicDecompileTest", new String[][]{{"testdata/as3_new/bin/as3_new.flex.swf", "classic"}}, false);
