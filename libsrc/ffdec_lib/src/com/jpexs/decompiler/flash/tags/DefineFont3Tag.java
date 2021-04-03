@@ -145,10 +145,12 @@ public class DefineFont3Tag extends FontTag {
                 offsetTable[i] = sis.readUI16("offset");
             }
         }
-        if (fontFlagsWideOffsets) {
-            sis.readUI32("codeTableOffset");
-        } else {
-            sis.readUI16("codeTableOffset");
+        if (numGlyphs > 0 || fontFlagsHasLayout) {
+            if (fontFlagsWideOffsets) {
+                sis.readUI32("codeTableOffset");
+            } else {
+                sis.readUI16("codeTableOffset");
+            }
         }
         glyphShapeTable = new ArrayList<>();
         for (int i = 0; i < numGlyphs; i++) {
@@ -269,11 +271,13 @@ public class DefineFont3Tag extends FontTag {
                 sos.writeUI16((int) offset2);
             }
         }
-        long offset = (glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + baGlyphShapes.length;
-        if (fontFlagsWideOffsets) {
-            sos.writeUI32(offset);
-        } else {
-            sos.writeUI16((int) offset);
+        if (numGlyphs > 0 || fontFlagsHasLayout) {
+            long offset = (glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + baGlyphShapes.length;
+            if (fontFlagsWideOffsets) {
+                sos.writeUI32(offset);
+            } else {
+                sos.writeUI16((int) offset);
+            }
         }
         if (numGlyphs > 0) {
             sos.write(baGlyphShapes);

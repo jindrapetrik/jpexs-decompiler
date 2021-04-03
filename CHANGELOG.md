@@ -29,7 +29,7 @@ All notable changes to this project will be documented in this file.
 - [#1672] Raw editor - digits grouping causing incorrect cursor movement
 - Rename invalid identifiers renames identifiers with a dollar sign
 - [#1676] Messages on movie tags when Flash Player ActiveX not available
-- [#1677] DefineFont2/3 - missing codeTableOffset if numGlyphs is zero
+- [#1677] DefineFont2/3 - missing codeTableOffset if numGlyphs is zero and font has layout
 
 ## [14.3.1] - 2021-03-25
 ### Fixed
