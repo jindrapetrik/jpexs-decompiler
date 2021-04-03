@@ -132,6 +132,22 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     }
 
     @Test
+    public void testPushWhile() {
+        decompileMethod("assembled", "testPushWhile", "var _loc3_:int = 5;\r\n"
+                + "§§push(obfuscated[\"xxx\"] = new [\"ByteArray\"]());\r\n"
+                + "§§push(50);\r\n"
+                + "while(§§dup(§§pop()))\r\n"
+                + "{\r\n"
+                + "§§dup(§§pop())[§§dup(§§dup(§§pop())).length] = 41 ^ 111;\r\n"
+                + "§§dup(§§pop())[§§dup(§§dup(§§pop())).length] = 9 ^ 84;\r\n"
+                + "§§push(§§pop() - 1);\r\n"
+                + "}\r\n"
+                + "§§pop();\r\n"
+                + "§§pop();\r\n",
+                false);
+    }
+
+    @Test
     public void testSetSlotDup() {
         decompileMethod("assembled", "testSetSlotDup", "var _loc5_:int = 5;\r\n"
                 + "var myslot:int;\r\n"

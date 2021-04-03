@@ -1350,7 +1350,7 @@ public class Graph {
         return printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, parent, part, stopPart, stopPartKind, loops, throwStates, null, staticOperation, path, 0);
     }
 
-    protected GraphTargetItem checkLoop(List<GraphTargetItem> output, LoopItem loopItem, BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) {
+    protected GraphTargetItem checkLoop(List<GraphTargetItem> output, LoopItem loopItem, BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates, TranslateStack stack) {
         return loopItem;
     }
 
@@ -1901,6 +1901,9 @@ public class Graph {
             }
         }
 
+        if (isLoop) {
+            makeAllCommands(ret, stack);
+        }
         if (debugPrintGraph) {
             System.err.println("loopsize:" + loops.size());
         }
@@ -2675,7 +2678,7 @@ public class Graph {
             }
             currentLoop.phase = 2;
 
-            GraphTargetItem replaced = checkLoop(ret, li, localData, loops, throwStates);
+            GraphTargetItem replaced = checkLoop(ret, li, localData, loops, throwStates, sPreLoop);
             if (replaced != li) {
                 int index = ret.indexOf(li);
                 ret.remove(index);
@@ -2951,21 +2954,18 @@ public class Graph {
                 clen--;
             }
         }
-        while (stack.size() > 0) {
-            GraphTargetItem p = stack.pop();
+        for (int i = stack.size() - 1; i >= 0; i--) {
+            GraphTargetItem p = stack.get(i);
             if (p instanceof BranchStackResistant) {
                 continue;
             }
+            stack.remove(i);
             if (!(p instanceof PopItem)) {
-                if (p instanceof FunctionActionItem) {
+                if (isExit) {
+                    //ASC2 leaves some function calls unpopped on stack before returning from a method
                     commands.add(clen, p);
                 } else {
-                    if (isExit) {
-                        //ASC2 leaves some function calls unpopped on stack before returning from a method
-                        commands.add(clen, p);
-                    } else {
-                        commands.add(clen, new PushItem(p));
-                    }
+                    commands.add(clen, new PushItem(p));
                 }
             }
         }

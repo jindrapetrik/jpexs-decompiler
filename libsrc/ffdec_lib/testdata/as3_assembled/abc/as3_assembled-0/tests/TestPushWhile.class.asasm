@@ -1,0 +1,99 @@
+class
+ refid "tests:TestPushWhile"
+ instance QName(PackageNamespace("tests"), "TestPushWhile")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestPushWhile")
+  iinit
+   refid "tests:TestPushWhile/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestPushWhile/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+            getlocal0
+            pushscope
+            pushbyte 5
+            setlocal 3
+            
+            pushstring "ByteArray"
+            dup
+            findpropstrict MultinameL([PackageNamespace("flash.utils","1")])
+            swap
+            constructprop MultinameL([PackageNamespace("flash.utils","1")]), 0
+            dup
+            getlex QName(PackageNamespace("","2"),"obfuscated")
+            swap
+            pushstring "xxx"
+            swap
+            setproperty MultinameL([PackageNamespace("","2")])
+            pushint 50
+   ofs0016:
+            label
+            dup
+            iffalse ofs0039
+            decrement_i
+            swap
+            dup
+            dup
+            getproperty QName(PackageNamespace("","2"),"length")
+            pushbyte 41
+            pushbyte 111
+            bitxor
+            setproperty MultinameL([PackageNamespace("","2")])
+            dup
+            dup
+            getproperty QName(PackageNamespace("","2"),"length")
+            pushbyte 9
+            pushbyte 84
+            bitxor
+            setproperty MultinameL([PackageNamespace("","2")])
+            swap
+            jump ofs0016
+   ofs0039:
+            pop
+            pop
+            returnvoid
+     end ; code
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestPushWhile/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class
