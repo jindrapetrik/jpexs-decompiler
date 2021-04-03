@@ -3673,6 +3673,7 @@ public class CommandLineArgumentParser {
         File out;
         PrintWriter pw = new PrintWriter(System.out);
         boolean found = false;
+        boolean detectBundle = true;
         while (!args.isEmpty()) {
             String a = args.pop();
             switch (a) {
@@ -3688,13 +3689,16 @@ public class CommandLineArgumentParser {
                         pw = new PrintWriter(out);
                     }
                     break;
+                case "-nobundle":
+                    detectBundle = false;
+                    break;
                 default:
                     SWFBundle bundle;
                     String sfile = a;
                     File file = new File(sfile);
                     try {
 
-                        SWFSourceInfo sourceInfo = new SWFSourceInfo(null, sfile, sfile);
+                        SWFSourceInfo sourceInfo = new SWFSourceInfo(null, sfile, sfile, detectBundle);
                         bundle = sourceInfo.getBundle(false, SearchMode.ALL);
                         logger.log(Level.INFO, "Load file: {0}", sourceInfo.getFile());
 
