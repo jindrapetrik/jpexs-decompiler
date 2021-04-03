@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.iggy.conversion.IggySwfBundle;
@@ -35,10 +36,16 @@ public class SWFSourceInfo {
 
     private final String fileTitle;
 
+    private final boolean detectBundle;
+
     public SWFSourceInfo(InputStream inputStream, String file, String fileTitle) {
+        this(inputStream, file, fileTitle, true);
+    }
+    public SWFSourceInfo(InputStream inputStream, String file, String fileTitle, boolean detectBundle) {
         this.inputStream = inputStream;
         this.file = file;
         this.fileTitle = fileTitle;
+        this.detectBundle = detectBundle;
     }
 
     public InputStream getInputStream() {
@@ -77,7 +84,7 @@ public class SWFSourceInfo {
                 return false;
             }
             String extension = Path.getExtension(fileObj);
-            return extension == null || !(extension.equals(".swf") || extension.equals(".gfx"));
+            return (detectBundle) && (extension == null || !(extension.equals(".swf") || extension.equals(".gfx")));
         }
         return false;
     }
