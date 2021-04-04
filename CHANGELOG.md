@@ -31,6 +31,7 @@ All notable changes to this project will be documented in this file.
 - [#1676] Messages on movie tags when Flash Player ActiveX not available
 - [#1677] DefineFont2/3 - missing codeTableOffset if numGlyphs is zero and font has layout
 - AS decompilation - §§push before loop
+- [#1678] Flash viewer - shapes with mitter join do not render correctly
 
 ## [14.3.1] - 2021-03-25
 ### Fixed
@@ -2191,6 +2192,7 @@ All notable changes to this project will be documented in this file.
 [#1671]: https://www.free-decompiler.com/flash/issues/1671
 [#1672]: https://www.free-decompiler.com/flash/issues/1672
 [#1677]: https://www.free-decompiler.com/flash/issues/1677
+[#1678]: https://www.free-decompiler.com/flash/issues/1678
 [#1665]: https://www.free-decompiler.com/flash/issues/1665
 [#1661]: https://www.free-decompiler.com/flash/issues/1661
 [#1435]: https://www.free-decompiler.com/flash/issues/1435
