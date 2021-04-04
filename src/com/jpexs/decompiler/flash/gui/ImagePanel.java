@@ -48,6 +48,7 @@ import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
+import com.jpexs.decompiler.flash.tags.base.DisplayObjectCacheKey;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
@@ -142,7 +143,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private final List<SoundTagPlayer> soundPlayers = new ArrayList<>();
 
-    private final Cache<PlaceObjectTypeTag, SerializableImage> displayObjectCache = Cache.getInstance(false, false, "displayObject");
+    private final Cache<DisplayObjectCacheKey, SerializableImage> displayObjectCache = Cache.getInstance(false, false, "displayObject");
 
     private final IconPanel iconPanel;
 

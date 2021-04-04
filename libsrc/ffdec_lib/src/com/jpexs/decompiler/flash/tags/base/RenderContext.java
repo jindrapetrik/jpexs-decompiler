@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -37,5 +38,13 @@ public class RenderContext {
 
     public SerializableImage borderImage;
 
-    public Cache<PlaceObjectTypeTag, SerializableImage> displayObjectCache;
+    public Cache<DisplayObjectCacheKey, SerializableImage> displayObjectCache;
+
+    public void clearPlaceObjectCache(PlaceObjectTypeTag placeObject) {
+        for (DisplayObjectCacheKey k : displayObjectCache.keys()) {
+            if (k.placeObject == placeObject) {
+                displayObjectCache.remove(k);
+            }
+        }
+    }
 }

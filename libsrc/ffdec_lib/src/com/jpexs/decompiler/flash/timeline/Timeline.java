@@ -39,6 +39,7 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.DisplayObjectCacheKey;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
@@ -662,6 +663,7 @@ public class Timeline {
         strokeTransform = strokeTransform.concatenate(layerMatrix);
 
         boolean cacheAsBitmap = layer.cacheAsBitmap() && layer.placeObjectTag != null && drawable.isSingleFrame();
+
         /* // draw bounds
          AffineTransform trans = mat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).toTransform();
          g.setTransform(trans);
@@ -679,7 +681,8 @@ public class Timeline {
 
         SerializableImage img = null;
         if (cacheAsBitmap && renderContext.displayObjectCache != null) {
-            img = renderContext.displayObjectCache.get(layer.placeObjectTag);
+            DisplayObjectCacheKey key = new DisplayObjectCacheKey(layer.placeObjectTag, unzoom, viewRect);
+            img = renderContext.displayObjectCache.get(key);
         }
 
         int stateCount = renderContext.stateUnderCursor == null ? 0 : renderContext.stateUnderCursor.size();
@@ -689,6 +692,8 @@ public class Timeline {
         } else {
             dframe = time % drawableFrameCount;
         }
+
+        ExportRectangle viewRect2 = new ExportRectangle(viewRect);
 
         if (filters != null && filters.size() > 0) {
             // calculate size after applying the filters
@@ -704,12 +709,16 @@ public class Timeline {
             rect.xMax += deltaXMax * unzoom * SWF.unitDivisor;
             rect.yMin -= deltaYMax * unzoom * SWF.unitDivisor;
             rect.yMax += deltaYMax * unzoom * SWF.unitDivisor;
+            viewRect2.xMin -= deltaXMax * SWF.unitDivisor;
+            viewRect2.xMax += deltaXMax * SWF.unitDivisor;
+            viewRect2.yMin -= deltaXMax * SWF.unitDivisor;
+            viewRect2.yMax += deltaXMax * SWF.unitDivisor;
         }
 
         rect.xMin -= SWF.unitDivisor;
         rect.yMin -= SWF.unitDivisor;
-        rect.xMin = Math.max(0, rect.xMin);
-        rect.yMin = Math.max(0, rect.yMin);
+        /*rect.xMin = Math.max(0, rect.xMin);
+        rect.yMin = Math.max(0, rect.yMin);*/
         drawMatrix.translate(rect.xMin, rect.yMin);
         drawMatrix.translateX /= SWF.unitDivisor;
         drawMatrix.translateY /= SWF.unitDivisor;
@@ -795,7 +804,7 @@ public class Timeline {
             }
 
             if (!(drawable instanceof ImageTag) || (swf.isAS3() && layer.hasImage)) {
-                drawable.toImage(dframe, time, ratio, renderContext, img, isClip || clipDepth > -1, m, strokeTransform, absMat, mfull, clrTrans2, unzoom, sameImage, viewRect, scaleStrokes, drawMode);
+                drawable.toImage(dframe, time, ratio, renderContext, img, isClip || clipDepth > -1, m, strokeTransform, absMat, mfull, clrTrans2, unzoom, sameImage, viewRect2, scaleStrokes, drawMode);
             } else {
                 // todo: show one time warning
             }
@@ -812,7 +821,8 @@ public class Timeline {
             }
 
             if (!sameImage && cacheAsBitmap && renderContext.displayObjectCache != null) {
-                renderContext.displayObjectCache.put(layer.placeObjectTag, img);
+                renderContext.clearPlaceObjectCache(layer.placeObjectTag);
+                renderContext.displayObjectCache.put(new DisplayObjectCacheKey(layer.placeObjectTag, unzoom, viewRect), img);
             }
         }
 

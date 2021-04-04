@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.helpers.Freed;
@@ -21,8 +22,11 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.WeakHashMap;
 
 /**
@@ -168,5 +172,11 @@ public class Cache<K, V> implements Freed {
         if (cache instanceof Freed) {
             ((Freed) cache).free();
         }
+    }
+
+    public Set<K> keys() {
+        Set<K> ret = new HashSet<>();
+        ret.addAll(cache.keySet());
+        return ret;
     }
 }
