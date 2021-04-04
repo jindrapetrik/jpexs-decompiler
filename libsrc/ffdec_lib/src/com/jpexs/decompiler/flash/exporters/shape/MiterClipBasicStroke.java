@@ -106,6 +106,9 @@ public class MiterClipBasicStroke implements Stroke {
         int type;
         float points[] = new float[6];
 
+        Area area = new Area(stroke.createStrokedShape(p));
+        AffineTransform t = new AffineTransform();
+
         List<Vector> vectors = new ArrayList<>();
         List<Boolean> offPath = new ArrayList<>();
         float x = 0;
@@ -114,6 +117,8 @@ public class MiterClipBasicStroke implements Stroke {
             type = pi.currentSegment(points);
             switch (type) {
                 case PathIterator.SEG_MOVETO:
+                    vectors.add(new Vector(x, y, points[0], points[1]));
+                    offPath.add(true);
                     x = points[0];
                     y = points[1];
                     break;
@@ -145,8 +150,6 @@ public class MiterClipBasicStroke implements Stroke {
             pi.next();
         }
 
-        Area area = new Area(stroke.createStrokedShape(p));
-        AffineTransform t = new AffineTransform();
         for (int i = 0; i < vectors.size() - 1; i++) {
             if (offPath.get(i)) {
                 continue;
