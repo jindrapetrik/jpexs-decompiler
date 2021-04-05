@@ -121,4 +121,8 @@ public class ExportRectangle {
         }
         return true; //?
     }
+
+    public ExportRectangle toPx() {
+        return new ExportRectangle(Math.round(xMin / 20), Math.round(yMin / 20), Math.round(xMax / 20), Math.round(yMax / 20));
+    }
 }
