@@ -33,6 +33,9 @@ All notable changes to this project will be documented in this file.
 - AS decompilation - §§push before loop
 - [#1678] Flash viewer - shapes with mitter join do not render correctly
 
+### Removed
+- Flash viewer - miter with clip support removed as it was not working correctly
+
 ## [14.3.1] - 2021-03-25
 ### Fixed
 - "protected", "const", "namespace", "package" are not reserved keywords in AS1/2
