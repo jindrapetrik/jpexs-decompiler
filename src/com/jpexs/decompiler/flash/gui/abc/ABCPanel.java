@@ -1581,6 +1581,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                     public void run() {
                         ((Tag) abc.parentTag).getSwf().clearScriptCache();
                         fTraits.traits.remove(fTraitIndex);
+                        if (fTraits.traits.isEmpty()) {
+                            abc.script_info.get(decompiledTextArea.getScriptLeaf().scriptIndex).delete(abc, true);
+                            abc.pack();
+                        }
                         ((Tag) abc.parentTag).setModified(true);
                     }
                 });
