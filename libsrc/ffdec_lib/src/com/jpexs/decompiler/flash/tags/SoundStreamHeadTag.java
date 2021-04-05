@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -266,5 +267,10 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
         tagInfo.addInfo("general", "samplingRate", soundFormat.samplingRate);
         tagInfo.addInfo("general", "stereo", soundFormat.stereo);
         tagInfo.addInfo("general", "sampleCount", streamSoundSampleCount);
+    }
+
+    @Override
+    public String toString() {
+        return getName() + (virtualCharacterId > 0 ? " (" + virtualCharacterId + ")" : "");
     }
 }
