@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- SoundStreamHead has associated sprite id in its name in the tagtree
+
 ## [14.4.0] - 2021-04-05
 ### Added
 - [#1015], [#1466], [#1513] Better error messages during saving, display message on out of memory
