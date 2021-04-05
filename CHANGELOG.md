@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [14.4.0] - 2021-04-05
 ### Added
 - [#1015], [#1466], [#1513] Better error messages during saving, display message on out of memory
 - [#1657] Option to disable adding second quote/bracket/parenthesis
