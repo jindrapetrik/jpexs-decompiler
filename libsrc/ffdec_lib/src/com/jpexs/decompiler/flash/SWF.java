@@ -2620,11 +2620,11 @@ public final class SWF implements SWFContainerItem, Timelined {
     public void clearScriptCache() {
         as2Cache.clear();
         as3Cache.clear();
-        if (abcList != null) {
-            for (ABCContainerTag c : abcList) {
-                c.getABC().clearPacksCache();
-            }
+        List<ABCContainerTag> abcList = getAbcList();
+        for (ABCContainerTag c : abcList) {
+            c.getABC().clearPacksCache();
         }
+
         asmsCache = null;
         asmsCacheExportFilenames = null;
         IdentifiersDeobfuscation.clearCache();
@@ -2652,11 +2652,11 @@ public final class SWF implements SWFContainerItem, Timelined {
     public void clearAllCache() {
         characters = null;
         characterIdTags = null;
-        clearAbcListCache();
         timeline = null;
         clearReadOnlyListCache();
         clearImageCache();
         clearScriptCache();
+        clearAbcListCache();
         clearAllStaticCache();
     }
 

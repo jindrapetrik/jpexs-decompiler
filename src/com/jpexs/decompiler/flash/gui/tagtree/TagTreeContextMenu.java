@@ -1477,118 +1477,127 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             if (ViewMessages.showConfirmDialog(mainPanel, confirmationMessage, mainPanel.translate("message.confirm"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+
+                Runnable r = new Runnable() {
+                    @Override
+                    public void run() {
+                        Map<SWF, List<Tag>> tagsToRemoveBySwf = new HashMap<>();
+                        Set<SWF> swfsToClearCache = new HashSet<>();
+
+                        for (int i = 0; i < itemsToRemove.size(); i++) {
+                            Object item = itemsToRemove.get(i);
+                            if (item instanceof AS3Package) {
+                                List<ScriptPack> subScriptPacks = new ArrayList<>();
+                                getAllAS3PackageScriptPacks((AS3Package) item, subScriptPacks);
+                                for (ScriptPack pack : subScriptPacks) {
+                                    if (!itemsToRemove.contains(pack)) {
+                                        itemsToRemove.add(pack);
+                                        itemsToRemoveParents.add(new Object());
+                                        itemsToRemoveSprites.add(new Object());
+                                    }
+                                }
+                            }
+                            if (item instanceof AS2Package) {
+                                List<ASMSource> subAsmSources = new ArrayList<>();
+                                getAllAS2PackageScriptPacks((AS2Package) item, subAsmSources);
+                                for (ASMSource asmSource : subAsmSources) {
+                                    if (!itemsToRemove.contains(asmSource)) {
+                                        tagsToRemove.add((Tag) asmSource);
+                                    }
+                                }
+                            }
+                        }
+
+                        List<ABC> abcsToPack = new ArrayList<>();
+
+                        for (int i = 0; i < itemsToRemove.size(); i++) {
+                            Object item = itemsToRemove.get(i);
+                            Object parent = itemsToRemoveParents.get(i);
+                            if (item instanceof BUTTONCONDACTION) {
+                                DefineButton2Tag button = (DefineButton2Tag) parent;
+                                BUTTONCONDACTION buttonCondAction = (BUTTONCONDACTION) item;
+                                button.actions.remove(buttonCondAction);
+                                if (buttonCondAction.isLast) {
+                                    if (!button.actions.isEmpty()) {
+                                        button.actions.get(button.actions.size() - 1).isLast = true;
+                                    }
+                                }
+                                button.setModified(true);
+                            }
+                            if (item instanceof CLIPACTIONRECORD) {
+                                PlaceObjectTypeTag place = (PlaceObjectTypeTag) parent;
+                                Timelined tim = (itemsToRemoveSprites.get(i) instanceof DefineSpriteTag) ? (DefineSpriteTag) itemsToRemoveSprites.get(i) : place.getSwf();
+
+                                CLIPACTIONRECORD clipActionRecord = (CLIPACTIONRECORD) item;
+                                CLIPACTIONS clipActions = place.getClipActions();
+                                clipActions.clipActionRecords.remove(clipActionRecord);
+                                if (clipActions.clipActionRecords.isEmpty()) {
+                                    place.setPlaceFlagHasClipActions(false);
+                                    place.setClipActions(null);
+                                }
+                                clipActions.calculateAllEventFlags();
+                                place.setModified(true);
+                                tim.resetTimeline();
+                            }
+                            if (item instanceof ScriptPack) {
+                                ScriptPack sp = (ScriptPack) item;
+                                sp.delete(sp.abc, true);
+                                abcsToPack.add(sp.abc);
+                                swfsToClearCache.add(sp.getSwf());
+                                for (ABCContainerTag ct : sp.getSwf().getAbcList()) {
+                                    if (ct.getABC() == sp.abc) {
+                                        ((Tag) ct).setModified(true);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        for (ABC abc : abcsToPack) {
+                            abc.pack();
+
+                            ABCContainerTag container = null;
+                            for (ABCContainerTag ct : abc.getSwf().getAbcList()) {
+                                if (ct.getABC() == abc) {
+                                    container = ct;
+                                    break;
+                                }
+                            }
+
+                            if (abc.script_info.isEmpty()) { //all scripts in abc were removed
+                                abc.getSwf().removeTag((Tag) container);
+                                abc.getSwf().setModified(true);
+                            } else {
+                                ((Tag) container).setModified(true);
+                            }
+                        }
+
+                        for (Tag tag : tagsToRemove) {
+                            SWF swf = tag.getSwf();
+                            if (!tagsToRemoveBySwf.containsKey(swf)) {
+                                tagsToRemoveBySwf.put(swf, new ArrayList<>());
+                            }
+
+                            tagsToRemoveBySwf.get(swf).add(tag);
+                        }
+
+                        for (SWF swf : tagsToRemoveBySwf.keySet()) {
+                            swf.removeTags(tagsToRemoveBySwf.get(swf), removeDependencies);
+                        }
+
+                        for (SWF swf : swfsToClearCache) {
+                            swf.clearAllCache();
+                        }
+                    }
+                };
+
                 if (mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
-                    tagTree.clearSelection();
+                    mainPanel.treeOperation(r);
+                } else {
+                    //current folder must stay selected
+                    r.run();
+                    mainPanel.refreshTree();
                 }
-                Map<SWF, List<Tag>> tagsToRemoveBySwf = new HashMap<>();
-                Set<SWF> swfsToClearCache = new HashSet<>();
-
-                for (int i = 0; i < itemsToRemove.size(); i++) {
-                    Object item = itemsToRemove.get(i);
-                    if (item instanceof AS3Package) {
-                        List<ScriptPack> subScriptPacks = new ArrayList<>();
-                        getAllAS3PackageScriptPacks((AS3Package) item, subScriptPacks);
-                        for (ScriptPack pack : subScriptPacks) {
-                            if (!itemsToRemove.contains(pack)) {
-                                itemsToRemove.add(pack);
-                                itemsToRemoveParents.add(new Object());
-                                itemsToRemoveSprites.add(new Object());
-                            }
-                        }
-                    }
-                    if (item instanceof AS2Package) {
-                        List<ASMSource> subAsmSources = new ArrayList<>();
-                        getAllAS2PackageScriptPacks((AS2Package) item, subAsmSources);
-                        for (ASMSource asmSource : subAsmSources) {
-                            if (!itemsToRemove.contains(asmSource)) {
-                                tagsToRemove.add((Tag) asmSource);
-                            }
-                        }
-                    }
-                }
-
-                List<ABC> abcsToPack = new ArrayList<>();
-
-                for (int i = 0; i < itemsToRemove.size(); i++) {
-                    Object item = itemsToRemove.get(i);
-                    Object parent = itemsToRemoveParents.get(i);
-                    if (item instanceof BUTTONCONDACTION) {
-                        DefineButton2Tag button = (DefineButton2Tag) parent;
-                        BUTTONCONDACTION buttonCondAction = (BUTTONCONDACTION) item;
-                        button.actions.remove(buttonCondAction);
-                        if (buttonCondAction.isLast) {
-                            if (!button.actions.isEmpty()) {
-                                button.actions.get(button.actions.size() - 1).isLast = true;
-                            }
-                        }
-                        button.setModified(true);
-                    }
-                    if (item instanceof CLIPACTIONRECORD) {
-                        PlaceObjectTypeTag place = (PlaceObjectTypeTag) parent;
-                        Timelined tim = (itemsToRemoveSprites.get(i) instanceof DefineSpriteTag) ? (DefineSpriteTag) itemsToRemoveSprites.get(i) : place.getSwf();
-
-                        CLIPACTIONRECORD clipActionRecord = (CLIPACTIONRECORD) item;
-                        CLIPACTIONS clipActions = place.getClipActions();
-                        clipActions.clipActionRecords.remove(clipActionRecord);
-                        if (clipActions.clipActionRecords.isEmpty()) {
-                            place.setPlaceFlagHasClipActions(false);
-                            place.setClipActions(null);
-                        }
-                        clipActions.calculateAllEventFlags();
-                        place.setModified(true);
-                        tim.resetTimeline();
-                    }
-                    if (item instanceof ScriptPack) {
-                        ScriptPack sp = (ScriptPack) item;
-                        sp.delete(sp.abc, true);
-                        abcsToPack.add(sp.abc);
-                        swfsToClearCache.add(sp.getSwf());
-                        for (ABCContainerTag ct : sp.getSwf().getAbcList()) {
-                            if (ct.getABC() == sp.abc) {
-                                ((Tag) ct).setModified(true);
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                for (ABC abc : abcsToPack) {
-                    abc.pack();
-
-                    ABCContainerTag container = null;
-                    for (ABCContainerTag ct : abc.getSwf().getAbcList()) {
-                        if (ct.getABC() == abc) {
-                            container = ct;
-                            break;
-                        }
-                    }
-
-                    if (abc.script_info.isEmpty()) { //all scripts in abc were removed
-                        abc.getSwf().removeTag((Tag) container);
-                        abc.getSwf().setModified(true);
-                    } else {
-                        ((Tag) container).setModified(true);
-                    }
-                }
-
-                for (Tag tag : tagsToRemove) {
-                    SWF swf = tag.getSwf();
-                    if (!tagsToRemoveBySwf.containsKey(swf)) {
-                        tagsToRemoveBySwf.put(swf, new ArrayList<>());
-                    }
-
-                    tagsToRemoveBySwf.get(swf).add(tag);
-                }
-
-                for (SWF swf : tagsToRemoveBySwf.keySet()) {
-                    swf.removeTags(tagsToRemoveBySwf.get(swf), removeDependencies);
-                }
-
-                for (SWF swf : swfsToClearCache) {
-                    swf.clearAllCache();
-                }
-                    
-                mainPanel.refreshTree();
             }
         }
     }
