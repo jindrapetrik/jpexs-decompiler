@@ -20,6 +20,7 @@ import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
 import com.jpexs.debugger.flash.messages.in.InConstantPool;
 import com.jpexs.debugger.flash.messages.in.InFrame;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler.BreakListener;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import de.hameister.treetable.MyTreeTable;
@@ -222,7 +223,9 @@ public class DebugPanel extends JPanel {
         traceLogTextarea.setEditable(false);
         traceLogTextarea.setOpaque(false);
         traceLogTextarea.setFont(new JLabel().getFont());
-        traceLogTextarea.setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            traceLogTextarea.setBackground(Color.white);
+        }
 
         Main.getDebugHandler().addTraceListener(new DebuggerHandler.TraceListener() {
 

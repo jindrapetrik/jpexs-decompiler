@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -71,7 +72,9 @@ public class FilesChangedDialog extends AppDialog {
         label.setBorder(new EmptyBorder(10, 10, 10, 10));
         cnt.add(label, BorderLayout.NORTH);
         filesList = new JList<String>(listModel);
-        filesList.setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            filesList.setBackground(Color.white);
+        }
         cnt.add(new FasterScrollPane(filesList), BorderLayout.CENTER);
 
         JPanel panButtons = new JPanel(new FlowLayout());

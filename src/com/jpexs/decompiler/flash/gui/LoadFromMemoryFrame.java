@@ -308,7 +308,9 @@ public class LoadFromMemoryFrame extends AppFrame {
                     }
                 }
                 if (!isSelected) {
-                    label.setBackground(Color.white);
+                    if (Configuration.setControlsBackgroundToWhite.get()) {
+                        label.setBackground(Color.white);
+                    }
                 }
                 return label;
             }

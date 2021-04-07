@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -57,7 +58,9 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
         this.abcPanel = abcPanel;
         setCellRenderer(new IconListRenderer());
         //setUI(new BasicListUI());
-        setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            setBackground(Color.white);
+        }
     }
 
     public void clearAbc() {

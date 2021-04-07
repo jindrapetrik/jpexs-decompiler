@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.dumpview;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
@@ -208,7 +209,9 @@ public class DumpViewPanel extends JPanel {
     }
 
     private void doSearch() {
-        filterField.setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            filterField.setBackground(Color.white);
+        }
 
         String text = filterField.getText();
         if (text.length() == 0) {

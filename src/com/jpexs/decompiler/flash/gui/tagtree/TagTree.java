@@ -172,12 +172,11 @@ public class TagTree extends JTree {
         private Font boldFont;
 
         public TagTreeCellRenderer() {
-            setUI(new BasicLabelUI());
-            setOpaque(false);
-            //setBackground(Color.green);
-            setBackgroundNonSelectionColor(Color.white);
-            //setBackgroundSelectionColor(Color.ORANGE);
-
+            if (Configuration.setControlsBackgroundToWhite.get()) {
+                setUI(new BasicLabelUI());
+                setOpaque(false);
+                setBackgroundNonSelectionColor(Color.white);
+            }
         }
 
         @Override
@@ -244,10 +243,12 @@ public class TagTree extends JTree {
                 plainFont = font.deriveFont(Font.PLAIN);
             }
             setFont(isModified ? boldFont : plainFont);
-            if (isReadOnly) {
-                setForeground(new Color(0xcc, 0xcc, 0xcc));
-            } else {
-                setForeground(Color.BLACK);
+            if (Configuration.setControlsBackgroundToWhite.get()) {
+                if (isReadOnly) {
+                    setForeground(new Color(0xcc, 0xcc, 0xcc));
+                } else {
+                    setForeground(Color.BLACK);
+                }
             }
 
             return this;
@@ -259,12 +260,16 @@ public class TagTree extends JTree {
         this.mainPanel = mainPanel;
         setCellRenderer(new TagTreeCellRenderer());
         setRootVisible(false);
-        setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            setBackground(Color.white);
+        }
         setRowHeight(Math.max(getFont().getSize() + 5, 16));
         setLargeModel(true);
         setUI(new BasicTreeUI() {
             {
-                setHashColor(Color.gray);
+                if (Configuration.setControlsBackgroundToWhite.get()) {
+                    setHashColor(Color.gray);
+                }
             }
         });
     }

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.action;
 
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -240,7 +241,9 @@ public class AddScriptDialog extends AppDialog {
         frameList = new JList<>(framesArr);
         final ImageIcon frameIcon = View.getIcon("frame16");
         final ImageIcon frameInvalidIcon = View.getIcon("frameinvalid16");
-        frameList.setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            frameList.setBackground(Color.white);
+        }
         frameList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -329,7 +332,9 @@ public class AddScriptDialog extends AppDialog {
 
         final ImageIcon spriteIcon = View.getIcon("sprite16");
         final ImageIcon spriteInvalidIcon = View.getIcon("spriteinvalid16");
-        spriteInitList.setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            spriteInitList.setBackground(Color.white);
+        }
         spriteInitList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -371,7 +376,6 @@ public class AddScriptDialog extends AppDialog {
         });
         spriteFrameTextField.getDocument().addDocumentListener(documentListener);
 
-
         MyTreeNode root = new MyTreeNode();
         root.setData("root");
         populateSpriteNodes(root, swf);
@@ -383,9 +387,11 @@ public class AddScriptDialog extends AppDialog {
 
         spriteFrameTree.setCellRenderer(new DefaultTreeCellRenderer() {
             {
-                setUI(new BasicLabelUI());
-                setOpaque(false);
-                setBackgroundNonSelectionColor(Color.white);
+                if (Configuration.setControlsBackgroundToWhite.get()) {
+                    setUI(new BasicLabelUI());
+                    setOpaque(false);
+                    setBackgroundNonSelectionColor(Color.white);
+                }
             }
 
             @Override
@@ -411,7 +417,9 @@ public class AddScriptDialog extends AppDialog {
             }
         });
 
-        spriteFrameTree.setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            spriteFrameTree.setBackground(Color.white);
+        }
         spriteFrameTree.setRootVisible(false);
         spriteFrameTree.setShowsRootHandles(true);
         spriteFrameTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -449,7 +457,9 @@ public class AddScriptDialog extends AppDialog {
         }
         buttonList = new JList<>(buttons.toArray(new DefineButton2Tag[buttons.size()]));
         final ImageIcon buttonIcon = View.getIcon("button16");
-        buttonList.setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            buttonList.setBackground(Color.white);
+        }
         buttonList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -619,9 +629,11 @@ public class AddScriptDialog extends AppDialog {
 
         instanceTree.setCellRenderer(new DefaultTreeCellRenderer() {
             {
-                setUI(new BasicLabelUI());
-                setOpaque(false);
-                setBackgroundNonSelectionColor(Color.white);
+                if (Configuration.setControlsBackgroundToWhite.get()) {
+                    setUI(new BasicLabelUI());
+                    setOpaque(false);
+                    setBackgroundNonSelectionColor(Color.white);
+                }
             }
 
             @Override
@@ -646,7 +658,9 @@ public class AddScriptDialog extends AppDialog {
         });
 
         instanceTree.addTreeSelectionListener(this::instanceValueChanged);
-        instanceTree.setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            instanceTree.setBackground(Color.white);
+        }
 
         instancePreviewPanel = new PreviewPanel(Main.getMainFrame().getPanel(), null);
         instancePreviewPanel.setReadOnly(true);

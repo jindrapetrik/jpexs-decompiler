@@ -193,8 +193,10 @@ public class View {
             UIManager.put("RibbonApplicationMenuPopupPanelUI", MyRibbonApplicationMenuPopupPanelUI.class.getName());
             UIManager.put("RibbonApplicationMenuButtonUI", MyRibbonApplicationMenuButtonUI.class.getName());
             UIManager.put("ProgressBarUI", MyProgressBarUI.class.getName());
-            UIManager.put("TextField.background", Color.white);
-            UIManager.put("FormattedTextField.background", Color.white);
+            if (Configuration.setControlsBackgroundToWhite.get()) {
+                UIManager.put("TextField.background", Color.white);
+                UIManager.put("FormattedTextField.background", Color.white);
+            }
             UIManager.put("CommandButtonUI", MyCommandButtonUI.class.getName());
 
             if (defaultFontPolicy == null) {

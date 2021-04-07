@@ -113,15 +113,21 @@ public class ErrorLogFrame extends AppFrame {
     public ErrorLogFrame() {
         setTitle(translate("dialog.title"));
         setSize(700, 400);
-        setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            setBackground(Color.white);
+        }
         View.centerScreen(this);
         View.setWindowIcon(this);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-        logView.setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            logView.setBackground(Color.white);
+        }
         logView.setLayout(new BorderLayout());
-        cnt.setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            cnt.setBackground(Color.white);
+        }
 
         logViewInner.setLayout(new BoxLayout(logViewInner, BoxLayout.Y_AXIS));
         logView.add(logViewInner, BorderLayout.NORTH);
@@ -209,7 +215,9 @@ public class ErrorLogFrame extends AppFrame {
                 notifyMainFrame(level);
 
                 JPanel pan = new JPanel();
-                pan.setBackground(Color.white);
+                if (Configuration.setControlsBackgroundToWhite.get()) {
+                    pan.setBackground(Color.white);
+                }
                 pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
 
                 JComponent detailComponent;
@@ -220,13 +228,16 @@ public class ErrorLogFrame extends AppFrame {
                     detailTextArea.setEditable(false);
                     detailTextArea.setOpaque(false);
                     detailTextArea.setFont(new JLabel().getFont());
-                    detailTextArea.setBackground(Color.white);
+                    if (Configuration.setControlsBackgroundToWhite.get()) {
+                        detailTextArea.setBackground(Color.white);
+                    }
                     detailComponent = detailTextArea;
                 }
                 JPanel header = new JPanel();
                 header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
-                header.setBackground(Color.white);
-
+                if (Configuration.setControlsBackgroundToWhite.get()) {
+                    header.setBackground(Color.white);
+                }
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
                 final String dateStr = format.format(new Date());
 
