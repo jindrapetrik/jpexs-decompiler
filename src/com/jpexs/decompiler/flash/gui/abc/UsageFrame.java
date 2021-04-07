@@ -78,7 +78,7 @@ public class UsageFrame extends AppDialog implements MouseListener {
             usageListModel.addElement(u);
         }
         usageList = new JList<>(usageListModel);
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             usageList.setBackground(Color.white);
         }
         gotoButton.addActionListener(this::gotoButtonActionPerformed);

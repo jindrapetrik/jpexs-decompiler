@@ -209,7 +209,7 @@ public class DumpViewPanel extends JPanel {
     }
 
     private void doSearch() {
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             filterField.setBackground(Color.white);
         }
 

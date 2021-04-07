@@ -241,7 +241,7 @@ public class AddScriptDialog extends AppDialog {
         frameList = new JList<>(framesArr);
         final ImageIcon frameIcon = View.getIcon("frame16");
         final ImageIcon frameInvalidIcon = View.getIcon("frameinvalid16");
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             frameList.setBackground(Color.white);
         }
         frameList.setCellRenderer(new DefaultListCellRenderer() {
@@ -332,7 +332,7 @@ public class AddScriptDialog extends AppDialog {
 
         final ImageIcon spriteIcon = View.getIcon("sprite16");
         final ImageIcon spriteInvalidIcon = View.getIcon("spriteinvalid16");
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             spriteInitList.setBackground(Color.white);
         }
         spriteInitList.setCellRenderer(new DefaultListCellRenderer() {
@@ -387,7 +387,7 @@ public class AddScriptDialog extends AppDialog {
 
         spriteFrameTree.setCellRenderer(new DefaultTreeCellRenderer() {
             {
-                if (Configuration.setControlsBackgroundToWhite.get()) {
+                if (View.isOceanic()) {
                     setUI(new BasicLabelUI());
                     setOpaque(false);
                     setBackgroundNonSelectionColor(Color.white);
@@ -417,7 +417,7 @@ public class AddScriptDialog extends AppDialog {
             }
         });
 
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             spriteFrameTree.setBackground(Color.white);
         }
         spriteFrameTree.setRootVisible(false);
@@ -457,7 +457,7 @@ public class AddScriptDialog extends AppDialog {
         }
         buttonList = new JList<>(buttons.toArray(new DefineButton2Tag[buttons.size()]));
         final ImageIcon buttonIcon = View.getIcon("button16");
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             buttonList.setBackground(Color.white);
         }
         buttonList.setCellRenderer(new DefaultListCellRenderer() {
@@ -629,7 +629,7 @@ public class AddScriptDialog extends AppDialog {
 
         instanceTree.setCellRenderer(new DefaultTreeCellRenderer() {
             {
-                if (Configuration.setControlsBackgroundToWhite.get()) {
+                if (View.isOceanic()) {
                     setUI(new BasicLabelUI());
                     setOpaque(false);
                     setBackgroundNonSelectionColor(Color.white);
@@ -658,7 +658,7 @@ public class AddScriptDialog extends AppDialog {
         });
 
         instanceTree.addTreeSelectionListener(this::instanceValueChanged);
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             instanceTree.setBackground(Color.white);
         }
 

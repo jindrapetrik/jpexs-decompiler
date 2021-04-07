@@ -72,7 +72,7 @@ public class FilesChangedDialog extends AppDialog {
         label.setBorder(new EmptyBorder(10, 10, 10, 10));
         cnt.add(label, BorderLayout.NORTH);
         filesList = new JList<String>(listModel);
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             filesList.setBackground(Color.white);
         }
         cnt.add(new FasterScrollPane(filesList), BorderLayout.CENTER);

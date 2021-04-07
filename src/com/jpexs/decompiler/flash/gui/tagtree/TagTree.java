@@ -172,9 +172,9 @@ public class TagTree extends JTree {
         private Font boldFont;
 
         public TagTreeCellRenderer() {
-            if (Configuration.setControlsBackgroundToWhite.get()) {
-                setUI(new BasicLabelUI());
-                setOpaque(false);
+            setUI(new BasicLabelUI());
+            setOpaque(false);
+            if (View.isOceanic()) {
                 setBackgroundNonSelectionColor(Color.white);
             }
         }
@@ -243,7 +243,7 @@ public class TagTree extends JTree {
                 plainFont = font.deriveFont(Font.PLAIN);
             }
             setFont(isModified ? boldFont : plainFont);
-            if (Configuration.setControlsBackgroundToWhite.get()) {
+            if (View.isOceanic()) {
                 if (isReadOnly) {
                     setForeground(new Color(0xcc, 0xcc, 0xcc));
                 } else {
@@ -260,14 +260,14 @@ public class TagTree extends JTree {
         this.mainPanel = mainPanel;
         setCellRenderer(new TagTreeCellRenderer());
         setRootVisible(false);
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             setBackground(Color.white);
         }
         setRowHeight(Math.max(getFont().getSize() + 5, 16));
         setLargeModel(true);
         setUI(new BasicTreeUI() {
             {
-                if (Configuration.setControlsBackgroundToWhite.get()) {
+                if (View.isOceanic()) {
                     setHashColor(Color.gray);
                 }
             }

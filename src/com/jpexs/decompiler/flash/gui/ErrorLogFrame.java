@@ -113,7 +113,7 @@ public class ErrorLogFrame extends AppFrame {
     public ErrorLogFrame() {
         setTitle(translate("dialog.title"));
         setSize(700, 400);
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             setBackground(Color.white);
         }
         View.centerScreen(this);
@@ -121,11 +121,11 @@ public class ErrorLogFrame extends AppFrame {
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             logView.setBackground(Color.white);
         }
         logView.setLayout(new BorderLayout());
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             cnt.setBackground(Color.white);
         }
 
@@ -215,7 +215,7 @@ public class ErrorLogFrame extends AppFrame {
                 notifyMainFrame(level);
 
                 JPanel pan = new JPanel();
-                if (Configuration.setControlsBackgroundToWhite.get()) {
+                if (View.isOceanic()) {
                     pan.setBackground(Color.white);
                 }
                 pan.setLayout(new BoxLayout(pan, BoxLayout.Y_AXIS));
@@ -228,14 +228,14 @@ public class ErrorLogFrame extends AppFrame {
                     detailTextArea.setEditable(false);
                     detailTextArea.setOpaque(false);
                     detailTextArea.setFont(new JLabel().getFont());
-                    if (Configuration.setControlsBackgroundToWhite.get()) {
+                    if (View.isOceanic()) {
                         detailTextArea.setBackground(Color.white);
                     }
                     detailComponent = detailTextArea;
                 }
                 JPanel header = new JPanel();
                 header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
-                if (Configuration.setControlsBackgroundToWhite.get()) {
+                if (View.isOceanic()) {
                     header.setBackground(Color.white);
                 }
                 SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");

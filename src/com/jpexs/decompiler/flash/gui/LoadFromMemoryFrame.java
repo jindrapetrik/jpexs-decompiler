@@ -308,7 +308,7 @@ public class LoadFromMemoryFrame extends AppFrame {
                     }
                 }
                 if (!isSelected) {
-                    if (Configuration.setControlsBackgroundToWhite.get()) {
+                    if (View.isOceanic()) {
                         label.setBackground(Color.white);
                     }
                 }

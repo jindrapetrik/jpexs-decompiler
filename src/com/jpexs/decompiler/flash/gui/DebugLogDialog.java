@@ -48,7 +48,7 @@ public class DebugLogDialog extends AppDialog {
         setSize(800, 600);
         this.debug = debug;
         setTitle(translate("dialog.title"));
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             logTextArea.setBackground(Color.white);
         }
         logTextArea.setEditable(false);

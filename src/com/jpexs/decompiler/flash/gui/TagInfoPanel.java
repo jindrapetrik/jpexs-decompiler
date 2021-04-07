@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.TagInfo;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,7 +87,11 @@ public class TagInfoPanel extends JPanel {
 
         List<TagInfo.TagInfoItem> items = tagInfo.getInfos().get(categoryName);
 
-        result += "<tr bgcolor='#FDFDFD'>";
+        if (View.isOceanic()) {
+            result += "<tr bgcolor='#FDFDFD'>";
+        } else {
+            result += "</tr>";
+        }
         result += "<td width='50%' style='text-align:center;'>";
         result += mainPanel.translate("tagInfo.header.name");
         result += "</td>";
@@ -100,7 +105,11 @@ public class TagInfoPanel extends JPanel {
 
             flipFlop = !flipFlop;
 
-            result += "<tr bgcolor='" + (flipFlop ? "#FDFDFD" : "#F4F4F4") + "'>";
+            if (View.isOceanic()) {
+                result += "<tr bgcolor='" + (flipFlop ? "#FDFDFD" : "#F4F4F4") + "'>";
+            } else {
+                result += "<tr>";
+            }
 
             String name = item.getName();
             String key = "tagInfo." + name;
@@ -149,22 +158,37 @@ public class TagInfoPanel extends JPanel {
 
         editorPane.setText(result);
 
-        Font font = UIManager.getFont("Label.font");
+        Font font = UIManager.getFont("Table.font");
         String bodyRule = "body { font-family: " + font.getFamily() + ";"
                 + " font-size: " + font.getSize() + "pt;"
                 + "}"
                 + " table {"
-                + " width:100%;"
-                + " color:#053E6A;"
-                + " padding:1px;"
-                + "}"
-                + "td { border: 1px solid #e4e4e4; }"
-                + "html { border: 1px solid #789AC4; }";
+                + " width:100%;";
+
+        if (View.isOceanic()) {
+            bodyRule += "color:#053E6A;"
+                    + "padding:1px;"
+                    + "}"
+                    + "td { border: 1px solid #e4e4e4; }"
+                    + "html { border: 1px solid #789AC4; }";
+        } else {
+            bodyRule += "background-color: " + getUIColorToHex("Table.background") + ";"
+                    + "color:" + getUIColorToHex("Table.foreground") + ";"
+                    + "padding:1px;"
+                    + "}"
+                    + "td { border: 1px solid " + getUIColorToHex("Table.gridColor") + "; }"
+                    + "html { border: 1px solid " + getUIColorToHex("Table.gridColor") + "; }";;
+        }
 
         ((HTMLDocument) editorPane.getDocument()).getStyleSheet().addRule(bodyRule);
 
         editorPane.setOpaque(false);
         editorPane.setBorder(null);
         editorPane.setEditable(false);
+    }
+
+    private static String getUIColorToHex(String name) {
+        Color c = UIManager.getColor(name);
+        return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
     }
 }

@@ -117,7 +117,7 @@ public class DumpTree extends JTree {
     public class DumpTreeCellRenderer extends DefaultTreeCellRenderer {
 
         public DumpTreeCellRenderer() {
-            if (Configuration.setControlsBackgroundToWhite.get()) {
+            if (View.isOceanic()) {
                 setUI(new BasicLabelUI());
                 setOpaque(false);
                 setBackgroundNonSelectionColor(Color.white);
@@ -236,7 +236,7 @@ public class DumpTree extends JTree {
         this.mainPanel = mainPanel;
         setCellRenderer(new DumpTreeCellRenderer());
         setRootVisible(false);
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             setBackground(Color.white);
             setUI(new BasicTreeUI() {
                 {

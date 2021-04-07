@@ -42,7 +42,7 @@ public class DocsPanel extends JPanel implements DocsListener {
         add(sp, BorderLayout.CENTER);
         textDisplay.setContentType("text/html");
         textDisplay.setFocusable(false);
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             textDisplay.setBackground(Color.white);
         }
     }
