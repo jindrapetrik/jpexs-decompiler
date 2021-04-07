@@ -185,15 +185,17 @@ public class View {
             }
 
             UIManager.put(SubstanceLookAndFeel.COLORIZATION_FACTOR, 0.999);//This works for not changing labels color and not changing Dialogs title
-            UIManager.put("Tree.expandedIcon", getIcon("expand16"));
-            UIManager.put("Tree.collapsedIcon", getIcon("collapse16"));
+            if (View.isOceanic()) {
+                UIManager.put("Tree.expandedIcon", getIcon("expand16"));
+                UIManager.put("Tree.collapsedIcon", getIcon("collapse16"));
+            }
             UIManager.put("ColorChooserUI", BasicColorChooserUI.class.getName());
             UIManager.put("ColorChooser.swatchesRecentSwatchSize", new Dimension(20, 20));
             UIManager.put("ColorChooser.swatchesSwatchSize", new Dimension(20, 20));
             UIManager.put("RibbonApplicationMenuPopupPanelUI", MyRibbonApplicationMenuPopupPanelUI.class.getName());
             UIManager.put("RibbonApplicationMenuButtonUI", MyRibbonApplicationMenuButtonUI.class.getName());
             UIManager.put("ProgressBarUI", MyProgressBarUI.class.getName());
-            if (Configuration.setControlsBackgroundToWhite.get()) {
+            if (View.isOceanic()) {
                 UIManager.put("TextField.background", Color.white);
                 UIManager.put("FormattedTextField.background", Color.white);
             }
@@ -695,5 +697,9 @@ public class View {
         }
 
         return image;
+    }
+
+    public static boolean isOceanic() {
+        return SubstanceLookAndFeel.getCurrentSkin() instanceof OceanicSkin;
     }
 }

@@ -223,7 +223,7 @@ public class DebugPanel extends JPanel {
         traceLogTextarea.setEditable(false);
         traceLogTextarea.setOpaque(false);
         traceLogTextarea.setFont(new JLabel().getFont());
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             traceLogTextarea.setBackground(Color.white);
         }
 

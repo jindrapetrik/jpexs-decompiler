@@ -113,7 +113,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
     private class MyTree extends JTree {
 
         public MyTree() {
-            if (Configuration.setControlsBackgroundToWhite.get()) {
+            if (View.isOceanic()) {
                 setBackground(Color.white);
             }
             setUI(new BasicTreeUI() {
@@ -480,7 +480,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
     public class MyTreeCellRenderer extends DefaultTreeCellRenderer {
 
         public MyTreeCellRenderer() {
-            if (Configuration.setControlsBackgroundToWhite.get()) {
+            if (View.isOceanic()) {
                 setUI(new BasicLabelUI());
                 setOpaque(false);
                 setBackgroundNonSelectionColor(Color.white);

@@ -469,7 +469,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         detailPanel.setLayout(new CardLayout());
 
         JPanel whitePanel = new JPanel();
-        if (Configuration.setControlsBackgroundToWhite.get()) {
+        if (View.isOceanic()) {
             whitePanel.setBackground(Color.white);
         }
         detailPanel.add(whitePanel, DETAILCARDEMPTYPANEL);
