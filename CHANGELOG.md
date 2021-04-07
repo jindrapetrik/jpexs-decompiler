@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - SoundStreamHead has associated sprite id in its name in the tagtree
+- [#1485] Improved skins support, night mode
 
 ## [14.4.0] - 2021-04-05
 ### Added
@@ -2074,7 +2075,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.3.1...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.4.0...dev
+[14.4.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.3.1...version14.4.0
 [14.3.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.3.0...version14.3.1
 [14.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.2.1...version14.3.0
 [14.2.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.2.0...version14.2.1
@@ -2187,6 +2189,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1485]: https://www.free-decompiler.com/flash/issues/1485
 [#1015]: https://www.free-decompiler.com/flash/issues/1015
 [#1466]: https://www.free-decompiler.com/flash/issues/1466
 [#1513]: https://www.free-decompiler.com/flash/issues/1513

@@ -13,14 +13,14 @@
  */
 package jsyntaxpane.syntaxkits;
 
-import jsyntaxpane.DefaultSyntaxKit;
+import jsyntaxpane.DarkModeAwareSyntaxKit;
 import jsyntaxpane.Lexer;
 import jsyntaxpane.lexers.SWFTextLexer;
 
 /**
  * @author JPEXS
  */
-public class SWFTextSyntaxKit extends DefaultSyntaxKit {
+public class SWFTextSyntaxKit extends DarkModeAwareSyntaxKit {
 
     public SWFTextSyntaxKit() {
         super(new SWFTextLexer());

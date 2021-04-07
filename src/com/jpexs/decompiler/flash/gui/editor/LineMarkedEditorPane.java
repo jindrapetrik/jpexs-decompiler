@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.plaf.TextUI;
@@ -642,19 +643,49 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
         }
     }
 
+    private int cut(double val) {
+        int ival = (int) Math.round(val);
+        if (ival < 0) {
+            return 0;
+        }
+        if (ival > 255) {
+            ival = 255;
+        }
+        return ival;
+    }
+
     @Override
     public void paint(Graphics g) {
-        g.setColor(Color.white); //FIXME
+        Color c;
+        Color selColor;
+        if (com.jpexs.decompiler.flash.gui.View.isOceanic()) {
+            c = Color.white;
+            g.setColor(c);
+            selColor = BG_SELECTED_LINE;
+        } else {
+            c = UIManager.getColor("EditorPane.background");
+            g.setColor(c);
+            int light = (c.getRed() + c.getGreen() + c.getBlue()) / 3;
+
+            if (light > 128) {
+                selColor = new Color(cut(c.getRed() * 0.9), cut(c.getGreen() * 0.9), cut(c.getBlue() * 0.9));
+            } else {
+                selColor = new Color(cut(c.getRed() * 1.1), cut(c.getGreen() * 1.1), cut(c.getBlue() * 1.1));
+            }
+        }
+
+
+
         g.fillRect(0, 0, getWidth(), getHeight());
         FontMetrics fontMetrics = g.getFontMetrics();
         int lh = fontMetrics.getHeight();
         int d = fontMetrics.getDescent();
 
-        if (lastLine > 0) {
+        if (lastLine > -1) {
             if (error) {
                 g.setColor(BG_ERROR_LINE);
             } else {
-                g.setColor(BG_SELECTED_LINE);
+                g.setColor(selColor);
             }
             g.fillRect(0, d + lh * lastLine - 1, getWidth(), lh);
         }

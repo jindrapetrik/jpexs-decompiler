@@ -177,7 +177,8 @@ public class TagInfoPanel extends JPanel {
                     + "padding:1px;"
                     + "}"
                     + "td { border: 1px solid " + getUIColorToHex("Table.gridColor") + "; }"
-                    + "html { border: 1px solid " + getUIColorToHex("Table.gridColor") + "; }";;
+                    + "html { border: 1px solid " + getUIColorToHex("Table.gridColor") + "; }"
+                    + "a {color: " + getUIColorToHex("List.selectionBackground") + "}";
         }
 
         ((HTMLDocument) editorPane.getDocument()).getStyleSheet().addRule(bodyRule);

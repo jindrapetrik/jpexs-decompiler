@@ -19,7 +19,9 @@ package com.jpexs.decompiler.flash.gui;
 import java.awt.Color;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
+import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
+import javax.swing.text.html.HTMLDocument;
 
 public class HtmlLabel extends JEditorPane {
 
@@ -53,11 +55,20 @@ public class HtmlLabel extends JEditorPane {
         }
         this.rawText = t;
         super.setText(modText);
+
+        String aRule = "a {color: " + getUIColorToHex("List.selectionBackground") + "}";
+
+        ((HTMLDocument) getDocument()).getStyleSheet().addRule(aRule);
     }
 
     @Override
     public String getText() {
         return rawText;
+    }
+
+    private static String getUIColorToHex(String name) {
+        Color c = UIManager.getColor(name);
+        return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
     }
 
 }

@@ -13,7 +13,7 @@
  */
 package jsyntaxpane.syntaxkits;
 
-import jsyntaxpane.DefaultSyntaxKit;
+import jsyntaxpane.DarkModeAwareSyntaxKit;
 import jsyntaxpane.Lexer;
 import jsyntaxpane.lexers.ActionScriptLexer;
 
@@ -21,7 +21,7 @@ import jsyntaxpane.lexers.ActionScriptLexer;
  *
  * @author JPEXS
  */
-public class ActionScriptSyntaxKit extends DefaultSyntaxKit {
+public class ActionScriptSyntaxKit extends DarkModeAwareSyntaxKit {
 
     public ActionScriptSyntaxKit() {
         super(new ActionScriptLexer());
