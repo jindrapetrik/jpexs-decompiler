@@ -13,14 +13,14 @@
  */
 package jsyntaxpane.syntaxkits;
 
-import jsyntaxpane.DefaultSyntaxKit;
+import jsyntaxpane.DarkModeAwareSyntaxKit;
 import jsyntaxpane.Lexer;
 import jsyntaxpane.lexers.Flasm3MethodInfoLexer;
 
 /**
  * @author JPEXS
  */
-public class Flasm3MethodInfoSyntaxKit extends DefaultSyntaxKit {
+public class Flasm3MethodInfoSyntaxKit extends DarkModeAwareSyntaxKit {
 
     public Flasm3MethodInfoSyntaxKit() {
         super(new Flasm3MethodInfoLexer());

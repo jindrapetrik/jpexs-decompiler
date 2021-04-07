@@ -17,12 +17,14 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.SystemColor;
 import java.awt.geom.GeneralPath;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.swing.JLabel;
+import javax.swing.UIManager;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;

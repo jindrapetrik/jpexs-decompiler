@@ -24,6 +24,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.Set;
+import javax.swing.UIManager;
 import jsyntaxpane.components.BreakPointListener;
 import jsyntaxpane.components.LineMarkerPainter;
 import jsyntaxpane.components.LineNumbersBreakpointsRuler;
@@ -38,7 +39,7 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
 
     private static final Color BG_RULER_COLOR = new Color(0xe9, 0xe8, 0xe2);
 
-    private static final Color BG_BREAKPOINT_COLOR = new Color(0xfc, 0x9d, 0x9f);
+    private static Color BG_BREAKPOINT_COLOR = new Color(0xfc, 0x9d, 0x9f);
 
     private static final Color FG_BREAKPOINT_COLOR = null;
 
@@ -56,7 +57,7 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
 
     private static final int PRIORITY_INVALID_BREAKPOINT = 10;
 
-    public static final LineMarker BREAKPOINT_MARKER = new LineMarker(FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
+    public static LineMarker BREAKPOINT_MARKER = new LineMarker(FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
 
     public static final LineMarker IP_MARKER = new LineMarker(FG_IP_COLOR, BG_IP_COLOR, PRIORITY_IP);
 
@@ -65,6 +66,16 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
     protected String scriptName = null;
 
     private LineNumbersBreakpointsRuler ruler;
+
+    public DebuggableEditorPane() {
+
+        Color editorBackground = UIManager.getColor("EditorPane.background");
+        int light = (editorBackground.getRed() + editorBackground.getGreen() + editorBackground.getBlue()) / 3;
+        if (light < 128) {
+            BG_BREAKPOINT_COLOR = new Color(0x88, 0x00, 0x00);
+            BREAKPOINT_MARKER = new LineMarker(FG_BREAKPOINT_COLOR, BG_BREAKPOINT_COLOR, PRIORITY_BREAKPOINT);
+        }
+    }
 
     public synchronized void setScriptName(String scriptName) {
         this.scriptName = scriptName;
@@ -128,18 +139,24 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
     public void paintLineMarker(Graphics g, int line, int x, int lineY, int textY, int lineHeight, boolean currentLine, int maxLines) {
 
         if (currentLine) {
-            g.setColor(BG_CURRENT_COLOR);
+            g.setColor(UIManager.getColor("List.selectionBackground"));
         } else {
-            g.setColor(View.getDefaultBackgroundColor());
+            g.setColor(UIManager.getColor("Panel.background"));
         }
         int h = lineHeight;
         if (line == 1) {
             h += lineY;
         }
-        if (line == maxLines) {
+        /*if (line == maxLines) {
             h = getHeight() - lineY;
-        }
+        }*/
         g.fillRect(0, line == 1 ? 0 : lineY, getWidth(), h);
+
+        if (line == maxLines) {
+            g.setColor(UIManager.getColor("Panel.background"));
+            g.fillRect(0, line == 1 ? 0 : lineY + h, getWidth(), getHeight() - lineY - lineHeight);
+        }
+
 
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -168,7 +185,11 @@ public class DebuggableEditorPane extends LineMarkedEditorPane implements BreakP
             drawText = false;
         }
         if (drawText) {
-            g.setColor(getForeground());
+            if (currentLine) {
+                g.setColor(UIManager.getColor("List.selectionForeground"));
+            } else {
+                g.setColor(UIManager.getColor("Panel.foreground"));
+            }
             g.drawString("" + line, x, textY);
         }
 

@@ -32,6 +32,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
@@ -87,7 +88,8 @@ public class LineNumbersRuler extends JPanel
     // The formatting to use for displaying numbers.  Use in String.format(numbersFormat, line)
     private String numbersFormat = "%3d";
 
-    private Color currentLineColor;
+    protected Color currentLineColor;
+    protected Color currentLineForegroundColor;
 
     /**
      * Get the JscrollPane that contains this EditorPane, or null if no
@@ -112,11 +114,13 @@ public class LineNumbersRuler extends JPanel
         int right = config.getInteger(PROPERTY_RIGHT_MARGIN, DEFAULT_R_MARGIN);
         int left = config.getInteger(PROPERTY_LEFT_MARGIN, DEFAULT_L_MARGIN);
         Color foreground = config.getColor(PROPERTY_FOREGROUND, Color.BLACK);
-        setForeground(foreground);
+        setForeground(UIManager.getColor("Panel.foreground"));
         Color back = config.getColor(PROPERTY_BACKGROUND, Color.WHITE);
-        setBackground(back);
+        setBackground(UIManager.getColor("Panel.background"));
         setBorder(BorderFactory.createEmptyBorder(0, left, 0, right));
-        currentLineColor = config.getColor(PROPERTY_CURRENT_BACK, back);
+        //currentLineColor = config.getColor(PROPERTY_CURRENT_BACK, back);
+        currentLineColor = UIManager.getColor("List.selectionBackground");
+        currentLineForegroundColor = UIManager.getColor("List.selectionForeground");
     }
 
     @Override
@@ -237,9 +241,10 @@ public class LineNumbersRuler extends JPanel
             if (line == currentLine) {
                 g.setColor(currentLineColor);
                 g.fillRect(0, y - lh + fontMetrics.getDescent() - 1, getWidth(), lh);
-                g.setColor(getForeground());
+                g.setColor(currentLineForegroundColor);
                 g.drawString(lineNumber, insets.left, y);
             } else {
+                g.setColor(getForeground());
                 g.drawString(lineNumber, insets.left, y);
             }
         }
