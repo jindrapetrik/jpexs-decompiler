@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.generictageditors.Amf3ValueEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BinaryDataEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
@@ -112,7 +113,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
     private class MyTree extends JTree {
 
         public MyTree() {
-            setBackground(Color.white);
+            if (Configuration.setControlsBackgroundToWhite.get()) {
+                setBackground(Color.white);
+            }
             setUI(new BasicTreeUI() {
                 @Override
                 public void paint(Graphics g, JComponent c) {
@@ -477,9 +480,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
     public class MyTreeCellRenderer extends DefaultTreeCellRenderer {
 
         public MyTreeCellRenderer() {
-            setUI(new BasicLabelUI());
-            setOpaque(false);
-            setBackgroundNonSelectionColor(Color.white);
+            if (Configuration.setControlsBackgroundToWhite.get()) {
+                setUI(new BasicLabelUI());
+                setOpaque(false);
+                setBackgroundNonSelectionColor(Color.white);
+            }
         }
     }
 

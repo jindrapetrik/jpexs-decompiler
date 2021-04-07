@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
 import com.jpexs.decompiler.flash.gui.debugger.Debugger;
 import java.awt.BorderLayout;
@@ -47,7 +48,9 @@ public class DebugLogDialog extends AppDialog {
         setSize(800, 600);
         this.debug = debug;
         setTitle(translate("dialog.title"));
-        logTextArea.setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            logTextArea.setBackground(Color.white);
+        }
         logTextArea.setEditable(false);
         JScrollPane spane = new FasterScrollPane(logTextArea);
         spane.setPreferredSize(new Dimension(800, 500));

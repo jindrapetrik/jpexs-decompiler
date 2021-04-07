@@ -725,6 +725,10 @@ public final class Configuration {
     @ConfigurationInternal
     public static ConfigurationItem<Boolean> showDialogOnError = null;
 
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> setControlsBackgroundToWhite = null;
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

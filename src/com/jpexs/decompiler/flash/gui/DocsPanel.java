@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.abc.DocsListener;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -41,7 +42,9 @@ public class DocsPanel extends JPanel implements DocsListener {
         add(sp, BorderLayout.CENTER);
         textDisplay.setContentType("text/html");
         textDisplay.setFocusable(false);
-        textDisplay.setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            textDisplay.setBackground(Color.white);
+        }
     }
 
     @Override

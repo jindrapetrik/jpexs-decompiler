@@ -469,7 +469,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         detailPanel.setLayout(new CardLayout());
 
         JPanel whitePanel = new JPanel();
-        whitePanel.setBackground(Color.white);
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            whitePanel.setBackground(Color.white);
+        }
         detailPanel.add(whitePanel, DETAILCARDEMPTYPANEL);
 
         tagInfoPanel = new TagInfoPanel(this);

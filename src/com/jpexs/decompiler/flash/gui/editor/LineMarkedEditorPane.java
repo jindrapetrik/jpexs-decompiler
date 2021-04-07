@@ -644,7 +644,7 @@ public class LineMarkedEditorPane extends UndoFixedEditorPane implements LinkHan
 
     @Override
     public void paint(Graphics g) {
-        g.setColor(Color.white);
+        g.setColor(Color.white); //FIXME
         g.fillRect(0, 0, getWidth(), getHeight());
         FontMetrics fontMetrics = g.getFontMetrics();
         int lh = fontMetrics.getHeight();

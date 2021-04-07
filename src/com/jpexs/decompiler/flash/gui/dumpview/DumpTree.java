@@ -117,9 +117,11 @@ public class DumpTree extends JTree {
     public class DumpTreeCellRenderer extends DefaultTreeCellRenderer {
 
         public DumpTreeCellRenderer() {
-            setUI(new BasicLabelUI());
-            setOpaque(false);
-            setBackgroundNonSelectionColor(Color.white);
+            if (Configuration.setControlsBackgroundToWhite.get()) {
+                setUI(new BasicLabelUI());
+                setOpaque(false);
+                setBackgroundNonSelectionColor(Color.white);
+            }
         }
 
         @Override
@@ -234,12 +236,14 @@ public class DumpTree extends JTree {
         this.mainPanel = mainPanel;
         setCellRenderer(new DumpTreeCellRenderer());
         setRootVisible(false);
-        setBackground(Color.white);
-        setUI(new BasicTreeUI() {
-            {
-                setHashColor(Color.gray);
-            }
-        });
+        if (Configuration.setControlsBackgroundToWhite.get()) {
+            setBackground(Color.white);
+            setUI(new BasicTreeUI() {
+                {
+                    setHashColor(Color.gray);
+                }
+            });
+        }
     }
 
     public void createContextMenu() {
