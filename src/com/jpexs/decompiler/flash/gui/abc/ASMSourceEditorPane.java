@@ -47,6 +47,7 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.Helper;
+import java.awt.Color;
 import java.awt.Point;
 import java.io.IOException;
 import java.io.StringReader;
@@ -60,6 +61,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
@@ -593,6 +595,10 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
     public void updateDocs() {
         String path = getLevel();
 
+        Color c = UIManager.getColor("EditorPane.background");
+        int light = (c.getRed() + c.getGreen() + c.getBlue()) / 3;
+        boolean nightMode = light <= 128;
+
         String pathNoTrait = path;
         if (path.startsWith("trait.method")) {
             pathNoTrait = path.substring("trait.".length());
@@ -626,11 +632,12 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                 SwingUtilities.convertPointToScreen(loc, this);
             }
             if (insNameToDef.containsKey(insName)) {
-                fireDocs("instruction." + insName, As3PCodeDocs.getDocsForIns(insName, false, true, true), loc);
+
+                fireDocs("instruction." + insName, As3PCodeDocs.getDocsForIns(insName, false, true, true, nightMode), loc);
                 return;
             }
         }
-        String pathDocs = As3PCodeOtherDocs.getDocsForPath(pathNoTrait);
+        String pathDocs = As3PCodeOtherDocs.getDocsForPath(pathNoTrait, nightMode);
         if (pathDocs == null) {
             fireNoDocs();
         } else {

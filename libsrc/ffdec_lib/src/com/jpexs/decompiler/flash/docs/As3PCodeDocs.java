@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.docs;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
@@ -82,14 +83,14 @@ public class As3PCodeDocs extends AbstractDocs {
         return identName.toString();
     }
 
-    public static String getDocsForIns(String insName, boolean showDataSize, boolean ui, boolean withStyle) {
+    public static String getDocsForIns(String insName, boolean showDataSize, boolean ui, boolean withStyle, boolean nightMode) {
         if (!nameToDef.containsKey(insName)) {
             return null;
         }
-        return getDocsForIns(nameToDef.get(insName), showDataSize, ui, withStyle);
+        return getDocsForIns(nameToDef.get(insName), showDataSize, ui, withStyle, nightMode);
     }
 
-    public static String getDocsForIns(InstructionDefinition def, boolean showDataSize, boolean ui, boolean standalone) {
+    public static String getDocsForIns(InstructionDefinition def, boolean showDataSize, boolean ui, boolean standalone, boolean nightMode) {
         final String cacheKey = def.instructionName + "|" + (showDataSize ? 1 : 0) + "|" + (ui ? 1 : 0) + "|" + (standalone ? 1 : 0);
         String v = docsCache.get(cacheKey);
         if (v != null) {
@@ -98,7 +99,7 @@ public class As3PCodeDocs extends AbstractDocs {
 
         StringBuilder sb = new StringBuilder();
         if (standalone) {
-            sb.append(htmlHeader("", getStyle()));
+            sb.append(htmlHeader("", getStyle(), nightMode));
         }
         String insName = def.instructionName;
 
@@ -122,9 +123,17 @@ public class As3PCodeDocs extends AbstractDocs {
         String stack = def.hasFlag(AVM2InstructionFlag.UNKNOWN_STACK) ? getProperty("ui.unknown") : stackBefore + "<span class=\"stack-to\">" + getProperty("ui.stack.to") + "</span>" + stackAfter;
         String operandsDoc = def.hasFlag(AVM2InstructionFlag.UNKNOWN_OPERANDS) ? getProperty("ui.unknown") : getProperty("instruction." + insName + ".operands");
 
-        sb.append("<");
-        sb.append(standalone ? "body" : "div");
-        sb.append(" class=\"instruction");
+        if (standalone) {
+            sb.append("<body class=\"");
+            if (nightMode) {
+                sb.append("standalonenight");
+            } else {
+                sb.append("standalone");
+            }
+            sb.append("\">");
+        }
+
+        sb.append("<div class=\"instruction");
 
         for (AVM2InstructionFlag fl : def.flags) {
             sb.append(" instruction-flag-").append(makeIdent(fl.toString()));
@@ -213,10 +222,9 @@ public class As3PCodeDocs extends AbstractDocs {
         if (flagsPrinted) {
             sb.append("</ul>").append(NEWLINE);
         }
-        sb.append("</");
-        sb.append(standalone ? "body" : "div"); //.instruction
-        sb.append(">").append(NEWLINE);
+        sb.append("</div>").append(NEWLINE); //.instruction        
         if (standalone) {
+            sb.append("</body>");
             sb.append(htmlFooter());
         }
         String r = sb.toString();
@@ -241,7 +249,7 @@ public class As3PCodeDocs extends AbstractDocs {
         return js;
     }
 
-    public static String getAllInstructionDocs() {
+    public static String getAllInstructionDocs(boolean nightMode) {
 
         String jsData = "";
         jsData += "var txt_filter_hide = \"" + getProperty("ui.filter.hide") + "\";" + NEWLINE;
@@ -264,7 +272,12 @@ public class As3PCodeDocs extends AbstractDocs {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(htmlHeader(jsData + getJs(), getStyle()));
+        sb.append(htmlHeader(jsData + getJs(), getStyle(), nightMode));
+        sb.append("<body");
+        if (nightMode) {
+            sb.append(" class=\"night\"");
+        }
+        sb.append(">");
         sb.append("\t\t<h1>").append(getProperty("ui.list.heading")).append("</h1>").append(NEWLINE);
         sb.append("<span id=\"js-switcher\" class=\"js\"></span>");
         sb.append("\t\t<ul class=\"instruction-list\">").append(NEWLINE);
@@ -275,7 +288,7 @@ public class As3PCodeDocs extends AbstractDocs {
                 continue;
             }
             sb.append("\t\t\t<li class=\"instruction-item\">").append(NEWLINE);
-            sb.append("\t\t\t\t").append(getDocsForIns(def, true, false, false).trim().replace(NEWLINE, NEWLINE + "\t\t\t\t")).append(NEWLINE);
+            sb.append("\t\t\t\t").append(getDocsForIns(def, true, false, false, nightMode).trim().replace(NEWLINE, NEWLINE + "\t\t\t\t")).append(NEWLINE);
             sb.append("\t\t\t</li>").append(NEWLINE);
         }
         sb.append("\t\t</ul>").append(NEWLINE);
@@ -285,10 +298,10 @@ public class As3PCodeDocs extends AbstractDocs {
     }
 
     public static void main(String[] args) throws UnsupportedEncodingException {
-        System.out.println(getAllInstructionDocs());
+        System.out.println(getAllInstructionDocs(false));
     }
 
-    protected static String htmlHeader(String js, String style) {
+    protected static String htmlHeader(String js, String style, boolean nightMode) {
         Date dateGenerated = new Date();
         StringBuilder sb = new StringBuilder();
         sb.append("<!DOCTYPE html>").append(NEWLINE).
