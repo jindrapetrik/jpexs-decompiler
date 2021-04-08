@@ -9,7 +9,7 @@ strong.flags-title {font-weight: bold;}
 .hidden {display:none}
 .filter-flag-title {display:inline-block; width: 50ex;}
 .instruction {padding:5px;}
-.instruction.instruction-flag-noFlashPlayer {background-color: #ccc;}
+.instruction.instruction-flag-noFlashPlayer {background-color: #cccccc;}
 body {font-family: serif;}
 h1, h2, h3, h4, h5 {font-family: sans-serif;}
 .instruction-signature {font-family: "Courier New", monospace; font-size: 1.05em;}
@@ -17,3 +17,17 @@ h1, h2, h3, h4, h5 {font-family: sans-serif;}
 .path {font-weight: bold; color: blue;}
 .path-block {}
 .path-docs {}
+
+
+.night {background-color: red;}
+
+body.standalone {background-color: #f5f5b5;}
+body.standalonenight {background-color: #330;}
+
+body.standalonenight .instruction {background-color: #330; color:white;}
+body.standalonenight .otherdoc {background-color: #330; color:white;}
+body.standalonenight .instruction.instruction-flag-noFlashPlayer {background-color: #333;}
+
+body.standalonenight strong.instruction-name {color: #88f;}
+
+body.standalonenight .path {color: #88f;}

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.docs;
 
 import com.jpexs.decompiler.flash.ApplicationInfo;
@@ -30,12 +31,12 @@ public class As3PCodeOtherDocs extends AbstractDocs {
         prop = ResourceBundle.getBundle("com.jpexs.decompiler.flash.locales.docs.pcode.AS3other");
     }
 
-    public static String getDocsForPath(String path) {
+    public static String getDocsForPath(String path, boolean nightMode) {
 
-        return getDocsForPath(path, true);
+        return getDocsForPath(path, true, nightMode);
     }
 
-    private static String getDocsForPath(String path, boolean standalone) {
+    private static String getDocsForPath(String path, boolean standalone, boolean nightMode) {
 
         final String cacheKey = path + "|" + (standalone ? 1 : 0);
         String v = docsCache.get(cacheKey);
@@ -53,10 +54,16 @@ public class As3PCodeOtherDocs extends AbstractDocs {
             sb.append(htmlHeader("", getStyle()));
         }
 
-        sb.append("<");
-        sb.append(standalone ? "body" : "div");
-        sb.append(" class=\"otherdoc\"");
-        sb.append(">");
+        if (standalone) {
+            sb.append("<body class=\"");
+            if (nightMode) {
+                sb.append("standalonenight");
+            } else {
+                sb.append("standalone");
+            }
+            sb.append("\">");
+        }
+        sb.append("<div class=\"otherdoc\">");
 
         String pathParts[] = new String[]{path};
         if (path.contains(".")) {
@@ -88,10 +95,9 @@ public class As3PCodeOtherDocs extends AbstractDocs {
             }
         }
 
-        sb.append("</");
-        sb.append(standalone ? "body" : "div"); //.instruction
-        sb.append(">").append(NEWLINE);
+        sb.append("</div>").append(NEWLINE); //.instruction        
         if (standalone) {
+            sb.append("</body>");
             sb.append(htmlFooter());
         }
         String r = sb.toString();

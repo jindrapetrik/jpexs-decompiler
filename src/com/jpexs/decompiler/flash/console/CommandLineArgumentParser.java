@@ -3369,9 +3369,13 @@ public class CommandLineArgumentParser {
         String format = null;
         String out = null;
         String locale = null;
+        boolean nightMode = false;
         while (!args.isEmpty()) {
             String arg = args.pop();
             switch (arg) {
+                case "-night":
+                    nightMode = true;
+                    break;
                 case "-out":
                     if (args.isEmpty() || out != null) {
                         badArguments("doc");
@@ -3416,7 +3420,7 @@ public class CommandLineArgumentParser {
             Locale.setDefault(Locale.forLanguageTag(locale));
         }
 
-        String doc = As3PCodeDocs.getAllInstructionDocs();
+        String doc = As3PCodeDocs.getAllInstructionDocs(nightMode);
 
         PrintStream outStream;
 
