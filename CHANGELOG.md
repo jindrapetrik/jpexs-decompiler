@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - SoundStreamHead has associated sprite id in its name in the tagtree
 - [#1485] Improved skins support, night mode
+- [#1681] AS3 - context menu for adding classes on packages
 
 ## [14.4.0] - 2021-04-05
 ### Added
@@ -2190,6 +2191,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1485]: https://www.free-decompiler.com/flash/issues/1485
+[#1681]: https://www.free-decompiler.com/flash/issues/1681
 [#1015]: https://www.free-decompiler.com/flash/issues/1015
 [#1466]: https://www.free-decompiler.com/flash/issues/1466
 [#1513]: https://www.free-decompiler.com/flash/issues/1513

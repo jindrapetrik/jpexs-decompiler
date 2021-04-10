@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.ReplaceCharacterDialog;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
+import com.jpexs.decompiler.flash.gui.abc.AddClassDialog;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.action.AddScriptDialog;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -498,6 +499,9 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (firstItem instanceof ClassesListTreeModel) {
                 addAs3ClassMenuItem.setVisible(true);
             }
+            if (firstItem instanceof AS3Package) {
+                addAs3ClassMenuItem.setVisible(true);
+            }
 
             if (firstItem instanceof CharacterTag) {
                 replaceWithTagMenuItem.setVisible(true);
@@ -840,29 +844,37 @@ public class TagTreeContextMenu extends JPopupMenu {
     private void addAs3ClassActionPerformed(ActionEvent evt) {
         List<TreeItem> sel = tagTree.getSelected();
         if (!sel.isEmpty()) {
+            SWF swf = null;
+            String preselected = "";
             if (sel.get(0) instanceof ClassesListTreeModel) {
                 ClassesListTreeModel cl = (ClassesListTreeModel) sel.get(0);
-                SWF swf = cl.getSwf();
-                String className = "";
-                String parts[];
-                loopinput:
-                while (true) {
-                    className = ViewMessages.showInputDialog(mainPanel, AppDialog.translateForDialog("classname", AddScriptDialog.class), className);
-                    if (className == null || className.isEmpty()) {
-                        return;
+                swf = cl.getSwf();
+            }
+            if (sel.get(0) instanceof AS3Package) {
+                AS3Package pkg = (AS3Package) sel.get(0);
+                swf = pkg.getSwf();
+                TreePath tp = tagTree.getSelectionPaths()[0];
+                Object[] path = tp.getPath();
+                for (int p = path.length - 1; p >= 0; p--) {
+                    if (path[p] instanceof ClassesListTreeModel) {
+                        break;
                     }
-
-
-                    parts = className.contains(".") ? className.split("\\.") : new String[]{className};
-                    DottedChain classNameDc = new DottedChain(parts, "");
-                    for (ABCContainerTag ct : swf.getAbcList()) {
-                        if (ct.getABC().findClassByName(classNameDc) > -1) {
-                            ViewMessages.showMessageDialog(mainPanel, AppDialog.translateForDialog("message.classexists", AddScriptDialog.class), mainPanel.translate("error"), JOptionPane.ERROR_MESSAGE);
-                            continue loopinput;
-                        }
-                    }
-                    break;
+                    preselected = ((AS3Package) path[p]).packageName + "." + preselected;
                 }
+            }
+
+            TreePath scriptsPath = tagTree.getSelectionPaths()[0];
+            while (!(scriptsPath.getLastPathComponent() instanceof ClassesListTreeModel)) {
+                scriptsPath = scriptsPath.getParentPath();
+            }
+
+            {
+                AddClassDialog acd = new AddClassDialog(Main.getDefaultDialogsOwner());
+                String className = acd.showDialog(preselected);
+                if (className == null) {
+                    return;
+                }
+                String[] parts = className.contains(".") ? className.split("\\.") : new String[]{className};
 
                 DoABC2Tag doAbc = new DoABC2Tag(swf);
                 doAbc.setTimelined(swf);
@@ -917,9 +929,6 @@ public class TagTreeContextMenu extends JPopupMenu {
 
                 Object item = mainPanel.tagTree.getModel().getScriptsNode(swf);
 
-                TreePath selection = mainPanel.tagTree.getSelectionPath();
-                TreePath swfPath = selection.getParentPath();
-                TreePath scriptsPath = swfPath.pathByAddingChild(item);
                 TreePath classPath = scriptsPath;
 
                 for (int i = 0; i < parts.length; i++) {
