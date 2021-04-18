@@ -359,6 +359,8 @@ public final class SWF implements SWFContainerItem, Timelined {
     @Internal
     private Map<String, ASMSource> asmsCache;
 
+    private Set<Integer> cyclicCharacters = null;
+
     private static final DecompilerPool decompilerPool = new DecompilerPool();
 
     public static final String AS2_PKG_PREFIX = "__Packages.";
@@ -2653,6 +2655,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         characters = null;
         characterIdTags = null;
         timeline = null;
+        cyclicCharacters = null;
         clearReadOnlyListCache();
         clearImageCache();
         clearScriptCache();
@@ -3841,5 +3844,55 @@ public final class SWF implements SWFContainerItem, Timelined {
     @Override
     public RECT getRectWithStrokes() {
         return getRect();
+    }
+
+    public Set<Integer> getCyclicCharacters() {
+        if (cyclicCharacters != null) {
+            return cyclicCharacters;
+        }
+        Set<Integer> ct = new HashSet<>();
+        Map<Integer, Set<Integer>> characterToNeeded = new HashMap<>();
+
+        for (Tag t : getTags()) {
+            if (t instanceof CharacterTag) {
+                CharacterTag cht = (CharacterTag) t;
+                Set<Integer> needed = new HashSet<>();
+                cht.getNeededCharacters(needed);
+                characterToNeeded.put(cht.getCharacterId(), needed);
+            }
+        }
+
+        for (int chid : characterToNeeded.keySet()) {
+            for (int n : characterToNeeded.get(chid)) {
+                if (searchNeeded(characterToNeeded, chid, n, new HashSet<>())) {
+                    ct.add(chid);
+                }
+            }
+        }
+
+        cyclicCharacters = ct;
+        return cyclicCharacters;
+    }
+
+    private boolean searchNeeded(Map<Integer, Set<Integer>> characterToNeeded, int searched, int current, Set<Integer> visited) {
+        if (visited.contains(current)) {
+            return false;
+        }
+        visited.add(current);
+        if (current == searched) {
+            return true;
+        }
+
+        if (!characterToNeeded.containsKey(current)) {
+            return false;
+        }
+
+        for (int n : characterToNeeded.get(current)) {
+            if (searchNeeded(characterToNeeded, searched, n, visited)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
