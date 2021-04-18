@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
 - [#1485] Improved skins support, night mode
 - [#1681] AS3 - context menu for adding classes on packages
 
+### Fixed
+- [#1687] Slow speed of cyclic tags detection
+
 ## [14.4.0] - 2021-04-05
 ### Added
 - [#1015], [#1466], [#1513] Better error messages during saving, display message on out of memory
@@ -2192,6 +2195,7 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1485]: https://www.free-decompiler.com/flash/issues/1485
 [#1681]: https://www.free-decompiler.com/flash/issues/1681
+[#1687]: https://www.free-decompiler.com/flash/issues/1687
 [#1015]: https://www.free-decompiler.com/flash/issues/1015
 [#1466]: https://www.free-decompiler.com/flash/issues/1466
 [#1513]: https://www.free-decompiler.com/flash/issues/1513
