@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - SoundStreamHead has associated sprite id in its name in the tagtree
 - [#1485] Improved skins support, night mode
 - [#1681] AS3 - context menu for adding classes on packages
+- GFX: Support for loading external images
 
 ### Fixed
 - [#1687] Slow speed of cyclic tags detection
