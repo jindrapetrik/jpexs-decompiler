@@ -177,6 +177,7 @@ And links also these libraries:
 * [DoubleType] (Font TTF export) - GPLv2
 * [jPacker] (Canvas scripts compression) - MIT License
 * [gnujpdf] (PDF export) - LGPL License
+* [DDSReader] (DDS reading) - MIT License
 
 [GIT]: http://git-scm.com/downloads
 [Netbeans IDE]: http://www.netbeans.org/
@@ -202,3 +203,4 @@ And links also these libraries:
 [DoubleType]: http://sourceforge.net/projects/doubletype/
 [jPacker]: https://code.google.com/p/jpacker/
 [gnujpdf]: http://gnujpdf.sourceforge.net/
+[DDSReader]: https://github.com/npedotnet/DDSReader/
