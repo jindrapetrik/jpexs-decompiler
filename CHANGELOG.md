@@ -7,9 +7,12 @@ All notable changes to this project will be documented in this file.
 - [#1485] Improved skins support, night mode
 - [#1681] AS3 - context menu for adding classes on packages
 - GFX: Support for loading external images
+- Updated Japanese translation
+- Try loading .gfx files if .swf failed to load for imports and similar
 
 ### Fixed
 - [#1687] Slow speed of cyclic tags detection
+- CopyStream bug for copies smaller than the buffer size
 
 ## [14.4.0] - 2021-04-05
 ### Added

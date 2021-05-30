@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.helpers;
 
 import com.jpexs.decompiler.flash.AppResources;
@@ -730,15 +731,18 @@ public class Helper {
         try {
             final int bufSize = 4096;
             byte[] buf = new byte[bufSize];
+            int chunkSize = bufSize;
             int cnt = 0;
-            while ((cnt = is.read(buf)) > 0) {
+            while (maxLength > 0) {
+                if (maxLength < bufSize) {
+                    chunkSize = (int) maxLength;
+                }
+                cnt = is.read(buf, 0, chunkSize);
+                if (cnt <= 0) {
+                    break;
+                }
                 os.write(buf, 0, cnt);
                 maxLength -= cnt;
-
-                // last chunk is smaller
-                if (maxLength < bufSize) {
-                    buf = new byte[(int) maxLength];
-                }
             }
         } catch (IOException ex) {
             // ignore

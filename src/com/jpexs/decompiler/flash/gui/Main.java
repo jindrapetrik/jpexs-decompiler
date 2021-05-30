@@ -875,12 +875,23 @@ public class Main {
                                     //ignore
                                 }
                             } else {
-                                File f = new File(new File(file).getParentFile(), url);
-                                if (f.exists()) {
+                                File swf = new File(new File(file).getParentFile(), url);
+                                if (swf.exists()) {
                                     try {
-                                        return open(new FileInputStream(f), f.getAbsolutePath(), f.getName());
+                                        return open(new FileInputStream(swf), swf.getAbsolutePath(), swf.getName());
                                     } catch (Exception ex) {
                                         //ignore
+                                    }
+                                }
+                                // try .gfx if .swf failed
+                                if (url.endsWith(".swf")) {
+                                    File gfx = new File(new File(file).getParentFile(), url.substring(0, url.length()-4)+".gfx");
+                                    if (gfx.exists()) {
+                                        try {
+                                            return open(new FileInputStream(gfx), gfx.getAbsolutePath(), gfx.getName());
+                                        } catch (Exception ex) {
+                                            //ignore
+                                        }
                                     }
                                 }
                             }
