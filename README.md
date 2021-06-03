@@ -184,7 +184,7 @@ And also links to these libraries:
 [launch4j]: http://launch4j.sourceforge.net/
 [NSIS]: http://nsis.sourceforge.net/
 [JSyntaxPane]: https://code.google.com/p/jsyntaxpane/
-[Muffin]: http://muffin.doit.org/
+[Muffin]: https://web.archive.org/web/20171025082558/http://muffin.doit.org/ (original: http://muffin.doit.org/)
 [Java Native Access - JNA]: https://github.com/twall/jna
 [Insubstantial]: http://shemnon.com/speling/2011/04/insubstantial-62-release.html
 [javactivex]:https://github.com/jindrapetrik/javactivex
