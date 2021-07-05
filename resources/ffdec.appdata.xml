@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+	<id>com.jpexs.decompiler.flash</id>
+	<name>JPEXS Free Flash Decompiler</name>
+	<summary>Decompile and edit SWF files</summary>
+	<launchable type="desktop-id">com.jpexs.decompiler.flash.desktop</launchable>
+	<metadata_license>CC0-1.0</metadata_license>
+	<project_license>GPL-3.0-or-later</project_license>
+	<url type="homepage">https://github.com/jindrapetrik/jpexs-decompiler</url>
+	<url type="bugtracker">https://www.free-decompiler.com/flash/issues</url>
+	<description>
+		<p>Open Source Flash SWF decompiler and editor. Extract resources, convert SWF to FLA, edit ActionScript, replace images, sounds, texts or fonts. Various output formats available. Works with Java on Linux, Windows and macOS.</p>
+	</description>
+	<screenshots>
+		<screenshot type="default">
+			<caption>ActionScript 2 decompilation and its P-code view</caption>
+			<image width="1423" height="843">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/dev/graphics/screenshots/version14.4.0/01_as2.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>ActionScript 3 decompilation and its P-code view</caption>
+			<image width="1423" height="843">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/dev/graphics/screenshots/version14.4.0/02_as3.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Viewing a shape using internal viewer without Flash Player</caption>
+			<image width="1217" height="876">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/dev/graphics/screenshots/version14.4.0/03_shape.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Viewing a code flow graph using GraphViz tool</caption>
+			<image width="1676" height="950">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/dev/graphics/screenshots/version14.4.0/04_graph.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Hexadecimal view of the SWF structure</caption>
+			<image width="1345" height="950">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/dev/graphics/screenshots/version14.4.0/05_hexview.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Program allows many export types</caption>
+			<image width="1523" height="927">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/dev/graphics/screenshots/version14.4.0/06_export.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Searching text in ActionScript</caption>
+			<image width="1521" height="931">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/dev/graphics/screenshots/version14.4.0/07_search.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Text fields editation, search and replace text</caption>
+			<image width="1521" height="932">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/dev/graphics/screenshots/version14.4.0/08_text.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Timeline viewer</caption>
+			<image width="1318" height="950">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/dev/graphics/screenshots/version14.4.0/09_timeline.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Adding new AS1/2 script to the SWF file</caption>
+			<image width="1526" height="932">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/dev/graphics/screenshots/version14.4.0/10_add_script.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Debugging ActionScript 3 source code</caption>
+			<image width="1311" height="950">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/dev/graphics/screenshots/version14.4.0/11_debug_as3.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Debugging P-code</caption>
+			<image width="1527" height="935">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/dev/graphics/screenshots/version14.4.0/12_debug_pcode.png</image>
+		</screenshot>
+	</screenshots>
+	<releases>
+		<release version="14.4.0" date="2021-04-05"/>
+	</releases>
+	<content_rating type="oars-1.1" />
+	<custom>
+		<value key="Purism::form_factor">workstation</value>
+	</custom>
+</component>
