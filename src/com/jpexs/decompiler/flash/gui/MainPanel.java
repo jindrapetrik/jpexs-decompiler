@@ -825,7 +825,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         View.checkAccess();
 
         filterField.setText("");
-        doFilter();
         searchPanel.setVisible(false);
     }
 
