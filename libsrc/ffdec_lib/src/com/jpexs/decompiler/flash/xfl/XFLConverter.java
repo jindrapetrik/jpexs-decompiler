@@ -4135,7 +4135,7 @@ public class XFLConverter {
                     }
                     italic = ft.isItalic();
                     bold = ft.isBold();
-                    size = det.fontHeight;
+                    size = (int) (det.fontHeight / SWF.unitDivisor);
                     fontFace = new Font(fontName, (italic ? Font.ITALIC : 0) | (bold ? Font.BOLD : 0) | (!italic && !bold ? Font.PLAIN : 0), size < 0 ? 10 : size).getPSName();
                 }
             }
