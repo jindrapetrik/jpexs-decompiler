@@ -1697,6 +1697,8 @@ public class XFLConverter {
                                             convertText(null, (TextTag) character, matrix, filters, null, recCharWriter);
                                         } else if (character instanceof DefineVideoStreamTag) {
                                             convertVideoInstance(null, matrix, (DefineVideoStreamTag) character, null, recCharWriter);
+                                        } else if (character instanceof ImageTag) {
+                                            convertImageInstance(null, matrix, (ImageTag) character, null, recCharWriter);
                                         } else {
                                             convertSymbolInstance(null, matrix, colorTransformAlpha, false, blendMode, filters, true, null, null, null, characters.get(rec.characterId), characters, tags, flaVersion, recCharWriter);
                                         }
@@ -2295,6 +2297,23 @@ public class XFLConverter {
         writer.writeEndElement();
         writer.writeEndElement();
     }
+    
+    private static void convertImageInstance(String instanceName, MATRIX matrix, ImageTag bitmap, CLIPACTIONS clipActions, XFLXmlWriter writer) throws XMLStreamException {
+        writer.writeStartElement("DOMBitmapInstance", new String[]{
+           "libraryItemName", "bitmap" + bitmap.characterID + bitmap.getImageFormat().getExtension(),
+        });
+        if (instanceName != null) {
+            writer.writeAttribute("name", instanceName);
+        }
+        
+        writer.writeStartElement("matrix");
+        convertMatrix(matrix, writer);
+        writer.writeEndElement();
+        writer.writeStartElement("transformationPoint");
+        writer.writeEmptyElement("Point");
+        writer.writeEndElement();
+        writer.writeEndElement();
+    }
 
     private static void convertFrames(List<Integer> onlyFrames, int startFrame, int endFrame, String prevStr, String afterStr, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, int depth, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
         boolean lastIn = true;
@@ -2462,6 +2481,8 @@ public class XFLConverter {
                                     convertText(instanceName, (TextTag) character, matrix, filters, clipActions, elementsWriter);
                                 } else if (character instanceof DefineVideoStreamTag) {
                                     convertVideoInstance(instanceName, matrix, (DefineVideoStreamTag) character, clipActions, elementsWriter);
+                                } else if (character instanceof ImageTag) {
+                                    convertImageInstance(instanceName, matrix, (ImageTag) character, clipActions, elementsWriter);
                                 } else {
                                     convertSymbolInstance(instanceName, matrix, colorTransForm, cacheAsBitmap, blendMode, filters, isVisible, backGroundColor, clipActions, metadata, character, characters, tags, flaVersion, elementsWriter);
                                 }
