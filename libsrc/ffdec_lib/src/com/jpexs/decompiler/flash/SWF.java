@@ -584,6 +584,20 @@ public final class SWF implements SWFContainerItem, Timelined {
         return null;
     }
 
+    public FontTag getFontByNameInTag(String fontName) {
+        if (fontName == null) {
+            return null;
+        }
+        for (Tag t : getTags()) {
+            if (t instanceof FontTag) {
+                if (fontName.equals(((FontTag) t).getFontNameIntag())) {
+                    return (FontTag) t;
+                }
+            }
+        }
+        return null;
+    }
+
     public FontTag getFont(int fontId) {
         CharacterTag characterTag = getCharacters().get(fontId);
         if (characterTag instanceof FontTag) {

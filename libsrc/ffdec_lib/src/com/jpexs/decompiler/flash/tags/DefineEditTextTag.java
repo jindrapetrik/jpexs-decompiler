@@ -440,7 +440,7 @@ public class DefineEditTextTag extends TextTag {
                                  {
                                     if (face != null && face.length() > 0) {
                                         style.fontFace = face;
-                                        FontTag insideFont = swf.getFontByName(face);
+                                        FontTag insideFont = swf.getFontByNameInTag(face);
                                         style.font = insideFont;
                                         if (insideFont != null) {
                                             style.fontFace = null;
@@ -1043,11 +1043,16 @@ public class DefineEditTextTag extends TextTag {
                 ge.fontStyle = (lastStyle.bold ? Font.BOLD : 0) | (lastStyle.italic ? Font.ITALIC : 0);
                 ge.character = c;
 
-                ge.glyphIndex = -1; // always use system character glyphs in edit text
+                if (font != null) {
+                    ge.glyphIndex = font.charToGlyph(c);
+                } else {
+                    ge.glyphIndex = -1;
+                }
 
                 String fontName = ge.fontFace != null ? ge.fontFace : FontTag.getDefaultFontName();
                 int fontStyle = font == null ? ge.fontStyle : font.getFontStyle();
-                ge.glyphAdvance = (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar));
+                ge.glyphAdvance = font == null ? (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar))
+                        : (int) (font.getGlyphAdvance(ge.glyphIndex) / font.getDivider());
 
                 textModel.addGlyph(c, ge);
                 if (Character.isWhitespace(c)) {
