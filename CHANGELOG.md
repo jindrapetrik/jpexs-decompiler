@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - [#1687] Slow speed of cyclic tags detection
 - CopyStream bug for copies smaller than the buffer size
 - [#1748] Wrong matching of DefineEditText fonts for rendering
+- Editation of font descent colliding with leading
 
 ## [14.4.0] - 2021-04-05
 ### Added
