@@ -115,6 +115,7 @@ import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3Importer;
 import com.jpexs.decompiler.flash.importers.amf.amf3.Amf3ParseException;
+import com.jpexs.decompiler.flash.importers.svg.SvgImporter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
@@ -2932,6 +2933,7 @@ public class CommandLineArgumentParser {
                         CharacterTag characterTag = swf.getCharacter(characterId);
                         String repFile = args.pop();
                         byte[] data = Helper.readFile(repFile);
+                        String ext = Path.getExtension(repFile);
                         if (characterTag instanceof DefineBinaryDataTag) {
                             DefineBinaryDataTag defineBinaryData = (DefineBinaryDataTag) characterTag;
                             new BinaryDataImporter().importData(defineBinaryData, data);
@@ -2945,9 +2947,15 @@ public class CommandLineArgumentParser {
                                 args.pop();
                                 fill = false;
                             }
-                            int format = parseImageFormat(args);
                             ShapeTag shapeTag = (ShapeTag) characterTag;
-                            new ShapeImporter().importImage(shapeTag, data, format, fill);
+
+                            if (".svg".equals(ext)) {
+                                String svgText = Helper.readTextFile(repFile);
+                                new SvgImporter().importSvg(shapeTag, svgText);
+                            } else {
+                                int format = parseImageFormat(args);
+                                new ShapeImporter().importImage(shapeTag, data, format, fill);
+                            }
                         } else if (characterTag instanceof TextTag) {
                             TextTag textTag = (TextTag) characterTag;
                             new TextImporter(new MissingCharacterHandler(), new TextImportErrorHandler() {
