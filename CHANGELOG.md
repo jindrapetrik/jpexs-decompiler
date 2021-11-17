@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - GFX: Support for loading external images
 - Updated Japanese translation
 - Try loading .gfx files if .swf failed to load for imports and similar
+- [#1744] SVG shape import from commandline
 
 ### Fixed
 - [#1687] Slow speed of cyclic tags detection
@@ -2202,6 +2203,7 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1485]: https://www.free-decompiler.com/flash/issues/1485
 [#1681]: https://www.free-decompiler.com/flash/issues/1681
+[#1744]: https://www.free-decompiler.com/flash/issues/1744
 [#1687]: https://www.free-decompiler.com/flash/issues/1687
 [#1748]: https://www.free-decompiler.com/flash/issues/1748
 [#1015]: https://www.free-decompiler.com/flash/issues/1015
