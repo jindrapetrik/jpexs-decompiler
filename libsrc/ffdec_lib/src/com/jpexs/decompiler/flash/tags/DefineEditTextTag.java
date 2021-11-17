@@ -1123,7 +1123,8 @@ public class DefineEditTextTag extends TextTag {
 
         List<TEXTRECORD> allTextRecords = new ArrayList<>();
         int lastHeight = 0;
-        int yOffset = -leading;
+        int yOffset = 0;
+        boolean firstLine = true;
         for (List<SameStyleTextRecord> line : lines) {
             int width = 0;
             int currentOffset = 0;
@@ -1132,13 +1133,17 @@ public class DefineEditTextTag extends TextTag {
             } else {
                 for (SameStyleTextRecord tr : line) {
                     width += tr.width;
-                    int lineHeight = tr.style.fontHeight + tr.style.fontLeading;
+                    int lineHeight = (int) Math.round(tr.style.fontHeight * tr.style.font.getAscent() / tr.style.font.getDivider() / 1024.0) + tr.style.fontLeading;
+                    if (tr.style.font != null && !firstLine) {
+                        lineHeight += (int) Math.round(tr.style.fontHeight * tr.style.font.getDescent() / tr.style.font.getDivider() / 1024.0);
+                    }
                     lastHeight = lineHeight;
                     if (lineHeight > currentOffset) {
                         currentOffset = lineHeight;
                     }
                 }
             }
+            firstLine = false;
             yOffset += currentOffset;
             int alignOffset = 0;
             switch (align) {
