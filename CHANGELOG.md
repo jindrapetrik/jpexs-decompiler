@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - [#1748] Wrong matching of DefineEditText fonts for rendering
 - [#1748] Line height - Descent/ascent in multiline DefineEditText
 - Editation of font descent colliding with leading
+- [#1741] AS1/2 direct editation - new String constructor call
 
 ## [14.4.0] - 2021-04-05
 ### Added
@@ -2206,6 +2207,7 @@ All notable changes to this project will be documented in this file.
 [#1744]: https://www.free-decompiler.com/flash/issues/1744
 [#1687]: https://www.free-decompiler.com/flash/issues/1687
 [#1748]: https://www.free-decompiler.com/flash/issues/1748
+[#1741]: https://www.free-decompiler.com/flash/issues/1741
 [#1015]: https://www.free-decompiler.com/flash/issues/1015
 [#1466]: https://www.free-decompiler.com/flash/issues/1466
 [#1513]: https://www.free-decompiler.com/flash/issues/1513
