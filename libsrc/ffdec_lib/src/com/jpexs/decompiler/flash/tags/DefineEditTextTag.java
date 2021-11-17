@@ -1052,7 +1052,7 @@ public class DefineEditTextTag extends TextTag {
                 String fontName = ge.fontFace != null ? ge.fontFace : FontTag.getDefaultFontName();
                 int fontStyle = font == null ? ge.fontStyle : font.getFontStyle();
                 ge.glyphAdvance = font == null ? (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar))
-                        : (int) (font.getGlyphAdvance(ge.glyphIndex) / font.getDivider());
+                        : (int) Math.round(font.getGlyphAdvance(ge.glyphIndex) / font.getDivider() * lastStyle.fontHeight / 1024);
 
                 textModel.addGlyph(c, ge);
                 if (Character.isWhitespace(c)) {
