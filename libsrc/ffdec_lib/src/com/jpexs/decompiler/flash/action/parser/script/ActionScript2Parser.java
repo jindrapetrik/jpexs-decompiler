@@ -1833,6 +1833,12 @@ public class ActionScript2Parser {
                         args.add(((ToNumberActionItem) newvar).value);
                     }
                     ret = new NewObjectActionItem(null, null, pushConst("Number"), args);
+                } else if (newvar instanceof ToStringActionItem) {
+                    List<GraphTargetItem> args = new ArrayList<>();
+                    if (((ToStringActionItem) newvar).value != null) {
+                        args.add(((ToStringActionItem) newvar).value);
+                    }
+                    ret = new NewObjectActionItem(null, null, pushConst("String"), args);
                 } else if (newvar instanceof GetMemberActionItem) {
 
                     GetMemberActionItem ca = (GetMemberActionItem) newvar;
