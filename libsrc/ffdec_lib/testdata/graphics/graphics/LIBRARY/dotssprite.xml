@@ -1,0 +1,32 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="dotssprite" itemID="606a0ecd-00000234" lastModified="1617563341" lastUniqueIdentifier="2">
+  <timeline>
+    <DOMTimeline name="dotssprite">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="ThreePinkDots" selected="true" centerPoint3DX="225.55" centerPoint3DY="75">
+                  <matrix>
+                    <Matrix tx="150.55"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="75" y="75"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Sprite1" selected="true" centerPoint3DX="87.5" centerPoint3DY="220">
+                  <matrix>
+                    <Matrix ty="145"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="87.5" y="75"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

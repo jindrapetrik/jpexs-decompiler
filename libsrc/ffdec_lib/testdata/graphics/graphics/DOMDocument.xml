@@ -1,7 +1,7 @@
-<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" viewAngle3D="50.6510299754819" nextSceneIdentifier="75" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" viewAngle3D="50.6510299754819" nextSceneIdentifier="79" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
      <fonts>
-          <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
           <DOMFontItem name="Font 2" itemID="604e7a9e-00000444" font="TimesNewRomanPS-BoldMT" size="30" id="2" sourceLastImported="1615755934" embedRanges="1|2"/>
+          <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
      </fonts>
      <media>
           <DOMBitmapItem name="bitmapfill.png" itemID="604dcb84-00000229" sourceLastImported="1615711005" externalFileSize="1931" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill.png" bitmapDataHRef="M 2 1615711026.dat" frameRight="640" frameBottom="1280"/>
@@ -39,7 +39,7 @@
           <Include href="VideoSprite.xml" loadImmediate="false" itemID="60672f60-00000201" lastModified="1617375202"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="61">
+          <DOMTimeline name="Scene 1" currentFrame="62">
                <layers>
                     <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
@@ -51,9 +51,36 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Prev next buttons" color="#4FFF4F" locked="true" autoNamed="false">
+                    <DOMLayer name="Prev next buttons" color="#4FFF4F" locked="true" current="true" isSelected="true" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" duration="62" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="btnNext" symbolType="button">
+                                             <matrix>
+                                                  <Matrix tx="450"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="25" y="200"/>
+                                             </transformationPoint>
+                                             <Actionscript>
+                                                  <script><![CDATA[on(press){
+	nextFrame();
+}]]></script>
+                                             </Actionscript>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="btnPrev" symbolType="button">
+                                             <transformationPoint>
+                                                  <Point x="25" y="200"/>
+                                             </transformationPoint>
+                                             <Actionscript>
+                                                  <script><![CDATA[on(press){
+	prevFrame();
+}]]></script>
+                                             </Actionscript>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="62" keyMode="9728">
                                    <elements>
                                         <DOMSymbolInstance libraryItemName="btnNext" symbolType="button">
                                              <matrix>
@@ -249,10 +276,10 @@
                                              <edges>
                                                   <Edge fillStyle1="2" edges="
 !5000 2500|6500 2500!6500 2500|6500 5500!6500 5500|3500 5500!3500 5500|3500 4001"/>
-                                                  <Edge fillStyle1="1" edges="
-!3500 4001|2000 4001!2000 4001|2000 1001!2000 1001|5000 1001!5000 1001|5000 2500"/>
                                                   <Edge fillStyle0="1" fillStyle1="2" edges="
 !3500 4001|3500 2500!3500 2500|5000 2500"/>
+                                                  <Edge fillStyle0="1" edges="
+!5000 2500|5000 1001!5000 1001|2000 1001!2000 1001|2000 4001!2000 4001|3500 4001"/>
                                              </edges>
                                         </DOMShape>
                                    </elements>
@@ -781,10 +808,10 @@
 !3980 1990|2980 1990!2980 1990|2980 990!2980 990|3980 990!3980 990|3980 1990"/>
                                                   <Edge strokeStyle="5" edges="
 !1960 990|1960 1990!1960 1990|960 1990!960 1990|960 990!960 990|1960 990"/>
-                                                  <Edge strokeStyle="7" edges="
-!1980 4990|980 4990!980 4990|980 3990!980 3990|1980 3990!1980 3990|1980 4990"/>
                                                   <Edge strokeStyle="6" edges="
 !2980 3990|3980 3990!3980 3990|3980 4990!3980 4990|2980 4990!2980 4990|2980 3990"/>
+                                                  <Edge strokeStyle="7" edges="
+!1980 4990|980 4990!980 4990|980 3990!980 3990|1980 3990!1980 3990|1980 4990"/>
                                                   <Edge strokeStyle="8" edges="
 !5980 3990|5980 4990!5980 4990|4980 4990!4980 4990|4980 3990!4980 3990|5980 3990"/>
                                                   <Edge cubics="!1960 990(;1960,990 1960,1990 1960,1990q1960 990 1960 1990);"/>
@@ -1383,18 +1410,18 @@
                                                   </StrokeStyle>
                                              </strokes>
                                              <edges>
-                                                  <Edge strokeStyle="2" edges="
-!3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
                                                   <Edge strokeStyle="5" edges="
 !5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
+                                                  <Edge strokeStyle="2" edges="
+!3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
                                                   <Edge strokeStyle="1" edges="
 !2000 1000|2000 2000!2000 2000|1000 2000!1000 2000|1000 1000"/>
-                                                  <Edge strokeStyle="6" edges="
-!4647 3660/4942 4670!4942 4670/5019 3660"/>
-                                                  <Edge strokeStyle="3" edges="
-!2553 3660/2848 4670!2848 4670/2925 3660"/>
                                                   <Edge strokeStyle="4" edges="
 !1000 3660/1295 4670!1295 4670/1372 3660"/>
+                                                  <Edge strokeStyle="3" edges="
+!2553 3660/2848 4670!2848 4670/2925 3660"/>
+                                                  <Edge strokeStyle="6" edges="
+!4647 3660/4942 4670!4942 4670/5019 3660"/>
                                                   <Edge cubics="!5000 2000(;5000,2000 4000,2000 4000,2000q5000 2000 4000 2000);"/>
                                                   <Edge cubics="!4000 2000(4000,2000;4000,2000 4000,1000 4000,1000q4000 2000 4000 1000);"/>
                                                   <Edge cubics="!5000 1000(;5000,1000 5000,2000 5000,2000q5000 1000 5000 2000);"/>
@@ -1416,12 +1443,12 @@
                               </DOMFrame>
                               <DOMFrame index="44" keyMode="9728">
                                    <elements>
-                                        <DOMBitmapInstance libraryItemName="bitmapfill.png">
+                                        <DOMBitmapInstance selected="true" libraryItemName="bitmapfill.png">
                                              <matrix>
                                                   <Matrix tx="100" ty="150"/>
                                              </matrix>
                                         </DOMBitmapInstance>
-                                        <DOMBitmapInstance libraryItemName="pony.jpg">
+                                        <DOMBitmapInstance selected="true" libraryItemName="pony.jpg">
                                              <matrix>
                                                   <Matrix a="0.298141479492188" d="0.298141479492188" tx="200" ty="130"/>
                                              </matrix>
@@ -1429,7 +1456,7 @@
                                                   <Point x="400" y="267"/>
                                              </transformationPoint>
                                         </DOMBitmapInstance>
-                                        <DOMStaticText width="30.25" height="16.6" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText selected="true" width="30.25" height="16.6" autoExpand="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="102" ty="244.15"/>
                                              </matrix>
@@ -1442,7 +1469,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="25.25" height="16.6" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText selected="true" width="25.25" height="16.6" autoExpand="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="301.3" ty="303.45"/>
                                              </matrix>
@@ -2150,7 +2177,52 @@
                                    </elements>
                               </DOMFrame>
                               <DOMFrame index="61" keyMode="9728">
-                                   <elements/>
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="VideoSprite" centerPoint3DX="250" centerPoint3DY="175">
+                                             <matrix>
+                                                  <Matrix tx="50" ty="50"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="200" y="125"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="62" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor color="#FF0000"/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <edges>
+                                                  <Edge fillStyle1="1" edges="
+!6605 2644|405 2644!405 2644|405 2089!405 2089|6605 2089!6605 2089|6605 2644!6649 3919/410 3939!410 3939/400 3439!400 3439/6665 3399!6665 3399/6649 3919"/>
+                                                  <Edge cubics="!6665 3399(;6665,3399 6649,3919 6649,3919q6665 3399 6649 3919);"/>
+                                                  <Edge cubics="!410 3939(;410,3939 400,3439 400,3439q410 3939 400 3439);"/>
+                                                  <Edge cubics="!400 3439(;400,3439 6665,3399 6665,3399q400 3439 6665 3399);"/>
+                                                  <Edge cubics="!6649 3919(;6649,3919 410,3939 410,3939q6649 3919 410 3939);"/>
+                                                  <Edge cubics="!6605 2089(;6605,2089 6605,2644 6605,2644q6605 2089 6605 2644)6605,2644;"/>
+                                                  <Edge cubics="!405 2644(;405,2644 405,2089 405,2089q405 2644 405 2089);"/>
+                                                  <Edge cubics="!6605 2644(;6605,2644 405,2644 405,2644q6605 2644 405 2644);"/>
+                                                  <Edge cubics="!405 2089(;405,2089 6605,2089 6605,2089q405 2089 6605 2089);"/>
+                                             </edges>
+                                        </DOMShape>
+                                        <DOMDynamicText width="263.3" height="202.25" isSelectable="false" lineType="multiline">
+                                             <matrix>
+                                                  <Matrix a="0.935348510742188" d="1.051025390625" tx="51.85" ty="52.1"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>First&#xD;Second&#xD;Third</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="50" bitmapSize="1000" face="Verdana-Bold"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMDynamicText>
+                                   </elements>
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
@@ -2779,7 +2851,7 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Frame description layer" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+                    <DOMLayer name="Frame description layer" color="#9933CC" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" keyMode="9728">
                                    <elements>
@@ -3527,14 +3599,23 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMSymbolInstance libraryItemName="VideoSprite" centerPoint3DX="250" centerPoint3DY="175">
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="62" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
-                                                  <Matrix tx="50" ty="50"/>
+                                                  <Matrix tx="22" ty="342"/>
                                              </matrix>
-                                             <transformationPoint>
-                                                  <Point x="200" y="125"/>
-                                             </transformationPoint>
-                                        </DOMSymbolInstance>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>063 Multiline text</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
                                    </elements>
                               </DOMFrame>
                          </frames>
@@ -3544,6 +3625,10 @@
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="1592" publishTime="1637176557"/>
+          <PublishItem publishSize="1586" publishTime="1637176556"/>
+          <PublishItem publishSize="1586" publishTime="1637176556"/>
+          <PublishItem publishSize="1586" publishTime="1637176556"/>
           <PublishItem publishSize="3655062" publishTime="1617375217"/>
           <PublishItem publishSize="2351995" publishTime="1617369003"/>
           <PublishItem publishSize="1611" publishTime="1617210496"/>
@@ -3560,9 +3645,5 @@
           <PublishItem publishSize="1615" publishTime="1617205510"/>
           <PublishItem publishSize="1610" publishTime="1617205470"/>
           <PublishItem publishSize="1611" publishTime="1617205391"/>
-          <PublishItem publishSize="2338093" publishTime="1617205328"/>
-          <PublishItem publishSize="1611" publishTime="1617205226"/>
-          <PublishItem publishSize="1610" publishTime="1617205197"/>
-          <PublishItem publishSize="1610" publishTime="1617205108"/>
      </publishHistory>
 </DOMDocument>
