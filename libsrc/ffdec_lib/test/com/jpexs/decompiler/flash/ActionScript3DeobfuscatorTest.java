@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorGroupParts;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
@@ -31,6 +32,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
+import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.CompilationException;
 import java.io.BufferedInputStream;
@@ -64,7 +66,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")), false);
     }
 
-    private String recompilePCode(String str) throws IOException, AVM2ParseException, InterruptedException {
+    private String recompilePCode(String str, SWFDecompilerAdapter deobfuscator) throws IOException, AVM2ParseException, InterruptedException {
         str = "code\r\n"
                 + "getlocal0\r\n"
                 + "pushscope\r\n"
@@ -89,7 +91,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         MethodBody b = new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]);
         AVM2Code code = ASM3Parser.parse(abc, new StringReader(str), null, b, new MethodInfo());
         b.setCode(code);
-        new AVM2DeobfuscatorJumps().avm2CodeRemoveTraps("test", 0, true, 0, abc, null, 0, b);
+        deobfuscator.avm2CodeRemoveTraps("test", 0, true, 0, abc, null, 0, b);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         code.toASMSource(abc, abc.constants, new MethodInfo(), new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]), ScriptExportMode.PCODE, writer);
         String ret = writer.toString();
@@ -239,7 +241,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "jump b\r\n" //should not change
                 + "a:jump c\r\n"
                 + "c:pushbyte 4\r\n"
-                + "b:pushbyte 3\r\n");
+                + "b:pushbyte 3\r\n", new AVM2DeobfuscatorJumps());
         Assert.assertEquals(res, "getlocal0\r\n"
                 + "pushscope\r\n"
                 + "pushbyte 3\r\n"
@@ -250,6 +252,52 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 + "pushbyte 4\r\n"
                 + "ofs0010:\r\n"
                 + "pushbyte 3\r\n"
+                + "returnvoid\r\n");
+    }
+
+    @Test
+    public void testGroupParts() throws Exception {
+        String res = recompilePCode(
+                "pushbyte 1\r\npop\r\n"
+                + "jump A\r\n"
+                + "B:pushbyte 3\r\npop\r\n"
+                + "jump C\r\n"
+                + "A:pushbyte 2\r\npop\r\n"
+                + "jump B\r\n"
+                + "C:pushbyte 4\r\npop\r\n", new AVM2DeobfuscatorGroupParts());
+        Assert.assertEquals(res, "getlocal0\r\n"
+                + "pushscope\r\n"
+                + "pushbyte 1\r\n"
+                + "pop\r\n"
+                + "pushbyte 2\r\n"
+                + "pop\r\n"
+                + "pushbyte 3\r\n"
+                + "pop\r\n"
+                + "pushbyte 4\r\n"
+                + "pop\r\n"
+                + "returnvoid\r\n");
+    }
+
+    @Test
+    public void testGroupParts2() throws Exception {
+        String res = recompilePCode(
+                "pushbyte 1\r\npop\r\n"
+                + "jump A\r\n"
+                + "B:pushbyte 3\r\npop\r\n"
+                + "jump C\r\n"
+                + "A:pushbyte 2\r\npop\r\n"
+                + "jump B\r\n"
+                + "C:pushbyte 4\r\npop\r\n", new AVM2DeobfuscatorGroupParts());
+        Assert.assertEquals(res, "getlocal0\r\n"
+                + "pushscope\r\n"
+                + "pushbyte 1\r\n"
+                + "pop\r\n"
+                + "pushbyte 2\r\n"
+                + "pop\r\n"
+                + "pushbyte 3\r\n"
+                + "pop\r\n"
+                + "pushbyte 4\r\n"
+                + "pop\r\n"
                 + "returnvoid\r\n");
     }
 
