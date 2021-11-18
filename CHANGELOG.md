@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - [#1741] AS1/2 direct editation - new String constructor call
 - [#1726] Decompiling AS - missing break when on false branch vs continue on true
 - AS3 jumps deobfuscator
+- [#1699] AS1/2 detection of unitialized vars stuck
 
 ## [14.4.0] - 2021-04-05
 ### Added
@@ -2211,6 +2212,7 @@ All notable changes to this project will be documented in this file.
 [#1748]: https://www.free-decompiler.com/flash/issues/1748
 [#1741]: https://www.free-decompiler.com/flash/issues/1741
 [#1726]: https://www.free-decompiler.com/flash/issues/1726
+[#1699]: https://www.free-decompiler.com/flash/issues/1699
 [#1015]: https://www.free-decompiler.com/flash/issues/1015
 [#1466]: https://www.free-decompiler.com/flash/issues/1466
 [#1513]: https://www.free-decompiler.com/flash/issues/1513

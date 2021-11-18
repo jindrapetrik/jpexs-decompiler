@@ -118,25 +118,15 @@ public class ClassActionItem extends ActionItem implements Block {
             GetMemberActionItem gm = (GetMemberActionItem) item;
             if (isThis(gm.object)) {
                 ret.add(gm.memberName);
-            } else {
-                detectUnitializedVars(gm.object, ret);
             }
         }
         if (item instanceof SetMemberActionItem) {
             SetMemberActionItem sm = (SetMemberActionItem) item;
             if (isThis(sm.object)) {
                 ret.add(sm.objectName);
-            } else {
-                detectUnitializedVars(sm.object, ret);
             }
         }
 
-        if (item instanceof Block) {
-            Block bl = (Block) item;
-            for (List<GraphTargetItem> list : bl.getSubs()) {
-                detectUnitializedVars(list, ret);
-            }
-        }
         detectUnitializedVars(item.getAllSubItems(), ret);
     }
 
