@@ -2320,8 +2320,7 @@ public class AVM2Graph extends Graph {
         }
     }
 
-    @Override
-    protected void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
+    public static void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
         for (int i = 0; i < stack.size(); i++) {
             //These are often obfuscated, so ignore them                
             if (stack.get(i) instanceof NewFunctionAVM2Item) {
@@ -2329,7 +2328,7 @@ public class AVM2Graph extends Graph {
                 i--;
             }
         }
-        super.makeAllCommands(commands, stack);
+        Graph.makeAllCommands(commands, stack);
     }
 
 

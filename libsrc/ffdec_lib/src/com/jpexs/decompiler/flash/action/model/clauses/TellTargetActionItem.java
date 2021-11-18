@@ -12,13 +12,18 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model.clauses;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf3.ActionSetTarget;
+import com.jpexs.decompiler.flash.action.swf4.ActionGetProperty;
+import com.jpexs.decompiler.flash.action.swf4.ActionPop;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetTarget2;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -40,6 +45,8 @@ public class TellTargetActionItem extends ActionItem {
     public List<GraphTargetItem> commands;
 
     public GraphTargetItem target;
+
+    public boolean nested = false;
 
     public TellTargetActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem target, List<GraphTargetItem> commands) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
@@ -73,6 +80,12 @@ public class TellTargetActionItem extends ActionItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
+        ActionSourceGenerator actionGenerator = (ActionSourceGenerator) generator;
+        if (nested) {
+            ret.add(new ActionPush(""));
+            ret.add(new ActionPush(11)); //_target
+            ret.add(new ActionGetProperty());
+        }
         if ((target instanceof DirectValueActionItem) && ((((DirectValueActionItem) target).value instanceof String) || (((DirectValueActionItem) target).value instanceof ConstantIndex))) {
             ret.add(new ActionSetTarget((String) target.getResult()));
         } else {
@@ -81,6 +94,10 @@ public class TellTargetActionItem extends ActionItem {
         }
         ret.addAll(generator.generate(localData, commands));
         ret.add(new ActionSetTarget(""));
+
+        if (nested) {
+            ret.add(new ActionSetTarget2());
+        }
         return ret;
     }
 
