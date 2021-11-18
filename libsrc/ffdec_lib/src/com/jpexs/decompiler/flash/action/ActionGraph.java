@@ -23,6 +23,7 @@ import static com.jpexs.decompiler.flash.action.Action.adr2ip;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
+import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTarget2ActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTargetActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTypeActionItem;
@@ -54,6 +55,8 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
 import com.jpexs.decompiler.graph.model.IfItem;
+import com.jpexs.decompiler.graph.model.PopItem;
+import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
@@ -181,6 +184,7 @@ public class ActionGraph extends Graph {
             ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
             detector.checkClass(list, path);
         }
+
         int targetStart;
         int targetEnd;
 
@@ -193,6 +197,17 @@ public class ActionGraph extends Graph {
             GraphTargetItem target = null;
             for (int t = 0; t < list.size(); t++) {
                 GraphTargetItem it = list.get(t);
+                if (it instanceof PushItem) {
+                    PushItem pi = (PushItem) it;
+                    if (pi.value instanceof GetPropertyActionItem) {
+                        GetPropertyActionItem gp = (GetPropertyActionItem) pi.value;
+                        if (gp.propertyIndex == 11 /*_target*/) {
+                            list.remove(t);
+                            t--;
+                            continue;
+                        }
+                    }
+                }
                 if (it instanceof SetTargetActionItem) {
                     SetTargetActionItem st = (SetTargetActionItem) it;
                     if (st.target.isEmpty()) {
@@ -208,6 +223,11 @@ public class ActionGraph extends Graph {
                 }
                 if (it instanceof SetTarget2ActionItem) {
                     SetTarget2ActionItem st = (SetTarget2ActionItem) it;
+                    if (st.target instanceof PopItem) {
+                        list.remove(t);
+                        t--;
+                        continue;
+                    }
                     if ((st.target instanceof DirectValueActionItem) && st.target.getResult().equals("")) {
                         if (targetStart > -1) {
                             targetEnd = t;
@@ -230,6 +250,7 @@ public class ActionGraph extends Graph {
                     tellist.add(list.get(i));
                 }
                 newlist.add(new TellTargetActionItem(targetStartItem.getSrc(), targetStartItem.getLineStartItem(), target, tellist));
+                //TODO: maybe set nested flag
                 for (int i = targetEnd + 1; i < list.size(); i++) {
                     newlist.add(list.get(i));
                 }
