@@ -351,13 +351,21 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                             @Override
                                             public void actionPerformed(ActionEvent e) {
                                                 TreePath tps[] = tree.getSelectionPaths();
+                                                if (tps == null) {
+                                                    tps = new TreePath[]{selPath};
+                                                }
+                                                boolean somethingRemoved = false;
                                                 for (int t = tps.length - 1; t >= 0; t--) {
                                                     TreePath tp = tps[t];
                                                     Object selObject = tp.getLastPathComponent();
                                                     if (selObject instanceof FieldNode) {
                                                         final FieldNode fnode = (FieldNode) selObject;
                                                         removeItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index);
+                                                        somethingRemoved = true;
                                                     }
+                                                }
+                                                if (!somethingRemoved) {
+                                                    removeItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index);
                                                 }
                                             }
                                         });
@@ -425,13 +433,23 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                                 @Override
                                                 public void actionPerformed(ActionEvent e) {
                                                     TreePath tps[] = tree.getSelectionPaths();
+                                                    if (tps == null) {
+                                                        tps = new TreePath[]{selPath};
+                                                    }
+                                                    boolean someRemoved = false;
                                                     for (int t = tps.length - 1; t >= 0; t--) {
                                                         TreePath tp = tps[t];
                                                         Object selObject = tp.getLastPathComponent();
                                                         if (selObject instanceof FieldNode) {
                                                             final FieldNode fnode = (FieldNode) selObject;
-                                                            removeItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index);
+                                                            if (fnode.index > -1) {
+                                                                removeItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index);
+                                                                someRemoved = true;
+                                                            }
                                                         }
+                                                    }
+                                                    if (!someRemoved) {
+                                                        removeItem(fnode.obj, fnode.fieldSet.get(FIELD_INDEX), fnode.index);
                                                     }
                                                 }
                                             });

@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - AS3 jumps deobfuscator
 - [#1699] AS1/2 detection of unitialized vars stuck
 - [#1686] AS1/2 decompilation and editation of nested tellTarget
+- [#1685] generic tag editor - removing multiple items at once vs single item
 
 ## [14.4.0] - 2021-04-05
 ### Added
@@ -2215,6 +2216,7 @@ All notable changes to this project will be documented in this file.
 [#1726]: https://www.free-decompiler.com/flash/issues/1726
 [#1699]: https://www.free-decompiler.com/flash/issues/1699
 [#1686]: https://www.free-decompiler.com/flash/issues/1686
+[#1685]: https://www.free-decompiler.com/flash/issues/1685
 [#1015]: https://www.free-decompiler.com/flash/issues/1015
 [#1466]: https://www.free-decompiler.com/flash/issues/1466
 [#1513]: https://www.free-decompiler.com/flash/issues/1513
