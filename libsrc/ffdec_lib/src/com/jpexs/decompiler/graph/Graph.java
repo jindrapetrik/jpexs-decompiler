@@ -1141,12 +1141,13 @@ public class Graph {
                     }
                 }
 
+                //Switch break onFalse and continue onTrue
                 if (i < list.size() - 1) {
                     if ((list.get(list.size() - 1) instanceof ExitItem) || (list.get(list.size() - 1) instanceof BreakItem)) {
                         if (onFalse.isEmpty() && !onTrue.isEmpty() && (onTrue.get(onTrue.size() - 1) instanceof ContinueItem)) {
                             ifi.expression = ifi.expression.invert(null);
                             List<GraphTargetItem> onTrueItems = new ArrayList<>();
-                            for (int j = i + 1; j < list.size(); j++) {
+                            for (int j = i; j < list.size(); j++) {
                                 onTrueItems.add(list.remove(i + 1));
                             }
                             list.addAll(i + 1, ifi.onTrue);
