@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - Editation of font descent colliding with leading
 - [#1741] AS1/2 direct editation - new String constructor call
 - [#1726] Decompiling AS - missing break when on false branch vs continue on true
+- AS3 jumps deobfuscator
 
 ## [14.4.0] - 2021-04-05
 ### Added
