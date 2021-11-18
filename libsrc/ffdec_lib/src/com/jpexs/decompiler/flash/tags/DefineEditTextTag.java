@@ -1051,7 +1051,7 @@ public class DefineEditTextTag extends TextTag {
 
                 String fontName = ge.fontFace != null ? ge.fontFace : FontTag.getDefaultFontName();
                 int fontStyle = font == null ? ge.fontStyle : font.getFontStyle();
-                ge.glyphAdvance = font == null ? (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar))
+                ge.glyphAdvance = ge.glyphIndex == -1 ? (int) Math.round(SWF.unitDivisor * FontTag.getSystemFontAdvance(fontName, fontStyle, (int) (lastStyle.fontHeight / SWF.unitDivisor), c, nextChar))
                         : (int) Math.round(font.getGlyphAdvance(ge.glyphIndex) / font.getDivider() * lastStyle.fontHeight / 1024);
 
                 textModel.addGlyph(c, ge);
@@ -1133,10 +1133,12 @@ public class DefineEditTextTag extends TextTag {
             } else {
                 for (SameStyleTextRecord tr : line) {
                     width += tr.width;
-                    int lineHeight = (int) Math.round(tr.style.fontHeight * tr.style.font.getAscent() / tr.style.font.getDivider() / 1024.0) + tr.style.fontLeading;
-                    if (tr.style.font != null && !firstLine) {
+                    int lineHeight = tr.style.font.hasLayout() ? (int) Math.round(tr.style.fontHeight * tr.style.font.getAscent() / tr.style.font.getDivider() / 1024.0) + tr.style.fontLeading
+                            : tr.style.fontHeight + tr.style.fontLeading;
+                    if (tr.style.font != null && !firstLine && tr.style.font.hasLayout()) {
                         lineHeight += (int) Math.round(tr.style.fontHeight * tr.style.font.getDescent() / tr.style.font.getDivider() / 1024.0);
                     }
+                    //TODO: maybe get ascent/descent from system font when not haslayout
                     lastHeight = lineHeight;
                     if (lineHeight > currentOffset) {
                         currentOffset = lineHeight;
