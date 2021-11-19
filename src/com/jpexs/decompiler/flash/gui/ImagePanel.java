@@ -2428,7 +2428,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                         //Frame "time" - ticks in current frame
                         int currentFrameTicks = 0;
-                        if (frameCount == 1) { //We have only one frame, so the ticks on that frame equal ticks on whole timeline
+                        if (frameCount == 1 || stillFrame) { //We have only one frame, so the ticks on that frame equal ticks on whole timeline
                             currentFrameTicks = ticksFromStart;
                         }
                         nextFrame(thisTimer, skipFrames, currentFrameTicks);
