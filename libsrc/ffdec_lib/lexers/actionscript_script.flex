@@ -36,6 +36,8 @@ import java.util.Stack;
 
     private static String xmlTagName = "";
 
+    private int repeatNum = 1;
+
     public int yychar() {
         return yychar;
     }
@@ -385,24 +387,26 @@ Preprocessor = \u00A7\u00A7 {Identifier}
 <OIDENTIFIER> {
     "\u00A7"                         {
                                      yybegin(YYINITIAL);
+                                     repeatNum = 1;
                                      // length also includes the trailing quote
                                      return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, string.toString());
                                  }
 
-  {OIdentifierCharacter}+             { string.append(yytext()); }
+  {OIdentifierCharacter}         { for(int r=0;r<repeatNum;r++) string.append(yytext()); repeatNum = 1;}
 
   /* escape sequences */
-  "\\b"                          { string.append('\b'); }
-  "\\t"                          { string.append('\t'); }
-  "\\n"                          { string.append('\n'); }
-  "\\f"                          { string.append('\f'); }
-  "\\\u00A7"                     { string.append('\u00A7'); }
-  "\\r"                          { string.append('\r'); }
-  "\\\\"                         { string.append('\\'); }
+  "\\b"                          { for(int r=0;r<repeatNum;r++) string.append('\b'); repeatNum = 1;}
+  "\\t"                          { for(int r=0;r<repeatNum;r++) string.append('\t'); repeatNum = 1;}
+  "\\n"                          { for(int r=0;r<repeatNum;r++) string.append('\n'); repeatNum = 1;}
+  "\\f"                          { for(int r=0;r<repeatNum;r++) string.append('\f'); repeatNum = 1;}
+  "\\\u00A7"                     { for(int r=0;r<repeatNum;r++) string.append('\u00A7'); repeatNum = 1;}
+  "\\r"                          { for(int r=0;r<repeatNum;r++) string.append('\r'); repeatNum = 1;}
+  "\\\\"                         { for(int r=0;r<repeatNum;r++) string.append('\\'); repeatNum = 1;}
   \\x{HexDigit}{2}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
-                        				   string.append(val); }
+                        				   for(int r=0;r<repeatNum;r++) string.append(val); repeatNum = 1;}
   \\u{HexDigit}{4}        { char val = (char) Integer.parseInt(yytext().substring(2), 16);
-                        				   string.append(val); }
+                        				   for(int r=0;r<repeatNum;r++) string.append(val); repeatNum = 1;}
+  \\\{{DecIntegerLiteral}\}      { repeatNum = Integer.parseInt(yytext().substring(2, yytext().length()-1)); }
 
   /* escape sequences */
 

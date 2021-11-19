@@ -725,6 +725,10 @@ public final class Configuration {
     @ConfigurationInternal
     public static ConfigurationItem<Boolean> showDialogOnError = null;
 
+    @ConfigurationDefaultInt(20)
+    @ConfigurationCategory("limit")
+    public static ConfigurationItem<Integer> limitSameChars = null;
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

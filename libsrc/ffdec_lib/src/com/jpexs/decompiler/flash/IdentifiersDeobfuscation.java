@@ -12,10 +12,12 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.RenameType;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -419,8 +421,6 @@ public class IdentifiersDeobfuscation {
                 writer.append("\\n");
             } else if (c == '\r') {
                 writer.append("\\r");
-            } else if (c == '\t') {
-                writer.append("\\t");
             } else if (c == '\b') {
                 writer.append("\\b");
             } else if (c == '\t') {
@@ -434,6 +434,18 @@ public class IdentifiersDeobfuscation {
             } else if (c < 32) {
                 writer.append("\\x").append(Helper.byteToHex((byte) c));
             } else {
+                int num = 1;
+                for (int j = i + 1; j < s.length(); j++) {
+                    if (s.charAt(j) == c) {
+                        num++;
+                    } else {
+                        break;
+                    }
+                }
+                if (num > Configuration.limitSameChars.get()) {
+                    writer.append("\\{").append(num).append("}");
+                    i += num - 1;
+                }
                 writer.append(c);
             }
         }
@@ -453,8 +465,6 @@ public class IdentifiersDeobfuscation {
                 ret.append("\\t");
             } else if (c == '\b') {
                 ret.append("\\b");
-            } else if (c == '\t') {
-                ret.append("\\t");
             } else if (c == '\f') {
                 ret.append("\\f");
             } else if (c == '\\') {
@@ -464,6 +474,18 @@ public class IdentifiersDeobfuscation {
             } else if (c < 32) {
                 ret.append("\\x").append(Helper.byteToHex((byte) c));
             } else {
+                int num = 1;
+                for (int j = i + 1; j < s.length(); j++) {
+                    if (s.charAt(j) == c) {
+                        num++;
+                    } else {
+                        break;
+                    }
+                }
+                if (num > Configuration.limitSameChars.get()) {
+                    ret.append("\\{").append(num).append("}");
+                    i += num - 1;
+                }
                 ret.append(c);
             }
         }
