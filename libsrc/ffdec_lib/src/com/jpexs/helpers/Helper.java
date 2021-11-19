@@ -247,6 +247,54 @@ public class Helper {
      * @param s String to escape
      * @return Escaped string
      */
+    public static String escapePCodeString(String s) {
+        StringBuilder ret = new StringBuilder(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '\n') {
+                ret.append("\\n");
+            } else if (c == '\r') {
+                ret.append("\\r");
+            } else if (c == '\t') {
+                ret.append("\\t");
+            } else if (c == '\b') {
+                ret.append("\\b");
+            } else if (c == '\f') {
+                ret.append("\\f");
+            } else if (c == '\\') {
+                ret.append("\\\\");
+            } else if (c == '"') {
+                ret.append("\\\"");
+            } else if (c == '\'') {
+                ret.append("\\'");
+            } else if (c < 32) {
+                ret.append("\\x").append(byteToHex((byte) c));
+            } else {
+                int num = 1;
+                for (int j = i + 1; j < s.length(); j++) {
+                    if (s.charAt(j) == c) {
+                        num++;
+                    } else {
+                        break;
+                    }
+                }
+                if (num > Configuration.limitSameChars.get()) {
+                    ret.append("\\{").append(num).append("}");
+                    i += num - 1;
+                }
+                ret.append(c);
+            }
+        }
+
+        return ret.toString();
+    }
+
+    /**
+     * Escapes string by adding backslashes
+     *
+     * @param s String to escape
+     * @return Escaped string
+     */
     public static String escapeJavaString(String s) {
         StringBuilder ret = new StringBuilder(s.length());
         for (int i = 0; i < s.length(); i++) {

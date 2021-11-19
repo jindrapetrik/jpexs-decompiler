@@ -405,7 +405,7 @@ public abstract class Trait implements Cloneable, Serializable {
             for (int m : metadata) {
                 writer.append("metadata");
                 writer.append("\"");
-                writer.append(Helper.escapeActionScriptString(abc.constants.getString(abc.metadata_info.get(m).name_index)));
+                writer.append(Helper.escapePCodeString(abc.constants.getString(abc.metadata_info.get(m).name_index)));
                 writer.append("\"");
                 if (Configuration.indentAs3PCode.get()) {
                     writer.indent();
@@ -418,13 +418,13 @@ public abstract class Trait implements Cloneable, Serializable {
                         writer.append("item ");
 
                         writer.append("\"");
-                        writer.append(Helper.escapeActionScriptString(abc.constants.getString(key)));
+                        writer.append(Helper.escapePCodeString(abc.constants.getString(key)));
                         writer.append("\"");
 
                         writer.append(" ");
 
                         writer.append("\"");
-                        writer.append(Helper.escapeActionScriptString(abc.constants.getString(val)));
+                        writer.append(Helper.escapePCodeString(abc.constants.getString(val)));
                         writer.append("\"");
                         writer.newLine();
                     }

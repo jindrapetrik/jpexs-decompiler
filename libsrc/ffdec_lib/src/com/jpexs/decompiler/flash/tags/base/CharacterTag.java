@@ -12,13 +12,15 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 
 /**
  *
@@ -44,10 +46,10 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
     public String getName() {
         String nameAppend = "";
         if (exportName != null) {
-            nameAppend = ": " + exportName;
+            nameAppend = ": " + Helper.escapePCodeString(exportName);
         }
         if (className != null) {
-            nameAppend = ": " + className;
+            nameAppend = ": " + Helper.escapePCodeString(className);
         }
         return tagName + " (" + getCharacterId() + nameAppend + ")";
     }
