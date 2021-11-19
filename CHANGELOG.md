@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [14.5.0] - 2021-11-19
 ### Added
 - SoundStreamHead has associated sprite id in its name in the tagtree
 - [#1485] Improved skins support, night mode
