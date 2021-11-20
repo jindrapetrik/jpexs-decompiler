@@ -83,7 +83,8 @@ public class DefineLocalActionItem extends ActionItem implements SetTypeActionIt
         HighlightData srcData = getSrcData();
         srcData.localName = name.toStringNoQuotes(localData);
         srcData.declaration = true;
-        if (((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString()) && (!IdentifiersDeobfuscation.isValidName(false, ((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"))) {
+        if (((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString()) && (!IdentifiersDeobfuscation.isValidName(false, ((DirectValueActionItem) name).toStringNoQuotes(localData),
+                "this", "super", "true", "false", "NaN", "null", "newline", "Infinity", "undefined", "get", "set", "each"))) {
             IdentifiersDeobfuscation.appendObfuscatedIdentifier(((DirectValueActionItem) name).toStringNoQuotes(localData), writer);
         } else {
             stripQuotes(name, localData, writer);

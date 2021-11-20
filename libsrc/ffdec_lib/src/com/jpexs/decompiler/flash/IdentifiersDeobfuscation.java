@@ -71,20 +71,34 @@ public class IdentifiersDeobfuscation {
     public static final String[] reservedWordsAS2 = {
         // is "add" really a keyword? documentation says yes, but I can create "add" variable in CS6...
         // "add",
-        "and", "break", "case", "catch", "class", "continue", "default", "delete", "do", "dynamic", "else",
-        "eq", "extends", "false", "finally", "for", "function", "ge", "get", "gt", "if", "ifFrameLoaded", "implements",
+        "and", "break", "case", "catch", "class", "continue", "default", "delete", "do", "dynamic",
+        "each", //can be in variable definition
+        "else",
+        "eq", "extends",
+        "false", //can be in variable definition
+        "finally", "for", "function", "ge",
+        "get", //can be in variable definition
+        "gt", "if", "ifFrameLoaded", "implements",
         "import", "in", "instanceof", "interface", "intrinsic", "le",
         // is "it" really a keyword? documentation says yes, but I can create "it" variable in CS6...
         // "it",
-        "ne", "new", "not", "null", "on", "onClipEvent",
-        "or", "private", "public", "return", "set", "static",
+        "ne", "new", "not",
+        "null", //can be in variable definition
+        "on", "onClipEvent",
+        "or", "private", "public", "return",
+        "set", //can be in variable definition        
+        "static",
         //allow as variable:
         //"super",
         "switch", "tellTarget",
         //allow as variable:
         //"this",
-        "throw", "try",
-        "typeof", "undefined", "var", "void", "while", "with"
+        "throw",
+        "true", //can be in variable definition 
+        "try",
+        "typeof", "undefined", "var", "void", "while", "with",
+        //global constants, can be in variable definition :
+        "NaN", "newline", "Infinity"
     };
 
     // http://www.adobe.com/devnet/actionscript/learning/as3-fundamentals/syntax.html

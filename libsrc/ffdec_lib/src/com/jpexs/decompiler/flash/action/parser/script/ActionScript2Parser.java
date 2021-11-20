@@ -1003,7 +1003,10 @@ public class ActionScript2Parser {
                 break;
             case VAR:
                 s = lex();
-                expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                expected(s, lexer.yyline(), SymbolType.IDENTIFIER,
+                        SymbolType.TRUE, SymbolType.FALSE, SymbolGroup.GLOBALCONST,
+                        SymbolType.GET, SymbolType.SET,
+                        SymbolType.EACH);
                 String varIdentifier = s.value.toString();
                 s = lex();
                 if (s.type == SymbolType.COLON) {
@@ -1783,7 +1786,7 @@ public class ActionScript2Parser {
                 allowMemberOrCall = true;
                 break;
             case NEWLINE:
-                ret = new DirectValueActionItem(null, null, 0, "\r", new ArrayList<>());
+                ret = new DirectValueActionItem(null, null, 0, "\n", new ArrayList<>());
                 allowMemberOrCall = true;
                 break;
             case NAN:
