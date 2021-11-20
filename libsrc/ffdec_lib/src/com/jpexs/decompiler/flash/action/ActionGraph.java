@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.action.model.SetTarget2ActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTargetActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTypeActionItem;
 import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
+import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.model.clauses.ForInActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.TellTargetActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.NeqActionItem;
@@ -42,12 +43,15 @@ import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
 import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.ecma.Null;
+import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
+import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.StopPartKind;
 import com.jpexs.decompiler.graph.ThrowState;
@@ -63,7 +67,9 @@ import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -307,6 +313,69 @@ public class ActionGraph extends Graph {
         //Handle for loops at the end:
         super.finalProcess(list, level, localData, path);
 
+    }
+
+    @Override
+    protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
+        super.finalProcessAfter(list, level, localData, path);
+        makeDefineRegistersUp(list);
+    }
+
+
+    /*
+      This makes declarations of registers on one level up when inside some
+      structure. 
+       Example : 
+        if((var loc4 = random()) > 5) {
+            trace("x");
+        } 
+        => 
+        var loc4 = null;
+        if ((loc4 = random()) > 5)
+        {
+            trace("x");
+        }
+     
+     
+     */
+    private void makeDefineRegistersUp(List<GraphTargetItem> list) {
+        for (int i = 0; i < list.size(); i++) {
+            final int fi = i;
+            GraphTargetItem ti = list.get(i);
+
+            if (ti instanceof TemporaryRegister) {
+                continue;
+            }
+
+            Set<GraphTargetItem> visitedItems = new HashSet<>();
+            ti.visitNoBlock(new AbstractGraphTargetVisitor() {
+                @Override
+                public void visit(GraphTargetItem item) {
+                    if (item != null && !visitedItems.contains(item)) {
+                        visitedItems.add(item);
+
+                        if (item instanceof TemporaryRegister) {
+                            return;
+                        }
+                        if (item instanceof StoreRegisterActionItem) {
+                            StoreRegisterActionItem sr = (StoreRegisterActionItem) item;
+                            if (sr.define) {
+                                list.add(fi, new StoreRegisterActionItem(null, null, sr.register, new DirectValueActionItem(Null.INSTANCE), true));
+                                sr.define = false;
+                            }
+                        }
+
+                        item.visitNoBlock(this);
+                    }
+                }
+            });
+            if (ti instanceof Block) {
+                Block b = (Block) ti;
+                for (List<GraphTargetItem> items : b.getSubs()) {
+                    makeDefineRegistersUp(items);
+                }
+            }
+        }
     }
 
     @Override

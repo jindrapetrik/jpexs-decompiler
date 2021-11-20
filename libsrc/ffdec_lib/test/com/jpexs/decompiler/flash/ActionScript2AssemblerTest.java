@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.action.Action;
@@ -62,6 +63,28 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
         return null;
     }
 
+    private String decompilePcode(String pcode) {
+        try {
+            List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false);
+
+            DoActionTag doa = getFirstActionTag();
+            doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
+            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+
+            try {
+                Action.actionsToSource(doa, doa.getActions(), "", writer);
+            } catch (InterruptedException ex) {
+                fail();
+            }
+
+            return writer.toString();
+        } catch (IOException | ActionParseException ex) {
+            fail();
+        }
+
+        return null;
+    }
+
     @Test
     public void testModifiedConstantPools() {
         String actionsString = "ConstantPool \"ok\"\n"
@@ -96,5 +119,32 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
         String actionsString = "Push -0.25";
         String decompiled = recompilePcode(actionsString);
         assertTrue(decompiled.contains("Push -0.25"));
+    }
+
+    @Test
+    public void testDeclaredRegister() {
+        String res = decompilePcode("ConstantPool\n"
+                + "DefineFunction2 \"test\" 1 3 false true true false true false true false false 2 \"p\"  {\n"
+                + "Push register2 \"type\"\n"
+                + "GetMember\n"
+                + "StoreRegister 0\n"
+                + "Push 1\n"
+                + "StrictEquals\n"
+                + "If loc003a\n"
+                + "Jump loc004a\n"
+                + "loc003a:Push \"Hello\"\n"
+                + "Trace\n"
+                + "Jump loc004a\n"
+                + "}\n"
+                + "loc004a:");
+        res = cleanPCode(res);
+        assertEquals(res, "function test(p)\n"
+                + "{\n"
+                + "var _loc0_ = null;\n"
+                + "if((_loc0_ = p.type) === 1)\n"
+                + "{\n"
+                + "trace(\"Hello\");\n"
+                + "}\n"
+                + "}");
     }
 }

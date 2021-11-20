@@ -87,6 +87,12 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
         visitor.visitAll(actions);
     }
 
+    @Override
+    public void visitNoBlock(GraphTargetVisitorInterface visitor) {
+
+    }
+
+
     public FunctionActionItem() {
         super(null, null, PRECEDENCE_PRIMARY);
     }
