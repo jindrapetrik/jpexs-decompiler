@@ -2208,6 +2208,17 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "var transient = 27;\r\n"
                 + "var use = 28;\r\n"
                 + "var volatile = 29;\r\n"
+                + "var false = 43;\r\n"
+                + "var get = 48;\r\n"
+                + "var null = 62;\r\n"
+                + "var set = 69;\r\n"
+                + "var undefined = 76;\r\n"
+                + "var true = 81;\r\n"
+                + "var false = 82;\r\n"
+                + "var NaN = 83;\r\n"
+                + "var newline = 84;\r\n"
+                + "var Infinity = 85;\r\n"
+                + "var each = 86;\r\n"
         );
     }
 
@@ -2258,6 +2269,46 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "trace(\"P\");\r\n"
                 + "}\r\n"
                 + "trace(\"Q\");\r\n"
+        );
+    }
+
+    @Test
+    public void frame79_registersVsDefineLocalTest() {
+        compareSrc(79, "function x1(c)\r\n"
+                + "{\r\n"
+                + "var _loc2_ = 1;\r\n"
+                + "var _loc1_ = 2;\r\n"
+                + "return _loc2_ + _loc1_ * c;\r\n"
+                + "}\r\n"
+                + "function x2(c)\r\n"
+                + "{\r\n"
+                + "var a0 = 1;\r\n"
+                + "var a1 = 2;\r\n"
+                + "var r = Math.floor(Math.random() * 2);\r\n"
+                + "return eval(\"a\" + r) + b * c;\r\n"
+                + "}\r\n"
+                + "function x3(c)\r\n"
+                + "{\r\n"
+                + "var _loc2_ = 1;\r\n"
+                + "var _loc3_ = 2;\r\n"
+                + "var _loc1_ = Math.floor(Math.random() * 2);\r\n"
+                + "set(\"a\" + _loc1_,12);\r\n"
+                + "return _loc2_ + b * c;\r\n"
+                + "}\r\n"
+                + "trace(\"registersVsDefineLocalTest\");\r\n"
+                + "trace(x1(2) + x2(3) + x3(4));\r\n"
+        );
+    }
+
+    @Test
+    public void frame80_deleteEvalTest() {
+        compareSrc(80, "trace(\"deleteEvalTest\");\r\n"
+                + "var k0 = 1;\r\n"
+                + "var k1 = 2;\r\n"
+                + "var r = Math.floor(Math.random() * 2);\r\n"
+                + "trace(eval(\"k\" + r));\r\n"
+                + "delete (\"k\" + r);\r\n"
+                + "trace(eval(\"k\" + r));\r\n"
         );
     }
 }
