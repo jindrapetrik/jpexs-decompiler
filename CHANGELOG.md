@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - AS1/2 handle declaration of registers in certain cases
 - AS1/2 setProperty, getProperty handling
+- [#1750] Application won't start when cannot access font file
 
 ## [14.5.1] - 2021-11-20
 ### Fixed
@@ -2110,7 +2111,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.4.0...dev
+[14.5.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.5.0...version14.5.1
+[14.5.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.4.0...version14.5.0
 [14.4.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.3.1...version14.4.0
 [14.3.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.3.0...version14.3.1
 [14.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.2.1...version14.3.0
@@ -2224,6 +2226,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1750]: https://www.free-decompiler.com/flash/issues/1750
 [#1485]: https://www.free-decompiler.com/flash/issues/1485
 [#1681]: https://www.free-decompiler.com/flash/issues/1681
 [#1744]: https://www.free-decompiler.com/flash/issues/1744
