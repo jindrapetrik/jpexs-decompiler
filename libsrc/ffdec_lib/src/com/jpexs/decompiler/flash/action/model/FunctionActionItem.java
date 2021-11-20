@@ -63,6 +63,8 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
 
     public GraphTargetItem calculatedFunctionName;
 
+    public boolean hasEval = false;
+
     private int regStart;
 
     private List<VariableActionItem> variables;
@@ -89,7 +91,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
         super(null, null, PRECEDENCE_PRIMARY);
     }
 
-    public FunctionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, List<String> paramNames, Map<Integer, String> regNames, List<GraphTargetItem> actions, List<String> constants, int regStart, List<VariableActionItem> variables, List<FunctionActionItem> innerFunctions) {
+    public FunctionActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, List<String> paramNames, Map<Integer, String> regNames, List<GraphTargetItem> actions, List<String> constants, int regStart, List<VariableActionItem> variables, List<FunctionActionItem> innerFunctions, boolean hasEval) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.actions = actions;
         this.constants = constants;
@@ -99,6 +101,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
         this.regStart = regStart;
         this.variables = variables;
         this.innerFunctions = innerFunctions;
+        this.hasEval = hasEval;
     }
 
     @Override
@@ -344,7 +347,8 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
                 String varName = v.getVariableName();
                 GraphTargetItem stored = v.getStoreValue();
                 if (needsFun2) {
-                    if (v.isDefinition() && !registerNames.contains(varName) && !deeplyUsedVariableNames.contains(varName)) {
+                    if (v.isDefinition() && !registerNames.contains(varName) && !deeplyUsedVariableNames.contains(varName)
+                            && !hasEval) {
                         registerNames.add(varName);
                     }
                 }

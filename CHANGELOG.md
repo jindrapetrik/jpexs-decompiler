@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - AS 1/2 - do not use eval function on obfuscated increment/decrement
 - AS 1/2 direct editation - newline as "\n", not "\r"
 - AS 1/2 allow various nonstandard names for definelocal
+- AS 1/2 use DefineLocal in function instead of registers when eval, set is used
 
 ## [14.5.0] - 2021-11-19
 ### Added

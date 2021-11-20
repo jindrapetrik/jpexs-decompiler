@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf7;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
@@ -316,7 +317,7 @@ public class ActionDefineFunction2 extends Action implements GraphSourceItemCont
                 funcList.add((FunctionActionItem) val);
             }
         }
-        FunctionActionItem fti = new FunctionActionItem(this, lineStartItem, functionName, paramNames, getRegNames(), content.get(0), constantPool, getFirstRegister(), new ArrayList<>(), funcList);
+        FunctionActionItem fti = new FunctionActionItem(this, lineStartItem, functionName, paramNames, getRegNames(), content.get(0), constantPool, getFirstRegister(), new ArrayList<>(), funcList, false /*actually unknown*/);
         functions.put(functionName, fti);
         stack.push(fti);
     }
