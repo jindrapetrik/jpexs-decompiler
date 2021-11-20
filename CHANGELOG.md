@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 # [Unreleased]
 ### Fixed
 - AS1/2 handle declaration of registers in certain cases
+- AS1/2 setProperty, getProperty handling
 
 ## [14.5.1] - 2021-11-20
 ### Fixed

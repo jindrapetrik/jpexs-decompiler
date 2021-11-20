@@ -1554,7 +1554,9 @@ public class ActionScript2Parser {
                             assigned = new BitXorActionItem(null, null, lhs, assigned);
                             break;
                     }
-                    if (lhs instanceof VariableActionItem) {
+                    if (lhs instanceof GetPropertyActionItem) {
+                        lhs = new SetPropertyActionItem(null, null, ((GetPropertyActionItem) lhs).target, ((GetPropertyActionItem) lhs).propertyIndex, assigned);
+                    } else if (lhs instanceof VariableActionItem) {
                         if (assigned != rhs) {
                             lhs = new VariableActionItem(((VariableActionItem) lhs).getVariableName(), assigned, false);
                             variables.add((VariableActionItem) lhs);
@@ -1898,8 +1900,12 @@ public class ActionScript2Parser {
                     }
                     lexer.pushback(s2);
 
-                    ret = new VariableActionItem(varName, null, false);
-                    variables.add((VariableActionItem) ret);
+                    /*if (Action.propertyNamesList.contains(varName)) {
+                        ret = new GetPropertyActionItem(null, null, pushConst(""), Action.propertyNamesList.indexOf(varName));
+                    } else {*/
+                        ret = new VariableActionItem(varName, null, false);
+                        variables.add((VariableActionItem) ret);
+                    //}
                     allowMemberOrCall = true;
                 }
 
@@ -1967,7 +1973,20 @@ public class ActionScript2Parser {
                     ret = new CallMethodActionItem(null, null, mem.object, mem.memberName, args);
                 } else if (ret instanceof VariableActionItem) {
                     VariableActionItem var = (VariableActionItem) ret;
-                    ret = new CallFunctionActionItem(null, null, pushConst(var.getVariableName()), args);
+
+                    if (var.getVariableName().equals("getProperty")
+                            && args.size() == 2
+                            && (args.get(1) instanceof VariableActionItem)
+                            && (Action.propertyNamesList.contains(((VariableActionItem) args.get(1)).getVariableName()))) {
+                        ret = new GetPropertyActionItem(null, null, args.get(0), Action.propertyNamesList.indexOf(((VariableActionItem) args.get(1)).getVariableName()));
+                    } else if (var.getVariableName().equals("setProperty")
+                            && args.size() == 3
+                            && (args.get(1) instanceof VariableActionItem)
+                            && (Action.propertyNamesList.contains(((VariableActionItem) args.get(1)).getVariableName()))) {
+                        ret = new SetPropertyActionItem(null, null, args.get(0), Action.propertyNamesList.indexOf(((VariableActionItem) args.get(1)).getVariableName()), args.get(2));
+                    } else {
+                        ret = new CallFunctionActionItem(null, null, pushConst(var.getVariableName()), args);
+                    }
                 } else if (ret instanceof EvalActionItem) {
                     EvalActionItem ev = (EvalActionItem) ret;
                     ret = new CallFunctionActionItem(null, null, ev.value, args);
