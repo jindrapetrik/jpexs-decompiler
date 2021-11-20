@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [14.5.1] - 2021-11-20
 ### Fixed
 - AS 1/2 - do not use eval function on obfuscated increment/decrement
 - AS 1/2 direct editation - newline as "\n", not "\r"
