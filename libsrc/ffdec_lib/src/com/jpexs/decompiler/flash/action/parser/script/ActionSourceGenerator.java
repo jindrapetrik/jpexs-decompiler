@@ -705,11 +705,11 @@ public class ActionSourceGenerator implements SourceGenerator {
             if (!isInterface) {
                 val.add(new ActionStoreRegister(1));
             }
-            constr.addAll(typeToActions(nameStr, val));
+            constr.addAll(typeToActions(globalClassTypeStr, val));
         } else {
             constr.addAll(toActionList(((FunctionActionItem) constructor).toSource(localData, this)));
             constr.add(new ActionStoreRegister(1));
-            constr = (typeToActions(nameStr, constr));
+            constr = (typeToActions(globalClassTypeStr, constr));
         }
         if (!isInterface) {
             for (int pass = 1; pass <= 2; pass++) { //two passes, methods first, then variables
@@ -738,7 +738,7 @@ public class ActionSourceGenerator implements SourceGenerator {
         if (!isInterface) {
             ifbody.add(new ActionPush((Long) 1L));
             ifbody.add(new ActionPush(Null.INSTANCE));
-            ifbody.addAll(typeToActions(nameStr, null));
+            ifbody.addAll(typeToActions(globalClassTypeStr, null));
             ifbody.add(pushConst("prototype"));
             ifbody.add(new ActionGetMember());
             ifbody.add(new ActionPush((Long) 3L));

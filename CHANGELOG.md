@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 handle declaration of registers in certain cases
 - AS1/2 setProperty, getProperty handling
 - [#1750] Application won't start when cannot access font file
+- AS2 direct editation of classes - missing _global prefix
 
 ## [14.5.1] - 2021-11-20
 ### Fixed
