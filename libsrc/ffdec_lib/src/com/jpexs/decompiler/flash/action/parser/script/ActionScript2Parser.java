@@ -697,6 +697,8 @@ public class ActionScript2Parser {
                 } else if (varDel instanceof VariableActionItem) {
                     variables.remove(varDel);
                     ret = new DeleteActionItem(null, null, null, pushConst(((VariableActionItem) varDel).getVariableName()));
+                } else if ((varDel instanceof EvalActionItem) || (varDel instanceof ParenthesisItem)) {
+                    ret = new DeleteActionItem(null, null, null, varDel.value);
                 } else if (varDel instanceof DirectValueActionItem) {
                     ret = new DeleteActionItem(null, null, null, varDel);
                 } else {
@@ -1966,6 +1968,9 @@ public class ActionScript2Parser {
                 } else if (ret instanceof VariableActionItem) {
                     VariableActionItem var = (VariableActionItem) ret;
                     ret = new CallFunctionActionItem(null, null, pushConst(var.getVariableName()), args);
+                } else if (ret instanceof EvalActionItem) {
+                    EvalActionItem ev = (EvalActionItem) ret;
+                    ret = new CallFunctionActionItem(null, null, ev.value, args);
                 } else {
                     ret = new CallFunctionActionItem(null, null, ret, args);
                 }

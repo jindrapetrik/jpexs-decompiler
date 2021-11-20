@@ -69,10 +69,16 @@ public class DeleteActionItem extends ActionItem {
             return writer;
         }
 
+        if (propertyName.getPrecedence() > getPrecedence()) {
+            writer.append("(");
+        }
         if (IdentifiersDeobfuscation.isValidName(false, propertyName.toStringNoQuotes(localData))) {
             propertyName.toStringNoQuotes(writer, localData);
         } else {
             propertyName.toString(writer, localData);
+        }
+        if (propertyName.getPrecedence() > getPrecedence()) {
+            writer.append(")");
         }
         return writer;
     }
