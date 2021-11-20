@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- AS 1/2 - do not use eval function on obfuscated increment/decrement
+
 ## [14.5.0] - 2021-11-19
 ### Added
 - SoundStreamHead has associated sprite id in its name in the tagtree

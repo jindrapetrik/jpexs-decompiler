@@ -84,6 +84,9 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
             GraphTargetItem obj = ((IncrementActionItem) value).object;
             if (!stack.isEmpty() && stack.peek().valueEquals(obj)) {
                 stack.pop();
+                if (obj instanceof GetVariableActionItem) {
+                    ((GetVariableActionItem) obj).printObfuscatedName = true;
+                }
                 stack.push(new PostIncrementActionItem(this, lineStartAction, obj));
                 return;
             }
@@ -92,6 +95,9 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
             GraphTargetItem obj = ((DecrementActionItem) value).object;
             if (!stack.isEmpty() && stack.peek().valueEquals(obj)) {
                 stack.pop();
+                if (obj instanceof GetVariableActionItem) {
+                    ((GetVariableActionItem) obj).printObfuscatedName = true;
+                }
                 stack.push(new PostDecrementActionItem(this, lineStartAction, obj));
                 return;
             }
@@ -99,6 +105,10 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
         if (value instanceof IncrementActionItem) {
             if (((IncrementActionItem) value).object instanceof GetVariableActionItem) {
                 if (((GetVariableActionItem) ((IncrementActionItem) value).object).name.valueEquals(name)) {
+
+                    if (((IncrementActionItem) value).object instanceof GetVariableActionItem) {
+                        ((GetVariableActionItem) ((IncrementActionItem) value).object).printObfuscatedName = true;
+                    }
                     output.add(new PostIncrementActionItem(this, lineStartAction, ((IncrementActionItem) value).object));
                     return;
                 }
@@ -107,6 +117,9 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
         if (value instanceof DecrementActionItem) {
             if (((DecrementActionItem) value).object instanceof GetVariableActionItem) {
                 if (((GetVariableActionItem) ((DecrementActionItem) value).object).name.valueEquals(name)) {
+                    if (((DecrementActionItem) value).object instanceof GetVariableActionItem) {
+                        ((GetVariableActionItem) ((DecrementActionItem) value).object).printObfuscatedName = true;
+                    }
                     output.add(new PostDecrementActionItem(this, lineStartAction, ((DecrementActionItem) value).object));
                     return;
                 }
@@ -141,12 +154,14 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
                 if (value instanceof IncrementActionItem) {
                     if (((IncrementActionItem) value).object instanceof GetVariableActionItem) {
                         if (((GetVariableActionItem) ((IncrementActionItem) value).object).name.valueEquals(name)) {
+                            ((GetVariableActionItem) ((IncrementActionItem) value).object).printObfuscatedName = true;
                             ret = new PreIncrementActionItem(this, lineStartAction, ((IncrementActionItem) value).object);
                         }
                     }
                 } else if (value instanceof DecrementActionItem) {
                     if (((DecrementActionItem) value).object instanceof GetVariableActionItem) {
                         if (((GetVariableActionItem) ((DecrementActionItem) value).object).name.valueEquals(name)) {
+                            ((GetVariableActionItem) ((DecrementActionItem) value).object).printObfuscatedName = true;
                             ret = new PreDecrementActionItem(this, lineStartAction, ((DecrementActionItem) value).object);
                         }
                     }
