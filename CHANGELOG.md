@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - AS 1/2 use DefineLocal in function instead of registers when eval, set is used
 - AS 1/2 direct editation - delete operator parenthesis
 - AS 1/2 direct editation - call function on eval
+- AS 1/2 export selection of scripts in buttons, classes and similar
 
 ## [14.5.0] - 2021-11-19
 ### Added
