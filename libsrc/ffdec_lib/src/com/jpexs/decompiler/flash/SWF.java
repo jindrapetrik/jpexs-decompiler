@@ -2370,7 +2370,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
                 List<GraphTargetItem> dec;
                 try {
-                    dec = Action.actionsToTree(true /*Yes, inside doInitAction*/, dia.getActions(), version, staticOperation, ""/*FIXME*/);
+                    dec = Action.actionsToTree(true /*Yes, inside doInitAction*/, false, dia.getActions(), version, staticOperation, ""/*FIXME*/);
                 } catch (EmptyStackException ex) {
                     continue;
                 }
