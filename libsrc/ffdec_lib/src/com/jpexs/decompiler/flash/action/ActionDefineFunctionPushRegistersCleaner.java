@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -206,7 +207,25 @@ public class ActionDefineFunctionPushRegistersCleaner extends SWFDecompilerAdapt
                 return false;
             }
 
-            Iterator<Action> ait = code.getReferencesFor(asr);
+            Action actionWithRefs = asr;
+
+            //Special: ignore zero jump when pushundefined is stripped as unreachable            
+            if (code.get(pos - 1) instanceof ActionJump) {
+                if (((ActionJump) code.get(pos - 1)).getJumpOffset() == 0) {
+                    Iterator<Action> zit = code.getReferencesFor(code.get(pos));
+                    int refCnt = 0;
+                    while (zit.hasNext()) {
+                        zit.next();
+                        refCnt++;
+                    }
+                    if (refCnt == 1) {
+                        actionWithRefs = code.get(pos - 1);
+                        pos--;
+                    }
+                }
+            }
+
+            Iterator<Action> ait = code.getReferencesFor(actionWithRefs);
             while (ait.hasNext()) {
                 Action a = ait.next();
                 if (!(a instanceof ActionJump)) {
@@ -215,6 +234,7 @@ public class ActionDefineFunctionPushRegistersCleaner extends SWFDecompilerAdapt
                 jumpsToReturnPositions.add(code.indexOf(a));
             }
             pos--;
+
             if (!(code.get(pos) instanceof ActionJump)) {
                 actionBeforeFinishPart = code.get(pos);
             }

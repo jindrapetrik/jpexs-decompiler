@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.DisassemblyListener;
@@ -28,13 +29,16 @@ import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf5.ActionConstantPool;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.helpers.CancellableWorker;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.stat.Statistics;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -162,6 +166,13 @@ public class ActionListReader {
                 logger.log(Level.SEVERE, "Deobfuscation failed in: " + path, ex);
             }
         }
+
+        /*System.err.println("=======================");
+        int p = 0;
+        for (Action a : actions) {
+            System.err.println("loc" + Helper.formatAddress(a.getAddress()) + " (" + p + "): " + a.getASMSource(actions, new HashSet<Long>(), ScriptExportMode.PCODE));
+            p++;
+        }*/
 
         //TODO: This cleaner needs to be executed only before actual decompilation, not when disassembly only
         try {

@@ -147,4 +147,49 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "}\n"
                 + "}");
     }
+
+    @Test
+    public void testDefineFuncRegCleaner() {
+        String res = decompilePcode("ConstantPool \"Math\" \"randi\" \"random\" \"b\" \"a\" \"floor\" \"randf\" \"randa\" \"arguments\" \"rande\" \"sign\" \"abs\"\n"
+                + "Push constant0\n"
+                + "GetVariable\n"
+                + "Push constant10\n"
+                + "definefunction \"\" 1 \"a\" { \n"
+                + "push register1 constant4\n"
+                + "getvariable\n"
+                + "storeregister 1\n"
+                + "pop\n"
+                + "push register1 0.0\n"
+                + "Equals2\n"
+                + "If locC\n"
+                + "push register1 1 constant0\n"
+                + "getvariable\n"
+                + "push constant11\n"
+                + "callmethod\n"
+                + "push register1\n"
+                + "divide\n"
+                + "jump locB\n"
+                + "locC:\n"
+                + "push 0.0\n"
+                + "locB: jump locA\n"
+                + "push undefined\n"
+                + "locA: storeregister 0\n"
+                + "pop\n"
+                + "storeregister 1\n"
+                + "pop\n"
+                + "push register0\n"
+                + "return\n"
+                + "}\n"
+                + "loc00a5:SetMember");
+        res = cleanPCode(res);
+        assertEquals(res, "Math.sign = function(a)\n"
+                + "{\n"
+                + "var _loc1_ = a;\n"
+                + "if(_loc1_ != 0)\n"
+                + "{\n"
+                + "return Math.abs(_loc1_) / _loc1_;\n"
+                + "}\n"
+                + "return 0;\n"
+                + "};");
+    }
 }
