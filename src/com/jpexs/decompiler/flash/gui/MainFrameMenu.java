@@ -726,6 +726,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/file/close", swfSelected && !isWorking);
         setMenuEnabled("_/closeAll", swfLoaded && !isWorking);
         setMenuEnabled("/file/closeAll", swfLoaded && !isWorking);
+        setMenuEnabled("/file/reload", swfSelected && !isWorking);
 
         setMenuEnabled("/file/export", swfSelected);
         setMenuEnabled("_/exportAll", swfSelected && !isWorking);
