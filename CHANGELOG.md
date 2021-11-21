@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 - Japanese in english locales for Gotoaddress, addclass dialog
 - AS1/2 DefineFunction cleaner
 - AS1/2 direct editation - postincrement/decrement
-- Reload menu disabled when do SWF selected
+- Reload menu disabled when no SWF selected
 - AS2 - Do not detect classes inside functions
 - AS1/2 - Slash syntax colon vs ternar operator collision
 - AS1/2 - Allow nonstandard identifiers in object literal
