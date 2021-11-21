@@ -2407,6 +2407,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void importText(final SWF swf) {
+        ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importTexts"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportTextInfo);
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
@@ -2488,6 +2489,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (as3ScriptReplacer == null) {
             return;
         }
+        ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importScripts"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportScriptsInfo);
+
         String flexLocation = Configuration.flexSdkLocation.get();
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
@@ -2513,6 +2516,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void importSymbolClass(final SWF swf) {
+        ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importSymbolClass").replace("%file%", SymbolClassExporter.SYMBOL_CLASS_EXPORT_FILENAME), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportSymbolClassInfo);
+
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
@@ -2645,6 +2650,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void importSwfXml() {
         View.checkAccess();
+
+        ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importXml"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportXmlInfo);
+
 
         List<TreeItem> sel = tagTree.getSelected();
         Set<SWF> swfs = new HashSet<>();

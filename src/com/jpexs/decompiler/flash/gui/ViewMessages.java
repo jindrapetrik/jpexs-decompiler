@@ -97,7 +97,7 @@ public class ViewMessages {
                     return;
                 }
 
-                JLabel warLabel = new JLabel("<html>" + message.replace("\r\n", "<br>") + "</html>");
+                JLabel warLabel = new JLabel("<html><center>" + message.replace("\r\n", "<br>") + "</center></html>");
                 final JPanel warPanel = new JPanel(new BorderLayout());
                 warPanel.add(warLabel, BorderLayout.CENTER);
                 donotShowAgainCheckBox = new JCheckBox(AppStrings.translate("message.confirm.donotshowagain"));

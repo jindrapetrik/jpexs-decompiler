@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Information message before importing scripts, text, XML, Symbol-Class
+
 ### Fixed
 - Japanese in english locales for Gotoaddress, addclass dialog
 - AS1/2 DefineFunction cleaner
