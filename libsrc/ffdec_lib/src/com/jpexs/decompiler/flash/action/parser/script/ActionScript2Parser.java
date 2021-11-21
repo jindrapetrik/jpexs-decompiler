@@ -650,6 +650,23 @@ public class ActionScript2Parser {
         if (s.type == SymbolType.EOF) {
             return null;
         }
+        if (s.group == SymbolGroup.GLOBALFUNC) {
+            ParsedSymbol s2 = lex();
+            if (s2.type != SymbolType.PARENT_OPEN) {
+                lexer.removeListener(buf);
+                buf.pushAllBack(lexer);
+
+                ret = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                s = lex();
+                if ((s != null) && (s.type != SymbolType.SEMICOLON)) {
+                    lexer.pushback(s);
+                }
+                return ret;
+            } else {
+                lexer.pushback(s2);
+            }
+        }
+
         switch (s.type) {
             case FSCOMMAND:
                 expectedType(SymbolType.PARENT_OPEN);
@@ -1638,6 +1655,29 @@ public class ActionScript2Parser {
         return arrCnt;
     }
 
+    private GraphTargetItem handleVariable(ParsedSymbol s, GraphTargetItem ret, List<VariableActionItem> variables, Reference<Boolean> allowMemberOrCall, boolean inFunction, boolean inMethod, boolean inTellTarget, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException {
+        if (s.value.equals("not")) {
+            ret = new NotItem(null, null, expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval));
+        } else {
+            String varName = s.value.toString();
+            if (s.type == SymbolType.PATH) { //only with slash syntax
+                ParsedSymbol s2 = lex();
+                while (s2.type == SymbolType.COLON) {
+                    s2 = lex();
+                    expected(s2, lexer.yyline(), SymbolType.IDENTIFIER);
+                    varName += ":" + s2.value.toString();
+                    s2 = lex();
+                }
+                lexer.pushback(s2);
+            }
+
+            ret = new VariableActionItem(varName, null, false);
+            variables.add((VariableActionItem) ret);
+            allowMemberOrCall.setVal(true);
+        }
+        return ret;
+    }
+
     private GraphTargetItem expressionPrimary(boolean allowEmpty, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean allowCall, Reference<Boolean> hasEval) throws IOException, ActionParseException {
         if (debugMode) {
             System.out.println("primary:");
@@ -1874,40 +1914,34 @@ public class ActionScript2Parser {
             case THIS:
             case SUPER:
             case PATH:
-                if (s.value.equals("not")) {
-                    ret = new NotItem(null, null, expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval));
-                } else {
-                    String varName = s.value.toString();
-                    if (s.type == SymbolType.PATH) { //only with slash syntax
-                        ParsedSymbol s2 = lex();
-                        while (s2.type == SymbolType.COLON) {
-                            s2 = lex();
-                            expected(s2, lexer.yyline(), SymbolType.IDENTIFIER);
-                            varName += ":" + s2.value.toString();
-                            s2 = lex();
-                        }
-                        lexer.pushback(s2);
-                    }
-
-                    /*if (Action.propertyNamesList.contains(varName)) {
-                        ret = new GetPropertyActionItem(null, null, pushConst(""), Action.propertyNamesList.indexOf(varName));
-                    } else {*/
-                    ret = new VariableActionItem(varName, null, false);
-                    variables.add((VariableActionItem) ret);
-                    //}
-                    allowMemberOrCall = true;
-                }
+                Reference<Boolean> allowMemberOrCallRef = new Reference<>(allowMemberOrCall);
+                ret = handleVariable(s, ret, variables, allowMemberOrCallRef, inFunction, inMethod, inTellTarget, functions, hasEval);
+                allowMemberOrCall = allowMemberOrCallRef.getVal();
 
                 break;
             default:
-                GraphTargetItem excmd = expressionCommands(s, inFunction, inMethod, inTellTarget, -1, variables, functions, hasEval);
-                if (excmd != null) {
-                    //?
-                    ret = excmd;
-                    allowMemberOrCall = true; //?
-                    break;
+
+                boolean isGlobalFuncVar = false;
+                if (s.group == SymbolGroup.GLOBALFUNC) {
+                    ParsedSymbol s2 = peekLex();
+                    if (s2.type != SymbolType.PARENT_OPEN) {
+                        Reference<Boolean> allowMemberOrCallRef2 = new Reference<>(allowMemberOrCall);
+                        ret = handleVariable(s, ret, variables, allowMemberOrCallRef2, inFunction, inMethod, inTellTarget, functions, hasEval);
+                        allowMemberOrCall = allowMemberOrCallRef2.getVal();
+                        isGlobalFuncVar = true;
+                    }
                 }
-                lexer.pushback(s);
+
+                if (!isGlobalFuncVar) {
+                    GraphTargetItem excmd = expressionCommands(s, inFunction, inMethod, inTellTarget, -1, variables, functions, hasEval);
+                    if (excmd != null) {
+                        //?
+                        ret = excmd;
+                        allowMemberOrCall = true; //?
+                        break;
+                    }
+                    lexer.pushback(s);
+                }
         }
 
         if (allowMemberOrCall && ret != null) {
