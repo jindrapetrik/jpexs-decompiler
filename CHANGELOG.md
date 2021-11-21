@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Japanese in english locales for Gotoaddress, addclass dialog
 - AS1/2 DefineFunction cleaner
+- AS1/2 direct editation - postincrement/decrement
 
 ## [14.5.2] - 2021-11-20
 ### Fixed

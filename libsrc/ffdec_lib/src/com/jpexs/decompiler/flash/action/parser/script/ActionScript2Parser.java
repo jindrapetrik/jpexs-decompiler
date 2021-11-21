@@ -1598,22 +1598,6 @@ public class ActionScript2Parser {
             }
         }
 
-        switch (lookahead.type) {
-            case INCREMENT: //postincrement
-                lex();
-                if (!(lhs instanceof VariableActionItem) && !(lhs instanceof GetMemberActionItem)) {
-                    throw new ActionParseException("Invalid assignment", lexer.yyline());
-                }
-                lhs = new PostIncrementActionItem(null, null, lhs);
-                break;
-            case DECREMENT: //postdecrement
-                lex();
-                if (!(lhs instanceof VariableActionItem) && !(lhs instanceof GetMemberActionItem)) {
-                    throw new ActionParseException("Invalid assignment", lexer.yyline());
-                }
-                lhs = new PostDecrementActionItem(null, null, lhs);
-                break;
-        }
         if (debugMode) {
             System.out.println("/expression1");
         }
@@ -2007,6 +1991,24 @@ public class ActionScript2Parser {
             }
             op = lex();
         }
+
+        switch (op.type) {
+            case INCREMENT: //postincrement
+                if (!(ret instanceof VariableActionItem) && !(ret instanceof GetMemberActionItem)) {
+                    throw new ActionParseException("Invalid assignment", lexer.yyline());
+                }
+                ret = new PostIncrementActionItem(null, null, ret);
+                op = lex();
+                break;
+            case DECREMENT: //postdecrement
+                if (!(ret instanceof VariableActionItem) && !(ret instanceof GetMemberActionItem)) {
+                    throw new ActionParseException("Invalid assignment", lexer.yyline());
+                }
+                ret = new PostDecrementActionItem(null, null, ret);
+                op = lex();
+                break;
+        }
+
         lexer.pushback(op);
         return ret;
     }
