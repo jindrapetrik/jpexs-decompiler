@@ -297,7 +297,8 @@ public class ActionGraph extends Graph {
                                     checkedLoop = new Loop(localData.loops.size(), null, null);
                                     checkedBody.add(new BreakItem(null, null, checkedLoop.id));
                                 }
-                                list.add(t, new ForInActionItem(null, null, checkedLoop, sti.getObject(), eti.object, checkedBody));
+                                sti.setValue(new DirectValueActionItem(Null.INSTANCE));
+                                list.add(t, new ForInActionItem(null, null, checkedLoop, (GraphTargetItem) sti/*sti.getObject()*/, eti.object, checkedBody));
                                 list.remove(t - 1);
                                 t--;
                             }
@@ -358,6 +359,10 @@ public class ActionGraph extends Graph {
                         visitedItems.add(item);
 
                         if (item instanceof TemporaryRegister) {
+                            return;
+                        }
+                        //can has definition in for in...
+                        if ((ti instanceof ForInActionItem) && (item == ((ForInActionItem) ti).variableName)) {
                             return;
                         }
                         if (item instanceof StoreRegisterActionItem) {
