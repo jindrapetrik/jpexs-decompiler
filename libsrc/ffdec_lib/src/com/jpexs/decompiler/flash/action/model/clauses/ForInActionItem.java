@@ -20,7 +20,9 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.SetTypeActionItem;
 import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
+import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
@@ -111,10 +113,16 @@ public class ForInActionItem extends LoopActionItem implements Block {
             writer.append(" ");
         }
         writer.append("(");
-        if ((variableName instanceof DirectValueActionItem) && (((DirectValueActionItem) variableName).value instanceof RegisterNumber)) {
-            writer.append("var ");
+        if (variableName instanceof SetTypeActionItem) {
+            GraphTargetItem vn = ((SetTypeActionItem) variableName).getObject();
+
+            if ((variableName instanceof StoreRegisterActionItem) && ((StoreRegisterActionItem) variableName).define) {
+                writer.append("var ");
+            }
+
+            stripQuotes(vn, localData, writer);
         }
-        stripQuotes(variableName, localData, writer);
+
         writer.append(" in ");
         enumVariable.toString(writer, localData);
         writer.append(")").startBlock();
@@ -161,8 +169,10 @@ public class ForInActionItem extends LoopActionItem implements Block {
         loopExpr.add(forInEndIf);
         List<Action> loopBody = new ArrayList<>();
 
-        //assuming (variableName instanceof VariableActionItem)
-        SetVariableActionItem setVar = new SetVariableActionItem(null, null, asGenerator.pushConstTargetItem(((VariableActionItem) variableName).getVariableName()), new DirectValueActionItem(new RegisterNumber(exprReg)));
+        //assuming (variableName instanceof VariableActionItem)       
+        VariableActionItem vaact = (VariableActionItem) variableName;
+        GraphTargetItem setVar = vaact.getBoxedValue();
+        setVar.value = new DirectValueActionItem(new RegisterNumber(exprReg));
 
         loopBody.addAll(asGenerator.toActionList(setVar.toSourceIgnoreReturnValue(localData, generator)));
         //loopBody.add(new ActionPush(new RegisterNumber(exprReg)));
