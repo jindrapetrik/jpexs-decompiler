@@ -729,6 +729,22 @@ public final class Configuration {
     @ConfigurationCategory("limit")
     public static ConfigurationItem<Integer> limitSameChars = null;
 
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> showImportScriptsInfo = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> showImportTextInfo = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> showImportSymbolClassInfo = null;
+
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> showImportXmlInfo = null;
+
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
