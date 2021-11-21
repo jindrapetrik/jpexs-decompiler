@@ -1875,20 +1875,22 @@ public class ActionScript2Parser {
                     ret = new NotItem(null, null, expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval));
                 } else {
                     String varName = s.value.toString();
-                    ParsedSymbol s2 = lex();
-                    while (s2.type == SymbolType.COLON) {
-                        s2 = lex();
-                        expected(s2, lexer.yyline(), SymbolType.IDENTIFIER);
-                        varName += ":" + s2.value.toString();
-                        s2 = lex();
+                    if (s.type == SymbolType.PATH) { //only with slash syntax
+                        ParsedSymbol s2 = lex();
+                        while (s2.type == SymbolType.COLON) {
+                            s2 = lex();
+                            expected(s2, lexer.yyline(), SymbolType.IDENTIFIER);
+                            varName += ":" + s2.value.toString();
+                            s2 = lex();
+                        }
+                        lexer.pushback(s2);
                     }
-                    lexer.pushback(s2);
 
                     /*if (Action.propertyNamesList.contains(varName)) {
                         ret = new GetPropertyActionItem(null, null, pushConst(""), Action.propertyNamesList.indexOf(varName));
                     } else {*/
-                        ret = new VariableActionItem(varName, null, false);
-                        variables.add((VariableActionItem) ret);
+                    ret = new VariableActionItem(varName, null, false);
+                    variables.add((VariableActionItem) ret);
                     //}
                     allowMemberOrCall = true;
                 }
