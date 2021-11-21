@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - AS2 - Do not detect classes inside functions
 - AS1/2 - Slash syntax colon vs ternar operator collision
 - AS1/2 - Allow nonstandard identifiers in object literal
+- AS1/2 - Allow globalfunc names as variable identifiers
 
 ## [14.5.2] - 2021-11-20
 ### Fixed
