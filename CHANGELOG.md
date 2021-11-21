@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - Japanese in english locales for Gotoaddress, addclass dialog
 - AS1/2 DefineFunction cleaner
 - AS1/2 direct editation - postincrement/decrement
+- Reload menu disabled when do SWF selected
 
 ## [14.5.2] - 2021-11-20
 ### Fixed
