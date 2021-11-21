@@ -1014,7 +1014,7 @@ public class ActionScript2Parser {
                 expected(s, lexer.yyline(), SymbolType.IDENTIFIER,
                         SymbolType.TRUE, SymbolType.FALSE, SymbolGroup.GLOBALCONST,
                         SymbolType.GET, SymbolType.SET,
-                        SymbolType.EACH);
+                        SymbolType.EACH, SymbolGroup.GLOBALFUNC);
                 String varIdentifier = s.value.toString();
                 s = lex();
                 if (s.type == SymbolType.COLON) {
@@ -1745,7 +1745,10 @@ public class ActionScript2Parser {
                         lexer.pushback(s);
                     }
                     s = lex();
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER,
+                            SymbolType.TRUE, SymbolType.FALSE, SymbolGroup.GLOBALCONST,
+                            SymbolType.GET, SymbolType.SET,
+                            SymbolType.EACH, SymbolGroup.GLOBALFUNC);
                     objectNames.add(0, pushConst((String) s.value));
                     expectedType(SymbolType.COLON);
                     objectValues.add(0, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
