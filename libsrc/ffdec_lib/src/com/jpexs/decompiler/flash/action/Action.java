@@ -830,8 +830,8 @@ public abstract class Action implements GraphSourceItem {
         return -1;
     }
 
-    public static List<GraphTargetItem> actionsToTree(boolean insideDoInitAction, List<Action> actions, int version, int staticOperation, String path) throws InterruptedException {
-        return actionsToTree(insideDoInitAction, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path);
+    public static List<GraphTargetItem> actionsToTree(boolean insideDoInitAction, boolean insideFunction, List<Action> actions, int version, int staticOperation, String path) throws InterruptedException {
+        return actionsToTree(insideDoInitAction, insideFunction, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path);
     }
 
     /**
@@ -857,7 +857,7 @@ public abstract class Action implements GraphSourceItem {
                 public List<GraphTargetItem> call() throws Exception {
                     int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
                     boolean insideDoInitAction = (asm instanceof DoInitActionTag);
-                    List<GraphTargetItem> tree = actionsToTree(insideDoInitAction, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path);
+                    List<GraphTargetItem> tree = actionsToTree(insideDoInitAction, false, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path);
                     SWFDecompilerPlugin.fireActionTreeCreated(tree, swf);
                     if (Configuration.autoDeobfuscate.get()) {
                         new ActionDeobfuscator().actionTreeCreated(tree, swf);
@@ -916,8 +916,9 @@ public abstract class Action implements GraphSourceItem {
      * @return List of treeItems
      * @throws java.lang.InterruptedException
      */
-    public static List<GraphTargetItem> actionsToTree(boolean insideDoInitAction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path) throws InterruptedException {
-        return ActionGraph.translateViaGraph(insideDoInitAction, regNames, variables, functions, actions, version, staticOperation, path);
+    public static List<GraphTargetItem> actionsToTree(boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path) throws InterruptedException {
+        return ActionGraph.translateViaGraph(insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path
+        );
     }
 
     @Override
@@ -1039,7 +1040,7 @@ public abstract class Action implements GraphSourceItem {
                                 }
                             }
                         }
-                        out = ActionGraph.translateViaGraph(insideDoInitAction, regNames, variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
+                        out = ActionGraph.translateViaGraph(insideDoInitAction, true, regNames, variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
                     } catch (OutOfMemoryError | TranslateException | StackOverflowError ex) {
                         logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);
                         if (ex instanceof OutOfMemoryError) {

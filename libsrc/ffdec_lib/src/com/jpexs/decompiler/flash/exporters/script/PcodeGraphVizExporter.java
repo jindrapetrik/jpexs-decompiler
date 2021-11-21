@@ -80,7 +80,7 @@ public class PcodeGraphVizExporter {
 
     public void exportAs12(ASMSource src, GraphTextWriter writer) throws InterruptedException {
         ActionList alist = src.getActions();
-        ActionGraph gr = new ActionGraph("", false, alist, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION);
+        ActionGraph gr = new ActionGraph("", false, false, alist, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION);
         export(gr, writer);
     }
 

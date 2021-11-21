@@ -83,9 +83,12 @@ public class ActionGraph extends Graph {
 
     private boolean insideDoInitAction;
 
-    public ActionGraph(String path, boolean insideDoInitAction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
+    private boolean insideFunction;
+
+    public ActionGraph(String path, boolean insideDoInitAction, boolean insideFunction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
         super(new ActionGraphSource(path, insideDoInitAction, code, version, registerNames, variables, functions), new ArrayList<>());
         this.insideDoInitAction = insideDoInitAction;
+        this.insideFunction = insideFunction;
     }
 
     @Override
@@ -110,7 +113,7 @@ public class ActionGraph extends Graph {
 
                 for (ActionList al : outs) {
                     subgraphs.put("loc" + Helper.formatAddress(code.pos2adr(ip)) + ": function " + functionName,
-                            new ActionGraph("", false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION)
+                            new ActionGraph("", false, false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION)
                     );
                 }
             }
@@ -128,8 +131,8 @@ public class ActionGraph extends Graph {
 
     }
 
-    public static List<GraphTargetItem> translateViaGraph(boolean insideDoInitAction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) throws InterruptedException {
-        ActionGraph g = new ActionGraph(path, insideDoInitAction, code, registerNames, variables, functions, version);
+    public static List<GraphTargetItem> translateViaGraph(boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) throws InterruptedException {
+        ActionGraph g = new ActionGraph(path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version);
         ActionLocalData localData = new ActionLocalData(insideDoInitAction, registerNames);
         g.init(localData);
         return g.translate(localData, staticOperation, path);
@@ -184,11 +187,6 @@ public class ActionGraph extends Graph {
                 }
             }
             list.addAll(0, removed);
-        }
-
-        if (insideDoInitAction) {
-            ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
-            detector.checkClass(list, path);
         }
 
         int targetStart;
@@ -316,9 +314,14 @@ public class ActionGraph extends Graph {
     }
 
     @Override
-    protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
-        super.finalProcessAfter(list, level, localData, path);
-        makeDefineRegistersUp(list);
+    public List<GraphTargetItem> translate(BaseLocalData localData, int staticOperation, String path) throws InterruptedException {
+        List<GraphTargetItem> ret = super.translate(localData, staticOperation, path);
+        if (insideDoInitAction && !insideFunction) {
+            ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
+            detector.checkClass(ret, path);
+        }
+        makeDefineRegistersUp(ret);
+        return ret;
     }
 
 

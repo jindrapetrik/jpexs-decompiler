@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 DefineFunction cleaner
 - AS1/2 direct editation - postincrement/decrement
 - Reload menu disabled when do SWF selected
+- AS2 - Do not detect classes inside functions
 
 ## [14.5.2] - 2021-11-20
 ### Fixed
