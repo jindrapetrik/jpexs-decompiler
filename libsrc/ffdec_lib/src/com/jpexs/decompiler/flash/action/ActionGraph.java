@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTarget2ActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTargetActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTypeActionItem;
@@ -415,6 +416,9 @@ public class ActionGraph extends Graph {
             caseValuesMap.add(set.rightSide);
             if (set.leftSide instanceof StoreRegisterActionItem) {
                 switchedObject = ((StoreRegisterActionItem) set.leftSide).value;
+            }
+            if (set.leftSide instanceof GetVariableActionItem) {
+                switchedObject = set.leftSide;
             }
             List<GraphPart> caseBodyParts = new ArrayList<>();
             caseBodyParts.add(part.nextParts.get(0));

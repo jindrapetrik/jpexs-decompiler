@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- AS1/2 switch with getvariable decompilation
+
 ## [14.6.0] - 2021-11-22
 ### Added
 - Information message before importing scripts, text, XML, Symbol-Class

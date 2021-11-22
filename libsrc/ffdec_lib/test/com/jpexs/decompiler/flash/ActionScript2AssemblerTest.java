@@ -192,4 +192,36 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "return 0;\n"
                 + "};");
     }
+
+    @Test
+    public void testSwitchVariable() {
+        String res = decompilePcode("ConstantPool \"t\"\n"
+                + "Push \"t\"\n"
+                + "GetVariable\n"
+                + "Push 0.0\n"
+                + "StrictEquals\n"
+                + "If loc0038\n"
+                + "Push \"t\"\n"
+                + "GetVariable\n"
+                + "Push 1\n"
+                + "StrictEquals\n"
+                + "If loc0041\n"
+                + "Jump loc004a\n"
+                + "loc0038:Push 0\n"
+                + "Return\n"
+                + "loc0041:Push 1\n"
+                + "Return\n"
+                + "loc004a:Push 3\n"
+                + "Return");
+        res = cleanPCode(res);
+        assertEquals(res, "switch(t)\n"
+                + "{\n"
+                + "case 0:\n"
+                + "return 0;\n"
+                + "case 1:\n"
+                + "return 1;\n"
+                + "default:\n"
+                + "return 3;\n"
+                + "}");
+    }
 }
