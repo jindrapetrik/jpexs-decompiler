@@ -232,7 +232,7 @@
         <property name="deb.file" value="${releases.dir}/${prefix.filename}_${version}${version.suffix}.deb" />        
         <move file="${deb.file.orig}" tofile="${deb.file}" />
         <delete file="${app.deb.desktop.temp}" />
-    </target>   
+    </target>         
     
     <target name="osx-app-installer" depends="osx-app-bundle">
         <mkdir dir="${app.installer.dir}/flat/base.pkg"/>
@@ -318,6 +318,10 @@
        <xar destfile="${basedir}/${pkg.file}" compression="none">
            <tarfileset dir="${app.installer.dir}/flat" group="staff" gid="20" username="builder" uid="501" />
        </xar>                 
+    </target>
+    
+    <target name="deb-versioned" depends="-new-version-set,deb">
+        
     </target>
     
     
@@ -768,6 +772,34 @@
         
     </target>          
     
+    <target name="new-version-library" depends="-new-version-set,library">
+        
+    </target>
+    
+    <target name="new-version-archive" depends="-new-version-set,archive">
+        
+    </target>
+    
+    <target name="new-version-deb" depends="-new-version-set,deb">
+        
+    </target>
+    
+    <target name="new-version-osx-app-archive" depends="-new-version-set,osx-app-archive">
+        
+    </target>
+    
+    <target name="new-version-installer" depends="-new-version-set,installer">
+        
+    </target>
+    
+    <target name="new-version-osx-app-installer" depends="-new-version-set,osx-app-installer">
+        
+    </target>
+    
+    <target name="new-version-locales" depends="-new-version-set,locales">
+        
+    </target>
+    
     <target name="windows-home" >
         
     </target>
@@ -865,5 +897,5 @@
     </target>
     <target name="deps" depends="download-playerglobal">
         
-    </target>                 
+    </target>        
 </project>
