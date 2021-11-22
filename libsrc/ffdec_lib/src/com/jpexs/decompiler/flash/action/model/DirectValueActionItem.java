@@ -124,6 +124,11 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         if (value instanceof ConstantIndex) {
             return this.constants.get(((ConstantIndex) value).index);
         }
+
+        if (value instanceof RegisterNumber) {
+            return ((RegisterNumber) value).translate();
+        }
+
         return value.toString();
     }
 
@@ -145,6 +150,11 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         if (value instanceof ConstantIndex) {
             return writer.append(this.constants.get(((ConstantIndex) value).index));
         }
+
+        if (value instanceof RegisterNumber) {
+            return writer.append(((RegisterNumber) value).translate());
+        }
+
         return writer.append(value.toString());
     }
 
