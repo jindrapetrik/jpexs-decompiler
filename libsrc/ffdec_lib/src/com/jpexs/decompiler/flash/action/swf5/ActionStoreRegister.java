@@ -119,9 +119,9 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
         }
 
         if (value instanceof TemporaryRegister) {
-            if (((TemporaryRegister) value).value instanceof EnumerationAssignmentValueActionItem) {
-                value = ((TemporaryRegister) value).value;
-            }
+            //if (((TemporaryRegister) value).value instanceof EnumerationAssignmentValueActionItem) {
+            value = ((TemporaryRegister) value).value;
+            //}
         }
 
         variables.put("__register" + registerNumber, value);
