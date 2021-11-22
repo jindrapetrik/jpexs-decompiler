@@ -18,7 +18,12 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
+import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
+import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
+import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -28,6 +33,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -160,6 +166,19 @@ public class CallFunctionActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+
+        if (functionName instanceof VariableActionItem) {
+            VariableActionItem varItem = (VariableActionItem) functionName;
+            if (varItem.getBoxedValue() instanceof DirectValueActionItem) {
+                if (((DirectValueActionItem) varItem.getBoxedValue()).value instanceof RegisterNumber) {
+                    return toSourceMerge(localData, generator, toSourceCall(localData, generator, arguments), varItem.getBoxedValue(), new DirectValueActionItem(Undefined.INSTANCE), new ActionCallMethod());
+                }
+            }
+            String varName = varItem.getVariableName();
+            ActionSourceGenerator asg = (ActionSourceGenerator) generator;
+            return toSourceMerge(localData, generator, toSourceCall(localData, generator, arguments), asg.pushConst(varName), new ActionCallFunction());
+        }
+
         return toSourceMerge(localData, generator, toSourceCall(localData, generator, arguments), functionName, new ActionCallFunction());
     }
 

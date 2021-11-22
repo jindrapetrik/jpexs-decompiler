@@ -2008,7 +2008,7 @@ public class ActionScript2Parser {
                             && (Action.propertyNamesList.contains(((VariableActionItem) args.get(1)).getVariableName()))) {
                         ret = new SetPropertyActionItem(null, null, args.get(0), Action.propertyNamesList.indexOf(((VariableActionItem) args.get(1)).getVariableName()), args.get(2));
                     } else {
-                        ret = new CallFunctionActionItem(null, null, pushConst(var.getVariableName()), args);
+                        ret = new CallFunctionActionItem(null, null, var, args);
                     }
                 } else if (ret instanceof EvalActionItem) {
                     EvalActionItem ev = (EvalActionItem) ret;
