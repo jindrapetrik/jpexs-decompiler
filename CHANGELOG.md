@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - Registers in for..in clause, proper define
 - AS1/2 - loops and switch break/continue vs definefunction
 - AS1/2 - callmethod on register instead of callfunction on var
+- AS1/2 - delete operator correct localreg names
 
 ## [14.5.2] - 2021-11-20
 ### Fixed

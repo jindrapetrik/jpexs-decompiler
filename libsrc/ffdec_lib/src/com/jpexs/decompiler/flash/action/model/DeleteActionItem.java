@@ -58,14 +58,14 @@ public class DeleteActionItem extends ActionItem {
         writer.append("delete ");
         if (object != null) {
             object.toStringNoQuotes(writer, localData);
-            if (IdentifiersDeobfuscation.isValidName(false, propertyName.toStringNoQuotes(localData))) {
+            /*if (IdentifiersDeobfuscation.isValidName(false, propertyName.toStringNoQuotes(localData))) {
                 writer.append(".");
                 propertyName.toStringNoQuotes(writer, localData);
-            } else {
+            } else {*/
                 writer.append("[");
                 propertyName.toString(writer, localData);
                 writer.append("]");
-            }
+            //}
             return writer;
         }
 
