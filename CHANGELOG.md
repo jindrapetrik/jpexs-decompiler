@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - Allow nonstandard identifiers in object literal
 - AS1/2 - Allow globalfunc names as variable identifiers
 - AS1/2 - Registers in for..in clause, proper define
+- AS1/2 - loops and switch break/continue vs definefunction
 
 ## [14.5.2] - 2021-11-20
 ### Fixed

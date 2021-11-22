@@ -196,7 +196,7 @@ public class ActionSourceGenerator implements SourceGenerator {
     private void fixLoop(List<Action> code, int breakOffset, int continueOffset) {
         int pos = 0;
         for (Action a : code) {
-            pos += a.getTotalActionLength();
+            pos += a.getBytesLength();
             if (a instanceof ActionJump) {
                 ActionJump aj = (ActionJump) a;
                 if (aj.isContinue && (continueOffset != Integer.MAX_VALUE)) {
