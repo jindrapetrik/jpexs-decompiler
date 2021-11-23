@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - direct editation - use actionadd instead of add2 on swfver < 5
 - AS1/2 - tellTarget when single
 - AS1/2 - use slash syntax in get/setvariable only in eval/set
+- AS1/2 - get/setProperty when propertyindex is string
 
 ## [14.6.0] - 2021-11-22
 ### Added
