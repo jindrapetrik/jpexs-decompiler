@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
 import com.jpexs.decompiler.flash.action.swf5.ActionAdd2;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.EcmaType;
@@ -85,7 +86,7 @@ public class AddActionItem extends BinaryOpItem implements CompoundableBinaryOp 
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSourceMerge(localData, generator, leftSide, rightSide, new ActionAdd2());
+        return toSourceMerge(localData, generator, leftSide, rightSide, version2 ? new ActionAdd2() : new ActionAdd());
     }
 
     @Override
