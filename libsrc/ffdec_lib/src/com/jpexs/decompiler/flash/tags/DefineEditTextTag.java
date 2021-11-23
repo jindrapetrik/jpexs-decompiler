@@ -76,6 +76,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -402,6 +403,9 @@ public class DefineEditTextTag extends TextTag {
                                 // todo: parse the following attribute:
                                 // align
                                 break;
+                            case "a":
+                                // todo: handle link - href, target attributes
+                                break;
                             case "b":
                                 style = style.clone();
                                 style.bold = true;
@@ -419,13 +423,13 @@ public class DefineEditTextTag extends TextTag {
                                 break;
                             case "font":
                                 style = style.clone();
-                                String color = attributes.getValue("color");
+                                String color = unescape(attributes.getValue("color"));
                                 if (color != null) {
                                     if (color.startsWith("#")) {
                                         style.textColor = new RGBA(Color.decode(color));
                                     }
                                 }
-                                String size = attributes.getValue("size");
+                                String size = unescape(attributes.getValue("size"));
                                 if (size != null && size.length() > 0) {
                                     char firstChar = size.charAt(0);
                                     if (firstChar != '+' && firstChar != '-') {
@@ -436,7 +440,7 @@ public class DefineEditTextTag extends TextTag {
                                         // todo: parse relative sizes
                                     }
                                 }
-                                String face = attributes.getValue("face");
+                                String face = unescape(attributes.getValue("face"));
                                  {
                                     if (face != null && face.length() > 0) {
                                         style.fontFace = face;
@@ -458,7 +462,6 @@ public class DefineEditTextTag extends TextTag {
                                 ret.add(cs);
                                 break;
                         }
-                        //ret = entitiesReplace(ret);
                     }
 
                     @Override
@@ -480,19 +483,35 @@ public class DefineEditTextTag extends TextTag {
                         }
                     }
 
+                    private String unescape(String txt) {
+                        txt = txt.replace("/{entity-nbsp}", "\u00A0");
+                        txt = txt.replace("/{entity-lt}", "<");
+                        txt = txt.replace("/{entity-gt}", ">");
+                        txt = txt.replace("/{entity-quot}", "\"");
+                        txt = txt.replace("/{entity-amp}", "&");
+                        return txt;
+                    }
+
                     @Override
                     public void characters(char[] ch, int start, int length) throws SAXException {
-                        String txt = new String(ch, start, length);
+                        String txt = unescape(new String(ch, start, length));
                         TextStyle style = styles.peek();
                         addCharacters(ret, txt, style);
                     }
                 };
+
+                str = str.replace("&nbsp;", "/{entity-nbsp}");
+                str = str.replace("&lt;", "/{entity-lt}");
+                str = str.replace("&gt;", "/{entity-gt}");
+                str = str.replace("&quot;", "/{entity-quot}");
+                str = str.replace("&amp;", "/{entity-amp}");
+                str = str.replace("&", "&amp;");
+                
                 str = "<!DOCTYPE html [\n"
-                        + "    <!ENTITY nbsp \"&#160;\"> \n"
                         + "]><root>" + str + "</root>";
                 saxParser.parse(new ByteArrayInputStream(str.getBytes(Utf8Helper.charset)), handler);
             } catch (ParserConfigurationException | SAXException | IOException ex) {
-                Logger.getLogger(DefineEditTextTag.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(DefineEditTextTag.class.getName()).log(Level.SEVERE, "Error parsing text " + getCharacterId(), ex);
             }
         } else {
             addCharacters(ret, str, style);
