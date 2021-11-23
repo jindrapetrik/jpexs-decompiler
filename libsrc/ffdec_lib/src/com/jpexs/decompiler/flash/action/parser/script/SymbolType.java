@@ -175,8 +175,7 @@ public enum SymbolType {
     UNLOADMOVIE(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     UNLOADMOVIENUM(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     FSCOMMAND(GraphTargetItem.PRECEDENCE_PRIMARY, false),
-    PREPROCESSOR(GraphTargetItem.PRECEDENCE_PRIMARY, false),
-    PATH(GraphTargetItem.PRECEDENCE_PRIMARY, false);
+    PREPROCESSOR(GraphTargetItem.PRECEDENCE_PRIMARY, false);
 
     private int precedence = GraphTargetItem.NOPRECEDENCE;
 

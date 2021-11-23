@@ -113,8 +113,6 @@ Identifier = [:jletter:][:jletterdigit:]*
 
 IdentifierOrParent = {Identifier} | ".."
 
-Path = "/" | "/"? {IdentifierOrParent} ("/" {IdentifierOrParent})* "/"?
-
 /* integer literals */
 DecIntegerLiteral = 0 | [1-9][0-9]*
 
@@ -379,8 +377,7 @@ Preprocessor = \u00A7\u00A7 {Identifier}
   /* whitespace */
   {WhiteSpace}                   { /*ignore*/ }
   /* identifiers */
-  {Identifier}                   { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, yytext()); }
-  {Path}                         { return new ParsedSymbol(SymbolGroup.PATH, SymbolType.PATH, yytext()); }
+  {Identifier}                   { return new ParsedSymbol(SymbolGroup.IDENTIFIER, SymbolType.IDENTIFIER, yytext()); }    
 }
 
 

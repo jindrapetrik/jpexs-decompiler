@@ -83,8 +83,7 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString())
-                && (IdentifiersDeobfuscation.isValidName(false, ((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super")
-                || IdentifiersDeobfuscation.isValidNameWithSlash(((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"))) {
+                && (IdentifiersDeobfuscation.isValidName(false, ((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"))) {
             HighlightData srcData = getSrcData();
             srcData.localName = name.toStringNoQuotes(localData);
             stripQuotes(name, localData, writer);
