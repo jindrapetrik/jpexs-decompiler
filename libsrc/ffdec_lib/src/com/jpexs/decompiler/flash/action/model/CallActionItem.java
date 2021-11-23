@@ -43,7 +43,7 @@ public class CallActionItem extends ActionItem {
         writer.append("call");
         writer.spaceBeforeCallParenthesies(1);
         writer.append("(");
-        stripQuotes(value, localData, writer);
+        value.appendTo(writer, localData);
         return writer.append(")");
     }
 
