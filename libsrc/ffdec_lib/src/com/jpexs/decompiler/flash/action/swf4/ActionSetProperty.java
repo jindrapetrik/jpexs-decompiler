@@ -37,6 +37,8 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -83,7 +85,15 @@ public class ActionSetProperty extends Action {
                 indexInt = (int) Math.round((Double) ((DirectValueActionItem) index).value);
             } else if (((DirectValueActionItem) index).value instanceof Float) {
                 indexInt = (int) Math.round((Float) ((DirectValueActionItem) index).value);
+            } else if (((DirectValueActionItem) index).isString()) {
+                try {
+                    indexInt = Integer.parseInt(((DirectValueActionItem) index).toString());
+                } catch (NumberFormatException nfe) {
+                    Logger.getLogger(ActionGetProperty.class.getName()).log(Level.SEVERE, "Invalid property index: {0}", index.toString());
+                }
             }
+        } else {
+            Logger.getLogger(ActionGetProperty.class.getName()).log(Level.SEVERE, "Invalid property index: {0}", index.getClass().getSimpleName());
         }
         if (value.getThroughDuplicate() instanceof IncrementActionItem) {
             GraphTargetItem obj = ((IncrementActionItem) value).object;
