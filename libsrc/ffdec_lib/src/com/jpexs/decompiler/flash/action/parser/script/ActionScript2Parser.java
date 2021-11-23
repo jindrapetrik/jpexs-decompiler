@@ -1512,7 +1512,7 @@ public class ActionScript2Parser {
                     lhs = new MultiplyActionItem(null, null, lhs, rhs);
                     break;
                 case PLUS:
-                    lhs = new AddActionItem(null, null, lhs, rhs, true);
+                    lhs = new AddActionItem(null, null, lhs, rhs, swfVersion >= 5);
                     break;
                 case XOR:
                     lhs = new BitXorActionItem(null, null, lhs, rhs);
@@ -1556,7 +1556,7 @@ public class ActionScript2Parser {
                             assigned = new MultiplyActionItem(null, null, lhs, assigned);
                             break;
                         case ASSIGN_PLUS:
-                            assigned = new AddActionItem(null, null, lhs, assigned, true/*TODO:SWF version?*/);
+                            assigned = new AddActionItem(null, null, lhs, assigned, swfVersion >= 5);
                             break;
                         case ASSIGN_SHIFT_LEFT:
                             assigned = new LShiftActionItem(null, null, lhs, assigned);

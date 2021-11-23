@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - switch with getvariable decompilation
 - AS1/2 - call action parameters as string
 - AS1/2 - gotolabelaction is gotoandplay
+- AS1/2 - direct editation - use actionadd instead of add2 on swfver < 5
 
 ## [14.6.0] - 2021-11-22
 ### Added
