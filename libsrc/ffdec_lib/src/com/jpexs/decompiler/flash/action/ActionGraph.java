@@ -192,13 +192,14 @@ public class ActionGraph extends Graph {
 
         int targetStart;
         int targetEnd;
+        GraphTargetItem targetStartItem = null;
 
         boolean again;
         do {
             again = false;
             targetStart = -1;
             targetEnd = -1;
-            GraphTargetItem targetStartItem = null;
+            targetStartItem = null;
             GraphTargetItem target = null;
             for (int t = 0; t < list.size(); t++) {
                 GraphTargetItem it = list.get(t);
@@ -243,6 +244,13 @@ public class ActionGraph extends Graph {
                         target = st.target;
                         targetStartItem = it;
                     }
+                }
+            }
+
+            if (targetStart > -1 && targetEnd == -1) {
+                targetEnd = list.size();
+                if (list.get(list.size() - 1) instanceof ScriptEndItem) {
+                    targetEnd--;
                 }
             }
             if ((targetStart > -1) && (targetEnd > -1) && targetStartItem != null) {
