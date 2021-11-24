@@ -281,13 +281,13 @@ public class ActionScript2Parser {
         GraphTargetItem ret;
 
         ParsedSymbol s = lex();
-        expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.STRING_OP);
+        expectedIdentifier(s, lexer.yyline());
         ret = new VariableActionItem(s.value.toString(), null, false);
         variables.add((VariableActionItem) ret);
         s = lex();
         while (s.type == SymbolType.DOT) {
             s = lex();
-            expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.STRING_OP, SymbolGroup.GLOBALFUNC);
+            expectedIdentifier(s, lexer.yyline());
             ret = new GetMemberActionItem(null, null, ret, pushConst(s.value.toString()));
             s = lex();
         }
@@ -1140,7 +1140,7 @@ public class ActionScript2Parser {
                 VariableActionItem item = null;
                 int innerExprReg = 0;
                 boolean define = false;
-                if (s.type == SymbolType.VAR || s.type == SymbolType.IDENTIFIER) {
+                if (s.type == SymbolType.VAR || isIdentifier(s)) {
                     ParsedSymbol s2 = null;
                     ParsedSymbol ssel = s;
                     if (s.type == SymbolType.VAR) {
@@ -1297,7 +1297,7 @@ public class ActionScript2Parser {
                 while (s.type == SymbolType.CATCH) {
                     expectedType(SymbolType.PARENT_OPEN);
                     s = lex();
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.STRING);
+                    expectedIdentifier(s, lexer.yyline(), SymbolType.STRING);
                     catchExceptionNames.add(pushConst((String) s.value));
                     s = lex();
                     if (s.type == SymbolType.COLON) {
