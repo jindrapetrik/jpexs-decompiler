@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionCallFunction;
+import com.jpexs.decompiler.flash.action.swf5.ActionCallMethod;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionGetMember;
 import com.jpexs.decompiler.flash.action.swf5.ActionNewObject;
@@ -70,7 +71,10 @@ import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -711,6 +715,16 @@ public class ActionSourceGenerator implements SourceGenerator {
             constr.add(new ActionStoreRegister(1));
             constr = (typeToActions(globalClassTypeStr, constr));
         }
+
+        Set<String> properties = new LinkedHashSet<>();
+        Set<String> setters = new HashSet<>();
+        Set<String> getters = new HashSet<>();
+
+        Set<String> staticProperties = new LinkedHashSet<>();
+        Set<String> staticSetters = new HashSet<>();
+        Set<String> staticGetters = new HashSet<>();
+
+
         if (!isInterface) {
             for (int pass = 1; pass <= 2; pass++) { //two passes, methods first, then variables
                 for (int t = 0; t < traits.size(); t++) {
@@ -721,8 +735,20 @@ public class ActionSourceGenerator implements SourceGenerator {
                     boolean isFunc = (en.getValue() instanceof FunctionActionItem);
                     if (pass == 1 && isFunc) { //Add methods in first pass
                         FunctionActionItem fi = (FunctionActionItem) en.getValue();
+                        if (fi.isGetter || fi.isSetter) {
+                            (traitsStatic.get(t) ? staticProperties : properties).add(fi.calculatedFunctionName.toString());
+                        }
+                        String prefix = "";
+                        if (fi.isGetter) {
+                            (traitsStatic.get(t) ? staticGetters : getters).add(fi.calculatedFunctionName.toString());
+                            prefix = "__get__";
+                        }
+                        if (fi.isSetter) {
+                            (traitsStatic.get(t) ? staticSetters : setters).add(fi.calculatedFunctionName.toString());
+                            prefix = "__set__";
+                        }
                         ifbody.add(new ActionPush(new RegisterNumber(traitsStatic.get(t) ? 1 : 2)));
-                        ifbody.add(pushConst(getName(en.getKey())));
+                        ifbody.add(pushConst(prefix + getName(en.getKey())));
                         ifbody.addAll(toActionList(fi.toSource(localData, this)));
                         ifbody.add(new ActionSetMember());
                     } else if (pass == 2 && !isFunc) { //add variables in second pass
@@ -734,6 +760,41 @@ public class ActionSourceGenerator implements SourceGenerator {
                 }
             }
         }
+
+        for (String prop : staticProperties) {
+            if (staticSetters.contains(prop)) {
+                ifbody.add(new ActionPush(new Object[]{new RegisterNumber(1), "__set__" + prop}));
+                ifbody.add(new ActionGetMember());
+            } else {
+                ifbody.add(new ActionDefineFunction("", new ArrayList<String>(), 0, swfVersion));
+            }
+            if (staticGetters.contains(prop)) {
+                ifbody.add(new ActionPush(new Object[]{new RegisterNumber(1), "__get__" + prop}));
+                ifbody.add(new ActionGetMember());
+            } else {
+                ifbody.add(new ActionDefineFunction("", new ArrayList<String>(), 0, swfVersion));
+            }
+            ifbody.add(new ActionPush(new Object[]{prop, 3, new RegisterNumber(1), "addProperty"}));
+            ifbody.add(new ActionCallMethod());
+        }
+
+        for (String prop : properties) {
+            if (setters.contains(prop)) {
+                ifbody.add(new ActionPush(new Object[]{new RegisterNumber(2), "__set__" + prop}));
+                ifbody.add(new ActionGetMember());
+            } else {
+                ifbody.add(new ActionDefineFunction("", new ArrayList<String>(), 0, swfVersion));
+            }
+            if (getters.contains(prop)) {
+                ifbody.add(new ActionPush(new Object[]{new RegisterNumber(2), "__get__" + prop}));
+                ifbody.add(new ActionGetMember());
+            } else {
+                ifbody.add(new ActionDefineFunction("", new ArrayList<String>(), 0, swfVersion));
+            }
+            ifbody.add(new ActionPush(new Object[]{prop, 3, new RegisterNumber(2), "addProperty"}));
+            ifbody.add(new ActionCallMethod());
+        }
+
 
         if (!isInterface) {
             ifbody.add(new ActionPush((Long) 1L));

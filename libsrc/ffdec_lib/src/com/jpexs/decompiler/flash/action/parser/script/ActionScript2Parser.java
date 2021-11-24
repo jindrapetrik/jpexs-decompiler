@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.parser.script;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.abc.avm2.model.CallMethodAVM2Item;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.AsciiToCharActionItem;
 import com.jpexs.decompiler.flash.action.model.CallActionItem;
@@ -447,6 +448,8 @@ public class ActionScript2Parser {
         looptrait:
         while (true) {
             s = lex();
+            boolean isGetter = false;
+            boolean isSetter = false;
             boolean isStatic = false;
             while (s.isType(SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE)) {
                 if (s.type == SymbolType.STATIC) {
@@ -457,6 +460,15 @@ public class ActionScript2Parser {
             switch (s.type) {
                 case FUNCTION:
                     s = lex();
+
+                    if (s.type == SymbolType.SET) {
+                        isSetter = true;
+                        s = lex();
+                    } else if (s.type == SymbolType.GET) {
+                        isGetter = true;
+                        s = lex();
+                    }
+
                     expectedIdentifier(s, lexer.yyline());
                     String fname = s.value.toString();
                     if (fname.equals(classNameStr)) { //constructor
@@ -466,16 +478,37 @@ public class ActionScript2Parser {
                         if (isStatic) {
                             FunctionActionItem ft = function(!isInterface, "", true, variables, functions, inTellTarget, hasEval);
                             ft.calculatedFunctionName = pushConst(fname);
+                            ft.isSetter = isSetter;
+                            ft.isGetter = isGetter;
                             //staticFunctions.add(ft);
                             traits.add(new MyEntry<>(ft.calculatedFunctionName, ft));
                             traitsStatic.add(true);
+
+                            if (isSetter) {
+                                //add return getter automatically
+                                GraphTargetItem callM = new CallMethodActionItem(null, null, nameStr, pushConst("__get__" + fname), new ArrayList<>());
+                                GraphTargetItem retV = new ReturnActionItem(null, null, callM);
+                                ft.actions.add(retV);
+                            }
                         } else {
                             FunctionActionItem ft = function(!isInterface, "", true, variables, functions, inTellTarget, hasEval);
                             ft.calculatedFunctionName = pushConst(fname);
+                            ft.isSetter = isSetter;
+                            ft.isGetter = isGetter;
                             //instanceFunctions.add(ft);
                             traits.add(new MyEntry<>(ft.calculatedFunctionName, ft));
                             traitsStatic.add(false);
+
+                            if (isSetter) {
+                                //add return getter automatically                            
+                                GraphTargetItem thisVar = new VariableActionItem("this", null, false);
+                                ft.addVariable((VariableActionItem) thisVar);
+                                GraphTargetItem callM = new CallMethodActionItem(null, null, thisVar, pushConst("__get__" + fname), new ArrayList<>());
+                                GraphTargetItem retV = new ReturnActionItem(null, null, callM);
+                                ft.actions.add(retV);
+                            }
                         }
+
                     }
                     break;
                 case VAR:
@@ -651,6 +684,7 @@ public class ActionScript2Parser {
                 SymbolType.EACH, SymbolGroup.GLOBALFUNC,
                 SymbolType.NUMBER_OP, SymbolType.STRING_OP);
     }
+
     private void expectedIdentifier(ParsedSymbol s, int line, Object... exceptions) throws IOException, ActionParseException {
         for (Object ex : exceptions) {
             if (s.isType(ex)) {
