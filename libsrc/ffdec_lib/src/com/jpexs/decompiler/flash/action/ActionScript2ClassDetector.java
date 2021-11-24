@@ -271,64 +271,79 @@ public class ActionScript2ClassDetector {
     private boolean checkClassContent(List<GraphTargetItem> parts, int partsPos, int commandsStartPos, int commandsEndPos, List<GraphTargetItem> commands, List<String> classNamePath, String scriptPath) {
 
         try {
-            GraphTargetItem item = parts.get(partsPos);
+
             GraphTargetItem extendsOp = null;
             List<GraphTargetItem> implementsOp = new ArrayList<>();
-            if (item instanceof ExtendsActionItem) {
-                ExtendsActionItem et = (ExtendsActionItem) parts.get(partsPos);
-                extendsOp = getWithoutGlobal(et.superclass);
-                partsPos++;
-                item = parts.get(partsPos);
-            }
+            GraphTargetItem item = null;
             int instanceReg = -1;
             int classReg = -1;
             GraphTargetItem classNameTargetPath = null;
             GraphTargetItem constructor = null;
-            if (item instanceof StoreRegisterActionItem) {
-                StoreRegisterActionItem sr = (StoreRegisterActionItem) item;
-                instanceReg = sr.register.number;
-                if (sr.value instanceof GetMemberActionItem) {
-                    GetMemberActionItem gm = (GetMemberActionItem) sr.value;
-                    if (gm.object instanceof TemporaryRegister) {
-                        TemporaryRegister treg = (TemporaryRegister) gm.object;
-                        classReg = treg.getRegId();
-                        if (!"prototype".equals(getAsString(gm.memberName, "memberName"))) {
-                            throw new AssertException("memberName not \"prototype\"");
-                        }
-                        if ((treg.value instanceof SetMemberActionItem) || (treg.value instanceof SetVariableActionItem)) {
-                            List<String> path = getSetMembersPath(treg.value);
-                            if (path == null || path.isEmpty()) {
-                                throw new AssertException("Cannot detect class - tempreg value is not a path");
-                            }
-                            //remove _global if it's there - happens for classes in global package
-                            if ("_global".equals(path.get(0))) {
-                                path.remove(0);
-                            }
-                            if (classNamePath.equals(path)) {
-                                //can start with _global for classes on top level
-                                classNameTargetPath = getWithoutGlobal(setMemberToGetMember(treg.value));
 
-                                //treg.value.value is the value being set - treg.value is setmember ot setvariable
-                                if (!(treg.value.value instanceof StoreRegisterActionItem)) {
-                                    throw new AssertException("Constructor expected to be in storeregister");
+            if (parts.size() > partsPos) {
+                item = parts.get(partsPos);
+                if (item instanceof ExtendsActionItem) {
+                    ExtendsActionItem et = (ExtendsActionItem) parts.get(partsPos);
+                    extendsOp = getWithoutGlobal(et.superclass);
+                    partsPos++;
+                    if (parts.size() > partsPos) {
+                        item = parts.get(partsPos);
+                    } else {
+                        item = null;
+                    }
+                }
+
+                if (item instanceof StoreRegisterActionItem) {
+                    StoreRegisterActionItem sr = (StoreRegisterActionItem) item;
+                    instanceReg = sr.register.number;
+                    if (sr.value instanceof GetMemberActionItem) {
+                        GetMemberActionItem gm = (GetMemberActionItem) sr.value;
+                        if (gm.object instanceof TemporaryRegister) {
+                            TemporaryRegister treg = (TemporaryRegister) gm.object;
+                            classReg = treg.getRegId();
+                            if (!"prototype".equals(getAsString(gm.memberName, "memberName"))) {
+                                throw new AssertException("memberName not \"prototype\"");
+                            }
+                            if ((treg.value instanceof SetMemberActionItem) || (treg.value instanceof SetVariableActionItem)) {
+                                List<String> path = getSetMembersPath(treg.value);
+                                if (path == null || path.isEmpty()) {
+                                    throw new AssertException("Cannot detect class - tempreg value is not a path");
                                 }
-                                if (!(treg.value.value.value instanceof FunctionActionItem)) {
-                                    throw new AssertException("Constructor expected as functionitem");
+                                //remove _global if it's there - happens for classes in global package
+                                if ("_global".equals(path.get(0))) {
+                                    path.remove(0);
                                 }
-                                constructor = treg.value.value.value;
+                                if (classNamePath.equals(path)) {
+                                    //can start with _global for classes on top level
+                                    classNameTargetPath = getWithoutGlobal(setMemberToGetMember(treg.value));
+
+                                    //treg.value.value is the value being set - treg.value is setmember ot setvariable
+                                    if (!(treg.value.value instanceof StoreRegisterActionItem)) {
+                                        throw new AssertException("Constructor expected to be in storeregister");
+                                    }
+                                    if (!(treg.value.value.value instanceof FunctionActionItem)) {
+                                        throw new AssertException("Constructor expected as functionitem");
+                                    }
+                                    constructor = treg.value.value.value;
+                                } else {
+                                    throw new AssertException("temporaryreg value does not match class path");
+                                }
                             } else {
-                                throw new AssertException("temporaryreg value does not match class path");
+                                throw new AssertException("temporaryreg value not setmember/setvariable");
                             }
                         } else {
-                            throw new AssertException("temporaryreg value not setmember/setvariable");
+                            throw new AssertException("Getmember does not have TemporaryRegister as object");
                         }
                     } else {
-                        throw new AssertException("Getmember does not have TemporaryRegister as object");
+                        throw new AssertException("Not Getmember in StoreRegister");
                     }
-                } else {
-                    throw new AssertException("Not Getmember in StoreRegister");
+                    partsPos++;
                 }
-                partsPos++;
+            } else {
+                classNameTargetPath = new GetVariableActionItem(null, null, new DirectValueActionItem(classNamePath.get(0)));
+                for (int i = 1; i < classNamePath.size(); i++) {
+                    classNameTargetPath = new GetMemberActionItem(null, null, classNameTargetPath, new DirectValueActionItem(classNamePath.get(i)));
+                }
             }
             List<MyEntry<GraphTargetItem, GraphTargetItem>> traits = new ArrayList<>();
             List<Boolean> traitsStatic = new ArrayList<>();
@@ -574,7 +589,7 @@ public class ActionScript2ClassDetector {
                 ((FunctionActionItem) constructor).calculatedFunctionName = classBaseName;
                 traits.add(0, new MyEntry<>(classBaseName, constructor));
             } else {
-                throw new AssertException("No constructor found");
+                //throw new AssertException("No constructor found");
             }
 
             ClassActionItem clsItem = new ClassActionItem(classNameTargetPath, extendsOp, implementsOp, traits, traitsStatic);
