@@ -369,7 +369,7 @@ public class ActionScript2Parser {
                 lexer.pushback(s);
             }
             s = lex();
-            expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+            expectedIdentifier(s, lexer.yyline());
             paramNames.add(s.value.toString());
             s = lex();
             if (s.type == SymbolType.COLON) {
@@ -457,7 +457,7 @@ public class ActionScript2Parser {
             switch (s.type) {
                 case FUNCTION:
                     s = lex();
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolGroup.GLOBALFUNC);
+                    expectedIdentifier(s, lexer.yyline());
                     String fname = s.value.toString();
                     if (fname.equals(classNameStr)) { //constructor
                         //actually there's no difference, it's instance trait
@@ -480,7 +480,7 @@ public class ActionScript2Parser {
                     break;
                 case VAR:
                     s = lex();
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER);
+                    expectedIdentifier(s, lexer.yyline());
                     String ident = s.value.toString();
                     s = lex();
                     if (s.type == SymbolType.COLON) {
@@ -637,6 +637,29 @@ public class ActionScript2Parser {
             System.out.println("/expressionCommands");
         }
         return ret;
+    }
+
+    private boolean isIdentifier(ParsedSymbol s, Object... exceptions) {
+        for (Object ex : exceptions) {
+            if (s.isType(ex)) {
+                return true;
+            }
+        }
+        return s.isType(SymbolType.IDENTIFIER,
+                SymbolType.TRUE, SymbolType.FALSE, SymbolGroup.GLOBALCONST,
+                SymbolType.GET, SymbolType.SET,
+                SymbolType.EACH, SymbolGroup.GLOBALFUNC,
+                SymbolType.NUMBER_OP, SymbolType.STRING_OP);
+    }
+    private void expectedIdentifier(ParsedSymbol s, int line, Object... exceptions) throws IOException, ActionParseException {
+        for (Object ex : exceptions) {
+            if (s.isType(ex)) {
+                return;
+            }
+        }
+        if (!isIdentifier(s)) {
+            throw new ActionParseException(SymbolType.IDENTIFIER + " expected but " + s.type + " found", line);
+        }
     }
 
     private GraphTargetItem command(boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, boolean mustBeCommand, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException {
@@ -1023,15 +1046,12 @@ public class ActionScript2Parser {
                 break;
             case FUNCTION:
                 s = lexer.lex();
-                expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolGroup.GLOBALFUNC);
+                expectedIdentifier(s, lexer.yyline());
                 ret = (function(true, s.value.toString(), false, variables, functions, inTellTarget, hasEval));
                 break;
             case VAR:
                 s = lex();
-                expected(s, lexer.yyline(), SymbolType.IDENTIFIER,
-                        SymbolType.TRUE, SymbolType.FALSE, SymbolGroup.GLOBALCONST,
-                        SymbolType.GET, SymbolType.SET,
-                        SymbolType.EACH, SymbolGroup.GLOBALFUNC);
+                expectedIdentifier(s, lexer.yyline());
                 String varIdentifier = s.value.toString();
                 s = lex();
                 if (s.type == SymbolType.COLON) {
@@ -1129,7 +1149,7 @@ public class ActionScript2Parser {
                         define = true;
                     }
 
-                    if (ssel.type == SymbolType.IDENTIFIER) {
+                    if (isIdentifier(ssel)) {
                         objIdent = ssel.value.toString();
 
                         ParsedSymbol s3 = lex();
@@ -1785,10 +1805,7 @@ public class ActionScript2Parser {
                         lexer.pushback(s);
                     }
                     s = lex();
-                    expected(s, lexer.yyline(), SymbolType.IDENTIFIER,
-                            SymbolType.TRUE, SymbolType.FALSE, SymbolGroup.GLOBALCONST,
-                            SymbolType.GET, SymbolType.SET,
-                            SymbolType.EACH, SymbolGroup.GLOBALFUNC);
+                    expectedIdentifier(s, lexer.yyline());
                     objectNames.add(0, pushConst((String) s.value));
                     expectedType(SymbolType.COLON);
                     objectValues.add(0, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
@@ -1810,7 +1827,7 @@ public class ActionScript2Parser {
             case FUNCTION:
                 s = lex();
                 String fname = "";
-                if (s.isType(SymbolType.IDENTIFIER, SymbolGroup.GLOBALFUNC)) {
+                if (isIdentifier(s)) {
                     fname = s.value.toString();
                 } else {
                     lexer.pushback(s);
@@ -2023,7 +2040,7 @@ public class ActionScript2Parser {
             }
             if (op.type == SymbolType.DOT) {
                 ParsedSymbol s = lex();
-                expected(s, lexer.yyline(), SymbolType.IDENTIFIER, SymbolType.THIS, SymbolType.SUPER, SymbolType.STRING_OP, SymbolGroup.GLOBALFUNC);
+                expectedIdentifier(s, lexer.yyline(), SymbolType.THIS, SymbolType.SUPER);
 
                 ret = new GetMemberActionItem(null, null, ret, pushConst(s.value.toString()));
             }
