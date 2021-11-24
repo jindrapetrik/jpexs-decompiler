@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - DefineEditText - ampersand in link href
 - AS1/2 - cannot use globalfunc/const variable names
 - AS2 - class detection when no constructor found
+- AS1/2 - subtract precedence
 
 ## [14.6.0] - 2021-11-22
 ### Added
