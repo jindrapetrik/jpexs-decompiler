@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - cannot use globalfunc/const variable names
 - AS2 - class detection when no constructor found
 - AS1/2 - subtract precedence
+- AS2 - getters and setters decompilation and editing
+- AS1/2 - definefunction2 suppresssuper parameter
 
 ## [14.6.0] - 2021-11-22
 ### Added

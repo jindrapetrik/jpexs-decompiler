@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.ImplementsOpActionItem;
 import com.jpexs.decompiler.flash.action.model.NewMethodActionItem;
 import com.jpexs.decompiler.flash.action.model.NewObjectActionItem;
+import com.jpexs.decompiler.flash.action.model.ReturnActionItem;
 import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
@@ -40,6 +41,7 @@ import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
+import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.List;
@@ -504,7 +506,19 @@ public class ActionScript2ClassDetector {
                             if (!(getterNameStr.equals("__get__" + propertyNameStr))) {
                                 throw new AssertException("getter does not match property name");
                             }
-                            //TODO: handle getter HERE                                                                                                       
+
+                            for (MyEntry<GraphTargetItem, GraphTargetItem> trait : traits) {
+                                if (trait.getKey() instanceof DirectValueActionItem) {
+                                    if (((DirectValueActionItem) trait.getKey()).isString()) {
+                                        if (((DirectValueActionItem) trait.getKey()).toString().equals(getterNameStr)) {
+                                            if (trait.getValue() instanceof FunctionActionItem) {
+                                                FunctionActionItem func = (FunctionActionItem) trait.getValue();
+                                                func.isGetter = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
 
                         } else if (propertyGetter instanceof FunctionActionItem) {
                             FunctionActionItem getterFunc = (FunctionActionItem) propertyGetter;
@@ -525,7 +539,38 @@ public class ActionScript2ClassDetector {
                             if (!(setterNameStr.equals("__set__" + propertyNameStr))) {
                                 throw new AssertException("setter does not match property name");
                             }
-                            //TODO: handle setter HERE
+
+                            for (MyEntry<GraphTargetItem, GraphTargetItem> trait : traits) {
+                                if (trait.getKey() instanceof DirectValueActionItem) {
+                                    if (((DirectValueActionItem) trait.getKey()).isString()) {
+                                        if (((DirectValueActionItem) trait.getKey()).toString().equals(setterNameStr)) {
+                                            if (trait.getValue() instanceof FunctionActionItem) {
+                                                FunctionActionItem func = (FunctionActionItem) trait.getValue();
+                                                func.isSetter = true;
+
+                                                //There is return getter added at the end of every setter, gotta remove it, since it won't compile
+                                                //as setter must not return a value
+                                                if (!func.actions.isEmpty()) {
+                                                    int pos = func.actions.size() - 1;
+                                                    if (func.actions.get(pos) instanceof ScriptEndItem) {
+                                                        pos--;
+                                                    }
+                                                    if (pos >= 0 && func.actions.get(pos) instanceof ReturnActionItem) {
+                                                        GraphTargetItem val = func.actions.get(pos);
+                                                        if (val.value instanceof CallMethodActionItem) {
+                                                            if (((CallMethodActionItem) val.value).methodName instanceof DirectValueActionItem) {
+                                                                if (((CallMethodActionItem) val.value).methodName.toString().startsWith("__get__")) {
+                                                                    func.actions.remove(pos);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         } else if (propertySetter instanceof FunctionActionItem) {
                             FunctionActionItem setterFunc = (FunctionActionItem) propertySetter;
                             if (!(setterFunc.actions.isEmpty() && setterFunc.functionName.isEmpty() && ((FunctionActionItem) propertySetter).paramNames.isEmpty())) {

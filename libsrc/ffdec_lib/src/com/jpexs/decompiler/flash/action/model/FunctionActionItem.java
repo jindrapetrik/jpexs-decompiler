@@ -51,6 +51,10 @@ import java.util.Set;
  */
 public class FunctionActionItem extends ActionItem implements BranchStackResistant {
 
+    public boolean isGetter = false;
+
+    public boolean isSetter = false;
+
     public List<GraphTargetItem> actions;
 
     public List<String> constants;
@@ -92,6 +96,10 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
 
     }
 
+    public void addVariable(VariableActionItem variable) {
+        variables.add(variable);
+    }
+
 
     public FunctionActionItem() {
         super(null, null, PRECEDENCE_PRIMARY);
@@ -119,21 +127,43 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             srcData.localName = n;
             srcData.declaration = true;
         }
+
         writer.append("function");
+        if (isGetter) {
+            writer.append(" get");
+        }
+        if (isSetter) {
+            writer.append(" set");
+        }
         if (calculatedFunctionName != null) {
             writer.append(" ");
             String fname = calculatedFunctionName.toStringNoQuotes(localData);
+            if (isGetter && fname.startsWith("__get__")) {
+                fname = fname.substring(7);
+            }
+            if (isSetter && fname.startsWith("__set__")) {
+                fname = fname.substring(7);
+            }
+
             if (!IdentifiersDeobfuscation.isValidName(false, fname)) {
                 IdentifiersDeobfuscation.appendObfuscatedIdentifier(fname, writer);
             } else {
-                calculatedFunctionName.appendToNoQuotes(writer, localData);
+                writer.append(fname);
+                //calculatedFunctionName.appendToNoQuotes(writer, localData);
             }
         } else if (!functionName.isEmpty()) {
+            String fname = functionName;
+            if (isGetter && fname.startsWith("__get__")) {
+                fname = fname.substring(7);
+            }
+            if (isSetter && fname.startsWith("__set__")) {
+                fname = fname.substring(7);
+            }
             writer.append(" ");
-            if (!IdentifiersDeobfuscation.isValidName(false, functionName)) {
-                IdentifiersDeobfuscation.appendObfuscatedIdentifier(functionName, writer);
+            if (!IdentifiersDeobfuscation.isValidName(false, fname)) {
+                IdentifiersDeobfuscation.appendObfuscatedIdentifier(fname, writer);
             } else {
-                writer.append(functionName);
+                writer.append(fname);
             }
         }
         writer.spaceBeforeCallParenthesies(paramNames.size());
@@ -262,7 +292,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
         boolean preloadThisFlag = false;
         boolean preloadGlobalFlag = false;
 
-        boolean suppressParentFlag = false;
+        boolean suppressSuperFlag = false;
         boolean suppressArgumentsFlag = false;
         boolean suppressThisFlag = false;
 
@@ -288,7 +318,10 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             preloadSuperFlag = true;
             needsFun2 = true;
             registerNames.add("super");
+        } else {
+            suppressSuperFlag = true;
         }
+
         if (usedNames.contains("_root")) {
             preloadRootFlag = true;
             needsFun2 = true;
@@ -298,8 +331,6 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             preloadParentFlag = true;
             needsFun2 = true;
             registerNames.add("_parent");
-        } else {
-            suppressParentFlag = true;
         }
         if (usedNames.contains("_global")) {
             needsFun2 = true;
@@ -404,7 +435,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             ret.add(0, new ActionDefineFunction2(functionName,
                     preloadParentFlag,
                     preloadRootFlag,
-                    suppressParentFlag,
+                    suppressSuperFlag,
                     preloadSuperFlag,
                     suppressArgumentsFlag,
                     preloadArgumentsFlag,
