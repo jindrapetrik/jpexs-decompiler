@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - use slash syntax in get/setvariable only in eval/set
 - AS1/2 - get/setProperty when propertyindex is string
 - DefineEditText - ampersand in link href
+- AS1/2 - cannot use globalfunc/const variable names
 
 ## [14.6.0] - 2021-11-22
 ### Added
