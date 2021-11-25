@@ -724,7 +724,6 @@ public class ActionSourceGenerator implements SourceGenerator {
         Set<String> staticSetters = new HashSet<>();
         Set<String> staticGetters = new HashSet<>();
 
-
         if (!isInterface) {
             for (int pass = 1; pass <= 2; pass++) { //two passes, methods first, then variables
                 for (int t = 0; t < traits.size(); t++) {
@@ -738,12 +737,25 @@ public class ActionSourceGenerator implements SourceGenerator {
                         if (fi.isGetter || fi.isSetter) {
                             (traitsStatic.get(t) ? staticProperties : properties).add(fi.calculatedFunctionName.toString());
                         }
+
+                        if (!FunctionActionItem.DECOMPILE_GET_SET) {
+                            if (fi.calculatedFunctionName.toString().startsWith("__get__") || fi.calculatedFunctionName.toString().startsWith("__set__")) {
+                                (traitsStatic.get(t) ? staticProperties : properties).add(fi.calculatedFunctionName.toString().substring(7));
+                            }
+                            if (fi.calculatedFunctionName.toString().startsWith("__get__")) {
+                                (traitsStatic.get(t) ? staticGetters : getters).add(fi.calculatedFunctionName.toString().substring(7));
+                            }
+                            if (fi.calculatedFunctionName.toString().startsWith("__set__")) {
+                                (traitsStatic.get(t) ? staticSetters : setters).add(fi.calculatedFunctionName.toString().substring(7));
+                            }
+                        }
+
                         String prefix = "";
-                        if (fi.isGetter) {
+                        if (fi.isGetter) { //really has "get" keyword
                             (traitsStatic.get(t) ? staticGetters : getters).add(fi.calculatedFunctionName.toString());
                             prefix = "__get__";
                         }
-                        if (fi.isSetter) {
+                        if (fi.isSetter) { //really has "set" keyword
                             (traitsStatic.get(t) ? staticSetters : setters).add(fi.calculatedFunctionName.toString());
                             prefix = "__set__";
                         }
@@ -794,7 +806,6 @@ public class ActionSourceGenerator implements SourceGenerator {
             ifbody.add(new ActionPush(new Object[]{prop, 3, new RegisterNumber(2), "addProperty"}));
             ifbody.add(new ActionCallMethod());
         }
-
 
         if (!isInterface) {
             ifbody.add(new ActionPush((Long) 1L));
