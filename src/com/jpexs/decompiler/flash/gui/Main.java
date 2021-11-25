@@ -2523,7 +2523,7 @@ public class Main {
 
         if (!versions.isEmpty()) {
             View.execInEventDispatch(() -> {
-                NewVersionDialog newVersionDialog = new NewVersionDialog(mainFrame.getWindow(), versions);
+                NewVersionDialog newVersionDialog = new NewVersionDialog(mainFrame == null ? null :mainFrame.getWindow(), versions);
                 newVersionDialog.setVisible(true);
                 Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
             });
