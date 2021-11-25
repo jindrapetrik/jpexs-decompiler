@@ -51,6 +51,8 @@ import java.util.Set;
  */
 public class FunctionActionItem extends ActionItem implements BranchStackResistant {
 
+    public static final boolean DECOMPILE_GET_SET = true;
+
     public boolean isGetter = false;
 
     public boolean isSetter = false;
@@ -100,7 +102,6 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
         variables.add(variable);
     }
 
-
     public FunctionActionItem() {
         super(null, null, PRECEDENCE_PRIMARY);
     }
@@ -129,20 +130,24 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
         }
 
         writer.append("function");
-        if (isGetter) {
-            writer.append(" get");
-        }
-        if (isSetter) {
-            writer.append(" set");
+        if (DECOMPILE_GET_SET) {
+            if (isGetter) {
+                writer.append(" get");
+            }
+            if (isSetter) {
+                writer.append(" set");
+            }
         }
         if (calculatedFunctionName != null) {
             writer.append(" ");
             String fname = calculatedFunctionName.toStringNoQuotes(localData);
-            if (isGetter && fname.startsWith("__get__")) {
-                fname = fname.substring(7);
-            }
-            if (isSetter && fname.startsWith("__set__")) {
-                fname = fname.substring(7);
+            if (DECOMPILE_GET_SET) {
+                if (isGetter && fname.startsWith("__get__")) {
+                    fname = fname.substring(7);
+                }
+                if (isSetter && fname.startsWith("__set__")) {
+                    fname = fname.substring(7);
+                }
             }
 
             if (!IdentifiersDeobfuscation.isValidName(false, fname)) {
@@ -153,11 +158,13 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             }
         } else if (!functionName.isEmpty()) {
             String fname = functionName;
-            if (isGetter && fname.startsWith("__get__")) {
-                fname = fname.substring(7);
-            }
-            if (isSetter && fname.startsWith("__set__")) {
-                fname = fname.substring(7);
+            if (DECOMPILE_GET_SET) {
+                if (isGetter && fname.startsWith("__get__")) {
+                    fname = fname.substring(7);
+                }
+                if (isSetter && fname.startsWith("__set__")) {
+                    fname = fname.substring(7);
+                }
             }
             writer.append(" ");
             if (!IdentifiersDeobfuscation.isValidName(false, fname)) {

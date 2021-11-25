@@ -548,19 +548,21 @@ public class ActionScript2ClassDetector {
                                                 FunctionActionItem func = (FunctionActionItem) trait.getValue();
                                                 func.isSetter = true;
 
-                                                //There is return getter added at the end of every setter, gotta remove it, since it won't compile
-                                                //as setter must not return a value
-                                                if (!func.actions.isEmpty()) {
-                                                    int pos = func.actions.size() - 1;
-                                                    if (func.actions.get(pos) instanceof ScriptEndItem) {
-                                                        pos--;
-                                                    }
-                                                    if (pos >= 0 && func.actions.get(pos) instanceof ReturnActionItem) {
-                                                        GraphTargetItem val = func.actions.get(pos);
-                                                        if (val.value instanceof CallMethodActionItem) {
-                                                            if (((CallMethodActionItem) val.value).methodName instanceof DirectValueActionItem) {
-                                                                if (((CallMethodActionItem) val.value).methodName.toString().startsWith("__get__")) {
-                                                                    func.actions.remove(pos);
+                                                if (FunctionActionItem.DECOMPILE_GET_SET) {
+                                                    //There is return getter added at the end of every setter, gotta remove it, since it won't compile
+                                                    //as setter must not return a value
+                                                    if (!func.actions.isEmpty()) {
+                                                        int pos = func.actions.size() - 1;
+                                                        if (func.actions.get(pos) instanceof ScriptEndItem) {
+                                                            pos--;
+                                                        }
+                                                        if (pos >= 0 && func.actions.get(pos) instanceof ReturnActionItem) {
+                                                            GraphTargetItem val = func.actions.get(pos);
+                                                            if (val.value instanceof CallMethodActionItem) {
+                                                                if (((CallMethodActionItem) val.value).methodName instanceof DirectValueActionItem) {
+                                                                    if (((CallMethodActionItem) val.value).methodName.toString().startsWith("__get__")) {
+                                                                        func.actions.remove(pos);
+                                                                    }
                                                                 }
                                                             }
                                                         }
