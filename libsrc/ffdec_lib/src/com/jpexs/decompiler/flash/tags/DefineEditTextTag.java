@@ -484,6 +484,9 @@ public class DefineEditTextTag extends TextTag {
                     }
 
                     private String unescape(String txt) {
+                        if (txt == null) {
+                            return null;
+                        }
                         txt = txt.replace("/{entity-nbsp}", "\u00A0");
                         txt = txt.replace("/{entity-lt}", "<");
                         txt = txt.replace("/{entity-gt}", ">");
