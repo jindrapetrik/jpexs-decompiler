@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - definefunction2 suppresssuper parameter
 - New version dialog error when no main window available
 - AS1/2 direct editation - commands as expressions
+- AS1/2 direct editation - delete operator on anything
 
 ## [14.6.0] - 2021-11-22
 ### Added

@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.action.parser.script;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
-import com.jpexs.decompiler.flash.abc.avm2.model.CallMethodAVM2Item;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.AsciiToCharActionItem;
 import com.jpexs.decompiler.flash.action.model.CallActionItem;
@@ -776,7 +775,7 @@ public class ActionScript2Parser {
                 } else if (varDel instanceof DirectValueActionItem) {
                     ret = new DeleteActionItem(null, null, null, varDel);
                 } else {
-                    throw new ActionParseException("Not a property", lexer.yyline());
+                    ret = new DeleteActionItem(null, null, null, varDel);
                 }
                 break;
             case TRACE:
