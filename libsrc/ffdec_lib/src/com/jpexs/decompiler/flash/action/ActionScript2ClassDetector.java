@@ -445,6 +445,10 @@ public class ActionScript2ClassDetector {
                         if (memPath == null) {
                             throw new AssertException("Invalid pathsource");
                         }
+                        //remove _global if it's there - happens for classes in global package
+                        if (memPath.size() > 0 && "_global".equals(memPath.get(0))) {
+                            memPath.remove(0);
+                        }
                         if (!classNamePath.equals(memPath)) {
                             throw new AssertException("Invalid path of setmember:" + String.join(".", memPath));
                         }
