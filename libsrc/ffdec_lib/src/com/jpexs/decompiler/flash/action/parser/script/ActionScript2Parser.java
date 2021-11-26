@@ -549,6 +549,11 @@ public class ActionScript2Parser {
         }
         GraphTargetItem ret;
         switch (s.type) {
+            case CALL:
+                expectedType(SymbolType.PARENT_OPEN);
+                ret = new CallActionItem(null, null, (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval)));
+                expectedType(SymbolType.PARENT_CLOSE);
+                break;
             case GETVERSION:
                 expectedType(SymbolType.PARENT_OPEN);
                 ret = new GetVersionActionItem(null, null);
@@ -643,16 +648,6 @@ public class ActionScript2Parser {
                 ret = new AsciiToCharActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
-            case DUPLICATEMOVIECLIP:
-                expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem src3 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
-                expectedType(SymbolType.COMMA);
-                GraphTargetItem tar3 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
-                expectedType(SymbolType.COMMA);
-                GraphTargetItem dep3 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
-                expectedType(SymbolType.PARENT_CLOSE);
-                ret = new CloneSpriteActionItem(null, null, src3, tar3, dep3);
-                break;
             case GETTIMER:
                 expectedType(SymbolType.PARENT_OPEN);
                 expectedType(SymbolType.PARENT_CLOSE);
@@ -725,14 +720,19 @@ public class ActionScript2Parser {
         }
 
         switch (s.type) {
+            case DUPLICATEMOVIECLIP:
+                expectedType(SymbolType.PARENT_OPEN);
+                GraphTargetItem src3 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                expectedType(SymbolType.COMMA);
+                GraphTargetItem tar3 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                expectedType(SymbolType.COMMA);
+                GraphTargetItem dep3 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
+                expectedType(SymbolType.PARENT_CLOSE);
+                ret = new CloneSpriteActionItem(null, null, src3, tar3, dep3);
+                break;
             case FSCOMMAND:
                 expectedType(SymbolType.PARENT_OPEN);
                 ret = new FSCommandActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
-                expectedType(SymbolType.PARENT_CLOSE);
-                break;
-            case CALL:
-                expectedType(SymbolType.PARENT_OPEN);
-                ret = new CallActionItem(null, null, (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval)));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case LENGTH:
@@ -1372,11 +1372,6 @@ public class ActionScript2Parser {
                 }
                 return new EmptyCommand();
             default:
-                GraphTargetItem valcmd = expressionCommands(s, inFunction, inMethod, inTellTarget, forinlevel, variables, functions, hasEval);
-                if (valcmd != null) {
-                    ret = valcmd;
-                    break;
-                }
                 lexer.pushback(s);
                 ret = expression(inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval);
         }
