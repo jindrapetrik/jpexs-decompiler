@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - AS2 - getters and setters decompilation and editing
 - AS1/2 - definefunction2 suppresssuper parameter
 - New version dialog error when no main window available
+- AS1/2 direct editation - commands as expressions
 
 ## [14.6.0] - 2021-11-22
 ### Added
