@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.action.model.CallFunctionActionItem;
 import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -508,7 +509,9 @@ public class ActionScript2ClassDetector {
                             }
                             String getterNameStr = getAsString(((GetMemberActionItem) propertyGetter).memberName, "getter memberName");
                             if (!(getterNameStr.equals("__get__" + propertyNameStr))) {
-                                throw new AssertException("getter does not match property name");
+                                //throw new AssertException("getter does not match property name");
+                                Logger.getLogger(ActionScript2ClassDetector.class.getName()).warning(scriptPath + ": getter " + IdentifiersDeobfuscation.printIdentifier(false, getterNameStr) + " does not match property name " + IdentifiersDeobfuscation.printIdentifier(false, propertyNameStr));
+                                continue;
                             }
 
                             for (MyEntry<GraphTargetItem, GraphTargetItem> trait : traits) {
@@ -541,7 +544,9 @@ public class ActionScript2ClassDetector {
                             }
                             String setterNameStr = getAsString(((GetMemberActionItem) propertySetter).memberName, "setter memberNAme");
                             if (!(setterNameStr.equals("__set__" + propertyNameStr))) {
-                                throw new AssertException("setter does not match property name");
+                                Logger.getLogger(ActionScript2ClassDetector.class.getName()).warning(scriptPath + ": setter " + IdentifiersDeobfuscation.printIdentifier(false, setterNameStr) + " does not match property name " + IdentifiersDeobfuscation.printIdentifier(false, propertyNameStr));
+                                continue;
+                                //throw new AssertException("setter does not match property name");
                             }
 
                             for (MyEntry<GraphTargetItem, GraphTargetItem> trait : traits) {
