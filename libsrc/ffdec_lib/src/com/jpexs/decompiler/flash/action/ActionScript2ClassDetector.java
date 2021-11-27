@@ -45,9 +45,14 @@ import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -271,7 +276,7 @@ public class ActionScript2ClassDetector {
         return mnDv.getAsString();
     }
 
-    private boolean checkClassContent(List<GraphTargetItem> parts, int partsPos, int commandsStartPos, int commandsEndPos, List<GraphTargetItem> commands, List<String> classNamePath, String scriptPath) {
+    private boolean checkClassContent(List<GraphTargetItem> parts, HashMap<String, GraphTargetItem> variables, int partsPos, int commandsStartPos, int commandsEndPos, List<GraphTargetItem> commands, List<String> classNamePath, String scriptPath) {
 
         try {
 
@@ -283,8 +288,63 @@ public class ActionScript2ClassDetector {
             GraphTargetItem classNameTargetPath = null;
             GraphTargetItem constructor = null;
 
+            Pattern regPattern = Pattern.compile("__register([0-9]+)");
+
+            Set<Integer> definedRegisters = new HashSet<>();
+            for (int i = partsPos; i < parts.size(); i++) {
+                item = parts.get(i);
+                if (item instanceof StoreRegisterActionItem) {
+                    StoreRegisterActionItem sr = (StoreRegisterActionItem) item;
+                    definedRegisters.add(sr.register.number);
+                }
+            }
+
+            /*
+            Hack:
+            When register is not used after setting, then FFDec discards its value,
+            but the value is crucial as there is setmember, atc.
+            This will bypass the situation.
+            
+            This happens when there are no methods/vars, constructor only.
+             */
+            int numr = 0;
+            for (String s : variables.keySet()) {
+                Matcher m = regPattern.matcher(s);
+                if (m.matches()) {
+                    if (variables.get(s) instanceof TemporaryRegister) {
+                        int regId = Integer.parseInt(m.group(1));
+                        if (!definedRegisters.contains(regId)) {
+                            parts.add(partsPos + numr, variables.get(s).value);
+                            numr++;
+                        }
+                    }
+                }
+            }
+
             if (parts.size() > partsPos) {
                 item = parts.get(partsPos);
+
+                if (item instanceof SetMemberActionItem) {
+                    List<String> memPath = getSetMembersPath((SetMemberActionItem) item);
+                    if (memPath != null) {
+                        if (memPath.get(0).equals("_global")) {
+                            memPath.remove(0);
+                        }
+                        if (memPath.equals(classNamePath)) {
+                            if (item.value instanceof StoreRegisterActionItem) {
+                                constructor = item.value.value;
+                                partsPos++;
+                                if (parts.size() > partsPos) {
+                                    item = parts.get(partsPos);
+                                } else {
+                                    item = null;
+                                }
+                            }
+
+                        }
+                    }
+                }
+
                 if (item instanceof ExtendsActionItem) {
                     ExtendsActionItem et = (ExtendsActionItem) parts.get(partsPos);
                     extendsOp = getWithoutGlobal(et.superclass);
@@ -293,6 +353,26 @@ public class ActionScript2ClassDetector {
                         item = parts.get(partsPos);
                     } else {
                         item = null;
+                    }
+                }
+
+                if (item instanceof SetMemberActionItem) {
+                    SetMemberActionItem sm = (SetMemberActionItem) item;
+                    List<String> protoPath = new ArrayList<>(classNamePath);
+                    protoPath.add("prototype");
+                    List<String> smPath = getSetMembersPath(sm);
+                    if (smPath.get(0).equals("_global")) {
+                        smPath.remove(0);
+                    }
+                    if (smPath.equals(protoPath)) {
+                        if (sm.value instanceof StoreRegisterActionItem) {
+                            partsPos++;
+                            if (parts.size() > partsPos) {
+                                item = parts.get(partsPos);
+                            } else {
+                                item = null;
+                            }
+                        }
                     }
                 }
 
@@ -342,11 +422,10 @@ public class ActionScript2ClassDetector {
                     }
                     partsPos++;
                 }
-            } else {
-                classNameTargetPath = new GetVariableActionItem(null, null, new DirectValueActionItem(classNamePath.get(0)));
-                for (int i = 1; i < classNamePath.size(); i++) {
-                    classNameTargetPath = new GetMemberActionItem(null, null, classNameTargetPath, new DirectValueActionItem(classNamePath.get(i)));
-                }
+            }
+            classNameTargetPath = new GetVariableActionItem(null, null, new DirectValueActionItem(classNamePath.get(0)));
+            for (int i = 1; i < classNamePath.size(); i++) {
+                classNameTargetPath = new GetMemberActionItem(null, null, classNameTargetPath, new DirectValueActionItem(classNamePath.get(i)));
             }
             List<MyEntry<GraphTargetItem, GraphTargetItem>> traits = new ArrayList<>();
             List<Boolean> traitsStatic = new ArrayList<>();
@@ -453,7 +532,7 @@ public class ActionScript2ClassDetector {
                         if (!classNamePath.equals(memPath)) {
                             throw new AssertException("Invalid path of setmember:" + String.join(".", memPath));
                         }
-                        classNameTargetPath = pathSource;
+                        //classNameTargetPath = pathSource;
                         if (!(sm2.value instanceof StoreRegisterActionItem)) {
                             throw new AssertException("Not storeregister");
                         }
@@ -669,7 +748,7 @@ public class ActionScript2ClassDetector {
         return false;
     }
 
-    private boolean checkIfVariants(List<GraphTargetItem> commands, int pos, String scriptPath) {
+    private boolean checkIfVariants(List<GraphTargetItem> commands, HashMap<String, GraphTargetItem> variables, int pos, String scriptPath) {
 
 
         /*
@@ -725,7 +804,7 @@ public class ActionScript2ClassDetector {
                         }
                         List<String> classPath = pathToSearchVariant1;
                         classPath.remove(0); //remove _global
-                        if (this.checkClassContent(ifItem.onTrue, 0, pos, checkPos, commands, classPath, scriptPath)) {
+                        if (this.checkClassContent(ifItem.onTrue, variables, 0, pos, checkPos, commands, classPath, scriptPath)) {
                             return true;
                         } else {
                             break check_variant1;
@@ -792,7 +871,7 @@ public class ActionScript2ClassDetector {
                         }
                     }
                 }
-                if (checkClassContent(parts, checkPos, pos, pos, commands, memPath, scriptPath)) {
+                if (checkClassContent(parts, variables, checkPos, pos, pos, commands, memPath, scriptPath)) {
                     return true;
                 }
             }
@@ -801,9 +880,9 @@ public class ActionScript2ClassDetector {
         return false;
     }
 
-    public void checkClass(List<GraphTargetItem> commands, String scriptPath) {
+    public void checkClass(List<GraphTargetItem> commands, HashMap<String, GraphTargetItem> variables, String scriptPath) {
         for (int pos = 0; pos < commands.size(); pos++) {
-            checkIfVariants(commands, pos, scriptPath);
+            checkIfVariants(commands, variables, pos, scriptPath);
         }
     }
 }
