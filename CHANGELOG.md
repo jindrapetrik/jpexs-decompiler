@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - AS2 - class detection of top level classes
 - AS2 - class detection - warning only if propertyname does not match getter/setter
 - AS2 - some minor cases in class detection
+- AS2 - class detection - ignore standalone directvalues
 
 ## [14.6.0] - 2021-11-22
 ### Added

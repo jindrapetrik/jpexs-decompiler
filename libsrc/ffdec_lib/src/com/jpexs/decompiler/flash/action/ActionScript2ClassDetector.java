@@ -712,6 +712,9 @@ public class ActionScript2ClassDetector {
                     } else {
                         throw new AssertException("unknown pushitem function call " + funName);
                     }
+                } else if (item instanceof DirectValueActionItem) {
+                    //ignore such values
+                    //TODO: maybe somehow display in the class ?
                 } else {
                     throw new AssertException("unknown item - " + item.getClass().getSimpleName());
                 }
