@@ -12,10 +12,12 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 
 /**
@@ -30,6 +32,15 @@ public class ActionScript2TestBase extends ActionScriptTestBase {
         for (Tag t : swf.getTags()) {
             if (t instanceof DoActionTag) {
                 return (DoActionTag) t;
+            }
+        }
+        return null;
+    }
+
+    protected DoInitActionTag getFirstInitActionTag() {
+        for (Tag t : swf.getTags()) {
+            if (t instanceof DoInitActionTag) {
+                return (DoInitActionTag) t;
             }
         }
         return null;

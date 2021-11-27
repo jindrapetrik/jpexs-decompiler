@@ -328,7 +328,7 @@ public class ActionGraph extends Graph {
         List<GraphTargetItem> ret = super.translate(localData, staticOperation, path);
         if (insideDoInitAction && !insideFunction) {
             ActionScript2ClassDetector detector = new ActionScript2ClassDetector();
-            detector.checkClass(ret, path);
+            detector.checkClass(ret, ((ActionGraphSource) code).getVariables(), path);
         }
         makeDefineRegistersUp(ret);
         return ret;

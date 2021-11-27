@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 direct editation - delete operator on anything
 - AS2 - class detection of top level classes
 - AS2 - class detection - warning only if propertyname does not match getter/setter
+- AS2 - some minor cases in class detection
 
 ## [14.6.0] - 2021-11-22
 ### Added

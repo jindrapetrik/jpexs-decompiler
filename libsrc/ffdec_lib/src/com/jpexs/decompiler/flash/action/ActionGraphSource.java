@@ -195,4 +195,8 @@ public class ActionGraphSource extends GraphSource {
         return ret;
     }
 
+    public HashMap<String, GraphTargetItem> getVariables() {
+        return variables;
+    }
+
 }

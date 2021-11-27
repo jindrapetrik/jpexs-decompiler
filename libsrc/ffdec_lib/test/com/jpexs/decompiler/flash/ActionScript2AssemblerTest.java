@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -73,6 +74,28 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
 
             try {
                 Action.actionsToSource(doa, doa.getActions(), "", writer);
+            } catch (InterruptedException ex) {
+                fail();
+            }
+
+            return writer.toString();
+        } catch (IOException | ActionParseException ex) {
+            fail();
+        }
+
+        return null;
+    }
+
+    private String decompileClassPcode(String pcode) {
+        try {
+            List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false);
+
+            DoInitActionTag doi = getFirstInitActionTag();
+            doi.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
+            HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
+
+            try {
+                Action.actionsToSource(doi, doi.getActions(), "", writer);
             } catch (InterruptedException ex) {
                 fail();
             }
@@ -222,6 +245,52 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "return 1;\n"
                 + "default:\n"
                 + "return 3;\n"
+                + "}");
+    }
+
+    @Test
+    public void testClassSpecial() {
+        String res = decompileClassPcode("ConstantPool\n"
+                + "Push \"_global\"\n"
+                + "GetVariable\n"
+                + "Push \"Guide\"\n"
+                + "GetMember\n"
+                + "Not\n"
+                + "Not\n"
+                + "If loc00d9\n"
+                + "Push \"_global\"\n"
+                + "GetVariable\n"
+                + "Push \"Guide\"\n"
+                + "DefineFunction \"\" 0  {\n"
+                + "Push \"hello\"\n"
+                + "Trace\n"
+                + "}\n"
+                + "StoreRegister 1\n"
+                + "SetMember\n"
+                + "Push \"_global\"\n"
+                + "GetVariable\n"
+                + "Push \"Guide\"\n"
+                + "GetMember\n"
+                + "Push \"prototype\" 0.0 \"MovieClip\"\n"
+                + "NewObject\n"
+                + "StoreRegister 2\n"
+                + "SetMember\n"
+                + "Push 1 null \"_global\"\n"
+                + "GetVariable\n"
+                + "Push \"Guide\"\n"
+                + "GetMember\n"
+                + "Push \"prototype\"\n"
+                + "GetMember\n"
+                + "Push 3 \"ASSetPropFlags\"\n"
+                + "CallFunction\n"
+                + "loc00d9:Pop");
+        res = cleanPCode(res);
+        assertEquals(res, "class Guide\n"
+                + "{\n"
+                + "function Guide()\n"
+                + "{\n"
+                + "trace(\"hello\");\n"
+                + "}\n"
                 + "}");
     }
 }
