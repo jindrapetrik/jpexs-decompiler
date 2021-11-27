@@ -27,11 +27,13 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetTarget2;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +42,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class TellTargetActionItem extends ActionItem {
+public class TellTargetActionItem extends ActionItem implements Block {
 
     public List<GraphTargetItem> commands;
 
@@ -109,5 +111,28 @@ public class TellTargetActionItem extends ActionItem {
     @Override
     public boolean hasReturnValue() {
         return false;
+    }
+
+    @Override
+    public List<ContinueItem> getContinues() {
+        List<ContinueItem> ret = new ArrayList<>();
+        for (GraphTargetItem ti : commands) {
+            if (ti instanceof ContinueItem) {
+                ret.add((ContinueItem) ti);
+            }
+            if (ti instanceof Block) {
+                ret.addAll(((Block) ti).getContinues());
+            }
+        }
+        return ret;
+    }
+
+    @Override
+    public List<List<GraphTargetItem>> getSubs() {
+        List<List<GraphTargetItem>> ret = new ArrayList<>();
+        if (commands != null) {
+            ret.add(commands);
+        }
+        return ret;
     }
 }
