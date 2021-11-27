@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTypeActionItem;
 import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
@@ -118,6 +119,10 @@ public class ForInActionItem extends LoopActionItem implements Block {
 
             if ((variableName instanceof StoreRegisterActionItem) && ((StoreRegisterActionItem) variableName).define) {
                 writer.append("var ");
+            }
+
+            if (vn instanceof GetVariableActionItem) {
+                ((GetVariableActionItem) vn).printObfuscatedName = true; //cannot use eval
             }
 
             stripQuotes(vn, localData, writer);
