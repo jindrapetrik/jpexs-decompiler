@@ -47,6 +47,7 @@ public class TernarOpItem extends GraphTargetItem {
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
+        visitor.visit(expression);
         visitor.visit(onTrue);
         visitor.visit(onFalse);
     }
