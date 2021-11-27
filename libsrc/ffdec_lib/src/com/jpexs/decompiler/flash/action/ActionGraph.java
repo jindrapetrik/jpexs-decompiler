@@ -416,7 +416,7 @@ public class ActionGraph extends Graph {
                 }
             }
             if (switchedObject == null) {
-                switchedObject = new DirectValueActionItem(null, null, -1, Null.INSTANCE, null);
+                //switchedObject = new DirectValueActionItem(null, null, -1, Null.INSTANCE, null);
             }
             List<GraphTargetItem> caseValuesMap = new ArrayList<>();
 
@@ -427,6 +427,11 @@ public class ActionGraph extends Graph {
             }
             if (set.leftSide instanceof GetVariableActionItem) {
                 switchedObject = set.leftSide;
+            }
+
+            if (switchedObject == null) {
+                stack.push(set);
+                return ret;
             }
             List<GraphPart> caseBodyParts = new ArrayList<>();
             caseBodyParts.add(part.nextParts.get(0));
