@@ -38,14 +38,21 @@ import java.util.Set;
 public class TypeOfActionItem extends ActionItem {
 
     public TypeOfActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem value) {
-        super(instruction, lineStartIns, PRECEDENCE_PRIMARY, value);
+        super(instruction, lineStartIns, PRECEDENCE_UNARY, value);
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("typeof ");
         writer.spaceBeforeCallParenthesies(1);
+        if (value.getPrecedence() > getPrecedence()) {
+            writer.append("(");
+        }
         value.toString(writer, localData);
+        if (value.getPrecedence() > getPrecedence()) {
+            writer.append(")");
+        }
+
         return writer;
     }
 
