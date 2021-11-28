@@ -38,11 +38,13 @@ import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.helpers.collections.MyEntry;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.IfItem;
 import com.jpexs.decompiler.graph.model.NotItem;
 import com.jpexs.decompiler.graph.model.PopItem;
 import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.ScriptEndItem;
+import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -751,8 +753,33 @@ public class ActionScript2ClassDetector {
         return false;
     }
 
+    //in some weird cases, ifs are detected as ternars, this method expands ternars to ifs
+    private void expandTernars(List<GraphTargetItem> commands) {
+        for (int i = 0; i < commands.size(); i++) {
+            if (commands.get(i) instanceof TernarOpItem) {
+                TernarOpItem ter = (TernarOpItem) commands.get(i);
+                List<GraphTargetItem> onTrue = new ArrayList<>();
+                if (ter.onTrue instanceof CommaExpressionItem) {
+                    CommaExpressionItem ce = (CommaExpressionItem) ter.onTrue;
+                    onTrue = ce.commands;
+                } else {
+                    onTrue.add(ter.onTrue);
+                }
+                List<GraphTargetItem> onFalse = new ArrayList<>();
+                if (ter.onFalse instanceof CommaExpressionItem) {
+                    CommaExpressionItem ce = (CommaExpressionItem) ter.onFalse;
+                    onFalse = ce.commands;
+                } else {
+                    onFalse.add(ter.onFalse);
+                }
+                commands.set(i, new IfItem(null, null, ter.expression, onTrue, onFalse));
+            }
+        }
+    }
+
     private boolean checkIfVariants(List<GraphTargetItem> commands, HashMap<String, GraphTargetItem> variables, int pos, String scriptPath) {
 
+        expandTernars(commands);
 
         /*
             Variant 1:        
@@ -884,8 +911,16 @@ public class ActionScript2ClassDetector {
     }
 
     public void checkClass(List<GraphTargetItem> commands, HashMap<String, GraphTargetItem> variables, String scriptPath) {
-        for (int pos = 0; pos < commands.size(); pos++) {
-            checkIfVariants(commands, variables, pos, scriptPath);
+        List<GraphTargetItem> localCommands = new ArrayList<>(commands);
+        boolean changed = false;
+        for (int pos = 0; pos < localCommands.size(); pos++) {
+            if (checkIfVariants(localCommands, variables, pos, scriptPath)) {
+                changed = true;
+            }
+        }
+        if (changed) {
+            commands.clear();
+            commands.addAll(localCommands);
         }
     }
 }
