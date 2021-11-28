@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf5.ActionInitObject;
@@ -61,7 +62,8 @@ public class InitObjectActionItem extends ActionItem {
             if (i < values.size() - 1) {
                 writer.append(",");
             }
-            names.get(i).toStringNoQuotes(writer, localData); //AS1/2 do not allow quotes in name here
+            //AS1/2 does not allow quotes in name here
+            writer.append(IdentifiersDeobfuscation.printIdentifier(false, names.get(i).toStringNoQuotes(localData)));
             writer.append(":");
             if (values.get(i) instanceof TernarOpItem) { //Ternar operator contains ":"
                 writer.append("(");
