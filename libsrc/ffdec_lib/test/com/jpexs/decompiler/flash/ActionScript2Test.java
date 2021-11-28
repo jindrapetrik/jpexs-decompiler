@@ -2368,4 +2368,21 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "trace(\"E\");\r\n"
         );
     }
+
+    @Test
+    public void frame84_withTest() {
+        compareSrc(84, "trace(\"withTest\");\r\n"
+                + "trace(\"before\");\r\n"
+                + "with(_root.something)\r\n"
+                + "{\r\n"
+                + "somesub = 5;\r\n"
+                + "with(subvar)\r\n"
+                + "{\r\n"
+                + "somesub2 = 4;\r\n"
+                + "}\r\n"
+                + "trace(\"after1\");\r\n"
+                + "}\r\n"
+                + "trace(\"after\");\r\n"
+        );
+    }
 }

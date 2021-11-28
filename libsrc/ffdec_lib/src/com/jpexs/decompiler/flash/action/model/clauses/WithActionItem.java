@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.model.clauses;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -59,11 +60,10 @@ public class WithActionItem extends ActionItem {
         }
         writer.append("(");
         scope.toString(writer, localData);
-        writer.append(")").startBlock();
-        for (GraphTargetItem ti : items) {
-            ti.toString(writer, localData).newLine();
-        }
-        return writer.endBlock();
+        writer.append(")");
+        appendBlock(null, writer, localData, items);
+
+        return writer;
     }
 
     @Override
@@ -83,4 +83,10 @@ public class WithActionItem extends ActionItem {
     public boolean hasReturnValue() {
         return false;
     }
+
+    @Override
+    public boolean needsSemicolon() {
+        return false;
+    }
+
 }
