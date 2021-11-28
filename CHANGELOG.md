@@ -34,6 +34,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - properties postincrement
 - AS1/2 - direct editation - allow call on numbers, boolean, etc.
 - AS1/2 - direct editation - try..finally without catch clause
+- AS1/2 - GotoFrame2 - scene bias is first
 
 ## [14.6.0] - 2021-11-22
 ### Added
