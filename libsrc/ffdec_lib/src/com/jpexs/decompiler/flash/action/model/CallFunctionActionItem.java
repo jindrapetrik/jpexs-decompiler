@@ -74,7 +74,13 @@ public class CallFunctionActionItem extends ActionItem {
                 functionName.toStringNoQuotes(writer, localData);
             }
         } else {
+            if (functionName.getPrecedence() > getPrecedence()) {
+                writer.append("(");
+            }
             functionName.appendTry(writer, localData);
+            if (functionName.getPrecedence() > getPrecedence()) {
+                writer.append(")");
+            }
         }
         writer.spaceBeforeCallParenthesies(arguments.size());
         writer.append("(");
