@@ -39,6 +39,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -106,9 +107,16 @@ public class ActionWaitForFrame extends Action implements ActionStore {
     public void translate(SecondPassData secondPassData, boolean insideDoInitAction, GraphSourceItem lineStartAction, TranslateStack stack, List<GraphTargetItem> output, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int staticOperation, String path) throws InterruptedException {
         GraphTargetItem frameTi = new DirectValueActionItem(null, null, 0, (Long) ((long) frame), new ArrayList<>());
         List<GraphTargetItem> body;
+        HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
+        HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
+
         try {
             body = ActionGraph.translateViaGraph(null, insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path);
         } catch (SecondPassException spe) {
+            variables.clear();
+            variables.putAll(variablesBackup);
+            functions.clear();
+            functions.putAll(functionsBackup);
             body = ActionGraph.translateViaGraph(spe.getData(), insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path);
         }
         output.add(new IfFrameLoadedActionItem(frameTi, body, this, lineStartAction));

@@ -86,6 +86,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -930,9 +931,15 @@ public abstract class Action implements GraphSourceItem {
      * @throws java.lang.InterruptedException
      */
     public static List<GraphTargetItem> actionsToTree(boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path) throws InterruptedException {
+        HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
+        HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
         try {
             return ActionGraph.translateViaGraph(null, insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path);
         } catch (SecondPassException spe) {
+            variables.clear();
+            variables.putAll(variablesBackup);
+            functions.clear();
+            functions.putAll(functionsBackup);
             return ActionGraph.translateViaGraph(spe.getData(), insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path);
         }
     }
@@ -980,6 +987,18 @@ public abstract class Action implements GraphSourceItem {
     @Override
     public void setIgnored(boolean ignored, int pos) {
         this.ignored = ignored;
+    }
+
+    private static HashMap<String, GraphTargetItem> prepareVariables(GraphSourceItemContainer cnt, HashMap<String, GraphTargetItem> variables) {
+        HashMap<String, GraphTargetItem> variables2 = Helper.deepCopy(variables);
+        if (cnt instanceof ActionDefineFunction || cnt instanceof ActionDefineFunction2) {
+            for (int r = 0; r < 256; r++) {
+                if (variables2.containsKey("__register" + r)) {
+                    variables2.remove("__register" + r);
+                }
+            }
+        }
+        return variables2;
     }
 
     public static List<GraphTargetItem> actionsPartToTree(SecondPassData secondPassData, boolean insideDoInitAction, Reference<GraphSourceItem> fi, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, TranslateStack stack, List<Action> actions, int start, int end, int version, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
@@ -1033,14 +1052,7 @@ public abstract class Action implements GraphSourceItem {
                 long endAddr = action.getAddress() + cnt.getHeaderSize();
                 String cntName = cnt.getName();
                 List<List<GraphTargetItem>> outs = new ArrayList<>();
-                HashMap<String, GraphTargetItem> variables2 = Helper.deepCopy(variables);
-                if (cnt instanceof ActionDefineFunction || cnt instanceof ActionDefineFunction2) {
-                    for (int r = 0; r < 256; r++) {
-                        if (variables2.containsKey("__register" + r)) {
-                            variables2.remove("__register" + r);
-                        }
-                    }
-                }
+                HashMap<String, GraphTargetItem> variables2 = prepareVariables(cnt, variables);
                 for (long size : cnt.getContainerSizes()) {
                     if (size == 0) {
                         outs.add(new ArrayList<>());
@@ -1056,7 +1068,12 @@ public abstract class Action implements GraphSourceItem {
                                 }
                             }
                         }
-                        out = ActionGraph.translateViaGraph(secondPassData, insideDoInitAction, true, regNames, variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
+                        try {
+                            out = ActionGraph.translateViaGraph(null, insideDoInitAction, true, regNames, variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
+                        } catch (SecondPassException spe) {
+                            variables2 = prepareVariables(cnt, variables);
+                            out = ActionGraph.translateViaGraph(spe.getData(), insideDoInitAction, true, regNames, variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
+                        }
                     } catch (OutOfMemoryError | TranslateException | StackOverflowError ex) {
                         logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);
                         if (ex instanceof OutOfMemoryError) {

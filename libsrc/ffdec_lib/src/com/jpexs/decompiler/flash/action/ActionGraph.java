@@ -398,6 +398,15 @@ public class ActionGraph extends Graph {
         }
     }
 
+    private GraphPart findPart(int ip, Set<GraphPart> allParts) {
+        for (GraphPart p : allParts) {
+            if (p.containsIP(ip)) {
+                return p;
+            }
+        }
+        return null;
+    }
+
     @Override
     protected List<GraphTargetItem> check(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         if (!output.isEmpty()) {
@@ -445,29 +454,31 @@ public class ActionGraph extends Graph {
             if (secondPassData != null) {
                 for (int si = 0; si < secondPassData.switchParts.size(); si++) {
                     if (secondPassData.switchParts.get(si).get(0).equals(part)) {
-                        part = secondPassData.switchParts.get(si).get(secondPassData.switchParts.get(si).size() - 1);
+                        //we need to use findpart as parts have changed between first and second pass
+                        part = findPart(secondPassData.switchParts.get(si).get(secondPassData.switchParts.get(si).size() - 1).start, allParts);
                         caseBodyParts.clear();
-                        caseBodyParts.addAll(secondPassData.switchOnFalseParts.get(si));
+                        for (GraphPart p : secondPassData.switchOnFalseParts.get(si)) {
+                            caseBodyParts.add(findPart(p.start, allParts));
+                        }
                         caseValuesMap.clear();
                         caseValuesMap.addAll(secondPassData.switchCaseExpressions.get(si));
                         secondSwitchFound = true;
                     }
                 }
             }
-
             int cnt = 1;
-            if (!secondSwitchFound) {
+            if (false) { //always do secondPass
                 try {
-                while (part.nextParts.size() > 1
-                        && part.nextParts.get(1).getHeight() > 1
-                        && code.get(part.nextParts.get(1).end >= code.size() ? code.size() - 1 : part.nextParts.get(1).end) instanceof ActionIf
-                        && ((top = translatePartGetStack(localData, part.nextParts.get(1), stack, staticOperation)) instanceof StrictEqActionItem)) {
-                    cnt++;
-                    part = part.nextParts.get(1);
-                    caseBodyParts.add(part.nextParts.get(0));
+                    while (part.nextParts.size() > 1
+                            && part.nextParts.get(1).getHeight() > 1
+                            && code.get(part.nextParts.get(1).end >= code.size() ? code.size() - 1 : part.nextParts.get(1).end) instanceof ActionIf
+                            && ((top = translatePartGetStack(localData, part.nextParts.get(1), stack, staticOperation)) instanceof StrictEqActionItem)) {
+                        cnt++;
+                        part = part.nextParts.get(1);
+                        caseBodyParts.add(part.nextParts.get(0));
 
-                    set = (StrictEqActionItem) top;
-                    caseValuesMap.add(set.rightSide);
+                        set = (StrictEqActionItem) top;
+                        caseValuesMap.add(set.rightSide);
                     }
                 } catch (GraphPartChangeException gce) {
                     //ignore
@@ -555,9 +566,16 @@ public class ActionGraph extends Graph {
                     List<GraphTargetItem> switchExpressions = new ArrayList<>();
                     List<GraphPart> switchOnFalseParts = new ArrayList<>();
                     BinaryOpItem sneq = (BinaryOpItem) ii.expression;
-                    if (sneq.leftSide instanceof StoreRegisterActionItem) {
-                        StoreRegisterActionItem sr = (StoreRegisterActionItem) sneq.leftSide;
-                        int regId = sr.register.number;
+                    if ((sneq.leftSide instanceof StoreRegisterActionItem) || (sneq.leftSide instanceof GetVariableActionItem)) {
+
+                        int regId = -1;
+                        GetVariableActionItem svar = null;
+                        if (sneq.leftSide instanceof StoreRegisterActionItem) {
+                            StoreRegisterActionItem sr = (StoreRegisterActionItem) sneq.leftSide;
+                            regId = sr.register.number;
+                        } else {
+                            svar = (GetVariableActionItem) sneq.leftSide;
+                        }
 
                         switchParts.add(ii.decisionPart);
                         switchExpressions.add(sneq.rightSide);
@@ -583,6 +601,15 @@ public class ActionGraph extends Graph {
                                             } else {
                                                 break;
                                             }
+                                        } else {
+                                            break;
+                                        }
+                                    } else if (svar != null && sneq.leftSide instanceof GetVariableActionItem) {
+                                        if (sneq.leftSide.valueEquals(svar)) {
+                                            switchParts.add(ii2.decisionPart);
+                                            switchOnFalseParts.add(ii2.onTruePart);
+                                            switchExpressions.add(sneq.rightSide);
+                                            walkNext.add(isNeq ? ii2.onFalse : ii2.onTrue);
                                         } else {
                                             break;
                                         }
