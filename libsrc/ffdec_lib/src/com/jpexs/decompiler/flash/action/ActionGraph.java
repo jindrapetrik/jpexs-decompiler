@@ -568,7 +568,6 @@ public class ActionGraph extends Graph {
                             if ((isNeq && (!ii2.onTrue.isEmpty() && (ii2.onTrue.get(0) instanceof IfItem)))
                                     || (!isNeq && (!ii2.onFalse.isEmpty() && (ii2.onFalse.get(0) instanceof IfItem)))) {
                                 ii2 = (IfItem) (isNeq ? ii2.onTrue.get(0) : ii2.onFalse.get(0));
-                                System.err.println("" + ii2.expression.getClass().getSimpleName());
                                 if ((ii2.expression instanceof StrictNeqActionItem) || (ii2.expression instanceof StrictEqActionItem)) {
                                     isNeq = (ii2.expression instanceof StrictNeqActionItem);
                                     sneq = ((BinaryOpItem) ii2.expression);
