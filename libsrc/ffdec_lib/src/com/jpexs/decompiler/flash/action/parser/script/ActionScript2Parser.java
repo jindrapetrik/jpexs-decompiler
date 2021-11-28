@@ -805,16 +805,24 @@ public class ActionScript2Parser {
                 ret = new GetURL2ActionItem(null, null, url, target, getuMethod);
                 break;
             case GOTOANDSTOP:
+            case GOTOANDPLAY:
+                SymbolType gtKind = s.type;
                 expectedType(SymbolType.PARENT_OPEN);
                 GraphTargetItem gtsFrame = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
+                int gtsSceneBias = -1;
                 s = lex();
                 if (s.type == SymbolType.COMMA) { //Handle scene?
-                    lex();
+                    if ((gtsFrame instanceof DirectValueActionItem) && (((DirectValueActionItem) gtsFrame).value instanceof Long)) {
+                        gtsSceneBias = (int) (long) (Long) ((DirectValueActionItem) gtsFrame).value;
+                    } else {
+                        throw new ActionParseException("Scene bias must be number", lexer.yyline());
+                    }
+
                     gtsFrame = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
                 } else {
                     lexer.pushback(s);
                 }
-                ret = new GotoFrame2ActionItem(null, null, gtsFrame, false, false, 0);
+                ret = new GotoFrame2ActionItem(null, null, gtsFrame, gtsSceneBias != -1, gtKind == SymbolType.GOTOANDPLAY, gtsSceneBias);
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
             case NEXTFRAME:
@@ -948,20 +956,6 @@ public class ActionScript2Parser {
                         break;
                 }
                 break;
-            case GOTOANDPLAY:
-                expectedType(SymbolType.PARENT_OPEN);
-                GraphTargetItem gtpFrame = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
-                s = lex();
-                if (s.type == SymbolType.COMMA) { //Handle scene?
-                    lex();
-                    gtpFrame = expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval);
-                } else {
-                    lexer.pushback(s);
-                }
-                ret = new GotoFrame2ActionItem(null, null, gtpFrame, false, true, 0);
-                expectedType(SymbolType.PARENT_CLOSE);
-                break;
-
             case REMOVEMOVIECLIP:
                 expectedType(SymbolType.PARENT_OPEN);
                 ret = new RemoveSpriteActionItem(null, null, (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval)));
