@@ -40,6 +40,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - deobfuscate function parameter names in registers
 - AS1/2 - direct editation - do..while
 - AS1/2 - newmethod proper brackets
+- AS1/2 - class detection with ternars
 
 ## [14.6.0] - 2021-11-22
 ### Added
