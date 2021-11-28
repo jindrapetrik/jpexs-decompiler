@@ -143,4 +143,43 @@ public class ActionScript2ClassesTest extends ActionScript2TestBase {
                 + "trace(\"after _x1\");\r\n"
                 + "}\r\n");
     }
+
+    @Test
+    public void testSetterGetter() {
+        compareSrc("TestSetterGetter", "var _myvar = 1;\r\n"
+                + "static var _mystvar = 2;\r\n"
+                + "var _myvarsetonly = 3;\r\n"
+                + "var _myvargetonly = 4;\r\n"
+                + "function TestSetterGetter()\r\n"
+                + "{\r\n"
+                + "}\r\n"
+                + "static function get mystvar()\r\n"
+                + "{\r\n"
+                + "return com.jpexs.flash.test.testcases.TestSetterGetter._mystvar;\r\n"
+                + "}\r\n"
+                + "static function set mystvar(val)\r\n"
+                + "{\r\n"
+                + "com.jpexs.flash.test.testcases.TestSetterGetter._mystvar = val;\r\n"
+                + "}\r\n"
+                + "function get myvar()\r\n"
+                + "{\r\n"
+                + "return this._myvar;\r\n"
+                + "}\r\n"
+                + "function set myvar(val)\r\n"
+                + "{\r\n"
+                + "this._myvar = val;\r\n"
+                + "}\r\n"
+                + "function get myvargetonly()\r\n"
+                + "{\r\n"
+                + "return this._myvargetonly;\r\n"
+                + "}\r\n"
+                + "function set myvarsetonly(val)\r\n"
+                + "{\r\n"
+                + "this._myvarsetonly = val;\r\n"
+                + "}\r\n"
+                + "function classic()\r\n"
+                + "{\r\n"
+                + "trace(\"okay\");\r\n"
+                + "}\r\n");
+    }
 }
