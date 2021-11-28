@@ -2085,6 +2085,13 @@ public class Graph {
                     output.addAll(ex.getOutput());
                     for (GraphPart p : allParts) {
                         if (p.containsIP(ex.getIp())) {
+                            if (ipStart == p.start) {
+                                //can this happen? TODO: find some example in the wild
+                                currentRet.addAll(output);
+                                //to check for stopparts,etc. we need to call printGraph again
+                                part = p;
+                                return printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, parent, part, stopPart, stopPartKind, loops, throwStates, ret, staticOperation, path, recursionLevel);
+                            }
                             exHappened = true;
                             ipStart = ex.getIp();
                             part = p;
