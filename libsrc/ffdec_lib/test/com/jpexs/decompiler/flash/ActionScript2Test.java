@@ -2311,4 +2311,61 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "trace(eval(\"k\" + r));\r\n"
         );
     }
+
+    @Test
+    public void frame81_globalFuncAsVarTest() {
+        compareSrc(81, "function t(x)\r\n"
+                + "{\r\n"
+                + "trace(x);\r\n"
+                + "}\r\n"
+                + "trace(\"globalFuncAsVarTest\");\r\n"
+                + "var trace = 5;\r\n"
+                + "trace = t;\r\n"
+        );
+    }
+
+    @Test
+    public void frame82_switchAndTest() {
+        compareSrc(82, "trace(\"switchAndTest\");\r\n"
+                + "var a = 5;\r\n"
+                + "var b = 3;\r\n"
+                + "switch(true)\r\n"
+                + "{\r\n"
+                + "case a >= 0 && a <= 3:\r\n"
+                + "trace(\"a 0-3\");\r\n"
+                + "break;\r\n"
+                + "case a >= 4 && a <= 6:\r\n"
+                + "trace(\"a 4-6\");\r\n"
+                + "case a >= 7 && a <= 10:\r\n"
+                + "trace(\"a 7-10\");\r\n"
+                + "break;\r\n"
+                + "case a >= 11 && a <= 20:\r\n"
+                + "trace(\"a 11-20\");\r\n"
+                + "break;\r\n"
+                + "case a != 0 ? b < 5 : b > 5:\r\n"
+                + "trace(\"a 0, b xx\");\r\n"
+                + "}\r\n"
+        );
+    }
+
+    @Test
+    public void frame83_ifframeLoaded2Test() {
+        compareSrc(83, "trace(\"ifframeLoaded2Test\");\r\n"
+                + "trace(\"A\");\r\n"
+                + "ifFrameLoaded(9)\r\n"
+                + "{\r\n"
+                + "var d = 5;\r\n"
+                + "if(d == 4)\r\n"
+                + "{\r\n"
+                + "trace(\"B\");\r\n"
+                + "}\r\n"
+                + "else\r\n"
+                + "{\r\n"
+                + "trace(\"C\");\r\n"
+                + "}\r\n"
+                + "trace(\"D\");\r\n"
+                + "}\r\n"
+                + "trace(\"E\");\r\n"
+        );
+    }
 }
