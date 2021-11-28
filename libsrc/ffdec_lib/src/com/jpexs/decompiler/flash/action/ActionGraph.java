@@ -60,6 +60,7 @@ import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.StopPartKind;
 import com.jpexs.decompiler.graph.ThrowState;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
 import com.jpexs.decompiler.graph.model.IfItem;
@@ -546,11 +547,14 @@ public class ActionGraph extends Graph {
             boolean canUseBlock = true;
             if (item instanceof IfItem) {
                 IfItem ii = (IfItem) item;
-                if (ii.expression instanceof StrictNeqActionItem) {
+                boolean isNeq = true;
+                if ((ii.expression instanceof StrictNeqActionItem) || (ii.expression instanceof StrictEqActionItem)) {
+                    isNeq = (ii.expression instanceof StrictNeqActionItem);
+
                     List<GraphPart> switchParts = new ArrayList<>();
                     List<GraphTargetItem> switchExpressions = new ArrayList<>();
                     List<GraphPart> switchOnFalseParts = new ArrayList<>();
-                    StrictNeqActionItem sneq = (StrictNeqActionItem) ii.expression;
+                    BinaryOpItem sneq = (BinaryOpItem) ii.expression;
                     if (sneq.leftSide instanceof StoreRegisterActionItem) {
                         StoreRegisterActionItem sr = (StoreRegisterActionItem) sneq.leftSide;
                         int regId = sr.register.number;
@@ -561,10 +565,13 @@ public class ActionGraph extends Graph {
 
                         IfItem ii2 = ii;
                         while (true) {
-                            if (!ii2.onTrue.isEmpty() && (ii2.onTrue.get(0) instanceof IfItem)) {
-                                ii2 = (IfItem) ii2.onTrue.get(0);
-                                if (ii2.expression instanceof StrictNeqActionItem) {
-                                    sneq = (StrictNeqActionItem) ii2.expression;
+                            if ((isNeq && (!ii2.onTrue.isEmpty() && (ii2.onTrue.get(0) instanceof IfItem)))
+                                    || (!isNeq && (!ii2.onFalse.isEmpty() && (ii2.onFalse.get(0) instanceof IfItem)))) {
+                                ii2 = (IfItem) (isNeq ? ii2.onTrue.get(0) : ii2.onFalse.get(0));
+                                System.err.println("" + ii2.expression.getClass().getSimpleName());
+                                if ((ii2.expression instanceof StrictNeqActionItem) || (ii2.expression instanceof StrictEqActionItem)) {
+                                    isNeq = (ii2.expression instanceof StrictNeqActionItem);
+                                    sneq = ((BinaryOpItem) ii2.expression);
                                     if (sneq.leftSide instanceof DirectValueActionItem) {
                                         DirectValueActionItem dv = (DirectValueActionItem) sneq.leftSide;
                                         if (dv.value instanceof RegisterNumber) {
@@ -573,7 +580,7 @@ public class ActionGraph extends Graph {
                                                 switchParts.add(ii2.decisionPart);
                                                 switchOnFalseParts.add(ii2.onTruePart);
                                                 switchExpressions.add(sneq.rightSide);
-                                                walkNext.add(ii2.onFalse);
+                                                walkNext.add(isNeq ? ii2.onFalse : ii2.onTrue);
                                             } else {
                                                 break;
                                             }
