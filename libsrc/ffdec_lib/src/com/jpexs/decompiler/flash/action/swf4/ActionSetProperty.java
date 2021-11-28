@@ -106,6 +106,15 @@ public class ActionSetProperty extends Action {
                 }
                 stack.push(new PostIncrementActionItem(this, lineStartAction, obj));
                 return;
+            } else {
+                IncrementActionItem dec = (IncrementActionItem) value.getThroughDuplicate();
+                if (dec.object instanceof GetPropertyActionItem) {
+                    GetPropertyActionItem gp = (GetPropertyActionItem) dec.object;
+                    if (gp.target.valueEquals(target) && gp.propertyIndex == indexInt) {
+                        output.add(new PostIncrementActionItem(this, lineStartAction, gp));
+                        return;
+                    }
+                }
             }
         }
         if (value.getThroughDuplicate() instanceof DecrementActionItem) {
@@ -117,6 +126,15 @@ public class ActionSetProperty extends Action {
                 }
                 stack.push(new PostDecrementActionItem(this, lineStartAction, obj));
                 return;
+            } else {
+                DecrementActionItem dec = (DecrementActionItem) value.getThroughDuplicate();
+                if (dec.object instanceof GetPropertyActionItem) {
+                    GetPropertyActionItem gp = (GetPropertyActionItem) dec.object;
+                    if (gp.target.valueEquals(target) && gp.propertyIndex == indexInt) {
+                        output.add(new PostDecrementActionItem(this, lineStartAction, gp));
+                        return;
+                    }
+                }
             }
         }
 

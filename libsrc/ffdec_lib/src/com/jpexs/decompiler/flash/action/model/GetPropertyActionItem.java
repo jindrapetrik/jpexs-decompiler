@@ -56,16 +56,16 @@ public class GetPropertyActionItem extends ActionItem {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        /*if (isEmptyString(target)) {
+        if (isEmptyString(target)) {
             return writer.append(Action.propertyNames[propertyIndex]);
-        }*/
+        }
 
-        if (!useGetPropertyFunction && !isEmptyString(target)) {
+        /*if (!useGetPropertyFunction) {
             target.appendToNoQuotes(writer, localData);
             writer.append(":");
             writer.append(Action.propertyNames[propertyIndex]);
             return writer;
-        }
+        }*/
 
         writer.append("getProperty");
         writer.spaceBeforeCallParenthesies(2);
