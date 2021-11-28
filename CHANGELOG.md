@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - typeof precedence / parenthesis
 - AS1/2 - switch detection
 - AS1/2 - nested tellTarget
+- AS1/2 - switch with nontrivial expressions like and/or,ternar (second pass)
 
 ## [14.6.0] - 2021-11-22
 ### Added

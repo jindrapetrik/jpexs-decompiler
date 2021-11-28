@@ -34,11 +34,13 @@ import com.jpexs.decompiler.flash.action.model.clauses.ForInActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.TellTargetActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.NeqActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.StrictEqActionItem;
+import com.jpexs.decompiler.flash.action.model.operations.StrictNeqActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionEquals;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionNot;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionDefineFunction;
 import com.jpexs.decompiler.flash.action.swf5.ActionEquals2;
 import com.jpexs.decompiler.flash.action.swf6.ActionStrictEquals;
@@ -52,8 +54,8 @@ import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.decompiler.graph.GraphTargetItem;
-import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.Loop;
+import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.StopPartKind;
 import com.jpexs.decompiler.graph.ThrowState;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -68,7 +70,6 @@ import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -132,9 +133,9 @@ public class ActionGraph extends Graph {
 
     }
 
-    public static List<GraphTargetItem> translateViaGraph(boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) throws InterruptedException {
+    public static List<GraphTargetItem> translateViaGraph(SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) throws InterruptedException {
         ActionGraph g = new ActionGraph(path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version);
-        ActionLocalData localData = new ActionLocalData(insideDoInitAction, registerNames);
+        ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames);
         g.init(localData);
         return g.translate(localData, staticOperation, path);
     }
@@ -436,19 +437,37 @@ public class ActionGraph extends Graph {
             List<GraphPart> caseBodyParts = new ArrayList<>();
             caseBodyParts.add(part.nextParts.get(0));
             GraphTargetItem top = null;
-            int cnt = 1;
-            while (part.nextParts.size() > 1
-                    && part.nextParts.get(1).getHeight() > 1
-                    && code.get(part.nextParts.get(1).end >= code.size() ? code.size() - 1 : part.nextParts.get(1).end) instanceof ActionIf
-                    && ((top = translatePartGetStack(localData, part.nextParts.get(1), stack, staticOperation)) instanceof StrictEqActionItem)) {
-                cnt++;
-                part = part.nextParts.get(1);
-                caseBodyParts.add(part.nextParts.get(0));
 
-                set = (StrictEqActionItem) top;
-                caseValuesMap.add(set.rightSide);
+            ActionSecondPassData secondPassData = (ActionSecondPassData) localData.secondPassData;
+            boolean secondSwitchFound = false;
+            if (secondPassData != null) {
+                for (int si = 0; si < secondPassData.switchParts.size(); si++) {
+                    if (secondPassData.switchParts.get(si).get(0).equals(part)) {
+                        part = secondPassData.switchParts.get(si).get(secondPassData.switchParts.get(si).size() - 1);
+                        caseBodyParts.clear();
+                        caseBodyParts.addAll(secondPassData.switchOnFalseParts.get(si));
+                        caseValuesMap.clear();
+                        caseValuesMap.addAll(secondPassData.switchCaseExpressions.get(si));
+                        secondSwitchFound = true;
+                    }
+                }
             }
-            if (cnt == 1) {
+
+            int cnt = 1;
+            if (!secondSwitchFound) {
+                while (part.nextParts.size() > 1
+                        && part.nextParts.get(1).getHeight() > 1
+                        && code.get(part.nextParts.get(1).end >= code.size() ? code.size() - 1 : part.nextParts.get(1).end) instanceof ActionIf
+                        && ((top = translatePartGetStack(localData, part.nextParts.get(1), stack, staticOperation)) instanceof StrictEqActionItem)) {
+                    cnt++;
+                    part = part.nextParts.get(1);
+                    caseBodyParts.add(part.nextParts.get(0));
+
+                    set = (StrictEqActionItem) top;
+                    caseValuesMap.add(set.rightSide);
+                }
+            }
+            if (!secondSwitchFound && cnt == 1) {
                 stack.push(set);
             } else {
                 part = part.nextParts.get(1);
@@ -503,5 +522,88 @@ public class ActionGraph extends Graph {
             return checkIp(ip);
         }
         return ip;
+    }
+
+    @Override
+    public SecondPassData prepareSecondPass(List<GraphTargetItem> list) {
+        ActionSecondPassData spd = new ActionSecondPassData();
+        checkSecondPassSwitches(list, spd.switchParts, spd.switchOnFalseParts, spd.switchCaseExpressions);
+
+        if (spd.switchParts.isEmpty()) {
+            return null; //no need to second pass
+        }
+        return spd;
+    }
+
+    private void checkSecondPassSwitches(List<GraphTargetItem> list, List<List<GraphPart>> allSwitchParts, List<List<GraphPart>> allSwitchOnFalseParts, List<List<GraphTargetItem>> allSwitchExpressions) {
+        for (GraphTargetItem item : list) {
+            List<List<GraphTargetItem>> walkNext = new ArrayList<>();
+            boolean canUseBlock = true;
+            if (item instanceof IfItem) {
+                IfItem ii = (IfItem) item;
+                if (ii.expression instanceof StrictNeqActionItem) {
+                    List<GraphPart> switchParts = new ArrayList<>();
+                    List<GraphTargetItem> switchExpressions = new ArrayList<>();
+                    List<GraphPart> switchOnFalseParts = new ArrayList<>();
+                    StrictNeqActionItem sneq = (StrictNeqActionItem) ii.expression;
+                    if (sneq.leftSide instanceof StoreRegisterActionItem) {
+                        StoreRegisterActionItem sr = (StoreRegisterActionItem) sneq.leftSide;
+                        int regId = sr.register.number;
+
+                        switchParts.add(ii.decisionPart);
+                        switchExpressions.add(sneq.rightSide);
+                        switchOnFalseParts.add(ii.onTruePart);
+
+                        IfItem ii2 = ii;
+                        while (true) {
+                            if (!ii2.onTrue.isEmpty() && (ii2.onTrue.get(0) instanceof IfItem)) {
+                                ii2 = (IfItem) ii2.onTrue.get(0);
+                                if (ii2.expression instanceof StrictNeqActionItem) {
+                                    sneq = (StrictNeqActionItem) ii2.expression;
+                                    if (sneq.leftSide instanceof DirectValueActionItem) {
+                                        DirectValueActionItem dv = (DirectValueActionItem) sneq.leftSide;
+                                        if (dv.value instanceof RegisterNumber) {
+                                            RegisterNumber rn = (RegisterNumber) dv.value;
+                                            if (rn.number == regId) {
+                                                switchParts.add(ii2.decisionPart);
+                                                switchOnFalseParts.add(ii2.onTruePart);
+                                                switchExpressions.add(sneq.rightSide);
+                                                walkNext.add(ii2.onFalse);
+                                            } else {
+                                                break;
+                                            }
+                                        } else {
+                                            break;
+                                        }
+                                    } else {
+                                        break;
+                                    }
+                                } else {
+                                    break;
+                                }
+                            } else {
+                                break;
+                            }
+                        }
+
+                        if (switchParts.size() > 1) {
+                            allSwitchParts.add(switchParts);
+                            allSwitchOnFalseParts.add(switchOnFalseParts);
+                            allSwitchExpressions.add(switchExpressions);
+                            walkNext.add(ii2.onFalse);
+                            canUseBlock = false;
+                        }
+                    }
+                }
+            }
+            if ((item instanceof Block) && (canUseBlock)) {
+                for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
+                    checkSecondPassSwitches(sub, allSwitchParts, allSwitchOnFalseParts, allSwitchExpressions);
+                }
+            }
+            for (List<GraphTargetItem> next : walkNext) {
+                checkSecondPassSwitches(next, allSwitchParts, allSwitchOnFalseParts, allSwitchExpressions);
+            }
+        }
     }
 }

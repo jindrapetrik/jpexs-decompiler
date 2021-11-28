@@ -2205,7 +2205,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     private static void getVariables(boolean insideDoInitAction, List<MyEntry<DirectValueActionItem, ConstantPool>> variables, List<GraphSourceItem> functions, HashMap<DirectValueActionItem, ConstantPool> strings, HashMap<DirectValueActionItem, String> usageTypes, ActionGraphSource code, int addr, String path) throws InterruptedException {
-        ActionLocalData localData = new ActionLocalData(insideDoInitAction);
+        ActionLocalData localData = new ActionLocalData(null, insideDoInitAction);
         getVariables(null, localData, new TranslateStack(path), new ArrayList<>(), code, code.adr2pos(addr), variables, functions, strings, new ArrayList<>(), usageTypes, path);
     }
 

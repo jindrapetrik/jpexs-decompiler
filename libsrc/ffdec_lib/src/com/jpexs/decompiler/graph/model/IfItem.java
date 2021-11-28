@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
@@ -40,6 +41,10 @@ public class IfItem extends GraphTargetItem implements Block {
     public List<GraphTargetItem> onTrue;
 
     public List<GraphTargetItem> onFalse;
+
+    public GraphPart decisionPart;
+    public GraphPart onTruePart;
+    public GraphPart onFalsePart;
 
     @Override
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
