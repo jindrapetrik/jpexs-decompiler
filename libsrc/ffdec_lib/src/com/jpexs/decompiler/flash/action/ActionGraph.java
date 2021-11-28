@@ -275,6 +275,62 @@ public class ActionGraph extends Graph {
                 again = true;
             }
         } while (again);
+
+        targetStart = -1;
+        targetEnd = -1;
+        GraphTargetItem target = null;
+
+        //process empty telltargets
+        for (int t = 0; t < list.size(); t++) {
+            GraphTargetItem it = list.get(t);
+
+            if (it instanceof SetTargetActionItem) {
+                SetTargetActionItem st = (SetTargetActionItem) it;
+                if (st.target.isEmpty()) {
+                    if (targetStart > -1) {
+                        targetEnd = t;
+                    } else {
+                        targetStart = t;
+                        targetStartItem = st;
+                        target = new DirectValueActionItem(null, null, 0, st.target, new ArrayList<>());
+                    }
+                }
+            }
+            if (it instanceof SetTarget2ActionItem) {
+                SetTarget2ActionItem st = (SetTarget2ActionItem) it;
+                if ((st.target instanceof DirectValueActionItem) && st.target.getResult().equals("")) {
+                    if (targetStart > -1) {
+                        targetEnd = t;
+                    } else {
+                        targetStart = t;
+                        targetStartItem = st;
+                        target = st.target;
+                    }
+                }
+            }
+
+            if (targetStart > -1 && targetEnd > -1) {
+                List<GraphTargetItem> newlist = new ArrayList<>();
+                for (int i = 0; i < targetStart; i++) {
+                    newlist.add(list.get(i));
+                }
+                List<GraphTargetItem> tellist = new ArrayList<>();
+                for (int i = targetStart + 1; i < targetEnd; i++) {
+                    tellist.add(list.get(i));
+                }
+                newlist.add(new TellTargetActionItem(targetStartItem.getSrc(), targetStartItem.getLineStartItem(), target, tellist));
+                //TODO: maybe set nested flag
+                for (int i = targetEnd + 1; i < list.size(); i++) {
+                    newlist.add(list.get(i));
+                }
+                list.clear();
+                list.addAll(newlist);
+                targetStart = -1;
+                targetEnd = -1;
+                target = null;
+                t = 0;
+            }
+        }
         for (int t = 1/*not first*/; t < list.size(); t++) {
             GraphTargetItem it = list.get(t);
             List<GraphTargetItem> checkedBody = null;
