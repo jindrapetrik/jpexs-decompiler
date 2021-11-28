@@ -537,6 +537,13 @@ public class Graph {
 
         List<GraphTargetItem> ret = printGraph(gotos, new HashMap<>(), new HashMap<>(), new HashSet<>(), localData, stack, allParts, null, heads.get(0), null, null, loops, throwStates, staticOperation, path);
 
+        if (localData.secondPassData == null) {
+            SecondPassData secondPassData = prepareSecondPass(ret);
+            if (secondPassData != null) {
+                throw new SecondPassException(secondPassData);
+            }
+        }
+
         processIfGotos2(new ArrayList<>(), gotos, ret, ret);
         processIfGotos(gotos, ret, ret);
 
@@ -556,7 +563,6 @@ public class Graph {
             }
         }
         expandGotos(ret);
-        //processSwitches(ret);
         processIfs(ret);
         finalProcessStack(stack, ret, path);
         makeAllCommands(ret, stack);
@@ -566,6 +572,10 @@ public class Graph {
 
     protected void processSwitches(List<GraphTargetItem> list) {
         processSwitches(list, -1);
+    }
+
+    protected SecondPassData prepareSecondPass(List<GraphTargetItem> list) {
+        return null;
     }
 
     /*
@@ -2423,6 +2433,9 @@ public class Graph {
                         if (isIf) {
                             makeAllCommands(currentRet, stack);
                             IfItem b = new IfItem(null, localData.lineStartInstruction, expr.invert(null), onTrue, onFalse);
+                            b.decisionPart = part;
+                            b.onTruePart = nps.get(0);
+                            b.onFalsePart = nps.get(1);
                             currentRet.add(b);
                             if (processSubBlk(b, null)) {
                                 stack.push(new PopItem(null, localData.lineStartInstruction));

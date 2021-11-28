@@ -12,12 +12,14 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SecondPassData;
 import java.util.HashMap;
 
 /**
@@ -36,24 +38,27 @@ public class ActionLocalData extends BaseLocalData {
 
     public boolean insideDoInitAction;
 
-    public ActionLocalData(boolean insideDoInitAction) {
+    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction) {
+        this.secondPassData = secondPassData;
         regNames = new HashMap<>();
         variables = new HashMap<>();
         functions = new HashMap<>();
         this.insideDoInitAction = insideDoInitAction;
     }
 
-    public ActionLocalData(boolean insideDoInitAction, HashMap<Integer, String> regNames) {
+    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames) {
         this.regNames = regNames;
+        this.secondPassData = secondPassData;
         variables = new HashMap<>();
         functions = new HashMap<>();
         this.insideDoInitAction = insideDoInitAction;
     }
 
-    public ActionLocalData(boolean insideDoInitAction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public ActionLocalData(SecondPassData secondPassData, boolean insideDoInitAction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
         this.regNames = regNames;
         this.variables = variables;
         this.functions = functions;
         this.insideDoInitAction = insideDoInitAction;
+        this.secondPassData = secondPassData;
     }
 }
