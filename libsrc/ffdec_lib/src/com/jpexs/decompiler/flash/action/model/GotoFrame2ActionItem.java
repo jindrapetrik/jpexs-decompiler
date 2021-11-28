@@ -67,8 +67,11 @@ public class GotoFrame2ActionItem extends ActionItem {
         writer.append(prefix);
         writer.spaceBeforeCallParenthesies(1);
         writer.append("(");
+        if (sceneBiasFlag) {
+            writer.append(sceneBias + ", ");
+        }
         frame.toString(writer, localData);
-        writer.append((sceneBiasFlag ? "," + sceneBias : ""));
+
         return writer.append(")");
     }
 
