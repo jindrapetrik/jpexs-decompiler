@@ -684,6 +684,11 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                     tagInfo.addInfo("general", "dependentCharacters", Helper.joinStrings(dependent, ", "));
                 }
             }
+            
+            Set<Integer> dependent2 = swf.getDependentFrames(characterId);
+            if(dependent2 != null && dependent2.size() > 0) {
+                tagInfo.addInfo("general", "dependentFrames", Helper.joinStrings(dependent2, ", "));
+            }
         }
     }
 }

@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -29,6 +30,7 @@ import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -132,5 +134,14 @@ public class Frame implements TreeItem, Exportable {
             return true;
         }
         return false;
+    }
+
+    public void getNeededCharacters(Set<Integer> needed) {
+        for (Tag t : innerTags) {
+            if(t instanceof PlaceObjectTypeTag) {
+                needed.add(((PlaceObjectTypeTag)t).getCharacterId());
+            }
+        }
+        needed.remove(-1);
     }
 }
