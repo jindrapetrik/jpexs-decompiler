@@ -43,6 +43,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - class detection with ternars
 - AS1/2 - empty tellTarget
 - AS1/2 - deobfuscate object literal names
+- AS1/2 - spacing in with statement
 
 ## [14.6.0] - 2021-11-22
 ### Added
