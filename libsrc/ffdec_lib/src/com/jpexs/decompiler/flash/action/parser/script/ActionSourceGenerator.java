@@ -256,7 +256,14 @@ public class ActionSourceGenerator implements SourceGenerator {
     @Override
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, DoWhileItem item) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
-        List<Action> doExpr = generateToActionList(localData, item.expression);
+        List<Action> doExpr = new ArrayList<>();
+
+        List<GraphTargetItem> ex = new ArrayList<>(item.expression);
+        if (!ex.isEmpty()) {
+            GraphTargetItem lastItem = ex.remove(ex.size() - 1);
+            doExpr.addAll(generateToActionList(localData, ex));
+            doExpr.addAll(toActionList(lastItem.toSource(localData, this))); //Want result
+        }
         List<Action> doBody = generateToActionList(localData, item.commands);
 
         int doBodyLen = Action.actionsToBytes(doBody, false, SWF.DEFAULT_VERSION).length;
