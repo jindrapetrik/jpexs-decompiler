@@ -305,6 +305,9 @@ public final class SWF implements SWFContainerItem, Timelined {
     private volatile Map<Integer, Set<Integer>> dependentCharacters;
 
     @Internal
+    private volatile Map<Integer, Set<Integer>> dependentFrames;
+
+    @Internal
     private volatile List<ABCContainerTag> abcList;
 
     @Internal
@@ -488,20 +491,20 @@ public final class SWF implements SWFContainerItem, Timelined {
                     Map<Integer, Set<Integer>> dep = new HashMap<>();
                     for (Tag tag : getTags()) {
                         if (tag instanceof CharacterTag) {
-                            int characterId = ((CharacterTag) tag).getCharacterId();
-                            Set<Integer> needed = new HashSet<>();
-                            tag.getNeededCharacters(needed);
-                            for (Integer needed1 : needed) {
-                                Set<Integer> s = dep.get(needed1);
-                                if (s == null) {
-                                    s = new HashSet<>();
-                                    dep.put(needed1, s);
-                                }
-
-                                s.add(characterId);
-                            }
-                        }
+                int characterId = ((CharacterTag) tag).getCharacterId();
+                Set<Integer> needed = new HashSet<>();
+                tag.getNeededCharacters(needed);
+                for (Integer needed1 : needed) {
+                    Set<Integer> s = dep.get(needed1);
+                    if (s == null) {
+                        s = new HashSet<>();
+                        dep.put(needed1, s);
                     }
+
+                    s.add(characterId);
+                }
+            }
+        }
 
                     dependentCharacters = dep;
                 }
@@ -544,6 +547,38 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
 
         return dependents;
+    }
+    
+    public void computeDependentFrames() {
+        Map<Integer, Set<Integer>> dep = new HashMap<>();
+        for (int i = 0; i < timeline.getFrameCount(); i++) {
+            Frame frame = timeline.getFrame(i);
+            Set<Integer> needed = new HashSet<>();
+            frame.getNeededCharacters(needed);
+            for (Integer needed1 : needed) {
+                Set<Integer> s = dep.get(needed1);
+                if (s == null) {
+                    s = new HashSet<>();
+                    dep.put(needed1, s);
+                }
+
+                s.add(i);
+            }
+        }
+
+        dependentFrames = dep;
+    }
+
+    public Set<Integer> getDependentFrames(int characterId) {
+        if (dependentFrames == null) {
+            synchronized (this) {
+                if (dependentFrames == null) {
+                    computeDependentFrames();
+                }
+            }
+        }
+
+        return dependentFrames.get(characterId);
     }
 
     public CharacterTag getCharacter(int characterId) {
@@ -1446,7 +1481,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-    public void assignExportNamesToSymbols() {
+      public void assignExportNamesToSymbols() {
         HashMap<Integer, String> exportNames = new HashMap<>();
         for (Tag t : getTags()) {
             if (t instanceof ExportAssetsTag) {

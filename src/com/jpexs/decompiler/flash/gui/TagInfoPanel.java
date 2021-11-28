@@ -16,11 +16,14 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.TagInfo;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -62,11 +65,25 @@ public class TagInfoPanel extends JPanel {
             public void hyperlinkUpdate(HyperlinkEvent hyperLink) {
 
                 if (HyperlinkEvent.EventType.ACTIVATED.equals(hyperLink.getEventType())) {
-                    String url = hyperLink.getDescription();
-                    String strId = url.substring(7);
-                    Integer id = Integer.parseInt(strId);
+                    URI url;
+                    try {
+                        url = new URI(hyperLink.getDescription());
+                    } catch (Exception ex) {
+                        return;
+                    }
 
-                    mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentSwf().getCharacter(id));
+                    String scheme = url.getScheme();
+                    String strId = url.getHost();
+                    Integer id = Integer.parseInt(strId);
+                    SWF swf = mainPanel.getCurrentSwf();
+
+                    TreeItem item = null;
+                    if ("char".equals(scheme)) {
+                        item = swf.getCharacter(id);
+                    } else if ("frame".equals(scheme)) {
+                        item = swf.getTimeline().getFrame(id);
+                    }
+                    mainPanel.setTagTreeSelectedNode(item);
                 }
             }
 
@@ -92,16 +109,17 @@ public class TagInfoPanel extends JPanel {
         } else {
             result += "</tr>";
         }
-        result += "<td width='50%' style='text-align:center;'>";
-        result += mainPanel.translate("tagInfo.header.name");
-        result += "</td>";
-        result += "<td width='50%' style='text-align:center;'>";
-        result += mainPanel.translate("tagInfo.header.value");
-        result += "</td>";
+        result += String.format(
+                "<td width='50%%' style='text-align:center;'>%s</td>",
+                mainPanel.translate("tagInfo.header.name")
+        );
+        result += String.format(
+                "<td width='50%%' style='text-align:center;'>%s</td>",
+                mainPanel.translate("tagInfo.header.value")
+        );
         result += "</tr>";
 
         for (TagInfo.TagInfoItem item : items) {
-            Boolean convertToCharacterList;
 
             flipFlop = !flipFlop;
 
@@ -114,7 +132,8 @@ public class TagInfoPanel extends JPanel {
             String name = item.getName();
             String key = "tagInfo." + name;
 
-            convertToCharacterList = name.equals("dependentCharacters") || name.equals("neededCharacters");
+            boolean frameList = name.equals("dependentFrames");
+            boolean convertToLinkList = name.equals("dependentCharacters") || name.equals("neededCharacters") || frameList;
 
             try {
                 name = mainPanel.translate(key);
@@ -130,11 +149,10 @@ public class TagInfoPanel extends JPanel {
             if (value instanceof Boolean) {
                 boolean boolValue = (boolean) value;
                 value = boolValue ? AppStrings.translate("yes") : AppStrings.translate("no");
-            } else if (convertToCharacterList) {
-                String strValue = (String) value;
-                String[] strIds = strValue.split(", ");
+            } else if (convertToLinkList) {
+                String[] strIds = ((String) value).split(", ");
                 List<Integer> sortedIds = new ArrayList<>();
-                strValue = "";
+                String strValue = "";
 
                 for (String strId : strIds) {
                     sortedIds.add(Integer.parseInt(strId));
@@ -142,8 +160,11 @@ public class TagInfoPanel extends JPanel {
 
                 Collections.sort(sortedIds);
 
+                String scheme = frameList ? "frame" : "char";         
+
                 for (int id : sortedIds) {
-                    strValue += "<a href='jump://" + id + "'>" + id + "</a>, ";
+                    int displayId = frameList ? id + 1 : id;
+                    strValue += String.format("<a href='%s://%d'>%d</a>, ", scheme, id, displayId);
                 }
 
                 value = strValue.substring(0, strValue.length() - 2);
