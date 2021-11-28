@@ -213,7 +213,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
             public void mouseClicked(MouseEvent e) {
                 int gotoFrame = PlayerControls.this.display.getCurrentFrame();
                 if (gotoFrame > 0) {
-                    mainPanel.gotoFrame(gotoFrame);
+                    mainPanel.gotoFrame(gotoFrame - 1);
                 }
             }
         });
