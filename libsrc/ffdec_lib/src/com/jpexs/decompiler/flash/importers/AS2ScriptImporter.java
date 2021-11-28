@@ -82,6 +82,8 @@ public class AS2ScriptImporter {
                     logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName), ex);
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
+                } catch (Exception ex) {
+                    logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
                 }
 
                 asm.setModified();

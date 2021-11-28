@@ -1801,18 +1801,19 @@ public class ActionScript2Parser {
                 break;
             case TRUE:
                 ret = new DirectValueActionItem(null, null, 0, Boolean.TRUE, new ArrayList<>());
-
+                allowMemberOrCall = true;
                 break;
             case NULL:
                 ret = new DirectValueActionItem(null, null, 0, Null.INSTANCE, new ArrayList<>());
-
+                allowMemberOrCall = true;
                 break;
             case UNDEFINED:
                 ret = new DirectValueActionItem(null, null, 0, Undefined.INSTANCE, new ArrayList<>());
+                allowMemberOrCall = true;
                 break;
             case FALSE:
                 ret = new DirectValueActionItem(null, null, 0, Boolean.FALSE, new ArrayList<>());
-
+                allowMemberOrCall = true;
                 break;
             case CURLY_OPEN: //Object literal
                 s = lex();
@@ -1863,16 +1864,16 @@ public class ActionScript2Parser {
                 break;
             case NAN:
                 ret = new DirectValueActionItem(null, null, 0, Double.NaN, new ArrayList<>());
-
+                allowMemberOrCall = true;
                 break;
             case INFINITY:
                 ret = new DirectValueActionItem(null, null, 0, Double.POSITIVE_INFINITY, new ArrayList<>());
-
+                allowMemberOrCall = true;
                 break;
             case INTEGER:
             case DOUBLE:
                 ret = new DirectValueActionItem(null, null, 0, s.value, new ArrayList<>());
-
+                allowMemberOrCall = true;
                 break;
             case DELETE:
                 GraphTargetItem varDel = expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval);
