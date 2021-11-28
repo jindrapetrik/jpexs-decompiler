@@ -30,6 +30,8 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - switch with nontrivial expressions like and/or,ternar (second pass)
 - AS1/2 - ifFrameLoaded with nontrivial items inside
 - AS1/2 - (mb)length is expressioncommand, not a command
+- AS1/2 - get/set top level properties
+- AS1/2 - properties postincrement
 
 ## [14.6.0] - 2021-11-22
 ### Added

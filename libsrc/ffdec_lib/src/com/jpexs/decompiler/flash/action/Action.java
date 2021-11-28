@@ -158,6 +158,14 @@ public abstract class Action implements GraphSourceItem {
 
     public static final List<String> propertyNamesList = Arrays.asList(propertyNames);
 
+    public static final List<String> propertyNamesListLowerCase = new ArrayList<>();
+
+    {
+        for (String s : propertyNamesList) {
+            propertyNamesListLowerCase.add(s.toLowerCase());
+        }
+    }
+
     private static final Logger logger = Logger.getLogger(Action.class.getName());
 
     /**

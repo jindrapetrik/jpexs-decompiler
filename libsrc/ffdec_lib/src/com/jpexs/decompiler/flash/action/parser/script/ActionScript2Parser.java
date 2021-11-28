@@ -2034,13 +2034,13 @@ public class ActionScript2Parser {
                     if (var.getVariableName().equals("getProperty")
                             && args.size() == 2
                             && (args.get(1) instanceof VariableActionItem)
-                            && (Action.propertyNamesList.contains(((VariableActionItem) args.get(1)).getVariableName()))) {
-                        ret = new GetPropertyActionItem(null, null, args.get(0), Action.propertyNamesList.indexOf(((VariableActionItem) args.get(1)).getVariableName()));
+                            && (Action.propertyNamesListLowerCase.contains(((VariableActionItem) args.get(1)).getVariableName().toLowerCase()))) {
+                        ret = new GetPropertyActionItem(null, null, args.get(0), Action.propertyNamesListLowerCase.indexOf(((VariableActionItem) args.get(1)).getVariableName().toLowerCase()));
                     } else if (var.getVariableName().equals("setProperty")
                             && args.size() == 3
                             && (args.get(1) instanceof VariableActionItem)
-                            && (Action.propertyNamesList.contains(((VariableActionItem) args.get(1)).getVariableName()))) {
-                        ret = new SetPropertyActionItem(null, null, args.get(0), Action.propertyNamesList.indexOf(((VariableActionItem) args.get(1)).getVariableName()), args.get(2));
+                            && (Action.propertyNamesListLowerCase.contains(((VariableActionItem) args.get(1)).getVariableName().toLowerCase()))) {
+                        ret = new SetPropertyActionItem(null, null, args.get(0), Action.propertyNamesListLowerCase.indexOf(((VariableActionItem) args.get(1)).getVariableName().toLowerCase()), args.get(2));
                     } else {
                         ret = new CallFunctionActionItem(null, null, var, args);
                     }
@@ -2287,18 +2287,7 @@ public class ActionScript2Parser {
             GraphTargetItem stored = v.getStoreValue();
             int propIndex = -1;
             boolean hasSubVars = false;
-            if (varName.contains(":")) {
-                hasSubVars = true;
-                String lowerNameStr = varName.toLowerCase();
-                for (int p = 0; p < Action.propertyNames.length; p++) {
-                    String prop = Action.propertyNames[p];
-                    if (lowerNameStr.endsWith(":" + prop.toLowerCase())) {
-                        propIndex = p;
-                        varName = varName.substring(0, varName.lastIndexOf(":"));
-                        break;
-                    }
-                }
-            }
+            propIndex = Action.propertyNamesListLowerCase.indexOf(varName.toLowerCase());
             if (v.isDefinition()) {
                 if (hasSubVars) {
                     throw new ActionParseException("Invalid : character in variable definition", lexer.yyline());
@@ -2306,13 +2295,13 @@ public class ActionScript2Parser {
                 v.setBoxedValue(new DefineLocalActionItem(null, null, pushConst(varName), stored));
             } else if (stored != null) {
                 if (propIndex > -1) {
-                    v.setBoxedValue(new SetPropertyActionItem(null, null, pushConst(varName), propIndex, stored));
+                    v.setBoxedValue(new SetPropertyActionItem(null, null, pushConst(""), propIndex, stored));
                 } else {
                     v.setBoxedValue(new SetVariableActionItem(null, null, pushConst(varName), stored));
                 }
 
             } else if (propIndex > -1) {
-                v.setBoxedValue(new GetPropertyActionItem(null, null, pushConst(varName), propIndex));
+                v.setBoxedValue(new GetPropertyActionItem(null, null, pushConst(""), propIndex));
             } else {
                 v.setBoxedValue(new GetVariableActionItem(null, null, pushConst(varName)));
             }
