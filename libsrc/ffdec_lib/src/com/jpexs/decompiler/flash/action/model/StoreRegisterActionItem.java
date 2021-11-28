@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
@@ -96,7 +97,7 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
                 srcData.declaredType = DottedChain.ALL;
                 writer.append("var ");
             }
-            writer.append(register.translate());
+            writer.append(IdentifiersDeobfuscation.printIdentifier(false, register.translate()));
 
             if (compoundOperator != null) {
                 writer.append(" ");
