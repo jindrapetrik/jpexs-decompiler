@@ -1313,7 +1313,7 @@ public class ActionScript2Parser {
                 tryCommands.add(command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
                 s = lex();
                 boolean found = false;
-                List<List<GraphTargetItem>> catchCommands = null;
+                List<List<GraphTargetItem>> catchCommands = new ArrayList<>();
                 List<GraphTargetItem> catchExceptionNames = new ArrayList<>();
                 List<GraphTargetItem> catchExceptionTypes = new ArrayList<>();
 
@@ -1330,9 +1330,6 @@ public class ActionScript2Parser {
                         lexer.pushback(s);
                     }
                     expectedType(SymbolType.PARENT_CLOSE);
-                    if (catchCommands == null) {
-                        catchCommands = new ArrayList<>();
-                    }
                     List<GraphTargetItem> cc = new ArrayList<>();
                     cc.add(command(inFunction, inMethod, forinlevel, inTellTarget, true, variables, functions, hasEval));
                     catchCommands.add(cc);
