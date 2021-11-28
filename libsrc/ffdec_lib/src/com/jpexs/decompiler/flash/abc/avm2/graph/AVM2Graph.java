@@ -82,6 +82,7 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphException;
 import com.jpexs.decompiler.graph.GraphPart;
+import com.jpexs.decompiler.graph.GraphPartChangeException;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -239,7 +240,12 @@ public class AVM2Graph extends Graph {
             AVM2LocalData localData2 = new AVM2LocalData(localData);
             localData2.scopeStack = new ScopeStack();
 
-            List<GraphTargetItem> targetOutput = translatePart(localData2, finallyTryTargetPart, finallyTryTargetStack, 0 /*??*/, "try_target");
+            List<GraphTargetItem> targetOutput;
+            try {
+                targetOutput = translatePart(localData2, finallyTryTargetPart, finallyTryTargetStack, 0 /*??*/, "try_target");
+            } catch (GraphPartChangeException ex1) { //should not happen
+                targetOutput = new ArrayList<>();
+            }
 
             int switchedReg = -1;
             int finallyKind = FINALLY_KIND_UNKNOWN;
@@ -1043,8 +1049,12 @@ public class AVM2Graph extends Graph {
                 AVM2LocalData localData2 = new AVM2LocalData(localData);
                 localData2.scopeStack = new ScopeStack();
 
-                //We are assuming Finally target has only 1 part
-                finallyTargetItems = translatePart(localData2, finallyTryTargetPart, st2, staticOperation, path);//printGraph(foundGotos, partCodes, partCodePos, visited, localData2, st2, allParts, null, finallyTryTargetPart, finallyTargetStopPart, loops, throwStates, 0, path);
+                try {
+                    //We are assuming Finally target has only 1 part
+                    finallyTargetItems = translatePart(localData2, finallyTryTargetPart, st2, staticOperation, path);//printGraph(foundGotos, partCodes, partCodePos, visited, localData2, st2, allParts, null, finallyTryTargetPart, finallyTargetStopPart, loops, throwStates, 0, path);
+                } catch (GraphPartChangeException ex) { //should not happen
+                    finallyTargetItems = new ArrayList<>();
+                }
                 //boolean targetHasThrow = false;
                 if (!finallyTargetItems.isEmpty() && (finallyTargetItems.get(finallyTargetItems.size() - 1) instanceof ThrowAVM2Item)) {
 
@@ -1132,7 +1142,11 @@ public class AVM2Graph extends Graph {
                     finallyCommands = printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, null, finallyPart, finallyStopPart, finallyStopPartKind, loops, throwStates, staticOperation, path);
                 }
                 if (switchPart != null) {
-                    finallyCommands.addAll(translatePart(localData, switchPart, stack, staticOperation, path));
+                    try {
+                        finallyCommands.addAll(translatePart(localData, switchPart, stack, staticOperation, path));
+                    } catch (GraphPartChangeException ex) {
+                        //should not happen
+                    }
                     stack.pop(); //value switched by lookupswitch                   
                 }
             }
@@ -1421,17 +1435,21 @@ public class AVM2Graph extends Graph {
             caseBodyParts.add(part.nextParts.get(0));
             GraphTargetItem top = null;
             int cnt = 1;
-            while (part.nextParts.size() > 1
-                    && part.nextParts.get(1).getHeight() > 1
-                    && ((AVM2Instruction) code.get(part.nextParts.get(1).end >= code.size() ? code.size() - 1 : part.nextParts.get(1).end)).definition instanceof IfStrictEqIns
-                    && ((top = translatePartGetStack(localData, part.nextParts.get(1), stack, staticOperation)) instanceof StrictEqAVM2Item)) {
-                cnt++;
-                part = part.nextParts.get(1);
-                caseBodyParts.add(part.nextParts.get(0));
+            try {
+                while (part.nextParts.size() > 1
+                        && part.nextParts.get(1).getHeight() > 1
+                        && ((AVM2Instruction) code.get(part.nextParts.get(1).end >= code.size() ? code.size() - 1 : part.nextParts.get(1).end)).definition instanceof IfStrictEqIns
+                        && ((top = translatePartGetStack(localData, part.nextParts.get(1), stack, staticOperation)) instanceof StrictEqAVM2Item)) {
+                    cnt++;
+                    part = part.nextParts.get(1);
+                    caseBodyParts.add(part.nextParts.get(0));
 
-                set = (StrictEqAVM2Item) top;
-                caseValuesMapLeft.add(set.leftSide);
-                caseValuesMapRight.add(set.rightSide);
+                    set = (StrictEqAVM2Item) top;
+                    caseValuesMapLeft.add(set.leftSide);
+                    caseValuesMapRight.add(set.rightSide);
+                }
+            } catch (GraphPartChangeException gpc) {
+                //ignore
             }
             List<GraphTargetItem> caseValuesMap = caseValuesMapLeft;
 
@@ -2330,6 +2348,5 @@ public class AVM2Graph extends Graph {
         }
         Graph.makeAllCommands(commands, stack);
     }
-
 
 }
