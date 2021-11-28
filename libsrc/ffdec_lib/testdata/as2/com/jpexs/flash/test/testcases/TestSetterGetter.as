@@ -1,34 +1,39 @@
-class com.jpexs.flash.test.testcases.TestSetterGetter {
+﻿class com.jpexs.flash.test.testcases.TestSetterGetter {
 	
-	private var priv_myvar:Number;
+	private var _myvar = 1;
 	
-	private static var priv_mystatvar: Number;
+	private static var _mystvar = 2;
 	
-	private var priv_myreadonly : Number = 1;
+	private var _myvarsetonly = 3;
 	
-	private var priv_mywriteonly : Number = 2;
+	private var _myvargetonly = 4;
+	
+	
+	public static function get mystvar(){
+		return _mystvar;
+	}
+	
+	public static function set mystvar(val){
+		_mystvar = val;
+	}
 	
 	public function get myvar(){
-		return this.priv_myvar;
+		return _myvar;
 	}
 	
 	public function set myvar(val){
-		this.priv_myvar = val;
+		_myvar = val;
 	}
 	
-	public static function get mystatvar(){
-		return TestSetterGetter.priv_mystatvar;
+	public function get myvargetonly(){
+		return this._myvargetonly;
 	}
 	
-	public static function set mystatvar(val:Number){
-		TestSetterGetter.priv_mystatvar = val;
+	public function set myvarsetonly(val){		
+		this._myvarsetonly = val;
 	}
 	
-	public function get myreadonly(){
-		return this.priv_myreadonly;
-	}
-	
-	public function set mywriteonly(val:Number) {
-		this.priv_mywriteonly = val;
+	public function classic(){
+		trace("okay");
 	}
 }

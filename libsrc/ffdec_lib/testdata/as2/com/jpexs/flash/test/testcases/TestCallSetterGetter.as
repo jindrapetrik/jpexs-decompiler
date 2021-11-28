@@ -1,4 +1,4 @@
-class com.jpexs.flash.test.testcases.TestCallSetterGetter {
+﻿class com.jpexs.flash.test.testcases.TestCallSetterGetter {
 	public var myobj : com.jpexs.flash.test.testcases.TestSetterGetter;
 	
 	public function testSetterCall(){
@@ -9,10 +9,10 @@ class com.jpexs.flash.test.testcases.TestCallSetterGetter {
 	}
 	
 	public function testStatGetterCall() : Number {
-		return com.jpexs.flash.test.testcases.TestSetterGetter.mystatvar;
+		return com.jpexs.flash.test.testcases.TestSetterGetter.mystvar;
 	}
 	
 	public function testStatSetterCall(val:Number) {
-		com.jpexs.flash.test.testcases.TestSetterGetter.mystatvar = 6;
+		com.jpexs.flash.test.testcases.TestSetterGetter.mystvar = 6;
 	}
 }
