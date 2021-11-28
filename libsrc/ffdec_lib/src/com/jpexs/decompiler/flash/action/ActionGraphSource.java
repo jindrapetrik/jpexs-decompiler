@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action;
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.graph.GraphPart;
+import com.jpexs.decompiler.graph.GraphPartChangeException;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -99,7 +100,7 @@ public class ActionGraphSource extends GraphSource {
     }
 
     @Override
-    public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException {
+    public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
         Reference<GraphSourceItem> fi = new Reference<>(localData.lineStartInstruction);
 
         List<GraphTargetItem> r = Action.actionsPartToTree(localData.secondPassData, this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path);

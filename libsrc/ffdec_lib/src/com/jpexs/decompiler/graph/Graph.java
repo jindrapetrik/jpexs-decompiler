@@ -1290,13 +1290,13 @@ public class Graph {
     }
 
     //@SuppressWarnings("unchecked")
-    protected GraphTargetItem translatePartGetStack(BaseLocalData localData, GraphPart part, TranslateStack stack, int staticOperation) throws InterruptedException {
+    protected GraphTargetItem translatePartGetStack(BaseLocalData localData, GraphPart part, TranslateStack stack, int staticOperation) throws InterruptedException, GraphPartChangeException {
         stack = (TranslateStack) stack.clone();
         translatePart(localData, part, stack, staticOperation, null);
         return stack.pop();
     }
 
-    protected List<GraphTargetItem> translatePart(BaseLocalData localData, GraphPart part, TranslateStack stack, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> translatePart(BaseLocalData localData, GraphPart part, TranslateStack stack, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
         List<GraphPart> sub = part.getSubParts();
         List<GraphTargetItem> ret = new ArrayList<>();
         int end;
@@ -2075,7 +2075,24 @@ public class Graph {
         if (checkPartOutput(currentRet, foundGotos, partCodes, partCodePos, visited, code, localData, allParts, stack, parent, part, stopPart, stopPartKind, loops, throwStates, currentLoop, staticOperation, path, recursionLevel)) {
             parseNext = false;
         } else {
-            output.addAll(code.translatePart(part, localData, stack, part.start, part.end, staticOperation, path));
+            boolean exHappened = false;
+            int ipStart = part.start;
+            do {
+                exHappened = false;
+                try {
+                    output.addAll(code.translatePart(part, localData, stack, ipStart, part.end, staticOperation, path));
+                } catch (GraphPartChangeException ex) { //Special case for ifFrameLoaded when it's over multiple parts
+                    output.addAll(ex.getOutput());
+                    for (GraphPart p : allParts) {
+                        if (p.containsIP(ex.getIp())) {
+                            exHappened = true;
+                            ipStart = ex.getIp();
+                            part = p;
+                            break;
+                        }
+                    }
+                }
+            } while (exHappened);
             if ((part.end >= code.size() - 1) && getNextParts(localData, part).isEmpty()) {
                 output.add(new ScriptEndItem());
             }

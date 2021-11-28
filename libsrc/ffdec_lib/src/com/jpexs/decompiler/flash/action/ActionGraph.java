@@ -50,6 +50,7 @@ import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
 import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
+import com.jpexs.decompiler.graph.GraphPartChangeException;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
@@ -455,6 +456,7 @@ public class ActionGraph extends Graph {
 
             int cnt = 1;
             if (!secondSwitchFound) {
+                try {
                 while (part.nextParts.size() > 1
                         && part.nextParts.get(1).getHeight() > 1
                         && code.get(part.nextParts.get(1).end >= code.size() ? code.size() - 1 : part.nextParts.get(1).end) instanceof ActionIf
@@ -465,6 +467,9 @@ public class ActionGraph extends Graph {
 
                     set = (StrictEqActionItem) top;
                     caseValuesMap.add(set.rightSide);
+                    }
+                } catch (GraphPartChangeException gce) {
+                    //ignore
                 }
             }
             if (!secondSwitchFound && cnt == 1) {
