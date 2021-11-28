@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
@@ -126,7 +127,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         }
 
         if (value instanceof RegisterNumber) {
-            return ((RegisterNumber) value).translate();
+            return IdentifiersDeobfuscation.printIdentifier(false, ((RegisterNumber) value).translate());
         }
 
         return value.toString();
@@ -152,7 +153,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
         }
 
         if (value instanceof RegisterNumber) {
-            return writer.append(((RegisterNumber) value).translate());
+            return writer.append(IdentifiersDeobfuscation.printIdentifier(false, ((RegisterNumber) value).translate()));
         }
 
         return writer.append(value.toString());
@@ -191,7 +192,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
             srcData.localName = ((RegisterNumber) value).translate();
             srcData.regIndex = ((RegisterNumber) value).number;
 
-            return writer.appendWithData(((RegisterNumber) value).translate(), srcData);
+            return writer.appendWithData(IdentifiersDeobfuscation.printIdentifier(false, ((RegisterNumber) value).translate()), srcData);
         }
         return writer.append(EcmaScript.toString(value));
     }
