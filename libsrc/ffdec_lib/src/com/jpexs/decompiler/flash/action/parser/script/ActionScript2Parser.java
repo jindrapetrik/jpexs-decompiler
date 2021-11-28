@@ -734,16 +734,6 @@ public class ActionScript2Parser {
                 ret = new FSCommandActionItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));
                 expectedType(SymbolType.PARENT_CLOSE);
                 break;
-            case LENGTH:
-                expectedType(SymbolType.PARENT_OPEN);
-                ret = new StringLengthActionItem(null, null, (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval)));
-                expectedType(SymbolType.PARENT_CLOSE);
-                break;
-            case MBLENGTH:
-                expectedType(SymbolType.PARENT_OPEN);
-                ret = new MBStringLengthActionItem(null, null, (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval)));
-                expectedType(SymbolType.PARENT_CLOSE);
-                break;
             case SET:
                 expectedType(SymbolType.PARENT_OPEN);
                 GraphTargetItem name1 = (expression(inFunction, inMethod, inTellTarget, true, variables, functions, false, hasEval));

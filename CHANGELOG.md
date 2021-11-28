@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - nested tellTarget
 - AS1/2 - switch with nontrivial expressions like and/or,ternar (second pass)
 - AS1/2 - ifFrameLoaded with nontrivial items inside
+- AS1/2 - (mb)length is expressioncommand, not a command
 
 ## [14.6.0] - 2021-11-22
 ### Added
