@@ -1120,7 +1120,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         tagTree.clearSelection();
         for (TreeItem n : nodes) {
             if (n instanceof ClassesListTreeModel) {
-                String filterText = filterField.getText();                
+                String filterText = filterField.getText();
                 ((ClassesListTreeModel) n).setFilter(filterText);
                 TagTreeModel tm = tagTree.getModel();
                 TreePath path = tm.getTreePath(n);
@@ -3718,6 +3718,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             TagInfo tagInfo = new TagInfo();
             tag.getTagInfo(tagInfo);
             if (!tagInfo.isEmpty()) {
+                tagInfoPanel.setTagInfos(tagInfo);
+                showDetail(DETAILCARDTAGINFO);
+            } else {
+                showDetail(DETAILCARDEMPTYPANEL);
+            }
+        } else if (treeItem instanceof Frame) {
+            Frame frame = (Frame) treeItem;
+            Set<Integer> needed = new LinkedHashSet<>();
+
+            frame.getNeededCharacters(needed);
+
+            if (!needed.isEmpty()) {
+                TagInfo tagInfo = new TagInfo();
+                tagInfo.addInfo("general", "neededCharacters", Helper.joinStrings(needed, ", "));
                 tagInfoPanel.setTagInfos(tagInfo);
                 showDetail(DETAILCARDTAGINFO);
             } else {
