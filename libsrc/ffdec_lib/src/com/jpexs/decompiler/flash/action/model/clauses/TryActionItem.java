@@ -185,7 +185,7 @@ public class TryActionItem extends ActionItem implements Block {
         int catchSize = 0;
         int catchRegister = 0;
         boolean catchInRegisterFlag = false;
-        if (catchCommands != null && !catchCommands.isEmpty()) {
+        if (!catchCommands.isEmpty()) {
 
             List<GraphSourceItem> fullCatchBody = new ArrayList<>();
 
@@ -266,7 +266,7 @@ public class TryActionItem extends ActionItem implements Block {
             finallySize = Action.actionsToBytes(finallyCommandsA, false, SWF.DEFAULT_VERSION).length;
         }
         int trySize = Action.actionsToBytes(tryCommandsA, false, SWF.DEFAULT_VERSION).length;
-        ret.add(new ActionTry(catchInRegisterFlag, finallyCommands != null, catchCommands != null, catchName, catchRegister, trySize, catchSize, finallySize, SWF.DEFAULT_VERSION));
+        ret.add(new ActionTry(catchInRegisterFlag, finallyCommands != null, !catchCommands.isEmpty(), catchName, catchRegister, trySize, catchSize, finallySize, SWF.DEFAULT_VERSION));
         ret.addAll(tryCommandsA);
         if (catchCommandsA != null) {
             ret.addAll(catchCommandsA);
