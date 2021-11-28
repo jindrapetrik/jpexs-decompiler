@@ -69,13 +69,10 @@ public class CallFunctionActionItem extends ActionItem {
 
         if (functionName instanceof DirectValueActionItem) {
             if (!IdentifiersDeobfuscation.isValidName(false, (functionName).toStringNoQuotes(localData))) {
-                writer.append("eval(");
                 functionName.toString(writer, localData);
-                writer.append(")");
             } else {
                 functionName.toStringNoQuotes(writer, localData);
             }
-            //writer.append(IdentifiersDeobfuscation.printIdentifier(false, (functionName).toStringNoQuotes(localData)));
         } else {
             functionName.appendTry(writer, localData);
         }
