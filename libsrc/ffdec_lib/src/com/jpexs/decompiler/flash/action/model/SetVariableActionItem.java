@@ -80,13 +80,29 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
         this.name = name;
     }
 
+    private boolean resultNeeded() {
+        boolean needsTempRegister = false;
+        if (value instanceof StoreRegisterActionItem) {
+            StoreRegisterActionItem sr = (StoreRegisterActionItem) value;
+            if (sr.temporary) {
+                needsTempRegister = true;
+            }
+        }
+        return needsTempRegister;
+    }
+
+    private boolean isValidName(LocalData localData) {
+        return ((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString())
+                && (IdentifiersDeobfuscation.isValidName(false, ((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"));
+    }
+
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if (((name instanceof DirectValueActionItem)) && (((DirectValueActionItem) name).isString())
-                && (IdentifiersDeobfuscation.isValidName(false, ((DirectValueActionItem) name).toStringNoQuotes(localData), "this", "super"))) {
+        if (isValidName(localData) || resultNeeded()) {
+            //TODO: handle result needed better, without identifierdeobfuscation
             HighlightData srcData = getSrcData();
             srcData.localName = name.toStringNoQuotes(localData);
-            stripQuotes(name, localData, writer);
+            writer.append(IdentifiersDeobfuscation.printIdentifier(false, name.toStringNoQuotes(localData)));
             if (compoundOperator != null) {
                 writer.append(" ");
                 writer.append(compoundOperator);
