@@ -1853,14 +1853,6 @@ public class ActionScript2Parser {
                 ret = new DirectValueActionItem(null, null, 0, "\n", new ArrayList<>());
                 allowMemberOrCall = true;
                 break;
-            case NAN:
-                ret = new DirectValueActionItem(null, null, 0, Double.NaN, new ArrayList<>());
-                allowMemberOrCall = true;
-                break;
-            case INFINITY:
-                ret = new DirectValueActionItem(null, null, 0, Double.POSITIVE_INFINITY, new ArrayList<>());
-                allowMemberOrCall = true;
-                break;
             case INTEGER:
             case DOUBLE:
                 ret = new DirectValueActionItem(null, null, 0, s.value, new ArrayList<>());

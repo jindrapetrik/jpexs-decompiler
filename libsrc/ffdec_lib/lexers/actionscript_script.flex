@@ -251,10 +251,6 @@ Preprocessor = \u00A7\u00A7 {Identifier}
   [uU][nN][dD][eE][fF][iI][nN][eE][dD]                                            { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.UNDEFINED, yytext()); }
   /* newline */ 
   [nN][eE][wW][lL][iI][nN][eE]                                                    { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.NEWLINE, yytext()); }
-  /* Infinity */ 
-  [iI][nN][fF][iI][nN][iI][tT][yY]                                                { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.INFINITY, yytext()); }
-  /* NaN */ 
-  [nN][aA][nN]                                                                    { return new ParsedSymbol(SymbolGroup.GLOBALCONST, SymbolType.NAN, yytext()); }
   /* getVersion */ 
   [gG][eE][tT][vV][eE][rR][sS][iI][oO][nN]                                        { return new ParsedSymbol(SymbolGroup.GLOBALFUNC, SymbolType.GETVERSION, yytext()); }
   /* call */ 

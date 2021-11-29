@@ -50,6 +50,7 @@ All notable changes to this project will be documented in this file.
 - Playercontrols frame display incorrect frame
 - AS1/2 - empty parenthesis nullpointer
 - AS1/2 - delete on nonmember
+- AS1/2 - Infinity, NaN can be used as identifiers, are normal variables
 
 ## [14.6.0] - 2021-11-22
 ### Added
