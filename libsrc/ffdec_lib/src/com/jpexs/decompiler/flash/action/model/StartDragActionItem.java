@@ -26,7 +26,9 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.decompiler.graph.model.TrueItem;
 import java.util.List;
 import java.util.Objects;
 
@@ -64,7 +66,7 @@ public class StartDragActionItem extends ActionItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         boolean hasConstrains = true;
-        if (constrain instanceof DirectValueActionItem) {
+        if ((constrain instanceof DirectValueActionItem) || (constrain instanceof TrueItem) || (constrain instanceof FalseItem)) {
             if (Double.compare(constrain.getResultAsNumber(), 0) == 0) {
                 hasConstrains = false;
             }

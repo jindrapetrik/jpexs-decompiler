@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.action.swf4;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
@@ -26,6 +27,8 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.model.FalseItem;
+import com.jpexs.decompiler.graph.model.TrueItem;
 import java.util.HashMap;
 import java.util.List;
 
@@ -61,7 +64,7 @@ public class ActionStartDrag extends Action {
         GraphTargetItem constrain = stack.pop();
 
         boolean hasConstrains = true;
-        if (constrain instanceof DirectValueActionItem) {
+        if ((constrain instanceof DirectValueActionItem) || (constrain instanceof TrueItem) || (constrain instanceof FalseItem)) {
             if (Double.compare(constrain.getResultAsNumber(), 0) == 0) {
                 hasConstrains = false;
             }
