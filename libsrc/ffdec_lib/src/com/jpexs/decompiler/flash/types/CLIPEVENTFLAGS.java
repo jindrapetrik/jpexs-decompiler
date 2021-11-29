@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
@@ -204,7 +205,7 @@ public class CLIPEVENTFLAGS implements Serializable {
             if (asFileName) {
                 onList.add("keyPress " + Helper.makeFileName(CLIPACTIONRECORD.keyToString(key).replace("<", "").replace(">", "")) + "");
             } else {
-                onList.add("keyPress \"" + CLIPACTIONRECORD.keyToString(key) + "\"");
+                onList.add("keyPress \"" + Helper.escapeActionScriptString(CLIPACTIONRECORD.keyToString(key)) + "\"");
             }
         }
         if (clipEventDragOut) {

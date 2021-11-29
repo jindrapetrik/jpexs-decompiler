@@ -56,6 +56,7 @@ All notable changes to this project will be documented in this file.
 - AS2 - obfuscated extends, implements
 - AS1/2 - chained assignments with obfuscated/slash variables
 - AS - direct editation - long integer values
+- AS1/2 - on keypress key escaping
 
 ## [14.6.0] - 2021-11-22
 ### Added

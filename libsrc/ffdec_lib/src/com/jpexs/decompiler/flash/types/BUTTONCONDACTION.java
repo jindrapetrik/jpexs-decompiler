@@ -306,7 +306,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
             if (asFilename) {
                 events.add("keyPress " + Helper.makeFileName(CLIPACTIONRECORD.keyToString(condKeyPress).replace("<", "").replace(">", "")) + "");
             } else {
-                events.add("keyPress \"" + CLIPACTIONRECORD.keyToString(condKeyPress) + "\"");
+                events.add("keyPress \"" + Helper.escapeActionScriptString(CLIPACTIONRECORD.keyToString(condKeyPress)) + "\"");
             }
         }
         String onStr = "";
