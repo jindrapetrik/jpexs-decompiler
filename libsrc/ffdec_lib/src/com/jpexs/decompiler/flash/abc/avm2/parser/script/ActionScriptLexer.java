@@ -1403,7 +1403,12 @@ public final class ActionScriptLexer {
           }
         case 192: break;
         case 13: 
-          { return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Long.parseLong((yytext())));
+          { try{
+                                        return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Long.parseLong(yytext())); 
+                                    } catch(NumberFormatException nfe){
+                                        //its too long for a Long var
+                                        return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(yytext())); 
+                                    }
           }
         case 193: break;
         case 14: 
@@ -1597,7 +1602,7 @@ public final class ActionScriptLexer {
           }
         case 232: break;
         case 53: 
-          { return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble((yytext())));
+          { return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(yytext()));
           }
         case 233: break;
         case 54: 
