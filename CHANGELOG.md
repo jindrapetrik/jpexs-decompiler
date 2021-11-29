@@ -26,7 +26,7 @@ All notable changes to this project will be documented in this file.
 - AS2 - some minor cases in class detection
 - AS2 - class detection - ignore standalone directvalues
 - AS1/2 - obfuscated name in forin cannot use eval
-- Ternar visit (can cause invalid reg declarations)
+- AS1/2 - Ternar visit (can cause invalid reg declarations)
 - AS1/2 - typeof precedence / parenthesis
 - AS1/2 - switch detection
 - AS1/2 - nested tellTarget
