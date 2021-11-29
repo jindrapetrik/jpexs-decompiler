@@ -137,6 +137,22 @@ public class ClassActionItem extends ActionItem implements Block {
         }
     }
 
+    private void makePrintObfuscated(GraphTargetItem item) {
+        if (item == null) {
+            return;
+        }
+        GraphTargetItem it = item;
+        while (it instanceof GetMemberActionItem) {
+            GetMemberActionItem m = (GetMemberActionItem) it;
+            m.printObfuscatedMemberName = true;
+            it = m.object;
+        }
+        if (it instanceof GetVariableActionItem) {
+            GetVariableActionItem gv = (GetVariableActionItem) it;
+            gv.printObfuscatedName = true;
+        }
+    }
+
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         GraphTargetItem clsName = className;
@@ -147,6 +163,12 @@ public class ClassActionItem extends ActionItem implements Block {
         if (clsName instanceof GetVariableActionItem) {
             ((GetVariableActionItem) clsName).printObfuscatedName = true;
         }
+
+        makePrintObfuscated(extendsOp);
+        for (GraphTargetItem im : implementsOp) {
+            makePrintObfuscated(im);
+        }
+
         writer.startClass(className.toStringNoQuotes(localData));
         writer.append("class ");
         className.toStringNoQuotes(writer, localData);
