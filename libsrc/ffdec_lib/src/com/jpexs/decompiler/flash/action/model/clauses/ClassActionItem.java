@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model.clauses;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
@@ -197,7 +198,7 @@ public class ClassActionItem extends ActionItem implements Block {
                     item.getValue().toString(writer, localData).newLine();
                 } else {
                     writer.append("var ");
-                    item.getKey().toStringNoQuotes(writer, localData);
+                    writer.append(IdentifiersDeobfuscation.printIdentifier(false, item.getKey().toStringNoQuotes(localData)));
                     writer.append(" = ");
                     item.getValue().toString(writer, localData);
                     writer.append(";").newLine();
