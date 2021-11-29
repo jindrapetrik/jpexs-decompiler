@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Frame dependencies
+
 ### Fixed
 - AS1/2 - switch with getvariable decompilation
 - AS1/2 - call action parameters as string
