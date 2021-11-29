@@ -49,6 +49,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - spacing in with statement
 - Playercontrols frame display incorrect frame
 - AS1/2 - empty parenthesis nullpointer
+- AS1/2 - delete on nonmember
 
 ## [14.6.0] - 2021-11-22
 ### Added
