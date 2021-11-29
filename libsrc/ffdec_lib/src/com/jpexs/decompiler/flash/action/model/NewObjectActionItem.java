@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.action.model;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf5.ActionNewObject;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -54,7 +55,7 @@ public class NewObjectActionItem extends ActionItem {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("new ");
-        stripQuotes(objectName, localData, writer);
+        writer.append(IdentifiersDeobfuscation.printIdentifier(false, objectName.toStringNoQuotes(localData)));
         writer.spaceBeforeCallParenthesies(arguments.size());
         writer.append("(");
         for (int t = 0; t < arguments.size(); t++) {
