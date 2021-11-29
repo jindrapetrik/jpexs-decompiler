@@ -1891,9 +1891,12 @@ public class ActionScript2Parser {
 
                 break;
             case PARENT_OPEN:
-                ret = new ParenthesisItem(null, null, expression(inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval));
+                GraphTargetItem pexpr = expression(inFunction, inMethod, inTellTarget, true, variables, functions, true, hasEval);
+                if (pexpr == null) {
+                    throw new ActionParseException("Expression expected", lexer.yyline());
+                }
+                ret = new ParenthesisItem(null, null, pexpr);
                 expectedType(SymbolType.PARENT_CLOSE);
-                //ret = memberOrCall(ret, inFunction, inMethod, variables, functions);
                 allowMemberOrCall = true;
                 break;
             case NEW:
