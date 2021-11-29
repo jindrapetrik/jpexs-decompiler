@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Frame dependencies
 
+### Changed
+- AS1/2 direct editation no longer marked as experimental
+
 ### Fixed
 - AS1/2 - switch with getvariable decompilation
 - AS1/2 - call action parameters as string

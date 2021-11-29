@@ -124,8 +124,6 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
     public JButton cancelButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
 
-    public JLabel experimentalLabel = new JLabel(AppStrings.translate("action.edit.experimental"));
-
     public JButton editDecompiledButton = new JButton(AppStrings.translate("button.edit.script.decompiled"), View.getIcon("edit16"));
 
     public JButton saveDecompiledButton = new JButton(AppStrings.translate("button.save"), View.getIcon("save16"));
@@ -751,7 +749,6 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
         JPanel decButtonsPan = new JPanel(new FlowLayout());
         decButtonsPan.add(editDecompiledButton);
-        decButtonsPan.add(experimentalLabel);
         decButtonsPan.add(saveDecompiledButton);
         decButtonsPan.add(cancelDecompiledButton);
 
@@ -965,7 +962,6 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         saveDecompiledButton.setVisible(val);
         saveDecompiledButton.setEnabled(false);
         editDecompiledButton.setVisible(!val);
-        experimentalLabel.setVisible(!val);
         cancelDecompiledButton.setVisible(val);
 
         decompiledEditor.getCaret().setVisible(true);
@@ -1073,9 +1069,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
     }
 
     private void editDecompiledButtonActionPerformed(ActionEvent evt) {
-        if (ViewMessages.showConfirmDialog(this, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS12Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
-            setDecompiledEditMode(true);
-        }
+        setDecompiledEditMode(true);
     }
 
     private void cancelDecompiledButtonActionPerformed(ActionEvent evt) {
