@@ -59,6 +59,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - on keypress key escaping
 - AS1/2 - stop/play/etc. can be used in expressions, pushing undefined
 - AS1/2 - startDrag constaint
+- AS1/2 - gotoAndStop/play with simple label compiled as gotolabel
 
 ## [14.6.0] - 2021-11-22
 ### Added
