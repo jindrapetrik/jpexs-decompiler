@@ -1872,7 +1872,10 @@ public class ActionScript2Parser {
                     GetMemberActionItem gm = (GetMemberActionItem) varDel;
                     ret = new DeleteActionItem(null, null, gm.object, gm.memberName);
                 } else {
-                    throw new ActionParseException("Not a property", lexer.yyline());
+                    if (varDel instanceof VariableActionItem) {
+                        varDel = pushConst(((VariableActionItem) varDel).getVariableName());
+                    }
+                    ret = new DeleteActionItem(null, null, null, varDel);
                 }
                 break;
             case INCREMENT:
