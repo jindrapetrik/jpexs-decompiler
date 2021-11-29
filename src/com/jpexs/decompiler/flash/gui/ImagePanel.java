@@ -2207,6 +2207,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 first = false;
                 CharacterTag c = swf.getCharacter(ds.characterId);
                 ret.append(c.toString());
+                if(ds.depth > 0) {
+                    ret.append(" Depth: ");
+                    ret.append(ds.depth);
+                }
             }
 
             if (first) {

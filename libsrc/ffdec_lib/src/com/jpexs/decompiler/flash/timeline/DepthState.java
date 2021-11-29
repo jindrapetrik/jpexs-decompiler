@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author JPEXS
  */
 public class DepthState {
+    public int depth = -1;
 
     public int characterId = -1;
 
@@ -113,6 +114,7 @@ public class DepthState {
         time = obj.time;
         placeObjectTag = obj.placeObjectTag;
         minPlaceObjectNum = obj.minPlaceObjectNum;
+        depth = obj.depth;
         if (sameInstance) {
             time++;
             instanceId = obj.instanceId;
