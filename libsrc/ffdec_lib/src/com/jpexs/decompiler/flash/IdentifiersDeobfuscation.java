@@ -96,9 +96,7 @@ public class IdentifiersDeobfuscation {
         "throw",
         "true", //can be in variable definition 
         "try",
-        "typeof", "undefined", "var", "void", "while", "with",
-        //global constants, can be in variable definition :
-        "NaN", "newline", "Infinity"
+        "typeof", "undefined", "var", "void", "while", "with"
     };
 
     // http://www.adobe.com/devnet/actionscript/learning/as3-fundamentals/syntax.html
