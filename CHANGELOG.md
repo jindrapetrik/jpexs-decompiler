@@ -48,13 +48,14 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - deobfuscate object literal names
 - AS1/2 - spacing in with statement
 - Playercontrols frame display incorrect frame
-- AS1/2 - empty parenthesis nullpointer
+- AS1/2 - direct editation - empty parenthesis nullpointer
 - AS1/2 - delete on nonmember
-- AS1/2 - Infinity, NaN can be used as identifiers, are normal variables
+- AS1/2 - direct editation - Infinity, NaN can be used as identifiers, are normal variables
 - AS2 - obfuscated class attribute names
 - AS1/2 - newobject deobfuscated name
 - AS2 - obfuscated extends, implements
 - AS1/2 - chained assignments with obfuscated/slash variables
+- AS - direct editation - long integer values
 
 ## [14.6.0] - 2021-11-22
 ### Added
