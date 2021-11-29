@@ -165,4 +165,12 @@ public class ActionScript2CompilerTest extends ActionScript2TestBase {
                 + "DefineLocal\n"
                 + "}");
     }
+
+    @Test
+    public void stopUndefined() {
+        testCompilation("trace(stop());", "ConstantPool\n"
+                + "Stop\n"
+                + "Push undefined undefined\n"
+                + "Trace");
+    }
 }

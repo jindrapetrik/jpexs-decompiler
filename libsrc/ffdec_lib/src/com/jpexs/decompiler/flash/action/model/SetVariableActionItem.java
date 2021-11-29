@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionSetVariable;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
 import com.jpexs.decompiler.flash.action.swf5.ActionStoreRegister;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -49,6 +50,8 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
     public GraphTargetItem compoundValue;
 
     public String compoundOperator;
+
+    public boolean forceUseSet = false;
 
     @Override
     public GraphPart getFirstPart() {
@@ -153,6 +156,10 @@ public class SetVariableActionItem extends ActionItem implements SetTypeActionIt
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
+
+        if (forceUseSet) {
+            return toSourceMerge(localData, generator, name, value, new ActionSetVariable(), new ActionPush(Undefined.INSTANCE));
+        }
         int tmpReg = asGenerator.getTempRegister(localData);
         try {
             return toSourceMerge(localData, generator, name, value, new ActionStoreRegister(tmpReg), new ActionSetVariable(), new ActionPush(new RegisterNumber(tmpReg)));

@@ -17,7 +17,9 @@
 package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ActionStartDrag;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -100,6 +102,15 @@ public class StartDragActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSource(localData, generator, true);
+    }
+
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSource(localData, generator, false);
+    }
+
+    private List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
         boolean hasConstrains = true;
         if (constrain instanceof DirectValueActionItem) {
             if (Double.compare(constrain.getResultAsNumber(), 0) == 0) {
@@ -107,9 +118,9 @@ public class StartDragActionItem extends ActionItem {
             }
         }
         if (hasConstrains) {
-            return toSourceMerge(localData, generator, x1, y1, x2, y2, constrain, lockCenter, target, new ActionStartDrag());
+            return toSourceMerge(localData, generator, x1, y1, x2, y2, constrain, lockCenter, target, new ActionStartDrag(), needsReturn ? new ActionPush(new Object[]{Undefined.INSTANCE, Undefined.INSTANCE}) : null);
         } else {
-            return toSourceMerge(localData, generator, constrain, lockCenter, target, new ActionStartDrag());
+            return toSourceMerge(localData, generator, constrain, lockCenter, target, new ActionStartDrag(), needsReturn ? new ActionPush(new Object[]{Undefined.INSTANCE, Undefined.INSTANCE}) : null);
         }
     }
 

@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.model.operations.AddActionItem;
 import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -65,8 +67,17 @@ public class PrintActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSource(localData, generator, true);
+    }
+
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSource(localData, generator, false);
+    }
+
+    private List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
-        return toSourceMerge(localData, generator, new AddActionItem(getSrc(), getLineStartItem(), asGenerator.pushConstTargetItem("print:#"), boundingBox, true), target, new ActionGetURL2(0, false, false));
+        return toSourceMerge(localData, generator, new AddActionItem(getSrc(), getLineStartItem(), asGenerator.pushConstTargetItem("print:#"), boundingBox, true), target, new ActionGetURL2(0, false, false), needsReturn ? new ActionPush(new Object[]{Undefined.INSTANCE, Undefined.INSTANCE}) : null);
     }
 
     @Override

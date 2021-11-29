@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf3.ActionGetURL;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -61,11 +62,20 @@ public class UnLoadMovieNumActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSource(localData, generator, true);
+    }
+
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSource(localData, generator, false);
+    }
+
+    private List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         if ((num instanceof DirectValueActionItem) && (((DirectValueActionItem) num).value instanceof Long)) {
-            return toSourceMerge(localData, generator, new ActionGetURL("", "_level" + ((DirectValueActionItem) num).value));
+            return toSourceMerge(localData, generator, new ActionGetURL("", "_level" + ((DirectValueActionItem) num).value), needsReturn ? new ActionPush(new Object[]{Undefined.INSTANCE, Undefined.INSTANCE}) : null);
         } else {
-            return toSourceMerge(localData, generator, new ActionPush(""), new AddActionItem(getSrc(), getLineStartItem(), asGenerator.pushConstTargetItem("_level"), num, true), new ActionGetURL2(0, false, true));
+            return toSourceMerge(localData, generator, new ActionPush(""), new AddActionItem(getSrc(), getLineStartItem(), asGenerator.pushConstTargetItem("_level"), num, true), new ActionGetURL2(0, false, true), needsReturn ? new ActionPush(new Object[]{Undefined.INSTANCE, Undefined.INSTANCE}) : null);
         }
 
     }

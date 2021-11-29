@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.action.model;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf4.ActionGetURL2;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -58,7 +59,16 @@ public class UnLoadMovieActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSourceMerge(localData, generator, new ActionPush(""), targetString, new ActionGetURL2(0, false, true));
+        return toSource(localData, generator, true);
+    }
+
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSource(localData, generator, false);
+    }
+
+    private List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
+        return toSourceMerge(localData, generator, new ActionPush(""), targetString, new ActionGetURL2(0, false, true), needsReturn ? new ActionPush(new Object[]{Undefined.INSTANCE, Undefined.INSTANCE}) : null);
     }
 
     @Override

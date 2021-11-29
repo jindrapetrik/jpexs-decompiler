@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.swf3.ActionGotoFrame;
 import com.jpexs.decompiler.flash.action.swf3.ActionPlay;
 import com.jpexs.decompiler.flash.action.swf4.ActionGotoFrame2;
+import com.jpexs.decompiler.flash.action.swf4.ActionPush;
+import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -84,10 +86,19 @@ public class GotoFrame2ActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSource(localData, generator, true);
+    }
+
+    @Override
+    public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        return toSource(localData, generator, false);
+    }
+
+    private List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
         if (!sceneBiasFlag && (frame instanceof DirectValueActionItem) && (((DirectValueActionItem) frame).value instanceof Long)) {
-            return toSourceMerge(localData, generator, new ActionGotoFrame((int) ((long) (Long) ((DirectValueActionItem) frame).value) - 1), playFlag ? new ActionPlay() : null);
+            return toSourceMerge(localData, generator, new ActionGotoFrame((int) ((long) (Long) ((DirectValueActionItem) frame).value) - 1), playFlag ? new ActionPlay() : null, needsReturn ? new ActionPush(new Object[]{Undefined.INSTANCE, Undefined.INSTANCE}) : null);
         } else {
-            return toSourceMerge(localData, generator, frame, new ActionGotoFrame2(playFlag, sceneBiasFlag, sceneBias));
+            return toSourceMerge(localData, generator, frame, new ActionGotoFrame2(playFlag, sceneBiasFlag, sceneBias), needsReturn ? new ActionPush(new Object[]{Undefined.INSTANCE, Undefined.INSTANCE}) : null);
         }
     }
 
