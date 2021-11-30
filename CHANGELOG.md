@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Display object depth in flash panel
+
 ### Fixed
 - [#1761] AS3 - try..finally inside another structure like if
 
