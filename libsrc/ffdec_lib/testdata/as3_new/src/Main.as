@@ -58,6 +58,7 @@ package
 		TestHello;
 		TestIf;
 		TestIfElse;
+		TestIfFinally;
 		TestIfInIf;
 		TestIfTry;
 		TestIgnoreAndOr;

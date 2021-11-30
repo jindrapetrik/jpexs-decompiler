@@ -23,6 +23,7 @@ public class ActionScript3OptinalParametersTest extends ActionScript3DecompileTe
     public void init() throws IOException, InterruptedException {
         addSwf("standard", "testdata/as3_new/bin/as3_new.flex.swf");
     }
+
     @Test
     public void testOptionalParameters() {
         String methodName = "testOptionalParameters";

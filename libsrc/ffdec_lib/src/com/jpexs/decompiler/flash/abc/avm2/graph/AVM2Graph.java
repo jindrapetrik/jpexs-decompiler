@@ -462,15 +462,17 @@ public class AVM2Graph extends Graph {
                     }
                 }
 
-                //return in finally block is joined after switch decision
-                for (GraphPart p : switchPart.nextParts) {
+                //This caused problems, so it's commented out
+                //the tests still pass, so I can only wonder why it's there. :-(
+                //return in finally block is joined after switch decision                
+                /*for (GraphPart p : switchPart.nextParts) {
                     for (GraphPart r : p.refs) {
                         if (r != switchPart) {
                             localData.finallyJumps.put(r, p);
                             localData.finallyJumpsToFinallyIndex.put(r, e);
                         }
                     }
-                }
+                }*/
 
                 localData.ignoredSwitches.put(e, switchPart);
             } else {

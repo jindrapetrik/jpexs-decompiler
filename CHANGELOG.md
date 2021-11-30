@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- [#1761] AS3 - try..finally inside another structure like if
+
 ## [15.0.0] - 2021-11-29
 ### Added
 - Frame dependencies
@@ -2194,6 +2198,10 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version15.0.0...dev
+[15.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.6.0...version15.0.0
+[14.6.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.5.2...version14.6.0
+[14.5.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.5.1...version14.5.2
 [14.5.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.5.0...version14.5.1
 [14.5.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.4.0...version14.5.0
 [14.4.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.3.1...version14.4.0
@@ -2309,6 +2317,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1761]: https://www.free-decompiler.com/flash/issues/1761
 [#1750]: https://www.free-decompiler.com/flash/issues/1750
 [#1485]: https://www.free-decompiler.com/flash/issues/1485
 [#1681]: https://www.free-decompiler.com/flash/issues/1681
