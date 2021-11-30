@@ -865,6 +865,27 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testIfFinally() {
+        decompileMethod("classic", "testIfFinally", "var a:int = Math.random();\r\n"
+                + "if(a == 5)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try body\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch\");\r\n"
+                + "}\r\n"
+                + "finally\r\n"
+                + "{\r\n"
+                + "trace(\"in finally\");\r\n"
+                + "}\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
     public void testIfInIf() {
         decompileMethod("classic", "testIfInIf", "var k:int = 5;\r\n"
                 + "if(k > 5 && k < 20)\r\n"
