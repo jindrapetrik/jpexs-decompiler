@@ -1916,8 +1916,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     declarations.add(d);
                 }
             }
+            boolean addRet = false;
             if (body != null) {
                 body.addAll(0, declarations);
+                if (body.isEmpty() || (!((body.get(body.size() - 1) instanceof ReturnValueAVM2Item)
+                        || (body.get(body.size() - 1) instanceof ReturnVoidAVM2Item)))) {
+                    addRet = true;
+                }
             }
 
             localData.exceptions = new ArrayList<>();
@@ -2002,15 +2007,14 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 mbodyCode.add(0, new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
                 mbodyCode.add(1, new AVM2Instruction(0, AVM2Instructions.PushScope, null));
             }
-            boolean addRet = false;
-            if (!mbodyCode.isEmpty()) {
+            /*if (!mbodyCode.isEmpty()) {
                 InstructionDefinition lastDef = mbodyCode.get(mbodyCode.size() - 1).definition;
                 if (!((lastDef instanceof ReturnVoidIns) || (lastDef instanceof ReturnValueIns))) {
                     addRet = true;
                 }
             } else {
                 addRet = true;
-            }
+            }*/
             if (addRet) {
                 if (retType.toString().equals("*") || retType.toString().equals("void") || constructor) {
                     mbodyCode.add(new AVM2Instruction(0, AVM2Instructions.ReturnVoid, null));

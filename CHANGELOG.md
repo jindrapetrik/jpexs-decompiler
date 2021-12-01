@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#1761] AS3 - try..finally inside another structure like if
 - [#1762] AS call on integer numbers parenthesis
+- [#1762] AS3 - Auto adding returnvoid/return undefined
 
 ## [15.0.0] - 2021-11-29
 ### Added
