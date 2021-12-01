@@ -1215,6 +1215,13 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testNumberCall() {
+        decompileMethod("classic_air", "testNumberCall", "var a:String = (5).toString();\r\n"
+                + "var b:String = 5.2.toString();\r\n",
+                false);
+    }
+
+    @Test
     public void testParamNames() {
         decompileMethod("classic_air", "testParamNames", "return firstp + secondp + thirdp;\r\n",
                 false);

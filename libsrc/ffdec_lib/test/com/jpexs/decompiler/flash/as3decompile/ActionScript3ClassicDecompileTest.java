@@ -1205,6 +1205,13 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testNumberCall() {
+        decompileMethod("classic", "testNumberCall", "var a:String = (5).toString();\r\n"
+                + "var b:String = 5.2.toString();\r\n",
+                false);
+    }
+
+    @Test
     public void testParamNames() {
         decompileMethod("classic", "testParamNames", "return firstp + secondp + thirdp;\r\n",
                 false);

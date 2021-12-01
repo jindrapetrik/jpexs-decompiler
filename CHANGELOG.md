@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - [#1761] AS3 - try..finally inside another structure like if
+- [#1762] AS call on integer numbers parenthesis
 
 ## [15.0.0] - 2021-11-29
 ### Added
@@ -2321,6 +2322,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1761]: https://www.free-decompiler.com/flash/issues/1761
+[#1762]: https://www.free-decompiler.com/flash/issues/1762
 [#1750]: https://www.free-decompiler.com/flash/issues/1750
 [#1485]: https://www.free-decompiler.com/flash/issues/1485
 [#1681]: https://www.free-decompiler.com/flash/issues/1681
