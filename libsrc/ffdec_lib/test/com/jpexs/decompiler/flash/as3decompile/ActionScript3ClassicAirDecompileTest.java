@@ -1375,6 +1375,25 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testSwitchIf() {
+        decompileMethod("classic_air", "testSwitchIf", "var code:String = \"4\";\r\n"
+                + "var a:Boolean = true;\r\n"
+                + "switch(int(code) - 2)\r\n"
+                + "{\r\n"
+                + "case 0:\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "break;\r\n"
+                + "case 1:\r\n"
+                + "}\r\n"
+                + "trace(\"B\");\r\n",
+                false);
+    }
+
+    @Test
     public void testTernarOperator() {
         decompileMethod("classic_air", "testTernarOperator", "var a:int = 5;\r\n"
                 + "var b:int = 4;\r\n"

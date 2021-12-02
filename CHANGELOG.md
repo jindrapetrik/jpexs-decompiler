@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - [#1761] AS3 - try..finally inside another structure like if
 - [#1762] AS call on integer numbers parenthesis
 - [#1762] AS3 - Auto adding returnvoid/return undefined
+- [#1762] AS - switch detection (mostcommon pathpart)
 
 ## [15.0.0] - 2021-11-29
 ### Added

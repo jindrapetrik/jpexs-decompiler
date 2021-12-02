@@ -91,6 +91,7 @@ package
 		TestSwitch;
 		TestSwitchComma;
 		TestSwitchDefault;
+		TestSwitchIf;
 		TestTernarOperator;
 		TestTry;
 		TestTryIf;

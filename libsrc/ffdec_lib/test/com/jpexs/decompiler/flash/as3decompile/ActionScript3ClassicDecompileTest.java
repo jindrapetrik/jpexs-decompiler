@@ -1365,6 +1365,24 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testSwitchIf() {
+        decompileMethod("classic", "testSwitchIf", "var code:String = \"4\";\r\n"
+                + "var a:Boolean = true;\r\n"
+                + "switch(int(code) - 2)\r\n"
+                + "{\r\n"
+                + "case 0:\r\n"
+                + "case 1:\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"B\");\r\n",
+                false);
+    }
+
+    @Test
     public void testTernarOperator() {
         decompileMethod("classic", "testTernarOperator", "var a:* = 5;\r\n"
                 + "var b:* = 4;\r\n"
