@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - [#1762] AS3 - Auto adding returnvoid/return undefined
 - [#1762] AS - switch detection (mostcommon pathpart)
 - [#1763] AS3 - initialization of activation object in some cases
+- AS3 - direct editation - arguments object on method with activation
 
 ## [15.0.0] - 2021-11-29
 ### Added

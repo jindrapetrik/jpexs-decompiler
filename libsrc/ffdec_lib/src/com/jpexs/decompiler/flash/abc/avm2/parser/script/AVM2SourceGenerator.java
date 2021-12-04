@@ -1689,8 +1689,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 NameAVM2Item n = (NameAVM2Item) an;
                 if (n.getVariableName().equals("arguments") & !n.isDefinition()) {
                     registerNames.add("arguments");
-                    registerTypes.add(new TypeItem("Object"));
+                    registerTypes.add(new TypeItem("Array"));
                     registerLines.add(0); //?
+                    slotNames.add(n.getVariableName());
+                    slotTypes.add(new TypeItem("Array"));
                     hasArguments = true;
                     break;
                 }

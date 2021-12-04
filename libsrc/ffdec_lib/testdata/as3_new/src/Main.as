@@ -15,6 +15,7 @@ package
 	 */
 	public class Main extends Sprite
 	{
+		TestActivationArguments;
 		TestArguments;
 		TestCatchFinally;
 		TestChain2;
