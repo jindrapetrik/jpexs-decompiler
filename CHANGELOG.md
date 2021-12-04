@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - [#1762] AS call on integer numbers parenthesis
 - [#1762] AS3 - Auto adding returnvoid/return undefined
 - [#1762] AS - switch detection (mostcommon pathpart)
+- [#1763] AS3 - initialization of activation object in some cases
 
 ## [15.0.0] - 2021-11-29
 ### Added
@@ -2325,6 +2326,7 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1761]: https://www.free-decompiler.com/flash/issues/1761
 [#1762]: https://www.free-decompiler.com/flash/issues/1762
+[#1763]: https://www.free-decompiler.com/flash/issues/1763
 [#1750]: https://www.free-decompiler.com/flash/issues/1750
 [#1485]: https://www.free-decompiler.com/flash/issues/1485
 [#1681]: https://www.free-decompiler.com/flash/issues/1681

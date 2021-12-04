@@ -1039,7 +1039,6 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
         decompileMethod("classic_air", "testInlineFunctions", "var first:String = \"value1\";\r\n"
                 + "var traceParameter:Function = function(aParam:String):String\r\n"
                 + "{\r\n"
-                + "aParam = aParam;\r\n"
                 + "var second:String = \"value2\";\r\n"
                 + "second = second + \"cc\";\r\n"
                 + "var traceParam2:Function = function(bParam:String):String\r\n"
@@ -1057,8 +1056,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testInnerFunctionScope() {
-        decompileMethod("classic_air", "testInnerFunctionScope", "a = a;\r\n"
-                + "var innerFunc:Function = function(b:String):*\r\n"
+        decompileMethod("classic_air", "testInnerFunctionScope", "var innerFunc:Function = function(b:String):*\r\n"
                 + "{\r\n"
                 + "testProm = 4;\r\n"
                 + "trace(testProm);\r\n"
@@ -1069,8 +1067,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testInnerFunctions() {
-        decompileMethod("classic_air", "testInnerFunctions", "a = a;\r\n"
-                + "var s:int = 0;\r\n"
+        decompileMethod("classic_air", "testInnerFunctions", "var s:int = 0;\r\n"
                 + "var innerFunc:Function = function(b:String):*\r\n"
                 + "{\r\n"
                 + "trace(b);\r\n"
