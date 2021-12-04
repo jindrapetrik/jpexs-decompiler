@@ -18,7 +18,7 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
 
     @Test
     public void testActivationProps() {
-        decompileMethod("assembled", "testActivationProps", "\r\n",
+        decompileMethod("assembled", "testActivationProps", "var myvar2:int = 10;\r\n",
                 false);
     }
 

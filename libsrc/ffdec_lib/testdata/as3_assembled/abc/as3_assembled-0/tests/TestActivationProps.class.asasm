@@ -41,6 +41,10 @@ class
         slotid 1
         type QName(PackageNamespace(""),"int")
      end ; trait
+     trait slot QName(PackageInternalNs("testing"),"myvar2")
+        slotid 2
+        type QName(PackageNamespace(""),"int")
+     end ; trait     
      code
       debug 1, "myvar", 0, 0
       getlocal0
@@ -52,6 +56,9 @@ class
       findpropstrict QName(PackageInternalNs("testing"),"myvar")
       getlocal1
       setproperty QName(PackageInternalNs("testing"),"myvar")
+      findpropstrict QName(PackageInternalNs("testing"),"myvar2")
+      pushbyte 10
+      setproperty QName(PackageInternalNs("testing"),"myvar2")      
       returnvoid
      end ; code
     end ; body

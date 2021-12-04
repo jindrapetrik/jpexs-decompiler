@@ -250,6 +250,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXAttrIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.xml.EscXElemIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
@@ -1861,7 +1862,7 @@ public class AVM2Code implements Cloneable {
         return assignment;
     }
 
-    private void injectDeclarations(List<GraphTargetItem> items, int minreg, DeclarationAVM2Item[] declaredRegisters, List<Slot> declaredSlots, List<DeclarationAVM2Item> declaredSlotsDec, ABC abc, MethodBody body) {
+    private void injectDeclarations(List<GraphTargetItem> items, int minreg, DeclarationAVM2Item[] declaredRegisters, List<Slot> declaredSlots, List<DeclarationAVM2Item> declaredSlotsDec, List<String> declaredProperties, List<DeclarationAVM2Item> declaredPropsDec, ABC abc, MethodBody body) {
         for (int i = 0; i < items.size(); i++) {
             GraphTargetItem currentItem = items.get(i);
             List<GraphTargetItem> itemsOnLine = new ArrayList<>();
@@ -1905,6 +1906,38 @@ public class AVM2Code implements Cloneable {
                         }
                     }
                 }
+                if (subItem instanceof SetPropertyAVM2Item) {
+                    SetPropertyAVM2Item sp = (SetPropertyAVM2Item) subItem;
+                    if (sp.object instanceof FindPropertyAVM2Item) {
+                        if (sp.propertyName instanceof FullMultinameAVM2Item) {
+                            FullMultinameAVM2Item propName = (FullMultinameAVM2Item) sp.propertyName;
+                            if (!declaredProperties.contains(propName.resolvedMultinameName)) {
+                                for (int t = 0; t < body.traits.traits.size(); t++) {
+                                    if (body.traits.traits.get(t).getName(abc).getName(abc.constants, new ArrayList<DottedChain>(), true, false)
+                                            .equals(propName.resolvedMultinameName)) {
+                                        if (body.traits.traits.get(t) instanceof TraitSlotConst) {
+                                            GraphTargetItem type = PropertyAVM2Item.multinameToType(((TraitSlotConst) body.traits.traits.get(t)).type_index, abc.constants);
+                                            DeclarationAVM2Item d = new DeclarationAVM2Item(subItem, type);
+                                            sp.setDeclaration(d);
+                                            declaredPropsDec.add(d);
+                                            declaredProperties.add(propName.resolvedMultinameName);
+                                            if (subItem == currentItem) {
+                                                items.set(i, d);
+                                            } else {
+                                                d.showValue = false;
+                                                items.add(i, d);
+                                                i++;
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                int idx = declaredProperties.indexOf(propName.resolvedMultinameName);
+                                sp.setDeclaration(declaredPropsDec.get(idx));
+                            }
+                        }
+                    }
+                }
                 if (subItem instanceof SetSlotAVM2Item) {
                     SetSlotAVM2Item ssti = (SetSlotAVM2Item) subItem;
                     if (ssti.scope instanceof NewActivationAVM2Item) {
@@ -1942,7 +1975,7 @@ public class AVM2Code implements Cloneable {
             if (currentItem instanceof Block) {
                 Block blk = (Block) currentItem;
                 for (List<GraphTargetItem> sub : blk.getSubs()) {
-                    injectDeclarations(sub, minreg, declaredRegisters, declaredSlots, declaredSlotsDec, abc, body);
+                    injectDeclarations(sub, minreg, declaredRegisters, declaredSlots, declaredSlotsDec, declaredProperties, declaredPropsDec, abc, body);
                 }
             }
         }
@@ -2088,7 +2121,7 @@ public class AVM2Code implements Cloneable {
         //
 
         //int minreg = abc.method_info.get(body.method_info).getMaxReservedReg() + 1;
-        injectDeclarations(list, 1, d, new ArrayList<>(), new ArrayList<>(), abc, body);
+        injectDeclarations(list, 1, d, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), abc, body);
 
         int lastPos = list.size() - 1;
         if (lastPos < 0) {
