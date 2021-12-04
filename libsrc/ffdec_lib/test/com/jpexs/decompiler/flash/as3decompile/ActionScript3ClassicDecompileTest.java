@@ -17,6 +17,19 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testActivationArguments() {
+        decompileMethod("classic", "testActivationArguments", "var func:Function = function(a:int, b:int):int\r\n"
+                + "{\r\n"
+                + "return a + b;\r\n"
+                + "};\r\n"
+                + "if(arguments.length > 0)\r\n"
+                + "{\r\n"
+                + "trace(arguments[0]);\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
     public void testArguments() {
         decompileMethod("classic", "testArguments", "return arguments[0];\r\n",
                 false);
@@ -1201,6 +1214,13 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "var b:* = ns::[name];\r\n"
                 + "trace(b.c);\r\n"
                 + "var c:* = myInternal::neco;\r\n",
+                false);
+    }
+
+    @Test
+    public void testNegate() {
+        decompileMethod("classic", "testNegate", "var a:int = 5;\r\n"
+                + "var b:int = ~a;\r\n",
                 false);
     }
 

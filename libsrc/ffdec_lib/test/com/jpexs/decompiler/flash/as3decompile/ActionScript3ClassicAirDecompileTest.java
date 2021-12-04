@@ -17,6 +17,19 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testActivationArguments() {
+        decompileMethod("classic_air", "testActivationArguments", "var func:Function = function(a:int, b:int):int\r\n"
+                + "{\r\n"
+                + "return a + b;\r\n"
+                + "};\r\n"
+                + "if(arguments.length > 0)\r\n"
+                + "{\r\n"
+                + "trace(arguments[0]);\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
     public void testArguments() {
         decompileMethod("classic_air", "testArguments", "return arguments[0];\r\n",
                 false);
@@ -1208,6 +1221,13 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var b:* = ns::[name];\r\n"
                 + "trace(b.c);\r\n"
                 + "var c:* = myInternal::neco;\r\n",
+                false);
+    }
+
+    @Test
+    public void testNegate() {
+        decompileMethod("classic_air", "testNegate", "var a:int = 5;\r\n"
+                + "var b:int = ~a;\r\n",
                 false);
     }
 

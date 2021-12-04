@@ -77,6 +77,7 @@ package
 		TestMultipleCondition;
 		TestNamedAnonFunctions;
 		TestNames;
+		TestNegate;
 		TestNumberCall;
 		TestOptionalParameters;
 		TestParamNames;

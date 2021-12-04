@@ -58,6 +58,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.clauses.TryAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.AddAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.AsTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.BitAndAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.operations.BitNotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.BitOrAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.BitXorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.DeletePropertyAVM2Item;
@@ -2252,7 +2253,7 @@ public class ActionScript3Parser {
                 break;
             case NEGATE:
                 ret = expressionPrimary(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, false, variables);
-                ret = new NegAVM2Item(null, null, ret);
+                ret = new BitNotAVM2Item(null, null, ret);
 
                 break;
             case MINUS:
