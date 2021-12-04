@@ -36,6 +36,13 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testCallLocal() {
+        decompileMethod("classic", "testCallLocal", "var f:Function = this.getF();\r\n"
+                + "var b:int = f(1,3);\r\n",
+                false);
+    }
+
+    @Test
     public void testCatchFinally() {
         decompileMethod("classic", "testCatchFinally", "var a:* = 5;\r\n"
                 + "try\r\n"

@@ -36,6 +36,13 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testCallLocal() {
+        decompileMethod("classic_air", "testCallLocal", "var f:Function = getF();\r\n"
+                + "var b:int = f(1,3);\r\n",
+                false);
+    }
+
+    @Test
     public void testCatchFinally() {
         decompileMethod("classic_air", "testCatchFinally", "var a:int = 5;\r\n"
                 + "try\r\n"

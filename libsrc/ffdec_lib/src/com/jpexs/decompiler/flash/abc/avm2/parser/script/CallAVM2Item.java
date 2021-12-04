@@ -78,34 +78,33 @@ public class CallAVM2Item extends AVM2Item {
         }
         if (callable instanceof NameAVM2Item) {
             NameAVM2Item n = (NameAVM2Item) callable;
-            /*List<ABC> allAbcs = new ArrayList<>();
-             allAbcs.add(g.abc);
-             allAbcs.addAll(g.allABCs);*/
-            String cname = localData.currentClass;
-            DottedChain pkgName = localData.pkg;
-            GraphTargetItem obj = null;
-            Reference<String> outName = new Reference<>("");
-            Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);
-            Reference<DottedChain> outPropNs = new Reference<>(DottedChain.EMPTY);
-            Reference<Integer> outPropNsKind = new Reference<>(1);
-            Reference<Integer> outPropNsIndex = new Reference<>(0);
-            Reference<GraphTargetItem> outPropType = new Reference<>(null);
-            Reference<ValueKind> outPropValue = new Reference<>(null);
-            Reference<ABC> outPropValueABC = new Reference<>(null);
-            List<Integer> otherNs = new ArrayList<>();
-            for (NamespaceItem on : openedNamespaces) {
-                if (on.isResolved()) {
-                    otherNs.add(on.getCpoolIndex(g.abcIndex));
+            if (!localData.registerVars.containsKey(n.getVariableName())) {
+                String cname = localData.currentClass;
+                DottedChain pkgName = localData.pkg;
+                GraphTargetItem obj = null;
+                Reference<String> outName = new Reference<>("");
+                Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);
+                Reference<DottedChain> outPropNs = new Reference<>(DottedChain.EMPTY);
+                Reference<Integer> outPropNsKind = new Reference<>(1);
+                Reference<Integer> outPropNsIndex = new Reference<>(0);
+                Reference<GraphTargetItem> outPropType = new Reference<>(null);
+                Reference<ValueKind> outPropValue = new Reference<>(null);
+                Reference<ABC> outPropValueABC = new Reference<>(null);
+                List<Integer> otherNs = new ArrayList<>();
+                for (NamespaceItem on : openedNamespaces) {
+                    if (on.isResolved()) {
+                        otherNs.add(on.getCpoolIndex(g.abcIndex));
+                    }
                 }
+                if (cname != null && AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, true, g.abcIndex, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueABC)) {
+                    NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), n.line, "this", null, false, n.openedNamespaces, abcIndex);
+                    nobj.setRegNumber(0);
+                    obj = nobj;
+                }
+                PropertyAVM2Item p = new PropertyAVM2Item(obj, n.getVariableName(), g.abcIndex, n.openedNamespaces, new ArrayList<>());
+                p.setAssignedValue(n.getAssignedValue());
+                callable = p;
             }
-            if (cname != null && AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, true, g.abcIndex, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueABC)) {
-                NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), n.line, "this", null, false, n.openedNamespaces, abcIndex);
-                nobj.setRegNumber(0);
-                obj = nobj;
-            }
-            PropertyAVM2Item p = new PropertyAVM2Item(obj, n.getVariableName(), g.abcIndex, n.openedNamespaces, new ArrayList<>());
-            p.setAssignedValue(n.getAssignedValue());
-            callable = p;
         }
 
         int propIndex = -1;
