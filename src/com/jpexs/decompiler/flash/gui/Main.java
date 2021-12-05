@@ -196,6 +196,8 @@ public class Main {
 
     public static SearchResultsStorage searchResultsStorage = new SearchResultsStorage();
 
+    public static CancellableWorker importWorker = null;
+
     //This method makes file watcher to shut up during our own file saving
     public static void startSaving(File savedFile) {
         savedFiles.add(savedFile);
@@ -1045,6 +1047,9 @@ public class Main {
                     }
                     if (event.equals("rename")) {
                         startWork(AppStrings.translate("work.renaming") + "..." + (String) data, null);
+                    }
+                    if (event.equals("importing_as")) {
+                        startWork(AppStrings.translate("work.importing_as") + "..." + (String) data, importWorker);
                     }
                 }
             });

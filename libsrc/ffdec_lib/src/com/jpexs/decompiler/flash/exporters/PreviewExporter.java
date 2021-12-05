@@ -179,6 +179,8 @@ public class PreviewExporter {
             Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ActionParseException ex) {
             Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
         }
         overVideoButton.actions.add(bca);
 
@@ -204,6 +206,8 @@ public class PreviewExporter {
         } catch (CompilationException ex) {
             Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ActionParseException ex) {
+            Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
             Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
         }
         progressBarButton.actions.add(bca);
@@ -237,6 +241,8 @@ public class PreviewExporter {
         } catch (CompilationException ex) {
             Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ActionParseException ex) {
+            Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
             Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
         }
 

@@ -1949,7 +1949,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-    protected void informListeners(String event, Object data) {
+    public void informListeners(String event, Object data) {
         for (EventListener listener : listeners) {
             listener.handleEvent(event, data);
         }
