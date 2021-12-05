@@ -1011,7 +1011,8 @@ public class ActionScript3Parser {
                         List<String> names = new ArrayList<>();
                         List<String> namespaces = new ArrayList<>();
                         //FIXME for Private classes in script (?)
-                        AVM2SourceGenerator.parentNamesAddNames(abcIndex, AVM2SourceGenerator.resolveType(new SourceGeneratorLocalData(new HashMap<>(), 0, false, 0), ((TypeItem) ((UnresolvedAVM2Item) extendsTypeStr).resolve(pkgName.addWithSuffix(subNameStr).toRawString(), null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), new ArrayList<>())), abcIndex), indices, names, namespaces);
+                        AVM2SourceGenerator.parentNamesAddNames(abcIndex, AVM2SourceGenerator.resolveType(new SourceGeneratorLocalData(new HashMap<>(), 0, false, 0), ((TypeItem) ((UnresolvedAVM2Item) extendsTypeStr)
+                                .resolve(null, pkgName.addWithSuffix(subNameStr).toRawString(), null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), new ArrayList<>())), abcIndex), indices, names, namespaces);
                         for (int i = 0; i < names.size(); i++) {
                             if (namespaces.get(i) == null || namespaces.get(i).isEmpty()) {
                                 continue;
@@ -1750,7 +1751,7 @@ public class ActionScript3Parser {
                                 UnresolvedAVM2Item ui = (UnresolvedAVM2Item) a;
                                 if (ui.getVariableName().equals(DottedChain.parseWithSuffix(e.getVariableName()))) {
                                     try {
-                                        ui.resolve(null, null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), variables);
+                                        ui.resolve(null, null, null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), variables);
                                     } catch (CompilationException ex) {
                                         // ignore
                                     }
@@ -1773,7 +1774,7 @@ public class ActionScript3Parser {
                             for (NameAVM2Item e : catchExceptions) {
                                 if (ui.getVariableName().equals(DottedChain.parseWithSuffix(e.getVariableName()))) {
                                     try {
-                                        ui.resolve(null, null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), variables);
+                                        ui.resolve(null, null, null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), variables);
                                     } catch (CompilationException ex) {
                                         // ignore
                                     }

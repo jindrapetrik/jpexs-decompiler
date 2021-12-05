@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - direct editation - arguments object on method with activation
 - AS3 - direct editation - bit not
 - AS3 - direct editation - call on local register
+- AS3 - direct editation - resolve properties and local regs before types
 
 ## [15.0.0] - 2021-11-29
 ### Added
