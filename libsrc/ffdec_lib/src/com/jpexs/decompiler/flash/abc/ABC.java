@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
+import com.jpexs.decompiler.flash.DeobfuscationListener;
 import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
@@ -232,14 +233,24 @@ public class ABC {
     }
 
     public int removeTraps() throws InterruptedException {
+        return removeTraps(null);
+    }
+    public int removeTraps(DeobfuscationListener listener) throws InterruptedException {
         int rem = 0;
         for (int s = 0; s < script_info.size(); s++) {
             rem += script_info.get(s).removeTraps(s, this, "");
+            if (listener != null) {
+                listener.itemDeobfuscated();
+            }
         }
         return rem;
     }
 
     public int removeDeadCode() throws InterruptedException {
+        return removeDeadCode(null);
+    }
+
+    public int removeDeadCode(DeobfuscationListener listener) throws InterruptedException {
         int rem = 0;
         for (MethodBody body : bodies) {
             rem += body.removeDeadCode(constants, null/*FIXME*/, method_info.get(body.method_info));

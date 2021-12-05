@@ -2804,11 +2804,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 @Override
                 protected void onStart() {
+                    Main.deobfuscatePCodeWorker = this;
                     Main.startWork(translate("work.deobfuscating") + "...", this);
                 }
 
                 @Override
                 protected void done() {
+                    Main.deobfuscatePCodeWorker = null;
                     View.execInEventDispatch(() -> {
                         Main.stopWork();
                         ViewMessages.showMessageDialog(MainPanel.this, translate("work.deobfuscating.complete"));

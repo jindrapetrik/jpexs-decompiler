@@ -168,6 +168,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ImmediateFuture;
 import com.jpexs.helpers.NulStream;
 import com.jpexs.helpers.ProgressListener;
+import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.AlphaComposite;
@@ -3353,13 +3354,24 @@ public final class SWF implements SWFContainerItem, Timelined {
     public void deobfuscate(DeobfuscationLevel level) throws InterruptedException {
         List<ABCContainerTag> atags = getAbcList();
 
+        int apos = 0;
         for (ABCContainerTag tag : atags) {
+            apos++;
+            final int fpos = apos;
+            Reference<Integer> numDeoScripts = new Reference<>(0);
+            DeobfuscationListener deoListener = new DeobfuscationListener() {
+                @Override
+                public void itemDeobfuscated() {
+                    numDeoScripts.setVal(numDeoScripts.getVal() + 1);
+                    informListeners("deobfuscate_pcode", "abc " + fpos + "/" + atags.size() + " script " + numDeoScripts.getVal() + "/" + tag.getABC().script_info.size());
+                }
+            };
             if (level == DeobfuscationLevel.LEVEL_REMOVE_DEAD_CODE) {
-                tag.getABC().removeDeadCode();
+                tag.getABC().removeDeadCode(deoListener);
             } else if (level == DeobfuscationLevel.LEVEL_REMOVE_TRAPS) {
-                tag.getABC().removeTraps();
+                tag.getABC().removeTraps(deoListener);
             } else if (level == DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW) {
-                tag.getABC().removeTraps();
+                tag.getABC().removeTraps(deoListener);
             }
 
             ((Tag) tag).setModified(true);

@@ -197,6 +197,7 @@ public class Main {
     public static SearchResultsStorage searchResultsStorage = new SearchResultsStorage();
 
     public static CancellableWorker importWorker = null;
+    public static CancellableWorker deobfuscatePCodeWorker = null;
 
     //This method makes file watcher to shut up during our own file saving
     public static void startSaving(File savedFile) {
@@ -1044,6 +1045,9 @@ public class Main {
                     }
                     if (event.equals("deobfuscate")) {
                         startWork(AppStrings.translate("work.deobfuscating") + "..." + (String) data, null);
+                    }
+                    if (event.equals("deobfuscate_pcode")) {
+                        startWork(AppStrings.translate("work.deobfuscating_pcode") + "..." + (String) data, deobfuscatePCodeWorker);
                     }
                     if (event.equals("rename")) {
                         startWork(AppStrings.translate("work.renaming") + "..." + (String) data, null);
