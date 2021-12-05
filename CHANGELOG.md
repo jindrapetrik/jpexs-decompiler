@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - Display object depth in flash panel
 - Show imported files on script import, able to cancel import
 - [#270] AS3 show progress on deofuscating p-code
+- [#1718] Show progress on injecting debug info / SWD generation (before Debugging)
 
 ### Fixed
 - [#1761] AS3 - try..finally inside another structure like if
@@ -2332,6 +2333,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#270]: https://www.free-decompiler.com/flash/issues/270
+[#1718]: https://www.free-decompiler.com/flash/issues/1718
 [#1761]: https://www.free-decompiler.com/flash/issues/1761
 [#1762]: https://www.free-decompiler.com/flash/issues/1762
 [#1763]: https://www.free-decompiler.com/flash/issues/1763

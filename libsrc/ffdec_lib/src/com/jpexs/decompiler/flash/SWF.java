@@ -3386,14 +3386,14 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @param decompileDir Directory to virtual decompile (will affect
      * debugfile)
      */
-    public void enableDebugging(boolean injectAS3Code, File decompileDir) {
+    public void enableDebugging(boolean injectAS3Code, File decompileDir) throws InterruptedException {
         enableDebugging(injectAS3Code, decompileDir, false);
     }
 
     /**
      * Enables debugging. Adds tags to enable debugging.
      */
-    public void enableDebugging() {
+    public void enableDebugging() throws InterruptedException {
         enableDebugging(false, null, false);
     }
 
@@ -3406,7 +3406,7 @@ public final class SWF implements SWFContainerItem, Timelined {
      * debugfile)
      * @param telemetry Enable telemetry info?
      */
-    public void enableDebugging(boolean injectAS3Code, File decompileDir, boolean telemetry) {
+    public void enableDebugging(boolean injectAS3Code, File decompileDir, boolean telemetry) throws InterruptedException {
         enableDebugging(injectAS3Code, decompileDir, telemetry, false);
     }
 
@@ -3414,9 +3414,15 @@ public final class SWF implements SWFContainerItem, Timelined {
      * Injects debugline and debugfile instructions to AS3 P-code (lines of
      * P-code)
      */
-    public void injectAS3PcodeDebugInfo() {
+    public void injectAS3PcodeDebugInfo() throws InterruptedException {
         List<ScriptPack> packs = getAS3Packs();
+        int i = 0;
         for (ScriptPack s : packs) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
+            }
+            i++;
+            informListeners("inject_debuginfo", "" + i + "/" + packs.size() + ": " + s.getPath());
             int abcIndex = s.allABCs.indexOf(s.abc);
             if (s.isSimple) {
                 s.injectPCodeDebugInfo(abcIndex);
@@ -3429,9 +3435,15 @@ public final class SWF implements SWFContainerItem, Timelined {
      *
      * @param decompileDir Directory to set file information paths
      */
-    public void injectAS3DebugInfo(File decompileDir) {
+    public void injectAS3DebugInfo(File decompileDir) throws InterruptedException {
         List<ScriptPack> packs = getAS3Packs();
+        int i = 0;
         for (ScriptPack s : packs) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
+            }
+            i++;
+            informListeners("inject_debuginfo", "" + i + "/" + packs.size() + ": " + s.getPath());
             if (s.isSimple) {
                 s.injectDebugInfo(decompileDir);
             }
@@ -3448,7 +3460,7 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @param telemetry Enable telemetry info?
      * @param pcodeLevel inject Pcode lines instead of decompiled lines
      */
-    public void enableDebugging(boolean injectAS3Code, File decompileDir, boolean telemetry, boolean pcodeLevel) {
+    public void enableDebugging(boolean injectAS3Code, File decompileDir, boolean telemetry, boolean pcodeLevel) throws InterruptedException {
 
         if (injectAS3Code) {
             if (pcodeLevel) {
@@ -3532,7 +3544,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         return r;
     }
 
-    public boolean generatePCodeSwdFile(File file, Map<String, Set<Integer>> breakpoints) throws IOException {
+    public boolean generatePCodeSwdFile(File file, Map<String, Set<Integer>> breakpoints) throws IOException, InterruptedException {
         DebugIDTag dit = getDebugId();
         if (dit == null) {
             return false;
@@ -3552,6 +3564,10 @@ public final class SWF implements SWFContainerItem, Timelined {
         List<String> names = new ArrayList<>(asms.keySet());
         Collections.sort(names);
         for (String name : names) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
+            }
+            informListeners("generate_swd", name);
             moduleId++;
             String sname = "#PCODE " + name;
             int bitmap = SWD.bitmapAction;
@@ -3623,6 +3639,10 @@ public final class SWF implements SWFContainerItem, Timelined {
             List<String> names = new ArrayList<>(asms.keySet());
             Collections.sort(names);
             for (String name : names) {
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new InterruptedException();
+                }
+                informListeners("generate_swd", name);
                 List<SWD.DebugRegisters> regitems = new ArrayList<>();
                 moduleId++;
                 HighlightedText cs;

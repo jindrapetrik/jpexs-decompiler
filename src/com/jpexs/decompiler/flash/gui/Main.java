@@ -198,6 +198,7 @@ public class Main {
 
     public static CancellableWorker importWorker = null;
     public static CancellableWorker deobfuscatePCodeWorker = null;
+    public static CancellableWorker swfPrepareWorker = null;
 
     //This method makes file watcher to shut up during our own file saving
     public static void startSaving(File savedFile) {
@@ -375,13 +376,13 @@ public class Main {
 
     private static interface SwfPreparation {
 
-        public SWF prepare(SWF swf);
+        public SWF prepare(SWF swf) throws InterruptedException;
     }
 
     private static class SwfRunPrepare implements SwfPreparation {
 
         @Override
-        public SWF prepare(SWF swf) {
+        public SWF prepare(SWF swf) throws InterruptedException {
             if (Configuration.autoOpenLoadedSWFs.get()) {
                 if (!DebuggerTools.hasDebugger(swf)) {
                     DebuggerTools.switchDebugger(swf);
@@ -401,8 +402,26 @@ public class Main {
         }
 
         @Override
-        public SWF prepare(SWF instrSWF) {
+        public SWF prepare(SWF instrSWF) throws InterruptedException {
             instrSWF = super.prepare(instrSWF);
+
+            EventListener prepEventListner = new EventListener() {
+                @Override
+                public void handleExportingEvent(String type, int index, int count, Object data) {
+                }
+
+                @Override
+                public void handleExportedEvent(String type, int index, int count, Object data) {
+                }
+
+                @Override
+                public void handleEvent(String event, Object data) {
+                    if (event.equals("inject_debuginfo")) {
+                        startWork(AppStrings.translate("work.injecting_debuginfo") + "..." + (String) data, swfPrepareWorker);
+                    }
+                }
+            };
+            instrSWF.addEventListener(prepEventListner);
             try {
                 File fTempFile = new File(instrSWF.getFile());
                 instrSWF.enableDebugging(true, new File("."), true, doPCode);
@@ -426,6 +445,22 @@ public class Main {
                             swfFileName = swfFileName + ".swd";
                         }
                         File swdFile = new File(swfFileName);
+                        instrSWF.addEventListener(new EventListener() {
+                            @Override
+                            public void handleExportingEvent(String type, int index, int count, Object data) {
+                            }
+
+                            @Override
+                            public void handleExportedEvent(String type, int index, int count, Object data) {
+                            }
+
+                            @Override
+                            public void handleEvent(String event, Object data) {
+                                if (event.equals("generate_swd")) {
+                                    startWork(AppStrings.translate("work.generating_swd") + "..." + (String) data, swfPrepareWorker);
+                                }
+                            }
+                        });
                         if (doPCode) {
                             instrSWF.generatePCodeSwdFile(swdFile, getPackBreakPoints(true));
                         } else {
@@ -436,11 +471,12 @@ public class Main {
             } catch (IOException ex) {
                 //ignore, return instrSWF
             }
+            instrSWF.removeEventListener(prepEventListner);
             return instrSWF;
         }
     }
 
-    private static void prepareSwf(SwfPreparation prep, File toPrepareFile, File origFile, List<File> tempFiles) throws IOException {
+    private static void prepareSwf(SwfPreparation prep, File toPrepareFile, File origFile, List<File> tempFiles) throws IOException, InterruptedException {
         SWF instrSWF = null;
         try (FileInputStream fis = new FileInputStream(toPrepareFile)) {
             instrSWF = new SWF(fis, toPrepareFile.getAbsolutePath(), origFile == null ? "unknown.swf" : origFile.getName(), false);
@@ -520,7 +556,8 @@ public class Main {
 
         } catch (IOException ex) {
             return;
-
+        } catch (InterruptedException ex) {
+            return;
         }
         if (tempFile != null) {
             synchronized (Main.class) {
@@ -569,6 +606,12 @@ public class Main {
                 public void workerCancelled() {
                     Main.stopWork();
                 }
+
+                @Override
+                protected void onStart() {
+                    swfPrepareWorker = this;
+                }
+
 
                 @Override
                 protected void done() {
