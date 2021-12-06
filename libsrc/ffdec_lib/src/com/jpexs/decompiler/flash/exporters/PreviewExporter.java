@@ -435,8 +435,8 @@ public class PreviewExporter {
                     RECT r = ((BoundedTag) treeItem).getRect();
                     rxmin = r.Xmin;
                     rymin = r.Ymin;
-                    /*mat.translateX = -r.Xmin;
-                    mat.translateY = -r.Ymin;*/
+                    mat.translateX = -r.Xmin;
+                    mat.translateY = -r.Ymin;
                     mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
                     mat.translateY = mat.translateY + (showControls ? height - progressBarHeight * 20 : height) / 2 - r.getHeight() / 2;
                 } else {

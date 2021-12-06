@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - direct editation - call on local register
 - AS3 - direct editation - resolve properties and local regs before types
 - AS3 - direct editation - call on index
+- Incorrect position in Flash Player preview and SWF export
 
 ## [15.0.0] - 2021-11-29
 ### Added
