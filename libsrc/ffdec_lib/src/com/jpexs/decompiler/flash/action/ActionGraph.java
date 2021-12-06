@@ -653,7 +653,7 @@ public class ActionGraph extends Graph {
                                                 switchParts.add(ii2.decisionPart);
                                                 switchOnFalseParts.add(ii2.onTruePart);
                                                 switchExpressions.add(sneq.rightSide);
-                                                walkNext.add(isNeq ? ii2.onFalse : ii2.onTrue);
+                                                walkNext.add(isNeq ? ii2.onTrue : ii2.onFalse);
                                             } else {
                                                 break;
                                             }
@@ -665,7 +665,7 @@ public class ActionGraph extends Graph {
                                             switchParts.add(ii2.decisionPart);
                                             switchOnFalseParts.add(ii2.onTruePart);
                                             switchExpressions.add(sneq.rightSide);
-                                            walkNext.add(isNeq ? ii2.onFalse : ii2.onTrue);
+                                            walkNext.add(isNeq ? ii2.onTrue : ii2.onFalse);
                                         } else {
                                             break;
                                         }
@@ -684,7 +684,7 @@ public class ActionGraph extends Graph {
                             allSwitchParts.add(switchParts);
                             allSwitchOnFalseParts.add(switchOnFalseParts);
                             allSwitchExpressions.add(switchExpressions);
-                            walkNext.add(ii2.onFalse);
+                            walkNext.add(isNeq ? ii2.onFalse : ii2.onTrue);
                             canUseBlock = false;
                         }
                     }

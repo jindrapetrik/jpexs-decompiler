@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - direct editation - call on index
 - Incorrect position in Flash Player preview and SWF export
 - AS1/2 actioncontainers (like try) inside ifs
+- AS1/2 switch detection
 
 ## [15.0.0] - 2021-11-29
 ### Added
