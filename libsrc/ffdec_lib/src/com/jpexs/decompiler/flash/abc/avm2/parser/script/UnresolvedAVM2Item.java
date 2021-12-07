@@ -349,10 +349,11 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             Reference<Integer> propertyIndex = new Reference<>(null);
             Reference<ValueKind> propertyValue = new Reference<>(null);
             Reference<ABC> propertyValueABC = new Reference<>(null);
+            Reference<Boolean> isType = new Reference<>(false);
 
-            resolvedx.resolve(true, localData, objectType, propertyType, propertyIndex, propertyValue, propertyValueABC);
+            resolvedx.resolve(true, localData, isType, objectType, propertyType, propertyIndex, propertyValue, propertyValueABC);
 
-            if (objectType.getVal() != null && !((objectType.getVal() instanceof TypeItem) && ("".equals(((TypeItem) objectType.getVal()).fullTypeName.toRawString())))) {
+            if (objectType.getVal() != null && !isType.getVal()) {
                 isProperty = true;
             }
         }

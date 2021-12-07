@@ -1516,8 +1516,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             decompiledTextArea.requestFocus();
 
         } catch (Throwable ex) {
-            Logger.getLogger(ABCPanel.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

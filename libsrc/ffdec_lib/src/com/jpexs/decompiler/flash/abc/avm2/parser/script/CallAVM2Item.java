@@ -91,12 +91,13 @@ public class CallAVM2Item extends AVM2Item {
                 Reference<ValueKind> outPropValue = new Reference<>(null);
                 Reference<ABC> outPropValueABC = new Reference<>(null);
                 List<Integer> otherNs = new ArrayList<>();
+                Reference<Boolean> isType = new Reference<>(false);
                 for (NamespaceItem on : openedNamespaces) {
                     if (on.isResolved()) {
                         otherNs.add(on.getCpoolIndex(g.abcIndex));
                     }
                 }
-                if (cname != null && AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, true, g.abcIndex, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueABC)) {
+                if (cname != null && AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, true, g.abcIndex, pkgName, cname, n.getVariableName(), outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueABC, isType)) {
                     NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), n.line, "this", null, false, n.openedNamespaces, abcIndex);
                     nobj.setRegNumber(0);
                     obj = nobj;
@@ -132,6 +133,7 @@ public class CallAVM2Item extends AVM2Item {
                 Reference<GraphTargetItem> outPropType = new Reference<>(null);
                 Reference<ValueKind> outPropValue = new Reference<>(null);
                 Reference<ABC> outPropValueAbc = new Reference<>(null);
+                Reference<Boolean> isType = new Reference<>(false);
 
                 List<Integer> otherNs = new ArrayList<>();
                 for (NamespaceItem n : openedNamespaces) {
@@ -140,7 +142,7 @@ public class CallAVM2Item extends AVM2Item {
                     }
                 }
 
-                if (cname != null && AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, true, g.abcIndex, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc) && (localData.getFullClass().equals(outNs.getVal().addWithSuffix(outName.getVal()).toRawString()))) {
+                if (cname != null && AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, true, g.abcIndex, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType) && (localData.getFullClass().equals(outNs.getVal().addWithSuffix(outName.getVal()).toRawString()))) {
                     NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, "this", null, false, new ArrayList<>(), abcIndex);
                     nobj.setRegNumber(0);
                     obj = nobj;
