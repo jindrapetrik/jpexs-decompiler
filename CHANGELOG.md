@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - Incorrect position in Flash Player preview and SWF export
 - AS1/2 actioncontainers (like try) inside ifs
 - AS1/2 switch detection
+- [#1766] AS3 - direct editation - namespaces on global level without leading colon
 
 ## [15.0.0] - 2021-11-29
 ### Added
@@ -2340,6 +2341,7 @@ All notable changes to this project will be documented in this file.
 [#1761]: https://www.free-decompiler.com/flash/issues/1761
 [#1762]: https://www.free-decompiler.com/flash/issues/1762
 [#1763]: https://www.free-decompiler.com/flash/issues/1763
+[#1766]: https://www.free-decompiler.com/flash/issues/1766
 [#1750]: https://www.free-decompiler.com/flash/issues/1750
 [#1485]: https://www.free-decompiler.com/flash/issues/1485
 [#1681]: https://www.free-decompiler.com/flash/issues/1681

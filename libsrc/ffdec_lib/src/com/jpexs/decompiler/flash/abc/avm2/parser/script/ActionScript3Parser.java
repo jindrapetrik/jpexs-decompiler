@@ -607,9 +607,9 @@ public class ActionScript3Parser {
     private void classTraits(List<List<NamespaceItem>> allOpenedNamespaces, boolean outsidePackage, List<AssignableAVM2Item> cinitVariables, Reference<Boolean> cinitNeedsActivation, List<GraphTargetItem> cinit, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, NamespaceItem pkg, String classNameStr, boolean isInterface, List<GraphTargetItem> traits, List<AssignableAVM2Item> iinitVariables, Reference<Boolean> iinitNeedsActivation, Reference<GraphTargetItem> iinit) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
 
         NamespaceItem publicNs = new NamespaceItem("", Namespace.KIND_PACKAGE);
-        NamespaceItem privateNs = new NamespaceItem(pkg.name.toRawString() + ":" + classNameStr, Namespace.KIND_PRIVATE);
-        NamespaceItem protectedNs = new NamespaceItem(pkg.name.toRawString() + ":" + classNameStr, Namespace.KIND_PROTECTED);
-        NamespaceItem staticProtectedNs = new NamespaceItem(pkg.name.toRawString() + ":" + classNameStr, Namespace.KIND_STATIC_PROTECTED);
+        NamespaceItem privateNs = new NamespaceItem(pkg.name.toRawString().isEmpty() ? classNameStr : pkg.name.toRawString() + ":" + classNameStr, Namespace.KIND_PRIVATE);
+        NamespaceItem protectedNs = new NamespaceItem(pkg.name.toRawString().isEmpty() ? classNameStr : pkg.name.toRawString() + ":" + classNameStr, Namespace.KIND_PROTECTED);
+        NamespaceItem staticProtectedNs = new NamespaceItem(pkg.name.toRawString().isEmpty() ? classNameStr : pkg.name.toRawString() + ":" + classNameStr, Namespace.KIND_STATIC_PROTECTED);
         NamespaceItem packageInternalNs = new NamespaceItem(pkg.name, Namespace.KIND_PACKAGE_INTERNAL);
 
         openedNamespaces = new ArrayList<>(openedNamespaces);

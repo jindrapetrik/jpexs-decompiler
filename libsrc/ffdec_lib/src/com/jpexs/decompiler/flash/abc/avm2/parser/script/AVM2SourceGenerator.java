@@ -1260,8 +1260,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
     public void generateClass(List<DottedChain> importedClasses, List<AssignableAVM2Item> cinitVariables, boolean cinitNeedsActivation, List<GraphTargetItem> cinit, List<NamespaceItem> openedNamespaces, int namespace, int initScope, DottedChain pkg, ClassInfo classInfo, InstanceInfo instanceInfo, SourceGeneratorLocalData localData, boolean isInterface, String name, String superName, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem iinit, List<AssignableAVM2Item> iinitVariables, boolean iinitNeedsActivation, List<GraphTargetItem> traitItems, Reference<Integer> class_index) throws AVM2ParseException, CompilationException {
         localData.currentClass = name;
         localData.pkg = pkg;
-        localData.privateNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PRIVATE, pkg.toRawString() + ":" + name, 0, true);
-        localData.protectedNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PROTECTED, pkg.toRawString() + ":" + name, 0, true);
+        localData.privateNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PRIVATE, pkg.toRawString().isEmpty() ? name : pkg.toRawString() + ":" + name, 0, true);
+        localData.protectedNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PROTECTED, pkg.toRawString().isEmpty() ? name : pkg.toRawString() + ":" + name, 0, true);
         if (extendsVal == null && !isInterface) {
             extendsVal = new TypeItem(DottedChain.OBJECT);
         }
