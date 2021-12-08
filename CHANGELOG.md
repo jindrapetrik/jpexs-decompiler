@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - [#1763] AS3 - function with activation - param assignment is not a declaration
 - AS3 - insert debug instruction to mark register names even with activation
 - AS3 - debugging in inner functions
+- AS1/2 - debugger - rewinding playback to apply breakpoints
 
 ## [15.0.0] - 2021-11-29
 ### Added
