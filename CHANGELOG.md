@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 switch detection
 - [#1766] AS3 - direct editation - namespaces on global level without leading colon
 - [#1763] AS3 - function with activation - param assignment is not a declaration
+- AS3 - insert debug instruction to mark register names even with activation
 
 ## [15.0.0] - 2021-11-29
 ### Added

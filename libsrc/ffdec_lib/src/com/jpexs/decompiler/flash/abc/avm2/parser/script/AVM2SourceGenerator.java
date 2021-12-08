@@ -2001,9 +2001,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
             }
             for (int i = 1; i < registerNames.size(); i++) {
-                if (!needsActivation) {
-                    mbodyCode.add(i - 1, ins(AVM2Instructions.Debug, 1, str(registerNames.get(i)), i - 1, (int) registerLines.get(i)));
-                }
+                mbodyCode.add(i - 1, ins(AVM2Instructions.Debug, 1, str(registerNames.get(i)), i - 1, (int) registerLines.get(i)));
             }
             if (!subMethod) {
                 mbodyCode.add(0, new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
