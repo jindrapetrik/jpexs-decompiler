@@ -27,7 +27,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - insert debug instruction to mark register names even with activation
 - AS3 - debugging in inner functions
 - AS1/2 - debugger - rewinding playback to apply breakpoints
-- [#1773] - auto set flagWideCodes on FontInfo wide character add
+- [#1773] - auto set flagWideCodes on FontInfo wide character adding
 
 ## [15.0.0] - 2021-11-29
 ### Added
