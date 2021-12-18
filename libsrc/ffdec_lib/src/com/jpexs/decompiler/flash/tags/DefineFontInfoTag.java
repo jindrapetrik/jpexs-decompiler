@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -146,6 +147,9 @@ public class DefineFontInfoTag extends FontInfoTag {
 
     @Override
     public void addFontCharacter(int index, int character) {
+        if (character > 255) {
+            fontFlagsWideCodes = true;
+        }
         codeTable.add(index, character);
         setModified(true);
     }
