@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- Multiname - performance issues
+
 ## [15.0.0] - 2021-11-29
 ### Added
 - Frame dependencies
