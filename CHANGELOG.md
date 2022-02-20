@@ -8,6 +8,9 @@ All notable changes to this project will be documented in this file.
 - [#270] AS3 show progress on deofuscating p-code
 - [#1718] Show progress on injecting debug info / SWD generation (before Debugging)
 
+### Changed
+- [#1801] - Flex SDK links to Apache Flex
+
 ### Fixed
 - [#1761] AS3 - try..finally inside another structure like if
 - [#1762] AS call on integer numbers parenthesis
@@ -29,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - AS1/2 - debugger - rewinding playback to apply breakpoints
 - [#1773] - Auto set flagWideCodes on FontInfo wide character adding
 - [#1769] - Do not mark getter+setter as colliding (#xxx suffix)
+- [#1801] - Flex SDK not required on commandline when Flex compilation is disabled
 
 ## [15.0.0] - 2021-11-29
 ### Added
@@ -2350,6 +2354,7 @@ All notable changes to this project will be documented in this file.
 [#1766]: https://www.free-decompiler.com/flash/issues/1766
 [#1773]: https://www.free-decompiler.com/flash/issues/1773
 [#1769]: https://www.free-decompiler.com/flash/issues/1769
+[#1801]: https://www.free-decompiler.com/flash/issues/1801
 [#1750]: https://www.free-decompiler.com/flash/issues/1750
 [#1485]: https://www.free-decompiler.com/flash/issues/1485
 [#1681]: https://www.free-decompiler.com/flash/issues/1681

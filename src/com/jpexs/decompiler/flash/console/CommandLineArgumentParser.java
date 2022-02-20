@@ -3498,8 +3498,8 @@ public class CommandLineArgumentParser {
     private static void parseImportScript(Stack<String> args) {
 
         String flexLocation = Configuration.flexSdkLocation.get();
-        if (flexLocation.isEmpty() || (!new File(flexLocation).exists())) {
-            System.err.println("Flex SDK path not set");
+        if (Configuration.useFlexAs3Compiler.get() && (flexLocation.isEmpty() || (!new File(flexLocation).exists()))) {
+            System.err.println("Flex AS3 compiler enabled but Flex SDK path not set");
             System.exit(1);
         }
 
