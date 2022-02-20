@@ -34,16 +34,24 @@ public class AS3ScriptImporter {
 
     private static final Logger logger = Logger.getLogger(AS3ScriptImporter.class.getName());
 
-    public int importScripts(As3ScriptReplacerInterface scriptReplacer, String scriptsFolder, List<ScriptPack> packs) {
+    public int importScripts(As3ScriptReplacerInterface scriptReplacer, String scriptsFolder, List<ScriptPack> packs) throws InterruptedException {
+        return importScripts(scriptReplacer, scriptsFolder, packs, null);
+    }
+
+    public int importScripts(As3ScriptReplacerInterface scriptReplacer, String scriptsFolder, List<ScriptPack> packs, ScriptImporterProgressListener listener) throws InterruptedException {
         if (!scriptsFolder.endsWith(File.separator)) {
             scriptsFolder += File.separator;
         }
 
         int importCount = 0;
         for (ScriptPack pack : packs) {
+            if (Thread.currentThread().isInterrupted()) {
+                return importCount;
+            }
             try {
                 File file = pack.getExportFile(scriptsFolder, new ScriptExportSettings(ScriptExportMode.AS, false, false));
                 if (file.exists()) {
+                    pack.getSwf().informListeners("importing_as", file.getAbsolutePath());
                     String fileName = file.getAbsolutePath();
                     String txt = Helper.readTextFile(fileName);
 
@@ -54,10 +62,13 @@ public class AS3ScriptImporter {
                             logger.log(Level.SEVERE, "%error% on line %line%, column %col%, file: %file%".replace("%error%", item.getMessage()).replace("%line%", Long.toString(item.getLine())).replace("%file%", fileName).replace("%col%", "" + item.getCol()));
                         }
                     } catch (InterruptedException ex) {
-                        logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
+                        return importCount;
                     }
 
                     importCount++;
+                    if (listener != null) {
+                        listener.scriptImported();
+                    }
                 }
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, null, ex);

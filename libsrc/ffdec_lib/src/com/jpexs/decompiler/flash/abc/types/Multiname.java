@@ -377,7 +377,7 @@ public class Multiname {
                 }
             }
 
-            if (fullyQualifiedNames != null && fullyQualifiedNames.contains(DottedChain.parseWithSuffix(name))) {
+            if (fullyQualifiedNames != null && !fullyQualifiedNames.isEmpty() && fullyQualifiedNames.contains(DottedChain.parseWithSuffix(name))) {
                 DottedChain dc = getNameWithNamespace(abc.constants, withSuffix);
                 return dontDeobfuscate ? dc.toRawString() : dc.toPrintableString(true);
             }
@@ -396,7 +396,7 @@ public class Multiname {
             return isAttribute() ? "@*" : "*";
         } else {
             String name = constants.getString(name_index);
-            if (fullyQualifiedNames != null && fullyQualifiedNames.contains(DottedChain.parseWithSuffix(name))) {
+            if (fullyQualifiedNames != null && !fullyQualifiedNames.isEmpty() && fullyQualifiedNames.contains(DottedChain.parseWithSuffix(name))) {
                 DottedChain dc = getNameWithNamespace(constants, withSuffix);
                 return dontDeobfuscate ? dc.toRawString() : dc.toPrintableString(true);
             }

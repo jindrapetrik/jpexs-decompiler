@@ -16,12 +16,15 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
@@ -148,6 +151,39 @@ public class DeclarationAVM2Item extends AVM2Item {
             }
             return writer;
         }
+
+        if (assignment instanceof SetPropertyAVM2Item) {
+            SetPropertyAVM2Item spti = (SetPropertyAVM2Item) assignment;
+            HighlightData srcData = getSrcData();
+            srcData.localName = ((FullMultinameAVM2Item) spti.propertyName).resolvedMultinameName;
+            srcData.declaration = true;
+
+            GraphTargetItem val = spti.value;
+            GraphTargetItem coerType = TypeItem.UNBOUNDED;
+            if (spti.value instanceof CoerceAVM2Item) {
+                coerType = ((CoerceAVM2Item) spti.value).typeObj;
+            }
+            if (spti.value instanceof ConvertAVM2Item) {
+                coerType = ((ConvertAVM2Item) spti.value).type;
+            }
+            //strip coerce if its declared as this type
+            if (coerType.equals(type) && !coerType.equals(TypeItem.UNBOUNDED)) {
+                val = val.value;
+            }
+
+            srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName : DottedChain.ALL;
+            writer.append("var ");
+            writer.append(IdentifiersDeobfuscation.printIdentifier(true, ((FullMultinameAVM2Item) spti.propertyName).resolvedMultinameName));
+            writer.append(":");
+
+            type.appendTry(writer, localData);
+            if (showValue) {
+                writer.append(" = ");
+                val.toString(writer, localData);
+            }
+            return writer;
+        }
+
         writer.append("var ");
         return assignment.toString(writer, localData);
     }

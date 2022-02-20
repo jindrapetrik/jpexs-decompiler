@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.FinalProcessLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2FinalProcessLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
@@ -46,6 +47,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceAIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.ConvertIIns;
+import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConstructAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FilteredCheckAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
@@ -114,6 +116,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -462,15 +465,17 @@ public class AVM2Graph extends Graph {
                     }
                 }
 
-                //return in finally block is joined after switch decision
-                for (GraphPart p : switchPart.nextParts) {
+                //This caused problems, so it's commented out
+                //the tests still pass, so I can only wonder why it's there. :-(
+                //return in finally block is joined after switch decision                
+                /*for (GraphPart p : switchPart.nextParts) {
                     for (GraphPart r : p.refs) {
                         if (r != switchPart) {
                             localData.finallyJumps.put(r, p);
                             localData.finallyJumpsToFinallyIndex.put(r, e);
                         }
                     }
-                }
+                }*/
 
                 localData.ignoredSwitches.put(e, switchPart);
             } else {
@@ -1964,6 +1969,24 @@ public class AVM2Graph extends Graph {
             Map<Integer, String> localRegNames = body.getLocalRegNames(abc);
             loopi:
             for (int i = 0; i < list.size(); i++) {
+                if (list.get(i) instanceof SetPropertyAVM2Item) {
+                    SetPropertyAVM2Item sp = (SetPropertyAVM2Item) list.get(i);
+                    if (sp.object instanceof FindPropertyAVM2Item) {
+                        if (sp.propertyName instanceof FullMultinameAVM2Item) {
+                            FullMultinameAVM2Item propName = (FullMultinameAVM2Item) sp.propertyName;
+                            if (sp.value instanceof LocalRegAVM2Item) {
+                                LocalRegAVM2Item lr = (LocalRegAVM2Item) sp.value;
+                                AVM2FinalProcessLocalData aLocalData = (AVM2FinalProcessLocalData) localData;
+                                if (Objects.equals(propName.resolvedMultinameName, AVM2Item.localRegName(aLocalData.localRegNames, lr.regIndex))) {
+                                    list.remove(i);
+                                    i--;
+                                    continue loopi;
+                                }
+                            }
+
+                        }
+                    }
+                }
                 if (list.get(i) instanceof SetSlotAVM2Item) {
                     SetSlotAVM2Item sslot = (SetSlotAVM2Item) list.get(i);
                     if (sslot.slotObject instanceof NewActivationAVM2Item) {
@@ -2153,7 +2176,7 @@ public class AVM2Graph extends Graph {
 
     @Override
     protected FinalProcessLocalData getFinalData(BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) {
-        FinalProcessLocalData finalProcess = super.getFinalData(localData, loops, throwStates);
+        FinalProcessLocalData finalProcess = new AVM2FinalProcessLocalData(loops, ((AVM2LocalData) localData).localRegNames);
         finalProcess.registerUsage = ((AVM2LocalData) localData).setLocalPosToGetLocalPos;
         return finalProcess;
     }

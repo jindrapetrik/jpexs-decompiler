@@ -179,6 +179,8 @@ public class PreviewExporter {
             Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ActionParseException ex) {
             Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
         }
         overVideoButton.actions.add(bca);
 
@@ -204,6 +206,8 @@ public class PreviewExporter {
         } catch (CompilationException ex) {
             Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ActionParseException ex) {
+            Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
             Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
         }
         progressBarButton.actions.add(bca);
@@ -237,6 +241,8 @@ public class PreviewExporter {
         } catch (CompilationException ex) {
             Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ActionParseException ex) {
+            Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
             Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -429,8 +435,8 @@ public class PreviewExporter {
                     RECT r = ((BoundedTag) treeItem).getRect();
                     rxmin = r.Xmin;
                     rymin = r.Ymin;
-                    /*mat.translateX = -r.Xmin;
-                    mat.translateY = -r.Ymin;*/
+                    mat.translateX = -r.Xmin;
+                    mat.translateY = -r.Ymin;
                     mat.translateX = mat.translateX + width / 2 - r.getWidth() / 2;
                     mat.translateY = mat.translateY + (showControls ? height - progressBarHeight * 20 : height) / 2 - r.getHeight() / 2;
                 } else {

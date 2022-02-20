@@ -1260,8 +1260,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
     public void generateClass(List<DottedChain> importedClasses, List<AssignableAVM2Item> cinitVariables, boolean cinitNeedsActivation, List<GraphTargetItem> cinit, List<NamespaceItem> openedNamespaces, int namespace, int initScope, DottedChain pkg, ClassInfo classInfo, InstanceInfo instanceInfo, SourceGeneratorLocalData localData, boolean isInterface, String name, String superName, GraphTargetItem extendsVal, List<GraphTargetItem> implementsStr, GraphTargetItem iinit, List<AssignableAVM2Item> iinitVariables, boolean iinitNeedsActivation, List<GraphTargetItem> traitItems, Reference<Integer> class_index) throws AVM2ParseException, CompilationException {
         localData.currentClass = name;
         localData.pkg = pkg;
-        localData.privateNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PRIVATE, pkg.toRawString() + ":" + name, 0, true);
-        localData.protectedNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PROTECTED, pkg.toRawString() + ":" + name, 0, true);
+        localData.privateNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PRIVATE, pkg.toRawString().isEmpty() ? name : pkg.toRawString() + ":" + name, 0, true);
+        localData.protectedNs = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PROTECTED, pkg.toRawString().isEmpty() ? name : pkg.toRawString() + ":" + name, 0, true);
         if (extendsVal == null && !isInterface) {
             extendsVal = new TypeItem(DottedChain.OBJECT);
         }
@@ -1621,7 +1621,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 UnresolvedAVM2Item n = (UnresolvedAVM2Item) an;
                 if (n.resolved == null) {
                     String fullClass = localData.getFullClass();
-                    GraphTargetItem res = n.resolve(localData.currentClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables);
+                    GraphTargetItem res = n.resolve(localData, localData.currentClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables);
                     if (res instanceof AssignableAVM2Item) {
                         subvariables.set(i, (AssignableAVM2Item) res);
                     } else {
@@ -1638,7 +1638,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 UnresolvedAVM2Item n = (UnresolvedAVM2Item) an;
                 if (n.resolved == null) {
                     String fullClass = localData.getFullClass();
-                    GraphTargetItem res = n.resolve(localData.currentClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables);
+                    GraphTargetItem res = n.resolve(localData, localData.currentClass, new TypeItem(fullClass), paramTypes, paramNames, abcIndex, callStack, subvariables);
                     paramTypes.set(t, res);
                 }
             }
@@ -1689,8 +1689,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 NameAVM2Item n = (NameAVM2Item) an;
                 if (n.getVariableName().equals("arguments") & !n.isDefinition()) {
                     registerNames.add("arguments");
-                    registerTypes.add(new TypeItem("Object"));
+                    registerTypes.add(new TypeItem("Array"));
                     registerLines.add(0); //?
+                    slotNames.add(n.getVariableName());
+                    slotTypes.add(new TypeItem("Array"));
                     hasArguments = true;
                     break;
                 }
@@ -1916,8 +1918,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     declarations.add(d);
                 }
             }
+            boolean addRet = false;
             if (body != null) {
                 body.addAll(0, declarations);
+                if (body.isEmpty() || (!((body.get(body.size() - 1) instanceof ReturnValueAVM2Item)
+                        || (body.get(body.size() - 1) instanceof ReturnVoidAVM2Item)))) {
+                    addRet = true;
+                }
             }
 
             localData.exceptions = new ArrayList<>();
@@ -1994,23 +2001,20 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
             }
             for (int i = 1; i < registerNames.size(); i++) {
-                if (!needsActivation) {
-                    mbodyCode.add(i - 1, ins(AVM2Instructions.Debug, 1, str(registerNames.get(i)), i - 1, (int) registerLines.get(i)));
-                }
+                mbodyCode.add(i - 1, ins(AVM2Instructions.Debug, 1, str(registerNames.get(i)), i - 1, (int) registerLines.get(i)));
             }
             if (!subMethod) {
                 mbodyCode.add(0, new AVM2Instruction(0, AVM2Instructions.GetLocal0, null));
                 mbodyCode.add(1, new AVM2Instruction(0, AVM2Instructions.PushScope, null));
             }
-            boolean addRet = false;
-            if (!mbodyCode.isEmpty()) {
+            /*if (!mbodyCode.isEmpty()) {
                 InstructionDefinition lastDef = mbodyCode.get(mbodyCode.size() - 1).definition;
                 if (!((lastDef instanceof ReturnVoidIns) || (lastDef instanceof ReturnValueIns))) {
                     addRet = true;
                 }
             } else {
                 addRet = true;
-            }
+            }*/
             if (addRet) {
                 if (retType.toString().equals("*") || retType.toString().equals("void") || constructor) {
                     mbodyCode.add(new AVM2Instruction(0, AVM2Instructions.ReturnVoid, null));
@@ -2172,7 +2176,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     public int superIntName(SourceGeneratorLocalData localData, GraphTargetItem un) throws CompilationException {
         if (un instanceof UnresolvedAVM2Item) {
-            ((UnresolvedAVM2Item) un).resolve(localData.currentClass, null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), new ArrayList<>());
+            ((UnresolvedAVM2Item) un).resolve(localData, localData.currentClass, null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), new ArrayList<>());
             un = ((UnresolvedAVM2Item) un).resolved;
         }
         if (!(un instanceof TypeItem)) { //not applyType
@@ -2606,31 +2610,34 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return TypeItem.UNBOUNDED;
     }
 
-    public static boolean searchPrototypeChain(List<Integer> otherNs, int privateNs, int protectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc) {
+    public static boolean searchPrototypeChain(List<Integer> otherNs, int privateNs, int protectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType) {
         // private and protected namespaces first so we find overriding functions before overridden functions
-        if (searchPrototypeChain(privateNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc)) {
+        if (searchPrototypeChain(privateNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType)) {
             return true;
         }
-        if (searchPrototypeChain(protectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc)) {
+        if (searchPrototypeChain(protectedNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType)) {
             return true;
         }
 
         for (int ns : otherNs) {
-            if (searchPrototypeChain(ns, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc)) {
+            if (searchPrototypeChain(ns, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType)) {
                 return true;
             }
         }
 
-        return searchPrototypeChain(0, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc);
+        return searchPrototypeChain(0, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType);
     }
 
-    private static boolean searchPrototypeChain(int selectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc) {
-
+    private static boolean searchPrototypeChain(int selectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType) {
+        isType.setVal(false);
         AbcIndexing.TraitIndex sp = abc.findScriptProperty(pkg.addWithSuffix(propertyName));
         if (sp == null) {
             sp = abc.findProperty(new AbcIndexing.PropertyDef(propertyName, new TypeItem(pkg.addWithSuffix(obj)), abc.getSelectedAbc(), selectedNs), !instanceOnly, true);
         }
         if (sp != null) {
+            if (sp.trait instanceof TraitClass) {
+                isType.setVal(true);
+            }
             if (sp.objType instanceof TypeItem) {
                 outName.setVal(((TypeItem) sp.objType).fullTypeName.getLast());
                 outNs.setVal(((TypeItem) sp.objType).fullTypeName.getWithoutLast());
@@ -2712,7 +2719,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         if (item instanceof UnresolvedAVM2Item) {
             String fullClass = localData.getFullClass();
-            item = ((UnresolvedAVM2Item) item).resolve(localData.currentClass, new TypeItem(fullClass), new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), new ArrayList<>());
+            item = ((UnresolvedAVM2Item) item).resolve(localData, localData.currentClass, new TypeItem(fullClass), new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), new ArrayList<>());
         }
         if (item instanceof TypeItem) {
             typeItem = item;
@@ -2725,7 +2732,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
         if (typeItem instanceof UnresolvedAVM2Item) {
             String fullClass = localData.getFullClass();
-            typeItem = ((UnresolvedAVM2Item) typeItem).resolve(localData.currentClass, new TypeItem(fullClass), new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), new ArrayList<>());
+            typeItem = ((UnresolvedAVM2Item) typeItem).resolve(localData, localData.currentClass, new TypeItem(fullClass), new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), new ArrayList<>());
         }
 
         if (!(typeItem instanceof TypeItem)) {

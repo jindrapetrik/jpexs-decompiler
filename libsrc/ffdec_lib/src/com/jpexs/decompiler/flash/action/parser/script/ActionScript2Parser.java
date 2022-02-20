@@ -263,7 +263,7 @@ public class ActionScript2Parser {
         return "" + uniqLast;
     }
 
-    private List<GraphTargetItem> commands(boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException {
+    private List<GraphTargetItem> commands(boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         List<GraphTargetItem> ret = new ArrayList<>();
         if (debugMode) {
             System.out.println("commands:");
@@ -278,7 +278,7 @@ public class ActionScript2Parser {
         return ret;
     }
 
-    private GraphTargetItem type(List<VariableActionItem> variables) throws IOException, ActionParseException {
+    private GraphTargetItem type(List<VariableActionItem> variables) throws IOException, ActionParseException, InterruptedException {
         GraphTargetItem ret;
 
         ParsedSymbol s = lex();
@@ -329,13 +329,16 @@ public class ActionScript2Parser {
         }
     }
 
-    private ParsedSymbol expectedType(Object... type) throws IOException, ActionParseException {
+    private ParsedSymbol expectedType(Object... type) throws IOException, ActionParseException, InterruptedException {
         ParsedSymbol symb = lex();
         expected(symb, lexer.yyline(), type);
         return symb;
     }
 
-    private ParsedSymbol lex() throws IOException, ActionParseException {
+    private ParsedSymbol lex() throws IOException, ActionParseException, InterruptedException {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException();
+        }
         ParsedSymbol ret = lexer.lex();
         if (debugMode) {
             System.out.println(ret);
@@ -343,7 +346,7 @@ public class ActionScript2Parser {
         return ret;
     }
 
-    private List<GraphTargetItem> call(boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException {
+    private List<GraphTargetItem> call(boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         List<GraphTargetItem> ret = new ArrayList<>();
         //expected(SymbolType.PARENT_OPEN); //MUST BE HANDLED BY CALLER
         ParsedSymbol s = lex();
@@ -358,7 +361,7 @@ public class ActionScript2Parser {
         return ret;
     }
 
-    private FunctionActionItem function(boolean withBody, String functionName, boolean isMethod, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException {
+    private FunctionActionItem function(boolean withBody, String functionName, boolean isMethod, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         GraphTargetItem ret = null;
         ParsedSymbol s;
         expectedType(SymbolType.PARENT_OPEN);
@@ -401,7 +404,7 @@ public class ActionScript2Parser {
         return retf;
     }
 
-    private GraphTargetItem traits(boolean isInterface, GraphTargetItem nameStr, GraphTargetItem extendsStr, List<GraphTargetItem> implementsStr, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException {
+    private GraphTargetItem traits(boolean isInterface, GraphTargetItem nameStr, GraphTargetItem extendsStr, List<GraphTargetItem> implementsStr, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean inTellTarget, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
 
         GraphTargetItem ret = null;
         /*for (int i = 0; i < nameStr.size() - 1; i++) {
@@ -543,7 +546,7 @@ public class ActionScript2Parser {
         }
     }
 
-    private GraphTargetItem expressionCommands(ParsedSymbol s, boolean inFunction, boolean inMethod, boolean inTellTarget, int forinlevel, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException {
+    private GraphTargetItem expressionCommands(ParsedSymbol s, boolean inFunction, boolean inMethod, boolean inTellTarget, int forinlevel, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         if (debugMode) {
             System.out.println("expressionCommands:");
         }
@@ -950,7 +953,7 @@ public class ActionScript2Parser {
         }
     }
 
-    private GraphTargetItem command(boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, boolean mustBeCommand, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException {
+    private GraphTargetItem command(boolean inFunction, boolean inMethod, int forinlevel, boolean inTellTarget, boolean mustBeCommand, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         LexBufferer buf = new LexBufferer();
         lexer.addListener(buf);
         GraphTargetItem ret = null;
@@ -1375,7 +1378,7 @@ public class ActionScript2Parser {
 
     }
 
-    private GraphTargetItem expression(boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean allowComma, Reference<Boolean> hasEval) throws IOException, ActionParseException {
+    private GraphTargetItem expression(boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean allowComma, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         if (debugMode) {
             System.out.println("expression:");
         }
@@ -1402,7 +1405,7 @@ public class ActionScript2Parser {
         return new CommaExpressionItem(null, null, commaItems);
     }
 
-    private ParsedSymbol peekLex() throws IOException, ActionParseException {
+    private ParsedSymbol peekLex() throws IOException, ActionParseException, InterruptedException {
         ParsedSymbol lookahead = lex();
         lexer.pushback(lookahead);
         return lookahead;
@@ -1435,7 +1438,7 @@ public class ActionScript2Parser {
         return s.type.getPrecedence();
     }
 
-    private GraphTargetItem expression1(GraphTargetItem lhs, int min_precedence, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException {
+    private GraphTargetItem expression1(GraphTargetItem lhs, int min_precedence, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         ParsedSymbol op;
         GraphTargetItem rhs;
         GraphTargetItem mhs = null;
@@ -1663,7 +1666,7 @@ public class ActionScript2Parser {
         return (item instanceof VariableActionItem);
     }
 
-    private int brackets(List<GraphTargetItem> ret, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException {
+    private int brackets(List<GraphTargetItem> ret, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         ParsedSymbol s = lex();
         int arrCnt = 0;
         if (s.type == SymbolType.BRACKET_OPEN) {
@@ -1687,7 +1690,7 @@ public class ActionScript2Parser {
         return arrCnt;
     }
 
-    private GraphTargetItem handleVariable(ParsedSymbol s, GraphTargetItem ret, List<VariableActionItem> variables, Reference<Boolean> allowMemberOrCall, boolean inFunction, boolean inMethod, boolean inTellTarget, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException {
+    private GraphTargetItem handleVariable(ParsedSymbol s, GraphTargetItem ret, List<VariableActionItem> variables, Reference<Boolean> allowMemberOrCall, boolean inFunction, boolean inMethod, boolean inTellTarget, List<FunctionActionItem> functions, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         if (s.value.equals("not")) {
             ret = new NotItem(null, null, expressionPrimary(false, inFunction, inMethod, inTellTarget, false, variables, functions, true, hasEval));
         } else {
@@ -1710,7 +1713,7 @@ public class ActionScript2Parser {
         return ret;
     }
 
-    private GraphTargetItem expressionPrimary(boolean allowEmpty, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean allowCall, Reference<Boolean> hasEval) throws IOException, ActionParseException {
+    private GraphTargetItem expressionPrimary(boolean allowEmpty, boolean inFunction, boolean inMethod, boolean inTellTarget, boolean allowRemainder, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean allowCall, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         if (debugMode) {
             System.out.println("primary:");
         }
@@ -2008,7 +2011,7 @@ public class ActionScript2Parser {
         return false;
     }
 
-    private GraphTargetItem memberOrCall(GraphTargetItem ret, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean allowCall, Reference<Boolean> hasEval) throws IOException, ActionParseException {
+    private GraphTargetItem memberOrCall(GraphTargetItem ret, boolean inFunction, boolean inMethod, boolean inTellTarget, List<VariableActionItem> variables, List<FunctionActionItem> functions, boolean allowCall, Reference<Boolean> hasEval) throws IOException, ActionParseException, InterruptedException {
         ParsedSymbol op = lex();
         while (op.isType(SymbolType.PARENT_OPEN, SymbolType.BRACKET_OPEN, SymbolType.DOT)) {
             if (op.type == SymbolType.PARENT_OPEN) {
@@ -2100,7 +2103,7 @@ public class ActionScript2Parser {
 
     private List<String> constantPool;
 
-    public List<GraphTargetItem> treeFromString(String str, List<String> constantPool) throws ActionParseException, IOException {
+    public List<GraphTargetItem> treeFromString(String str, List<String> constantPool) throws ActionParseException, IOException, InterruptedException {
         List<GraphTargetItem> retTree = new ArrayList<>();
         this.constantPool = constantPool;
         lexer = new ActionScriptLexer(new StringReader(str));
@@ -2391,7 +2394,7 @@ public class ActionScript2Parser {
         return ret;
     }
 
-    public List<Action> actionsFromString(String s) throws ActionParseException, IOException, CompilationException {
+    public List<Action> actionsFromString(String s) throws ActionParseException, IOException, CompilationException, InterruptedException {
         try {
             List<String> constantPool = new ArrayList<>();
             List<GraphTargetItem> tree = treeFromString(s, constantPool);

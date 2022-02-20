@@ -518,6 +518,8 @@ public class DebuggerHandler implements DebugConnectionListener {
         }
 
         Main.getMainFrame().getPanel().updateMenu();
+        boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
+
 
         //enlog(DebuggerConnection.class);
         //enlog(DebuggerCommands.class);
@@ -611,8 +613,8 @@ public class DebuggerHandler implements DebugConnectionListener {
             commands.setGetterTimeout(1500);
             commands.setSetterTimeout(5000);
 
-            boolean isAS3 = (Main.getMainFrame().getPanel().getCurrentSwf().isAS3());
             con.isAS3 = isAS3;
+
 
             //Widelines - only AS3, it hangs in AS1/2 and SWD does not support UI32 lines
             if (isAS3) {
@@ -663,9 +665,6 @@ public class DebuggerHandler implements DebugConnectionListener {
                 }
             }
 
-            synchronized (this) {
-                connected = true;
-            }
             con.addMessageListener(new DebugMessageListener<InAskBreakpoints>() {
                 @Override
                 public void message(InAskBreakpoints message) {
@@ -697,17 +696,19 @@ public class DebuggerHandler implements DebugConnectionListener {
                         breakInfo = con.getMessage(InBreakAtExt.class, DebuggerConnection.PREF_RESPONSE_TIMEOUT);
                         breakReason = con.sendMessageWithTimeout(new OutGetBreakReason(con), InBreakReason.class);
 
+                        int reasonInt = breakReason == null ? 0 : breakReason.reason;
+
                         String newBreakScriptName = "unknown";
                         if (modulePaths.containsKey(message.file)) {
                             newBreakScriptName = modulePaths.get(message.file);
 
-                        } else if (breakReason.reason != InBreakReason.REASON_SCRIPT_LOADED) {
+                        } else if (reasonInt != InBreakReason.REASON_SCRIPT_LOADED) {
                             Logger.getLogger(DebuggerCommands.class.getName()).log(Level.SEVERE, "Invalid file: {0}", message.file);
                             return;
                         }
 
                         final String[] reasonNames = new String[]{"unknown", "breakpoint", "watch", "fault", "stopRequest", "step", "halt", "scriptLoaded"};
-                        String reason = breakReason.reason < reasonNames.length ? reasonNames[breakReason.reason] : reasonNames[0];
+                        String reason = reasonInt < reasonNames.length ? reasonNames[reasonInt] : reasonNames[0];
 
                         Logger.getLogger(DebuggerHandler.class.getName()).log(Level.FINE, "break at {0}:{1}, reason: {2}", new Object[]{newBreakScriptName, message.line, reason});
 
@@ -717,7 +718,7 @@ public class DebuggerHandler implements DebugConnectionListener {
                             breakIp = message.line;
                         }
 
-                        if (breakReason.reason == InBreakReason.REASON_SCRIPT_LOADED) {
+                        if (reasonInt == InBreakReason.REASON_SCRIPT_LOADED) {
                             if (!Configuration.debugHalt.get()) {
                                 commands.sendContinue();
                                 return;
@@ -743,6 +744,17 @@ public class DebuggerHandler implements DebugConnectionListener {
 
                 }
             });
+
+            synchronized (this) {
+                connected = true;
+            }
+            if (!isAS3) {
+                try {
+                    commands.getConnection().writeMessage(new OutRewind(commands.getConnection()));
+                } catch (IOException ex) {
+                    Logger.getLogger(DebuggerHandler.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
 
             for (ConnectionListener l : clisteners) {
                 l.connected();

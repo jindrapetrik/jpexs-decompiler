@@ -71,7 +71,8 @@ public class CallMethodActionItem extends ActionItem {
             }
 
             if (!blankMethod) {
-                if (scriptObject.getPrecedence() > this.precedence) {
+                if (scriptObject.getPrecedence() > this.precedence
+                        || ((scriptObject instanceof DirectValueActionItem) && (((DirectValueActionItem) scriptObject).value instanceof Long))) {
                     writer.append("(");
                     scriptObject.toString(writer, localData);
                     writer.append(")");

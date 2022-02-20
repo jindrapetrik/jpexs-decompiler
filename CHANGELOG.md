@@ -1,6 +1,40 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- Display object depth in flash panel
+- Show imported files on script import, able to cancel import
+- [#270] AS3 show progress on deofuscating p-code
+- [#1718] Show progress on injecting debug info / SWD generation (before Debugging)
+
+### Changed
+- [#1801] - Flex SDK links to Apache Flex
+
+### Fixed
+- [#1761] AS3 - try..finally inside another structure like if
+- [#1762] AS call on integer numbers parenthesis
+- [#1762] AS3 - Auto adding returnvoid/return undefined
+- [#1762] AS - switch detection (mostcommon pathpart)
+- [#1763] AS3 - initialization of activation object in some cases
+- AS3 - direct editation - arguments object on method with activation
+- AS3 - direct editation - bit not
+- AS3 - direct editation - call on local register
+- AS3 - direct editation - resolve properties and local regs before types
+- AS3 - direct editation - call on index
+- Incorrect position in Flash Player preview and SWF export
+- AS1/2 actioncontainers (like try) inside ifs
+- AS1/2 switch detection
+- [#1766] AS3 - direct editation - namespaces on global level without leading colon
+- [#1763] AS3 - function with activation - param assignment is not a declaration
+- AS3 - insert debug instruction to mark register names even with activation
+- AS3 - debugging in inner functions
+- AS1/2 - debugger - rewinding playback to apply breakpoints
+- [#1773] - Auto set flagWideCodes on FontInfo wide character adding
+- [#1769] - Do not mark getter+setter as colliding (#xxx suffix)
+- [#1801] - Flex SDK not required on commandline when Flex compilation is disabled
+- Multiname - performance issues
+
 ## [15.0.0] - 2021-11-29
 ### Added
 - Frame dependencies
@@ -2194,6 +2228,10 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version15.0.0...dev
+[15.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.6.0...version15.0.0
+[14.6.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.5.2...version14.6.0
+[14.5.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.5.1...version14.5.2
 [14.5.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.5.0...version14.5.1
 [14.5.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.4.0...version14.5.0
 [14.4.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.3.1...version14.4.0
@@ -2309,6 +2347,15 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#270]: https://www.free-decompiler.com/flash/issues/270
+[#1718]: https://www.free-decompiler.com/flash/issues/1718
+[#1761]: https://www.free-decompiler.com/flash/issues/1761
+[#1762]: https://www.free-decompiler.com/flash/issues/1762
+[#1763]: https://www.free-decompiler.com/flash/issues/1763
+[#1766]: https://www.free-decompiler.com/flash/issues/1766
+[#1773]: https://www.free-decompiler.com/flash/issues/1773
+[#1769]: https://www.free-decompiler.com/flash/issues/1769
+[#1801]: https://www.free-decompiler.com/flash/issues/1801
 [#1750]: https://www.free-decompiler.com/flash/issues/1750
 [#1485]: https://www.free-decompiler.com/flash/issues/1485
 [#1681]: https://www.free-decompiler.com/flash/issues/1681
@@ -2341,7 +2388,6 @@ All notable changes to this project will be documented in this file.
 [#1488]: https://www.free-decompiler.com/flash/issues/1488
 [#1584]: https://www.free-decompiler.com/flash/issues/1584
 [#1572]: https://www.free-decompiler.com/flash/issues/1572
-[#270]: https://www.free-decompiler.com/flash/issues/270
 [#1645]: https://www.free-decompiler.com/flash/issues/1645
 [#1639]: https://www.free-decompiler.com/flash/issues/1639
 [#1371]: https://www.free-decompiler.com/flash/issues/1371

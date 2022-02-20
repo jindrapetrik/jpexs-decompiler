@@ -101,6 +101,7 @@ import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.FFDecAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
+import com.jpexs.decompiler.flash.importers.ScriptImporterProgressListener;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
@@ -2500,18 +2501,56 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
             String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME);
+            final long timeBefore = System.currentTimeMillis();
+            new CancellableWorker<Void>() {
+                private int countAs2 = 0;
+                private int countAs3 = 0;
+                @Override
+                public Void doInBackground() throws Exception {
+                    new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true), new ScriptImporterProgressListener() {
+                        @Override
+                        public void scriptImported() {
+                            countAs2++;
+                        }
+                    });
+                    new AS3ScriptImporter().importScripts(as3ScriptReplacer, scriptsFolder, swf.getAS3Packs(), new ScriptImporterProgressListener() {
+                        @Override
+                        public void scriptImported() {
+                            countAs3++;
+                        }
+                    }
+                    );
 
-            int countAs2 = new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
-            int countAs3 = new AS3ScriptImporter().importScripts(as3ScriptReplacer, scriptsFolder, swf.getAS3Packs());
+                    if (countAs3 > 0) {
+                        updateClassesList();
+                    }
+                    return null;
+                }
 
-            if (countAs3 > 0) {
-                updateClassesList();
-            }
+                @Override
+                protected void onStart() {
+                    Main.importWorker = this;
+                    Main.startWork(translate("work.importing_as") + "...", this);
+                }
 
-            ViewMessages.showMessageDialog(this, translate("import.script.result").replace("%count%", Integer.toString(countAs2 + countAs3)));
-            if (countAs2 != 0 || countAs3 != 0) {
-                reload(true);
-            }
+                @Override
+                protected void done() {
+                    Main.stopWork();
+                    long timeAfter = System.currentTimeMillis();
+                    final long timeMs = timeAfter - timeBefore;
+
+                    Main.importWorker = null;
+                    View.execInEventDispatch(() -> {
+                        setStatus(translate("importing_as.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
+
+                        ViewMessages.showMessageDialog(MainPanel.this, translate("import.script.result").replace("%count%", Integer.toString(countAs2 + countAs3)));
+                        if (countAs2 != 0 || countAs3 != 0) {
+                            reload(true);
+                        }
+                    });
+                }
+            }.execute();
+
         }
     }
 
@@ -2765,11 +2804,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 @Override
                 protected void onStart() {
+                    Main.deobfuscatePCodeWorker = this;
                     Main.startWork(translate("work.deobfuscating") + "...", this);
                 }
 
                 @Override
                 protected void done() {
+                    Main.deobfuscatePCodeWorker = null;
                     View.execInEventDispatch(() -> {
                         Main.stopWork();
                         ViewMessages.showMessageDialog(MainPanel.this, translate("work.deobfuscating.complete"));

@@ -423,7 +423,7 @@ public class ScriptPack extends AS3ClassTreeItem {
                             Trait trait = abc.findTraitByTraitId(classIndex, traitIndex);
                             if (((trait instanceof TraitMethodGetterSetter) && (((TraitMethodGetterSetter) trait).method_info != methodIndex))
                                     || ((trait instanceof TraitFunction) && (((TraitFunction) trait).method_info != methodIndex))) {
-                                continue; //inner anonymous function - ignore. TODO: make work
+                                //continue; //inner anonymous function - ignore. TODO: make work
                             }
                         }
 

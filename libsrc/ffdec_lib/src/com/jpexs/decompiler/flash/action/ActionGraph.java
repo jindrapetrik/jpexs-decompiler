@@ -23,6 +23,7 @@ import static com.jpexs.decompiler.flash.action.Action.adr2ip;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.EnumerateActionItem;
 import com.jpexs.decompiler.flash.action.model.FunctionActionItem;
+import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTarget2ActionItem;
@@ -492,8 +493,7 @@ public class ActionGraph extends Graph {
             caseValuesMap.add(set.rightSide);
             if (set.leftSide instanceof StoreRegisterActionItem) {
                 switchedObject = ((StoreRegisterActionItem) set.leftSide).value;
-            }
-            if (set.leftSide instanceof GetVariableActionItem) {
+            } else {
                 switchedObject = set.leftSide;
             }
 
@@ -600,7 +600,8 @@ public class ActionGraph extends Graph {
     @Override
     public SecondPassData prepareSecondPass(List<GraphTargetItem> list) {
         ActionSecondPassData spd = new ActionSecondPassData();
-        checkSecondPassSwitches(list, spd.switchParts, spd.switchOnFalseParts, spd.switchCaseExpressions);
+        Set<GraphPart> processedIfs = new HashSet<>();
+        checkSecondPassSwitches(processedIfs, list, spd.switchParts, spd.switchOnFalseParts, spd.switchCaseExpressions);
 
         if (spd.switchParts.isEmpty()) {
             return null; //no need to second pass
@@ -608,64 +609,75 @@ public class ActionGraph extends Graph {
         return spd;
     }
 
-    private void checkSecondPassSwitches(List<GraphTargetItem> list, List<List<GraphPart>> allSwitchParts, List<List<GraphPart>> allSwitchOnFalseParts, List<List<GraphTargetItem>> allSwitchExpressions) {
+    private void checkSecondPassSwitches(Set<GraphPart> processedIfs, List<GraphTargetItem> list, List<List<GraphPart>> allSwitchParts, List<List<GraphPart>> allSwitchOnFalseParts, List<List<GraphTargetItem>> allSwitchExpressions) {
         for (GraphTargetItem item : list) {
-            List<List<GraphTargetItem>> walkNext = new ArrayList<>();
-            boolean canUseBlock = true;
             if (item instanceof IfItem) {
                 IfItem ii = (IfItem) item;
                 boolean isNeq = true;
-                if ((ii.expression instanceof StrictNeqActionItem) || (ii.expression instanceof StrictEqActionItem)) {
-                    isNeq = (ii.expression instanceof StrictNeqActionItem);
+                if (!processedIfs.contains(ii.decisionPart)) {
+                    if ((ii.expression instanceof StrictNeqActionItem) || (ii.expression instanceof StrictEqActionItem)) {
+                        isNeq = (ii.expression instanceof StrictNeqActionItem);
 
-                    List<GraphPart> switchParts = new ArrayList<>();
-                    List<GraphTargetItem> switchExpressions = new ArrayList<>();
-                    List<GraphPart> switchOnFalseParts = new ArrayList<>();
-                    BinaryOpItem sneq = (BinaryOpItem) ii.expression;
-                    if ((sneq.leftSide instanceof StoreRegisterActionItem) || (sneq.leftSide instanceof GetVariableActionItem)) {
+                        List<GraphPart> switchParts = new ArrayList<>();
+                        List<GraphTargetItem> switchExpressions = new ArrayList<>();
+                        List<GraphPart> switchOnFalseParts = new ArrayList<>();
+                        BinaryOpItem sneq = (BinaryOpItem) ii.expression;
+                        if (true) {
+                            /*(sneq.leftSide instanceof StoreRegisterActionItem)
+                            || (sneq.leftSide instanceof GetVariableActionItem)
+                            || (sneq.leftSide instanceof GetMemberActionItem)
+                            ) {*/
 
-                        int regId = -1;
-                        GetVariableActionItem svar = null;
-                        if (sneq.leftSide instanceof StoreRegisterActionItem) {
-                            StoreRegisterActionItem sr = (StoreRegisterActionItem) sneq.leftSide;
-                            regId = sr.register.number;
-                        } else {
-                            svar = (GetVariableActionItem) sneq.leftSide;
-                        }
+                            int regId = -1;
+                            GraphTargetItem svar = null;
+                            if (sneq.leftSide instanceof StoreRegisterActionItem) {
+                                StoreRegisterActionItem sr = (StoreRegisterActionItem) sneq.leftSide;
+                                regId = sr.register.number;
+                            } else {
+                                svar = sneq.leftSide;
+                            }
 
-                        switchParts.add(ii.decisionPart);
-                        switchExpressions.add(sneq.rightSide);
-                        switchOnFalseParts.add(ii.onTruePart);
+                            switchParts.add(ii.decisionPart);
+                            switchExpressions.add(sneq.rightSide);
+                            switchOnFalseParts.add(ii.onTruePart);
 
-                        IfItem ii2 = ii;
-                        while (true) {
-                            if ((isNeq && (!ii2.onTrue.isEmpty() && (ii2.onTrue.get(0) instanceof IfItem)))
-                                    || (!isNeq && (!ii2.onFalse.isEmpty() && (ii2.onFalse.get(0) instanceof IfItem)))) {
-                                ii2 = (IfItem) (isNeq ? ii2.onTrue.get(0) : ii2.onFalse.get(0));
-                                if ((ii2.expression instanceof StrictNeqActionItem) || (ii2.expression instanceof StrictEqActionItem)) {
-                                    isNeq = (ii2.expression instanceof StrictNeqActionItem);
-                                    sneq = ((BinaryOpItem) ii2.expression);
-                                    if (sneq.leftSide instanceof DirectValueActionItem) {
-                                        DirectValueActionItem dv = (DirectValueActionItem) sneq.leftSide;
-                                        if (dv.value instanceof RegisterNumber) {
-                                            RegisterNumber rn = (RegisterNumber) dv.value;
-                                            if (rn.number == regId) {
-                                                switchParts.add(ii2.decisionPart);
-                                                switchOnFalseParts.add(ii2.onTruePart);
-                                                switchExpressions.add(sneq.rightSide);
-                                                walkNext.add(isNeq ? ii2.onFalse : ii2.onTrue);
+                            IfItem ii2 = ii;
+                            IfItem lastOkayIi = ii;
+                            while (true) {
+                                if ((isNeq && (!ii2.onTrue.isEmpty() && (ii2.onTrue.get(0) instanceof IfItem)))
+                                        || (!isNeq && (!ii2.onFalse.isEmpty() && (ii2.onFalse.get(0) instanceof IfItem)))) {
+                                    ii2 = (IfItem) (isNeq ? ii2.onTrue.get(0) : ii2.onFalse.get(0));
+                                    if ((ii2.expression instanceof StrictNeqActionItem) || (ii2.expression instanceof StrictEqActionItem)) {
+                                        isNeq = (ii2.expression instanceof StrictNeqActionItem);
+                                        sneq = ((BinaryOpItem) ii2.expression);
+                                        if (sneq.leftSide instanceof DirectValueActionItem) {
+                                            DirectValueActionItem dv = (DirectValueActionItem) sneq.leftSide;
+                                            if (dv.value instanceof RegisterNumber) {
+                                                RegisterNumber rn = (RegisterNumber) dv.value;
+                                                if (rn.number == regId) {
+                                                    processedIfs.add(ii.decisionPart);
+                                                    processedIfs.add(ii2.decisionPart);
+                                                    switchParts.add(ii2.decisionPart);
+                                                    switchOnFalseParts.add(ii2.onTruePart);
+                                                    switchExpressions.add(sneq.rightSide);
+                                                    lastOkayIi = ii2;
+                                                } else {
+                                                    break;
+                                                }
                                             } else {
                                                 break;
                                             }
-                                        } else {
-                                            break;
-                                        }
-                                    } else if (svar != null && sneq.leftSide instanceof GetVariableActionItem) {
-                                        if (sneq.leftSide.valueEquals(svar)) {
-                                            switchParts.add(ii2.decisionPart);
-                                            switchOnFalseParts.add(ii2.onTruePart);
-                                            switchExpressions.add(sneq.rightSide);
-                                            walkNext.add(isNeq ? ii2.onFalse : ii2.onTrue);
+                                        } else if (svar != null) {
+                                            if (sneq.leftSide.valueEquals(svar)) {
+                                                processedIfs.add(ii.decisionPart);
+                                                processedIfs.add(ii2.decisionPart);
+                                                switchParts.add(ii2.decisionPart);
+                                                switchOnFalseParts.add(ii2.onTruePart);
+                                                switchExpressions.add(sneq.rightSide);
+                                                lastOkayIi = ii2;
+                                            } else {
+                                                break;
+                                            }
                                         } else {
                                             break;
                                         }
@@ -675,28 +687,21 @@ public class ActionGraph extends Graph {
                                 } else {
                                     break;
                                 }
-                            } else {
-                                break;
                             }
-                        }
 
-                        if (switchParts.size() > 1) {
-                            allSwitchParts.add(switchParts);
-                            allSwitchOnFalseParts.add(switchOnFalseParts);
-                            allSwitchExpressions.add(switchExpressions);
-                            walkNext.add(ii2.onFalse);
-                            canUseBlock = false;
+                            if (switchParts.size() > 1) {
+                                allSwitchParts.add(switchParts);
+                                allSwitchOnFalseParts.add(switchOnFalseParts);
+                                allSwitchExpressions.add(switchExpressions);
+                            }
                         }
                     }
                 }
             }
-            if ((item instanceof Block) && (canUseBlock)) {
+            if ((item instanceof Block)) {
                 for (List<GraphTargetItem> sub : ((Block) item).getSubs()) {
-                    checkSecondPassSwitches(sub, allSwitchParts, allSwitchOnFalseParts, allSwitchExpressions);
+                    checkSecondPassSwitches(processedIfs, sub, allSwitchParts, allSwitchOnFalseParts, allSwitchExpressions);
                 }
-            }
-            for (List<GraphTargetItem> next : walkNext) {
-                checkSecondPassSwitches(next, allSwitchParts, allSwitchOnFalseParts, allSwitchExpressions);
             }
         }
     }

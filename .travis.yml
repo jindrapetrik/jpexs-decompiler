@@ -1,5 +1,5 @@
 language: java
-jdk: [oraclejdk9]
+jdk: [openjdk8]
 #dist: trusty
 addons:
     apt:

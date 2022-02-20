@@ -41,7 +41,10 @@ public class AS2ScriptImporter {
 
     private static final Logger logger = Logger.getLogger(AS2ScriptImporter.class.getName());
 
-    public int importScripts(String scriptsFolder, Map<String, ASMSource> asms) {
+    public int importScripts(String scriptsFolder, Map<String, ASMSource> asms) throws InterruptedException {
+        return importScripts(scriptsFolder, asms, null);
+    }
+    public int importScripts(String scriptsFolder, Map<String, ASMSource> asms, ScriptImporterProgressListener listener) throws InterruptedException {
         if (!scriptsFolder.endsWith(File.separator)) {
             scriptsFolder += File.separator;
         }
@@ -50,6 +53,9 @@ public class AS2ScriptImporter {
 
         int importCount = 0;
         for (String key : asms.keySet()) {
+            if (Thread.currentThread().isInterrupted()) {
+                throw new InterruptedException();
+            }
             ASMSource asm = asms.get(key);
             String currentOutDir = scriptsFolder + key + File.separator;
             currentOutDir = new File(currentOutDir).getParentFile().toString() + File.separator;
@@ -71,6 +77,7 @@ public class AS2ScriptImporter {
 
             String fileName = Path.combine(currentOutDir, name) + ".as";
             if (new File(fileName).exists()) {
+                asm.getSwf().informListeners("importing_as", fileName);
                 String txt = Helper.readTextFile(fileName);
 
                 ActionScript2Parser par = new ActionScript2Parser(asm.getSwf(), asm);
@@ -82,16 +89,22 @@ public class AS2ScriptImporter {
                     logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName), ex);
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
+                } catch (InterruptedException ex) {
+                    return importCount;
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
                 }
 
                 asm.setModified();
                 importCount++;
+                if (listener != null) {
+                    listener.scriptImported();
+                }
             }
 
             fileName = Path.combine(currentOutDir, name) + ".pcode";
             if (new File(fileName).exists()) {
+                asm.getSwf().informListeners("importing_as", fileName);
                 String txt = Helper.readTextFile(fileName);
 
                 try {
@@ -104,19 +117,27 @@ public class AS2ScriptImporter {
 
                 asm.setModified();
                 importCount++;
+                if (listener != null) {
+                    listener.scriptImported();
+                }
             }
 
             fileName = Path.combine(currentOutDir, name) + ".hex";
             if (new File(fileName).exists()) {
+                asm.getSwf().informListeners("importing_as", fileName);
                 String txt = Helper.readTextFile(fileName);
 
                 asm.setActionBytes(Helper.getBytesFromHexaText(txt));
                 asm.setModified();
                 importCount++;
+                if (listener != null) {
+                    listener.scriptImported();
+                }
             }
 
             fileName = Path.combine(currentOutDir, name) + ".txt";
             if (new File(fileName).exists()) {
+                asm.getSwf().informListeners("importing_as", fileName);
                 String txt = Helper.readTextFile(fileName);
 
                 try {
@@ -126,6 +147,9 @@ public class AS2ScriptImporter {
                 }
                 asm.setModified();
                 importCount++;
+                if (listener != null) {
+                    listener.scriptImported();
+                }
             }
         }
 

@@ -360,38 +360,6 @@ public class Graph {
             }
         }
 
-        for (GraphPart p : parts) {
-            if (loopContinues.contains(p)) {
-                break;
-            }
-            boolean common = true;
-            for (GraphPart q : parts) {
-                if (q == p) {
-                    continue;
-                }
-                if (!q.leadsTo(localData, this, code, p, loops, throwStates, false /*!!THROW*/)) {
-                    common = false;
-                    break;
-                }
-            }
-            if (common) {
-                return p;
-            }
-        }
-
-        /*loopi:
-        for (int i = 0; i < parts.size(); i++) {
-            for (int j = 0; j < parts.size(); j++) {
-                if (j == i) {
-                    continue;
-                }
-                if (parts.get(i).leadsTo(localData, this, code, parts.get(j), loops)) {
-                    parts.remove(i);
-                    i--;
-                    continue loopi;
-                }
-            }
-        }*/
         List<Set<GraphPart>> reachable = new ArrayList<>();
         Set<GraphPart> allReachable = new LinkedHashSet<>();
         for (GraphPart p : parts) {
@@ -404,37 +372,76 @@ public class Graph {
             allReachable.add(p);
             allReachable.addAll(r1);
         }
-        int maxCommonLevel = 0;
-        GraphPart maxCommonLevelPart = null;
-        Set<GraphPart> visited = new HashSet<>();
-        for (GraphPart p : allReachable) {
-            if (loopContinues.contains(p)) {
-                break;
-            }
-            if (visited.contains(p)) {
+        int maxCommonLevel = -1;
+        GraphPart maxCommonPart = null;
+        for (GraphPart r : allReachable) {
+            if (loopContinues.contains(r)) {
                 continue;
             }
-            visited.add(p);
+            boolean common = true;
             int commonLevel = 0;
-            for (Set<GraphPart> r : reachable) {
-                if (r.contains(p)) {
+            for (GraphPart p : parts) {
+                if (p == r) {
+                    commonLevel++;
+                    continue;
+                }
+                if (!p.leadsTo(localData, this, code, r, loops, throwStates, false)) {
+                    common = false;
+                } else {
                     commonLevel++;
                 }
             }
-            //System.err.println("commonlevel of " + p + " is " + commonLevel);
-            if (commonLevel <= maxCommonLevel) {
-                continue;
-            }
-            maxCommonLevel = commonLevel;
-            maxCommonLevelPart = p;
-        }
-        //System.err.println("maxclevel = " + maxCommonLevel);
-        //System.err.println("maxclevelpart = " + maxCommonLevelPart);
+            if (common) {
+                Stack<GraphPart> toProcess = new Stack<>();
+                Set<GraphPart> visited = new HashSet<>();
+                toProcess.addAll(parts);
 
+                loopprocess:
+                while (!toProcess.isEmpty()) {
+                    GraphPart p = toProcess.pop();
+                    if (p == r) {
+                        continue;
+                    }
+
+                    if (loopContinues.contains(p)) {
+                        continue;
+                    }
+                    if (visited.contains(p)) {
+                        continue;
+                    }
+                    visited.add(p);
+                    for (GraphPart n : p.nextParts) {
+                        if (n == r) {
+                            continue;
+                        }
+
+                        if (loopContinues.contains(n)) {
+                            continue;
+                        }
+                        if (visited.contains(n)) {
+                            continue;
+                        }
+                        if (!n.leadsTo(localData, this, code, r, loops, throwStates, false)) {
+                            common = false;
+                            break loopprocess;
+                        }
+                    }
+                    toProcess.addAll(p.nextParts);
+                }
+
+                if (common) {
+                    return r;
+                }
+            }
+            if (commonLevel > maxCommonLevel) {
+                maxCommonPart = r;
+                maxCommonLevel = commonLevel;
+            }
+        }
         if (maxCommonLevel <= 1) {
             return null;
         }
-        return maxCommonLevelPart;
+        return maxCommonPart;
     }
 
     public GraphPart getNextNoJump(GraphPart part, BaseLocalData localData) {
@@ -2085,8 +2092,7 @@ public class Graph {
                     output.addAll(ex.getOutput());
                     for (GraphPart p : allParts) {
                         if (p.containsIP(ex.getIp())) {
-                            if (ipStart == p.start) {
-                                //can this happen? TODO: find some example in the wild
+                            if (ex.getIp() == p.start) {
                                 currentRet.addAll(output);
                                 //to check for stopparts,etc. we need to call printGraph again
                                 part = p;

@@ -312,6 +312,7 @@ public class Timeline {
                 DepthState fl = frame.layers.get(depth);
                 if (fl == null) {
                     frame.layers.put(depth, fl = new DepthState(swf, frame));
+                    fl.depth = depth;
                 }
                 frame.layersChanged = true;
                 fl.placeObjectTag = po;

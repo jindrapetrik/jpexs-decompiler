@@ -89,8 +89,9 @@ public class NamespaceItem {
             PropertyAVM2Item prop = new PropertyAVM2Item(null, custom, abcIndex, openedNamespaces, new ArrayList<>());
             Reference<ValueKind> value = new Reference<>(null);
             Reference<ABC> outAbc = new Reference<>(null);
+            Reference<Boolean> isType = new Reference<>(false);
 
-            prop.resolve(true, localData, new Reference<>(null), new Reference<>(null), new Reference<>(0), value, outAbc);
+            prop.resolve(true, localData, isType, new Reference<>(null), new Reference<>(null), new Reference<>(0), value, outAbc);
             boolean resolved = true;
             if (value.getVal() == null) {
                 resolved = false;
