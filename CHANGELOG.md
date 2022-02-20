@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [15.1.0] - 2022-02-20
 ### Added
 - Display object depth in flash panel
 - Show imported files on script import, able to cancel import
