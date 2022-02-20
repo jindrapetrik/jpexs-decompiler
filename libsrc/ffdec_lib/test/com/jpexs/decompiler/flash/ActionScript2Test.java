@@ -2385,4 +2385,12 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "trace(\"after\");\r\n"
         );
     }
+
+    @Test
+    public void frame85_numbersCallTest() {
+        compareSrc(85, "trace(\"numbersCallTest\");\r\n"
+                + "var a = (5).toString();\r\n"
+                + "var b = 5.2.toString();\r\n"
+        );
+    }
 }

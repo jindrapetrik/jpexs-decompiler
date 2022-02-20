@@ -52,7 +52,13 @@ public class CallStaticAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        receiver.toString(writer, localData);
+        if (receiver.getPrecedence() > getPrecedence() || (receiver instanceof IntegerValueAVM2Item)) {
+            writer.append("(");
+            receiver.toString(writer, localData);
+            writer.append(")");
+        } else {
+            receiver.toString(writer, localData);
+        }
         writer.append(".");
         writer.append(methodName);
         writer.spaceBeforeCallParenthesies(arguments.size());

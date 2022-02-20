@@ -1241,7 +1241,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                             try {
                                 List<Action> actions = parser.actionsFromString("class " + dc.toPrintableString(false) + "{}");
                                 doInit.setActions(actions);
-                            } catch (ActionParseException | IOException | CompilationException ex) {
+                            } catch (ActionParseException | IOException | CompilationException | InterruptedException ex) {
                                 //ignore
                             }
 

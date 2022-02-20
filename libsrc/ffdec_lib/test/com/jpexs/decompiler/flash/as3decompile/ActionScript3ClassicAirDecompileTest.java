@@ -17,8 +17,28 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testActivationArguments() {
+        decompileMethod("classic_air", "testActivationArguments", "var func:Function = function(a:int, b:int):int\r\n"
+                + "{\r\n"
+                + "return a + b;\r\n"
+                + "};\r\n"
+                + "if(arguments.length > 0)\r\n"
+                + "{\r\n"
+                + "trace(arguments[0]);\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
     public void testArguments() {
         decompileMethod("classic_air", "testArguments", "return arguments[0];\r\n",
+                false);
+    }
+
+    @Test
+    public void testCallLocal() {
+        decompileMethod("classic_air", "testCallLocal", "var f:Function = getF();\r\n"
+                + "var b:int = f(1,3);\r\n",
                 false);
     }
 
@@ -871,6 +891,27 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testIfFinally() {
+        decompileMethod("classic_air", "testIfFinally", "var a:int = Math.random();\r\n"
+                + "if(a == 5)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try body\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch\");\r\n"
+                + "}\r\n"
+                + "finally\r\n"
+                + "{\r\n"
+                + "trace(\"in finally\");\r\n"
+                + "}\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
     public void testIfInIf() {
         decompileMethod("classic_air", "testIfInIf", "var k:int = 5;\r\n"
                 + "if(k > 5 && k < 20)\r\n"
@@ -1018,7 +1059,6 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
         decompileMethod("classic_air", "testInlineFunctions", "var first:String = \"value1\";\r\n"
                 + "var traceParameter:Function = function(aParam:String):String\r\n"
                 + "{\r\n"
-                + "aParam = aParam;\r\n"
                 + "var second:String = \"value2\";\r\n"
                 + "second = second + \"cc\";\r\n"
                 + "var traceParam2:Function = function(bParam:String):String\r\n"
@@ -1036,8 +1076,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testInnerFunctionScope() {
-        decompileMethod("classic_air", "testInnerFunctionScope", "a = a;\r\n"
-                + "var innerFunc:Function = function(b:String):*\r\n"
+        decompileMethod("classic_air", "testInnerFunctionScope", "var innerFunc:Function = function(b:String):*\r\n"
                 + "{\r\n"
                 + "testProm = 4;\r\n"
                 + "trace(testProm);\r\n"
@@ -1048,8 +1087,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testInnerFunctions() {
-        decompileMethod("classic_air", "testInnerFunctions", "a = a;\r\n"
-                + "var s:int = 0;\r\n"
+        decompileMethod("classic_air", "testInnerFunctions", "var s:int = 0;\r\n"
                 + "var innerFunc:Function = function(b:String):*\r\n"
                 + "{\r\n"
                 + "trace(b);\r\n"
@@ -1190,6 +1228,20 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var b:* = ns::[name];\r\n"
                 + "trace(b.c);\r\n"
                 + "var c:* = myInternal::neco;\r\n",
+                false);
+    }
+
+    @Test
+    public void testNegate() {
+        decompileMethod("classic_air", "testNegate", "var a:int = 5;\r\n"
+                + "var b:int = ~a;\r\n",
+                false);
+    }
+
+    @Test
+    public void testNumberCall() {
+        decompileMethod("classic_air", "testNumberCall", "var a:String = (5).toString();\r\n"
+                + "var b:String = 5.2.toString();\r\n",
                 false);
     }
 
@@ -1343,6 +1395,25 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "default:\r\n"
                 + "trace(\"default clause\");\r\n"
                 + "}\r\n",
+                false);
+    }
+
+    @Test
+    public void testSwitchIf() {
+        decompileMethod("classic_air", "testSwitchIf", "var code:String = \"4\";\r\n"
+                + "var a:Boolean = true;\r\n"
+                + "switch(int(code) - 2)\r\n"
+                + "{\r\n"
+                + "case 0:\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "break;\r\n"
+                + "case 1:\r\n"
+                + "}\r\n"
+                + "trace(\"B\");\r\n",
                 false);
     }
 

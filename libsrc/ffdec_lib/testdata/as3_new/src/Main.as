@@ -15,7 +15,9 @@ package
 	 */
 	public class Main extends Sprite
 	{
+		TestActivationArguments;
 		TestArguments;
+		TestCallLocal;
 		TestCatchFinally;
 		TestChain2;
 		TestChainedAssignments;
@@ -58,6 +60,7 @@ package
 		TestHello;
 		TestIf;
 		TestIfElse;
+		TestIfFinally;
 		TestIfInIf;
 		TestIfTry;
 		TestIgnoreAndOr;
@@ -75,6 +78,8 @@ package
 		TestMultipleCondition;
 		TestNamedAnonFunctions;
 		TestNames;
+		TestNegate;
+		TestNumberCall;
 		TestOptionalParameters;
 		TestParamNames;
 		TestParamsCount;
@@ -89,6 +94,7 @@ package
 		TestSwitch;
 		TestSwitchComma;
 		TestSwitchDefault;
+		TestSwitchIf;
 		TestTernarOperator;
 		TestTry;
 		TestTryIf;

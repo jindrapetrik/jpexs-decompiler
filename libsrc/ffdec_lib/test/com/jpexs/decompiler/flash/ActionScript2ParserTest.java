@@ -16,12 +16,15 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.graph.CompilationException;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -44,7 +47,7 @@ public class ActionScript2ParserTest extends ActionScript2TestBase {
             swf.version = SWF.DEFAULT_VERSION;
             ActionScript2Parser par = new ActionScript2Parser(swf, new DoActionTag(swf));
             par.actionsFromString(script);
-        } catch (IOException | CompilationException | ParseException ex) {
+        } catch (IOException | CompilationException | ParseException | InterruptedException ex) {
             fail("Unable to parse: " + script, ex);
         }
     }

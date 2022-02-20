@@ -17,8 +17,28 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testActivationArguments() {
+        decompileMethod("classic", "testActivationArguments", "var func:Function = function(a:int, b:int):int\r\n"
+                + "{\r\n"
+                + "return a + b;\r\n"
+                + "};\r\n"
+                + "if(arguments.length > 0)\r\n"
+                + "{\r\n"
+                + "trace(arguments[0]);\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
     public void testArguments() {
         decompileMethod("classic", "testArguments", "return arguments[0];\r\n",
+                false);
+    }
+
+    @Test
+    public void testCallLocal() {
+        decompileMethod("classic", "testCallLocal", "var f:Function = this.getF();\r\n"
+                + "var b:int = f(1,3);\r\n",
                 false);
     }
 
@@ -865,6 +885,27 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testIfFinally() {
+        decompileMethod("classic", "testIfFinally", "var a:int = Math.random();\r\n"
+                + "if(a == 5)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"in try body\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "trace(\"in catch\");\r\n"
+                + "}\r\n"
+                + "finally\r\n"
+                + "{\r\n"
+                + "trace(\"in finally\");\r\n"
+                + "}\r\n"
+                + "}\r\n",
+                false);
+    }
+
+    @Test
     public void testIfInIf() {
         decompileMethod("classic", "testIfInIf", "var k:int = 5;\r\n"
                 + "if(k > 5 && k < 20)\r\n"
@@ -1184,6 +1225,20 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testNegate() {
+        decompileMethod("classic", "testNegate", "var a:int = 5;\r\n"
+                + "var b:int = ~a;\r\n",
+                false);
+    }
+
+    @Test
+    public void testNumberCall() {
+        decompileMethod("classic", "testNumberCall", "var a:String = (5).toString();\r\n"
+                + "var b:String = 5.2.toString();\r\n",
+                false);
+    }
+
+    @Test
     public void testParamNames() {
         decompileMethod("classic", "testParamNames", "return firstp + secondp + thirdp;\r\n",
                 false);
@@ -1333,6 +1388,24 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "default:\r\n"
                 + "trace(\"default clause\");\r\n"
                 + "}\r\n",
+                false);
+    }
+
+    @Test
+    public void testSwitchIf() {
+        decompileMethod("classic", "testSwitchIf", "var code:String = \"4\";\r\n"
+                + "var a:Boolean = true;\r\n"
+                + "switch(int(code) - 2)\r\n"
+                + "{\r\n"
+                + "case 0:\r\n"
+                + "case 1:\r\n"
+                + "if(a)\r\n"
+                + "{\r\n"
+                + "trace(\"A\");\r\n"
+                + "break;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "trace(\"B\");\r\n",
                 false);
     }
 

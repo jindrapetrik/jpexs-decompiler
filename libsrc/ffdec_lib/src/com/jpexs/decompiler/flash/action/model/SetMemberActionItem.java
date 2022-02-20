@@ -91,7 +91,13 @@ public class SetMemberActionItem extends ActionItem implements SetTypeActionItem
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        object.toString(writer, localData);
+        if (((object instanceof DirectValueActionItem) && (((DirectValueActionItem) object).value instanceof Long))) {
+            writer.append("(");
+            object.toString(writer, localData);
+            writer.append(")");
+        } else {
+            object.toString(writer, localData);
+        }
 
         if ((!(objectName instanceof DirectValueActionItem)) || (!((DirectValueActionItem) objectName).isString()) || (!IdentifiersDeobfuscation.isValidName(false, ((DirectValueActionItem) objectName).toStringNoQuotes(localData)))) {
             writer.append("[");
