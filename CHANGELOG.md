@@ -33,6 +33,7 @@ All notable changes to this project will be documented in this file.
 - [#1773] - Auto set flagWideCodes on FontInfo wide character adding
 - [#1769] - Do not mark getter+setter as colliding (#xxx suffix)
 - [#1801] - Flex SDK not required on commandline when Flex compilation is disabled
+- Multiname - performance issues
 
 ## [15.0.0] - 2021-11-29
 ### Added
