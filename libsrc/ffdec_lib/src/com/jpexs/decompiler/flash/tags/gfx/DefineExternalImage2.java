@@ -12,26 +12,39 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.gfx;
 
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.helpers.ImageHelper;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
+import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.SerializableImage;
+import net.npe.dds.DDSReader;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  *
  * @author JPEXS
  */
-public class DefineExternalImage2 extends Tag {
+public class DefineExternalImage2 extends ImageTag {
 
     public static final int ID = 1009;
 
     public static final String NAME = "DefineExternalImage2";
 
-    public long characterId;
+    public int unknownID;
 
     public int bitmapFormat;
 
@@ -51,6 +64,9 @@ public class DefineExternalImage2 extends Tag {
 
     public static final int BITMAP_FORMAT_DDS = 2;
 
+    @HideInRawEdit
+    private SerializableImage serImage;
+
     /**
      * Gets data bytes
      *
@@ -59,7 +75,8 @@ public class DefineExternalImage2 extends Tag {
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
-        sos.writeUI32(characterId);
+        sos.writeUI16(characterID);
+        sos.writeUI16(unknownID);
         sos.writeUI16(bitmapFormat);
         sos.writeUI16(targetWidth);
         sos.writeUI16(targetHeight);
@@ -84,7 +101,8 @@ public class DefineExternalImage2 extends Tag {
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        characterId = sis.readUI32("characterId");
+        characterID = sis.readUI16("characterID") | 0x8000;
+        unknownID = sis.readUI16("unknownID"); // always 9
         bitmapFormat = sis.readUI16("bitmapFormat");
         targetWidth = sis.readUI16("targetWidth");
         targetHeight = sis.readUI16("targetHeight");
@@ -93,5 +111,50 @@ public class DefineExternalImage2 extends Tag {
         if (sis.available() > 0) { //there is usually one zero byte, bod knows why
             extraData = sis.readBytesEx(sis.available(), "extraData");
         }
+        if (bitmapFormat == BITMAP_FORMAT_TGA) {
+          return;
+        }
+
+        Path imagePath = Paths.get(sis.getSwf().getFile()).getParent().resolve(Paths.get(fileName));
+        byte[] imageData = Files.readAllBytes(imagePath);
+        int [] pixels = DDSReader.read(imageData, DDSReader.ARGB, 0);
+        BufferedImage bufImage = new BufferedImage(DDSReader.getWidth(imageData), DDSReader.getHeight(imageData), BufferedImage.TYPE_INT_ARGB);
+        bufImage.getRaster().setDataElements(0, 0, bufImage.getWidth(), bufImage.getHeight(), pixels);
+        Image scaled = bufImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+        bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+        bufImage.getGraphics().drawImage(scaled, 0, 0, null);
+        serImage = new SerializableImage(bufImage);
+    }
+
+    @Override
+    public void setImage(byte[] data) throws IOException {
+        serImage = new SerializableImage(ImageHelper.read(data));
+        clearCache();
+        setModified(true);
+    }
+
+    @Override
+    public ImageFormat getImageFormat() {
+        return ImageFormat.PNG;
+    }
+
+    @Override
+    public ImageFormat getOriginalImageFormat() {
+        return ImageFormat.PNG;
+    }
+
+    @Override
+    public InputStream getOriginalImageData() {
+        return null;
+    }
+
+    @Override
+    public SerializableImage getImage() {
+        return serImage;
+    }
+
+    @Override
+    public Dimension getImageDimension() {
+        return new Dimension(serImage.getWidth(), serImage.getHeight());
     }
 }
