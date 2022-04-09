@@ -700,7 +700,7 @@ Section "$(STRING_SWC)" SecPlayerGlobal
 ;checkadobe:
 DetailPrint "$(STRING_SWC_CHECK)"
 GetTempFileName $pghtml
-inetc::get /SILENT /USERAGENT "${APP_NAME} Setup" "https://www.adobe.com/support/flashplayer/downloads.html" "$pghtml" /END
+inetc::get /SILENT /USERAGENT "${APP_NAME} Setup" "https://web.archive.org/web/20220401020702/https://www.adobe.com/support/flashplayer/debug_downloads.html" "$pghtml" /END
 Pop $0
 StrCmp $0 "OK" dlok
 MessageBox MB_OK "$(STRING_SWC_NOTFOUND)"
