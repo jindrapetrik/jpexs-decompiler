@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Support for loading external images in DefineExternalImage2, DefineSubImage
 
+### Fixed
+- No longer working link to adobe dev downloads changed to its web-archived version
+
 ## [15.1.0] - 2022-02-20
 ### Added
 - Display object depth in flash panel
