@@ -67,11 +67,15 @@ public class SwfXmlExporter {
 
     private final Map<Class, List<Field>> cachedFields = new HashMap<>();
 
-    public List<File> exportXml(SWF swf, File outFile) throws IOException {
+    public List<File> exportXml(SWF swf, File outFile) throws IOException {        
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             Document xmlDoc = docBuilder.newDocument();
+            
+            xmlDoc.appendChild(xmlDoc.createComment("WARNING: The structure of this XML is not final. In later versions of FFDec it can be changed."));
+            xmlDoc.appendChild(xmlDoc.createComment(ApplicationInfo.applicationVerName));
+            
             exportXml(swf, xmlDoc, xmlDoc);
             try (Writer writer = new Utf8OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(outFile)))) {
                 writer.append(getXml(xmlDoc));
@@ -102,7 +106,7 @@ public class SwfXmlExporter {
     }
 
     public void exportXml(SWF swf, Document doc, Node node) throws IOException {
-        generateXml(doc, node, "swf", swf, false, 0, false);
+        generateXml(doc, node, "swf", swf, false, false);
     }
 
     public List<Field> getSwfFieldsCached(Class cls) {
@@ -115,7 +119,7 @@ public class SwfXmlExporter {
         return result;
     }
 
-    private void generateXml(Document doc, Node node, String name, Object obj, boolean isListItem, int level, boolean needsCData) {
+    private void generateXml(Document doc, Node node, String name, Object obj, boolean isListItem, boolean needsCData) {
         Class cls = obj != null ? obj.getClass() : null;
 
         if (obj != null && needsCData && cls == String.class) {
@@ -156,20 +160,16 @@ public class SwfXmlExporter {
         } else if (obj instanceof byte[]) {
             byte[] data = (byte[]) obj;
             ((Element) node).setAttribute(name, Helper.byteArrayToHex(data));
-        } else if (cls != null && obj != null && List.class.isAssignableFrom(cls)) {
-            List list = (List) obj;
-            Element listNode = doc.createElement(name);
-            node.appendChild(listNode);
-            for (int i = 0; i < list.size(); i++) {
-                generateXml(doc, listNode, "item", list.get(i), true, level + 1, false);
+        } else if (cls != null && (cls.isArray() || List.class.isAssignableFrom(cls))) {
+            if(List.class.isAssignableFrom(cls)) {
+                obj = ((List)obj).toArray();
             }
-        } else if (cls != null && cls.isArray()) {
-            Class arrayType = cls.getComponentType();
+            
             Element arrayNode = doc.createElement(name);
             node.appendChild(arrayNode);
             int length = Array.getLength(obj);
             for (int i = 0; i < length; i++) {
-                generateXml(doc, arrayNode, "item", Array.get(obj, i), true, level + 1, false);
+                generateXml(doc, arrayNode, "item", Array.get(obj, i), true, false);
             }
         } else if (obj != null) {
             if (obj instanceof LazyObject) {
@@ -186,14 +186,9 @@ public class SwfXmlExporter {
             Element objNode = doc.createElement(name);
             objNode.setAttribute("type", className);
             if (obj instanceof UnknownTag) {
-                objNode.setAttribute("tagId", "" + ((Tag) obj).getId());
+                objNode.setAttribute("tagId", String.valueOf(((Tag) obj).getId()));
             }
             node.appendChild(objNode);
-
-            if (level == 0) {
-                objNode.appendChild(doc.createComment("WARNING: The structure of this XML is not final. In later versions of FFDec it can be changed."));
-                objNode.appendChild(doc.createComment(ApplicationInfo.applicationVerName));
-            }
 
             for (Field f : fields) {
                 if (Modifier.isStatic(f.getModifiers())) {
@@ -208,7 +203,7 @@ public class SwfXmlExporter {
 
                 try {
                     f.setAccessible(true);
-                    generateXml(doc, objNode, f.getName(), f.get(obj), false, level + 1, multilineA != null);
+                    generateXml(doc, objNode, f.getName(), f.get(obj), false, multilineA != null);
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
