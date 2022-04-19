@@ -133,11 +133,63 @@ public class SwfXmlImporter {
 
     private static final Logger logger = Logger.getLogger(SwfXmlImporter.class.getName());
 
-    private Map<String, Class> swfTags;
+    private static final Map<String, Class> swfTags;
 
-    private Map<String, Class> swfObjects;
+    private static final Map<String, Class> swfObjects;
 
-    private Map<String, Class> swfObjectsParam;
+    private static final Map<String, Class> swfObjectsParam;
+    
+    static {
+        Map<String, Class> tags = new HashMap<>();
+        Map<Integer, TagTypeInfo> knownTags = Tag.getKnownClasses();
+        for (Integer key : knownTags.keySet()) {
+            Class cls = knownTags.get(key).getCls();
+            if (!ReflectionTools.canInstantiate(cls)) {
+                System.err.println("Can't instantiate: " + cls.getName());
+            }
+            tags.put(cls.getSimpleName(), cls);
+        }
+
+        swfTags = tags;
+        
+        Map<String, Class> objects = new HashMap<>();
+        Class[] knownObjects = new Class[]{ALPHABITMAPDATA.class, ALPHACOLORMAPDATA.class, ARGB.class, BITMAPDATA.class,
+            BUTTONCONDACTION.class, BUTTONRECORD.class, CLIPACTIONRECORD.class, CLIPACTIONS.class, CLIPEVENTFLAGS.class,
+            COLORMAPDATA.class, ColorTransform.class, CXFORM.class, CXFORMWITHALPHA.class,
+            FILLSTYLE.class, FILLSTYLEARRAY.class, FOCALGRADIENT.class, GLYPHENTRY.class, GRADIENT.class, GRADRECORD.class,
+            KERNINGRECORD.class, LANGCODE.class, LINESTYLE.class, LINESTYLE2.class, LINESTYLEARRAY.class, MATRIX.class,
+            MORPHFILLSTYLE.class, MORPHFILLSTYLEARRAY.class, MORPHFOCALGRADIENT.class, MORPHGRADIENT.class,
+            MORPHGRADRECORD.class, MORPHLINESTYLE.class, MORPHLINESTYLE2.class, MORPHLINESTYLEARRAY.class, PIX15.class,
+            PIX24.class, RECT.class, RGB.class, RGBA.class, SHAPE.class, SHAPEWITHSTYLE.class, SOUNDENVELOPE.class,
+            SOUNDINFO.class, TEXTRECORD.class, ZONEDATA.class, ZONERECORD.class,
+            CurvedEdgeRecord.class, EndShapeRecord.class, StraightEdgeRecord.class, StyleChangeRecord.class,
+            BEVELFILTER.class, BLURFILTER.class, COLORMATRIXFILTER.class, CONVOLUTIONFILTER.class,
+            DROPSHADOWFILTER.class, GLOWFILTER.class, GRADIENTBEVELFILTER.class, GRADIENTGLOWFILTER.class,
+            AVM2ConstantPool.class, Decimal.class, Namespace.class, NamespaceSet.class, Multiname.class, MethodInfo.class, MetadataInfo.class,
+            ValueKind.class, InstanceInfo.class, Traits.class, TraitClass.class, TraitFunction.class,
+            TraitMethodGetterSetter.class, TraitSlotConst.class, ClassInfo.class, ScriptInfo.class, MethodBody.class,
+            ABCException.class, ABCVersion.class, Amf3Value.class};
+        
+        for (Class cls2 : knownObjects) {
+            if (!ReflectionTools.canInstantiateDefaultConstructor(cls2)) {
+                System.err.println("Can't instantiate: " + cls2.getName());
+            }
+            objects.put(cls2.getSimpleName(), cls2);
+        }
+
+        swfObjects = objects;
+        
+        Map<String, Class> objectsParam = new HashMap<>();
+        Class[] knownObjectsParam = new Class[]{ABC.class};
+        for (Class cls2 : knownObjectsParam) {
+            if (!ReflectionTools.canInstantiate(cls2)) {
+                System.err.println("Can't instantiate: " + cls2.getName());
+            }
+            objectsParam.put(cls2.getSimpleName(), cls2);
+        }
+
+        swfObjectsParam = objectsParam;
+    }
 
     public void importSwf(SWF swf, String xml) throws IOException {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
@@ -309,20 +361,6 @@ public class SwfXmlImporter {
     }
 
     private Object createObject(String type, int tagTypeId, SWF swf, Tag tag) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        if (swfTags == null) {
-            Map<String, Class> tags = new HashMap<>();
-            Map<Integer, TagTypeInfo> knownTags = Tag.getKnownClasses();
-            for (Integer key : knownTags.keySet()) {
-                Class cls = knownTags.get(key).getCls();
-                if (!ReflectionTools.canInstantiate(cls)) {
-                    System.err.println("Can't instantiate: " + cls.getName());
-                }
-                tags.put(cls.getSimpleName(), cls);
-            }
-
-            swfTags = tags;
-        }
-
         if ("UnknownTag".equals(type)) {
             return new UnknownTag(swf, tagTypeId);
         }
@@ -332,50 +370,9 @@ public class SwfXmlImporter {
             return cls.getConstructor(SWF.class).newInstance(swf);
         }
 
-        if (swfObjects == null) {
-            Map<String, Class> objects = new HashMap<>();
-            Class[] knownObjects = new Class[]{ALPHABITMAPDATA.class, ALPHACOLORMAPDATA.class, ARGB.class, BITMAPDATA.class,
-                BUTTONCONDACTION.class, BUTTONRECORD.class, CLIPACTIONRECORD.class, CLIPACTIONS.class, CLIPEVENTFLAGS.class,
-                COLORMAPDATA.class, ColorTransform.class, CXFORM.class, CXFORMWITHALPHA.class,
-                FILLSTYLE.class, FILLSTYLEARRAY.class, FOCALGRADIENT.class, GLYPHENTRY.class, GRADIENT.class, GRADRECORD.class,
-                KERNINGRECORD.class, LANGCODE.class, LINESTYLE.class, LINESTYLE2.class, LINESTYLEARRAY.class, MATRIX.class,
-                MORPHFILLSTYLE.class, MORPHFILLSTYLEARRAY.class, MORPHFOCALGRADIENT.class, MORPHGRADIENT.class,
-                MORPHGRADRECORD.class, MORPHLINESTYLE.class, MORPHLINESTYLE2.class, MORPHLINESTYLEARRAY.class, PIX15.class,
-                PIX24.class, RECT.class, RGB.class, RGBA.class, SHAPE.class, SHAPEWITHSTYLE.class, SOUNDENVELOPE.class,
-                SOUNDINFO.class, TEXTRECORD.class, ZONEDATA.class, ZONERECORD.class,
-                CurvedEdgeRecord.class, EndShapeRecord.class, StraightEdgeRecord.class, StyleChangeRecord.class,
-                BEVELFILTER.class, BLURFILTER.class, COLORMATRIXFILTER.class, CONVOLUTIONFILTER.class,
-                DROPSHADOWFILTER.class, GLOWFILTER.class, GRADIENTBEVELFILTER.class, GRADIENTGLOWFILTER.class,
-                AVM2ConstantPool.class, Decimal.class, Namespace.class, NamespaceSet.class, Multiname.class, MethodInfo.class, MetadataInfo.class,
-                ValueKind.class, InstanceInfo.class, Traits.class, TraitClass.class, TraitFunction.class,
-                TraitMethodGetterSetter.class, TraitSlotConst.class, ClassInfo.class, ScriptInfo.class, MethodBody.class,
-                ABCException.class, ABCVersion.class, Amf3Value.class};
-            for (Class cls2 : knownObjects) {
-                if (!ReflectionTools.canInstantiateDefaultConstructor(cls2)) {
-                    System.err.println("Can't instantiate: " + cls2.getName());
-                }
-                objects.put(cls2.getSimpleName(), cls2);
-            }
-
-            swfObjects = objects;
-        }
-
         cls = swfObjects.get(type);
         if (cls != null) {
             return cls.getConstructor().newInstance();
-        }
-
-        if (swfObjectsParam == null) {
-            Map<String, Class> objects = new HashMap<>();
-            Class[] knownObjects = new Class[]{ABC.class};
-            for (Class cls2 : knownObjects) {
-                if (!ReflectionTools.canInstantiate(cls2)) {
-                    System.err.println("Can't instantiate: " + cls2.getName());
-                }
-                objects.put(cls2.getSimpleName(), cls2);
-            }
-
-            swfObjectsParam = objects;
         }
 
         cls = swfObjectsParam.get(type);
