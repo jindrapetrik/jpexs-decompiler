@@ -134,7 +134,7 @@ public class SwfXmlExporter {
 
     private boolean canBeAttribute(Class cls) {
         return cls != null && (isPrimitive(cls)
-                || (cls.isArray() && cls.componentType().equals(byte.class))
+                || cls.equals(byte[].class)
                 || ByteArrayRange.class.isAssignableFrom(cls)
                 || cls.isEnum());
     }
@@ -182,7 +182,7 @@ public class SwfXmlExporter {
             writer.writeStartElement(name);
             int length = Array.getLength(value);
             for (int i = 0; i < length; i++) {
-                generateXml(writer, "item", Array.get(obj, i), true, false);
+                generateXml(writer, "item", Array.get(value, i), true, false);
             }
             writer.writeEndElement();
         } else if (obj != null) {
