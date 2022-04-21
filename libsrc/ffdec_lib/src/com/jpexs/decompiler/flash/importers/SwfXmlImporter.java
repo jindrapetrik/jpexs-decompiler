@@ -102,7 +102,12 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.HashArrayList;
 import com.jpexs.helpers.ReflectionTools;
+import com.jpexs.helpers.utf8.Utf8InputStreamReader;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -190,16 +195,18 @@ public class SwfXmlImporter {
         return cls != null && (cls.isArray() || List.class.isAssignableFrom(cls));
     }
 
-    public void importSwf(SWF swf, String xml) throws IOException {
+    public void importSwf(SWF swf, File inFile) throws IOException {
         XMLInputFactory xmlFactory = XMLInputFactory.newInstance();
         
         try {
-            XMLStreamReader reader = xmlFactory.createXMLStreamReader(new StringReader(xml));
-            
-            reader.nextTag();
-            reader.require(XMLStreamConstants.START_ELEMENT, null, "swf");
-   
-            processElement(reader, swf, swf, null);
+            try(Reader reader = new Utf8InputStreamReader(new BufferedInputStream(new FileInputStream(inFile)))) {
+                XMLStreamReader xmlReader = xmlFactory.createXMLStreamReader(reader);
+
+                xmlReader.nextTag();
+                xmlReader.require(XMLStreamConstants.START_ELEMENT, null, "swf");
+
+                processElement(xmlReader, swf, swf, null);
+            }
             
             swf.clearAllCache();
             setSwfAndTimelined(swf);
