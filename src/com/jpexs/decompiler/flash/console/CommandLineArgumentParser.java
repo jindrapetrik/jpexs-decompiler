@@ -2583,9 +2583,9 @@ public class CommandLineArgumentParser {
         }
 
         try {
-            String xml = Helper.readTextFile(args.pop());
+            File inFile = new File(args.pop());
             SWF swf = new SWF();
-            new SwfXmlImporter().importSwf(swf, xml);
+            new SwfXmlImporter().importSwf(swf, inFile);
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(args.pop())))) {
                 swf.saveTo(fos);
             }
