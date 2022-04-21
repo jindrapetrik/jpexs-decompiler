@@ -374,7 +374,6 @@ public class SwfXmlImporter {
                 }*/
                 else {
                     Object childObj = processObject(reader, null, swf, tag);
-                    logger.log(Level.INFO, (childObj != null ? childObj.getClass().getSimpleName() : "null") + " " + field.getName() + ":" + field.getType().getSimpleName());
                     setFieldValue(field, obj, childObj);
                 }
             } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException ex) {
@@ -431,9 +430,9 @@ public class SwfXmlImporter {
             String isNullAttr = attributes.get("isNull");
             if (Boolean.parseBoolean(isNullAttr)) {
                 ret = null;
+            } else {
+                ret = getAs(requiredType, reader.getElementText());
             }
-
-            ret = getAs(requiredType, reader.getElementText());
         }
         
         // Check if element ended and end if needed
@@ -504,7 +503,7 @@ public class SwfXmlImporter {
         } else if (cls.isEnum()) {
             return Enum.valueOf(cls, stringValue);
         } else {
-            throw new RuntimeException("Unsupported object type.");
+            throw new RuntimeException("Unsupported object type: " + cls.getSimpleName() + ".");
         }
     }
 }
