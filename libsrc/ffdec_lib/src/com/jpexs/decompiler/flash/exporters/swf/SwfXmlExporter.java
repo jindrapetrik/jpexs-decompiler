@@ -111,7 +111,15 @@ public class SwfXmlExporter {
             });
 
             result.sort((o1, o2) -> {
-                return canBeAttribute(o1.getType()) ? -1 : canBeAttribute(o2.getType()) ? 1 : 0;
+                
+                boolean a1 = canBeAttribute(o1.getType());
+                boolean a2 = canBeAttribute(o2.getType());
+                
+                if(a1 == a2 && a1 == true) {
+                    return o1.getName().compareTo(o2.getName());
+                }
+                
+                return a1 ? -1 : a2 ? 1 : 0;
             });
 
             cachedFields.put(cls, result);
