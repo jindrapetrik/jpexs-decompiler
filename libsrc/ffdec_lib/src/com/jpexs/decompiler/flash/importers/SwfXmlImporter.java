@@ -329,15 +329,6 @@ public class SwfXmlImporter {
                         reader.nextTag();
                     }
                     
-                    /*for (int j = 0; j < child.getChildNodes().getLength(); j++) {
-                        Node childChildNode = child.getChildNodes().item(j);
-                        if (childChildNode instanceof Element) {
-                            Element childChild = (Element) child.getChildNodes().item(j);
-                            Object childObj = processObject(childChild, reqType, swf, tag);
-                            list.add(childObj);
-                        }
-                    }*/
-                    
                     Object value = list;
                     
                     if(childCls.isArray()) {
@@ -349,36 +340,6 @@ public class SwfXmlImporter {
                     
                     setFieldValue(field, obj, value);
                 }
-                /*if (List.class.isAssignableFrom(childCls)) {
-                    List list = HashArrayList.class.isAssignableFrom(childCls) ? new HashArrayList() : new ArrayList();
-                    for (int j = 0; j < child.getChildNodes().getLength(); j++) {
-                        Node childChildNode = child.getChildNodes().item(j);
-                        if (childChildNode instanceof Element) {
-                            Element childChild = (Element) child.getChildNodes().item(j);
-                            Object childObj = processObject(childChild, ReflectionTools.getFieldSubType(obj, field), swf, tag);
-                            list.add(childObj);
-                        }
-                    }
-
-                    setFieldValue(field, obj, list);
-                } else if (childCls.isArray()) {
-                    List list = new ArrayList();
-                    for (int j = 0; j < child.getChildNodes().getLength(); j++) {
-                        Node childChildNode = child.getChildNodes().item(j);
-                        if (childChildNode instanceof Element) {
-                            Element childChild = (Element) child.getChildNodes().item(j);
-                            Object childObj = processObject(childChild, childCls.getComponentType(), swf, tag);
-                            list.add(childObj);
-                        }
-                    }
-
-                    Object array = Array.newInstance(childCls.getComponentType(), list.size());
-                    for (int j = 0; j < list.size(); j++) {
-                        Array.set(array, j, list.get(j));
-                    }
-
-                    setFieldValue(field, obj, array);
-                }*/
                 else {
                     Object childObj = processObject(reader, null, swf, tag);
                     setFieldValue(field, obj, childObj);
