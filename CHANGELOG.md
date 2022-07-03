@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+- Nothing yet
+
 ## [15.1.1] - 2022-07-03
 ### Added
 - Support for loading external images in DefineExternalImage2, DefineSubImage
