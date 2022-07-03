@@ -875,14 +875,7 @@
     </target>
     
     <target name="download-playerglobal" depends="-get-playerglobal-home">
-        <tempfile property="adobe.temp.file" prefix="adobepages" suffix=".html" deleteonexit="true" />
-        <get src="${adobe.playerglobal.pages.url}" dest="${adobe.temp.file}" />       
-        <replaceregexp flags="s" file="${adobe.temp.file}" match=".*&lt;a href=&quot;([^&quot;]+)&quot;&gt;&lt;img[^&gt;]*/&gt;Download the playerglobal\.swc to target the latest version APIs&lt;/a&gt;.*" replace="\1" />
-        <loadfile srcfile="${adobe.temp.file}" property="playerglobal.url" />
-        <replaceregexp file="${adobe.temp.file}" match=".*/([^/]+\.swc)$" replace="\1" />        
-        <loadfile srcfile="${adobe.temp.file}" property="playerglobal.filename" />
-        <get src="${playerglobal.url}" dest="${playerglobal.homedir}/${playerglobal.filename}" />
-        <delete file="${adobe.temp.file}"/>
+        <copy src="${adobe.playerglobal.path}" todir="${playerglobal.homedir}"/>
     </target>
     <target name="fix-src-endoflines">
         <fixcrlf srcdir="${src.dir}" includes="**/*.java" />
