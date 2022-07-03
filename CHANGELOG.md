@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Support for loading external images in DefineExternalImage2, DefineSubImage
 
+### Changed
+- Updated pt_BR translation
+- XML import/export uses less memory
+
 ### Removed
 - Auto downloading playerglobal.swf in the installer
 
