@@ -875,7 +875,7 @@
     </target>
     
     <target name="download-playerglobal" depends="-get-playerglobal-home">
-        <copy src="${adobe.playerglobal.path}" todir="${playerglobal.homedir}"/>
+        <copy file="${adobe.playerglobal.path}" todir="${playerglobal.homedir}" />                
     </target>
     <target name="fix-src-endoflines">
         <fixcrlf srcdir="${src.dir}" includes="**/*.java" />
