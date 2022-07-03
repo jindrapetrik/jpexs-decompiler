@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Support for loading external images in DefineExternalImage2, DefineSubImage
 
+### Removed
+- Auto downloading playerglobal.swf in the installer
+
 ### Fixed
 - No longer working link to adobe dev downloads changed to its web-archived version
 

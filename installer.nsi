@@ -28,7 +28,6 @@ Unicode true
 
 SetCompressor /SOLID lzma
 !include "StrFunc.nsh"
-${StrLoc}
 ;!include "nsis_plugins\JREDyna_Inetc.nsh"
 
 ;Old not working
@@ -248,29 +247,6 @@ Function GetTime
 	Exch $1
 	Exch 6
 	Exch $0
-FunctionEnd
-
-Function RIndexOf
-Exch $R0
-Exch
-Exch $R1
-Push $R2
-Push $R3
- 
- StrCpy $R3 $R0
- StrCpy $R0 0
- IntOp $R0 $R0 + 1
-  StrCpy $R2 $R3 1 -$R0
-  StrCmp $R2 "" +2
-  StrCmp $R2 $R1 +2 -3
- 
- StrCpy $R0 -1
- 
-Pop $R3
-Pop $R2
-Pop $R1
-
-Exch $R0
 FunctionEnd
  
 !macro StrRPos Var Str Char
@@ -686,74 +662,6 @@ Section "FFDec" SecDummy
 
 SectionEnd
 
-
-
-
-var txt
-var pos
-var pgfound
-var f
-var pgname
-var pghtml
-
-Section "$(STRING_SWC)" SecPlayerGlobal
-;checkadobe:
-DetailPrint "$(STRING_SWC_CHECK)"
-GetTempFileName $pghtml
-inetc::get /SILENT /USERAGENT "${APP_NAME} Setup" "https://web.archive.org/web/20220401020702/https://www.adobe.com/support/flashplayer/debug_downloads.html" "$pghtml" /END
-Pop $0
-StrCmp $0 "OK" dlok
-MessageBox MB_OK "$(STRING_SWC_NOTFOUND)"
-Goto exit
-dlok:
-StrCpy $pgfound 0
-
-FileOpen $f "$pghtml" r
-loop:
-  FileRead $f $txt
-  IfErrors done      
-  StrCmp $pgfound 1 0 nolicheck
-    ${StrLoc} $pos $txt "<li><a href=$\"" ">"
-    StrCmp $pos "" nolicheck
-      IntOp $pos $pos + 13
-      StrCpy $txt $txt "" $pos
-      ${StrLoc} $pos $txt "$\"" ">"
-      StrCpy $txt $txt $pos
-      StrCpy $pgfound 2   
-      Goto done    
-  nolicheck:
-  ${StrLoc} $pos $txt "PlayerGlobal" ">"
-  StrCmp $pos "" loop
-    StrCpy $pgfound 1              
-  Goto loop
-done:
-  FileClose $f
-  StrCmp $pgfound 2 +3
-  MessageBox MB_OK "$(STRING_SWC_NOTFOUND)"
-  Goto exit
-
-  ${StrRPos} $pos $txt "/"
-  IntOp $pos $pos + 1
-  StrCpy $pgname $txt "" $pos    
-  SetShellVarContext current    
-
-  IfFileExists "$APPDATA\JPEXS\FFDec\flashlib\$pgname" swcexists
-    CreateDirectory "$APPDATA\JPEXS\FFDec\flashlib"
-    DetailPrint "$(STRING_STARTING_DOWNLOAD) PlayerGlobal.swc"
-    inetc::get /USERAGENT "${APP_NAME} Setup" $txt "$APPDATA\JPEXS\FFDec\flashlib\$pgname" /END
-    Pop $0
-    StrCmp $0 "OK" saved
-    MessageBox MB_OK "$(STRING_SWC_NOTFOUND)"
-    Goto exit
-
-    saved:
-     DetailPrint "PlayerGlobal.swc $(STRING_SAVED_TO) $APPDATA\JPEXS\FFDec\flashlib\$pgname"
-  Goto exit
-  swcexists:
-     DetailPrint "$APPDATA\JPEXS\FFDec\flashlib\$pgname $(STRING_EXISTS_SKIP_DOWNLOAD)"
-  exit:
-SectionEnd
-
 Section $(STRING_DESKTOP_SHORTCUT) SecShortcut
 SetShellVarContext all
 CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${APP_EXENAME}" ""
@@ -786,7 +694,6 @@ SectionEnd
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
     !insertmacro MUI_DESCRIPTION_TEXT ${SecDummy} "$(STRING_SECTION_APP)"
-    !insertmacro MUI_DESCRIPTION_TEXT ${SecPlayerGlobal} "$(STRING_SECTION_SWC)" 
     !insertmacro MUI_DESCRIPTION_TEXT ${SecContextMenu} "$(STRING_SECTION_CONTEXT_MENU)"
     !insertmacro MUI_DESCRIPTION_TEXT ${SecShortcut} "$(STRING_SECTION_SHORTCUT)"
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
