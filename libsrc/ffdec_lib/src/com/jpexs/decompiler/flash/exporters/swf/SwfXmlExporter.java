@@ -32,7 +32,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -43,19 +42,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.w3c.dom.CDATASection;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import javax.xml.transform.stream.StreamSource;
 
 /**
  *
@@ -68,15 +62,33 @@ public class SwfXmlExporter {
     private final Map<Class, List<Field>> cachedFields = new HashMap<>();
 
     public List<File> exportXml(SWF swf, File outFile) throws IOException {
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         try {
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-            Document xmlDoc = docBuilder.newDocument();
-            exportXml(swf, xmlDoc, xmlDoc);
-            try (Writer writer = new Utf8OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(outFile)))) {
-                writer.append(getXml(xmlDoc));
+            File tmp = File.createTempFile("FFDEC", "XML");
+
+            try (Writer writer = new Utf8OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(tmp)))) {
+                XMLStreamWriter xmlWriter = XMLOutputFactory.newInstance().createXMLStreamWriter(writer);
+
+                xmlWriter.writeStartDocument();
+                xmlWriter.writeComment("WARNING: The structure of this XML is not final. In later versions of FFDec it can be changed.");
+                xmlWriter.writeComment(ApplicationInfo.applicationVerName);
+
+                exportXml(swf, xmlWriter);
+
+                xmlWriter.writeEndDocument();
+                xmlWriter.flush();
+                xmlWriter.close();
             }
-        } catch (ParserConfigurationException ex) {
+
+            TransformerFactory factory = TransformerFactory.newInstance();
+
+            Transformer transformer = factory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+
+            transformer.transform(new StreamSource(tmp), new StreamResult(outFile));
+
+            tmp.delete();
+        } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
         }
 
@@ -85,138 +97,136 @@ public class SwfXmlExporter {
         return ret;
     }
 
-    private String getXml(Document xml) {
-        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-        StringWriter writer = new StringWriter();
-        try {
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-            DOMSource source = new DOMSource(xml);
-            StreamResult result = new StreamResult(writer);
-            transformer.transform(source, result);
-        } catch (TransformerException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
-        return writer.toString();
-    }
-
-    public void exportXml(SWF swf, Document doc, Node node) throws IOException {
-        generateXml(doc, node, "swf", swf, false, 0, false);
+    public void exportXml(SWF swf, XMLStreamWriter writer) throws IOException, XMLStreamException {
+        generateXml(writer, "swf", swf, false, false);
     }
 
     public List<Field> getSwfFieldsCached(Class cls) {
         List<Field> result = cachedFields.get(cls);
         if (result == null) {
             result = ReflectionTools.getSwfFields(cls);
+
+            result.removeIf((f) -> {
+                return Modifier.isStatic(f.getModifiers()) || f.getAnnotation(Internal.class) != null;
+            });
+
+            result.sort((o1, o2) -> {
+                
+                boolean a1 = canBeAttribute(o1.getType());
+                boolean a2 = canBeAttribute(o2.getType());
+                
+                if(a1 == a2 && a1 == true) {
+                    return o1.getName().compareTo(o2.getName());
+                }
+                
+                return a1 ? -1 : a2 ? 1 : 0;
+            });
+
             cachedFields.put(cls, result);
         }
 
         return result;
     }
 
-    private void generateXml(Document doc, Node node, String name, Object obj, boolean isListItem, int level, boolean needsCData) {
+    private boolean isPrimitive(Class cls) {
+        return cls != null && !cls.equals(Void.class) && (cls.isPrimitive()
+                || cls == Short.class
+                || cls == Integer.class
+                || cls == Long.class
+                || cls == Float.class
+                || cls == Double.class
+                || cls == Boolean.class
+                || cls == Character.class
+                || cls == String.class);
+    }
+
+    private boolean canBeAttribute(Class cls) {
+        return cls != null && (isPrimitive(cls)
+                || cls.equals(byte[].class)
+                || ByteArrayRange.class.isAssignableFrom(cls)
+                || cls.isEnum());
+    }
+
+    private boolean isList(Class cls) {
+        return cls != null && (cls.isArray() || List.class.isAssignableFrom(cls));
+    }
+
+    private void generateXml(XMLStreamWriter writer, String name, Object obj, boolean isListItem, boolean needsCData) throws XMLStreamException {
         Class cls = obj != null ? obj.getClass() : null;
 
         if (obj != null && needsCData && cls == String.class) {
-
-            Element objNode = doc.createElement(name);
-            objNode.setAttribute("type", "String");
-            CDATASection cdataNode = doc.createCDATASection((String) obj);
-            objNode.appendChild(cdataNode);
-
-            node.appendChild(objNode);
-        } else if (obj != null && (cls == Byte.class || cls == byte.class
-                || cls == Short.class || cls == short.class
-                || cls == Integer.class || cls == int.class
-                || cls == Long.class || cls == long.class
-                || cls == Float.class || cls == float.class
-                || cls == Double.class || cls == double.class
-                || cls == Boolean.class || cls == boolean.class
-                || cls == Character.class || cls == char.class
-                || cls == String.class)) {
+            writer.writeStartElement(name);
+            writer.writeAttribute("type", "String");
+            writer.writeCData((String) obj);
+            writer.writeEndElement();
+        } else if (obj != null && isPrimitive(cls)) {
             Object value = obj;
             if (value instanceof String) {
                 value = Helper.removeInvalidXMLCharacters((String) value);
             }
 
             if (isListItem) {
-                Element childNode = doc.createElement(name);
-                childNode.setTextContent(value.toString());
-                node.appendChild(childNode);
+                writer.writeStartElement(name);
+                writer.writeCharacters(value.toString());
+                writer.writeEndElement();
             } else {
-                ((Element) node).setAttribute(name, value.toString());
+                writer.writeAttribute(name, value.toString());
             }
         } else if (cls != null && obj != null && cls.isEnum()) {
-            ((Element) node).setAttribute(name, obj.toString());
+            writer.writeAttribute(name, obj.toString());
         } else if (obj instanceof ByteArrayRange) {
             ByteArrayRange range = (ByteArrayRange) obj;
             byte[] data = range.getRangeData();
-            ((Element) node).setAttribute(name, Helper.byteArrayToHex(data));
+            writer.writeAttribute(name, Helper.byteArrayToHex(data));
         } else if (obj instanceof byte[]) {
             byte[] data = (byte[]) obj;
-            ((Element) node).setAttribute(name, Helper.byteArrayToHex(data));
-        } else if (cls != null && obj != null && List.class.isAssignableFrom(cls)) {
-            List list = (List) obj;
-            Element listNode = doc.createElement(name);
-            node.appendChild(listNode);
-            for (int i = 0; i < list.size(); i++) {
-                generateXml(doc, listNode, "item", list.get(i), true, level + 1, false);
+            writer.writeAttribute(name, Helper.byteArrayToHex(data));
+        } else if (isList(cls)) {
+            Object value = obj;
+            if (List.class.isAssignableFrom(cls)) {
+                value = ((List) value).toArray();
             }
-        } else if (cls != null && cls.isArray()) {
-            Class arrayType = cls.getComponentType();
-            Element arrayNode = doc.createElement(name);
-            node.appendChild(arrayNode);
-            int length = Array.getLength(obj);
+
+            writer.writeStartElement(name);
+            int length = Array.getLength(value);
             for (int i = 0; i < length; i++) {
-                generateXml(doc, arrayNode, "item", Array.get(obj, i), true, level + 1, false);
+                generateXml(writer, "item", Array.get(value, i), true, false);
             }
+            writer.writeEndElement();
         } else if (obj != null) {
             if (obj instanceof LazyObject) {
                 ((LazyObject) obj).load();
             }
 
             Class clazz = obj.getClass();
+            List<Field> fields = getSwfFieldsCached(clazz);
+
             if (obj instanceof InternalClass) {
                 clazz = clazz.getSuperclass();
             }
 
-            String className = clazz.getSimpleName();
-            List<Field> fields = getSwfFieldsCached(obj.getClass());
-            Element objNode = doc.createElement(name);
-            objNode.setAttribute("type", className);
-            if (obj instanceof UnknownTag) {
-                objNode.setAttribute("tagId", "" + ((Tag) obj).getId());
-            }
-            node.appendChild(objNode);
+            writer.writeStartElement(name);
+            writer.writeAttribute("type", clazz.getSimpleName());
 
-            if (level == 0) {
-                objNode.appendChild(doc.createComment("WARNING: The structure of this XML is not final. In later versions of FFDec it can be changed."));
-                objNode.appendChild(doc.createComment(ApplicationInfo.applicationVerName));
+            if (obj instanceof UnknownTag) {
+                writer.writeAttribute("tagId", String.valueOf(((Tag) obj).getId()));
             }
 
             for (Field f : fields) {
-                if (Modifier.isStatic(f.getModifiers())) {
-                    continue;
-                }
-
-                Internal inter = f.getAnnotation(Internal.class);
-                if (inter != null) {
-                    continue;
-                }
                 Multiline multilineA = f.getAnnotation(Multiline.class);
 
                 try {
                     f.setAccessible(true);
-                    generateXml(doc, objNode, f.getName(), f.get(obj), false, level + 1, multilineA != null);
+                    generateXml(writer, f.getName(), f.get(obj), false, multilineA != null);
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
+            writer.writeEndElement();
         } else if (isListItem) {
-            Element childNode = doc.createElement(name);
-            childNode.setAttribute("isNull", Boolean.TRUE.toString());
-            node.appendChild(childNode);
+            writer.writeStartElement(name);
+            writer.writeAttribute("isNull", Boolean.TRUE.toString());
+            writer.writeEndElement();
         }
     }
 }

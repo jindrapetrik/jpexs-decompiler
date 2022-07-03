@@ -2706,9 +2706,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             File selectedFile = showImportFileChooser("filter.xml|*.xml", false);
             if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
-                String xml = Helper.readTextFile(selfile.getPath());
                 try {
-                    new SwfXmlImporter().importSwf(swf, xml);
+                    new SwfXmlImporter().importSwf(swf, selfile);
                     swf.clearAllCache();
                     swf.assignExportNamesToSymbols();
                     swf.assignClassesToSymbols();
