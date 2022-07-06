@@ -32,8 +32,8 @@ jobs:
         distribution: temurin
     - name: Set up PHP
       run: |
-        apt update
-        apt install php
+        apt update -y
+        apt install -y php
     - name: Build
       run: |
         bash -c 'echo "deb http://ftp.debian.org/debian unstable main contrib non-free" >> /etc/apt/sources.list.d/unstable.list'
