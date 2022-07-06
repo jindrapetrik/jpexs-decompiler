@@ -2,14 +2,19 @@
 
 # Exit immediately on first error
 set -e
-sudo apt-get -qq update    
+#sudo 
+apt-get -qq update    
 #NSIS needs these
-sudo apt-get install -y zlib1g-dev
-sudo apt-get install -y lib32z1
+#sudo
+apt-get install -y zlib1g-dev
+#sudo
+apt-get install -y lib32z1
 #lib32ncurses5
 #For deploying
-sudo apt-get install -y jq
-sudo apt-get install -y curl
+#sudo 
+apt-get install -y jq
+#sudo 
+apt-get install -y curl
 #For parsing changelog
 #sudo apt-get install -y php7.0-cli
 #commented out: assuming cicd tool already has php cli
@@ -19,8 +24,8 @@ php --version
 tools_dir=$CICD_TEMP/tools
 
 if [ ! -f "$tools_dir/cached.txt" ]; then    
-    sudo apt-get install -y scons
-    #For unpacking unzip :-)
+    #sudo apt-get install -y scons
+    #For unpacking unzip
     sudo apt-get install -y unzip
 
     # create directory where tools will be downloaded and installed
