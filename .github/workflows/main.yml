@@ -30,9 +30,9 @@ jobs:
         distribution: temurin
     - name: Build
       run: |
-        - export CICD_TEMP=${{ runner.temp }}
-        - sudo chmod a+x ./cicd_scripts/*.sh
-        - ./cicd_scripts/before_install.sh
-        - ./cicd_scripts/install.sh
-        - ./cicd_scripts/script.sh
-        - ./cicd_scripts/script.sh
+        export CICD_TEMP=${{ runner.temp }}
+        sudo chmod a+x ./cicd_scripts/*.sh
+        ./cicd_scripts/before_install.sh
+        ./cicd_scripts/install.sh
+        ./cicd_scripts/script.sh
+        ./cicd_scripts/script.sh
