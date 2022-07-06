@@ -31,9 +31,8 @@ jobs:
         java-version: 8
         distribution: temurin
     - name: Set up PHP 8.0
-      uses: shivammathur/setup-php@v2
-      with:
-          php-version: 8.0
+      run: |
+        apt-get -y install php8.0
     - name: Build
       run: |
         bash -c 'echo "deb http://ftp.debian.org/debian unstable main contrib non-free" >> /etc/apt/sources.list.d/unstable.list'
