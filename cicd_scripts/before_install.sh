@@ -11,11 +11,11 @@ sudo apt-get install -y jq
 sudo apt-get install -y curl
 #For parsing changelog
 #sudo apt-get install -y php7.0-cli
-#commented out: assuming travis already has php cli
+#commented out: assuming cicd tool already has php cli
 # test php installed
 php --version
 
-tools_dir=/home/travis/tools
+tools_dir=$CICD_TEMP/tools
 
 if [ ! -f "$tools_dir/cached.txt" ]; then    
     sudo apt-get install -y scons
@@ -27,7 +27,7 @@ if [ ! -f "$tools_dir/cached.txt" ]; then
 
     echo "cached">$tools_dir/cached.txt
 
-    cp ./travis/tools/nsis-3.0-src.tar.bz2 ./
+    cp ./cicd_scripts/tools/nsis-3.0-src.tar.bz2 ./
     #Unpack NSIS sources - Tool for making windows installers
     bzip2 -d nsis-3.0-src.tar.bz2
     tar xvf nsis-3.0-src.tar -C $tools_dir >/dev/null  
@@ -41,11 +41,11 @@ if [ ! -f "$tools_dir/cached.txt" ]; then
     cd -  
 
     #Extract some binary additional sources which NSIS needs and are part of Windows ZIP file
-    cp ./travis/tools/nsis-3.0-addon.zip ./
+    cp ./cicd_scripts/tools/nsis-3.0-addon.zip ./
     unzip -u nsis-3.0-addon.zip -d $tools_dir/nsis-3.0-src
 
     #Extract launch4j - tool for creating EXE file from Java
-    cp ./travis/tools/launch4j-3.12-linux.tgz ./
+    cp ./cicd_scripts/tools/launch4j-3.12-linux.tgz ./
     tar zxvf launch4j-3.12-linux.tgz -C $tools_dir >/dev/null
 fi
 
@@ -53,7 +53,7 @@ fi
 echo "nsis.path = $tools_dir/nsis-3.0-src/bin" > tools.properties
 echo "launch4j.path = $tools_dir/launch4j" >> tools.properties
 
-# Travis secure variable $website_password is not available from outside 
+# Secure variable $website_password is not available from outside 
 # of jpexs repository (e.g pull requests from other users on GitHub)
 if ! [ -z ${website_password+x} ]; then 
   # Store username and password for uploading releases to jpexs server

@@ -14,13 +14,13 @@ if [ -z ${GITHUB_ACCESS_TOKEN+x} ]; then
   ant all
 else
   # if tag set
-  if [ -n "$TRAVIS_TAG" ]; then
+  if [ $CICD_REFTYPE = "tag" ]; then
     #tag starts with "version" prefix
-    if [[ $TRAVIS_TAG =~ ^version.* ]] ; then
+    if [[ $CICD_REFNAME =~ ^version.* ]] ; then
       echo "Version tag, creating new version..."
     
       #generate prop file
-      VERSION_NUMBER=`echo $TRAVIS_TAG|sed 's/version//'`
+      VERSION_NUMBER=`echo $CICD_REFNAME|sed 's/version//'`
       
       VERSION_MAJOR=`echo $VERSION_NUMBER|cut -d '.' -f 1`
       VERSION_MINOR=`echo $VERSION_NUMBER|cut -d '.' -f 2`
@@ -31,16 +31,16 @@ else
       echo "minor=$VERSION_MINOR">>$VERSION_PROP_FILE
       echo "release=$VERSION_RELEASE">>$VERSION_PROP_FILE
       echo "build=0">>$VERSION_PROP_FILE
-      echo "revision=$TRAVIS_COMMIT">>$VERSION_PROP_FILE
+      echo "revision=$CICD_COMMIT">>$VERSION_PROP_FILE
       echo "debug=false">>$VERSION_PROP_FILE
              
       #compile, build, create files
       ant new-version
             
       # release standard version based on tag
-      export DEPLOY_TAG_NAME=$TRAVIS_TAG
+      export DEPLOY_TAG_NAME=$CICD_REFNAME
       export DEPLOY_VERSION_NAME="version $VERSION_NUMBER"
-      export DEPLOY_DESCRIPTION=`php ./travis/format_release_info.php -filever $VERSION_NUMBER $VERSION_NUMBER $DEPLOY_TAG_NAME ./CHANGELOG.md "$TRAVIS_REPO_SLUG"`
+      export DEPLOY_DESCRIPTION=`php ./travis/format_release_info.php -filever $VERSION_NUMBER $VERSION_NUMBER $DEPLOY_TAG_NAME ./CHANGELOG.md "$CICD_REPO_SLUG"`
       export DEPLOY_COMMITISH="master"
       export DEPLOY_PRERELEASE=false
       export DEPLOY_FILEVER_TAG="$VERSION_NUMBER"          
@@ -51,16 +51,16 @@ else
       ant all            
     fi
   else
-    #if we are on dev branch and it's not a pull request
-    if [ $TRAVIS_BRANCH = "dev" ] && [ $TRAVIS_PULL_REQUEST = "false" ]; then       
-      echo "On dev branch and no pull request, creating nightly..."
+    #if we are on $NIGHTLY_BRANCH branch and it's not a pull request
+    if [ $CICD_REFNAME = $NIGHTLY_BRANCH ] && [ $CICD_PULL_REQUEST = "false" ]; then       
+      echo "On $NIGHTLY_BRANCH branch and no pull request, creating nightly..."
       # create nightly build...
       
-      TAGGER_NAME="Travis CI"
-      TAGGER_EMAIL=travis@travis-ci.org          
+      TAGGER_NAME=$CICD_NAME
+      TAGGER_EMAIL=$CICD_EMAIL       
               
-      TAG_COMMIT_HASH=$TRAVIS_COMMIT
-      GITHUB_REPO=$TRAVIS_REPO_SLUG
+      TAG_COMMIT_HASH=$CICD_COMMIT
+      GITHUB_REPO=$CICD_REPO_SLUG
       echo "Getting new version tag and name..."
       RELEASES_JSON=`curl --silent --request GET --header "Accept: application/vnd.github.manifold-preview" --user $GITHUB_USER:$GITHUB_ACCESS_TOKEN https://api.github.com/repos/$GITHUB_REPO/releases`
       LAST_NIGHTLY_VER=`echo $RELEASES_JSON|jq --raw-output '.[].tag_name'|grep 'nightly'|sed 's/nightly//'|head -n 1`
@@ -81,7 +81,7 @@ else
       echo "minor=$VERSION_MINOR">>$VERSION_PROP_FILE
       echo "release=$VERSION_RELEASE">>$VERSION_PROP_FILE
       echo "build=$NEXT_NIGHTLY_VER">>$VERSION_PROP_FILE
-      echo "revision=$TRAVIS_COMMIT">>$VERSION_PROP_FILE
+      echo "revision=$CICD_COMMIT">>$VERSION_PROP_FILE
       echo "debug=true">>$VERSION_PROP_FILE
       
       #compile, build, create files
@@ -102,8 +102,8 @@ else
       export DEPLOY_RELEASE_TO_REMOVE=$LAST_NIGHTLY_TAG                                 
       export DEPLOY_TAG_NAME=$NEXT_NIGHTLY_TAG
       export DEPLOY_VERSION_NAME="(PREVIEW) version $LAST_STABLE_VER nightly $NEXT_NIGHTLY_VER"
-      export DEPLOY_DESCRIPTION=`php ./travis/format_release_info.php -filever $DEPLOY_FILEVER_TAG Unreleased $DEPLOY_TAG_NAME ./CHANGELOG.md "$TRAVIS_REPO_SLUG"`
-      export DEPLOY_COMMITISH="dev"
+      export DEPLOY_DESCRIPTION=`php ./travis/format_release_info.php -filever $DEPLOY_FILEVER_TAG Unreleased $DEPLOY_TAG_NAME ./CHANGELOG.md "$CICD_REPO_SLUG"`
+      export DEPLOY_COMMITISH=$NIGHTLY_BRANCH
       export DEPLOY_PRERELEASE=true
       export DO_DEPLOY=1
     else

@@ -1,0 +1,38 @@
+name: Build and deploy JPEXS FFDec
+
+on:
+  push:
+    branches: [ "ghactions" ]
+  pull_request:
+    branches: [ "ghactions" ]
+
+env:
+    CICD_REPO_SLUG: jindrapetrik/jpexs-decompiler
+    CICD_TEMP: ${{ runner.temp }}
+    CICD_REFTYPE: ${{ github.ref_type }}
+    CICD_REFNAME: ${{ github.ref_name }}
+    CICD_COMMIT: ${{ github.sha }}
+    CICD_NAME: GitHub Actions
+    CICD_EMAIL: GitHub
+    NIGHTLY_BRANCH: ghactions    
+    GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v3
+      with:
+        java-version: '1.8'
+    - name: Before install
+      run: ./cicd_scripts/before_install.sh
+    - name: Install
+      run: ./cicd_scripts/install.sh
+    - name: Script
+      run: ./cicd_scripts/script.sh
+    - name: After success
+      run: ./cicd_scripts/script.sh
