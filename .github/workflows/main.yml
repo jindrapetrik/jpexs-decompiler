@@ -30,11 +30,10 @@ jobs:
       with:
         java-version: 8
         distribution: temurin
-    - name: Set up PHP 8.1
+    - name: Set up PHP
       run: |
-        apt update && apt install -y software-properties-common
-        add-apt-repository ppa:ondrej/php
-        apt update && apt install -y php8.1
+        apt update
+        apt install php
     - name: Build
       run: |
         bash -c 'echo "deb http://ftp.debian.org/debian unstable main contrib non-free" >> /etc/apt/sources.list.d/unstable.list'
