@@ -54,9 +54,8 @@ if [ ! -f "$tools_dir/cached.txt" ]; then
     #unzip -u nsis-3.0-addon.zip -d $tools_dir/nsis-3.0-src
 
     #Extract launch4j - tool for creating EXE file from Java
-    cp ./cicd_scripts/tools/launch4j-3.12-linux.tgz ./
-    tar zxvf launch4j-3.12-linux.tgz -C "$tools_dir" >/dev/null
-    chmod 0777 "$tools_dir/launch4j/bin/windres"
+    cp ./cicd_scripts/tools/launch4j-3.14-linux.tgz ./
+    tar zxvf launch4j-3.14-linux.tgz -C "$tools_dir" >/dev/null
 fi
 
 #Create tools.properties with paths to NSIS and launch4j
