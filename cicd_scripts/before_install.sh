@@ -28,6 +28,7 @@ if [ ! -f "$tools_dir/cached.txt" ]; then
 
     echo "cached">$tools_dir/cached.txt  
 
+
     #cp ./cicd_scripts/tools/nsis-3.0-src.tar.bz2 ./
     #Unpack NSIS sources - Tool for making windows installers
     #bzip2 -d nsis-3.0-src.tar.bz2
@@ -51,8 +52,10 @@ if [ ! -f "$tools_dir/cached.txt" ]; then
 fi
 
 #Create tools.properties with paths to NSIS and launch4j
-echo "nsis.path = $tools_dir/nsis-3.0-src/bin" > tools.properties
+echo "nsis.path = `which makensis`" > tools.properties
 echo "launch4j.path = $tools_dir/launch4j" >> tools.properties
+
+cat tools.properties
 
 # Secure variable $website_password is not available from outside 
 # of jpexs repository (e.g pull requests from other users on GitHub)
