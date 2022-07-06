@@ -6,9 +6,9 @@ set -e
 apt-get -qq update    
 #NSIS needs these
 #sudo
-apt-get install -y zlib1g-dev
+#apt-get install -y zlib1g-dev
 #sudo
-apt-get install -y lib32z1
+#apt-get install -y lib32z1
 #lib32ncurses5
 #For deploying
 #sudo 
@@ -27,7 +27,8 @@ tools_dir=$CICD_TEMP/tools
 if [ ! -f "$tools_dir/cached.txt" ]; then    
     #sudo apt-get install -y scons
     #For unpacking unzip
-    sudo apt-get install -y unzip
+    #sudo
+    apt-get install -y unzip
 
     # create directory where tools will be downloaded and installed
     mkdir -p $tools_dir
