@@ -30,6 +30,8 @@ jobs:
       with:
         java-version: 8
         distribution: temurin
+    - name: Init permissions
+      run: sudo chmod a+x ./cicd_scripts/*.sh
     - name: Before install
       run: ./cicd_scripts/before_install.sh
     - name: Install
