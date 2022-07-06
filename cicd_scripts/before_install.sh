@@ -29,9 +29,9 @@ if [ ! -f "$tools_dir/cached.txt" ]; then
     echo "cached">$tools_dir/cached.txt
 
 
-    bash -c 'echo "deb http://ftp.debian.org/debian unstable main contrib non-free" >> /etc/apt/sources.list.d/unstable.list'
-    apt-get -y update
-    apt-get -y install -t unstable nsis
+    sudo bash -c 'echo "deb http://ftp.debian.org/debian unstable main contrib non-free" >> /etc/apt/sources.list.d/unstable.list'
+    sudo apt-get -y update
+    sudo apt-get -y install -t unstable nsis
 
     makensis -VERSION
 
