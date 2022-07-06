@@ -23,14 +23,15 @@ jobs:
     container: debian:sid
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
     - name: Set up JDK 1.8
       uses: actions/setup-java@v3
       with:
         java-version: 8
         distribution: temurin
     - name: Set up PHP 7.4
-      uses: nanasess/setup-php@v3
+      uses: shivammathur/setup-php@v2
       with:
           php-version: 7.4
     - name: Build
