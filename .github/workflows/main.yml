@@ -33,7 +33,7 @@ jobs:
     - name: Set up PHP
       run: |
         apt update -y -qq
-        apt install -y php
+        apt install -y -qq php
     - name: Set up NSis
       run: |
         bash -c 'echo "deb http://ftp.debian.org/debian unstable main contrib non-free" >> /etc/apt/sources.list.d/unstable.list'
@@ -42,7 +42,7 @@ jobs:
         makensis -VERSION
     - name: Set up ant
       run: |
-        apt install ant 
+        apt install -y -qq ant 
     - name: Build
       run: |        
         export CICD_TEMP=${{ runner.temp }}
