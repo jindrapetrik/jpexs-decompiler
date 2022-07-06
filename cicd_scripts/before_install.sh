@@ -28,22 +28,34 @@ if [ ! -f "$tools_dir/cached.txt" ]; then
 
     echo "cached">$tools_dir/cached.txt
 
-    cp ./cicd_scripts/tools/nsis-3.0-src.tar.bz2 ./
+
+    bash -c 'echo "deb http://ftp.debian.org/debian unstable main contrib non-free" >> /etc/apt/sources.list.d/unstable.list'
+    apt-get -y update
+    apt-get -y install -t unstable nsis
+
+    makensis -VERSION
+
+    which makensis
+
+    bagr
+
+
+    #cp ./cicd_scripts/tools/nsis-3.0-src.tar.bz2 ./
     #Unpack NSIS sources - Tool for making windows installers
-    bzip2 -d nsis-3.0-src.tar.bz2
-    tar xvf nsis-3.0-src.tar -C $tools_dir >/dev/null  
+    #bzip2 -d nsis-3.0-src.tar.bz2
+    #tar xvf nsis-3.0-src.tar -C $tools_dir >/dev/null  
 
     #Compile NSIS
-    cd $tools_dir/nsis-3.0-src/  
-    scons UNICODE=yes SKIPSTUBS=all SKIPPLUGINS=all SKIPUTILS=all SKIPMISC=all NSIS_CONFIG_CONST_DATA=no PREFIX=$tools_dir/nsis-3.0-src/ install-compiler >/dev/null
-    mkdir share
+    #cd $tools_dir/nsis-3.0-src/  
+    #scons UNICODE=yes SKIPSTUBS=all SKIPPLUGINS=all SKIPUTILS=all SKIPMISC=all NSIS_CONFIG_CONST_DATA=no PREFIX=$tools_dir/nsis-3.0-src/ install-compiler >/dev/null
+    #mkdir share
     #Make this symbolic link, otherwise it does not work
-    ln -s $tools_dir/nsis-3.0-src share/nsis
-    cd -  
+    #ln -s $tools_dir/nsis-3.0-src share/nsis
+    #cd -  
 
     #Extract some binary additional sources which NSIS needs and are part of Windows ZIP file
-    cp ./cicd_scripts/tools/nsis-3.0-addon.zip ./
-    unzip -u nsis-3.0-addon.zip -d $tools_dir/nsis-3.0-src
+    #cp ./cicd_scripts/tools/nsis-3.0-addon.zip ./
+    #unzip -u nsis-3.0-addon.zip -d $tools_dir/nsis-3.0-src
 
     #Extract launch4j - tool for creating EXE file from Java
     cp ./cicd_scripts/tools/launch4j-3.12-linux.tgz ./
