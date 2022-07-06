@@ -175,7 +175,7 @@
     
     <target name="installer" depends="-loadversion,-load-tools,dist">       
         <property name="exe.file" value="${releases.dir}/${prefix.filename}_${version}${version.suffix}_setup.exe"/>       
-        <nsis script="installer.nsi" path="${nsis.path}" verbosity="2">
+        <!--<nsis script="installer.nsi" path="${nsis.path}" verbosity="2">
             <define name="APP_NAME" value="${product.name}"/>
             <define name="APP_VER" value="${version}${version.suffix}"/>
             <define name="APP_VER_MAJOR" value="${version.major}"/>
@@ -185,6 +185,19 @@
             <define name="APP_SETUPFILE" value="${exe.file}" />
             <define name="JRE_VERSION" value="${target.java}" />
         </nsis>
+        -->
+        <exec executable="${nsis.path}/makensis">
+             <arg value="-V2" />
+             <arg value="-DAPP_NAME=${product.name}" />
+             <arg value="-DAPP_VER=${version}${version.suffix}" />
+             <arg value="-DAPP_VER_MAJOR=${version.major}" />
+             <arg value="-DAPP_VER_MINOR=${version.minor}" />
+             <arg value="-DAPP_PUBLISHER=${vendor}" />
+             <arg value="-DAPP_URL=${product.url}" />
+             <arg value="-DAPP_SETUPFILE=${exe.file}" />
+             <arg value="-DJRE_VERSION=${target.java}" />
+             <arg value="/__w/jpexs-decompiler/jpexs-decompiler/installer.nsi" />
+        </exec>
         <echo level="info" message="Setup created in ${exe.file}"/>
     </target>
     
