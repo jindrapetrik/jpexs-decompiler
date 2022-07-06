@@ -8,7 +8,6 @@ on:
 
 env:
     CICD_REPO_SLUG: jindrapetrik/jpexs-decompiler
-    CICD_TEMP: ${{ runner.temp }}
     CICD_REFTYPE: ${{ github.ref_type }}
     CICD_REFNAME: ${{ github.ref_name }}
     CICD_COMMIT: ${{ github.sha }}
@@ -24,6 +23,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Init ci/cd
+      run: export CICD_TEMP=${{ runner.temp }}
     - name: Set up JDK 1.8
       uses: actions/setup-java@v3
       with:
