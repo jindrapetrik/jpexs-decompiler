@@ -59,7 +59,11 @@ if [ ! -f "$tools_dir/cached.txt" ]; then
 fi
 
 #Create tools.properties with paths to NSIS and launch4j
-echo "nsis.path = `which makensis`" > tools.properties
+
+MAKENSIS_FULLPATH=`which makensis`
+MAKENSIS_PATH=`dirname "$MAKENSIS_FULLPATH"`
+
+echo "nsis.path = $MAKENSIS_PATH" > tools.properties
 echo "launch4j.path = $tools_dir/launch4j" >> tools.properties
 
 cat tools.properties
