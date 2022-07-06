@@ -32,7 +32,7 @@ jobs:
         distribution: temurin
     - name: Set up PHP
       run: |
-        apt update -y
+        apt update -y -qq
         apt install -y php
     - name: Build
       run: |
