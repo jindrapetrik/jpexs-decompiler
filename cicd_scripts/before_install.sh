@@ -17,7 +17,7 @@ apt-get install -y jq
 apt-get install -y curl
 #For parsing changelog
 #sudo
-apt-get install -y php7.4-cli
+#apt-get install -y php7.4-cli
 #commented out: assuming cicd tool already has php cli
 # test php installed
 php --version
