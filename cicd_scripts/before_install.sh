@@ -55,10 +55,8 @@ if [ ! -f "$tools_dir/cached.txt" ]; then
 
     #Extract launch4j - tool for creating EXE file from Java
     cp ./cicd_scripts/tools/launch4j-3.12-linux.tgz ./
-    tar zxvf launch4j-3.12-linux.tgz -C $tools_dir
-    # >/dev/null
-    ls -R $tools_dir
-    bagr
+    tar zxvf launch4j-3.12-linux.tgz -C "$tools_dir" >/dev/null
+    chmod 0777 "$tools_dir/launch4j/bin/windres"
 fi
 
 #Create tools.properties with paths to NSIS and launch4j
