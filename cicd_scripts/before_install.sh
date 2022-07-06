@@ -5,7 +5,8 @@ set -e
 sudo apt-get -qq update    
 #NSIS needs these
 sudo apt-get install -y zlib1g-dev
-sudo apt-get install -y lib32ncurses5 lib32z1
+sudo apt-get install -y lib32z1
+#lib32ncurses5
 #For deploying
 sudo apt-get install -y jq
 sudo apt-get install -y curl
