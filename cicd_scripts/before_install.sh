@@ -26,19 +26,7 @@ if [ ! -f "$tools_dir/cached.txt" ]; then
     # create directory where tools will be downloaded and installed
     mkdir -p $tools_dir
 
-    echo "cached">$tools_dir/cached.txt
-
-
-    sudo bash -c 'echo "deb http://ftp.debian.org/debian unstable main contrib non-free" >> /etc/apt/sources.list.d/unstable.list'
-    sudo apt-get -y update
-    sudo apt-get -y install -t unstable nsis
-
-    makensis -VERSION
-
-    which makensis
-
-    bagr
-
+    echo "cached">$tools_dir/cached.txt  
 
     #cp ./cicd_scripts/tools/nsis-3.0-src.tar.bz2 ./
     #Unpack NSIS sources - Tool for making windows installers

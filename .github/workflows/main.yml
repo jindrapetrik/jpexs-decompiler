@@ -20,6 +20,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    container: debian:sid
 
     steps:
     - uses: actions/checkout@v3
@@ -30,6 +31,11 @@ jobs:
         distribution: temurin
     - name: Build
       run: |
+        bash -c 'echo "deb http://ftp.debian.org/debian unstable main contrib non-free" >> /etc/apt/sources.list.d/unstable.list'
+        apt-get -y update
+        apt-get -y install -t unstable nsis
+        makensis -VERSION
+        which makensis
         export CICD_TEMP=${{ runner.temp }}
         sudo chmod a+x ./cicd_scripts/*.sh
         ./cicd_scripts/before_install.sh
