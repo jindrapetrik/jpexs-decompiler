@@ -5,7 +5,7 @@ set -e
 VERSION_PROP_FILE="version.properties"
 
 # If we've got website password, we can upload nightly builds.
-# Travis secure variable $website_password is not available from outside 
+# CICD secure variable $website_password is not available from outside 
 # of jpexs repository (e.g pull requests from other users on GitHub)
 
 if [ -z ${GITHUB_ACCESS_TOKEN+x} ]; then
@@ -40,7 +40,7 @@ else
       # release standard version based on tag
       export DEPLOY_TAG_NAME=$CICD_REFNAME
       export DEPLOY_VERSION_NAME="version $VERSION_NUMBER"
-      export DEPLOY_DESCRIPTION=`php ./travis/format_release_info.php -filever $VERSION_NUMBER $VERSION_NUMBER $DEPLOY_TAG_NAME ./CHANGELOG.md "$CICD_REPO_SLUG"`
+      export DEPLOY_DESCRIPTION=`php ./cicd_scripts/format_release_info.php -filever $VERSION_NUMBER $VERSION_NUMBER $DEPLOY_TAG_NAME ./CHANGELOG.md "$CICD_REPO_SLUG"`
       export DEPLOY_COMMITISH="master"
       export DEPLOY_PRERELEASE=false
       export DEPLOY_FILEVER_TAG="$VERSION_NUMBER"          
@@ -102,7 +102,7 @@ else
       export DEPLOY_RELEASE_TO_REMOVE=$LAST_NIGHTLY_TAG                                 
       export DEPLOY_TAG_NAME=$NEXT_NIGHTLY_TAG
       export DEPLOY_VERSION_NAME="(PREVIEW) version $LAST_STABLE_VER nightly $NEXT_NIGHTLY_VER"
-      export DEPLOY_DESCRIPTION=`php ./travis/format_release_info.php -filever $DEPLOY_FILEVER_TAG Unreleased $DEPLOY_TAG_NAME ./CHANGELOG.md "$CICD_REPO_SLUG"`
+      export DEPLOY_DESCRIPTION=`php ./cicd_scripts/format_release_info.php -filever $DEPLOY_FILEVER_TAG Unreleased $DEPLOY_TAG_NAME ./CHANGELOG.md "$CICD_REPO_SLUG"`
       export DEPLOY_COMMITISH=$NIGHTLY_BRANCH
       export DEPLOY_PRERELEASE=true
       export DO_DEPLOY=1

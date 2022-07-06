@@ -55,8 +55,8 @@ if [ "$DO_DEPLOY" = 1 ]; then
     # wait few seconds before DELETE properly propagates so we can delete tag then
     sleep 5
     #-delete tag
-    git config --local user.email "travis@travis-ci.org"
-    git config --local user.name "Travis CI"
+    git config --local user.email "$CICD_EMAIL"
+    git config --local user.name "$CICD_NAME"
     git remote add myorigin https://${GITHUB_ACCESS_TOKEN}@github.com/$CICD_REPO_SLUG.git
     #> /dev/null 2>&1
     set +e

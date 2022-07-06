@@ -1,1 +1,1 @@
-These archives are tools needed for successfull Travis build on GitHub.
+These archives are tools needed for successfull CICD build on GitHub.
