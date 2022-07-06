@@ -34,12 +34,17 @@ jobs:
       run: |
         apt update -y -qq
         apt install -y php
-    - name: Build
+    - name: Set up NSis
       run: |
         bash -c 'echo "deb http://ftp.debian.org/debian unstable main contrib non-free" >> /etc/apt/sources.list.d/unstable.list'
         apt-get -y update
         apt-get -y install -t unstable nsis
         makensis -VERSION
+    - name: Set up ant
+      run: |
+        apt install ant 
+    - name: Build
+      run: |        
         export CICD_TEMP=${{ runner.temp }}
         chmod a+x ./cicd_scripts/*.sh
         ./cicd_scripts/before_install.sh
