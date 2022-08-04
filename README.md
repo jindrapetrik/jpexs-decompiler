@@ -120,12 +120,12 @@ The application was made in Czech Republic.
 * **kalip** - italian translation
 * **Krock** - german translation
 * **Laurent LOUVET** - french translation
-* **MaGiC** - portugese translation
+* **MaGiC** - portuguese translation
 * **martinkoza** - polish translation
 * **Osman ÖZ** - turkish translation
 * **pepka** - ukrainian and dutch translation
 * **poxyran** - spanish translation
-* **realmaster42** - portugese-brasil translation
+* **realmaster42** - portuguese-brasil translation
 * **Rtsjx** - chinese translation
 * **koiru** - japanese translation
 
