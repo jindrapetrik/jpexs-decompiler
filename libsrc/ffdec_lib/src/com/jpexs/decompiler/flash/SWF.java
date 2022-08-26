@@ -484,14 +484,11 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         return null;
     }
-
-    public Map<Integer, Set<Integer>> getDependentCharacters() {
-        if (dependentCharacters == null) {
-            synchronized (this) {
-                if (dependentCharacters == null) {
-                    Map<Integer, Set<Integer>> dep = new HashMap<>();
-                    for (Tag tag : getTags()) {
-                        if (tag instanceof CharacterTag) {
+    
+    public void computeDependentCharacters() {
+        Map<Integer, Set<Integer>> dep = new HashMap<>();
+        for (Tag tag : getTags()) {
+            if (tag instanceof CharacterTag) {
                 int characterId = ((CharacterTag) tag).getCharacterId();
                 Set<Integer> needed = new HashSet<>();
                 tag.getNeededCharacters(needed);
@@ -507,7 +504,14 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
 
-                    dependentCharacters = dep;
+        dependentCharacters = dep;
+    }
+
+    public Map<Integer, Set<Integer>> getDependentCharacters() {
+        if (dependentCharacters == null) {
+            synchronized (this) {
+                if (dependentCharacters == null) {
+                    computeDependentCharacters();
                 }
             }
         }
@@ -3344,6 +3348,8 @@ public final class SWF implements SWFContainerItem, Timelined {
         assignClassesToSymbols();
         clearImageCache();
         updateCharacters();
+        computeDependentCharacters();
+        computeDependentFrames();
     }
 
     @Override
