@@ -2,7 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-- Nothing yet
+### Added
+- Replace characters references
 
 ## [15.1.1] - 2022-07-03
 ### Added
