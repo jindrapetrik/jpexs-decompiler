@@ -125,6 +125,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem replaceNoFillMenuItem;
 
     private JMenuItem replaceWithTagMenuItem;
+    
+    private JMenuItem replaceRefsWithTagMenuItem;
 
     private JMenuItem rawEditMenuItem;
 
@@ -193,6 +195,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceWithTagMenuItem = new JMenuItem(mainPanel.translate("button.replaceWithTag"));
         replaceWithTagMenuItem.addActionListener(this::replaceWithTagActionPerformed);
         add(replaceWithTagMenuItem);
+        
+        replaceRefsWithTagMenuItem = new JMenuItem(mainPanel.translate("button.replaceRefs"));
+        replaceRefsWithTagMenuItem.addActionListener(this::replaceRefsWithTagActionPerformed);
+        add(replaceRefsWithTagMenuItem);
 
         rawEditMenuItem = new JMenuItem(mainPanel.translate("contextmenu.rawEdit"));
         rawEditMenuItem.addActionListener(this::rawEditActionPerformed);
@@ -426,6 +432,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         replaceMenuItem.setVisible(false);
         replaceNoFillMenuItem.setVisible(false);
         replaceWithTagMenuItem.setVisible(false);
+        replaceRefsWithTagMenuItem.setVisible(false);
         rawEditMenuItem.setVisible(false);
         jumpToCharacterMenuItem.setVisible(false);
         exportJavaSourceMenuItem.setVisible(allSelectedIsSwf);
@@ -505,6 +512,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             if (firstItem instanceof CharacterTag) {
                 replaceWithTagMenuItem.setVisible(true);
+                replaceRefsWithTagMenuItem.setVisible(true);
             }
 
             addTagMenu.removeAll();
@@ -807,6 +815,54 @@ public class TagTreeContextMenu extends JPopupMenu {
             int newCharacterId = replaceCharacterDialog.getCharacterId();
             swf.replaceCharacterTags(characterTag, newCharacterId);
             mainPanel.refreshTree(swf);
+        }
+    }
+    
+    private void replaceRefsWithTagActionPerformed(ActionEvent evt) {
+        TreeItem itemr = tagTree.getCurrentTreeItem();
+        if (itemr == null) {
+            return;
+        }
+
+        SWF swf = itemr.getSwf();
+        CharacterTag characterTag = (CharacterTag) itemr;
+        int characterId = characterTag.getCharacterId();
+        ReplaceCharacterDialog replaceCharacterDialog = new ReplaceCharacterDialog(Main.getDefaultDialogsOwner());
+        if (replaceCharacterDialog.showDialog(swf, characterId) == AppDialog.OK_OPTION) {
+            int newCharacterId = replaceCharacterDialog.getCharacterId();
+            
+            for (Tag tag : swf.getTags()) {
+                replaceRef(tag, characterId, newCharacterId);
+            }
+            
+            swf.assignExportNamesToSymbols();
+            swf.assignClassesToSymbols();
+            swf.clearImageCache();
+            swf.updateCharacters();
+            swf.computeDependentCharacters();
+            swf.computeDependentFrames();
+            mainPanel.refreshTree(swf);
+        }
+    }
+    
+    private void replaceRef(Tag tag, int characterId, int newCharacterId) {
+        if(tag instanceof DefineSpriteTag) {
+            DefineSpriteTag sprite = (DefineSpriteTag)tag;
+            for (Tag subTag : sprite.getTags()) {
+                replaceRef(subTag, characterId, newCharacterId);
+            }
+            sprite.clearReadOnlyListCache();
+        }
+        if(tag instanceof PlaceObjectTypeTag) {
+            PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag)tag;
+            if(placeTag.getCharacterId() == characterId) {
+                placeTag.setCharacterId(newCharacterId);
+                placeTag.setModified(true);
+                Timelined tim = placeTag.getTimelined();
+                if(tim != null) {
+                    tim.resetTimeline();
+                }
+            }
         }
     }
 
