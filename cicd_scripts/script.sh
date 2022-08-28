@@ -52,7 +52,7 @@ else
     fi
   else
     #if we are on $NIGHTLY_BRANCH branch and it's not a pull request
-    if [ $CICD_REFNAME = $NIGHTLY_BRANCH ] && [ $CICD_PULL_REQUEST = "false" ]; then       
+    if [ $CICD_REFNAME = "$NIGHTLY_BRANCH" ] && [ $CICD_PULL_REQUEST = "false" ]; then       
       echo "On $NIGHTLY_BRANCH branch and no pull request, creating nightly..."
       # create nightly build...
       
