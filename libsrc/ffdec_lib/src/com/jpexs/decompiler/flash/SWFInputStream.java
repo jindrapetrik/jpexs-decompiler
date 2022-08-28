@@ -1228,9 +1228,10 @@ public class SWFInputStream implements AutoCloseable {
                     case ShowFrameTag.ID:
                     case PlaceObjectTag.ID:
                     case PlaceObject2Tag.ID:
+                    case PlaceObject3Tag.ID:
+                    case PlaceObject4Tag.ID:
                     case RemoveObjectTag.ID:
                     case RemoveObject2Tag.ID:
-                    case PlaceObject3Tag.ID: // ?
                     case StartSoundTag.ID:
                     case FrameLabelTag.ID:
                     case SoundStreamHeadTag.ID:

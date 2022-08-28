@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Replace characters references
 
+### Fixed
+- [#1834] PlaceObject4 tags appear as Unresolved inside of DefineSprite
+
 ## [15.1.1] - 2022-07-03
 ### Added
 - Support for loading external images in DefineExternalImage2, DefineSubImage
@@ -2246,7 +2249,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version15.0.0...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version15.1.1...dev
+[15.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version15.1.0...version15.1.1
+[15.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version15.0.0...version15.1.0
 [15.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.6.0...version15.0.0
 [14.6.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.5.2...version14.6.0
 [14.5.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.5.1...version14.5.2
@@ -2365,15 +2370,16 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1834]: https://www.free-decompiler.com/flash/issues/1834
 [#270]: https://www.free-decompiler.com/flash/issues/270
 [#1718]: https://www.free-decompiler.com/flash/issues/1718
+[#1801]: https://www.free-decompiler.com/flash/issues/1801
 [#1761]: https://www.free-decompiler.com/flash/issues/1761
 [#1762]: https://www.free-decompiler.com/flash/issues/1762
 [#1763]: https://www.free-decompiler.com/flash/issues/1763
 [#1766]: https://www.free-decompiler.com/flash/issues/1766
 [#1773]: https://www.free-decompiler.com/flash/issues/1773
 [#1769]: https://www.free-decompiler.com/flash/issues/1769
-[#1801]: https://www.free-decompiler.com/flash/issues/1801
 [#1750]: https://www.free-decompiler.com/flash/issues/1750
 [#1485]: https://www.free-decompiler.com/flash/issues/1485
 [#1681]: https://www.free-decompiler.com/flash/issues/1681
