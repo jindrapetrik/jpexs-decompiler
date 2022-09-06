@@ -1219,7 +1219,7 @@ public class Timeline {
                         exporter.endGroup();
                     }
                     Matrix mat = Matrix.getTranslateInstance(rect.xMin, rect.yMin).preConcatenate(new Matrix(layer.matrix));
-                    exporter.addUse(mat, boundRect, assetName, layer.instanceName, scalingGrid == null ? null : scalingGrid.splitter, drawable.getCharacterId(), drawable.getClassName());
+                    exporter.addUse(mat, boundRect, assetName, layer.instanceName, scalingGrid == null ? null : scalingGrid.splitter, String.valueOf(drawable.getCharacterId()), drawable.getClassName());
                 }
             }
         }
