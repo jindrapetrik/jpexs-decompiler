@@ -405,8 +405,11 @@ public class SVGExporter {
         }
         _svgGs.peek().appendChild(image);
     }
-
+    
     public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect) {
+        return addUse(transform, boundRect, href, instanceName, scalingRect, null, null);
+    }
+    public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName) {
         if (scalingRect != null && (transform == null || (Double.compare(transform.rotateSkew0, 0.0) == 0 && Double.compare(transform.rotateSkew1, 0.0) == 0))) {
             addScalingGridUse(transform, boundRect, href, instanceName, scalingRect);
             return null; //??
