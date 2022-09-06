@@ -228,7 +228,7 @@ public class SVGExporter {
 
     }
 
-    private void addScalingGridUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect) {
+    private void addScalingGridUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName) {
 
         Element image = _svg.createElement("g");
 
@@ -403,6 +403,12 @@ public class SVGExporter {
         if (instanceName != null) {
             image.setAttribute("id", instanceName);
         }
+        if (characterId != null) {
+            image.setAttribute("data-characterId", characterId);
+        }
+        if (characterName != null) {
+            image.setAttribute("data-characterName", characterName);
+        }
         _svgGs.peek().appendChild(image);
     }
     
@@ -411,7 +417,7 @@ public class SVGExporter {
     }
     public Element addUse(Matrix transform, RECT boundRect, String href, String instanceName, RECT scalingRect, String characterId, String characterName) {
         if (scalingRect != null && (transform == null || (Double.compare(transform.rotateSkew0, 0.0) == 0 && Double.compare(transform.rotateSkew1, 0.0) == 0))) {
-            addScalingGridUse(transform, boundRect, href, instanceName, scalingRect);
+            addScalingGridUse(transform, boundRect, href, instanceName, scalingRect, characterId, characterName);
             return null; //??
         }
         Element image = _svg.createElement("use");
@@ -422,6 +428,12 @@ public class SVGExporter {
         }
         if (instanceName != null) {
             image.setAttribute("id", instanceName);
+        }
+        if (characterId != null) {
+            image.setAttribute("data-characterId", characterId);
+        }
+        if (characterName != null) {
+            image.setAttribute("data-characterName", characterName);
         }
         image.setAttribute("xlink:href", "#" + href);
         _svgGs.peek().appendChild(image);
