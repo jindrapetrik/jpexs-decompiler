@@ -73,6 +73,7 @@ import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.SymbolClassExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfJavaExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
@@ -1383,7 +1384,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             if (export.isOptionEnabled(SymbolClassExportMode.class)) {
-                ret.addAll(new SymbolClassExporter().exportNames(selFile2, new ReadOnlyTagList(symbolNames), evl));
+                ret.addAll(new SymbolClassExporter().exportNames(handler, selFile2 + File.separator + SymbolClassExportSettings.EXPORT_FOLDER_NAME, new ReadOnlyTagList(symbolNames),
+                        new SymbolClassExportSettings(export.getValue(SymbolClassExportMode.class)), evl));
             }
 
             FrameExporter frameExporter = new FrameExporter();
@@ -1495,7 +1497,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         if (export.isOptionEnabled(SymbolClassExportMode.class)) {
-            new SymbolClassExporter().exportNames(selFile, swf.getTags(), evl);
+            new SymbolClassExporter().exportNames(handler, Path.combine(selFile, SymbolClassExportSettings.EXPORT_FOLDER_NAME), swf.getTags(),
+                    new SymbolClassExportSettings(export.getValue(SymbolClassExportMode.class)), evl);
         }
 
         FrameExporter frameExporter = new FrameExporter();
@@ -1603,7 +1606,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (export.isOptionEnabled(SymbolClassExportMode.class)) {
             for (SymbolClassExportMode exportMode : SymbolClassExportMode.values()) {
-                new SymbolClassExporter().exportNames(selFile, swf.getTags(), evl);
+                new SymbolClassExporter().exportNames(handler, Path.combine(selFile, SymbolClassExportSettings.EXPORT_FOLDER_NAME, exportMode.name()), swf.getTags(),
+                        new SymbolClassExportSettings(exportMode), evl);
             }
         }
 

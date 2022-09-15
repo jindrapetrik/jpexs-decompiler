@@ -60,6 +60,7 @@ import com.jpexs.decompiler.flash.exporters.MorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.MovieExporter;
 import com.jpexs.decompiler.flash.exporters.ShapeExporter;
 import com.jpexs.decompiler.flash.exporters.SoundExporter;
+import com.jpexs.decompiler.flash.exporters.SymbolClassExporter;
 import com.jpexs.decompiler.flash.exporters.TextExporter;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -74,6 +75,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SpriteExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.SymbolClassExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.script.LinkReportExporter;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
@@ -87,6 +89,7 @@ import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.SymbolClassExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfToSwcExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
@@ -339,6 +342,7 @@ public class CommandLineArgumentParser {
             out.println("        button - Buttons (Default format: PNG)");
             out.println("        sound - Sounds (Default format: MP3/WAV/FLV only sound)");
             out.println("        binaryData - Binary data (Default format:  Raw data)");
+            out.println("        symbolClass - Symbol-Class mapping (Default format: CSV)");
             out.println("        text - Texts (Default format: Plain text)");
             out.println("        all - Every resource (but not FLA and XFL)");
             out.println("        fla - Everything to FLA compressed format");
@@ -2109,6 +2113,7 @@ public class CommandLineArgumentParser {
             "button",
             "sound",
             "binarydata",
+            "symbolclass",
             "text",
             "all",
             "fla",
@@ -2286,6 +2291,11 @@ public class CommandLineArgumentParser {
                 if (exportAll || exportFormats.contains("binarydata")) {
                     System.out.println("Exporting binaryData...");
                     new BinaryDataExporter().exportBinaryData(handler, outDir + (multipleExportTypes ? File.separator + BinaryDataExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new BinaryDataExportSettings(enumFromStr(formats.get("binarydata"), BinaryDataExportMode.class)), evl);
+                }
+
+                if (exportAll || exportFormats.contains("symbolclass")) {
+                    System.out.println("Exporting symbolClass...");
+                    new SymbolClassExporter().exportNames(handler, outDir + (multipleExportTypes ? File.separator + SymbolClassExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new SymbolClassExportSettings(enumFromStr(formats.get("symbolclass"), SymbolClassExportMode.class)), evl);
                 }
 
                 if (exportAll || exportFormats.contains("text")) {
