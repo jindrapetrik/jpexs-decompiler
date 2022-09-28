@@ -3670,7 +3670,7 @@ public class CommandLineArgumentParser {
     }
 
     private static void replaceAS3(String asp, String as, ScriptPack pack) throws IOException, InterruptedException {
-        System.out.println("Replaceing: " + asp);
+        System.out.println("Replacing: " + asp);
         System.out.println("Warning: This feature is EXPERIMENTAL");
         As3ScriptReplacerInterface scriptReplacer = As3ScriptReplacerFactory.createByConfig();
         if (!scriptReplacer.isAvailable()) {
