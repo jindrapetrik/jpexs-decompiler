@@ -171,6 +171,7 @@ import java.awt.print.PageFormat;
 import java.awt.print.Paper;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -207,6 +208,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.io.FileWriter;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Scanner;
 
 /**
  *
@@ -2904,18 +2912,37 @@ public class CommandLineArgumentParser {
     }
 
     private static void parseReplace(Stack<String> args) {
-        if (args.size() < 4) {
+        if (args.size() == 3) {
             badArguments("replace");
         }
-
+        
+        System.out.println("Replacing in: " + args.lastElement());
+        
         File inFile = new File(args.pop());
         File outFile = new File(args.pop());
+        
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(args.pop()), StandardCharsets.UTF_8);
+            Collections.reverse(lines);
+            
+            args.clear();
+            args.addAll(lines);
+    
+        } catch (IOException e) {
+            e.printStackTrace(System.out);
+        }
+        
+        if (args.isEmpty()) {
+            System.err.println("Replacments file is empty.");
+            System.exit(1);
+        }
+        
         try {
             try (FileInputStream is = new FileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 while (true) {
-                    String objectToReplace = args.pop();
-
+                    String objectToReplace = args.pop();   
+                    
                     if (objectToReplace.matches("\\d+")) {
                         // replace character tag
                         int characterId = 0;
@@ -3004,15 +3031,16 @@ public class CommandLineArgumentParser {
                             }
                         } else {
                             List<ScriptPack> packs = swf.getAS3Packs();
+ 
                             for (ScriptPack entry : packs) {
-                                if (entry.getClassPath().toString().equals(objectToReplace)) {
+                                    if (entry.getClassPath().toString().equals(objectToReplace)) {
                                     found = true;
                                     // replace AS3
                                     String repFile = args.pop();
                                     String repText = Helper.readTextFile(repFile);
                                     ScriptPack pack = entry;
                                     if (Path.getExtension(repFile).equals(".as")) {
-                                        replaceAS3(repText, pack);
+                                        replaceAS3(repFile, repText, pack);
                                     } else {
                                         // todo: get traits
                                         if (args.isEmpty()) {
@@ -3641,8 +3669,8 @@ public class CommandLineArgumentParser {
         ((Tag) abc.parentTag).setModified(true);
     }
 
-    private static void replaceAS3(String as, ScriptPack pack) throws IOException, InterruptedException {
-        System.out.println("Replace AS3");
+    private static void replaceAS3(String asp, String as, ScriptPack pack) throws IOException, InterruptedException {
+        System.out.println("Replaceing: " + asp);
         System.out.println("Warning: This feature is EXPERIMENTAL");
         As3ScriptReplacerInterface scriptReplacer = As3ScriptReplacerFactory.createByConfig();
         if (!scriptReplacer.isAvailable()) {
