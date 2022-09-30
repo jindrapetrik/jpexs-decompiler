@@ -2912,7 +2912,7 @@ public class CommandLineArgumentParser {
     }
 
     private static void parseReplace(Stack<String> args) {
-        if (args.size() < 4) {
+        if (args.size() < 3) {
             badArguments("replace");
         }
         
