@@ -2912,7 +2912,7 @@ public class CommandLineArgumentParser {
     }
 
     private static void parseReplace(Stack<String> args) {
-        if (args.size() != 3) {
+        if (args.size() < 4) {
             badArguments("replace");
         }
         
@@ -2921,20 +2921,22 @@ public class CommandLineArgumentParser {
         File inFile = new File(args.pop());
         File outFile = new File(args.pop());
         
-        try {
-            List<String> lines = Files.readAllLines(Paths.get(args.pop()), StandardCharsets.UTF_8);
-            Collections.reverse(lines);
-            
-            args.clear();
-            args.addAll(lines);
-    
-        } catch (IOException e) {
-            e.printStackTrace(System.out);
-        }
-        
-        if (args.isEmpty()) {
-            System.err.println("Replacments file is empty.");
-            System.exit(1);
+        if (args.size() == 3){
+            try {
+                List<String> lines = Files.readAllLines(Paths.get(args.pop()), StandardCharsets.UTF_8);
+                Collections.reverse(lines);
+
+                args.clear();
+                args.addAll(lines);
+
+            } catch (IOException e) {
+                e.printStackTrace(System.out);
+            }
+
+            if (args.isEmpty()) {
+                System.err.println("Replacments file is empty.");
+                System.exit(1);
+            }
         }
         
         try {
