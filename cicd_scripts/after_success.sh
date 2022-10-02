@@ -2,7 +2,9 @@
 #stop on error
 set -e
 
-if [ "$DO_DEPLOY" = 1 ]; then
+echo "DO_DEPLOY=$DO_DEPLOY"
+
+if [ "$DO_DEPLOY" == 1 ]; then
   echo "Deploying..."
   GITHUB_REPO=$CICD_REPO_SLUG
 

@@ -96,9 +96,7 @@ else
       #Create tag
       echo "Creating tag $TAG_NAME..."
       echo '{"tag":"'$TAG_NAME'","message":"","object":"'$TAG_COMMIT_HASH'","type":"commit","tagger":{"name":'$ESC_TAGGER_NAME',"email":"'$TAGGER_EMAIL'","date":"'$CURRENT_DATE'"}}'>json.bin
-      cat json.bin
-      curl --silent --request POST --data-binary @json.bin --header "Content-Type: application/json" --header "Accept: application/vnd.github.manifold-preview" --user $GITHUB_USER:$GITHUB_ACCESS_TOKEN https://api.github.com/repos/$GITHUB_REPO/git/tags
-      #>/dev/null
+      curl --silent --request POST --data-binary @json.bin --header "Content-Type: application/json" --header "Accept: application/vnd.github.manifold-preview" --user $GITHUB_USER:$GITHUB_ACCESS_TOKEN https://api.github.com/repos/$GITHUB_REPO/git/tags>/dev/null
       
       echo "Tag created"            
       export DEPLOY_FILEVER_TAG="${VERSION_NUMBER}_nightly${NEXT_NIGHTLY_VER}"                          
@@ -109,6 +107,7 @@ else
       export DEPLOY_COMMITISH=$NIGHTLY_BRANCH
       export DEPLOY_PRERELEASE=true
       export DO_DEPLOY=1
+      echo "Setting DO_DEPLOY=1"
     else
       #tag not set - regular build
       echo "Other branch or pull request, regular build..."
