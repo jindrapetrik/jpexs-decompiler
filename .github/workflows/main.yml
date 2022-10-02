@@ -2,9 +2,13 @@ name: Build and deploy JPEXS FFDec
 
 on:
   push:
-    branches: [ "ghactions" ]
+    branches: 
+        - dev
+        - master        
   pull_request:
-    branches: [ "ghactions" ]
+    branches:
+        - dev
+        - master  
 
 env:
     CICD_REPO_SLUG: jindrapetrik/jpexs-decompiler
@@ -14,7 +18,7 @@ env:
     CICD_NAME: GitHub Actions
     CICD_EMAIL: GitHub
     CICD_EVENTNAME: ${{ github.event_name }}
-    NIGHTLY_BRANCH: ghactions
+    NIGHTLY_BRANCH: dev
     GITHUB_USER: jindrapetrik
     GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
