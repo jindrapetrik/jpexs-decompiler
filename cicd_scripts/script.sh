@@ -50,15 +50,10 @@ else
       echo "Other tag, regular build..."
       ant all            
     fi
-  else
-    echo "CICD_REFNAME = $CICD_REFNAME"
-    echo "NIGHTLY_BRANCH = $NIGHTLY_BRANCH"
-    echo "CICD_EVENTNAME = $CICD_EVENTNAME"
-        
+  else        
     #if we are on $NIGHTLY_BRANCH branch and it's not a pull request
     if [ "$CICD_REFNAME" == "$NIGHTLY_BRANCH" ] && [ "$CICD_EVENTNAME" != "pull_request" ]; then             
       echo "On $NIGHTLY_BRANCH branch and no pull request, creating nightly..."
-      exit 1
       # create nightly build...
       
       TAGGER_NAME=$CICD_NAME
@@ -114,7 +109,6 @@ else
     else
       #tag not set - regular build
       echo "Other branch or pull request, regular build..."
-      exit 1
       ant all                    
     fi  
   fi    

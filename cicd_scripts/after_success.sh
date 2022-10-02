@@ -54,15 +54,9 @@ if [ "$DO_DEPLOY" = 1 ]; then
     curl --silent --request DELETE --user $GITHUB_USER:$GITHUB_ACCESS_TOKEN https://api.github.com/repos/$GITHUB_REPO/releases/$RELEASE_ID>/dev/null
     # wait few seconds before DELETE properly propagates so we can delete tag then
     sleep 5
-    #-delete tag
-    git config --local user.email "$CICD_EMAIL"
-    git config --local user.name "$CICD_NAME"
-    git remote add myorigin https://${GITHUB_ACCESS_TOKEN}@github.com/$CICD_REPO_SLUG.git
-    #> /dev/null 2>&1
     set +e
-    git tag -d $DEPLOY_RELEASE_TO_REMOVE
-    git push --quiet --delete myorigin $DEPLOY_RELEASE_TO_REMOVE
-    #> /dev/null 2>&1
+    #delete tag
+    curl --silent --request DELETE --user $GITHUB_USER:$GITHUB_ACCESS_TOKEN https://api.github.com/repos/$GITHUB_REPO/git/$DEPLOY_RELEASE_TO_REMOVE>/dev/null        
   fi  
   echo "FINISHED"
   exit 0
