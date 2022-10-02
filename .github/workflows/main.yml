@@ -52,4 +52,3 @@ jobs:
         ./cicd_scripts/before_install.sh
         ./cicd_scripts/install.sh
         ./cicd_scripts/script.sh
-        ./cicd_scripts/after_success.sh
