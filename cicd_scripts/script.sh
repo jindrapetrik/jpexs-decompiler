@@ -156,6 +156,8 @@ if [ "$DO_DEPLOY" == 1 ]; then
     fi
     
     curl --silent --request POST --data-binary @$FILE_PATH --header "Content-Type: $CONTENT_TYPE" --header "Accept: application/vnd.github.manifold-preview" --user $GITHUB_USER:$GITHUB_ACCESS_TOKEN https://uploads.github.com/repos/$GITHUB_REPO/releases/$RELEASE_ID/assets?name=$FILE_NAME>/dev/null
+    #wait few seconds to not DDOS GitHub
+    sleep 2
   done
         
   if [ -n "$DEPLOY_RELEASE_TO_REMOVE" ]; then
