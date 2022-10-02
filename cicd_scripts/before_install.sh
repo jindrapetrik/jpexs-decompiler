@@ -22,6 +22,9 @@ apt-get install -y curl
 # test php installed
 php --version
 
+apt-get install -y gcc
+apt-get install -y binutils-mingw-w64-x86-64
+
 tools_dir=$CICD_TEMP/tools
 
 if [ ! -f "$tools_dir/cached.txt" ]; then    
@@ -56,6 +59,8 @@ if [ ! -f "$tools_dir/cached.txt" ]; then
     #Extract launch4j - tool for creating EXE file from Java
     cp ./cicd_scripts/tools/launch4j-3.14-linux.tgz ./
     tar zxvf launch4j-3.14-linux.tgz -C "$tools_dir" >/dev/null
+    ln -s /usr/bin/x86_64-w64-mingw32-ld $tools_dir/launch4j/bin/ld
+    ln -s /usr/bin/x86_64-w64-mingw32-windres $tools_dir/launch4j/bin/windres    
 fi
 
 #Create tools.properties with paths to NSIS and launch4j

@@ -13,7 +13,7 @@ env:
     CICD_COMMIT: ${{ github.sha }}
     CICD_NAME: GitHub Actions
     CICD_EMAIL: GitHub
-    NIGHTLY_BRANCH: ghactions    
+    NIGHTLY_BRANCH: ghactions
     GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
@@ -49,5 +49,4 @@ jobs:
         chmod a+x ./cicd_scripts/*.sh
         ./cicd_scripts/before_install.sh
         ./cicd_scripts/install.sh
-        ./cicd_scripts/script.sh
         ./cicd_scripts/script.sh
