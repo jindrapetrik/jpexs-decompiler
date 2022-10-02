@@ -2,59 +2,18 @@
 
 # Exit immediately on first error
 set -e
-#sudo 
 apt-get -qq update    
-#NSIS needs these
-#sudo
-#apt-get install -y zlib1g-dev
-#sudo
-#apt-get install -y lib32z1
-#lib32ncurses5
-#For deploying
-#sudo 
 apt-get install -y jq
-#sudo 
 apt-get install -y curl
-#For parsing changelog
-#sudo
-#apt-get install -y php7.4-cli
-#commented out: assuming cicd tool already has php cli
-# test php installed
-php --version
-
-apt-get install -y gcc
-apt-get install -y binutils-mingw-w64-x86-64
+apt-get install -y git
 
 tools_dir=$CICD_TEMP/tools
 
-if [ ! -f "$tools_dir/cached.txt" ]; then    
-    #sudo apt-get install -y scons
-    #For unpacking unzip
-    #sudo
-    apt-get install -y unzip
-
+if [ ! -f "$tools_dir/cached.txt" ]; then        
     # create directory where tools will be downloaded and installed
     mkdir -p $tools_dir
 
     echo "cached">$tools_dir/cached.txt  
-
-
-    #cp ./cicd_scripts/tools/nsis-3.0-src.tar.bz2 ./
-    #Unpack NSIS sources - Tool for making windows installers
-    #bzip2 -d nsis-3.0-src.tar.bz2
-    #tar xvf nsis-3.0-src.tar -C $tools_dir >/dev/null  
-
-    #Compile NSIS
-    #cd $tools_dir/nsis-3.0-src/  
-    #scons UNICODE=yes SKIPSTUBS=all SKIPPLUGINS=all SKIPUTILS=all SKIPMISC=all NSIS_CONFIG_CONST_DATA=no PREFIX=$tools_dir/nsis-3.0-src/ install-compiler >/dev/null
-    #mkdir share
-    #Make this symbolic link, otherwise it does not work
-    #ln -s $tools_dir/nsis-3.0-src share/nsis
-    #cd -  
-
-    #Extract some binary additional sources which NSIS needs and are part of Windows ZIP file
-    #cp ./cicd_scripts/tools/nsis-3.0-addon.zip ./
-    #unzip -u nsis-3.0-addon.zip -d $tools_dir/nsis-3.0-src
 
     #Extract launch4j - tool for creating EXE file from Java
     cp ./cicd_scripts/tools/launch4j-3.14-linux-x64.tgz ./
