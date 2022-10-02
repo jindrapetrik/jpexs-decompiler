@@ -5,7 +5,6 @@ set -e
 apt-get -qq update    
 apt-get install -y jq
 apt-get install -y curl
-apt-get install -y git
 
 tools_dir=$CICD_TEMP/tools
 
