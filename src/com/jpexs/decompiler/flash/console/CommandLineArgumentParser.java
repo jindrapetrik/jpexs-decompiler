@@ -530,6 +530,10 @@ public class CommandLineArgumentParser {
             out.println(" ...<format> parameter can be specified for Image and Shape tags");
             out.println(" ...valid formats: lossless, lossless2, jpeg2, jpeg3, jpeg4");
             out.println(" ...<methodBodyIndexN> parameter should be specified if and only if the imported entity is an AS3 P-Code");
+
+            out.println(" " + (cnt++) + ") -replace <infile> <outfile> <argsfile>");
+            out.println(" ... same as -replace command, but the rest of arguments is read as lines from a text file <argsfile>");
+
         }
 
         if (filter == null || filter.equals("replacealpha")) {
@@ -2915,13 +2919,12 @@ public class CommandLineArgumentParser {
         if (args.size() < 3) {
             badArguments("replace");
         }
-        
-        System.out.println("Replacing in: " + args.lastElement());
-        
+
         File inFile = new File(args.pop());
         File outFile = new File(args.pop());
-        
-        if (args.size() == 3){
+
+        if (args.size() == 3) {
+            System.out.println("Replacing - only single argument passed, taking it as file to load replacements from");
             try {
                 List<String> lines = Files.readAllLines(Paths.get(args.pop()), StandardCharsets.UTF_8);
                 Collections.reverse(lines);
@@ -2930,21 +2933,22 @@ public class CommandLineArgumentParser {
                 args.addAll(lines);
 
             } catch (IOException e) {
-                e.printStackTrace(System.out);
+                System.err.println("I/O Error during reading replacements file");
+                System.exit(1);
             }
 
             if (args.isEmpty()) {
-                System.err.println("Replacments file is empty.");
+                System.err.println("Replacements file is empty.");
                 System.exit(1);
             }
         }
-        
+
         try {
             try (FileInputStream is = new FileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 while (true) {
-                    String objectToReplace = args.pop();   
-                    
+                    String objectToReplace = args.pop();
+
                     if (objectToReplace.matches("\\d+")) {
                         // replace character tag
                         int characterId = 0;
@@ -3033,9 +3037,9 @@ public class CommandLineArgumentParser {
                             }
                         } else {
                             List<ScriptPack> packs = swf.getAS3Packs();
- 
+
                             for (ScriptPack entry : packs) {
-                                    if (entry.getClassPath().toString().equals(objectToReplace)) {
+                                if (entry.getClassPath().toString().equals(objectToReplace)) {
                                     found = true;
                                     // replace AS3
                                     String repFile = args.pop();
