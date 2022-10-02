@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - Replace characters references
+- Replace commandline action allows to load replacements list from a textfile
 
 ### Fixed
 - [#1834] PlaceObject4 tags appear as Unresolved inside of DefineSprite
