@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Replace characters references
 - Replace commandline action allows to load replacements list from a textfile
+- SymbolClass export from commandline
+- data-characterId and data-characterName tags to SVG export
 
 ### Fixed
 - [#1834] PlaceObject4 tags appear as Unresolved inside of DefineSprite
