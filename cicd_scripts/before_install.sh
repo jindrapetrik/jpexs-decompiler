@@ -59,7 +59,9 @@ if [ ! -f "$tools_dir/cached.txt" ]; then
     #Extract launch4j - tool for creating EXE file from Java
     cp ./cicd_scripts/tools/launch4j-3.14-linux.tgz ./
     tar zxvf launch4j-3.14-linux.tgz -C "$tools_dir" >/dev/null
+    rm $tools_dir/launch4j/bin/ld
     ln -s /usr/bin/x86_64-w64-mingw32-ld $tools_dir/launch4j/bin/ld
+    rm $tools_dir/launch4j/bin/windres
     ln -s /usr/bin/x86_64-w64-mingw32-windres $tools_dir/launch4j/bin/windres    
 fi
 
