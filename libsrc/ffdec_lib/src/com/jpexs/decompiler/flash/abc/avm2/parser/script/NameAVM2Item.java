@@ -166,7 +166,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
             case "*":
                 return new UndefinedAVM2Item(null, null);
             case "int":
-                return new IntegerValueAVM2Item(null, null, 0L);
+                return new IntegerValueAVM2Item(null, null, 0);
             case "Boolean":
                 return new BooleanAVM2Item(null, null, Boolean.FALSE);
             case "Number":

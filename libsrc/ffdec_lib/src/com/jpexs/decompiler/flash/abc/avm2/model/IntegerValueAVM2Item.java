@@ -42,9 +42,9 @@ import java.util.Set;
  */
 public class IntegerValueAVM2Item extends NumberValueAVM2Item implements IntegerValueTypeItem {
 
-    public Long value;
+    public Integer value;
 
-    public IntegerValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Long value) {
+    public IntegerValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Integer value) {
         super(instruction, lineStartIns);
         this.value = value;
     }

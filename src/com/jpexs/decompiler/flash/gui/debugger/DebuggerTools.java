@@ -199,8 +199,8 @@ public class DebuggerTools {
                     }
                     //Set debugger port to actually set port
                     for (int i = 0; i < a.constants.getIntCount(); i++) {
-                        if (a.constants.getInt(i) == 123456L) {
-                            a.constants.setInt(i, (long) port);
+                        if (a.constants.getInt(i) == 123456) {
+                            a.constants.setInt(i, port);
                         }
                     }
                     //Add to target SWF

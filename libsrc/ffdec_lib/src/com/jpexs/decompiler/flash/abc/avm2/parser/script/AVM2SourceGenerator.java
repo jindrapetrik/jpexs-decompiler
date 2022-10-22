@@ -625,11 +625,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
 
         List<AVM2Instruction> cases = new ArrayList<>();
-        cases.addAll(toInsList(new IntegerValueAVM2Item(null, null, (long) defIndex).toSource(localData, this)));
+        cases.addAll(toInsList(new IntegerValueAVM2Item(null, null, defIndex).toSource(localData, this)));
         int cLen = insToBytes(cases).length;
         List<AVM2Instruction> caseLast = new ArrayList<>();
         caseLast.add(0, ins(AVM2Instructions.Jump, cLen));
-        caseLast.addAll(0, toInsList(new IntegerValueAVM2Item(null, null, (long) defIndex).toSource(localData, this)));
+        caseLast.addAll(0, toInsList(new IntegerValueAVM2Item(null, null, defIndex).toSource(localData, this)));
         int cLastLen = insToBytes(caseLast).length;
         caseLast.add(0, ins(AVM2Instructions.Jump, cLastLen));
         cases.addAll(0, caseLast);
@@ -643,7 +643,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 continue;
             }
             List<AVM2Instruction> sub = new ArrayList<>();
-            sub.addAll(toInsList(new IntegerValueAVM2Item(null, null, (long) i).toSource(localData, this)));
+            sub.addAll(toInsList(new IntegerValueAVM2Item(null, null, i).toSource(localData, this)));
             sub.add(ins(AVM2Instructions.Jump, insToBytes(cases).length));
             int subLen = insToBytes(sub).length;
 
@@ -717,7 +717,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     }
                     cnt++;
                     localData.finallyCounter.put(clauseId, cnt);
-                    ret.addAll(new IntegerValueAVM2Item(null, null, (long) cnt).toSource(localData, this));
+                    ret.addAll(new IntegerValueAVM2Item(null, null, cnt).toSource(localData, this));
                     ret.add(ins(new FinallyJumpIns(clauseId), 0));
                     ret.add(ins(AVM2Instructions.Label));
                     ret.add(ins(AVM2Instructions.Pop));
@@ -1103,7 +1103,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     }
                     cnt++;
                     localData.finallyCounter.put(clauseId, cnt);
-                    ret.addAll(new IntegerValueAVM2Item(null, null, (long) cnt).toSource(localData, this));
+                    ret.addAll(new IntegerValueAVM2Item(null, null, cnt).toSource(localData, this));
                     ret.add(ins(new FinallyJumpIns(clauseId), 0));
                     ret.add(ins(AVM2Instructions.Label));
                     ret.add(ins(AVM2Instructions.Pop));
@@ -1143,7 +1143,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
                 cnt++;
                 localData.finallyCounter.put(clauseId, cnt);
-                ret.addAll(new IntegerValueAVM2Item(null, null, (long) cnt).toSource(localData, this));
+                ret.addAll(new IntegerValueAVM2Item(null, null, cnt).toSource(localData, this));
                 ret.add(ins(new FinallyJumpIns(clauseId), 0));
                 ret.add(ins(AVM2Instructions.Label));
                 ret.add(ins(AVM2Instructions.Pop));
@@ -1171,7 +1171,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
                 cnt++;
                 localData.finallyCounter.put(clauseId, cnt);
-                ret.addAll(new IntegerValueAVM2Item(null, null, (long) cnt).toSource(localData, this));
+                ret.addAll(new IntegerValueAVM2Item(null, null, cnt).toSource(localData, this));
                 ret.add(ins(new FinallyJumpIns(clauseId), 0));
                 ret.add(ins(AVM2Instructions.Label));
                 ret.add(ins(AVM2Instructions.Pop));
@@ -1568,7 +1568,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
     public int propertyName(GraphTargetItem name) {
         if (name instanceof NameAVM2Item) {
-            NameAVM2Item va = (NameAVM2Item) name;
+            NameAVM2Item va  = (NameAVM2Item) name;
             return abcIndex.getSelectedAbc().constants.getMultinameId(Multiname.createQName(false, str(va.getVariableName()), namespace(Namespace.KIND_PACKAGE, "")), true);
         }
         throw new RuntimeException("no prop"); //FIXME
@@ -2103,6 +2103,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
         if (val instanceof UndefinedAVM2Item) {
             return new ValueKind(ValueKind.CONSTANT_Undefined, ValueKind.CONSTANT_Undefined);
         }
+
+        //TODO: the compiler should check whether default value is compatible with its type
+        //Flash CS6 does this, example message: "Incompatible default value of type int where String is expected."
+        //However a negative integer value on uint type silently loses its negation. Weird.
         return null;
     }
 

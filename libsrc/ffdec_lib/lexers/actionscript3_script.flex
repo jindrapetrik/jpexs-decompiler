@@ -20,6 +20,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.math.BigInteger;
 
 %%
 
@@ -188,10 +189,10 @@ XmlSQuoteStringChar = [^\r\n\']
 /* integer literals */
 DecIntegerLiteral = 0 | [1-9][0-9]*
 
-HexIntegerLiteral = 0 [xX] 0* {HexDigit} {1,8}
+HexIntegerLiteral = 0 [xX] 0* {HexDigit}+
 HexDigit          = [0-9a-fA-F]
 
-OctIntegerLiteral = 0+ [1-3]? {OctDigit} {1,15}
+OctIntegerLiteral = 0+ [1-3]? {OctDigit}+
 OctDigit          = [0-7]
 
 /* floating point literals */
@@ -355,17 +356,29 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
   {DecIntegerLiteral}            { 
                                     try{
-                                        return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Long.parseLong(yytext())); 
+                                        return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Integer.parseInt(yytext())); 
                                     } catch(NumberFormatException nfe){
-                                        //its too long for a Long var
+                                        //its too long for an Integer var
                                         return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(yytext())); 
                                     }
                                  }
 
-  {HexIntegerLiteral}            { return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Long.parseLong(yytext().substring(2), 16)); }
-
-  {OctIntegerLiteral}            { return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Long.parseLong(yytext(), 8)); }
-
+  {HexIntegerLiteral}            { 
+                                    try {
+                                        return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Integer.parseInt(yytext().substring(2), 16));
+                                    } catch (NumberFormatException nfe) {
+                                        //its too long for an Integer var
+                                        return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, new BigInteger(yytext().substring(2), 16).doubleValue()); 
+                                    }
+                                 }
+  {OctIntegerLiteral}            { 
+                                   try {
+                                        return new ParsedSymbol(SymbolGroup.INTEGER, SymbolType.INTEGER, Integer.parseInt(yytext(), 8));
+                                   } catch (NumberFormatException nfe) {
+                                        //its too long for an Integer var
+                                        return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, new BigInteger(yytext(), 8).doubleValue()); 
+                                   }
+                                 }  
   {DoubleLiteral}                { return new ParsedSymbol(SymbolGroup.DOUBLE, SymbolType.DOUBLE, Double.parseDouble(yytext())); }
 
   /* comments */

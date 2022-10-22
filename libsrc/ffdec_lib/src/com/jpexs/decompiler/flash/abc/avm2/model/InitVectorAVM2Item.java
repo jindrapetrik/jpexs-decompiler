@@ -123,13 +123,13 @@ public class InitVectorAVM2Item extends AVM2Item {
                 ins(AVM2Instructions.GetProperty, constants.getMultinameId(Multiname.createMultiname(false, constants.getStringId("Vector", true), allNsSet(g.abcIndex)), true)),
                 subtype,
                 ins(AVM2Instructions.ApplyType, 1),
-                new IntegerValueAVM2Item(null, null, (long) arguments.size()),
+                new IntegerValueAVM2Item(null, null, arguments.size()),
                 ins(AVM2Instructions.Construct, 1)
         );
         for (int i = 0; i < arguments.size(); i++) {
             ret.addAll(toSourceMerge(localData, generator,
                     ins(AVM2Instructions.Dup),
-                    new IntegerValueAVM2Item(null, null, (long) i),
+                    new IntegerValueAVM2Item(null, null, i),
                     arguments.get(i),
                     ins(AVM2Instructions.SetProperty, constants.getMultinameId(Multiname.createMultinameL(false, NamespaceItem.getCpoolSetIndex(g.abcIndex, openedNamespaces)), true))
             ));

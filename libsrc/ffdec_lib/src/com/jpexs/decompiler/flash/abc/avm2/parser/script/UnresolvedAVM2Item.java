@@ -195,7 +195,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             case "*":
                 return new UndefinedAVM2Item(null, null);
             case "int":
-                return new IntegerValueAVM2Item(null, null, 0L);
+                return new IntegerValueAVM2Item(null, null, 0);
             case "Boolean":
                 return new BooleanAVM2Item(null, null, Boolean.FALSE);
             case "Number":
@@ -492,7 +492,6 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             }
             return resolvedRoot = ret;
         }
-
 
         if (!isProperty && (name.size() == 1 && name.get(0).equals("Vector"))) {
             TypeItem ret = new TypeItem(InitVectorAVM2Item.VECTOR_FQN);

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.abc.avm2.instructions.stack;
 
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -45,7 +46,7 @@ public class PushShortIns extends InstructionDefinition implements PushIntegerTy
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        stack.push(new IntegerValueAVM2Item(ins, localData.lineStartInstruction, (long) (short) ins.operands[0]));
+        stack.push(new IntegerValueAVM2Item(ins, localData.lineStartInstruction, (int) (short) ins.operands[0]));
     }
 
     @Override

@@ -483,7 +483,7 @@ public class ASM3Parser {
                     value_index = 0;
                 } else {
                     expected(value, ParsedSymbol.TYPE_INTEGER, "Integer or null");
-                    value_index = constants.getIntId((Long) value.value, true);
+                    value_index = constants.getIntId((Integer) value.value, true);
                 }
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
                 break;
@@ -517,7 +517,7 @@ public class ASM3Parser {
              break;*/
             case ParsedSymbol.TYPE_INTEGER:
                 value_kind = ValueKind.CONSTANT_Int;
-                value_index = constants.getIntId((Long) type.value, true);
+                value_index = constants.getIntId((Integer) type.value, true);
                 break;
             case ParsedSymbol.TYPE_FLOAT:
                 value_kind = ValueKind.CONSTANT_Double;
@@ -935,7 +935,7 @@ public class ASM3Parser {
                                     if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                                         operandsList.add(0);
                                     } else if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
-                                        long intVal = (Long) parsedOperand.value;
+                                        int intVal = (Integer) parsedOperand.value;
                                         int iid = constants.getIntId(intVal, false);
                                         if (iid == -1) {
                                             if ((missingHandler != null) && (missingHandler.missingInt(intVal))) {
@@ -1117,7 +1117,7 @@ public class ASM3Parser {
                                     break;
                                 case AVM2Code.OPT_S8:
                                     if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
-                                        long val = (long) (Long) parsedOperand.value;
+                                        int val = (Integer) parsedOperand.value;
                                         if (val < Byte.MIN_VALUE || val > Byte.MAX_VALUE) {
                                             throw new AVM2ParseException("Byte value expected (" + Byte.MIN_VALUE + " to " + Byte.MAX_VALUE + "). Use pushshort or pushint to push larger values", lexer.yyline());
                                         }

@@ -116,10 +116,10 @@ IdentifierOrParent = {Identifier} | ".."
 /* integer literals */
 DecIntegerLiteral = 0 | [1-9][0-9]*
 
-HexIntegerLiteral = 0 [xX] 0* {HexDigit} {1,8}
+HexIntegerLiteral = 0 [xX] 0* {HexDigit}+
 HexDigit          = [0-9a-fA-F]
 
-OctIntegerLiteral = 0+ [1-3]? {OctDigit} {1,15}
+OctIntegerLiteral = 0+ [1-3]? {OctDigit}+
 OctDigit          = [0-7]
 
 /* floating point literals */
