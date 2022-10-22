@@ -171,7 +171,7 @@ if [ "$DO_DEPLOY" == 1 ]; then
     sleep 5
     set +e
     #delete tag
-    curl --silent --request DELETE --user $GITHUB_USER:$GITHUB_ACCESS_TOKEN https://api.github.com/repos/$GITHUB_REPO/git/$DEPLOY_RELEASE_TO_REMOVE>/dev/null        
+    curl --silent --request DELETE --user $GITHUB_USER:$GITHUB_ACCESS_TOKEN https://api.github.com/repos/$GITHUB_REPO/git/refs/tags/$DEPLOY_RELEASE_TO_REMOVE>/dev/null        
   fi  
   echo "FINISHED"
   exit 0
