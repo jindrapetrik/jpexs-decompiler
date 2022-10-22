@@ -166,21 +166,21 @@ public class PDFStream extends PDFObject implements Serializable {
             dos.close();
 
             // FlatDecode is compatible with the java.util.zip.Deflater class
-            os.write("/Filter /FlateDecode\n".getBytes());
-            os.write("/Length ".getBytes());
-            os.write(Integer.toString(b.size() + 1).getBytes());
-            os.write("\n>>\nstream\n".getBytes());
+            os.write("/Filter /FlateDecode\n".getBytes("UTF-8"));
+            os.write("/Length ".getBytes("UTF-8"));
+            os.write(Integer.toString(b.size() + 1).getBytes("UTF-8"));
+            os.write("\n>>\nstream\n".getBytes("UTF-8"));
             b.writeTo(os);
-            os.write("\n".getBytes());
+            os.write("\n".getBytes("UTF-8"));
         } else {
             // This is a non-deflated stream
-            os.write("/Length ".getBytes());
-            os.write(Integer.toString(buf.size()).getBytes());
-            os.write("\n>>\nstream\n".getBytes());
+            os.write("/Length ".getBytes("UTF-8"));
+            os.write(Integer.toString(buf.size()).getBytes("UTF-8"));
+            os.write("\n>>\nstream\n".getBytes("UTF-8"));
             buf.writeTo(os);
         }
 
-        os.write("endstream\nendobj\n".getBytes());
+        os.write("endstream\nendobj\n".getBytes("UTF-8"));
 
         // Unlike most PDF objects, we dont call writeEnd(os) because we
         // contain a stream

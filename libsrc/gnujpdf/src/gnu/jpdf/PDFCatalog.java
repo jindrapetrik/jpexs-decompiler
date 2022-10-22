@@ -80,26 +80,26 @@ public class PDFCatalog extends PDFObject {
         writeStart(os);
 
         // now the objects body
-        os.write("/Version /1.7\n".getBytes());
+        os.write("/Version /1.7\n".getBytes("UTF-8"));
 
         // the /Pages object
-        os.write("/Pages ".getBytes());
-        os.write(pdfPageList.toString().getBytes());
-        os.write("\n".getBytes());
+        os.write("/Pages ".getBytes("UTF-8"));
+        os.write(pdfPageList.toString().getBytes("UTF-8"));
+        os.write("\n".getBytes("UTF-8"));
 
         // the Outlines object
         if (outlines != null) {
             //if(outlines.getLast()>-1) {
-            os.write("/Outlines ".getBytes());
-            os.write(outlines.toString().getBytes());
-            os.write("\n".getBytes());
+            os.write("/Outlines ".getBytes("UTF-8"));
+            os.write(outlines.toString().getBytes("UTF-8"));
+            os.write("\n".getBytes("UTF-8"));
             //}
         }
 
         // the /PageMode setting
-        os.write("/PageMode ".getBytes());
-        os.write(PDFDocument.PDF_PAGE_MODES[pagemode].getBytes());
-        os.write("\n".getBytes());
+        os.write("/PageMode ".getBytes("UTF-8"));
+        os.write(PDFDocument.PDF_PAGE_MODES[pagemode].getBytes("UTF-8"));
+        os.write("\n".getBytes("UTF-8"));
 
         // finish off with its footer
         writeEnd(os);

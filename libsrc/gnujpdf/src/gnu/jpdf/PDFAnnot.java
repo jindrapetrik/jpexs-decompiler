@@ -226,52 +226,52 @@ public class PDFAnnot extends PDFObject implements Serializable {
         writeStart(os);
 
         // now the objects body
-        os.write("/Subtype ".getBytes());
-        os.write(subtype.getBytes());
-        os.write("\n/Rect [".getBytes());
-        os.write(Integer.toString(l).getBytes());
-        os.write(" ".getBytes());
-        os.write(Integer.toString(b).getBytes());
-        os.write(" ".getBytes());
-        os.write(Integer.toString(r).getBytes());
-        os.write(" ".getBytes());
-        os.write(Integer.toString(t).getBytes());
-        os.write("]\n".getBytes());
+        os.write("/Subtype ".getBytes("UTF-8"));
+        os.write(subtype.getBytes("UTF-8"));
+        os.write("\n/Rect [".getBytes("UTF-8"));
+        os.write(Integer.toString(l).getBytes("UTF-8"));
+        os.write(" ".getBytes("UTF-8"));
+        os.write(Integer.toString(b).getBytes("UTF-8"));
+        os.write(" ".getBytes("UTF-8"));
+        os.write(Integer.toString(r).getBytes("UTF-8"));
+        os.write(" ".getBytes("UTF-8"));
+        os.write(Integer.toString(t).getBytes("UTF-8"));
+        os.write("]\n".getBytes("UTF-8"));
 
         // handle the border
         if (border == null) {
-            os.write("/Border [0 0 0]\n".getBytes());
+            os.write("/Border [0 0 0]\n".getBytes("UTF-8"));
             //if(pdf.defaultOutlineBorder==null)
             //pdf.add(pdf.defaultOutlineBorder = new border(SOLID,0.0));
-            //os.write(pdf.defaultOutlineBorder.toString().getBytes());
+            //os.write(pdf.defaultOutlineBorder.toString().getBytes("UTF-8"));
         } else {
-            os.write("/BS ".getBytes());
-            os.write(border.toString().getBytes());
-            os.write("\n".getBytes());
+            os.write("/BS ".getBytes("UTF-8"));
+            os.write(border.toString().getBytes("UTF-8"));
+            os.write("\n".getBytes("UTF-8"));
         }
 
         // Now the annotation subtypes
         if (subtype.equals("/Text")) {
-            os.write("/Contents ".getBytes());
-            os.write(PDFStringHelper.makePDFString(s).getBytes());
-            os.write("\n".getBytes());
+            os.write("/Contents ".getBytes("UTF-8"));
+            os.write(PDFStringHelper.makePDFString(s).getBytes("UTF-8"));
+            os.write("\n".getBytes("UTF-8"));
         } else if (subtype.equals("/Link")) {
-            os.write("/Dest [".getBytes());
-            os.write(dest.toString().getBytes());
+            os.write("/Dest [".getBytes("UTF-8"));
+            os.write(dest.toString().getBytes("UTF-8"));
             if (fl == FULL_PAGE) {
-                os.write(" /Fit]".getBytes());
+                os.write(" /Fit]".getBytes("UTF-8"));
             } else {
-                os.write(" /FitR ".getBytes());
-                os.write(Integer.toString(fl).getBytes());
-                os.write(" ".getBytes());
-                os.write(Integer.toString(fb).getBytes());
-                os.write(" ".getBytes());
-                os.write(Integer.toString(fr).getBytes());
-                os.write(" ".getBytes());
-                os.write(Integer.toString(ft).getBytes());
-                os.write("]".getBytes());
+                os.write(" /FitR ".getBytes("UTF-8"));
+                os.write(Integer.toString(fl).getBytes("UTF-8"));
+                os.write(" ".getBytes("UTF-8"));
+                os.write(Integer.toString(fb).getBytes("UTF-8"));
+                os.write(" ".getBytes("UTF-8"));
+                os.write(Integer.toString(fr).getBytes("UTF-8"));
+                os.write(" ".getBytes("UTF-8"));
+                os.write(Integer.toString(ft).getBytes("UTF-8"));
+                os.write("]".getBytes("UTF-8"));
             }
-            os.write("\n".getBytes());
+            os.write("\n".getBytes("UTF-8"));
         }
 
         // finish off with its footer

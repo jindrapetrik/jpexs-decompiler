@@ -74,23 +74,22 @@ public class PDFMask extends PDFStream implements ImageObserver {
         dos.finish();
         dos.close();
 
-        os.write("/Subtype /Image\n".getBytes());
-        os.write(("/Width " + width + "\n").getBytes());
-        os.write(("/Height " + height + "\n").getBytes());
-        os.write(("/BitsPerComponent 8\n").getBytes());
-        os.write(("/ColorSpace /DeviceGray\n").getBytes());
-        os.write(("/Decode [1 0]\n").getBytes());
-
+        os.write("/Subtype /Image\n".getBytes("UTF-8"));
+        os.write(("/Width " + width + "\n").getBytes("UTF-8"));
+        os.write(("/Height " + height + "\n").getBytes("UTF-8"));
+        os.write(("/BitsPerComponent 8\n").getBytes("UTF-8"));
+        os.write(("/ColorSpace /DeviceGray\n").getBytes("UTF-8"));
+        os.write(("/Decode [1 0]\n").getBytes("UTF-8"));
 
         // FlatDecode is compatible with the java.util.zip.Deflater class
-        os.write("/Filter /FlateDecode\n".getBytes());
-        os.write("/Length ".getBytes());
-        os.write(Integer.toString(b.size() + 1).getBytes());
-        os.write("\n>>\nstream\n".getBytes());
+        os.write("/Filter /FlateDecode\n".getBytes("UTF-8"));
+        os.write("/Length ".getBytes("UTF-8"));
+        os.write(Integer.toString(b.size() + 1).getBytes("UTF-8"));
+        os.write("\n>>\nstream\n".getBytes("UTF-8"));
         b.writeTo(os);
-        os.write("\n".getBytes());
+        os.write("\n".getBytes("UTF-8"));
 
-        os.write("endstream\nendobj\n".getBytes());
+        os.write("endstream\nendobj\n".getBytes("UTF-8"));
 
         // Unlike most PDF objects, we dont call writeEnd(os) because we
         // contain a stream

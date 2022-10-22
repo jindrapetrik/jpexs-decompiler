@@ -269,13 +269,13 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
     public void writeStream(OutputStream os) throws IOException {
         // This is a non-deflated stream
         /*
-    os.write("/Length ".getBytes());
+    os.write("/Length ".getBytes("UTF-8"));
     // Accout for stream\n ... >\nendstream
-    os.write(Integer.toString(buf.size() + 18).getBytes());
-    os.write("\n/Filter /ASCII85Decode".getBytes());
-    os.write("\n>>\nstream\n".getBytes());
+    os.write(Integer.toString(buf.size() + 18).getBytes("UTF-8"));
+    os.write("\n/Filter /ASCII85Decode".getBytes("UTF-8"));
+    os.write("\n>>\nstream\n".getBytes("UTF-8"));
     buf.writeTo(os);
-    os.write(">\nendstream\nendobj\n\n".getBytes());
+    os.write(">\nendstream\nendobj\n\n".getBytes("UTF-8"));
          */
         ByteArrayOutputStream b = new ByteArrayOutputStream();
         DeflaterOutputStream dos = new DeflaterOutputStream(b);
@@ -284,13 +284,13 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
         dos.close();
 
         // FlatDecode is compatible with the java.util.zip.Deflater class
-        //os.write("/Filter [/FlateDecode /ASCIIHexDecode]\n".getBytes());
-        os.write("/Filter [/FlateDecode /ASCII85Decode]\n".getBytes());
-        os.write("/Length ".getBytes());
-        os.write(Integer.toString(b.size()).getBytes());
-        os.write("\n>>\nstream\n".getBytes());
+        //os.write("/Filter [/FlateDecode /ASCIIHexDecode]\n".getBytes("UTF-8"));
+        os.write("/Filter [/FlateDecode /ASCII85Decode]\n".getBytes("UTF-8"));
+        os.write("/Length ".getBytes("UTF-8"));
+        os.write(Integer.toString(b.size()).getBytes("UTF-8"));
+        os.write("\n>>\nstream\n".getBytes("UTF-8"));
         b.writeTo(os);
-        os.write("\nendstream\nendobj\n".getBytes());
+        os.write("\nendstream\nendobj\n".getBytes("UTF-8"));
 
     } // end writeStream
 
@@ -306,18 +306,18 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
         writeStart(os);
 
         // write the extra details
-        os.write("/Subtype /Image\n/Name ".getBytes());
-        os.write(name.getBytes());
-        os.write("\n/Width ".getBytes());
-        os.write(Integer.toString(width).getBytes());
-        os.write("\n/Height ".getBytes());
-        os.write(Integer.toString(height).getBytes());
-        os.write("\n/BitsPerComponent 8\n/ColorSpace /DeviceRGB\n".getBytes());
+        os.write("/Subtype /Image\n/Name ".getBytes("UTF-8"));
+        os.write(name.getBytes("UTF-8"));
+        os.write("\n/Width ".getBytes("UTF-8"));
+        os.write(Integer.toString(width).getBytes("UTF-8"));
+        os.write("\n/Height ".getBytes("UTF-8"));
+        os.write(Integer.toString(height).getBytes("UTF-8"));
+        os.write("\n/BitsPerComponent 8\n/ColorSpace /DeviceRGB\n".getBytes("UTF-8"));
         if (mask != null) {
-            os.write(("/SMask " + mask + "\n").getBytes());
+            os.write(("/SMask " + mask + "\n").getBytes("UTF-8"));
         }
         if (interpolate) {
-            os.write("/Interpolate true\n".getBytes());
+            os.write("/Interpolate true\n".getBytes("UTF-8"));
         }
 
         // write the pixels to the stream
@@ -353,7 +353,7 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
                     if (encTuple.equals("!!!!!")) {
                         encTuple = "z";
                     }
-                    bos.write(encTuple.getBytes());
+                    bos.write(encTuple.getBytes("UTF-8"));
                 }
             }
         }
@@ -361,8 +361,8 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
 
         String lastTuple = base85Encoding(out.toString());
         //System.out.println("lastTuple: " + lastTuple);
-        bos.write(lastTuple.getBytes());
-        bos.write("~".getBytes());
+        bos.write(lastTuple.getBytes("UTF-8"));
+        bos.write("~".getBytes("UTF-8"));
 
         //System.out.println("Processing done");
         // this will write the actual stream

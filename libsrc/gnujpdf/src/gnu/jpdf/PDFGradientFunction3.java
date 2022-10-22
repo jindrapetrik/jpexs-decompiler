@@ -25,7 +25,7 @@ public class PDFGradientFunction3 extends PDFObject {
     @Override
     public void write(OutputStream os) throws IOException {
         writeStart(os);
-        os.write(("/FunctionType 3 /Domain [0 1] /Functions [" + String.join(" ", functions2Refs) + "] ").getBytes());
+        os.write(("/FunctionType 3 /Domain [0 1] /Functions [" + String.join(" ", functions2Refs) + "] ").getBytes("UTF-8"));
         int lastcols = fgrad.getColors().length - 1;
         List<String> bounds = new ArrayList<>();
         List<String> encode = new ArrayList<>();
@@ -35,8 +35,8 @@ public class PDFGradientFunction3 extends PDFObject {
             }
             encode.add("0 1");
         }
-        os.write(("/Bounds [" + String.join(" ", bounds) + "] ").getBytes());
-        os.write(("/Encode [" + String.join(" ", encode) + "]\n").getBytes());
+        os.write(("/Bounds [" + String.join(" ", bounds) + "] ").getBytes("UTF-8"));
+        os.write(("/Encode [" + String.join(" ", encode) + "]\n").getBytes("UTF-8"));
         writeEnd(os);
     }
 

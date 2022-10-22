@@ -520,55 +520,55 @@ public class PDFPage extends PDFObject implements Serializable {
 
         // now the objects body
         // the /Parent pages object
-        os.write("/Parent ".getBytes());
-        os.write(pdfPageList.toString().getBytes());
-        os.write("\n".getBytes());
+        os.write("/Parent ".getBytes("UTF-8"));
+        os.write(pdfPageList.toString().getBytes("UTF-8"));
+        os.write("\n".getBytes("UTF-8"));
 
         // the /MediaBox for the page size
-        os.write("/MediaBox [".getBytes());
-        os.write(Integer.toString(0).getBytes());
-        os.write(" ".getBytes());
-        os.write(Integer.toString(0).getBytes());
-        os.write(" ".getBytes());
-        os.write(Integer.toString((int) pageFormat.getWidth()).getBytes());
-        os.write(" ".getBytes());
-        os.write(Integer.toString((int) pageFormat.getHeight()).getBytes());
-        os.write("]\n".getBytes());
+        os.write("/MediaBox [".getBytes("UTF-8"));
+        os.write(Integer.toString(0).getBytes("UTF-8"));
+        os.write(" ".getBytes("UTF-8"));
+        os.write(Integer.toString(0).getBytes("UTF-8"));
+        os.write(" ".getBytes("UTF-8"));
+        os.write(Integer.toString((int) pageFormat.getWidth()).getBytes("UTF-8"));
+        os.write(" ".getBytes("UTF-8"));
+        os.write(Integer.toString((int) pageFormat.getHeight()).getBytes("UTF-8"));
+        os.write("]\n".getBytes("UTF-8"));
 
         // Rotation (if not zero)
 //        if(rotate!=0) {
-//            os.write("/Rotate ".getBytes());
-//            os.write(Integer.toString(rotate).getBytes());
-//            os.write("\n".getBytes());
+//            os.write("/Rotate ".getBytes("UTF-8"));
+//            os.write(Integer.toString(rotate).getBytes("UTF-8"));
+//            os.write("\n".getBytes("UTF-8"));
 //        }
         writeResources(os);
 
         // The thumbnail
         if (thumbnail != null) {
-            os.write("/Thumb ".getBytes());
-            os.write(thumbnail.toString().getBytes());
-            os.write("\n".getBytes());
+            os.write("/Thumb ".getBytes("UTF-8"));
+            os.write(thumbnail.toString().getBytes("UTF-8"));
+            os.write("\n".getBytes("UTF-8"));
         }
 
         // the /Contents pages object
         if (contents.size() > 0) {
             if (contents.size() == 1) {
                 PDFObject ob = (PDFObject) contents.elementAt(0);
-                os.write("/Contents ".getBytes());
-                os.write(ob.toString().getBytes());
-                os.write("\n".getBytes());
+                os.write("/Contents ".getBytes("UTF-8"));
+                os.write(ob.toString().getBytes("UTF-8"));
+                os.write("\n".getBytes("UTF-8"));
             } else {
-                os.write("/Contents [".getBytes());
-                os.write(PDFObject.toArray(contents).getBytes());
-                os.write("\n".getBytes());
+                os.write("/Contents [".getBytes("UTF-8"));
+                os.write(PDFObject.toArray(contents).getBytes("UTF-8"));
+                os.write("\n".getBytes("UTF-8"));
             }
         }
 
         // The /Annots object
         if (annotations.size() > 0) {
-            os.write("/Annots ".getBytes());
-            os.write(PDFObject.toArray(annotations).getBytes());
-            os.write("\n".getBytes());
+            os.write("/Annots ".getBytes("UTF-8"));
+            os.write(PDFObject.toArray(annotations).getBytes("UTF-8"));
+            os.write("\n".getBytes("UTF-8"));
         }
 
         // finish off with its footer
@@ -577,70 +577,70 @@ public class PDFPage extends PDFObject implements Serializable {
 
     public void writeResources(OutputStream os) throws IOException {
         // Now the resources
-        os.write("/Resources << ".getBytes());
+        os.write("/Resources << ".getBytes("UTF-8"));
         // fonts
         if (fonts.size() > 0) {
-            //os.write("/Font << ".getBytes());
-            os.write("\n/Font << ".getBytes());
+            //os.write("/Font << ".getBytes("UTF-8"));
+            os.write("\n/Font << ".getBytes("UTF-8"));
             for (PDFFont font : fonts) {
-                os.write(font.getName().getBytes());
-                os.write(" ".getBytes());
-                os.write(font.toString().getBytes());
-                os.write(" ".getBytes());
+                os.write(font.getName().getBytes("UTF-8"));
+                os.write(" ".getBytes("UTF-8"));
+                os.write(font.toString().getBytes("UTF-8"));
+                os.write(" ".getBytes("UTF-8"));
             }
-            os.write(">> ".getBytes());
+            os.write(">> ".getBytes("UTF-8"));
         }
         // Now the XObjects
         if (xobjects.size() > 0) {
-            os.write("\n/XObject << ".getBytes());
+            os.write("\n/XObject << ".getBytes("UTF-8"));
             for (String str : xobjects) {
-                os.write(str.getBytes());
-                os.write(" ".getBytes());
+                os.write(str.getBytes("UTF-8"));
+                os.write(" ".getBytes("UTF-8"));
             }
-            os.write(">> ".getBytes());
+            os.write(">> ".getBytes("UTF-8"));
         }
         // Any other resources
         for (String str : resources) {
-            os.write(str.getBytes());
-            os.write(" ".getBytes());
+            os.write(str.getBytes("UTF-8"));
+            os.write(" ".getBytes("UTF-8"));
         }
         // JM
         if (imageResources.size() > 0) {
-            os.write("/XObject << ".getBytes());
+            os.write("/XObject << ".getBytes("UTF-8"));
             for (String str : imageResources) {
-                os.write(str.getBytes());
-                os.write(" ".getBytes());
+                os.write(str.getBytes("UTF-8"));
+                os.write(" ".getBytes("UTF-8"));
             }
-            os.write(" >> ".getBytes());
+            os.write(" >> ".getBytes("UTF-8"));
         }
 
         if (patternResources.size() > 0) {
-            os.write("/Pattern << ".getBytes());
+            os.write("/Pattern << ".getBytes("UTF-8"));
             for (String str : patternResources) {
-                os.write(str.getBytes());
-                os.write(" ".getBytes());
+                os.write(str.getBytes("UTF-8"));
+                os.write(" ".getBytes("UTF-8"));
             }
-            os.write(" >> ".getBytes());
+            os.write(" >> ".getBytes("UTF-8"));
         }
 
         if (shadingResources.size() > 0) {
-            os.write("/Shading << ".getBytes());
+            os.write("/Shading << ".getBytes("UTF-8"));
             for (String str : shadingResources) {
-                os.write(str.getBytes());
-                os.write(" ".getBytes());
+                os.write(str.getBytes("UTF-8"));
+                os.write(" ".getBytes("UTF-8"));
             }
-            os.write(" >> ".getBytes());
+            os.write(" >> ".getBytes("UTF-8"));
         }
 
         if (extGStateResources.size() > 0) {
-            os.write("/ExtGState << ".getBytes());
+            os.write("/ExtGState << ".getBytes("UTF-8"));
             for (String str : extGStateResources) {
-                os.write(str.getBytes());
-                os.write(" ".getBytes());
+                os.write(str.getBytes("UTF-8"));
+                os.write(" ".getBytes("UTF-8"));
             }
-            os.write(" >> ".getBytes());
+            os.write(" >> ".getBytes("UTF-8"));
         }
-        os.write(">>\n".getBytes());
+        os.write(">>\n".getBytes("UTF-8"));
     }
 
     /**
@@ -688,19 +688,19 @@ public class PDFPage extends PDFObject implements Serializable {
             // Write the object header
             //writeStart(os);
 
-            os.write(Integer.toString(objser).getBytes());
-            os.write(" 0 obj\n".getBytes());
+            os.write(Integer.toString(objser).getBytes("UTF-8"));
+            os.write(" 0 obj\n".getBytes("UTF-8"));
 
             // now the objects body
-            os.write("[".getBytes());
+            os.write("[".getBytes("UTF-8"));
             for (String str : set) {
-                os.write(str.getBytes());
+                os.write(str.getBytes("UTF-8"));
             }
-            os.write("]\n".getBytes());
+            os.write("]\n".getBytes("UTF-8"));
 
             // finish off with its footer
             //writeEnd(os);
-            os.write("endobj\n".getBytes());
+            os.write("endobj\n".getBytes("UTF-8"));
         }
     }
 

@@ -159,38 +159,38 @@ public class PDFInfo extends PDFObject {
 
         // now the objects body
         if (author != null) {
-            os.write("/Author (".getBytes());
-            os.write(PDFStringHelper.makePDFString(author).getBytes());
-            os.write(")\n".getBytes());
+            os.write("/Author (".getBytes("UTF-8"));
+            os.write(PDFStringHelper.makePDFString(author).getBytes("UTF-8"));
+            os.write(")\n".getBytes("UTF-8"));
         }
 
         if (creator != null) {
-            os.write("/Creator (".getBytes());
-            os.write(PDFStringHelper.makePDFString(creator).getBytes());
-            os.write(")\n".getBytes());
+            os.write("/Creator (".getBytes("UTF-8"));
+            os.write(PDFStringHelper.makePDFString(creator).getBytes("UTF-8"));
+            os.write(")\n".getBytes("UTF-8"));
         }
 
-        os.write("/Producer ".getBytes());
+        os.write("/Producer ".getBytes("UTF-8"));
         os.write(PDFStringHelper.makePDFString("gnujpdf - gnujpdf.sourceforge.net")
-                .getBytes());
-        os.write("\n".getBytes());
+                .getBytes("UTF-8"));
+        os.write("\n".getBytes("UTF-8"));
 
         if (title != null) {
-            os.write("/Title ".getBytes());
-            os.write(PDFStringHelper.makePDFString(title).getBytes());
-            os.write("\n".getBytes());
+            os.write("/Title ".getBytes("UTF-8"));
+            os.write(PDFStringHelper.makePDFString(title).getBytes("UTF-8"));
+            os.write("\n".getBytes("UTF-8"));
         }
 
         if (subject != null) {
-            os.write("/Subject (".getBytes());
-            os.write(PDFStringHelper.makePDFString(subject).getBytes());
-            os.write(")\n".getBytes());
+            os.write("/Subject (".getBytes("UTF-8"));
+            os.write(PDFStringHelper.makePDFString(subject).getBytes("UTF-8"));
+            os.write(")\n".getBytes("UTF-8"));
         }
 
         if (keywords != null) {
-            os.write("/Keywords (".getBytes());
-            os.write(PDFStringHelper.makePDFString(keywords).getBytes());
-            os.write(")\n".getBytes());
+            os.write("/Keywords (".getBytes("UTF-8"));
+            os.write(PDFStringHelper.makePDFString(keywords).getBytes("UTF-8"));
+            os.write(")\n".getBytes("UTF-8"));
         }
 
         // finish off with its footer

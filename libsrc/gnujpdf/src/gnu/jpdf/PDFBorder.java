@@ -90,25 +90,25 @@ public class PDFBorder extends PDFObject {
     @Override
     public void write(OutputStream os) throws IOException {
         //writeStart(os);
-        os.write(Integer.toString(objser).getBytes());
-        os.write(" 0 obj\n".getBytes());
+        os.write(Integer.toString(objser).getBytes("UTF-8"));
+        os.write(" 0 obj\n".getBytes("UTF-8"));
 
-        os.write("[/S /".getBytes());
-        os.write("SDBIU".substring(style, style + 1).getBytes());
-        os.write(" /W ".getBytes());
-        os.write(Double.toString(width).getBytes());
+        os.write("[/S /".getBytes("UTF-8"));
+        os.write("SDBIU".substring(style, style + 1).getBytes("UTF-8"));
+        os.write(" /W ".getBytes("UTF-8"));
+        os.write(Double.toString(width).getBytes("UTF-8"));
         if (dash != null) {
-            os.write(" /D [".getBytes());
-            os.write(Double.toString(dash[0]).getBytes());
+            os.write(" /D [".getBytes("UTF-8"));
+            os.write(Double.toString(dash[0]).getBytes("UTF-8"));
             for (int i = 1; i < dash.length; i++) {
-                os.write(" ".getBytes());
-                os.write(Double.toString(dash[i]).getBytes());
+                os.write(" ".getBytes("UTF-8"));
+                os.write(Double.toString(dash[i]).getBytes("UTF-8"));
             }
-            os.write("] ".getBytes());
+            os.write("] ".getBytes("UTF-8"));
         }
-        os.write("]\n".getBytes());
+        os.write("]\n".getBytes("UTF-8"));
 
         //writeEnd(os);
-        os.write("endobj\n".getBytes());
+        os.write("endobj\n".getBytes("UTF-8"));
     }
 } // end class PDFBorder
