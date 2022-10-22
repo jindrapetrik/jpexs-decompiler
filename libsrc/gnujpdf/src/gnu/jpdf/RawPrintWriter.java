@@ -19,7 +19,7 @@ public class RawPrintWriter {
 
     public void print(String s) {
         try {
-            os.write(s.getBytes());
+            os.write(s.getBytes("UTF-8"));
         } catch (IOException ex) {
             Logger.getLogger(RawPrintWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -35,7 +35,7 @@ public class RawPrintWriter {
 
     public void println(String s) {
         try {
-            os.write((s + "\n").getBytes());
+            os.write((s + "\n").getBytes("UTF-8"));
         } catch (IOException ex) {
             Logger.getLogger(RawPrintWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
