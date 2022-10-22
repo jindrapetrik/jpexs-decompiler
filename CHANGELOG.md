@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - [#1834] PlaceObject4 tags appear as Unresolved inside of DefineSprite
+- [#1839] Sprite frames exported incorrectly and repeating
 
 ## [15.1.1] - 2022-07-03
 ### Added
@@ -2374,6 +2375,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1834]: https://www.free-decompiler.com/flash/issues/1834
+[#1839]: https://www.free-decompiler.com/flash/issues/1839
 [#270]: https://www.free-decompiler.com/flash/issues/270
 [#1718]: https://www.free-decompiler.com/flash/issues/1718
 [#1801]: https://www.free-decompiler.com/flash/issues/1801
