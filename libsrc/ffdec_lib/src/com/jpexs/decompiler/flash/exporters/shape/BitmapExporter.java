@@ -411,8 +411,14 @@ public class BitmapExporter extends ShapeExporterBase {
             }
         }
 
-        if (thickness < 0) {
-            thickness = -thickness;
+        if (Double.isNaN(thickness) || Double.compare(thickness, 0.0d) == 0) { //for example when bounding box width/height is zero
+            lineStroke = null;
+            lineColor = null;
+            return;
+        } else {
+            if (thickness < 0) {
+                thickness = -thickness;
+            }
         }
 
         if (joinStyle == BasicStroke.JOIN_MITER) {
