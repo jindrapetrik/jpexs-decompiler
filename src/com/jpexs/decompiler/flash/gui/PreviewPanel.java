@@ -559,11 +559,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         showCardLeft(FLASH_VIEWER_CARD);
     }
 
-    public void showImagePanel(Timelined timelined, SWF swf, int frame) {
+    public void showImagePanel(Timelined timelined, SWF swf, int frame, boolean showObjectsUnderCursor) {
         showCardLeft(DRAW_PREVIEW_CARD);
         parametersPanel.setVisible(false);
         imagePlayControls.setMedia(imagePanel);
-        imagePanel.setTimelined(timelined, swf, frame);
+        imagePanel.setTimelined(timelined, swf, frame, showObjectsUnderCursor);
     }
 
     public void showImagePanel(SerializableImage image) {
@@ -601,7 +601,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private void showFontPage(FontTag fontTag) {
         if (!mainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            showImagePanel(MainPanel.makeTimelined(fontTag), fontTag.getSwf(), fontPageNum);
+            showImagePanel(MainPanel.makeTimelined(fontTag), fontTag.getSwf(), fontPageNum, true);
         }
     }
 
@@ -619,7 +619,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showTextPanel(TextTag textTag) {
         if (!mainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            showImagePanel(MainPanel.makeTimelined(textTag), textTag.getSwf(), 0);
+            showImagePanel(MainPanel.makeTimelined(textTag), textTag.getSwf(), 0, true);
         }
 
         showCardRight(CARDTEXTPANEL);
@@ -717,7 +717,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeSplitPane.setDividerLocation((int) (0.6 * this.getWidth()));
         placeGenericPanel.setEditMode(false, tag);
         placeImagePanel.selectDepth(-1);
-        placeImagePanel.setTimelined(((Tag) tag).getTimelined(), ((Tag) tag).getSwf(), frame);
+        placeImagePanel.setTimelined(((Tag) tag).getTimelined(), ((Tag) tag).getSwf(), frame, true);
         placeImagePanel.selectDepth(tag.getDepth());
         parametersPanel.setVisible(false);
         placeEditButton.setVisible(!tag.isReadOnly());
@@ -1004,7 +1004,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         int pageCount = getFontPageCount(fontTag);
         fontPageNum = (fontPageNum + pageCount - 1) % pageCount;
         if (!mainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            imagePanel.setTimelined(MainPanel.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0);
+            imagePanel.setTimelined(MainPanel.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0, true);
         }
     }
 
@@ -1013,7 +1013,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         int pageCount = getFontPageCount(fontTag);
         fontPageNum = (fontPageNum + 1) % pageCount;
         if (!mainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            imagePanel.setTimelined(MainPanel.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0);
+            imagePanel.setTimelined(MainPanel.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0, true);
         }
     }
 

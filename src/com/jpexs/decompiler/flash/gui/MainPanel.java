@@ -47,6 +47,7 @@ import com.jpexs.decompiler.flash.exporters.ShapeExporter;
 import com.jpexs.decompiler.flash.exporters.SoundExporter;
 import com.jpexs.decompiler.flash.exporters.SymbolClassExporter;
 import com.jpexs.decompiler.flash.exporters.TextExporter;
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ButtonExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
@@ -115,12 +116,18 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
+import com.jpexs.decompiler.flash.tags.DefineBitsTag;
+import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
+import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
@@ -150,8 +157,18 @@ import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.flash.types.CXFORM;
+import com.jpexs.decompiler.flash.types.FILLSTYLE;
+import static com.jpexs.decompiler.flash.types.FILLSTYLE.CLIPPED_BITMAP;
+import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
+import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
+import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.flash.xfl.FLAVersion;
 import com.jpexs.helpers.ByteArrayRange;
@@ -193,6 +210,7 @@ import java.awt.event.MouseEvent;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -1846,7 +1864,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-
     public Set<SWF> getAllSwfs() {
         List<SWF> allSwfs = new ArrayList<>();
         for (SWFList slist : getSwfs()) {
@@ -2509,6 +2526,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             new CancellableWorker<Void>() {
                 private int countAs2 = 0;
                 private int countAs3 = 0;
+
                 @Override
                 public Void doInBackground() throws Exception {
                     new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true), new ScriptImporterProgressListener() {
@@ -2695,7 +2713,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         View.checkAccess();
 
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importXml"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportXmlInfo);
-
 
         List<TreeItem> sel = tagTree.getSelected();
         Set<SWF> swfs = new HashSet<>();
@@ -3612,7 +3629,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (treeItem instanceof SWF) {
             SWF swf = (SWF) treeItem;
             if (internalViewer) {
-                previewPanel.showImagePanel(swf, swf, -1);
+                previewPanel.showImagePanel(swf, swf, -1, true);
             } else {
                 previewPanel.setParametersPanelVisible(false);
                 //if (flashPanel != null) { //same for flashPanel2
@@ -3637,7 +3654,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof ImageTag) {
             ImageTag imageTag = (ImageTag) treeItem;
             previewPanel.setImageReplaceButtonVisible(!((Tag) imageTag).isReadOnly() && imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag);
-            previewPanel.showImagePanel(imageTag.getImageCached());
+            SWF imageSWF = makeTimelinedImage(imageTag);
+            previewPanel.showImagePanel(imageSWF, imageSWF, 0, false);
 
         } else if ((treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag)) && internalViewer) {
             final Tag tag = (Tag) treeItem;
@@ -3650,11 +3668,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             previewPanel.setParametersPanelVisible(false);
-            previewPanel.showImagePanel(timelined, tag.getSwf(), -1);
+            previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true);
         } else if (treeItem instanceof Frame && internalViewer) {
             Frame fn = (Frame) treeItem;
             SWF swf = fn.getSwf();
-            previewPanel.showImagePanel(fn.timeline.timelined, swf, fn.frame);
+            previewPanel.showImagePanel(fn.timeline.timelined, swf, fn.frame, true);
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
             previewPanel.setImageReplaceButtonVisible(((Tag) treeItem).isReadOnly() && (treeItem instanceof DefineSoundTag), false);
@@ -3935,6 +3953,103 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public static Timelined makeTimelined(final Tag tag) {
         return makeTimelined(tag, -1);
+    }
+
+    public static SWF makeTimelinedImage(ImageTag imageTag) {
+        SWF swf = new SWF();
+        int w = (int) (imageTag.getImageDimension().getWidth() * SWF.unitDivisor);
+        int h = (int) (imageTag.getImageDimension().getHeight() * SWF.unitDivisor);
+        swf.displayRect = new RECT(0, w, 0, h);
+        swf.frameCount = 1;
+        swf.frameRate = 1;
+        try {
+
+            JPEGTablesTag jpegTablesTag = null;
+            if (imageTag instanceof DefineBitsTag) {
+                jpegTablesTag = imageTag.getSwf().getJtt();
+            }
+            ImageTag imageTagCopy = (ImageTag) imageTag.cloneTag();
+            imageTagCopy.setSwf(swf);
+            int imageCharId = imageTag.getCharacterId();
+            DefineShape2Tag shapeTag = new DefineShape2Tag(swf);
+            int shapeCharId = imageCharId + 1;
+            shapeTag.shapeId = shapeCharId;
+            shapeTag.shapeBounds = new RECT(swf.displayRect);
+
+            SHAPEWITHSTYLE shapeData = new SHAPEWITHSTYLE();
+            FILLSTYLEARRAY fillStyleArray = new FILLSTYLEARRAY();
+            FILLSTYLE fillStyles[] = new FILLSTYLE[1];
+            FILLSTYLE fillStyle = new FILLSTYLE();
+            fillStyle.bitmapId = imageCharId;
+            fillStyle.inShape3 = false;
+            fillStyle.fillStyleType = CLIPPED_BITMAP;
+            fillStyle.bitmapMatrix = Matrix.getScaleInstance(SWF.unitDivisor).toMATRIX();
+            fillStyles[0] = fillStyle;
+            fillStyleArray.fillStyles = fillStyles;
+            shapeData.fillStyles = fillStyleArray;
+            shapeData.lineStyles = new LINESTYLEARRAY();
+
+            List<SHAPERECORD> shapeRecords = new ArrayList<>();
+
+            StyleChangeRecord scr = new StyleChangeRecord();
+            scr.stateFillStyle0 = true;
+            scr.fillStyle0 = 1;
+            shapeRecords.add(scr);
+
+            StyleChangeRecord scr2 = new StyleChangeRecord();
+            scr2.stateMoveTo = true;
+            scr2.moveDeltaX = 0;
+            scr2.moveDeltaY = 0;
+            scr2.calculateBits();
+            shapeRecords.add(scr2);
+
+            StraightEdgeRecord ser1 = new StraightEdgeRecord();
+            ser1.vertLineFlag = true;
+            ser1.deltaY = h;
+            ser1.calculateBits();
+            shapeRecords.add(ser1);
+
+            StraightEdgeRecord ser2 = new StraightEdgeRecord();
+            ser2.deltaX = w;
+            shapeRecords.add(ser2);
+
+            StraightEdgeRecord ser3 = new StraightEdgeRecord();
+            ser3.vertLineFlag = true;
+            ser3.deltaY = -h;
+            shapeRecords.add(ser3);
+
+            StraightEdgeRecord ser4 = new StraightEdgeRecord();
+            ser4.deltaX = -w;
+            shapeRecords.add(ser4);
+
+            shapeRecords.add(new EndShapeRecord());
+
+            shapeData.shapeRecords = shapeRecords;
+
+            shapeData.numFillBits = 1;
+            shapeData.numLineBits = 0;
+
+            shapeTag.shapes = shapeData;
+
+            PlaceObjectTag placeTag = new PlaceObjectTag(swf, shapeCharId, 1, new Matrix().toMATRIX(), null);
+
+            ShowFrameTag showFrameTag = new ShowFrameTag(swf);
+
+            EndTag endTag = new EndTag(swf);
+
+            if (jpegTablesTag != null) {
+                swf.addTag(jpegTablesTag);
+            }
+            swf.addTag(imageTagCopy);
+            swf.addTag(shapeTag);
+            swf.addTag(placeTag);
+            swf.addTag(showFrameTag);
+            swf.addTag(endTag);
+
+        } catch (InterruptedException | IOException ex) {
+            //ignore
+        }
+        return swf;
     }
 
     public static Timelined makeTimelined(final Tag tag, final int fontFrameNum) {

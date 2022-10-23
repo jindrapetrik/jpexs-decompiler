@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - Replace commandline action allows to load replacements list from a textfile
 - SymbolClass export from commandline
 - data-characterId and data-characterName tags to SVG export
+- [#1731] Image viewer zoom support
 
 ### Fixed
 - [#1834] PlaceObject4 tags appear as Unresolved inside of DefineSprite
@@ -2380,6 +2381,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1731]: https://www.free-decompiler.com/flash/issues/1731
 [#1834]: https://www.free-decompiler.com/flash/issues/1834
 [#1839]: https://www.free-decompiler.com/flash/issues/1839
 [#1838]: https://www.free-decompiler.com/flash/issues/1838

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -48,6 +49,7 @@ import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.DisplayObjectCacheKey;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.helpers.ByteArrayRange;
@@ -93,6 +95,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -164,6 +167,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private TextTag textTag;
 
     private TextTag newTextTag;
+
+    private boolean showObjectsUnderCursor;
 
     private int msPerFrame;
 
@@ -1506,7 +1511,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return zoomAvailable;
     }
 
-    public void setTimelined(final Timelined drawable, final SWF swf, int frame) {
+    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor) {
         Stage stage = new Stage(drawable) {
             @Override
             public void callFrame(int frame) {
@@ -1611,6 +1616,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
         }
 
+        this.showObjectsUnderCursor = showObjectsUnderCursor;
         fireMediaDisplayStateChanged();
     }
 
@@ -1720,6 +1726,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             fireMediaDisplayStateChanged();
         }
 
+        showObjectsUnderCursor = false;
         textTag = null;
         newTextTag = null;
         displayObjectCache.clear();
@@ -2199,30 +2206,37 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             StringBuilder ret = new StringBuilder();
 
             if (cursorPosition != null) {
-                ret.append(" [").append(cursorPosition.x).append(",").append(cursorPosition.y).append("] : ");
+                ret.append(" [").append(cursorPosition.x).append(",").append(cursorPosition.y).append("]");
+                if (showObjectsUnderCursor) {
+                    ret.append(" : ");
+                }
             }
 
             boolean handCursor = renderContext.mouseOverButton != null;
-            boolean first = true;
-            for (int i = renderContext.stateUnderCursor.size() - 1; i >= 0; i--) {
-                DepthState ds = renderContext.stateUnderCursor.get(i);
-                if (!first) {
-                    ret.append(", ");
+
+            if (showObjectsUnderCursor) {
+
+                boolean first = true;
+                for (int i = renderContext.stateUnderCursor.size() - 1; i >= 0; i--) {
+                    DepthState ds = renderContext.stateUnderCursor.get(i);
+                    if (!first) {
+                        ret.append(", ");
+                    }
+
+                    first = false;
+                    CharacterTag c = swf.getCharacter(ds.characterId);
+                    ret.append(c.toString());
+                    if (ds.depth > 0) {
+                        ret.append(" ");
+                        ret.append(AppStrings.translate("imagePanel.depth"));
+                        ret.append(" ");
+                        ret.append(ds.depth);
+                    }
                 }
 
-                first = false;
-                CharacterTag c = swf.getCharacter(ds.characterId);
-                ret.append(c.toString());
-                if (ds.depth > 0) {
-                    ret.append(" ");
-                    ret.append(AppStrings.translate("imagePanel.depth"));
-                    ret.append(" ");
-                    ret.append(ds.depth);
+                if (first) {
+                    ret.append(" - ");
                 }
-            }
-
-            if (first) {
-                ret.append(" - ");
             }
 
             ButtonTag lastMouseOverButton;
