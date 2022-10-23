@@ -328,6 +328,11 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     }
 
     @Override
+    public int indexOfTag(Tag tag) {
+        return subTags.indexOf(tag);
+    }
+
+    @Override
     public void createOriginalData() {
         super.createOriginalData();
         for (Tag subTag : getTags()) {

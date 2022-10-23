@@ -3190,13 +3190,19 @@ public final class SWF implements SWFContainerItem, Timelined {
             updateCharacters();
         }
     }
+    
+    public int indexOfTag(Tag tag) {
+        return tags.indexOf(tag);
+    }
 
     /**
-     * Adds a tag to the SWF If targetTreeItem is: - Frame: adds the tag to the
+     * Adds a tag to the SWF If targetTreeItem is: 
+     * - Frame: adds the tag to the
      * Frame. Frame can be a frame of the main timeline or a DefineSprite frame
-     * - DefineSprite: adds the tag to the end of the DefineSprite's tag list -
-     * Any other tag in the SWF: adds the new tag exactly before the specified
-     * tag - Other: adds the tag to the end of the SWF's tag list
+     * - DefineSprite: adds the tag to the end of the DefineSprite's tag list
+     * - Any other tag in the SWF: adds the new tag exactly before the specified
+     * tag
+     * - Other: adds the tag to the end of the SWF's tag list
      *
      * @param tag
      * @param targetTreeItem
