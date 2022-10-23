@@ -3952,6 +3952,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public static SWF makeTimelinedImage(ImageTag imageTag) {
         SWF swf = new SWF();
+        swf.gfx = imageTag.getSwf().gfx;
+        swf.version = imageTag.getSwf().version;
         int w = (int) (imageTag.getImageDimension().getWidth() * SWF.unitDivisor);
         int h = (int) (imageTag.getImageDimension().getHeight() * SWF.unitDivisor);
         swf.displayRect = new RECT(0, w, 0, h);
@@ -3963,6 +3965,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (imageTag instanceof DefineBitsTag) {
                 jpegTablesTag = imageTag.getSwf().getJtt();
             }
+            Set<Integer> needed = new LinkedHashSet<>();
+            imageTag.getNeededCharacters(needed);
+
+            List<CharacterTag> neededCopies = new ArrayList<>();
+            for (int n : needed) {
+                CharacterTag ct = (CharacterTag) imageTag.getSwf().getCharacter(n).cloneTag();
+                ct.setSwf(swf);
+                neededCopies.add(ct);
+            }
+
             ImageTag imageTagCopy = (ImageTag) imageTag.cloneTag();
             imageTagCopy.setSwf(swf);
             int imageCharId = imageTag.getCharacterId();
@@ -4034,6 +4046,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             if (jpegTablesTag != null) {
                 swf.addTag(jpegTablesTag);
+            }
+            for (CharacterTag neededCopy : neededCopies) {
+                swf.addTag(neededCopy);
             }
             swf.addTag(imageTagCopy);
             swf.addTag(shapeTag);

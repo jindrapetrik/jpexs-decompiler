@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
 import net.npe.dds.DDSReader;
 
 /**
@@ -53,7 +54,7 @@ public class DefineSubImage extends ImageTag {
     public int x2;
 
     public int y2;
-    
+
     @HideInRawEdit
     private SerializableImage serImage;
 
@@ -94,7 +95,7 @@ public class DefineSubImage extends ImageTag {
         x2 = sis.readUI16("x2");
         y2 = sis.readUI16("y2");
     }
-    
+
     @Override
     public void setImage(byte[] data) throws IOException {
         serImage = new SerializableImage(ImageHelper.read(data));
@@ -120,8 +121,8 @@ public class DefineSubImage extends ImageTag {
     @Override
     protected SerializableImage getImage() {
         if (serImage == null) {
-            DefineExternalImage2 image = (DefineExternalImage2)swf.getImage(imageCharacterId | 0x8000);
-                
+            DefineExternalImage2 image = (DefineExternalImage2) swf.getImage(imageCharacterId | 0x8000);
+
             Path imagePath = Paths.get(image.getSwf().getFile()).getParent().resolve(Paths.get(image.fileName));
             byte[] imageData;
             try {
@@ -129,7 +130,7 @@ public class DefineSubImage extends ImageTag {
             } catch (IOException e) {
                 return null;
             }
-            int [] pixels = DDSReader.read(imageData, DDSReader.ARGB, 0);
+            int[] pixels = DDSReader.read(imageData, DDSReader.ARGB, 0);
             BufferedImage bufImage = new BufferedImage(DDSReader.getWidth(imageData), DDSReader.getHeight(imageData), BufferedImage.TYPE_INT_ARGB);
             bufImage.getRaster().setDataElements(0, 0, bufImage.getWidth(), bufImage.getHeight(), pixels);
             Image scaled = bufImage.getScaledInstance(image.targetWidth, image.targetHeight, Image.SCALE_DEFAULT);
@@ -143,5 +144,10 @@ public class DefineSubImage extends ImageTag {
     @Override
     public Dimension getImageDimension() {
         return new Dimension(x2 - x1, y2 - y1);
+    }
+
+    @Override
+    public void getNeededCharacters(Set<Integer> needed) {
+        needed.add(imageCharacterId | 0x8000);
     }
 }
