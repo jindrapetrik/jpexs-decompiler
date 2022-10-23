@@ -483,7 +483,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         return null;
     }
-    
+
     public void computeDependentCharacters() {
         Map<Integer, Set<Integer>> dep = new HashMap<>();
         for (Tag tag : getTags()) {
@@ -552,7 +552,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         return dependents;
     }
-    
+
     public void computeDependentFrames() {
         Map<Integer, Set<Integer>> dep = new HashMap<>();
         for (int i = 0; i < timeline.getFrameCount(); i++) {
@@ -1485,7 +1485,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-      public void assignExportNamesToSymbols() {
+    public void assignExportNamesToSymbols() {
         HashMap<Integer, String> exportNames = new HashMap<>();
         for (Tag t : getTags()) {
             if (t instanceof ExportAssetsTag) {
@@ -2948,8 +2948,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
 
         RECT rect = displayRect;
-        SerializableImage image = new SerializableImage((int) (rect.getWidth() * zoom / SWF.unitDivisor) + 1,
-                (int) (rect.getHeight() * zoom / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB_PRE);
+        SerializableImage image = new SerializableImage(
+                rect.getWidth() == 0 ? 1 /*FIXME: is this necessary?*/ : (int) (rect.getWidth() * zoom / SWF.unitDivisor),
+                rect.getHeight() == 0 ? 1 : (int) (rect.getHeight() * zoom / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB_PRE);
         if (backGroundColor == null) {
             image.fillTransparent();
         } else {
