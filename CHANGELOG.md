@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - [#1838] AS3 - Properly handling of long unsigned values, hex values, default uint values etc.
 - [#1847] shape viewer and PDF exporter - correct drawing of pure vertical/horizontal shapes (zero width/height)
 - Slow zooming/redrawing on action when SWF has low framerate
+- Correct debug info label position/content on the top of flash viewer to avoid unwanted initial scroll
 
 ### Changed
 - AS3 integer values are internally (e.g. in the lib) handled as java int type instead of long.

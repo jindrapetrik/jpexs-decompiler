@@ -133,7 +133,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private int mouseButton;
 
-    private final JLabel debugLabel = new JLabel("-");
+    private static final String DEFAULT_DEBUG_LABEL_TEXT = " - ";
+
+    private final JLabel debugLabel = new JLabel(DEFAULT_DEBUG_LABEL_TEXT);
 
     private Point cursorPosition = null;
 
@@ -1288,7 +1290,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (selectedDepth > -1) {
             showSelectedName();
         } else {
-            debugLabel.setText(" - ");
+            debugLabel.setText(DEFAULT_DEBUG_LABEL_TEXT);
         }
     }
 
@@ -2230,7 +2232,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
 
                 if (first) {
-                    ret.append(" - ");
+                    ret.append(DEFAULT_DEBUG_LABEL_TEXT);
                 }
             }
 
@@ -2240,7 +2242,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     iconPanel.setImg(img);
                     lastMouseOverButton = iconPanel.mouseOverButton;
                     iconPanel.mouseOverButton = renderContext.mouseOverButton;
-                    debugLabel.setText(ret.toString());
+                    if (ret.isEmpty()) {
+                        debugLabel.setText(DEFAULT_DEBUG_LABEL_TEXT);
+                    } else {
+                        debugLabel.setText(ret.toString());
+                    }
+
                     if (freeTransformDepth == -1) {
                         if (handCursor) {
                             iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
