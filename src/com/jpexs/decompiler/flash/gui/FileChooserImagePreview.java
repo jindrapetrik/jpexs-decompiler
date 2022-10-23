@@ -1,9 +1,9 @@
 package com.jpexs.decompiler.flash.gui;
 
-import javax.swing.*;
-import java.beans.*;
 import java.awt.*;
+import java.beans.*;
 import java.io.File;
+import javax.swing.*;
 import javax.swing.border.Border;
 
 public class FileChooserImagePreview extends JComponent

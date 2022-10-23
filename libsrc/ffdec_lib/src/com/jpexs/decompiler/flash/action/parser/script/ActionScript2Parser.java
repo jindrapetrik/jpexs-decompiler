@@ -41,7 +41,6 @@ import com.jpexs.decompiler.flash.action.model.GetURL2ActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.GetVersionActionItem;
 import com.jpexs.decompiler.flash.action.model.GotoFrame2ActionItem;
-import com.jpexs.decompiler.flash.action.model.GotoLabelActionItem;
 import com.jpexs.decompiler.flash.action.model.InitArrayActionItem;
 import com.jpexs.decompiler.flash.action.model.InitObjectActionItem;
 import com.jpexs.decompiler.flash.action.model.LoadMovieActionItem;

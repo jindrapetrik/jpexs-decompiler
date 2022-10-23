@@ -157,7 +157,6 @@ import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import com.jpexs.decompiler.flash.types.CXFORM;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import static com.jpexs.decompiler.flash.types.FILLSTYLE.CLIPPED_BITMAP;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
@@ -210,7 +209,6 @@ import java.awt.event.MouseEvent;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -237,7 +235,6 @@ import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -253,11 +250,9 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicTreeUI;
-import javax.swing.plaf.metal.MetalFileChooserUI;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
-import org.pushingpixels.substance.internal.ui.SubstanceFileChooserUI;
 
 /**
  *
