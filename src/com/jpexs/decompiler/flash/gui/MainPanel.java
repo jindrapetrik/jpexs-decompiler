@@ -3959,6 +3959,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         swf.displayRect = new RECT(0, w, 0, h);
         swf.frameCount = 1;
         swf.frameRate = 1;
+        swf.setFile(imageTag.getSwf().getFile()); //DefineSubImage calculates relative paths from it
         try {
 
             JPEGTablesTag jpegTablesTag = null;
