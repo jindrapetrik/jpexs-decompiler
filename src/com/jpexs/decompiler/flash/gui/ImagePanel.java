@@ -2242,7 +2242,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     iconPanel.setImg(img);
                     lastMouseOverButton = iconPanel.mouseOverButton;
                     iconPanel.mouseOverButton = renderContext.mouseOverButton;
-                    if (ret.isEmpty()) {
+                    if (ret.length() == 0) {
                         debugLabel.setText(DEFAULT_DEBUG_LABEL_TEXT);
                     } else {
                         debugLabel.setText(ret.toString());
