@@ -162,8 +162,8 @@ if [ "$DO_DEPLOY" == 1 ]; then
     CURL_STATUS=$?
     if [ "$CURL_STATUS" != 0 ]; then
         echo "UPLOAD FAILED on CURL Error ${CURL_STATUS}";
-        if [ "$CURL_STATUS" != 55 ]; then
-            echo "Status ${CURL_STATUS} is other than ignored 55, aborting..." 1>&2
+        if [ "$CURL_STATUS" != 55 ] && [ "$CURL_STATUS" != 56 ]; then
+            echo "Status ${CURL_STATUS} is other than ignored 55 or 56, aborting..." 1>&2
             exit 1;
         fi
         if [ "$NUM_RETRY" == "$MAX_RETRY" ]; then
