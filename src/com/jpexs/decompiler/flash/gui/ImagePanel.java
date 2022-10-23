@@ -1399,8 +1399,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private synchronized void redraw() {
-        if (timer == null && timelined != null) {
+        final Timer thisTimer = timer;
+        if (timelined == null) {
+            return;
+        }
+        if (thisTimer == null) {
             startTimer(timelined.getTimeline(), false);
+        } else {
+            drawFrame(thisTimer, true);
         }
     }
 
@@ -2207,7 +2213,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 first = false;
                 CharacterTag c = swf.getCharacter(ds.characterId);
                 ret.append(c.toString());
-                if(ds.depth > 0) {
+                if (ds.depth > 0) {
                     ret.append(" ");
                     ret.append(AppStrings.translate("imagePanel.depth"));
                     ret.append(" ");

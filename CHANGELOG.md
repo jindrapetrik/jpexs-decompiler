@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#1839] Sprite frames exported incorrectly and repeating
 - [#1838] AS3 - Properly handling of long unsigned values, hex values, default uint values etc.
 - [#1847] shape viewer and PDF exporter - correct drawing of pure vertical/horizontal shapes (zero width/height)
+- Slow zooming/redrawing on action when SWF has low framerate
 
 ### Changed
 - AS3 integer values are internally (e.g. in the lib) handled as java int type instead of long.
