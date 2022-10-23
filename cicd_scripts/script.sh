@@ -145,7 +145,7 @@ if [ "$DO_DEPLOY" == 1 ]; then
   NUM_FILES=`echo "$DEPLOY_ATTACH_FILES_JSON"|jq ".|length"`
   
   set +e
-  MAX_RETRY = 3;
+  MAX_RETRY=3;
   NUM_RETRY=0
   for (( i=0; i<$NUM_FILES; i++ ))
   do              
