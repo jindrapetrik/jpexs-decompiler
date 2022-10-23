@@ -658,7 +658,7 @@ public class Timeline {
         fg.setStroke(new BasicStroke(1));
         fg.setTransform(new AffineTransform());
         fg.drawRect((int) (viewRectZoom.xMin / SWF.unitDivisor + 5), (int) (viewRectZoom.yMin / SWF.unitDivisor + 5), (int) (viewRectZoom.getWidth() / SWF.unitDivisor - 5), (int) (viewRectZoom.getHeight() / SWF.unitDivisor - 5));
-*/
+         */
         if (!viewRectZoom.intersects(fullRect)) {
             //System.err.println("hidden " + layer.characterId);           
             return;
@@ -772,7 +772,6 @@ public class Timeline {
             if (clipDepth > -1) {
                 canUseSameImage = false;
             }
-
 
             Matrix mfull = fullTransformation.concatenate(layerMatrix);
             if (canUseSameImage && sameImage) {
@@ -1019,110 +1018,103 @@ public class Timeline {
 
             CharacterTag character = swf.getCharacter(layer.characterId);
             Matrix layerMatrix = new Matrix(layer.matrix);
-            boolean zeroScale = false;
-            if (Double.compare(layerMatrix.scaleX, 0.0) == 0 || Double.compare(layerMatrix.scaleY, 0.0) == 0) {
-                zeroScale = true;
-                //Avoid problems in PDF export and elsewhere
+
+            Matrix mat = transformation.concatenate(layerMatrix);
+            Matrix absMat = absoluteTransformation.concatenate(layerMatrix);
+
+            ColorTransform clrTrans = colorTransform;
+            if (layer.colorTransForm != null && layer.blendMode <= 1) { // Normal blend mode
+                clrTrans = clrTrans == null ? layer.colorTransForm : colorTransform.merge(layer.colorTransForm);
             }
 
-            if (!zeroScale) {
-                Matrix mat = transformation.concatenate(layerMatrix);
-                Matrix absMat = absoluteTransformation.concatenate(layerMatrix);
+            boolean showPlaceholder = false;
 
-                ColorTransform clrTrans = colorTransform;
-                if (layer.colorTransForm != null && layer.blendMode <= 1) { // Normal blend mode
-                    clrTrans = clrTrans == null ? layer.colorTransForm : colorTransform.merge(layer.colorTransForm);
+            if (drawMode != DRAW_MODE_ALL && drawMode != DRAW_MODE_SPRITES && !(character instanceof ShapeTag)) {
+                continue;
+            }
+            if (drawMode != DRAW_MODE_ALL && drawMode != DRAW_MODE_SHAPES && (character instanceof ShapeTag)) {
+                continue;
+            }
+            if (character instanceof DrawableTag) {
+
+                RECT scalingRect = null;
+                DefineScalingGridTag sgt = character.getScalingGridTag();
+                if (sgt != null) {
+                    scalingRect = sgt.splitter;
                 }
 
-                boolean showPlaceholder = false;
-
-                if (drawMode != DRAW_MODE_ALL && drawMode != DRAW_MODE_SPRITES && !(character instanceof ShapeTag)) {
-                    continue;
-                }
-                if (drawMode != DRAW_MODE_ALL && drawMode != DRAW_MODE_SHAPES && (character instanceof ShapeTag)) {
-                    continue;
-                }
-                if (character instanceof DrawableTag) {
-
-                    RECT scalingRect = null;
-                    DefineScalingGridTag sgt = character.getScalingGridTag();
-                    if (sgt != null) {
-                        scalingRect = sgt.splitter;
-                    }
-
-                    if (scalingRect != null) {
-                        ExportRectangle[] sourceRect = new ExportRectangle[9];
-                        ExportRectangle[] targetRect = new ExportRectangle[9];
-                        Matrix[] transforms = new Matrix[9];
-                        DrawableTag dr = (DrawableTag) character;
-                        ExportRectangle boundsRect = new ExportRectangle(dr.getRect());
-                        ExportRectangle targetBoundsRect = layerMatrix.transform(boundsRect);
-                        DefineScalingGridTag.getSlices(targetBoundsRect, boundsRect, new ExportRectangle(scalingRect), sourceRect, targetRect, transforms);
-                        Shape c = g.getClip();
-                        AffineTransform origTransform = g.getTransform();
-                        int s = 0;
-                        for (int sy = 0; sy < 3; sy++) {
-                            for (int sx = 0; sx < 3; sx++) {
-                                g.setTransform(new AffineTransform());
-                                ExportRectangle p1 = transformation.transform(targetRect[s]);
-                                if (sx == 0) {
-                                    p1.xMin = 0;
-                                }
-                                if (sy == 0) {
-                                    p1.yMin = 0;
-                                }
-
-                                if (sx == 2) {
-                                    p1.xMax = unzoom * viewRect.getWidth();
-                                }
-                                if (sy == 2) {
-                                    p1.yMax = unzoom * viewRect.getHeight();
-                                }
-
-                                p1.xMin /= SWF.unitDivisor;
-                                p1.xMax /= SWF.unitDivisor;
-                                p1.yMin /= SWF.unitDivisor;
-                                p1.yMax /= SWF.unitDivisor;
-
-                                Rectangle2D r = new Rectangle2D.Double(p1.xMin, p1.yMin, p1.getWidth(), p1.getHeight());
-
-                                g.setClip(r);
-                                drawDrawable(strokeTransformation, layer, transforms[s], g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, layer.time + time, layer.ratio, renderContext, image, fullImage, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, fullTransformation, false, DRAW_MODE_SHAPES);
-                                s++;
+                if (scalingRect != null) {
+                    ExportRectangle[] sourceRect = new ExportRectangle[9];
+                    ExportRectangle[] targetRect = new ExportRectangle[9];
+                    Matrix[] transforms = new Matrix[9];
+                    DrawableTag dr = (DrawableTag) character;
+                    ExportRectangle boundsRect = new ExportRectangle(dr.getRect());
+                    ExportRectangle targetBoundsRect = layerMatrix.transform(boundsRect);
+                    DefineScalingGridTag.getSlices(targetBoundsRect, boundsRect, new ExportRectangle(scalingRect), sourceRect, targetRect, transforms);
+                    Shape c = g.getClip();
+                    AffineTransform origTransform = g.getTransform();
+                    int s = 0;
+                    for (int sy = 0; sy < 3; sy++) {
+                        for (int sx = 0; sx < 3; sx++) {
+                            g.setTransform(new AffineTransform());
+                            ExportRectangle p1 = transformation.transform(targetRect[s]);
+                            if (sx == 0) {
+                                p1.xMin = 0;
                             }
-                        }
-                        g.setClip(c);
+                            if (sy == 0) {
+                                p1.yMin = 0;
+                            }
 
-                        g.setTransform(origTransform);
+                            if (sx == 2) {
+                                p1.xMax = unzoom * viewRect.getWidth();
+                            }
+                            if (sy == 2) {
+                                p1.yMax = unzoom * viewRect.getHeight();
+                            }
 
-                        //draw all nonshapes (normally scaled) next
-                        drawDrawable(strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, layer.time + time, layer.ratio, renderContext, image, fullImage, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, fullTransformation, scaleStrokes, DRAW_MODE_SPRITES);
-                    } else {
-                        boolean subScaleStrokes = scaleStrokes;
-                        if (character instanceof DefineSpriteTag) {
-                            subScaleStrokes = true;
+                            p1.xMin /= SWF.unitDivisor;
+                            p1.xMax /= SWF.unitDivisor;
+                            p1.yMin /= SWF.unitDivisor;
+                            p1.yMax /= SWF.unitDivisor;
+
+                            Rectangle2D r = new Rectangle2D.Double(p1.xMin, p1.yMin, p1.getWidth(), p1.getHeight());
+
+                            g.setClip(r);
+                            drawDrawable(strokeTransformation, layer, transforms[s], g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, layer.time + time, layer.ratio, renderContext, image, fullImage, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, fullTransformation, false, DRAW_MODE_SHAPES);
+                            s++;
                         }
-                        drawDrawable(strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, layer.time + time, layer.ratio, renderContext, image, fullImage, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, fullTransformation, subScaleStrokes, DRAW_MODE_ALL);
                     }
-                } else if (character instanceof BoundedTag) {
-                    showPlaceholder = true;
-                }
+                    g.setClip(c);
 
-                if (showPlaceholder) {
-                    AffineTransform trans = mat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).toTransform();
-                    g.setTransform(trans);
-                    BoundedTag b = (BoundedTag) character;
-                    g.setPaint(new Color(255, 255, 255, 128));
-                    g.setComposite(BlendComposite.Invert);
-                    g.setStroke(new BasicStroke((int) SWF.unitDivisor));
-                    RECT r = b.getRect();
-                    g.setFont(g.getFont().deriveFont((float) (12 * SWF.unitDivisor)));
-                    g.drawString(character.toString(), r.Xmin + (int) (3 * SWF.unitDivisor), r.Ymin + (int) (15 * SWF.unitDivisor));
-                    g.draw(new Rectangle(r.Xmin, r.Ymin, r.getWidth(), r.getHeight()));
-                    g.drawLine(r.Xmin, r.Ymin, r.Xmax, r.Ymax);
-                    g.drawLine(r.Xmax, r.Ymin, r.Xmin, r.Ymax);
-                    g.setComposite(AlphaComposite.Dst);
+                    g.setTransform(origTransform);
+
+                    //draw all nonshapes (normally scaled) next
+                    drawDrawable(strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, layer.time + time, layer.ratio, renderContext, image, fullImage, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, fullTransformation, scaleStrokes, DRAW_MODE_SPRITES);
+                } else {
+                    boolean subScaleStrokes = scaleStrokes;
+                    if (character instanceof DefineSpriteTag) {
+                        subScaleStrokes = true;
+                    }
+                    drawDrawable(strokeTransformation, layer, layerMatrix, g, colorTransform, layer.blendMode, clips, transformation, isClip, layer.clipDepth, absMat, layer.time + time, layer.ratio, renderContext, image, fullImage, (DrawableTag) character, layer.filters, unzoom, clrTrans, sameImage, viewRect, fullTransformation, subScaleStrokes, DRAW_MODE_ALL);
                 }
+            } else if (character instanceof BoundedTag) {
+                showPlaceholder = true;
+            }
+
+            if (showPlaceholder) {
+                AffineTransform trans = mat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).toTransform();
+                g.setTransform(trans);
+                BoundedTag b = (BoundedTag) character;
+                g.setPaint(new Color(255, 255, 255, 128));
+                g.setComposite(BlendComposite.Invert);
+                g.setStroke(new BasicStroke((int) SWF.unitDivisor));
+                RECT r = b.getRect();
+                g.setFont(g.getFont().deriveFont((float) (12 * SWF.unitDivisor)));
+                g.drawString(character.toString(), r.Xmin + (int) (3 * SWF.unitDivisor), r.Ymin + (int) (15 * SWF.unitDivisor));
+                g.draw(new Rectangle(r.Xmin, r.Ymin, r.getWidth(), r.getHeight()));
+                g.drawLine(r.Xmin, r.Ymin, r.Xmax, r.Ymax);
+                g.drawLine(r.Xmax, r.Ymin, r.Xmin, r.Ymax);
+                g.setComposite(AlphaComposite.Dst);
             }
         }
 

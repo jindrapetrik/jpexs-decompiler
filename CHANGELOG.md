@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - Slow zooming/redrawing on action when SWF has low framerate
 - Correct debug info label position/content on the top of flash viewer to avoid unwanted initial scroll
 - [#1829] Adding extra pixel to the width and height when rendering items (for example to AVI)
+- [#1828] Zero scale layer matrices support
 
 ### Changed
 - AS3 integer values are internally (e.g. in the lib) handled as java int type instead of long.
@@ -2389,6 +2390,7 @@ All notable changes to this project will be documented in this file.
 [#1838]: https://www.free-decompiler.com/flash/issues/1838
 [#1847]: https://www.free-decompiler.com/flash/issues/1847
 [#1829]: https://www.free-decompiler.com/flash/issues/1829
+[#1828]: https://www.free-decompiler.com/flash/issues/1828
 [#270]: https://www.free-decompiler.com/flash/issues/270
 [#1718]: https://www.free-decompiler.com/flash/issues/1718
 [#1801]: https://www.free-decompiler.com/flash/issues/1801
