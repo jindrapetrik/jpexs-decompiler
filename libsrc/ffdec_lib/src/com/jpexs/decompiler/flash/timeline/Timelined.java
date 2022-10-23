@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
@@ -42,4 +43,6 @@ public interface Timelined extends BoundedTag {
     public void addTag(int index, Tag tag);
 
     public void replaceTag(int index, Tag newTag);
+    
+    public int indexOfTag(Tag tag);
 }

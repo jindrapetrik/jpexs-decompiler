@@ -264,7 +264,7 @@ public class TagTreeModel implements TreeModel {
             TreeItem sound = sounds.get(i);
             if (sound instanceof SoundStreamHeadTypeTag) {
                 List<SoundStreamBlockTag> blocks = ((SoundStreamHeadTypeTag) sound).getBlocks();
-                if (blocks.isEmpty()) {
+                if (blocks == null || blocks.isEmpty()) {
                     sounds.remove(i);
                 }
             }
