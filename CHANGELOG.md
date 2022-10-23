@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - [#1834] PlaceObject4 tags appear as Unresolved inside of DefineSprite
 - [#1839] Sprite frames exported incorrectly and repeating
 - [#1838] AS3 - Properly handling of long unsigned values, hex values, default uint values etc.
+- [#1847] shape viewer and PDF exporter - correct drawing of pure vertical/horizontal shapes (zero width/height)
 
 ### Changed
 - AS3 integer values are internally (e.g. in the lib) handled as java int type instead of long.
@@ -2381,6 +2382,7 @@ All notable changes to this project will be documented in this file.
 [#1834]: https://www.free-decompiler.com/flash/issues/1834
 [#1839]: https://www.free-decompiler.com/flash/issues/1839
 [#1838]: https://www.free-decompiler.com/flash/issues/1838
+[#1847]: https://www.free-decompiler.com/flash/issues/1847
 [#270]: https://www.free-decompiler.com/flash/issues/270
 [#1718]: https://www.free-decompiler.com/flash/issues/1718
 [#1801]: https://www.free-decompiler.com/flash/issues/1801

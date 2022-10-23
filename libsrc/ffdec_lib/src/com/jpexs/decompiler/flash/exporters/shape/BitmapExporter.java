@@ -167,7 +167,10 @@ public class BitmapExporter extends ShapeExporterBase {
         ExportRectangle bounds = new ExportRectangle(shape.getBounds());
         ExportRectangle transformedBounds = strokeTransformation.transform(bounds);
 
-        this.strokeTransformation = Matrix.getScaleInstance(transformedBounds.getWidth() / bounds.getWidth(), transformedBounds.getHeight() / bounds.getHeight());
+        this.strokeTransformation = Matrix.getScaleInstance(
+                Double.compare(bounds.getWidth(), 0.0d) == 0 /*horizontal line or single point */ ? 1 : transformedBounds.getWidth() / bounds.getWidth(),
+                Double.compare(bounds.getHeight(), 0.0d) == 0 /*vertical line or single point */ ? 1 : transformedBounds.getHeight() / bounds.getHeight()
+        );
 
         graphics = (Graphics2D) image.getGraphics();
         AffineTransform at = transformation.toTransform();
@@ -411,14 +414,8 @@ public class BitmapExporter extends ShapeExporterBase {
             }
         }
 
-        if (Double.isNaN(thickness) || Double.compare(thickness, 0.0d) == 0) { //for example when bounding box width/height is zero
-            lineStroke = null;
-            lineColor = null;
-            return;
-        } else {
-            if (thickness < 0) {
-                thickness = -thickness;
-            }
+        if (thickness < 0) {
+            thickness = -thickness;
         }
 
         if (joinStyle == BasicStroke.JOIN_MITER) {
