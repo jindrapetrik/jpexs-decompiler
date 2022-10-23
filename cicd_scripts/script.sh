@@ -144,6 +144,9 @@ if [ "$DO_DEPLOY" == 1 ]; then
   echo "Attaching files..."
   NUM_FILES=`echo "$DEPLOY_ATTACH_FILES_JSON"|jq ".|length"`
   
+  set +e
+  MAX_RETRY = 3;
+  NUM_RETRY=0
   for (( i=0; i<$NUM_FILES; i++ ))
   do              
     ITEM_JSON=`echo "$DEPLOY_ATTACH_FILES_JSON"|jq '.['$i']'`                                  
@@ -156,6 +159,23 @@ if [ "$DO_DEPLOY" == 1 ]; then
     fi
     
     curl --silent --request POST --data-binary @$FILE_PATH --header "Content-Type: $CONTENT_TYPE" --header "Accept: application/vnd.github.manifold-preview" --user $GITHUB_USER:$GITHUB_ACCESS_TOKEN https://uploads.github.com/repos/$GITHUB_REPO/releases/$RELEASE_ID/assets?name=$FILE_NAME>/dev/null
+    CURL_STATUS=$?
+    if [ "$CURL_STATUS" != 0 ]; then
+        echo "UPLOAD FAILED on CURL Error ${CURL_STATUS}";
+        if [ "$CURL_STATUS" != 55 ]; then
+            echo "Status ${CURL_STATUS} is other than ignored 55, aborting..." 1>&2
+            exit 1;
+        fi
+        if [ "$NUM_RETRY" == "$MAX_RETRY" ]; then
+            echo "Max retry reached, aborting" 1>&2
+            exit 1;
+        fi
+        i=$((i-1))
+        NUM_RETRY=$((NUM_RETRY+1))
+        echo "..retrying again (retry ${NUM_RETRY})"
+    else
+        NUM_RETRY=0
+    fi
     #wait few seconds to not DDOS GitHub
     sleep 2
   done
@@ -169,7 +189,6 @@ if [ "$DO_DEPLOY" == 1 ]; then
     curl --silent --request DELETE --user $GITHUB_USER:$GITHUB_ACCESS_TOKEN https://api.github.com/repos/$GITHUB_REPO/releases/$RELEASE_ID>/dev/null
     # wait few seconds before DELETE properly propagates so we can delete tag then
     sleep 5
-    set +e
     #delete tag
     curl --silent --request DELETE --user $GITHUB_USER:$GITHUB_ACCESS_TOKEN https://api.github.com/repos/$GITHUB_REPO/git/refs/tags/$DEPLOY_RELEASE_TO_REMOVE>/dev/null        
   fi  
