@@ -1215,10 +1215,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             df.setMinimumFractionDigits(0);
             df.setGroupingUsed(false);
 
-            float frameLoss = 100 - (getFpsIs() / fpsShouldBe * 100);
-
             if (Configuration._debugMode.get()) {
-                g2d.drawString("frameLoss:" + df.format(frameLoss) + "%", 20, 20);
+                g2d.drawString("frameLoss:" + df.format(getFrameLoss()) + "%", 20, 20);
             }
         }
     }
@@ -1408,7 +1406,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (thisTimer == null) {
             startTimer(timelined.getTimeline(), false);
         } else {
-            drawFrame(thisTimer, true);
+            //if there is no frameloss (no frames waiting in the queue), 
+            // then we can draw immediately to avoid long waiting between frames.
+            // This can happen on SWFs with small frameRate
+            if (Float.compare(getFrameLoss(), 0f) == 0) {
+                drawFrame(thisTimer, true);
+            }
         }
     }
 
@@ -2382,6 +2385,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return fpsIs;
     }
 
+    private synchronized float getFrameLoss() {
+        return 100 - (getFpsIs() / fpsShouldBe * 100);
+    }
+
     private synchronized void setSkippedFrames(int val) {
         skippedFrames = val;
     }
@@ -2439,13 +2446,23 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                         //How many ticks (= times where frame should be displayed in framerate) are there from hitting play button
                         int ticksFromStart = (int) Math.floor((frameTimeMsIs - startRun) / (double) getMsPerFrame()) + 1;
-                        //Add ticks to first frame when hitting play button, ignoring total framecount => this value can be larger than number of frames in timeline
-                        int frameOverMaxShouldBeNow = startFrame + ticksFromStart;
-                        //Apply maximum frames repating, this is actual frame which should be drawed now
-                        int frameShouldBeNow = frameOverMaxShouldBeNow % frameCount;
 
                         //How many frames are there between last displayed frame and now. For perfect display(=no framedrop), value should be 1
-                        int skipFrames = frameShouldBeNow - curFrame;
+                        int skipFrames;
+                        //Add ticks to first frame when hitting play button, ignoring total framecount => this value can be larger than number of frames in timeline
+                        int frameOverMaxShouldBeNow;
+                        if (stillFrame) {
+                            frameOverMaxShouldBeNow = ticksFromStart;
+                            skipFrames = ticksFromStart - time;
+                        } else {
+                            frameOverMaxShouldBeNow = startFrame + ticksFromStart;
+
+                            //Apply maximum frames repating, this is actual frame which should be drawed now
+                            int frameShouldBeNow = frameOverMaxShouldBeNow % frameCount;
+
+                            skipFrames = frameShouldBeNow - curFrame;
+                        }
+
                         //It is negative for some reason, this will display older frames. Add frameCount to stay in modulu framecount.
                         if (skipFrames < 0) {
                             skipFrames += frameCount;
