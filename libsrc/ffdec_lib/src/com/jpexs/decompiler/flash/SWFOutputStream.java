@@ -1389,7 +1389,7 @@ public class SWFOutputStream extends OutputStream {
         writeFILLSTYLEARRAY(value.fillStyles, shapeNum);
         writeLINESTYLEARRAY(value.lineStyles, shapeNum);
         value.numFillBits = getNeededBitsU(value.fillStyles.fillStyles.length);
-        value.numLineBits = getNeededBitsU(value.lineStyles.lineStyles.length);
+        value.numLineBits = getNeededBitsU(shapeNum <= 3 ? value.lineStyles.lineStyles.length : value.lineStyles.lineStyles2.length);
         writeUB(4, value.numFillBits);
         writeUB(4, value.numLineBits);
         writeSHAPERECORDS(value.shapeRecords, value.numFillBits, value.numLineBits, shapeNum);
@@ -1474,7 +1474,7 @@ public class SWFOutputStream extends OutputStream {
                     writeFILLSTYLEARRAY(scr.fillStyles, shapeNum);
                     writeLINESTYLEARRAY(scr.lineStyles, shapeNum);
                     fillBits = getNeededBitsU(scr.fillStyles.fillStyles.length);
-                    lineBits = getNeededBitsU(scr.lineStyles.lineStyles.length);
+                    lineBits = getNeededBitsU(shapeNum <= 3 ? scr.lineStyles.lineStyles.length : scr.lineStyles.lineStyles2.length);
 
                     if (Configuration._debugCopy.get()) {
                         fillBits = Math.max(fillBits, scr.numFillBits);

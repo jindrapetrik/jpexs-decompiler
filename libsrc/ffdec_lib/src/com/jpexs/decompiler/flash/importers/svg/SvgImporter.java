@@ -362,10 +362,9 @@ public class SvgImporter {
 
         newRecords.add(scrStyle);
 
-        ILINESTYLE lineStyleObj = scrStyle.lineStyles.lineStyles.length < 1 ? null : scrStyle.lineStyles.lineStyles[0];
         LINESTYLE2 lineStyle2Obj = null;
-        if (lineStyleObj instanceof LINESTYLE2) {
-            lineStyle2Obj = (LINESTYLE2) lineStyleObj;
+        if (shapeNum == 4) {
+            lineStyle2Obj = scrStyle.lineStyles.lineStyles2.length < 1 ? null : scrStyle.lineStyles.lineStyles2[0];
             lineStyle2Obj.noClose = true;
         }
 

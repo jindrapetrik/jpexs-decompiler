@@ -65,10 +65,13 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
 
     protected ColorTransform colorTransform;
 
+    protected int morphShapeNum;
+
     public MorphShapeExporterBase(int morphShapeNum, SHAPE shape, SHAPE endShape, ColorTransform colorTransform) {
         this.shape = shape;
         this.shapeEnd = endShape;
         this.colorTransform = colorTransform;
+        this.morphShapeNum = morphShapeNum;
         _fillStyles = new ArrayList<>();
         _lineStyles = new ArrayList<>();
         if (shape instanceof SHAPEWITHSTYLE) {
@@ -97,7 +100,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         // Create edge maps
         _fillEdgeMaps = new ArrayList<>();
         _lineEdgeMaps = new ArrayList<>();
-        createEdgeMaps(_fillStyles, _lineStyles, _fillStylesEnd, _lineStylesEnd, _fillEdgeMaps, _lineEdgeMaps);
+        createEdgeMaps(morphShapeNum, _fillStyles, _lineStyles, _fillStylesEnd, _lineStylesEnd, _fillEdgeMaps, _lineEdgeMaps);
 
         // Let the doc handler know that a shape export starts
         beginShape();
@@ -112,7 +115,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         endShape();
     }
 
-    protected void createEdgeMaps(List<FILLSTYLE> fillStyles, List<ILINESTYLE> lineStyles,
+    protected void createEdgeMaps(int morphShapeNum, List<FILLSTYLE> fillStyles, List<ILINESTYLE> lineStyles,
             List<FILLSTYLE> fillStylesEnd, List<ILINESTYLE> lineStylesEnd,
             List<Map<Integer, List<IMorphEdge>>> fillEdgeMaps, List<Map<Integer, List<IMorphEdge>>> lineEdgeMaps) {
         if (!edgeMapsCreated) {
@@ -152,9 +155,17 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                         fillStyleIdxOffset = fillStyles.size();
                         lineStyleIdxOffset = lineStyles.size();
                         appendFillStyles(fillStyles, styleChangeRecord.fillStyles.fillStyles);
-                        appendLineStyles(lineStyles, styleChangeRecord.lineStyles.lineStyles);
+                        if (morphShapeNum == 2) {
+                            appendLineStyles(lineStyles, styleChangeRecord.lineStyles.lineStyles2);
+                        } else {
+                            appendLineStyles(lineStyles, styleChangeRecord.lineStyles.lineStyles);
+                        }
                         appendFillStyles(fillStylesEnd, styleChangeRecord.fillStyles.fillStyles);
-                        appendLineStyles(lineStylesEnd, styleChangeRecord.lineStyles.lineStyles);
+                        if (morphShapeNum == 2) {
+                            appendLineStyles(lineStylesEnd, styleChangeRecord.lineStyles.lineStyles2);
+                        } else {
+                            appendLineStyles(lineStylesEnd, styleChangeRecord.lineStyles.lineStyles);
+                        }
                     }
                     // Check if all styles are reset to 0.
                     // This (probably) means that a new group starts with the next record
@@ -577,7 +588,11 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         v1.addAll(Arrays.asList(v2));
     }
 
-    protected void appendLineStyles(List<ILINESTYLE> v1, ILINESTYLE[] v2) {
+    protected void appendLineStyles(List<ILINESTYLE> v1, LINESTYLE[] v2) {
+        v1.addAll(Arrays.asList(v2));
+    }
+
+    protected void appendLineStyles(List<ILINESTYLE> v1, LINESTYLE2[] v2) {
         v1.addAll(Arrays.asList(v2));
     }
 

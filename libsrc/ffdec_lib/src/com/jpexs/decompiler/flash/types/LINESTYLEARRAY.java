@@ -42,16 +42,30 @@ public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
 
     @Override
     public void getNeededCharacters(Set<Integer> needed) {
-        for (ILINESTYLE ls : lineStyles) {
-            ls.getNeededCharacters(needed);
+        if (lineStyles != null) {
+            for (ILINESTYLE ls : lineStyles) {
+                ls.getNeededCharacters(needed);
+            }
+        }
+        if (lineStyles != null) {
+            for (ILINESTYLE ls : lineStyles2) {
+                ls.getNeededCharacters(needed);
+            }
         }
     }
 
     @Override
     public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
         boolean modified = false;
-        for (ILINESTYLE ls : lineStyles) {
-            modified |= ls.replaceCharacter(oldCharacterId, newCharacterId);
+        if (lineStyles != null) {
+            for (ILINESTYLE ls : lineStyles) {
+                modified |= ls.replaceCharacter(oldCharacterId, newCharacterId);
+            }
+        }
+        if (lineStyles2 != null) {
+            for (ILINESTYLE ls : lineStyles2) {
+                modified |= ls.replaceCharacter(oldCharacterId, newCharacterId);
+            }
         }
         return modified;
     }
@@ -59,8 +73,16 @@ public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
     @Override
     public boolean removeCharacter(int characterId) {
         boolean modified = false;
-        for (ILINESTYLE ls : lineStyles) {
-            modified |= ls.removeCharacter(characterId);
+        if (lineStyles != null) {
+            for (ILINESTYLE ls : lineStyles) {
+                modified |= ls.removeCharacter(characterId);
+            }
+        }
+
+        if (lineStyles2 != null) {
+            for (ILINESTYLE ls : lineStyles2) {
+                modified |= ls.removeCharacter(characterId);
+            }
         }
         return modified;
     }

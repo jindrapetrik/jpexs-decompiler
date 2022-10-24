@@ -817,7 +817,7 @@ public class XFLConverter {
                                 if (shapeNum == 4) {
                                     if (strokeStyleOrig > 0) {
                                         if (actualLinestyles != null && !((LINESTYLE2) actualLinestyles.lineStyles2[strokeStyleOrig]).hasFillFlag) {
-                                            RGBA color = (RGBA) actualLinestyles.lineStyles[strokeStyleOrig].getColor();
+                                            RGBA color = (RGBA) actualLinestyles.lineStyles2[strokeStyleOrig].getColor();
                                             if (color.alpha == 0 && color.red == 0 && color.green == 0 && color.blue == 0) {
                                                 empty = true;
                                             }
@@ -916,7 +916,7 @@ public class XFLConverter {
                             if (shapeNum == 4) {
                                 if (strokeStyleOrig > 0) {
                                     if (actualLinestyles != null && !((LINESTYLE2) actualLinestyles.lineStyles2[strokeStyleOrig]).hasFillFlag) {
-                                        RGBA color = (RGBA) actualLinestyles.lineStyles[strokeStyleOrig].getColor();
+                                        RGBA color = (RGBA) actualLinestyles.lineStyles2[strokeStyleOrig].getColor();
                                         if (color.alpha == 0 && color.red == 0 && color.green == 0 && color.blue == 0) {
                                             empty = true;
                                         }
@@ -960,7 +960,7 @@ public class XFLConverter {
                     if (shapeNum == 4) {
                         if (strokeStyleOrig > 0) {
                             if (actualLinestyles != null && !((LINESTYLE2) actualLinestyles.lineStyles2[strokeStyleOrig]).hasFillFlag) {
-                                RGBA color = (RGBA) actualLinestyles.lineStyles[strokeStyleOrig].getColor();
+                                RGBA color = (RGBA) actualLinestyles.lineStyles2[strokeStyleOrig].getColor();
                                 if (color.alpha == 0 && color.red == 0 && color.green == 0 && color.blue == 0) {
                                     empty = true;
                                 }

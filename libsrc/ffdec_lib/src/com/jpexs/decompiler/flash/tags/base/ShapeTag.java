@@ -45,6 +45,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -131,20 +133,37 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
 
     @Override
     public RECT getRectWithStrokes() {
-
         int maxWidth = 0;
-        for (ILINESTYLE ls : getShapes().lineStyles.lineStyles) {
-            if (ls.getWidth() > maxWidth) {
-                maxWidth = ls.getWidth();
+        List<ILINESTYLE> ilineStyles = new ArrayList<>();
+        if (getShapeNum() == 4) {
+            for (ILINESTYLE ls : getShapes().lineStyles.lineStyles2) {
+                if (ls.getWidth() > maxWidth) {
+                    maxWidth = ls.getWidth();
+                }
+            }
+        } else {
+            for (ILINESTYLE ls : getShapes().lineStyles.lineStyles) {
+                if (ls.getWidth() > maxWidth) {
+                    maxWidth = ls.getWidth();
+                }
             }
         }
+
         for (SHAPERECORD sr : getShapes().shapeRecords) {
             if (sr instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) sr;
                 if (scr.stateNewStyles) {
-                    for (ILINESTYLE ls : scr.lineStyles.lineStyles) {
-                        if (ls.getWidth() > maxWidth) {
-                            maxWidth = ls.getWidth();
+                    if (getShapeNum() == 4) {
+                        for (ILINESTYLE ls : scr.lineStyles.lineStyles2) {
+                            if (ls.getWidth() > maxWidth) {
+                                maxWidth = ls.getWidth();
+                            }
+                        }
+                    } else {
+                        for (ILINESTYLE ls : scr.lineStyles.lineStyles) {
+                            if (ls.getWidth() > maxWidth) {
+                                maxWidth = ls.getWidth();
+                            }
                         }
                     }
                 }

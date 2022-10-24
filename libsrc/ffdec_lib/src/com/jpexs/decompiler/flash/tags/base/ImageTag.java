@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -177,6 +178,7 @@ public abstract class ImageTag extends DrawableTag {
 
         shape.lineStyles = new LINESTYLEARRAY();
         shape.lineStyles.lineStyles = new LINESTYLE[0];
+        shape.lineStyles.lineStyles2 = new LINESTYLE2[0];
         shape.shapeRecords = new ArrayList<>();
         StyleChangeRecord style = new StyleChangeRecord();
         style.stateFillStyle0 = true;
