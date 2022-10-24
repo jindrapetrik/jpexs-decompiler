@@ -78,6 +78,9 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
     }
 
     public DefineScalingGridTag getScalingGridTag() {
+        if (swf == null) { //???
+            return null;
+        }
         return (DefineScalingGridTag) swf.getCharacterIdTag(getCharacterId(), DefineScalingGridTag.ID);
     }
 }

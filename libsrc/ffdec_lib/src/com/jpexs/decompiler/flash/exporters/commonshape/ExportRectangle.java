@@ -123,4 +123,20 @@ public class ExportRectangle {
     public ExportRectangle toPx() {
         return new ExportRectangle(Math.round(xMin / 20), Math.round(yMin / 20), Math.round(xMax / 20), Math.round(yMax / 20));
     }
+
+    public Point getUpperLeftPoint() {
+        return new Point(xMin, yMin);
+    }
+
+    public Point getUpperRightPoint() {
+        return new Point(xMax, yMin);
+    }
+
+    public Point getLowerLeftPoint() {
+        return new Point(xMin, yMax);
+    }
+
+    public Point getLowerRightPoint() {
+        return new Point(xMax, yMax);
+    }
 }

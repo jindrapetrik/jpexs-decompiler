@@ -45,6 +45,7 @@ import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -91,6 +92,12 @@ public class BitmapExporter extends ShapeExporterBase {
     private Stroke defaultStroke;
 
     private Matrix strokeTransformation;
+
+    private double thicknessScale;
+    private double thicknessScaleX;
+    private double thicknessScaleY;
+
+    private double realZoom;
 
     private static boolean linearGradientColorWarnignShown = false;
 
@@ -162,12 +169,8 @@ public class BitmapExporter extends ShapeExporterBase {
         this.image = image;
         this.scaleStrokes = scaleStrokes;
         ExportRectangle bounds = new ExportRectangle(shape.getBounds());
-        ExportRectangle transformedBounds = strokeTransformation.transform(bounds);
-
-        this.strokeTransformation = Matrix.getScaleInstance(
-                Double.compare(bounds.getWidth(), 0.0d) == 0 /*horizontal line or single point */ ? 1 : transformedBounds.getWidth() / bounds.getWidth(),
-                Double.compare(bounds.getHeight(), 0.0d) == 0 /*vertical line or single point */ ? 1 : transformedBounds.getHeight() / bounds.getHeight()
-        );
+        this.strokeTransformation = strokeTransformation;
+        calculateThicknessScale(bounds, transformation);
 
         graphics = (Graphics2D) image.getGraphics();
         AffineTransform at = transformation.toTransform();
@@ -175,6 +178,19 @@ public class BitmapExporter extends ShapeExporterBase {
         graphics.setTransform(at);
         defaultStroke = graphics.getStroke();
         super.export();
+    }
+
+    private void calculateThicknessScale(ExportRectangle bounds, Matrix transformation) {
+        com.jpexs.decompiler.flash.exporters.commonshape.Point p00 = strokeTransformation.transform(0, 0);
+        com.jpexs.decompiler.flash.exporters.commonshape.Point p11 = strokeTransformation.transform(1, 1);
+        thicknessScale = p00.distanceTo(p11) / Math.sqrt(2);
+        thicknessScaleX = Math.abs(p11.x - p00.x);
+        thicknessScaleY = Math.abs(p11.y - p00.y);
+
+        Matrix transPre = transformation.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
+        p00 = transPre.transform(0, 0);
+        p11 = transPre.transform(1, 1);
+        realZoom = p00.distanceTo(p11);
     }
 
     public SerializableImage getImage() {
@@ -398,21 +414,22 @@ public class BitmapExporter extends ShapeExporterBase {
         if (scaleStrokes) {
             switch (scaleMode) {
                 case "VERTICAL":
-                    thickness *= strokeTransformation.scaleY;
+                    thickness *= thicknessScaleY;
                     break;
                 case "HORIZONTAL":
-                    thickness *= strokeTransformation.scaleX;
+                    thickness *= thicknessScaleX;
                     break;
                 case "NORMAL":
-                    thickness *= Math.max(strokeTransformation.scaleX, strokeTransformation.scaleY);
+                    thickness *= thicknessScale;
                     break;
                 case "NONE":
                     break;
             }
         }
 
-        if (thickness < 0) {
-            thickness = -thickness;
+        //always display minimum strokem of 1 pixel, no matter how zoomed it is
+        if (thickness * realZoom < 1) {
+            thickness = 1 / realZoom;
         }
 
         if (joinStyle == BasicStroke.JOIN_MITER) {

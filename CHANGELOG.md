@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - Correct debug info label position/content on the top of flash viewer to avoid unwanted initial scroll
 - [#1829] Adding extra pixel to the width and height when rendering items (for example to AVI)
 - [#1828] Zero scale layer matrices support
+- [#1828] Incorrect stroke scaling (normal/none/vertical/horizontal)
 
 ### Changed
 - AS3 integer values are internally (e.g. in the lib) handled as java int type instead of long.
