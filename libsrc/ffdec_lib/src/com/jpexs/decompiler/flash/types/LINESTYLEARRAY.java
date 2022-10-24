@@ -12,10 +12,16 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
+import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
+import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
+import com.jpexs.decompiler.flash.tags.DefineShapeTag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import java.io.Serializable;
 import java.util.Set;
@@ -27,11 +33,16 @@ import java.util.Set;
 public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
 
     @SWFArray(value = "lineStyle")
+    @Conditional(tags = {DefineShapeTag.ID, DefineShape2Tag.ID, DefineShape3Tag.ID})
     public LINESTYLE[] lineStyles = new LINESTYLE[0];
+
+    @SWFArray(value = "lineStyle")
+    @Conditional(tags = {DefineShape4Tag.ID})
+    public LINESTYLE2[] lineStyles2 = new LINESTYLE2[0];
 
     @Override
     public void getNeededCharacters(Set<Integer> needed) {
-        for (LINESTYLE ls : lineStyles) {
+        for (ILINESTYLE ls : lineStyles) {
             ls.getNeededCharacters(needed);
         }
     }
@@ -39,7 +50,7 @@ public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
     @Override
     public boolean replaceCharacter(int oldCharacterId, int newCharacterId) {
         boolean modified = false;
-        for (LINESTYLE ls : lineStyles) {
+        for (ILINESTYLE ls : lineStyles) {
             modified |= ls.replaceCharacter(oldCharacterId, newCharacterId);
         }
         return modified;
@@ -48,7 +59,7 @@ public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
     @Override
     public boolean removeCharacter(int characterId) {
         boolean modified = false;
-        for (LINESTYLE ls : lineStyles) {
+        for (ILINESTYLE ls : lineStyles) {
             modified |= ls.removeCharacter(characterId);
         }
         return modified;

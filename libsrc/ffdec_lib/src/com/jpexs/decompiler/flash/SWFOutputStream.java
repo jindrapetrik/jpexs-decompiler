@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.amf.amf3.Amf3OutputStream;
@@ -1348,10 +1349,10 @@ public class SWFOutputStream extends OutputStream {
                 writeUI8(lineStyleCount);
             }
             for (int i = 0; i < lineStyleCount; i++) {
-                writeLINESTYLE(value.lineStyles[i], shapeNum);
+                writeLINESTYLE((LINESTYLE) value.lineStyles[i], shapeNum);
             }
         } else {
-            lineStyleCount = value.lineStyles.length;
+            lineStyleCount = value.lineStyles2.length;
             if (lineStyleCount >= 0xff) {
                 writeUI8(0xff);
                 writeUI16(lineStyleCount);
@@ -1359,7 +1360,7 @@ public class SWFOutputStream extends OutputStream {
                 writeUI8(lineStyleCount);
             }
             for (int i = 0; i < lineStyleCount; i++) {
-                writeLINESTYLE2((LINESTYLE2) value.lineStyles[i], shapeNum);
+                writeLINESTYLE2((LINESTYLE2) value.lineStyles2[i], shapeNum);
             }
         }
     }

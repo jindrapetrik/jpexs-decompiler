@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - [#1829] Adding extra pixel to the width and height when rendering items (for example to AVI)
 - [#1828] Zero scale layer matrices support
 - [#1828] Incorrect stroke scaling (normal/none/vertical/horizontal)
+- [#1771] DefineShape4 line filled using single color
 
 ### Changed
 - AS3 integer values are internally (e.g. in the lib) handled as java int type instead of long.
@@ -2392,6 +2393,7 @@ All notable changes to this project will be documented in this file.
 [#1847]: https://www.free-decompiler.com/flash/issues/1847
 [#1829]: https://www.free-decompiler.com/flash/issues/1829
 [#1828]: https://www.free-decompiler.com/flash/issues/1828
+[#1771]: https://www.free-decompiler.com/flash/issues/1771
 [#270]: https://www.free-decompiler.com/flash/issues/270
 [#1718]: https://www.free-decompiler.com/flash/issues/1718
 [#1801]: https://www.free-decompiler.com/flash/issues/1801

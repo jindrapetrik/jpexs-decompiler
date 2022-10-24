@@ -320,7 +320,7 @@ public abstract class MorphShapeTag extends DrawableTag {
         // todo: Currently the generated image is not cached, because the cache
         // key contains the hashCode of the finalRecord object, and it is always
         // recreated
-        BitmapExporter.export(swf, shape, null, image, transformation, strokeTransformation, colorTransform, scaleStrokes);
+        BitmapExporter.export(getShapeNum() == 2 ? 4 : 1, swf, shape, null, image, transformation, strokeTransformation, colorTransform, scaleStrokes);
     }
 
     @Override
@@ -328,11 +328,11 @@ public abstract class MorphShapeTag extends DrawableTag {
         if (ratio == -2) {
             SHAPEWITHSTYLE beginShapes = getShapeAtRatio(0);
             SHAPEWITHSTYLE endShapes = getShapeAtRatio(65535);
-            SVGMorphShapeExporter shapeExporter = new SVGMorphShapeExporter(swf, beginShapes, endShapes, getCharacterId(), exporter, null, colorTransform, 1);
+            SVGMorphShapeExporter shapeExporter = new SVGMorphShapeExporter(getShapeNum(), swf, beginShapes, endShapes, getCharacterId(), exporter, null, colorTransform, 1);
             shapeExporter.export();
         } else {
             SHAPEWITHSTYLE shapes = getShapeAtRatio(ratio);
-            SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shapes, getCharacterId(), exporter, null, colorTransform, 1);
+            SVGShapeExporter shapeExporter = new SVGShapeExporter(getShapeNum() == 2 ? 4 : 1, swf, shapes, getCharacterId(), exporter, null, colorTransform, 1);
             shapeExporter.export();
         }
     }
@@ -350,12 +350,12 @@ public abstract class MorphShapeTag extends DrawableTag {
 
     @Override
     public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked) {
-        return transformation.toTransform().createTransformedShape(getShapeAtRatio(ratio).getOutline(swf, stroked));
+        return transformation.toTransform().createTransformedShape(getShapeAtRatio(ratio).getOutline(getShapeNum() == 2 ? 4 : 1, swf, stroked));
     }
 
     @Override
     public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
-        CanvasMorphShapeExporter cmse = new CanvasMorphShapeExporter(swf, getShapeAtRatio(0), getShapeAtRatio(MAX_RATIO), null, unitDivisor, 0, 0);
+        CanvasMorphShapeExporter cmse = new CanvasMorphShapeExporter(getShapeNum(), swf, getShapeAtRatio(0), getShapeAtRatio(MAX_RATIO), null, unitDivisor, 0, 0);
         cmse.export();
         result.append(cmse.getShapeData());
     }

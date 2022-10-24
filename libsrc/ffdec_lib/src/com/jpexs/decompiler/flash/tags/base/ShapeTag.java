@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.exporters.shape.SVGShapeExporter;
 import com.jpexs.decompiler.flash.helpers.LazyObject;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.ILINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
@@ -131,20 +132,19 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
     @Override
     public RECT getRectWithStrokes() {
 
-
         int maxWidth = 0;
-        for (LINESTYLE ls : getShapes().lineStyles.lineStyles) {
-            if (ls.width > maxWidth) {
-                maxWidth = ls.width;
+        for (ILINESTYLE ls : getShapes().lineStyles.lineStyles) {
+            if (ls.getWidth() > maxWidth) {
+                maxWidth = ls.getWidth();
             }
         }
         for (SHAPERECORD sr : getShapes().shapeRecords) {
             if (sr instanceof StyleChangeRecord) {
                 StyleChangeRecord scr = (StyleChangeRecord) sr;
                 if (scr.stateNewStyles) {
-                    for (LINESTYLE ls : scr.lineStyles.lineStyles) {
-                        if (ls.width > maxWidth) {
-                            maxWidth = ls.width;
+                    for (ILINESTYLE ls : scr.lineStyles.lineStyles) {
+                        if (ls.getWidth() > maxWidth) {
+                            maxWidth = ls.getWidth();
                         }
                     }
                 }
@@ -160,7 +160,6 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
         return r;
     }
 
-
     @Override
     public int getUsedParameters() {
         return 0;
@@ -168,14 +167,14 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
 
     @Override
     public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked) {
-        return transformation.toTransform().createTransformedShape(getShapes().getOutline(swf, stroked));
+        return transformation.toTransform().createTransformedShape(getShapes().getOutline(getShapeNum(), swf, stroked));
     }
 
     @Override
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode) {
-        BitmapExporter.export(swf, getShapes(), null, image, transformation, strokeTransformation, colorTransform, scaleStrokes);
+        BitmapExporter.export(getShapeNum(), swf, getShapes(), null, image, transformation, strokeTransformation, colorTransform, scaleStrokes);
         if (Configuration._debugMode.get()) { // show control points
-            List<GeneralPath> paths = PathExporter.export(swf, getShapes());
+            List<GeneralPath> paths = PathExporter.export(getShapeNum(), swf, getShapes());
             double[] coords = new double[6];
             AffineTransform at = transformation.toTransform();
             at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
@@ -217,13 +216,13 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
-        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, getShapes(), getCharacterId(), exporter, null, colorTransform, 1);
+        SVGShapeExporter shapeExporter = new SVGShapeExporter(getShapeNum(), swf, getShapes(), getCharacterId(), exporter, null, colorTransform, 1);
         shapeExporter.export();
     }
 
     @Override
     public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
-        CanvasShapeExporter cse = new CanvasShapeExporter(null, unitDivisor, swf, getShapes(), null, 0, 0);
+        CanvasShapeExporter cse = new CanvasShapeExporter(getShapeNum(), null, unitDivisor, swf, getShapes(), null, 0, 0);
         cse.export();
         result.append(cse.getShapeData());
     }

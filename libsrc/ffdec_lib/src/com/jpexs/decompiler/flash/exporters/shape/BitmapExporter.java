@@ -154,13 +154,13 @@ public class BitmapExporter extends ShapeExporterBase {
         }
     }
 
-    public static void export(SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform, boolean scaleStrokes) {
-        BitmapExporter exporter = new BitmapExporter(swf, shape, defaultColor, colorTransform);
+    public static void export(int shapeNum, SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform, boolean scaleStrokes) {
+        BitmapExporter exporter = new BitmapExporter(shapeNum, swf, shape, defaultColor, colorTransform);
         exporter.exportTo(image, transformation, strokeTransformation, scaleStrokes);
     }
 
-    private BitmapExporter(SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
-        super(swf, shape, colorTransform);
+    private BitmapExporter(int shapeNum, SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
+        super(shapeNum, swf, shape, colorTransform);
         this.swf = swf;
         this.defaultColor = defaultColor;
     }

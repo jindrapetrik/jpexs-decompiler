@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
+import com.jpexs.decompiler.flash.types.ILINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
@@ -329,6 +330,7 @@ public class SvgImporter {
             showWarning(tagName + "tagNotSupported", "The SVG tag '" + tagName + "' is not supported.");
         }
     }
+
     private void processSvgObject(Map<String, Element> idMap, int shapeNum, SHAPEWITHSTYLE shapes, Element element, Matrix transform, SvgStyle style) {
         for (int i = 0; i < element.getChildNodes().getLength(); i++) {
             Node childNode = element.getChildNodes().item(i);
@@ -360,7 +362,7 @@ public class SvgImporter {
 
         newRecords.add(scrStyle);
 
-        LINESTYLE lineStyleObj = scrStyle.lineStyles.lineStyles.length < 1 ? null : scrStyle.lineStyles.lineStyles[0];
+        ILINESTYLE lineStyleObj = scrStyle.lineStyles.lineStyles.length < 1 ? null : scrStyle.lineStyles.lineStyles[0];
         LINESTYLE2 lineStyle2Obj = null;
         if (lineStyleObj instanceof LINESTYLE2) {
             lineStyle2Obj = (LINESTYLE2) lineStyleObj;
@@ -1148,7 +1150,7 @@ public class SvgImporter {
         st = (DefineShape4Tag) (new SvgImporter().importSvg(st, svgDataS, false));
         swf.addTag(st);
         SerializableImage si = new SerializableImage(480, 360, BufferedImage.TYPE_4BYTE_ABGR);
-        BitmapExporter.export(swf, st.shapes, Color.yellow, si, new Matrix(), new Matrix(), null, true);
+        BitmapExporter.export(st.getShapeNum(), swf, st.shapes, Color.yellow, si, new Matrix(), new Matrix(), null, true);
         List<Tag> li = new ArrayList<>();
         li.add(st);
         ImageIO.write(si.getBufferedImage(), "PNG", new File(name + ".imported.png"));
@@ -1583,8 +1585,8 @@ public class SvgImporter {
         }
         SvgFill strokeFill = style.getStrokeFillWithOpacity();
         if (strokeFill != null) {
-            if (scr.lineStyles.lineStyles.length > 0 && scr.lineStyles.lineStyles[0] instanceof LINESTYLE2) {
-                applyFillGradients(strokeFill, ((LINESTYLE2) scr.lineStyles.lineStyles[0]).fillType, bounds, scr, transform, shapeNum, style);
+            if (shapeNum == 4 && scr.lineStyles.lineStyles2.length > 0 && scr.lineStyles.lineStyles2[0] instanceof LINESTYLE2) {
+                applyFillGradients(strokeFill, ((LINESTYLE2) scr.lineStyles.lineStyles2[0]).fillType, bounds, scr, transform, shapeNum, style);
             }
         }
     }
@@ -1619,10 +1621,9 @@ public class SvgImporter {
         if (strokeFill != null && strokeFill != SvgTransparentFill.INSTANCE) {
             Color lineColor = strokeFill.toColor();
 
-            scr.lineStyles.lineStyles = new LINESTYLE[1];
-            LINESTYLE lineStyle = shapeNum <= 3 ? new LINESTYLE() : new LINESTYLE2();
-            lineStyle.color = getRGB(shapeNum, lineColor);
-            lineStyle.width = (int) Math.round(style.getStrokeWidth() * SWF.unitDivisor);
+            ILINESTYLE lineStyle = shapeNum <= 3 ? new LINESTYLE() : new LINESTYLE2();
+            lineStyle.setColor(getRGB(shapeNum, lineColor));
+            lineStyle.setWidth((int) Math.round(style.getStrokeWidth() * SWF.unitDivisor));
             SvgLineCap lineCap = style.getStrokeLineCap();
             SvgLineJoin lineJoin = style.getStrokeLineJoin();
             if (lineStyle instanceof LINESTYLE2) {
@@ -1643,6 +1644,8 @@ public class SvgImporter {
                                 : lineJoin == SvgLineJoin.BEVEL ? LINESTYLE2.BEVEL_JOIN : 0;
                 lineStyle2.joinStyle = swfJoin;
                 lineStyle2.miterLimitFactor = (float) style.getStrokeMiterLimit();
+                scr.lineStyles.lineStyles2 = new LINESTYLE2[1];
+                scr.lineStyles.lineStyles2[0] = lineStyle2;
             } else {
                 if (lineCap != SvgLineCap.ROUND) {
                     showWarning("lineCapNotSupported", "LineCap style not supported in shape " + shapeNum);
@@ -1650,12 +1653,14 @@ public class SvgImporter {
                 if (lineJoin != SvgLineJoin.ROUND) {
                     showWarning("lineJoinNotSupported", "LineJoin style not supported in shape " + shapeNum);
                 }
+                scr.lineStyles.lineStyles = new LINESTYLE[1];
+                scr.lineStyles.lineStyles[0] = (LINESTYLE) lineStyle;
             }
 
-            scr.lineStyles.lineStyles[0] = lineStyle;
             scr.lineStyle = 1;
         } else {
             scr.lineStyles.lineStyles = new LINESTYLE[0];
+            scr.lineStyles.lineStyles2 = new LINESTYLE2[0];
             scr.lineStyle = 0;
         }
 

@@ -1,7 +1,7 @@
 <DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" viewAngle3D="50.6510299754819" nextSceneIdentifier="83" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveEnabled="true" autoSaveHasPrompted="true">
      <fonts>
-          <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
           <DOMFontItem name="Font 2" itemID="604e7a9e-00000444" font="TimesNewRomanPS-BoldMT" size="30" id="2" sourceLastImported="1615755934" embedRanges="1|2"/>
+          <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
      </fonts>
      <media>
           <DOMBitmapItem name="bitmapfill.png" itemID="604dcb84-00000229" sourceLastImported="1615711005" externalFileSize="1931" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill.png" bitmapDataHRef="M 2 1615711026.dat" frameRight="640" frameBottom="1280"/>
@@ -39,7 +39,7 @@
           <Include href="VideoSprite.xml" loadImmediate="false" itemID="60672f60-00000201" lastModified="1617375202"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="64">
+          <DOMTimeline name="Scene 1" currentFrame="65">
                <layers>
                     <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
@@ -59,9 +59,9 @@
                     </DOMLayer>
                     <DOMLayer name="Prev next buttons" color="#4FFF4F" locked="true" autoNamed="false">
                          <frames>
-                              <DOMFrame index="0" duration="65" keyMode="9728">
+                              <DOMFrame index="0" duration="66" keyMode="9728">
                                    <elements>
-                                        <DOMSymbolInstance libraryItemName="btnNext" selected="true" symbolType="button">
+                                        <DOMSymbolInstance libraryItemName="btnNext" symbolType="button">
                                              <matrix>
                                                   <Matrix tx="450"/>
                                              </matrix>
@@ -74,7 +74,7 @@
 }]]></script>
                                              </Actionscript>
                                         </DOMSymbolInstance>
-                                        <DOMSymbolInstance libraryItemName="btnPrev" selected="true" symbolType="button">
+                                        <DOMSymbolInstance libraryItemName="btnPrev" symbolType="button">
                                              <transformationPoint>
                                                   <Point x="25" y="200"/>
                                              </transformationPoint>
@@ -175,7 +175,7 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Graphics layer" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
+                    <DOMLayer name="Graphics layer" color="#4FFF4F" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" keyMode="9728">
                                    <elements>
@@ -787,10 +787,10 @@
 !3980 1990|2980 1990!2980 1990|2980 990!2980 990|3980 990!3980 990|3980 1990"/>
                                                   <Edge strokeStyle="5" edges="
 !1960 990|1960 1990!1960 1990|960 1990!960 1990|960 990!960 990|1960 990"/>
-                                                  <Edge strokeStyle="7" edges="
-!1980 4990|980 4990!980 4990|980 3990!980 3990|1980 3990!1980 3990|1980 4990"/>
                                                   <Edge strokeStyle="6" edges="
 !2980 3990|3980 3990!3980 3990|3980 4990!3980 4990|2980 4990!2980 4990|2980 3990"/>
+                                                  <Edge strokeStyle="7" edges="
+!1980 4990|980 4990!980 4990|980 3990!980 3990|1980 3990!1980 3990|1980 4990"/>
                                                   <Edge strokeStyle="8" edges="
 !5980 3990|5980 4990!5980 4990|4980 4990!4980 4990|4980 3990!4980 3990|5980 3990"/>
                                                   <Edge cubics="!1960 990(;1960,990 1960,1990 1960,1990q1960 990 1960 1990);"/>
@@ -1389,18 +1389,18 @@
                                                   </StrokeStyle>
                                              </strokes>
                                              <edges>
-                                                  <Edge strokeStyle="2" edges="
-!3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
                                                   <Edge strokeStyle="5" edges="
 !5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
+                                                  <Edge strokeStyle="2" edges="
+!3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
                                                   <Edge strokeStyle="1" edges="
 !2000 1000|2000 2000!2000 2000|1000 2000!1000 2000|1000 1000"/>
-                                                  <Edge strokeStyle="6" edges="
-!4647 3660/4942 4670!4942 4670/5019 3660"/>
-                                                  <Edge strokeStyle="3" edges="
-!2553 3660/2848 4670!2848 4670/2925 3660"/>
                                                   <Edge strokeStyle="4" edges="
 !1000 3660/1295 4670!1295 4670/1372 3660"/>
+                                                  <Edge strokeStyle="3" edges="
+!2553 3660/2848 4670!2848 4670/2925 3660"/>
+                                                  <Edge strokeStyle="6" edges="
+!4647 3660/4942 4670!4942 4670/5019 3660"/>
                                                   <Edge cubics="!5000 2000(;5000,2000 4000,2000 4000,2000q5000 2000 4000 2000);"/>
                                                   <Edge cubics="!4000 2000(4000,2000;4000,2000 4000,1000 4000,1000q4000 2000 4000 1000);"/>
                                                   <Edge cubics="!5000 1000(;5000,1000 5000,2000 5000,2000q5000 1000 5000 2000);"/>
@@ -2273,7 +2273,7 @@
                                                   <Point x="40" y="40"/>
                                              </transformationPoint>
                                         </DOMSymbolInstance>
-                                        <DOMStaticText width="79.2" height="16.6" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="79.2" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="24.9" ty="165.15"/>
                                              </matrix>
@@ -2286,7 +2286,7 @@
                                                   </DOMTextRun>
                                              </textRuns>
                                         </DOMStaticText>
-                                        <DOMStaticText width="95.05" height="16.6" autoExpand="true" isSelectable="false">
+                                        <DOMStaticText width="95.05" height="16.6" autoExpand="true" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="24.9" ty="312.15"/>
                                              </matrix>
@@ -2323,6 +2323,44 @@
                                                   <Point x="40" y="50"/>
                                              </transformationPoint>
                                         </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="65" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor/>
+                                                  </FillStyle>
+                                                  <FillStyle index="2">
+                                                       <SolidColor color="#333333"/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <edges>
+                                                  <Edge fillStyle0="1" fillStyle1="2" edges="
+!5565 3435[5800 3669 5800 4000!5800 4000[5800 4331 5565 4566!5565 4566[5331 4800 5000 4800!5000 4800[4669 4800 4434 4566!4434 4566[4200 4331 4200 4000!4200 4000[4200 3669 4434 3435!4434 3435[4669 3200 5000 3200!5000 3200[5331 3200 5565
+ 3435"/>
+                                                  <Edge fillStyle1="1" edges="
+!6414 2586[7000 3172 7000 4000!7000 4000[7000 4828 6414 5414!6414 5414[5828 6000 5000 6000!5000 6000[4172 6000 3586 5414!3586 5414[3000 4828 3000 4000!3000 4000[3000 3172 3586 2586!3586 2586[4172 2000 5000 2000!5000 2000[5828 2000 6414
+ 2586"/>
+                                                  <Edge cubics="!3586 2586(;3977,2195 4449,2000 5000,2000q3586 2586Q4172 2000q5000 2000);"/>
+                                                  <Edge cubics="!5000 2000(;5552,2000 6023,2195 6414,2586q5000 2000Q5828 2000q6414 2586);"/>
+                                                  <Edge cubics="!5000 6000(;4449,6000 3977,5805 3586,5414q5000 6000Q4172 6000q3586 5414);"/>
+                                                  <Edge cubics="!6414 5414(;6023,5805 5552,6000 5000,6000q6414 5414Q5828 6000q5000 6000);"/>
+                                                  <Edge cubics="!3000 4000(;3000,3448 3195,2977 3586,2586q3000 4000Q3000 3172q3586 2586);"/>
+                                                  <Edge cubics="!3586 5414(;3195,5023 3000,4552 3000,4000q3586 5414Q3000 4828q3000 4000);"/>
+                                                  <Edge cubics="!6414 2586(;6805,2977 7000,3448 7000,4000q6414 2586Q7000 3172q7000 4000);"/>
+                                                  <Edge cubics="!7000 4000(;7000,4552 6805,5023 6414,5414q7000 4000Q7000 4828q6414 5414);"/>
+                                                  <Edge cubics="!4434 4566(;4278,4410 4200,4221 4200,4000q4434 4566Q4200 4331q4200 4000);"/>
+                                                  <Edge cubics="!4200 4000(;4200,3780 4278,3591 4434,3435q4200 4000Q4200 3669q4434 3435);"/>
+                                                  <Edge cubics="!5800 4000(;5800,4221 5721,4410 5565,4566q5800 4000Q5800 4331q5565 4566);"/>
+                                                  <Edge cubics="!5565 3435(;5721,3591 5800,3780 5800,4000q5565 3435Q5800 3669q5800 4000);"/>
+                                                  <Edge cubics="!5000 3200(;5220,3200 5409,3279 5565,3435q5000 3200Q5331 3200q5565 3435);"/>
+                                                  <Edge cubics="!4434 3435(;4590,3279 4779,3200 5000,3200q4434 3435Q4669 3200q5000 3200);"/>
+                                                  <Edge cubics="!5000 4800(;4779,4800 4590,4722 4434,4566q5000 4800Q4669 4800q4434 4566);"/>
+                                                  <Edge cubics="!5565 4566(;5409,4722 5220,4800 5000,4800q5565 4566Q5331 4800q5000 4800);"/>
+                                             </edges>
+                                        </DOMShape>
                                    </elements>
                               </DOMFrame>
                          </frames>
@@ -2952,7 +2990,7 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Frame description layer" color="#9933CC" autoNamed="false">
+                    <DOMLayer name="Frame description layer" color="#9933CC" current="true" isSelected="true" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" keyMode="9728">
                                    <elements>
@@ -3753,6 +3791,23 @@
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
+                              <DOMFrame index="65" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="22" ty="342"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>066 Antialiasing</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
                          </frames>
                     </DOMLayer>
                </layers>
@@ -3760,6 +3815,8 @@
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="3657883" publishTime="1666634735"/>
+          <PublishItem publishSize="3657878" publishTime="1666634687"/>
           <PublishItem publishSize="3657743" publishTime="1666596760" publishDebug="true"/>
           <PublishItem publishSize="3657647" publishTime="1666595782"/>
           <PublishItem publishSize="3657644" publishTime="1666594083"/>
@@ -3777,8 +3834,6 @@
           <PublishItem publishSize="1586" publishTime="1637176556"/>
           <PublishItem publishSize="3655062" publishTime="1617375217"/>
           <PublishItem publishSize="2351995" publishTime="1617369003"/>
-          <PublishItem publishSize="1611" publishTime="1617210496"/>
-          <PublishItem publishSize="1611" publishTime="1617210496"/>
           <PublishItem publishSize="1611" publishTime="1617210496"/>
      </publishHistory>
 </DOMDocument>

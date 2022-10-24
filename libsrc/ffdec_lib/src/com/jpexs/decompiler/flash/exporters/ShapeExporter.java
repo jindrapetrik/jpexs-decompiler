@@ -96,16 +96,16 @@ public class ShapeExporter {
                     switch (settings.mode) {
                         case SVG:
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                                ExportRectangle rect = new ExportRectangle(st.getRect());
-                                rect.xMax *= settings.zoom;
-                                rect.yMax *= settings.zoom;
-                                rect.xMin *= settings.zoom;
-                                rect.yMin *= settings.zoom;
-                                SVGExporter exporter = new SVGExporter(rect, settings.zoom);
-                                st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
-                                fos.write(Utf8Helper.getBytes(exporter.getSVG()));
-                            }
-                            break;
+                            ExportRectangle rect = new ExportRectangle(st.getRect());
+                            rect.xMax *= settings.zoom;
+                            rect.yMax *= settings.zoom;
+                            rect.xMin *= settings.zoom;
+                            rect.yMin *= settings.zoom;
+                            SVGExporter exporter = new SVGExporter(rect, settings.zoom);
+                            st.toSVG(exporter, -2, new CXFORMWITHALPHA(), 0);
+                            fos.write(Utf8Helper.getBytes(exporter.getSVG()));
+                        }
+                        break;
                         case PNG:
                         case BMP:
                             RECT rect = st.getRect();
@@ -132,29 +132,29 @@ public class ShapeExporter {
                             break;
                         case CANVAS:
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                                SHAPE shp = st.getShapes();
-                                int deltaX = -shp.getBounds().Xmin;
-                                int deltaY = -shp.getBounds().Ymin;
-                                CanvasShapeExporter cse = new CanvasShapeExporter(null, SWF.unitDivisor / settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), deltaX, deltaY);
-                                cse.export();
-                                Set<Integer> needed = new HashSet<>();
-                                needed.add(st.getCharacterId());
-                                st.getNeededCharactersDeep(needed);
-                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                                SWF.libraryToHtmlCanvas(st.getSwf(), needed, baos);
-                                fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(st) + st.getCharacterId(), st.getRect())));
-                            }
-                            break;
+                            SHAPE shp = st.getShapes();
+                            int deltaX = -shp.getBounds().Xmin;
+                            int deltaY = -shp.getBounds().Ymin;
+                            CanvasShapeExporter cse = new CanvasShapeExporter(st.getShapeNum(), null, SWF.unitDivisor / settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), deltaX, deltaY);
+                            cse.export();
+                            Set<Integer> needed = new HashSet<>();
+                            needed.add(st.getCharacterId());
+                            st.getNeededCharactersDeep(needed);
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            SWF.libraryToHtmlCanvas(st.getSwf(), needed, baos);
+                            fos.write(Utf8Helper.getBytes(cse.getHtml(new String(baos.toByteArray(), Utf8Helper.charset), SWF.getTypePrefix(st) + st.getCharacterId(), st.getRect())));
+                        }
+                        break;
                         case SWF:
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
-                                try {
-                                    new PreviewExporter().exportSwf(fos, st, null, 0, false);
-                                } catch (ActionParseException ex) {
-                                    Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
-                                }
+                            try {
+                                new PreviewExporter().exportSwf(fos, st, null, 0, false);
+                            } catch (ActionParseException ex) {
+                                Logger.getLogger(MorphShapeExporter.class.getName()).log(Level.SEVERE, null, ex);
                             }
+                        }
 
-                            break;
+                        break;
                     }
                 }, handler).run();
                 ret.add(file);

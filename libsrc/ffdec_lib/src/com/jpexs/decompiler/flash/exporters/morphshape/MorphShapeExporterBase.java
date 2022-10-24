@@ -12,13 +12,15 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.morphshape;
 
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
+import com.jpexs.decompiler.flash.types.ILINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RGB;
@@ -49,11 +51,11 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
 
     protected List<FILLSTYLE> _fillStyles;
 
-    protected List<LINESTYLE> _lineStyles;
+    protected List<ILINESTYLE> _lineStyles;
 
     protected List<FILLSTYLE> _fillStylesEnd;
 
-    protected List<LINESTYLE> _lineStylesEnd;
+    protected List<ILINESTYLE> _lineStylesEnd;
 
     protected List<Map<Integer, List<IMorphEdge>>> _fillEdgeMaps;
 
@@ -63,7 +65,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
 
     protected ColorTransform colorTransform;
 
-    public MorphShapeExporterBase(SHAPE shape, SHAPE endShape, ColorTransform colorTransform) {
+    public MorphShapeExporterBase(int morphShapeNum, SHAPE shape, SHAPE endShape, ColorTransform colorTransform) {
         this.shape = shape;
         this.shapeEnd = endShape;
         this.colorTransform = colorTransform;
@@ -72,14 +74,22 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         if (shape instanceof SHAPEWITHSTYLE) {
             SHAPEWITHSTYLE shapeWithStyle = (SHAPEWITHSTYLE) shape;
             _fillStyles.addAll(Arrays.asList(shapeWithStyle.fillStyles.fillStyles));
-            _lineStyles.addAll(Arrays.asList(shapeWithStyle.lineStyles.lineStyles));
+            if (morphShapeNum == 2) {
+                _lineStyles.addAll(Arrays.asList(shapeWithStyle.lineStyles.lineStyles2));
+            } else {
+                _lineStyles.addAll(Arrays.asList(shapeWithStyle.lineStyles.lineStyles));
+            }
         }
         _fillStylesEnd = new ArrayList<>();
         _lineStylesEnd = new ArrayList<>();
         if (endShape instanceof SHAPEWITHSTYLE) {
             SHAPEWITHSTYLE shapeWithStyle = (SHAPEWITHSTYLE) endShape;
             _fillStylesEnd.addAll(Arrays.asList(shapeWithStyle.fillStyles.fillStyles));
-            _lineStylesEnd.addAll(Arrays.asList(shapeWithStyle.lineStyles.lineStyles));
+            if (morphShapeNum == 2) {
+                _lineStylesEnd.addAll(Arrays.asList(shapeWithStyle.lineStyles.lineStyles2));
+            } else {
+                _lineStylesEnd.addAll(Arrays.asList(shapeWithStyle.lineStyles.lineStyles));
+            }
         }
     }
 
@@ -102,8 +112,8 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         endShape();
     }
 
-    protected void createEdgeMaps(List<FILLSTYLE> fillStyles, List<LINESTYLE> lineStyles,
-            List<FILLSTYLE> fillStylesEnd, List<LINESTYLE> lineStylesEnd,
+    protected void createEdgeMaps(List<FILLSTYLE> fillStyles, List<ILINESTYLE> lineStyles,
+            List<FILLSTYLE> fillStylesEnd, List<ILINESTYLE> lineStylesEnd,
             List<Map<Integer, List<IMorphEdge>>> fillEdgeMaps, List<Map<Integer, List<IMorphEdge>>> lineEdgeMaps) {
         if (!edgeMapsCreated) {
             int xPos = 0;
@@ -383,8 +393,8 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                     lineStyleIdx = e.getLineStyleIdx();
                     posX = Integer.MAX_VALUE;
                     posY = Integer.MAX_VALUE;
-                    LINESTYLE lineStyle = null;
-                    LINESTYLE lineStyleEnd = null;
+                    ILINESTYLE lineStyle = null;
+                    ILINESTYLE lineStyleEnd = null;
                     try {
                         lineStyle = _lineStyles.get(lineStyleIdx - 1);
                         lineStyleEnd = _lineStylesEnd.get(lineStyleIdx - 1);
@@ -415,10 +425,10 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
                             hasFillFlag = lineStyle2.hasFillFlag;
                         }
                         lineStyle(
-                                lineStyle.width,
-                                lineStyleEnd.width,
-                                colorTransform == null ? lineStyle.color : colorTransform.apply(lineStyle.color),
-                                colorTransform == null ? lineStyleEnd.color : colorTransform.apply(lineStyleEnd.color),
+                                lineStyle.getWidth(),
+                                lineStyleEnd.getWidth(),
+                                colorTransform == null ? lineStyle.getColor() : colorTransform.apply(lineStyle.getColor()),
+                                colorTransform == null ? lineStyleEnd.getColor() : colorTransform.apply(lineStyleEnd.getColor()),
                                 pixelHintingFlag,
                                 scaleMode,
                                 startCapStyle,
@@ -567,7 +577,7 @@ public abstract class MorphShapeExporterBase implements IMorphShapeExporter {
         v1.addAll(Arrays.asList(v2));
     }
 
-    protected void appendLineStyles(List<LINESTYLE> v1, LINESTYLE[] v2) {
+    protected void appendLineStyles(List<ILINESTYLE> v1, ILINESTYLE[] v2) {
         v1.addAll(Arrays.asList(v2));
     }
 

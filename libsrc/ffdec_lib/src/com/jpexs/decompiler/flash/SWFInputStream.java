@@ -231,6 +231,7 @@ import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
+import com.jpexs.decompiler.flash.types.ILINESTYLE;
 import com.jpexs.decompiler.flash.types.KERNINGRECORD;
 import com.jpexs.decompiler.flash.types.LANGCODE;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
@@ -2794,9 +2795,9 @@ public class SWFInputStream implements AutoCloseable {
                 ret.lineStyles[i] = readLINESTYLE(shapeNum, "lineStyle");
             }
         } else {
-            ret.lineStyles = new LINESTYLE2[lineStyleCount];
+            ret.lineStyles2 = new LINESTYLE2[lineStyleCount];
             for (int i = 0; i < lineStyleCount; i++) {
-                ret.lineStyles[i] = readLINESTYLE2(shapeNum, "lineStyle");
+                ret.lineStyles2[i] = readLINESTYLE2(shapeNum, "lineStyle");
             }
         }
         endDumpLevel();
