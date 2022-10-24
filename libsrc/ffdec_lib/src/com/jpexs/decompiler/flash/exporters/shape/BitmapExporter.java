@@ -429,7 +429,8 @@ public class BitmapExporter extends ShapeExporterBase {
 
         //always display minimum strokem of 1 pixel, no matter how zoomed it is
         if (thickness * realZoom < 1) {
-            thickness = 1 / realZoom;
+            //thickness = 1 / realZoom;
+            //TODO: fix for #1684
         }
 
         if (joinStyle == BasicStroke.JOIN_MITER) {
