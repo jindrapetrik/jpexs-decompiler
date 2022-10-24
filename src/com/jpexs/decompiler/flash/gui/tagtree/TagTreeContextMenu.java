@@ -391,7 +391,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 break;
             }
         }
-        
+
         boolean allSelectedIsTagOrFrame = true;
         for (TreeItem item : items) {
             if (!(item instanceof Tag)) {
@@ -400,7 +400,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     if (tag instanceof DoActionTag || tag instanceof DoInitActionTag) {
                         continue;
                     }
-                } else if(item instanceof Frame) {
+                } else if (item instanceof Frame) {
                     continue;
                 }
 
@@ -445,34 +445,26 @@ public class TagTreeContextMenu extends JPopupMenu {
                 break;
             }
         }
-
-        boolean noSelectParentChild = true;
-        Set<Timelined> selected = new HashSet<>();
-        Set<Timelined> parents = new HashSet<>();
-        for (TreeItem item : items) {
-            Timelined t = item.getSwf().getTimelined(item);
-            Timelined parent = null;
-            if (t != item.getSwf()) {
-                selected.add(t);
-            } else if (item instanceof Tag) {
-                Tag tag = (Tag) item;
-                Timelined temp = tag.getTimelined();
-                if (!(temp instanceof SWF)) {
-                    parents.add(temp);
-                    parent = temp;
+        
+        boolean allSelectedSameParent = !items.isEmpty();
+        if(allSelectedSameParent) {
+            TagTreeModel model = tagTree.getModel();
+            TreePath parent = model.getTreePath(items.get(0)).getParentPath();
+            
+            for (TreeItem item : items) {
+                TreePath currentParent = model.getTreePath(item).getParentPath();
+                
+                if(!currentParent.equals(parent)) {
+                    allSelectedSameParent = false;
+                    break;
                 }
-            }
-
-            if (selected.contains(parent) || parents.contains(t)) {
-                noSelectParentChild = false;
-                break;
             }
         }
 
         expandRecursiveMenuItem.setVisible(false);
         removeMenuItem.setVisible(canRemove);
         removeWithDependenciesMenuItem.setVisible(canRemove && !allDoNotHaveDependencies);
-        cloneTagMenuItem.setVisible(allSelectedIsTagOrFrame && noSelectParentChild);
+        cloneTagMenuItem.setVisible(allSelectedIsTagOrFrame && allSelectedSameParent);
         undoTagMenuItem.setVisible(allSelectedIsTag);
         exportSelectionMenuItem.setEnabled(tagTree.hasExportableNodes());
         replaceMenuItem.setVisible(false);
@@ -1752,16 +1744,19 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void cloneTagActionPerformed(ActionEvent e) {
         List<TreeItem> items = tagTree.getSelected();
+        /* Currently useless since all selected items must have the same parent
+        * but a better way to detect for parent/child selection 
+        * could remove that limitation */
         Set<SWF> swfs = new HashSet<>();
 
         try {
             for (TreeItem item : items) {
                 SWF swf = item.getSwf();
                 swfs.add(swf);
-                
+
                 if (item instanceof Tag) {
                     Tag tag = (Tag) item;
-                    
+
                     Tag copyTag = tag.cloneTag();
                     copyTag.setSwf(swf, true);
                     Timelined timelined = tag.getTimelined();
@@ -1771,7 +1766,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
                     chechUniqueCharacterId(copyTag);
                     copyTag.setModified(true);
-                    
+
                     timelined.resetTimeline();
                 } else if (item instanceof Frame) {
                     Frame f = (Frame) item;
@@ -1779,7 +1774,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
                     int i;
                     boolean isLast = f.showFrameTag == null;
-                    if(isLast) {
+                    if (isLast) {
                         f.showFrameTag = new ShowFrameTag(swf);
                         Tag last = f.innerTags.get(f.innerTags.size() - 1);
                         int idx = timelined.indexOfTag(last) + 1;
@@ -1788,25 +1783,25 @@ public class TagTreeContextMenu extends JPopupMenu {
                         i = idx;
                     } else {
                         i = timelined.indexOfTag(f.showFrameTag);
-                    }          
-                    
+                    }
+
                     for (Tag tag : f.innerTags) {
                         Tag copyTag = tag.cloneTag();
                         copyTag.setSwf(swf, true);
-                        
+
                         timelined.addTag(++i, copyTag);
                         copyTag.setTimelined(timelined);
 
                         chechUniqueCharacterId(copyTag);
                         copyTag.setModified(true);
                     }
-                    
-                    if(!isLast) {
+
+                    if (!isLast) {
                         ShowFrameTag next = new ShowFrameTag(swf);
                         timelined.addTag(++i, next);
                         next.setTimelined(timelined);
                     }
-                    
+
                     timelined.resetTimeline();
                 }
             }
