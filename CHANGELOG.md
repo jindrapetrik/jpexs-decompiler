@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - [#1828] Zero scale layer matrices support
 - [#1828] Incorrect stroke scaling (normal/none/vertical/horizontal)
 - [#1771] DefineShape4 line filled using single color
+- Minimum stroke width should be 1 px
 
 ### Changed
 - AS3 integer values are internally (e.g. in the lib) handled as java int type instead of long.

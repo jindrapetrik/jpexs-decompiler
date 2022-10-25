@@ -191,7 +191,7 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
 
     @Override
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode) {
-        BitmapExporter.export(getShapeNum(), swf, getShapes(), null, image, transformation, strokeTransformation, colorTransform, scaleStrokes);
+        BitmapExporter.export(getShapeNum(), swf, getShapes(), null, image, unzoom, transformation, strokeTransformation, colorTransform, scaleStrokes);
         if (Configuration._debugMode.get()) { // show control points
             List<GeneralPath> paths = PathExporter.export(getShapeNum(), swf, getShapes());
             double[] coords = new double[6];

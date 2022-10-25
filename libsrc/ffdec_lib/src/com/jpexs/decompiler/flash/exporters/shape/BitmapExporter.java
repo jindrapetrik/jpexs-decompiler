@@ -97,7 +97,7 @@ public class BitmapExporter extends ShapeExporterBase {
     private double thicknessScaleX;
     private double thicknessScaleY;
 
-    private double realZoom;
+    private double unzoom;
 
     private static boolean linearGradientColorWarnignShown = false;
 
@@ -154,9 +154,9 @@ public class BitmapExporter extends ShapeExporterBase {
         }
     }
 
-    public static void export(int shapeNum, SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform, boolean scaleStrokes) {
+    public static void export(int shapeNum, SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform, boolean scaleStrokes) {
         BitmapExporter exporter = new BitmapExporter(shapeNum, swf, shape, defaultColor, colorTransform);
-        exporter.exportTo(image, transformation, strokeTransformation, scaleStrokes);
+        exporter.exportTo(image, unzoom, transformation, strokeTransformation, scaleStrokes);
     }
 
     private BitmapExporter(int shapeNum, SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
@@ -165,7 +165,7 @@ public class BitmapExporter extends ShapeExporterBase {
         this.defaultColor = defaultColor;
     }
 
-    private void exportTo(SerializableImage image, Matrix transformation, Matrix strokeTransformation, boolean scaleStrokes) {
+    private void exportTo(SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, boolean scaleStrokes) {
         this.image = image;
         this.scaleStrokes = scaleStrokes;
         ExportRectangle bounds = new ExportRectangle(shape.getBounds());
@@ -177,6 +177,7 @@ public class BitmapExporter extends ShapeExporterBase {
         at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
         graphics.setTransform(at);
         defaultStroke = graphics.getStroke();
+        this.unzoom = unzoom;
         super.export();
     }
 
@@ -187,10 +188,11 @@ public class BitmapExporter extends ShapeExporterBase {
         thicknessScaleX = Math.abs(p11.x - p00.x);
         thicknessScaleY = Math.abs(p11.y - p00.y);
 
-        Matrix transPre = transformation.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
+        /*Matrix transPre = transformation.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
         p00 = transPre.transform(0, 0);
         p11 = transPre.transform(1, 1);
-        realZoom = p00.distanceTo(p11);
+        realZoom = p00.distanceTo(p11) / Math.sqrt(2);
+        System.out.println("realZoom=" + realZoom);*/
     }
 
     public SerializableImage getImage() {
@@ -427,10 +429,9 @@ public class BitmapExporter extends ShapeExporterBase {
             }
         }
 
-        //always display minimum strokem of 1 pixel, no matter how zoomed it is
-        if (thickness * realZoom < 1) {
-            //thickness = 1 / realZoom;
-            //TODO: fix for #1684
+        //always display minimum stroke of 1 pixel, no matter how zoomed it is
+        if (thickness * unzoom < 1 * SWF.unitDivisor) {
+            thickness = 1 * SWF.unitDivisor / unzoom;
         }
 
         if (joinStyle == BasicStroke.JOIN_MITER) {

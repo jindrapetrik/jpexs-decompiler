@@ -320,7 +320,7 @@ public abstract class MorphShapeTag extends DrawableTag {
         // todo: Currently the generated image is not cached, because the cache
         // key contains the hashCode of the finalRecord object, and it is always
         // recreated
-        BitmapExporter.export(getShapeNum() == 2 ? 4 : 1, swf, shape, null, image, transformation, strokeTransformation, colorTransform, scaleStrokes);
+        BitmapExporter.export(getShapeNum() == 2 ? 4 : 1, swf, shape, null, image, unzoom, transformation, strokeTransformation, colorTransform, scaleStrokes);
     }
 
     @Override

@@ -422,7 +422,7 @@ public abstract class TextTag extends DrawableTag {
         Graphics2D g = (Graphics2D) image.getGraphics();
         Matrix mat = transformation.clone();
         mat = mat.concatenate(new Matrix(textMatrix));
-        BitmapExporter.export(1, swf, getBorderShape(borderColor, fillColor, rect), null, image, mat, mat, colorTransform, true);
+        BitmapExporter.export(1, swf, getBorderShape(borderColor, fillColor, rect), null, image, 1 /*FIXME??*/, mat, mat, colorTransform, true);
     }
 
     public static void drawBorderHtmlCanvas(SWF swf, StringBuilder result, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, ColorTransform colorTransform, double unitDivisor) {
@@ -512,7 +512,7 @@ public abstract class TextTag extends DrawableTag {
                 }
 
                 if (shape != null) {
-                    BitmapExporter.export(1, swf, shape, textColor2, image, mat, mat, colorTransform, true);
+                    BitmapExporter.export(1, swf, shape, textColor2, image, 1 /*FIXME??*/, mat, mat, colorTransform, true);
                     if (SHAPERECORD.DRAW_BOUNDING_BOX) {
                         RGB borderColor = new RGBA(Color.black);
                         RGB fillColor = new RGBA(new Color(255, 255, 255, 0));
