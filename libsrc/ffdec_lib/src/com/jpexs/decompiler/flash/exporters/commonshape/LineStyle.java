@@ -71,9 +71,4 @@ public class LineStyle {
             fillType = lineStyle2.fillType == null ? null : new FillStyle(lineStyle2.fillType);
         }
     }
-
-    public LineStyle(LINESTYLE lineStyle) {
-
-        isLineStyle2 = false;
-    }
 }
