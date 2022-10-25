@@ -343,6 +343,8 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     private void exportLinePath(List<IEdge> path) {
         int posX = Integer.MAX_VALUE;
         int posY = Integer.MAX_VALUE;
+        int lastMoveToX = posX;
+        int lastMoveToY = posY;
         int lineStyleIdx = Integer.MAX_VALUE;
         if (path.size() > 0) {
             boolean autoClose = true;
@@ -434,6 +436,8 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                 }
                 if (posX != e.getFromX() || posY != e.getFromY()) {
                     moveTo(e.getFromX(), e.getFromY());
+                    lastMoveToX = e.getFromX();
+                    lastMoveToY = e.getFromY();
                 }
                 if (e instanceof CurvedEdge) {
                     CurvedEdge c = (CurvedEdge) e;
@@ -444,8 +448,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                 posX = e.getToX();
                 posY = e.getToY();
             }
-            IEdge firstEdge = path.get(0);
-            endLines(autoClose && firstEdge.getFromX() == posX && firstEdge.getFromY() == posY);
+            endLines(autoClose && lastMoveToX == posX && lastMoveToY == posY);
         }
     }
 
