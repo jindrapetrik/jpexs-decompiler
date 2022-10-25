@@ -372,7 +372,7 @@ public class FolderPreviewPanel extends JPanel {
         if (imgSrc == null) {
             DrawableTag drawable = (DrawableTag) treeItem;
             ExportRectangle viewRectangle = new ExportRectangle(0, 0, ow, oh);
-            drawable.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, null, scale, false, viewRectangle, true, Timeline.DRAW_MODE_ALL);
+            drawable.toImage(0, 0, 0, new RenderContext(), image, image, false, m, new Matrix(), m, m, null, scale, false, viewRectangle, true, Timeline.DRAW_MODE_ALL);
         } else {
             Graphics2D g = (Graphics2D) image.getGraphics();
             g.setTransform(m.toTransform());
