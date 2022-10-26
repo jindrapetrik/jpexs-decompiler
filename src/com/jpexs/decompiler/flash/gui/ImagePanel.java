@@ -1142,52 +1142,58 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
         }
 
-        private synchronized void calcRect() {
-            _rect = calcRect(zoom);
+        private void calcRect() {
+            synchronized (ImagePanel.this) {
+                synchronized (this) {
+                    _rect = calcRect(zoom);
+                }
+            }
         }
 
-        private synchronized Rectangle calcRect(Zoom z) {
-            if (_img != null || timelined != null) {
-                //int w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
-                //int h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
-                double zoomDouble = z.fit ? getZoomToFit() : z.value;
-                int w1;
-                int h1;
-                if (timelined != null) {
-                    w1 = (int) (timelined.getRectWithStrokes().getWidth() * zoomDouble / SWF.unitDivisor);
-                    h1 = (int) (timelined.getRectWithStrokes().getHeight() * zoomDouble / SWF.unitDivisor);
-                } else {
-                    w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
-                    h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
-                }
+        private Rectangle calcRect(Zoom z) {
+            synchronized (ImagePanel.this) {
+                if (_img != null || timelined != null) {
+                    //int w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
+                    //int h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
+                    double zoomDouble = z.fit ? getZoomToFit() : z.value;
+                    int w1;
+                    int h1;
+                    if (timelined != null) {
+                        w1 = (int) (timelined.getRectWithStrokes().getWidth() * zoomDouble / SWF.unitDivisor);
+                        h1 = (int) (timelined.getRectWithStrokes().getHeight() * zoomDouble / SWF.unitDivisor);
+                    } else {
+                        w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
+                        h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
+                    }
 
-                int w2 = getWidth();
-                int h2 = getHeight();
+                    int w2 = getWidth();
+                    int h2 = getHeight();
 
-                int w;
-                int h;
-                if (autoFit) {
-                    if (w1 <= w2 && h1 <= h2) {
+                    int w;
+                    int h;
+                    if (autoFit) {
+                        if (w1 <= w2 && h1 <= h2) {
+                            w = w1;
+                            h = h1;
+                        } else {
+
+                            h = h1 * w2 / w1;
+                            if (h > h2) {
+                                w = w1 * h2 / h1;
+                                h = h2;
+                            } else {
+                                w = w2;
+                            }
+                        }
+                    } else {
                         w = w1;
                         h = h1;
-                    } else {
-
-                        h = h1 * w2 / w1;
-                        if (h > h2) {
-                            w = w1 * h2 / h1;
-                            h = h2;
-                        } else {
-                            w = w2;
-                        }
                     }
-                } else {
-                    w = w1;
-                    h = h1;
-                }
 
-                setAllowMove(h > h2 || w > w2);
-                Rectangle r2 = new Rectangle(getWidth() / 2 - w / 2 + offsetPoint.x, getHeight() / 2 - h / 2 + offsetPoint.y, w, h);
-                return r2;
+                    setAllowMove(h > h2 || w > w2);
+                    Rectangle r2 = new Rectangle(getWidth() / 2 - w / 2 + offsetPoint.x, getHeight() / 2 - h / 2 + offsetPoint.y, w, h);
+                    return r2;
+                }
             }
             return null;
         }
@@ -1264,7 +1270,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             Point p = lastMouseEvent == null ? null : lastMouseEvent.getPoint();
 
-            synchronized (ImagePanel.class) {
+            synchronized (ImagePanel.this) {
                 if (timer == thisTimer) {
                     cursorPosition = p;
                 }
@@ -1306,7 +1312,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         iconPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                synchronized (ImagePanel.class) {
+                synchronized (ImagePanel.this) {
                     lastMouseEvent = e;
                     redraw();
                 }
@@ -1314,7 +1320,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             @Override
             public void mouseExited(MouseEvent e) {
-                synchronized (ImagePanel.class) {
+                synchronized (ImagePanel.this) {
                     lastMouseEvent = null;
                     hideMouseSelection();
                     redraw();
@@ -1323,7 +1329,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                synchronized (ImagePanel.class) {
+                synchronized (ImagePanel.this) {
                     mouseButton = e.getButton();
                     lastMouseEvent = e;
                     redraw();
@@ -1365,7 +1371,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                synchronized (ImagePanel.class) {
+                synchronized (ImagePanel.this) {
                     mouseButton = 0;
                     lastMouseEvent = e;
                     redraw();
@@ -1382,7 +1388,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         iconPanel.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-                synchronized (ImagePanel.class) {
+                synchronized (ImagePanel.this) {
                     lastMouseEvent = e;
                     redraw();
                 }
@@ -1390,7 +1396,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                synchronized (ImagePanel.class) {
+                synchronized (ImagePanel.this) {
                     lastMouseEvent = e;
                     redraw();
                 }
@@ -1568,7 +1574,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
         };
         lda = new LocalDataArea(stage);
-        synchronized (ImagePanel.class) {
+        synchronized (ImagePanel.this) {
             stopInternal();
             if (drawable instanceof ButtonTag) {
                 frame = ButtonTag.FRAME_UP;
@@ -1610,7 +1616,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
         }
 
-        synchronized (ImagePanel.class) {
+        synchronized (ImagePanel.this) {
             if (!drawReady) {
                 clearImagePanel();
             }
@@ -1710,7 +1716,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         stopInternal();
     }
 
-    private void stopAllSounds() {
+    private synchronized void stopAllSounds() {
         for (int i = soundPlayers.size() - 1; i >= 0; i--) {
             SoundTagPlayer pl = soundPlayers.get(i);
             pl.close();
@@ -1764,7 +1770,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
         }
-
         fireMediaDisplayStateChanged();
     }
 
@@ -1999,7 +2004,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private ExportRectangle getViewRect() {
 
         Zoom zoom;
-        synchronized (ImagePanel.class) {
+        synchronized (ImagePanel.this) {
             zoom = this.zoom;
 
             if (timelined == null) {
@@ -2076,14 +2081,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Zoom zoom;
         SWF swf;
 
-        synchronized (ImagePanel.class) {
+        synchronized (ImagePanel.this) {
             timelined = this.timelined;
             lastMouseEvent = this.lastMouseEvent;
         }
 
         boolean shownAgain = false;
 
-        synchronized (ImagePanel.class) {
+        synchronized (ImagePanel.this) {
             frame = this.frame;
             time = this.time;
             if (this.frame == this.prevFrame) {
@@ -2107,7 +2112,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return;
         }
 
-        iconPanel.calcRect();
+        synchronized (ImagePanel.this) {
+            iconPanel.calcRect();
+        }
 
         RenderContext renderContext = new RenderContext();
         renderContext.displayObjectCache = displayObjectCache;
@@ -2139,18 +2146,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (display) {
                 Stopwatch sw = Stopwatch.startNew();
 
-                synchronized (lock) {
-                    Reference<Point2D> registrationPointRef = new Reference<>(registrationPoint);
-                    Reference<Rectangle2D> boundsRef = new Reference<>(bounds);
+                synchronized (ImagePanel.this) {
+                    synchronized (lock) {
+                        Reference<Point2D> registrationPointRef = new Reference<>(registrationPoint);
+                        Reference<Rectangle2D> boundsRef = new Reference<>(bounds);
 
-                    _viewRect = getViewRect();
-                    if (_viewRect.getHeight() < 0 || _viewRect.getWidth() < 0) {
-                        img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
-                    } else {
-                        img = getFrame(_viewRect, swf, frame, time, timelined, renderContext, selectedDepth, freeTransformDepth, zoomDouble, registrationPointRef, boundsRef, transform, transformUpdated == null ? null : new Matrix(transformUpdated));
+                        _viewRect = getViewRect();
+                        if (_viewRect.getHeight() < 0 || _viewRect.getWidth() < 0) {
+                            img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+                        } else {
+                            img = getFrame(_viewRect, swf, frame, time, timelined, renderContext, selectedDepth, freeTransformDepth, zoomDouble, registrationPointRef, boundsRef, transform, transformUpdated == null ? null : new Matrix(transformUpdated));
+                        }
+                        bounds = boundsRef.getVal();
+                        registrationPoint = registrationPointRef.getVal();
                     }
-                    bounds = boundsRef.getVal();
-                    registrationPoint = registrationPointRef.getVal();
                 }
 
                 sw.stop();
@@ -2240,26 +2249,32 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
 
             ButtonTag lastMouseOverButton;
-            synchronized (ImagePanel.class) {
+            int freeTransformDepth = this.freeTransformDepth;
+            synchronized (ImagePanel.this) {
                 if (timer == thisTimer) {
                     iconPanel.setImg(img);
                     lastMouseOverButton = iconPanel.mouseOverButton;
                     iconPanel.mouseOverButton = renderContext.mouseOverButton;
-                    if (ret.length() == 0) {
-                        debugLabel.setText(DEFAULT_DEBUG_LABEL_TEXT);
-                    } else {
-                        debugLabel.setText(ret.toString());
-                    }
-
-                    if (freeTransformDepth == -1) {
-                        if (handCursor) {
-                            iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                        } else if (iconPanel.hasAllowMove()) {
-                            iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-                        } else {
-                            iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    View.execInEventDispatchLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (ret.length() == 0) {
+                                debugLabel.setText(DEFAULT_DEBUG_LABEL_TEXT);
+                            } else {
+                                debugLabel.setText(ret.toString());
+                            }
+                            if (freeTransformDepth == -1) {
+                                if (handCursor) {
+                                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                                } else if (iconPanel.hasAllowMove()) {
+                                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+                                } else {
+                                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                                }
+                            }
                         }
                     }
+                    );
 
                     if (lastMouseOverButton != renderContext.mouseOverButton) {
                         ButtonTag b = renderContext.mouseOverButton;
@@ -2306,14 +2321,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void playingFinished(MediaDisplay source) {
-                    synchronized (ImagePanel.class) {
+                    synchronized (ImagePanel.this) {
                         sp.close();
                         soundPlayers.remove(sp);
                     }
                 }
             });
 
-            synchronized (ImagePanel.class) {
+            synchronized (ImagePanel.this) {
                 if (timer != null && timer == thisTimer) {
                     soundPlayers.add(sp);
                     sp.play();
@@ -2418,7 +2433,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             @Override
             public void run() {
                 try {
-                    synchronized (ImagePanel.class) {
+                    synchronized (ImagePanel.this) {
                         if (timer != thisTimer) {
                             return;
                         }
@@ -2428,7 +2443,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     long delay = getMsPerFrame();
                     if (isSingleFrame) {
                         drawFrame(thisTimer, true);
-                        /*synchronized (ImagePanel.class) {
+                        /*synchronized (ImagePanel.this) {
                             thisTimer.cancel();
                             if (timer == thisTimer) {
                                 timer = null;
@@ -2487,7 +2502,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             delay = nextFrameOverMaxTimeMsShouldBe - afterDrawFrameTimeMsIs;
                         }
                     }
-                    synchronized (ImagePanel.class) {
+                    synchronized (ImagePanel.this) {
                         if (timer != thisTimer) {
                             return;
                         }
