@@ -2515,8 +2515,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
         };
-        if (timer != null) {
-            timer.schedule(task, msDelay);
+        synchronized (ImagePanel.this) {
+            if (timer != null) {
+                timer.schedule(task, msDelay);
+            }
         }
     }
 
