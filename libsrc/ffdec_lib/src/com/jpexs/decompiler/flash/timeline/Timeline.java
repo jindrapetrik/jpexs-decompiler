@@ -660,10 +660,12 @@ public class Timeline {
         fg.drawRect((int) (viewRectZoom.xMin / SWF.unitDivisor + 5), (int) (viewRectZoom.yMin / SWF.unitDivisor + 5), (int) (viewRectZoom.getWidth() / SWF.unitDivisor - 5), (int) (viewRectZoom.getHeight() / SWF.unitDivisor - 5));
          */
         if (!viewRectZoom.intersects(fullRect)) {
-            //System.err.println("hidden " + layer.characterId);           
+            if (clipDepth > -1) {
+                Clip clip = new Clip(new Area(), clipDepth);
+                clips.add(clip);
+            }
             return;
         }
-
         strokeTransform = strokeTransform.concatenate(layerMatrix);
 
         boolean cacheAsBitmap = layer.cacheAsBitmap() && layer.placeObjectTag != null && drawable.isSingleFrame();
