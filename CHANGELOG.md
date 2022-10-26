@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - Minimum stroke width should be 1 px
 - [#1828] Closing path in shape strokes from last moveTo only
 - Shape not clipped when clip area ouside of view
+- Sound tag player now uses less memory / threads - does not use Clip sound class
 
 ### Changed
 - AS3 integer values are internally (e.g. in the lib) handled as java int type instead of long.
