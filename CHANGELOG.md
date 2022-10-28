@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - [#1695] Freetransform tool vs zooming
 - [#1752] Freetransform tool on sprites with offset
 - [#1711] DefineFont2-3 advance values need to be handled as unsigned (UI16)
+- Leading of the font can be set to negative value
 
 ### Changed
 - AS3 integer values are internally (e.g. in the lib) handled as java int type instead of long.
