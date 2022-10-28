@@ -366,6 +366,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         private Point dragStart = null;
 
+        private synchronized Point getDragStart() {
+            return dragStart;
+        }
+
+        private synchronized void setDragStart(Point dragStart) {
+            this.dragStart = dragStart;
+        }
+
         private synchronized SerializableImage getImg() {
             return _img;
         }
@@ -463,7 +471,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     if (e.getButton() == MouseEvent.BUTTON1) {
-                        dragStart = e.getPoint();
+                        mouseMoved(e); //to correctly calculate mode, because moseMoved event is not called during dragging
+                        setDragStart(e.getPoint());
                     }
                     requestFocusInWindow();
                 }
@@ -483,6 +492,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                         mode = Cursor.DEFAULT_CURSOR;
                     }
+                }
+
+                private void stopDragging() {
+
                 }
 
                 @Override
@@ -1017,68 +1030,70 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         boolean shearY = ey > bounds.getY() && ey < bounds.getY() + bounds.getHeight();
 
                         Cursor cursor;
+                        int newMode;
                         if (top && left) {
-                            mode = Cursor.NW_RESIZE_CURSOR;
+                            newMode = Cursor.NW_RESIZE_CURSOR;
                             cursor = resizeNWSECursor;
                         } else if (bottom && left) {
-                            mode = Cursor.SW_RESIZE_CURSOR;
+                            newMode = Cursor.SW_RESIZE_CURSOR;
                             cursor = resizeSWNECursor;
                         } else if (top && right) {
-                            mode = Cursor.NE_RESIZE_CURSOR;
+                            newMode = Cursor.NE_RESIZE_CURSOR;
                             cursor = resizeSWNECursor;
                         } else if (bottom && right) {
-                            mode = Cursor.SE_RESIZE_CURSOR;
+                            newMode = Cursor.SE_RESIZE_CURSOR;
                             cursor = resizeNWSECursor;
                         } else if (top && xcenter) {
-                            mode = Cursor.N_RESIZE_CURSOR;
+                            newMode = Cursor.N_RESIZE_CURSOR;
                             cursor = resizeYCursor;
                         } else if (bottom && xcenter) {
-                            mode = Cursor.S_RESIZE_CURSOR;
+                            newMode = Cursor.S_RESIZE_CURSOR;
                             cursor = resizeYCursor;
                         } else if (left && ycenter) {
-                            mode = Cursor.W_RESIZE_CURSOR;
+                            newMode = Cursor.W_RESIZE_CURSOR;
                             cursor = resizeXCursor;
                         } else if (right && ycenter) {
-                            mode = Cursor.E_RESIZE_CURSOR;
+                            newMode = Cursor.E_RESIZE_CURSOR;
                             cursor = resizeXCursor;
                         } else if (registration) {
-                            mode = Cursor.HAND_CURSOR;
+                            newMode = Cursor.HAND_CURSOR;
                             cursor = moveRegPointCursor;
                         } else if (!inBounds && rightRotate && topRotate) {
-                            mode = MODE_ROTATE_NE;
+                            newMode = MODE_ROTATE_NE;
                             cursor = rotateCursor;
                         } else if (!inBounds && rightRotate && bottomRotate) {
-                            mode = MODE_ROTATE_SE;
+                            newMode = MODE_ROTATE_SE;
                             cursor = rotateCursor;
                         } else if (!inBounds && leftRotate && topRotate) {
-                            mode = MODE_ROTATE_NW;
+                            newMode = MODE_ROTATE_NW;
                             cursor = rotateCursor;
                         } else if (!inBounds && leftRotate && bottomRotate) {
-                            mode = MODE_ROTATE_SW;
+                            newMode = MODE_ROTATE_SW;
                             cursor = rotateCursor;
                         } else if (shearY && (left || right)) {
                             if (left) {
-                                mode = MODE_SHEAR_W;
+                                newMode = MODE_SHEAR_W;
                             } else {
-                                mode = MODE_SHEAR_E;
+                                newMode = MODE_SHEAR_E;
                             }
                             cursor = shearYCursor;
                         } else if (shearX && (top || bottom)) {
                             if (top) {
-                                mode = MODE_SHEAR_N;
+                                newMode = MODE_SHEAR_N;
                             } else {
-                                mode = MODE_SHEAR_S;
+                                newMode = MODE_SHEAR_S;
                             }
                             cursor = shearXCursor;
                         } else if (inBounds) {
-                            mode = Cursor.MOVE_CURSOR;
+                            newMode = Cursor.MOVE_CURSOR;
                             cursor = moveCursor;
                         } else {
-                            mode = Cursor.DEFAULT_CURSOR;
+                            newMode = Cursor.DEFAULT_CURSOR;
                             cursor = selectCursor;
                         }
 
                         setCursor(cursor);
+                        mode = newMode;
                     }
                 }
 
