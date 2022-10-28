@@ -722,6 +722,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeEditButton.setEnabled(true);
         placeSaveButton.setVisible(false);
         placeCancelButton.setVisible(false);
+        placeFreeTransformButton.setVisible(true);
     }
 
     public void setImageReplaceButtonVisible(boolean show, boolean showAlpha) {
@@ -742,7 +743,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
             if (treeItem instanceof SWF) {
                 SWF swf = (SWF) treeItem;
-                try (FileOutputStream fos = new FileOutputStream(extTempFile)) {
+                try ( FileOutputStream fos = new FileOutputStream(extTempFile)) {
                     swf.saveTo(fos);
                 }
             } else {
@@ -765,7 +766,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 }
 
                 SWFHeader header;
-                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(extTempFile))) {
+                try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(extTempFile))) {
                     header = new PreviewExporter().exportSwf(fos, treeItem, backgroundColor, fontPageNum, true);
                 }
             }
@@ -803,7 +804,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
 
             SWFHeader header;
-            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+            try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
                 header = new PreviewExporter().exportSwf(fos, treeItem, backgroundColor, fontPageNum, false);
             }
 
@@ -835,19 +836,19 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
         try {
             tempFile = File.createTempFile("ffdec_view_", ".swf");
-            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+            try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
                 swf.saveTo(fos, false);
             }
             //Inject Loader
             if (swf.isAS3() && Configuration.autoOpenLoadedSWFs.get() && Configuration.useAdobeFlashPlayerForPreviews.get() && !DebuggerTools.hasDebugger(swf)) {
                 SWF instrSWF;
-                try (InputStream fis = new BufferedInputStream(new FileInputStream(tempFile))) {
+                try ( InputStream fis = new BufferedInputStream(new FileInputStream(tempFile))) {
                     instrSWF = new SWF(fis, false, false);
                 }
 
                 DebuggerTools.switchDebugger(instrSWF);
                 DebuggerTools.injectDebugLoader(instrSWF);
-                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+                try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
                     instrSWF.saveTo(fos);
                 }
             }

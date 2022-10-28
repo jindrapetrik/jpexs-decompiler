@@ -25,6 +25,8 @@ All notable changes to this project will be documented in this file.
 - Shape not clipped when clip area ouside of view
 - Sound tag player now uses less memory / threads - does not use Clip sound class
 - Freetransform tool dragging not always started on mousedown
+- [#1695] Freetransform tool vs zooming
+- [#1752] Freetransform tool on sprites with offset
 
 ### Changed
 - AS3 integer values are internally (e.g. in the lib) handled as java int type instead of long.
@@ -2399,6 +2401,8 @@ All notable changes to this project will be documented in this file.
 [#1829]: https://www.free-decompiler.com/flash/issues/1829
 [#1828]: https://www.free-decompiler.com/flash/issues/1828
 [#1771]: https://www.free-decompiler.com/flash/issues/1771
+[#1695]: https://www.free-decompiler.com/flash/issues/1695
+[#1752]: https://www.free-decompiler.com/flash/issues/1752
 [#270]: https://www.free-decompiler.com/flash/issues/270
 [#1718]: https://www.free-decompiler.com/flash/issues/1718
 [#1801]: https://www.free-decompiler.com/flash/issues/1801

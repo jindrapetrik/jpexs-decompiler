@@ -158,6 +158,10 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
 
     @Override
     public void resetTimeline() {
+        Cache<CharacterTag, RECT> cache = swf == null ? null : swf.getRectCache();
+        if (cache != null) {
+            cache.remove(this);
+        }
         if (timeline != null) {
             timeline.reset(swf, this, spriteId, getRect());
         }

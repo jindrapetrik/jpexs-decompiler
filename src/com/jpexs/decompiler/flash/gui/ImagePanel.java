@@ -271,6 +271,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         m.scale(zoom);
 
                         Matrix eMatrix = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).inverse();
+                        eMatrix.translate(_rect.x < 0 ? -_rect.x : 0, _rect.y < 0 ? -_rect.y : 0);
 
                         return transform.preConcatenate(eMatrix).toMATRIX();
                     }
@@ -549,12 +550,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         if (transform == null) {
                             return;
                         }
-                        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
 
-                        int ex = e.getX() - _rect.x - (int) (_viewRect.xMin * zoomDouble / SWF.unitDivisor);
-                        int ey = e.getY() - _rect.y - (int) (_viewRect.yMin * zoomDouble / SWF.unitDivisor);
-                        int dsx = dragStart.x - _rect.x - (int) (_viewRect.xMin * zoomDouble / SWF.unitDivisor);
-                        int dsy = dragStart.y - _rect.y - (int) (_viewRect.yMin * zoomDouble / SWF.unitDivisor);
+                        int ex = e.getX() - (_rect.x < 0 ? 0 : _rect.x);
+                        int ey = e.getY() - (_rect.y < 0 ? 0 : _rect.y);
+                        int dsx = dragStart.x - (_rect.x < 0 ? 0 : _rect.x);
+                        int dsy = dragStart.y - (_rect.y < 0 ? 0 : _rect.y);
+
                         if (mode == MODE_SHEAR_N) {
 
                             double shearX = -(ex - dsx) / (bounds.getHeight());
@@ -996,9 +997,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             return;
                         }
 
-                        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
-                        int ex = e.getX() - _rect.x - (int) (_viewRect.xMin * zoomDouble / SWF.unitDivisor);
-                        int ey = e.getY() - _rect.y - (int) (_viewRect.yMin * zoomDouble / SWF.unitDivisor);
+                        int ex = e.getX() - (_rect.x < 0 ? 0 : _rect.x);
+                        int ey = e.getY() - (_rect.y < 0 ? 0 : _rect.y);
 
                         boolean left = ex >= bounds.getX() - TOLERANCE_SCALESHEAR && ex <= bounds.getX() + TOLERANCE_SCALESHEAR;
                         boolean right = ex >= bounds.getX() + bounds.getWidth() - TOLERANCE_SCALESHEAR && ex <= bounds.getX() + bounds.getWidth() + TOLERANCE_SCALESHEAR;
@@ -2112,8 +2112,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             this.prevFrame = this.frame;
             cursorPosition = this.cursorPosition;
-            if (cursorPosition
-                    != null) {
+            if (cursorPosition != null) {
                 cursorPosition = iconPanel.toImagePoint(cursorPosition);
             }
 
