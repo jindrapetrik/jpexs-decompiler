@@ -75,6 +75,7 @@ import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 /**
  *
@@ -428,6 +429,7 @@ public class SelectTagPositionDialog extends AppDialog {
         positionTree.setShowsRootHandles(true);
         positionTree.addTreeSelectionListener(this::spriteValueChanged);
         positionTree.addTreeSelectionListener(this::positionTreeValueChanged);
+        positionTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
         previewPanel = new PreviewPanel(Main.getMainFrame().getPanel(), null);
         previewPanel.setReadOnly(true);
