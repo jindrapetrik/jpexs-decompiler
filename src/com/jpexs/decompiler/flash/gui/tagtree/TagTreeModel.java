@@ -94,6 +94,8 @@ public class TagTreeModel implements TreeModel {
     private final Map<SWF, TagTreeSwfInfo> swfInfos = new HashMap<>();
 
     private final boolean addAllFolders;
+    
+    private final Map<TreeItem, TreePath> pathCache = new HashMap<>();
 
     public TagTreeModel(List<SWFList> swfs, boolean addAllFolders) {
         this.swfs = swfs;
@@ -432,17 +434,28 @@ public class TagTreeModel implements TreeModel {
     }
 
     public TreePath getTreePath(TreeItem obj) {
-        List<TreeItem> path = new ArrayList<>();
-        path.add(root);
-        if (obj != root) {
-            path = searchTreeItem(obj, root, path);
-        }
-        if (path == null) {
-            return null;
-        }
+        TreePath ret = pathCache.get(obj);
+        
+        if(ret == null) {
+            List<TreeItem> path = new ArrayList<>();
+            path.add(root);
+            if (obj != root) {
+                path = searchTreeItem(obj, root, path);
+            }
+            if (path == null) {
+                return null;
+            }
 
-        TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
-        return tp;
+            TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
+            pathCache.put(obj, tp);
+            return tp;
+        }
+        
+        return ret;
+    }
+    
+    public TreeItem getParent(TreeItem obj) {
+        return (TreeItem)getTreePath(obj).getParentPath().getLastPathComponent();
     }
 
     @Override
