@@ -1841,9 +1841,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         Tag t = (Tag)items.get(0);
         TreePath path = tagTree.getSelectionPath();
         Timelined timelined = null;
-        for (int i = path.getPathCount()-1; i >= 0; i--) {
-            if ((path.getPathComponent(i) instanceof DefineSpriteTag)||(path.getPathComponent(i) instanceof SWF)) {
+        for (int i = path.getPathCount() - 1 - 1 /*not last path component*/; i >= 0; i--) {
+            if ((path.getPathComponent(i) instanceof DefineSpriteTag) || (path.getPathComponent(i) instanceof SWF)) {
                 timelined = (Timelined)path.getPathComponent(i);
+                break;
             }
         }
         if (timelined == null) { //should not happen
