@@ -19,32 +19,12 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import static com.jpexs.decompiler.flash.gui.AppDialog.CANCEL_OPTION;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
-import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
-import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
-import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
-import com.jpexs.decompiler.flash.tags.DoABC2Tag;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
-import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
-import com.jpexs.decompiler.flash.tags.FileAttributesTag;
-import com.jpexs.decompiler.flash.tags.MetadataTag;
-import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.base.ButtonTag;
-import com.jpexs.decompiler.flash.tags.base.FontTag;
-import com.jpexs.decompiler.flash.tags.base.ImageTag;
-import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
-import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
-import com.jpexs.decompiler.flash.tags.base.RemoveTag;
-import com.jpexs.decompiler.flash.tags.base.ShapeTag;
-import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
-import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -203,7 +183,7 @@ public class SelectTagPositionDialog extends AppDialog {
         }
     }
 
-    private void populateNodes(MyTreeNode root, Timelined tim, int currentFrame) {
+    private void populateNodes(MyTreeNode root, Timelined tim) {
         int f = 1;
 
         MyTreeNode frameNode = new MyTreeNode();
@@ -218,7 +198,7 @@ public class SelectTagPositionDialog extends AppDialog {
 
             if (t instanceof DefineSpriteTag) {
                 if (allowInsideSprites) {
-                    populateNodes(node, (DefineSpriteTag) t, 1);
+                    populateNodes(node, (DefineSpriteTag) t);
                 }
             }
             if (t instanceof ShowFrameTag) {
@@ -308,7 +288,6 @@ public class SelectTagPositionDialog extends AppDialog {
             }
             return renderer;
         }
-
     }
 
     public SelectTagPositionDialog(Window parent, SWF swf, Tag selectedTag, Timelined selectedTimelined, boolean allowInsideSprites) {
@@ -334,7 +313,7 @@ public class SelectTagPositionDialog extends AppDialog {
         MyTreeNode root = new MyTreeNode();
         root.setData("root");
 
-        populateNodes(root, swf, 1);
+        populateNodes(root, swf);
 
         positionTree = new JTree(root) {
             @Override
