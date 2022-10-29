@@ -96,6 +96,7 @@ public class SelectTagPositionDialog extends AppDialog {
 
     private Tag selectedTag = null;
     private Timelined selectedTimelined = null;
+    private boolean allowInsideSprites;
 
     private static class MyTreeNode implements TreeNode {
 
@@ -216,7 +217,9 @@ public class SelectTagPositionDialog extends AppDialog {
             frameNode.addChild(node);
 
             if (t instanceof DefineSpriteTag) {
-                populateNodes(node, (DefineSpriteTag) t, 1);
+                if (allowInsideSprites) {
+                    populateNodes(node, (DefineSpriteTag) t, 1);
+                }
             }
             if (t instanceof ShowFrameTag) {
                 f++;
@@ -259,8 +262,8 @@ public class SelectTagPositionDialog extends AppDialog {
         }
     }
 
-    public SelectTagPositionDialog(Window parent, SWF swf) {
-        this(parent, swf, null, null);
+    public SelectTagPositionDialog(Window parent, SWF swf, boolean allowInsideSprites) {
+        this(parent, swf, null, null, allowInsideSprites);
     }
 
     private static class PositionTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -342,11 +345,12 @@ public class SelectTagPositionDialog extends AppDialog {
 
     }
 
-    public SelectTagPositionDialog(Window parent, SWF swf, Tag selectedTag, Timelined selectedTimelined) {
+    public SelectTagPositionDialog(Window parent, SWF swf, Tag selectedTag, Timelined selectedTimelined, boolean allowInsideSprites) {
         super(parent);
         this.swf = swf;
         this.selectedTag = selectedTag;
         this.selectedTimelined = selectedTimelined;
+        this.allowInsideSprites = allowInsideSprites;
         setTitle(translate("dialog.title"));
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         Container cnt = getContentPane();
@@ -461,7 +465,7 @@ public class SelectTagPositionDialog extends AppDialog {
     
     private Timelined getCurrentSelectedTimelined() {
         TreePath path = positionTree.getSelectionPath();
-        for (int i = path.getPathCount() - 1; i >= 0; i--) {
+        for (int i = path.getPathCount() - 1 - 1 /*sprite can be last, use its parent*/; i >= 0; i--) {
             MyTreeNode node = (MyTreeNode) path.getPathComponent(i);
             if ("root".equals(node.getData())) {
                 return swf;

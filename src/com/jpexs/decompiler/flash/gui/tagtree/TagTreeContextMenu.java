@@ -44,14 +44,23 @@ import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
+import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
+import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
+import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
+import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
+import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
+import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -1841,7 +1850,26 @@ public class TagTreeContextMenu extends JPopupMenu {
             return;
         }
         
-        SelectTagPositionDialog dialog = new SelectTagPositionDialog(Main.getDefaultDialogsOwner(), t.getSwf(), t, timelined);
+        boolean allowedInsideSprite = false;
+        switch(t.getId()){
+            case ShowFrameTag.ID:
+            case PlaceObjectTag.ID:
+            case PlaceObject2Tag.ID:
+            case PlaceObject3Tag.ID:
+            case PlaceObject4Tag.ID:
+            case RemoveObjectTag.ID:
+            case RemoveObject2Tag.ID:
+            case StartSoundTag.ID:
+            case FrameLabelTag.ID:
+            case SoundStreamHeadTag.ID:
+            case SoundStreamHead2Tag.ID:
+            case SoundStreamBlockTag.ID:
+            case VideoFrameTag.ID:
+            case EndTag.ID:
+                allowedInsideSprite = true;
+        }
+        
+        SelectTagPositionDialog dialog = new SelectTagPositionDialog(Main.getDefaultDialogsOwner(), t.getSwf(), t, timelined, allowedInsideSprite);
         if (dialog.showDialog() == AppDialog.OK_OPTION){
             Tag selectedTag = dialog.getSelectedTag();
             Timelined selectedTimelined = dialog.getSelectedTimelined();            
@@ -1855,6 +1883,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             } else {
                 selectedTimelined.addTag(selectedTimelined.indexOfTag(selectedTag), t);
             }
+            t.setTimelined(selectedTimelined);
             timelined.resetTimeline();
             if (timelined != selectedTimelined) {
                 selectedTimelined.resetTimeline();

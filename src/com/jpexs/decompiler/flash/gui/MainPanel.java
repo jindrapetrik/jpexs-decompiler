@@ -3655,8 +3655,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 //}                
             }
         } else if ((treeItem instanceof PlaceObjectTypeTag)) {// && (previewPanel != dumpPreviewPanel)) {
-            //TreePath path = tagTree.getModel().getTreePath(treeItem);
-            //Frame frame = (Frame) path.getParentPath().getLastPathComponent();
             previewPanel.showPlaceTagPanel((PlaceObjectTypeTag) treeItem, frame);
         } else if (treeItem instanceof MetadataTag) {
             MetadataTag metadataTag = (MetadataTag) treeItem;
