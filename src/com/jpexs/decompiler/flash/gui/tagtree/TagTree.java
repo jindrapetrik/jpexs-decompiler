@@ -72,6 +72,7 @@ import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.EnableDebugger2Tag;
 import com.jpexs.decompiler.flash.tags.EnableDebuggerTag;
 import com.jpexs.decompiler.flash.tags.EnableTelemetryTag;
+import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.FrameLabelTag;
@@ -154,7 +155,7 @@ public class TagTree extends JTree {
     static {
         ICONS = new HashMap<>();
         for (TreeNodeType treeNodeType : TreeNodeType.values()) {
-            if (treeNodeType != TreeNodeType.UNKNOWN && treeNodeType != TreeNodeType.SHOW_FRAME) {
+            if (treeNodeType != TreeNodeType.UNKNOWN) {
                 String tagTypeStr = treeNodeType.toString().toLowerCase(Locale.ENGLISH).replace("_", "");
                 ICONS.put(treeNodeType, View.getIcon(tagTypeStr + "16"));
             }
@@ -446,6 +447,11 @@ public class TagTree extends JTree {
         if (t instanceof RemoveTag) {
             return TreeNodeType.REMOVE_OBJECT;
         }
+        
+        if (t instanceof EndTag) {
+            return TreeNodeType.END;
+        }
+        
         if (t instanceof Tag) {
             return TreeNodeType.OTHER_TAG;
         }

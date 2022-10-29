@@ -270,7 +270,7 @@ public class SelectTagPositionDialog extends AppDialog {
     private static class PositionTreeCellRenderer extends DefaultTreeCellRenderer {
 
         private boolean selected;
-
+               
         public PositionTreeCellRenderer() {
             if (View.isOceanic()) {
                 setUI(new BasicLabelUI());
@@ -290,55 +290,15 @@ public class SelectTagPositionDialog extends AppDialog {
                 if (value instanceof MyTreeNode) {
                     subValue = ((MyTreeNode) value).getData();
                 }
-                TreeNodeType nodeType;
-                if (subValue instanceof MyFrame) {
-                    nodeType = TreeNodeType.FRAME;
-                } else if (subValue instanceof FontTag) {
-                    nodeType = TreeNodeType.FONT;
-                } else if (subValue instanceof TextTag) {
-                    nodeType = TreeNodeType.TEXT;
-                } else if (subValue instanceof ImageTag) {
-                    nodeType = TreeNodeType.IMAGE;
-                } else if (subValue instanceof ShapeTag) {
-                    nodeType = TreeNodeType.SHAPE;
-                } else if (subValue instanceof MorphShapeTag) {
-                    nodeType = TreeNodeType.MORPH_SHAPE;
-                } else if (subValue instanceof DefineSpriteTag) {
-                    nodeType = TreeNodeType.SPRITE;
-                } else if (subValue instanceof ButtonTag) {
-                    nodeType = TreeNodeType.BUTTON;
-                } else if (subValue instanceof DefineVideoStreamTag) {
-                    nodeType = TreeNodeType.MOVIE;
-                } else if ((subValue instanceof DefineSoundTag) || (subValue instanceof SoundStreamHeadTypeTag) || (subValue instanceof SoundStreamBlockTag)) {
-                    nodeType = TreeNodeType.SOUND;
-                } else if (subValue instanceof DefineBinaryDataTag) {
-                    nodeType = TreeNodeType.BINARY_DATA;
-                } else if ((subValue instanceof DoActionTag)
-                        || (subValue instanceof DoInitActionTag)
-                        || (subValue instanceof DoABCTag)
-                        || (subValue instanceof DoABC2Tag)) {
-                    nodeType = TreeNodeType.AS;
-                } else if (subValue instanceof ShowFrameTag) {
-                    nodeType = TreeNodeType.FRAME;
-                } else if (subValue instanceof SetBackgroundColorTag) {
-                    nodeType = TreeNodeType.SET_BACKGROUNDCOLOR;
-                } else if (subValue instanceof FileAttributesTag) {
-                    nodeType = TreeNodeType.FILE_ATTRIBUTES;
-                } else if (subValue instanceof MetadataTag) {
-                    nodeType = TreeNodeType.METADATA;
-                } else if (subValue instanceof PlaceObjectTypeTag) {
-                    nodeType = TreeNodeType.PLACE_OBJECT;
-                } else if (subValue instanceof RemoveTag) {
-                    nodeType = TreeNodeType.REMOVE_OBJECT;
-                } else if (subValue instanceof MyTimelineEnd) {
-                    nodeType = null;
-                } else {
-                    nodeType = TreeNodeType.OTHER_TAG;
+                if (subValue instanceof MyTimelineEnd) {
+                    lab.setIcon(TagTree.getIconForType(TreeNodeType.END));
                 }
-                if (nodeType == null) {
-                    //nothing
-                } else {
-                    lab.setIcon(TagTree.getIconForType(nodeType));
+                
+                if (subValue instanceof MyFrame) {
+                    lab.setIcon(TagTree.getIconForType(TreeNodeType.FRAME));
+                }
+                if (subValue instanceof TreeItem) {
+                    lab.setIcon(TagTree.getIconForType(TagTree.getTreeNodeType((TreeItem)subValue)));
                 }
             }
             return renderer;
