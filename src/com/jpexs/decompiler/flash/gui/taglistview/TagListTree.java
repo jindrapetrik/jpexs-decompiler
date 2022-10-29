@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
@@ -79,15 +80,18 @@ public class TagListTree extends JTree {
         if (swfs == null) {
             return false;
         }
-        root = new TagListTreeNode();
-        root.setData("root");
+        TagListTreeNode newRoot = new TagListTreeNode();
+        newRoot.setData("root");
         for (SWFList swfList : swfs) {
-            populateNodes(root, swfList);
+            populateNodes(newRoot, swfList);
         }
 
         List<List<String>> expandedNodes = View.getExpandedNodes(this);            
-        setModel(new DefaultTreeModel(root));
+        setModel(new DefaultTreeModel(newRoot));
+        
         View.expandTreeNodes(this, expandedNodes);
+        
+        root = newRoot;        
         return true;
     }
 
@@ -121,7 +125,11 @@ public class TagListTree extends JTree {
         Timeline timeline = timelined.getTimeline();
         
         TagListTreeNode frameNode = new TagListTreeNode();
-        frameNode.setData(timeline.getFrame(0));
+        Frame fr = timeline.getFrame(0);
+        if (fr == null) {
+            return;
+        }
+        frameNode.setData(fr);
         frameNode.setParent(root);
         root.addChild(frameNode);
 
@@ -136,14 +144,14 @@ public class TagListTree extends JTree {
             }            
             if (t instanceof ShowFrameTag) {
                 f++;
-                frameNode = new TagListTreeNode();
-                frameNode.setData(timeline.getFrame(f));
-                frameNode.setParent(root);
-                root.addChild(frameNode);
+                fr = timeline.getFrame(f);
+                if (fr != null) {
+                    frameNode = new TagListTreeNode();
+                    frameNode.setData(timeline.getFrame(f));
+                    frameNode.setParent(root);
+                    root.addChild(frameNode);
+                }
             }
-        }
-        if (frameNode.isLeaf()) {
-            root.removeChild(root.getChildCount() - 1);
         }
     }
 
