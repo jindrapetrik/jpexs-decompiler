@@ -608,7 +608,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         });
 
-        tagListTree = new TagListTree();
+        tagListTree = new TagListTree(this);
         tagListTree.addTreeSelectionListener(this);
 
         DragSource dragSource = DragSource.getDefaultDragSource();

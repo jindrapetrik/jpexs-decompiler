@@ -17,7 +17,9 @@
 package com.jpexs.decompiler.flash.gui.taglistview;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -49,7 +51,11 @@ public class TagListTree extends JTree {
     
     private boolean initialized = false;
     
-    public TagListTree() {
+    private MainPanel mainPanel;
+    
+    public TagListTree(MainPanel mainPanel) {
+        this.mainPanel = mainPanel;
+        
         setCellRenderer(new TagListTreeCellRenderer());
         setRootVisible(false);
         setShowsRootHandles(true);
@@ -224,9 +230,7 @@ public class TagListTree extends JTree {
     }
     
     public List<TreeItem> getSelection(SWF swf) {
-        Set<TreeItem> selected = new HashSet<>();
-        populateSelectedSwf(swf, root, selected);
-        return new ArrayList<>(selected);
+        return TagTree.getSelection(swf, getAllSelected());
     }
     
     public void populateSelectedSwf(SWF swf, TagListTreeNode node, Set<TreeItem> selected){
@@ -245,5 +249,9 @@ public class TagListTree extends JTree {
         for (int i = 0; i < node.getChildCount(); i++) {
             populateSelected((TagListTreeNode)node.getChildAt(i), selected);
         }
+    }
+    
+    public boolean hasExportableNodes() {
+        return !getSelection(mainPanel.getCurrentSwf()).isEmpty();
     }
 }
