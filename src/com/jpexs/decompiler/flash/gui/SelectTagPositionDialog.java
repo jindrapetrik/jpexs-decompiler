@@ -69,7 +69,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -390,7 +389,7 @@ public class SelectTagPositionDialog extends AppDialog {
         positionTree.addTreeSelectionListener(this::spriteValueChanged);
         positionTree.addTreeSelectionListener(this::positionTreeValueChanged);
         positionTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-
+        
         previewPanel = new PreviewPanel(Main.getMainFrame().getPanel(), null);
         previewPanel.setReadOnly(true);
         previewPanel.setPreferredSize(new Dimension(300, 1));
@@ -399,7 +398,7 @@ public class SelectTagPositionDialog extends AppDialog {
 
         JScrollPane positionTreeScrollPane = new FasterScrollPane(positionTree);
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, positionTreeScrollPane, previewPanel);
-        //splitPane.setDividerLocation(600);
+        splitPane.setDividerLocation(400);
         cnt.add(splitPane, BorderLayout.CENTER);
 
         List<Object> path = new ArrayList<>();
