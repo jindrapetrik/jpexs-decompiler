@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - data-characterId and data-characterName tags to SVG export
 - [#1731] Image viewer zoom support
 - Cloning of tags and frames
+- Changing tag position
 
 ### Fixed
 - [#1834] PlaceObject4 tags appear as Unresolved inside of DefineSprite

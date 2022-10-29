@@ -712,17 +712,18 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         showCardLeft(PLACE_TAG_CARD);
         placeTag = tag;
         oldMatrix = tag.getMatrix();
-        placeSplitPane.setDividerLocation((int) (0.6 * this.getWidth()));
+        placeSplitPane.setDividerLocation((int) (0.6 * this.getWidth()));        
+        placeGenericPanel.setVisible(!readOnly);
         placeGenericPanel.setEditMode(false, tag);
         placeImagePanel.selectDepth(-1);
         placeImagePanel.setTimelined(((Tag) tag).getTimelined(), ((Tag) tag).getSwf(), frame, true);
         placeImagePanel.selectDepth(tag.getDepth());
         parametersPanel.setVisible(false);
-        placeEditButton.setVisible(!tag.isReadOnly());
+        placeEditButton.setVisible(!tag.isReadOnly() && !readOnly);
         placeEditButton.setEnabled(true);
         placeSaveButton.setVisible(false);
         placeCancelButton.setVisible(false);
-        placeFreeTransformButton.setVisible(true);
+        placeFreeTransformButton.setVisible(!readOnly);
     }
 
     public void setImageReplaceButtonVisible(boolean show, boolean showAlpha) {
