@@ -1211,17 +1211,16 @@ public class SWFInputStream implements AutoCloseable {
             if (!skipUnusualTags) {
                 doParse = true;
             } else if (tag != null) {
+                if (tag.getId() == FileAttributesTag.ID && level == 0) { // FileAttributes 
+                    if (tag instanceof TagStub) {
+                        tag = resolveTag((TagStub) tag, level, parallel1, skipUnusualTags, lazy);
+                    }
+                    FileAttributesTag fileAttributes = (FileAttributesTag) tag;
+                    if (fileAttributes.actionScript3) {
+                        isAS3 = true;
+                    }
+                }
                 switch (tag.getId()) {
-                    case FileAttributesTag.ID: // FileAttributes
-                        if (tag instanceof TagStub) {
-                            tag = resolveTag((TagStub) tag, level, parallel1, skipUnusualTags, lazy);
-                        }
-                        FileAttributesTag fileAttributes = (FileAttributesTag) tag;
-                        if (fileAttributes.actionScript3) {
-                            isAS3 = true;
-                        }
-                        doParse = true;
-                        break;
                     case DoActionTag.ID:
                     case DoInitActionTag.ID:
                         doParse = !isAS3;
@@ -1249,7 +1248,6 @@ public class SWFInputStream implements AutoCloseable {
                         } else {
                             doParse = true;
                         }
-
                 }
             }
 

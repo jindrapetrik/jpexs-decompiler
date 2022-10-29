@@ -131,12 +131,12 @@ public class Timeline {
         }
     }
 
-    public List<Frame> getFrames() {
+    public synchronized List<Frame> getFrames() {
         ensureInitialized();
         return frames;
     }
 
-    public Frame getFrame(int index) {
+    public synchronized Frame getFrame(int index) {
         ensureInitialized();
         if (index >= frames.size()) {
             return null;
@@ -144,7 +144,7 @@ public class Timeline {
         return frames.get(index);
     }
 
-    public void addFrame(Frame frame) {
+    public synchronized void addFrame(Frame frame) {
         ensureInitialized();
         frames.add(frame);
         maxDepth = getMaxDepthInternal();
@@ -174,7 +174,7 @@ public class Timeline {
         reset(swf, swf, 0, swf.displayRect);
     }
 
-    public void reset(SWF swf, Timelined timelined, int id, RECT displayRect) {
+    public synchronized void reset(SWF swf, Timelined timelined, int id, RECT displayRect) {
         initialized = false;
         frames.clear();
         depthMaxFrame.clear();
@@ -196,7 +196,7 @@ public class Timeline {
         return maxDepth;
     }
 
-    private int getMaxDepthInternal() {
+    private synchronized int getMaxDepthInternal() {
         int max_depth = 0;
         for (Frame f : frames) {
             for (int depth : f.layers.keySet()) {
@@ -212,12 +212,12 @@ public class Timeline {
         return max_depth;
     }
 
-    public int getFrameCount() {
+    public synchronized int getFrameCount() {
         ensureInitialized();
         return frames.size();
     }
 
-    public int getRealFrameCount() {
+    public synchronized int getRealFrameCount() {
         ensureInitialized();
 
         int cnt = 1;
@@ -263,7 +263,7 @@ public class Timeline {
         return -1;
     }
 
-    private void initialize() {
+    private synchronized void initialize() {
         int frameIdx = 0;
         Frame frame = new Frame(this, frameIdx++);
         frame.layersChanged = true;
@@ -418,7 +418,7 @@ public class Timeline {
         initialized = true;
     }
 
-    private void detectTweens() {
+    private synchronized void detectTweens() {
         for (int d = 1; d <= maxDepth; d++) {
             int characterId = -1;
             int len = 0;
@@ -455,7 +455,7 @@ public class Timeline {
         }
     }
 
-    private void calculateMaxDepthFrames() {
+    private synchronized void calculateMaxDepthFrames() {
         depthMaxFrame.clear();
         for (int d = 1; d <= maxDepth; d++) {
             for (int f = frames.size() - 1; f >= 0; f--) {

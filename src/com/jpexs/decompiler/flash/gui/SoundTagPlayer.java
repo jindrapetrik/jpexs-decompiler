@@ -268,111 +268,115 @@ public class SoundTagPlayer implements MediaDisplay {
     }
 
     private void playLoop() {
-        final byte[] data = new byte[16];
 
-        setPausedFlag(false);
-        setActiveFlag(true);
-        long posBytes = 0;
-        try {
-            int numReadBytes = 0;
-            while (numReadBytes != -1) {
+        loop: while (true) {
+
+            final byte[] data = new byte[16];
+
+            setPausedFlag(false);
+            setActiveFlag(true);
+            long posBytes = 0;
+            try {
+                int numReadBytes = 0;
+                while (numReadBytes != -1) {
+
+                    if (getClosedFlag()) {
+                        break;
+                    }
+                    if (!getPausedFlag()) {
+                        if (newPositionMicrosec != null) {
+                            long newPosBytes = (long) (newPositionMicrosec / microsecPerByte);
+                            audioStream.close();
+                            reloadAudioStream();
+                            audioStream.skip(newPosBytes);
+                            newPositionMicrosec = null;
+                            posBytes = newPosBytes;
+                        }
+
+                        numReadBytes = audioStream.read(data, 0, data.length);
+                        if (numReadBytes != -1) {
+                            posBytes += numReadBytes;
+                            if (sourceLine.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+                                //((FloatControl) sourceLine.getControl(FloatControl.Type.MASTER_GAIN)).setValue(volume_dB);
+                            }
+                            sourceLine.write(data, 0, numReadBytes);
+                            synchronized (playLock) {
+                                positionMicrosec = microsecPerByte * posBytes;
+                            }
+                        }
+                    }
+
+                    if (getPausedFlag()) {
+                        synchronized (thread) {
+                            try {
+                                thread.wait(1000);
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                }
 
                 if (getClosedFlag()) {
-                    break;
+                    sourceLine.drain();
+                    sourceLine.stop();
+                    sourceLine.close();
                 }
-                if (!getPausedFlag()) {
-                    if (newPositionMicrosec != null) {
-                        long newPosBytes = (long) (newPositionMicrosec / microsecPerByte);
-                        audioStream.close();
-                        reloadAudioStream();
-                        audioStream.skip(newPosBytes);
-                        newPositionMicrosec = null;
-                        posBytes = newPosBytes;
-                    }
-
-                    numReadBytes = audioStream.read(data, 0, data.length);
-                    if (numReadBytes != -1) {
-                        posBytes += numReadBytes;
-                        if (sourceLine.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-                            //((FloatControl) sourceLine.getControl(FloatControl.Type.MASTER_GAIN)).setValue(volume_dB);
-                        }
-                        sourceLine.write(data, 0, numReadBytes);
-                        synchronized (playLock) {
-                            positionMicrosec = microsecPerByte * posBytes;
-                        }
-                    }
-                }
-
-                if (getPausedFlag()) {
-                    synchronized (thread) {
-                        try {
-                            thread.wait(1000);
-                        } catch (InterruptedException ex) {
-                            Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                }
+                audioStream.close();
+            } catch (IOException ex) {
+                Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UnsupportedAudioFileException ex) {
+                Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            if (getClosedFlag()) {
-                sourceLine.drain();
-                sourceLine.stop();
-                sourceLine.close();
-            }
-            audioStream.close();
-        } catch (IOException ex) {
-            Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedAudioFileException ex) {
-            Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            if (!getClosedFlag()) {
+                decreaseLoopCount();
 
-        if (!getClosedFlag()) {
-            decreaseLoopCount();
-
-            int currentLoopCount;
-            synchronized (playLock) {
-                currentLoopCount = loopCount;
-            }
-
-            if (currentLoopCount > 0) {
-                try {
-                    reloadAudioStream();
-                    playLoop();
-                } catch (IOException ex) {
-                    Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (UnsupportedAudioFileException ex) {
-                    Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
+                int currentLoopCount;
+                synchronized (playLock) {
+                    currentLoopCount = loopCount;
                 }
-            } else {
-                setActiveFlag(false);
-                firePlayingFinished();
 
-                if (getClosedFlag()) {
-                    return;
-                }
-                synchronized (thread) {
+                if (currentLoopCount > 0) {
                     try {
-                        thread.wait();
-                    } catch (InterruptedException ex) {
+                        reloadAudioStream();
+                        continue loop;
+                    } catch (IOException ex) {
+                        Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (UnsupportedAudioFileException ex) {
+                        Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    setActiveFlag(false);
+                    firePlayingFinished();
+
+                    if (getClosedFlag()) {
                         return;
                     }
-                }
+                    synchronized (thread) {
+                        try {
+                            thread.wait();
+                        } catch (InterruptedException ex) {
+                            return;
+                        }
+                    }
 
-                if (getClosedFlag()) {
-                    return;
-                }
-                setActiveFlag(true);
+                    if (getClosedFlag()) {
+                        return;
+                    }
+                    setActiveFlag(true);
 
-                try {
-                    reloadAudioStream();
-                    playLoop();
-                } catch (IOException ex) {
-                    Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (UnsupportedAudioFileException ex) {
-                    Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    try {
+                        reloadAudioStream();
+                        continue loop;
+                    } catch (IOException ex) {
+                        Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (UnsupportedAudioFileException ex) {
+                        Logger.getLogger(SoundTagPlayer.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
-
+            break;
         }
     }
 

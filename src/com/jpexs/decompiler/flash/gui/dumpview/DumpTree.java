@@ -72,6 +72,7 @@ import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -183,6 +184,7 @@ public class DumpTree extends JTree {
                             case DefineSoundTag.NAME:
                             case SoundStreamHeadTag.NAME:
                             case SoundStreamHead2Tag.NAME:
+                            case SoundStreamBlockTag.NAME:                                    
                                 nodeType = TreeNodeType.SOUND;
                                 break;
                             case DefineBinaryDataTag.NAME:
