@@ -612,7 +612,7 @@ public class TagTree extends JTree {
         return getSelection(swf, sel);
     }
 
-    public List<TreeItem> getSelection(SWF swf, List<TreeItem> sel) {
+    public static List<TreeItem> getSelection(SWF swf, List<TreeItem> sel) {
         List<TreeItem> ret = new ArrayList<>();
         for (TreeItem d : sel) {
             if (d instanceof SWFList) {

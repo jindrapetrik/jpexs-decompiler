@@ -524,13 +524,20 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
             }
         }
+        
+        boolean hasExportableNodes = false;
+        if (currentView == MainPanel.VIEW_RESOURCES) {
+            hasExportableNodes = tagTree.hasExportableNodes();
+        } else if (currentView == MainPanel.VIEW_TAGLIST) {
+            hasExportableNodes =  tagListTree.hasExportableNodes();
+        }
 
         expandRecursiveMenuItem.setVisible(false);
         removeMenuItem.setVisible(canRemove);
         removeWithDependenciesMenuItem.setVisible(canRemove && !allDoNotHaveDependencies);
         cloneTagMenuItem.setVisible(allSelectedIsTagOrFrame && allSelectedSameParent);
         undoTagMenuItem.setVisible(allSelectedIsTag);
-        exportSelectionMenuItem.setEnabled(currentView == MainPanel.VIEW_RESOURCES ? tagTree.hasExportableNodes() : true); //?
+        exportSelectionMenuItem.setEnabled(hasExportableNodes); //?
         replaceMenuItem.setVisible(false);
         replaceNoFillMenuItem.setVisible(false);
         replaceWithTagMenuItem.setVisible(false);
