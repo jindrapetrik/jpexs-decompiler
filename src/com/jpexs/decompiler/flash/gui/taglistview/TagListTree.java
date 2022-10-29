@@ -24,9 +24,13 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JTree;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeModel;
@@ -66,11 +70,15 @@ public class TagListTree extends JTree {
        
     public void setSwfs(List<SWFList> swfs) {                
         this.swfs = swfs;
-        updateSwfs();
-        initialized = true;
+        if (updateSwfs()) {
+            initialized = true;
+        }
     }
     
-    public void updateSwfs() {
+    public boolean updateSwfs() {
+        if (swfs == null) {
+            return false;
+        }
         root = new TagListTreeNode();
         root.setData("root");
         for (SWFList swfList : swfs) {
@@ -80,6 +88,7 @@ public class TagListTree extends JTree {
         List<List<String>> expandedNodes = View.getExpandedNodes(this);            
         setModel(new DefaultTreeModel(root));
         View.expandTreeNodes(this, expandedNodes);
+        return true;
     }
 
     private void populateNodes(TagListTreeNode parent, Object obj) {
@@ -149,9 +158,9 @@ public class TagListTree extends JTree {
         }
     }
     
-    
+            
     public TreePath getPathForData(Object data) {
-        TagListTreeNode node = getNodeForData(root, data);
+        TagListTreeNode node = getNodeForData(data);
         if (node == null) {
             return new TreePath(new Object[0]);
         }
@@ -169,7 +178,11 @@ public class TagListTree extends JTree {
         return new TreePath(pathArr);
     }
     
-    public TagListTreeNode getNodeForData(TagListTreeNode startNode, Object data) {
+    public TagListTreeNode getNodeForData(Object data) {
+        return getNodeForData(root, data);
+    }
+    
+    private TagListTreeNode getNodeForData(TagListTreeNode startNode, Object data) {
         if (startNode.getData() == data) {
             return startNode;
         }
@@ -180,5 +193,49 @@ public class TagListTree extends JTree {
             }
         }
         return null;
+    }
+    
+    public List<TreeItem> getSelected() {
+        TreePath[] paths = getSelectionPaths();
+        Set<TreeItem> selected = new LinkedHashSet<>();
+        for (TreePath path : paths) {
+            selected.add((TreeItem)((TagListTreeNode)path.getLastPathComponent()).getData());
+        }
+        List<TreeItem> ret = new ArrayList<>(selected);
+        return ret;
+    }
+    
+    public List<TreeItem> getAllSelected() {
+        TreePath[] paths = getSelectionPaths();
+        Set<TreeItem> selected = new LinkedHashSet<>();
+        for (TreePath path : paths) {
+            populateSelected((TagListTreeNode)path.getLastPathComponent(), selected);
+        }
+        List<TreeItem> ret = new ArrayList<>(selected);
+        return ret;
+    }
+    
+    public List<TreeItem> getSelection(SWF swf) {
+        Set<TreeItem> selected = new HashSet<>();
+        populateSelectedSwf(swf, root, selected);
+        return new ArrayList<>(selected);
+    }
+    
+    public void populateSelectedSwf(SWF swf, TagListTreeNode node, Set<TreeItem> selected){
+        TreeItem item = (TreeItem) node.getData();
+        if (item.getSwf() == swf) {
+            selected.add(item);
+        }
+        
+        for (int i = 0; i < node.getChildCount(); i++) {
+            populateSelected((TagListTreeNode)node.getChildAt(i), selected);
+        }
+    }
+    
+    public void populateSelected(TagListTreeNode node, Set<TreeItem> selected){
+        selected.add((TreeItem)node.getData());
+        for (int i = 0; i < node.getChildCount(); i++) {
+            populateSelected((TagListTreeNode)node.getChildAt(i), selected);
+        }
     }
 }

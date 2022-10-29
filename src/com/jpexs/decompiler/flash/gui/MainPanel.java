@@ -94,6 +94,7 @@ import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.taglistview.TagListTree;
 import com.jpexs.decompiler.flash.gui.taglistview.TagListTreeNode;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
+import com.jpexs.decompiler.flash.gui.tagtree.TagTreeContextMenu;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.gui.timeline.TimelineViewPanel;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
@@ -244,6 +245,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
@@ -363,9 +365,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private int currentView = VIEW_RESOURCES;
 
     public List<SearchResultsDialog> searchResultsDialogs = new ArrayList<>();
+    
+    private TagTreeContextMenu contextPopupMenu;
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
 
+    public TagTreeContextMenu getContextPopupMenu() {
+        return contextPopupMenu;
+    }
+
+    
+    
     public void setPercent(int percent) {
         View.checkAccess();
 
@@ -680,7 +690,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         });
 
-        tagTree.createContextMenu();
+        contextPopupMenu = new TagTreeContextMenu(tagTree, tagListTree, this);
 
         dumpTree = new DumpTree(null, this);
         dumpTree.addTreeSelectionListener(this);
@@ -1259,10 +1269,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return ViewMessages.showConfirmDialog(this, translate("message.confirm.experimental"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
     }
 
+    private List<TreeItem> getSelection(SWF swf) {
+        if (currentView == MainPanel.VIEW_RESOURCES) {
+            return tagTree.getSelection(getCurrentSwf());
+        } else if (currentView == MainPanel.VIEW_TAGLIST) {
+            return tagListTree.getSelection(getCurrentSwf());
+        }        
+        return new ArrayList<>();
+    }
+    
     public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException, InterruptedException {
 
         List<File> ret = new ArrayList<>();
-        List<TreeItem> sel = tagTree.getSelection(getCurrentSwf());
+        List<TreeItem> sel = getSelection(getCurrentSwf());
 
         Set<SWF> usedSwfs = new HashSet<>();
         for (TreeItem d : sel) {
@@ -1738,6 +1757,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
         } else if (treePanelMode == TreePanelMode.TAGLIST_TREE) {
             TagListTreeNode node = (TagListTreeNode) tagListTree.getLastSelectedPathComponent();
+            if (node == null) {
+                return null;
+            }
             TreeItem treeNode = (TreeItem) node.getData();
             if (treeNode == null || treeNode instanceof SWFList) {
                 return null;
@@ -1747,11 +1769,25 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         return null;
     }
+    
+    private TreeItem getLastSelectedPathComponent() {
+        if (currentView == VIEW_RESOURCES) {
+            return (TreeItem)tagTree.getLastSelectedPathComponent();
+        }
+        if (currentView == VIEW_TAGLIST) {
+            TagListTreeNode node = (TagListTreeNode)tagListTree.getLastSelectedPathComponent();
+            if (node == null) {
+                return null;
+            }
+            return (TreeItem) node.getData();
+        }
+        return null;
+    }
 
     public void gotoFrame(int frame) {
         View.checkAccess();
 
-        TreeItem treeItem = (TreeItem) tagTree.getLastSelectedPathComponent();
+        TreeItem treeItem = (TreeItem) getLastSelectedPathComponent();
         if (treeItem == null) {
             return;
         }
@@ -1903,7 +1939,27 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         return new LinkedHashSet<>(allSwfs);
     }
+    
+    private List<TreeItem> getAllSelected() {
+        if (currentView == VIEW_RESOURCES) {
+            return tagTree.getAllSelected();
+        }
+        if (currentView == VIEW_TAGLIST) {
+            return tagListTree.getAllSelected();
+        }
+        return new ArrayList<>();
+    }
 
+    private List<TreeItem> getSelected() {
+        if (currentView == VIEW_RESOURCES) {
+            return tagTree.getSelected();
+        }
+        if (currentView == VIEW_TAGLIST) {
+            return tagListTree.getSelected();
+        }
+        return new ArrayList<>();
+    }
+    
     public void searchInActionScriptOrText(Boolean searchInText, SWF swf, boolean useSelection) {
         View.checkAccess();
 
@@ -1913,7 +1969,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         Set<SWF> swfsUsed = new LinkedHashSet<>();
 
-        List<TreeItem> allItems = tagTree.getAllSelected();
+        List<TreeItem> allItems = getAllSelected();
         for (TreeItem t : allItems) {
             if (t instanceof ScriptPack) {
                 ScriptPack sp = (ScriptPack) t;
@@ -1957,7 +2013,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
 
-        List<TreeItem> items = tagTree.getSelected();
+        List<TreeItem> items = getSelected();
         String selected;
 
         if (scopeAs12.isEmpty() && scopeAs3.isEmpty()) {
@@ -2231,15 +2287,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
         if (currentView == VIEW_TAGLIST) {
-            TagListTreeNode node = (TagListTreeNode)tagTree.getLastSelectedPathComponent();
-            if (node != null) {
-                TreePath tp = tagListTree.getPathForNode(node);
-                if (tp != null) {
-                    tagListTree.setSelectionPath(tp);
-                    tagListTree.scrollPathToVisible(tp);
-                } else {
-                    showCard(CARDEMPTYPANEL);
-                }
+            TreePath tp = tagListTree.getPathForData(treeItem);
+            if (tp != null) {
+                tagListTree.setSelectionPath(tp);
+                tagListTree.scrollPathToVisible(tp);
             } else {
                 showCard(CARDEMPTYPANEL);
             }
@@ -2658,7 +2709,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         View.checkAccess();
 
         final SWF swf = getCurrentSwf();
-        List<TreeItem> sel = tagTree.getAllSelected();
+        List<TreeItem> sel = getAllSelected();
         if (!onlySel) {
             sel = null;
         } else if (sel.isEmpty()) {
@@ -2709,7 +2760,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void exportJavaSource() {
-        List<TreeItem> sel = tagTree.getSelected();
+        List<TreeItem> sel = getSelected();
         for (TreeItem item : sel) {
             if (item instanceof SWF) {
                 SWF swf = (SWF) item;
@@ -2731,7 +2782,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void exportSwfXml() {
         View.checkAccess();
 
-        List<TreeItem> sel = tagTree.getSelected();
+        List<TreeItem> sel = getSelected();
         Set<SWF> swfs = new HashSet<>();
 
         for (TreeItem item : sel) {
@@ -2759,7 +2810,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importXml"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportXmlInfo);
 
-        List<TreeItem> sel = tagTree.getSelected();
+        List<TreeItem> sel = getSelected();
         Set<SWF> swfs = new HashSet<>();
         for (TreeItem item : sel) {
             swfs.add(item.getSwf());
@@ -2912,7 +2963,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
 
-        List<TreeItem> sel = tagTree.getAllSelected();
+        List<TreeItem> sel = getAllSelected();
         Set<Integer> needed = new HashSet<>();
         for (TreeItem item : sel) {
             if (item instanceof CharacterTag) {
@@ -2954,13 +3005,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void treeOperation(Runnable runnable) {
-        TreeItem treeItem = tagTree.getCurrentTreeItem();
+        TreeItem treeItem = getCurrentTreeItem();
         tagTree.clearSelection();
+        tagListTree.clearSelection();
         runnable.run();
         clear();
         showCard(CARDEMPTYPANEL);
 
         tagTree.updateSwfs(new SWF[0]);
+        tagListTree.updateSwfs();
 
         if (treeItem != null) {
             SWF swf = treeItem.getSwf();
@@ -3072,27 +3125,41 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public boolean previousTag() {
+        JTree tree = null;
         if (getCurrentView() == VIEW_RESOURCES) {
-            if (tagTree.getSelectionRows().length > 0) {
-                int row = tagTree.getSelectionRows()[0];
+            tree = tagTree;            
+        } else if (getCurrentView() == VIEW_TAGLIST) {
+            tree = tagTree;            
+        }
+        
+        if (tree != null) {
+            if (tree.getSelectionRows().length > 0) {
+                int row = tree.getSelectionRows()[0];
                 if (row > 0) {
-                    tagTree.setSelectionRow(row - 1);
-                    tagTree.scrollRowToVisible(row - 1);
+                    tree.setSelectionRow(row - 1);
+                    tree.scrollRowToVisible(row - 1);
                     previewPanel.focusTextPanel();
                 }
             }
             return true;
         }
+        
         return false;
     }
 
     public boolean nextTag() {
+        JTree tree = null;
         if (getCurrentView() == VIEW_RESOURCES) {
-            if (tagTree.getSelectionRows().length > 0) {
-                int row = tagTree.getSelectionRows()[0];
-                if (row < tagTree.getRowCount() - 1) {
-                    tagTree.setSelectionRow(row + 1);
-                    tagTree.scrollRowToVisible(row + 1);
+            tree = tagTree;            
+        } else if (getCurrentView() == VIEW_TAGLIST) {
+            tree = tagTree;            
+        }
+        if (tree != null) {
+            if (tree.getSelectionRows().length > 0) {
+                int row = tree.getSelectionRows()[0];
+                if (row < tree.getRowCount() - 1) {
+                    tree.setSelectionRow(row + 1);
+                    tree.scrollRowToVisible(row + 1);
                     previewPanel.focusTextPanel();
                 }
             }
@@ -3110,7 +3177,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void replaceButtonActionPerformed(ActionEvent evt) {
-        List<TreeItem> items = tagTree.getSelected();
+        List<TreeItem> items = getSelected();
         if (items.size() == 0) {
             return;
         }
@@ -3230,8 +3297,22 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
+    
+    private TreeItem getCurrentTreeItem() {
+        if (currentView == MainPanel.VIEW_RESOURCES) {
+            return tagTree.getCurrentTreeItem();
+        }
+        if (currentView == MainPanel.VIEW_TAGLIST) {
+            TagListTreeNode node = (TagListTreeNode) tagListTree.getLastSelectedPathComponent();
+            if (node != null) {
+                return (TreeItem) node.getData();
+            }
+        }
+        return null;
+    }
+    
     public void replaceNoFillButtonActionPerformed(ActionEvent evt) {
-        TreeItem item = tagTree.getCurrentTreeItem();
+        TreeItem item = getCurrentTreeItem();
         if (item == null) {
             return;
         }
@@ -3273,7 +3354,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void replaceAlphaButtonActionPerformed(ActionEvent evt) {
-        TreeItem item = tagTree.getCurrentTreeItem();
+        TreeItem item = getCurrentTreeItem();
         if (item == null) {
             return;
         }
@@ -3472,7 +3553,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         valueChanged(source, e.getPath());
     }
 
-    private TreePath convertViewPath(TreePath path) {
+    public TreePath convertViewPath(TreePath path) {
         if (currentView == VIEW_RESOURCES) {
             return path;
         }
@@ -3685,7 +3766,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 currentView = view;
                 final SWF swf = getCurrentSwf();
                 if (swf != null) {
-                    TreeItem item = tagTree.getCurrentTreeItem();
+                    TreeItem item = getCurrentTreeItem();
                     if (item instanceof TagScript) {
                         item = ((TagScript) item).getTag();
                     }
