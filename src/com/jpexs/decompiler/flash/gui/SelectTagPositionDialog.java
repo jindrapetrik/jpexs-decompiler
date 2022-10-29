@@ -250,7 +250,13 @@ public class SelectTagPositionDialog extends AppDialog {
                 Object[] pathArray = subPath.toArray(new Object[subPath.size()]);
                 TreePath tpath = new TreePath(pathArray);
                 positionTree.setSelectionPath(tpath);
-                positionTree.scrollPathToVisible(tpath);
+                int row = positionTree.getRowForPath(tpath);
+                if (row != -1) {
+                    Rectangle rect = positionTree.getRowBounds(row);
+                    rect.width += rect.x;
+                    rect.x = 0;
+                    positionTree.scrollRectToVisible(rect);
+                }
                 return;
             }
 
