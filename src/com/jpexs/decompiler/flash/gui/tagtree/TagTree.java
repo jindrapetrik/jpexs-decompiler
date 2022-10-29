@@ -275,10 +275,6 @@ public class TagTree extends JTree {
         });
     }
 
-    public void createContextMenu() {
-        contextPopupMenu = new TagTreeContextMenu(this, mainPanel);
-    }
-
     public static TreeNodeType getTreeNodeType(TreeItem t) {
 
         if (t instanceof TagScript) {
