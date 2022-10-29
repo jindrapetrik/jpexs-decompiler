@@ -74,6 +74,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -110,7 +111,7 @@ public class Timeline {
 
     private final Map<ASMSource, Integer> actionFrames = new HashMap<>();
 
-    private final Map<SoundStreamHeadTypeTag, List<SoundStreamBlockTag>> soundStramBlocks = new HashMap<>();
+    private final Map<Integer, List<SoundStreamBlockTag>> soundStramBlocks = new LinkedHashMap<>();
 
     private AS2Package as2RootPackage;
 
@@ -163,7 +164,7 @@ public class Timeline {
 
     public List<SoundStreamBlockTag> getSoundStreamBlocks(SoundStreamHeadTypeTag head) {
         ensureInitialized();
-        return soundStramBlocks.get(head);
+        return soundStramBlocks.get(head.getCharacterId());
     }
 
     public Tag getParentTag() {
@@ -274,6 +275,7 @@ public class Timeline {
                 newFrameNeeded = true;
                 frame.innerTags.add(t);
             }
+            frame.allInnerTags.add(t);
 
             if (t instanceof ASMSourceContainer) {
                 ASMSourceContainer asmSourceContainer = (ASMSourceContainer) t;
@@ -504,7 +506,7 @@ public class Timeline {
                 SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) t;
                 head.setVirtualCharacterId(containerId);
                 blocks = new ArrayList<>();
-                soundStramBlocks.put(head, blocks);
+                soundStramBlocks.put(containerId, blocks);
                 continue;
             }
 

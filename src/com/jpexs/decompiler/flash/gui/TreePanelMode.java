@@ -22,5 +22,5 @@ package com.jpexs.decompiler.flash.gui;
  */
 public enum TreePanelMode {
 
-    TAG_TREE, DUMP_TREE
+    TAG_TREE, DUMP_TREE, TAGLIST_TREE
 }

@@ -58,6 +58,8 @@ public class Frame implements TreeItem, Exportable {
     public List<ASMSourceContainer> actionContainers = new ArrayList<>();
 
     public List<Tag> innerTags = new ArrayList<>();
+    
+    public List<Tag> allInnerTags = new ArrayList<>();
 
     public ShowFrameTag showFrameTag = null; // can be null for the last frame
 
@@ -113,6 +115,15 @@ public class Frame implements TreeItem, Exportable {
         return timeline.hashCode() ^ Integer.hashCode(frame);
     }
 
+    public boolean isAllInnerTagsModified() {
+        for (Tag t : allInnerTags) {
+            if (t.isModified()) {
+                return true;
+            }
+        }        
+        return false;
+    }
+    
     @Override
     public boolean isModified() {
         for (Tag t : innerTags) {
