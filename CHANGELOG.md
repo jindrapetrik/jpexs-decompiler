@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - [#1731] Image viewer zoom support
 - Cloning of tags and frames
 - Changing tag position
+- Tag list view
 
 ### Fixed
 - [#1834] PlaceObject4 tags appear as Unresolved inside of DefineSprite

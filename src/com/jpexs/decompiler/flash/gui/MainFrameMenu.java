@@ -863,6 +863,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         addMenuItem("/file/view", translate("menu.view"), null, null, 0, null, false, null, false);
         addToggleMenuItem("/file/view/viewResources", translate("menu.file.view.resources"), "view", "viewresources16", this::viewResourcesActionPerformed, PRIORITY_MEDIUM, null);
+        addToggleMenuItem("/file/view/viewTagList", translate("menu.file.view.tagList"), "view", "taglist16", this::viewTagListActionPerformed, PRIORITY_MEDIUM, null);
         addToggleMenuItem("/file/view/viewHex", translate("menu.file.view.hex"), "view", "viewhex16", this::viewHexActionPerformed, PRIORITY_MEDIUM, null);
         finishMenu("/file/view");
 
@@ -1141,6 +1142,14 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setGroupSelection("view", "/file/view/viewHex");
         setMenuChecked("/tools/timeline", false);
     }
+    
+    private void viewTagListActionPerformed(ActionEvent evt) {
+        Configuration.dumpView.set(false);    
+        MainPanel mainPanel = mainFrame.getPanel();
+        mainPanel.showView(MainPanel.VIEW_TAGLIST);
+        setGroupSelection("view", "/file/view/viewTagList");
+        setMenuChecked("/tools/timeline", false);        
+    }
 
     private void debuggerSwitchActionPerformed(ActionEvent evt) {
         boolean debuggerOn = isMenuChecked("/tools/debugger/debuggerSwitch");
@@ -1161,9 +1170,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
             } else {
                 setGroupSelection("view", null);
             }
-        } else if (Configuration.dumpView.get()) {
-            setGroupSelection("view", "/file/view/viewHex");
-            mainFrame.getPanel().showView(MainPanel.VIEW_DUMP);
         } else {
             setGroupSelection("view", "/file/view/viewResources");
             mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);

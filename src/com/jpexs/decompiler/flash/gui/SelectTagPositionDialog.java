@@ -19,32 +19,12 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import static com.jpexs.decompiler.flash.gui.AppDialog.CANCEL_OPTION;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
-import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
-import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
-import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
-import com.jpexs.decompiler.flash.tags.DoABC2Tag;
-import com.jpexs.decompiler.flash.tags.DoABCTag;
-import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
-import com.jpexs.decompiler.flash.tags.FileAttributesTag;
-import com.jpexs.decompiler.flash.tags.MetadataTag;
-import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.base.ButtonTag;
-import com.jpexs.decompiler.flash.tags.base.FontTag;
-import com.jpexs.decompiler.flash.tags.base.ImageTag;
-import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
-import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
-import com.jpexs.decompiler.flash.tags.base.RemoveTag;
-import com.jpexs.decompiler.flash.tags.base.ShapeTag;
-import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
-import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -64,7 +44,6 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -75,6 +54,7 @@ import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 /**
  *
@@ -203,7 +183,7 @@ public class SelectTagPositionDialog extends AppDialog {
         }
     }
 
-    private void populateNodes(MyTreeNode root, Timelined tim, int currentFrame) {
+    private void populateNodes(MyTreeNode root, Timelined tim) {
         int f = 1;
 
         MyTreeNode frameNode = new MyTreeNode();
@@ -218,7 +198,7 @@ public class SelectTagPositionDialog extends AppDialog {
 
             if (t instanceof DefineSpriteTag) {
                 if (allowInsideSprites) {
-                    populateNodes(node, (DefineSpriteTag) t, 1);
+                    populateNodes(node, (DefineSpriteTag) t);
                 }
             }
             if (t instanceof ShowFrameTag) {
@@ -250,7 +230,13 @@ public class SelectTagPositionDialog extends AppDialog {
                 Object[] pathArray = subPath.toArray(new Object[subPath.size()]);
                 TreePath tpath = new TreePath(pathArray);
                 positionTree.setSelectionPath(tpath);
-                positionTree.scrollPathToVisible(tpath);
+                int row = positionTree.getRowForPath(tpath);
+                if (row != -1) {
+                    Rectangle rect = positionTree.getRowBounds(row);
+                    rect.width += rect.x;
+                    rect.x = 0;
+                    positionTree.scrollRectToVisible(rect);
+                }
                 return;
             }
 
@@ -269,7 +255,7 @@ public class SelectTagPositionDialog extends AppDialog {
     private static class PositionTreeCellRenderer extends DefaultTreeCellRenderer {
 
         private boolean selected;
-
+               
         public PositionTreeCellRenderer() {
             if (View.isOceanic()) {
                 setUI(new BasicLabelUI());
@@ -289,60 +275,19 @@ public class SelectTagPositionDialog extends AppDialog {
                 if (value instanceof MyTreeNode) {
                     subValue = ((MyTreeNode) value).getData();
                 }
-                TreeNodeType nodeType;
-                if (subValue instanceof MyFrame) {
-                    nodeType = TreeNodeType.FRAME;
-                } else if (subValue instanceof FontTag) {
-                    nodeType = TreeNodeType.FONT;
-                } else if (subValue instanceof TextTag) {
-                    nodeType = TreeNodeType.TEXT;
-                } else if (subValue instanceof ImageTag) {
-                    nodeType = TreeNodeType.IMAGE;
-                } else if (subValue instanceof ShapeTag) {
-                    nodeType = TreeNodeType.SHAPE;
-                } else if (subValue instanceof MorphShapeTag) {
-                    nodeType = TreeNodeType.MORPH_SHAPE;
-                } else if (subValue instanceof DefineSpriteTag) {
-                    nodeType = TreeNodeType.SPRITE;
-                } else if (subValue instanceof ButtonTag) {
-                    nodeType = TreeNodeType.BUTTON;
-                } else if (subValue instanceof DefineVideoStreamTag) {
-                    nodeType = TreeNodeType.MOVIE;
-                } else if ((subValue instanceof DefineSoundTag) || (subValue instanceof SoundStreamHeadTypeTag) || (subValue instanceof SoundStreamBlockTag)) {
-                    nodeType = TreeNodeType.SOUND;
-                } else if (subValue instanceof DefineBinaryDataTag) {
-                    nodeType = TreeNodeType.BINARY_DATA;
-                } else if ((subValue instanceof DoActionTag)
-                        || (subValue instanceof DoInitActionTag)
-                        || (subValue instanceof DoABCTag)
-                        || (subValue instanceof DoABC2Tag)) {
-                    nodeType = TreeNodeType.AS;
-                } else if (subValue instanceof ShowFrameTag) {
-                    nodeType = TreeNodeType.FRAME;
-                } else if (subValue instanceof SetBackgroundColorTag) {
-                    nodeType = TreeNodeType.SET_BACKGROUNDCOLOR;
-                } else if (subValue instanceof FileAttributesTag) {
-                    nodeType = TreeNodeType.FILE_ATTRIBUTES;
-                } else if (subValue instanceof MetadataTag) {
-                    nodeType = TreeNodeType.METADATA;
-                } else if (subValue instanceof PlaceObjectTypeTag) {
-                    nodeType = TreeNodeType.PLACE_OBJECT;
-                } else if (subValue instanceof RemoveTag) {
-                    nodeType = TreeNodeType.REMOVE_OBJECT;
-                } else if (subValue instanceof MyTimelineEnd) {
-                    nodeType = null;
-                } else {
-                    nodeType = TreeNodeType.OTHER_TAG;
+                if (subValue instanceof MyTimelineEnd) {
+                    lab.setIcon(TagTree.getIconForType(TreeNodeType.END));
                 }
-                if (nodeType == null) {
-                    //nothing
-                } else {
-                    lab.setIcon(TagTree.getIconForType(nodeType));
+                
+                if (subValue instanceof MyFrame) {
+                    lab.setIcon(TagTree.getIconForType(TreeNodeType.FRAME));
+                }
+                if (subValue instanceof TreeItem) {
+                    lab.setIcon(TagTree.getIconForType(TagTree.getTreeNodeType((TreeItem)subValue)));
                 }
             }
             return renderer;
         }
-
     }
 
     public SelectTagPositionDialog(Window parent, SWF swf, Tag selectedTag, Timelined selectedTimelined, boolean allowInsideSprites) {
@@ -368,7 +313,7 @@ public class SelectTagPositionDialog extends AppDialog {
         MyTreeNode root = new MyTreeNode();
         root.setData("root");
 
-        populateNodes(root, swf, 1);
+        populateNodes(root, swf);
 
         positionTree = new JTree(root) {
             @Override
@@ -377,30 +322,29 @@ public class SelectTagPositionDialog extends AppDialog {
                 int rows[] = getSelectionRows();
                 if (rows.length == 1) {
                     int row = rows[0];
-                    
+
                     Object selection = getLastSelectedPathComponent();
                     boolean onFrame = false;
-                    if (selection != null && (((MyTreeNode)selection).getData() instanceof MyFrame)) { // && !isCollapsed(row)) {
+                    if (selection != null && (((MyTreeNode) selection).getData() instanceof MyFrame)) { // && !isCollapsed(row)) {
                         onFrame = true;
                         return;
-                    }                    
+                    }
                     Rectangle rect = this.getRowBounds(row);
                     int sideWidth = 6;
                     int sideHeight = 6;
                     int offsetX = -5;
-                    
-                    
+
                     int lineStartX = offsetX + rect.x;
                     int backStartX = getWidth() + offsetX;
                     if (onFrame) {
                         g.fillRect(lineStartX, rect.y + rect.height - 1, getWidth() - lineStartX, 1);
-                    } else {                        
-                        g.fillRect(lineStartX, rect.y, getWidth() - lineStartX, 1);                        
+                    } else {
+                        g.fillRect(lineStartX, rect.y, getWidth() - lineStartX, 1);
                     }
                     Graphics2D g2d = (Graphics2D) g;
                     g2d.setPaint(getForeground());
                     GeneralPath path = new GeneralPath();
-                    
+
                     if (onFrame) {
                         path.moveTo(backStartX - 6, rect.y + rect.height - 1 - 6);
                         path.lineTo(backStartX, rect.y + rect.height - 1);
@@ -428,7 +372,9 @@ public class SelectTagPositionDialog extends AppDialog {
         positionTree.setRootVisible(false);
         positionTree.setShowsRootHandles(true);
         positionTree.addTreeSelectionListener(this::spriteValueChanged);
-
+        positionTree.addTreeSelectionListener(this::positionTreeValueChanged);
+        positionTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        
         previewPanel = new PreviewPanel(Main.getMainFrame().getPanel(), null);
         previewPanel.setReadOnly(true);
         previewPanel.setPreferredSize(new Dimension(300, 1));
@@ -437,7 +383,7 @@ public class SelectTagPositionDialog extends AppDialog {
 
         JScrollPane positionTreeScrollPane = new FasterScrollPane(positionTree);
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, positionTreeScrollPane, previewPanel);
-        //splitPane.setDividerLocation(600);
+        splitPane.setDividerLocation(400);
         cnt.add(splitPane, BorderLayout.CENTER);
 
         List<Object> path = new ArrayList<>();
@@ -451,6 +397,15 @@ public class SelectTagPositionDialog extends AppDialog {
         View.setWindowIcon(this);
     }
 
+    public void positionTreeValueChanged(TreeSelectionEvent e) {
+        MyTreeNode node = (MyTreeNode) positionTree.getLastSelectedPathComponent();
+        boolean enabled = true;
+        if (node == null || (node.getData() instanceof MyFrame)) {
+            enabled = false;
+        }
+        okButton.setEnabled(enabled);
+    }
+
     private int getCurrentSelectedFrame() {
         TreePath path = positionTree.getSelectionPath();
         for (int i = path.getPathCount() - 1; i >= 0; i--) {
@@ -462,7 +417,7 @@ public class SelectTagPositionDialog extends AppDialog {
         }
         return -1;
     }
-    
+
     private Timelined getCurrentSelectedTimelined() {
         TreePath path = positionTree.getSelectionPath();
         for (int i = path.getPathCount() - 1 - 1 /*sprite can be last, use its parent*/; i >= 0; i--) {
@@ -471,7 +426,7 @@ public class SelectTagPositionDialog extends AppDialog {
                 return swf;
             }
             if (node.getData() instanceof DefineSpriteTag) {
-                return (Timelined) node.getData();         
+                return (Timelined) node.getData();
             }
         }
         return null;
@@ -485,7 +440,7 @@ public class SelectTagPositionDialog extends AppDialog {
             return;
         }
         MyTreeNode tnode = (MyTreeNode) selection.getLastPathComponent();
-        if (tnode.getData() instanceof Tag) {            
+        if (tnode.getData() instanceof Tag) {
             MainPanel.showPreview((TreeItem) tnode.getData(), previewPanel, getCurrentSelectedFrame() - 1, getCurrentSelectedTimelined());
         } else if (tnode.getData() instanceof MyFrame) {
             int f = ((MyFrame) tnode.getData()).frame;
@@ -507,7 +462,7 @@ public class SelectTagPositionDialog extends AppDialog {
     }
 
     private void okButtonActionPerformed(ActionEvent evt) {
-        MyTreeNode node = (MyTreeNode)positionTree.getLastSelectedPathComponent();
+        MyTreeNode node = (MyTreeNode) positionTree.getLastSelectedPathComponent();
         if (node.getData() instanceof MyFrame) {
             return;
         }
@@ -515,10 +470,10 @@ public class SelectTagPositionDialog extends AppDialog {
             selectedTag = null;
         } else {
             selectedTag = (Tag) node.getData();
-        }        
-        
+        }
+
         selectedTimelined = getCurrentSelectedTimelined();
-        
+
         result = OK_OPTION;
         previewPanel.clear();
         setVisible(false);
@@ -530,8 +485,10 @@ public class SelectTagPositionDialog extends AppDialog {
     }
 
     /**
-     * Gets current selected tag to determine position. null = end of timeline position
-     * @return 
+     * Gets current selected tag to determine position. null = end of timeline
+     * position
+     *
+     * @return
      */
     public Tag getSelectedTag() {
         return selectedTag;
@@ -539,7 +496,8 @@ public class SelectTagPositionDialog extends AppDialog {
 
     /**
      * Gets selected timelined
-     * @return 
+     *
+     * @return
      */
     public Timelined getSelectedTimelined() {
         return selectedTimelined;
