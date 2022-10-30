@@ -52,7 +52,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -678,7 +677,7 @@ public class FontPanel extends JPanel {
                     int ascent = Integer.parseInt(fontAscentTextField.getText());
                     int descent = Integer.parseInt(fontDescentTextField.getText());
                     int leading = Integer.parseInt(fontLeadingTextField.getText());
-                    if (ascent < 0 || descent < 0 || leading < 0) {
+                    if (ascent < 0 || descent < 0) {
                         return;
                     }
                     fontTag.setAscent(ascent);

@@ -477,15 +477,15 @@ public class FlashPlayerTest {
             new AVM2Instruction(0, AVM2Instructions.PushShort, new int[]{1073741824}), // 68
             new AVM2Instruction(0, AVM2Instructions.PushShort, new int[]{2147483647}), // 69
             new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{0}), // 70
-            new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{abc.constants.getIntId(-2147483649L, true)}), // 71
+            //new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{abc.constants.getIntId(-2147483649L, true)}), // 71
             new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{abc.constants.getIntId(-2147483648, true)}), // 72
             new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{abc.constants.getIntId(-1, true)}), // 73
             new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{abc.constants.getIntId(0, true)}), // 74
             new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{abc.constants.getIntId(1, true)}), // 75
             new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{abc.constants.getIntId(2147483647, true)}), // 76
-            new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{abc.constants.getIntId(2147483648L, true)}), // 77
-            new AVM2Instruction(0, AVM2Instructions.PushUInt, new int[]{abc.constants.getIntId(4294967295L, true)}), // 78
-            new AVM2Instruction(0, AVM2Instructions.PushUInt, new int[]{abc.constants.getIntId(4294967296L, true)}), // 79
+            //new AVM2Instruction(0, AVM2Instructions.PushInt, new int[]{abc.constants.getIntId(2147483648L, true)}), // 77
+            //new AVM2Instruction(0, AVM2Instructions.PushUInt, new int[]{abc.constants.getIntId(4294967295L, true)}), // 78
+            //new AVM2Instruction(0, AVM2Instructions.PushUInt, new int[]{abc.constants.getIntId(4294967296L, true)}), // 79
             new AVM2Instruction(0, AVM2Instructions.PushUInt, new int[]{0}), // 80
             new AVM2Instruction(0, AVM2Instructions.PushUInt, new int[]{abc.constants.getUIntId(-2147483649L, true)}), // 81
             new AVM2Instruction(0, AVM2Instructions.PushUInt, new int[]{abc.constants.getUIntId(-2147483648, true)}), // 82

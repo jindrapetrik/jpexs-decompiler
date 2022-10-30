@@ -48,7 +48,7 @@ public class AVM2ConstantPool implements Cloneable {
     private static final Logger logger = Logger.getLogger(AVM2ConstantPool.class.getName());
 
     @SWFField
-    private HashArrayList<Long> constant_int = new HashArrayList<>();
+    private HashArrayList<Integer> constant_int = new HashArrayList<>();
 
     @SWFField
     private HashArrayList<Long> constant_uint = new HashArrayList<>();
@@ -165,10 +165,10 @@ public class AVM2ConstantPool implements Cloneable {
         }
     }
 
-    public synchronized int addInt(long value) {
+    public synchronized int addInt(int value) {
         ensureDefault(constant_int);
         value = (int) value;
-        constant_int.add(value);
+        constant_int.add((Integer) value);
         return constant_int.size() - 1;
     }
 
@@ -231,7 +231,7 @@ public class AVM2ConstantPool implements Cloneable {
         return constant_string.size() - 1;
     }
 
-    public long setInt(int index, long value) {
+    public long setInt(int index, int value) {
         constant_int.set(index, value);
         return value;
     }
@@ -281,7 +281,7 @@ public class AVM2ConstantPool implements Cloneable {
         return value;
     }
 
-    public long getInt(int index) {
+    public int getInt(int index) {
         try {
             if (index == 0) {
                 return 0;
@@ -502,7 +502,7 @@ public class AVM2ConstantPool implements Cloneable {
         return getNamespaceId(kind, nameIndex, index, add);
     }
 
-    private int getIntId(long value) {
+    private int getIntId(int value) {
         return constant_int.indexOf(value);
     }
 
@@ -587,7 +587,7 @@ public class AVM2ConstantPool implements Cloneable {
         return getStringId(val.toRawString(), add);
     }
 
-    public int getIntId(long val, boolean add) {
+    public int getIntId(int val, boolean add) {
         int id = getIntId(val);
         if (add && id == -1) {
             id = addInt(val);
@@ -738,8 +738,8 @@ public class AVM2ConstantPool implements Cloneable {
     }
 
     public AVM2Instruction makePush(Object ovalue) {
-        if (ovalue instanceof Long) {
-            long value = (Long) ovalue;
+        if (ovalue instanceof Integer) {
+            int value = (Integer) ovalue;
             if (value >= -128 && value <= 127) {
                 return new AVM2Instruction(0, AVM2Instructions.PushByte, new int[]{(int) (long) value});
             } else if (value >= -32768 && value <= 32767) {
@@ -792,7 +792,7 @@ public class AVM2ConstantPool implements Cloneable {
         }
         intMap.put(0, 0);
         for (int i = 1; i < secondPool.constant_int.size(); i++) {
-            Long val = secondPool.constant_int.get(i);
+            int val = secondPool.constant_int.get(i);
             intMap.put(i, getIntId(val, true));
         }
         uintMap.put(0, 0);

@@ -19,7 +19,6 @@ package com.jpexs.decompiler.flash.gui.editor;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.helpers.Stopwatch;
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
@@ -38,9 +37,6 @@ import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
 import javax.swing.text.JTextComponent;
 import jsyntaxpane.SyntaxDocument;
-import jsyntaxpane.SyntaxStyle;
-import jsyntaxpane.SyntaxStyles;
-import jsyntaxpane.TokenType;
 
 /**
  *

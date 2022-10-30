@@ -43,7 +43,6 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.SerializableImage;
-import com.sun.jna.Platform;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -53,7 +52,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -559,11 +557,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         showCardLeft(FLASH_VIEWER_CARD);
     }
 
-    public void showImagePanel(Timelined timelined, SWF swf, int frame) {
+    public void showImagePanel(Timelined timelined, SWF swf, int frame, boolean showObjectsUnderCursor) {
         showCardLeft(DRAW_PREVIEW_CARD);
         parametersPanel.setVisible(false);
         imagePlayControls.setMedia(imagePanel);
-        imagePanel.setTimelined(timelined, swf, frame);
+        imagePanel.setTimelined(timelined, swf, frame, showObjectsUnderCursor);
     }
 
     public void showImagePanel(SerializableImage image) {
@@ -601,7 +599,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private void showFontPage(FontTag fontTag) {
         if (!mainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            showImagePanel(MainPanel.makeTimelined(fontTag), fontTag.getSwf(), fontPageNum);
+            showImagePanel(MainPanel.makeTimelined(fontTag), fontTag.getSwf(), fontPageNum, true);
         }
     }
 
@@ -619,7 +617,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showTextPanel(TextTag textTag) {
         if (!mainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            showImagePanel(MainPanel.makeTimelined(textTag), textTag.getSwf(), 0);
+            showImagePanel(MainPanel.makeTimelined(textTag), textTag.getSwf(), 0, true);
         }
 
         showCardRight(CARDTEXTPANEL);
@@ -714,16 +712,18 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         showCardLeft(PLACE_TAG_CARD);
         placeTag = tag;
         oldMatrix = tag.getMatrix();
-        placeSplitPane.setDividerLocation((int) (0.6 * this.getWidth()));
+        placeSplitPane.setDividerLocation((int) (0.6 * this.getWidth()));        
+        placeGenericPanel.setVisible(!readOnly);
         placeGenericPanel.setEditMode(false, tag);
         placeImagePanel.selectDepth(-1);
-        placeImagePanel.setTimelined(((Tag) tag).getTimelined(), ((Tag) tag).getSwf(), frame);
+        placeImagePanel.setTimelined(((Tag) tag).getTimelined(), ((Tag) tag).getSwf(), frame, true);
         placeImagePanel.selectDepth(tag.getDepth());
         parametersPanel.setVisible(false);
-        placeEditButton.setVisible(!tag.isReadOnly());
+        placeEditButton.setVisible(!tag.isReadOnly() && !readOnly);
         placeEditButton.setEnabled(true);
         placeSaveButton.setVisible(false);
         placeCancelButton.setVisible(false);
+        placeFreeTransformButton.setVisible(!readOnly);
     }
 
     public void setImageReplaceButtonVisible(boolean show, boolean showAlpha) {
@@ -744,7 +744,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
             if (treeItem instanceof SWF) {
                 SWF swf = (SWF) treeItem;
-                try (FileOutputStream fos = new FileOutputStream(extTempFile)) {
+                try ( FileOutputStream fos = new FileOutputStream(extTempFile)) {
                     swf.saveTo(fos);
                 }
             } else {
@@ -767,7 +767,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 }
 
                 SWFHeader header;
-                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(extTempFile))) {
+                try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(extTempFile))) {
                     header = new PreviewExporter().exportSwf(fos, treeItem, backgroundColor, fontPageNum, true);
                 }
             }
@@ -805,7 +805,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
 
             SWFHeader header;
-            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+            try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
                 header = new PreviewExporter().exportSwf(fos, treeItem, backgroundColor, fontPageNum, false);
             }
 
@@ -837,19 +837,19 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
         try {
             tempFile = File.createTempFile("ffdec_view_", ".swf");
-            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+            try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
                 swf.saveTo(fos, false);
             }
             //Inject Loader
             if (swf.isAS3() && Configuration.autoOpenLoadedSWFs.get() && Configuration.useAdobeFlashPlayerForPreviews.get() && !DebuggerTools.hasDebugger(swf)) {
                 SWF instrSWF;
-                try (InputStream fis = new BufferedInputStream(new FileInputStream(tempFile))) {
+                try ( InputStream fis = new BufferedInputStream(new FileInputStream(tempFile))) {
                     instrSWF = new SWF(fis, false, false);
                 }
 
                 DebuggerTools.switchDebugger(instrSWF);
                 DebuggerTools.injectDebugLoader(instrSWF);
-                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+                try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
                     instrSWF.saveTo(fos);
                 }
             }
@@ -918,7 +918,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             swf.assignClassesToSymbols();
             swf.assignExportNamesToSymbols();
             mainPanel.refreshTree(swf);
-            mainPanel.setTagTreeSelectedNode(tag);
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), tag);
             genericEditButton.setVisible(true);
             genericSaveButton.setVisible(false);
             genericCancelButton.setVisible(false);
@@ -949,7 +949,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 SWF swf = tag.getSwf();
                 tag.getTimelined().resetTimeline();
                 mainPanel.refreshTree(swf);
-                mainPanel.setTagTreeSelectedNode(tag);
+                mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), tag);
             }
             placeGenericPanel.setEditMode(false, null);
         }
@@ -1004,7 +1004,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         int pageCount = getFontPageCount(fontTag);
         fontPageNum = (fontPageNum + pageCount - 1) % pageCount;
         if (!mainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            imagePanel.setTimelined(MainPanel.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0);
+            imagePanel.setTimelined(MainPanel.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0, true);
         }
     }
 
@@ -1013,7 +1013,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         int pageCount = getFontPageCount(fontTag);
         fontPageNum = (fontPageNum + 1) % pageCount;
         if (!mainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            imagePanel.setTimelined(MainPanel.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0);
+            imagePanel.setTimelined(MainPanel.makeTimelined(fontTag, fontPageNum), fontTag.getSwf(), 0, true);
         }
     }
 

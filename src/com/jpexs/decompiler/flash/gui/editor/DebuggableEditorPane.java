@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui.editor;
 
 import com.jpexs.decompiler.flash.gui.Main;
-import com.jpexs.decompiler.flash.gui.View;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;

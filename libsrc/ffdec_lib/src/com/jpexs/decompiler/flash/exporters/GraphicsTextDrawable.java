@@ -5,7 +5,6 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
-import com.jpexs.helpers.SerializableImage;
 import java.util.List;
 
 /**

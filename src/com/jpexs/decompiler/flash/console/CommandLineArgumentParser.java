@@ -60,6 +60,7 @@ import com.jpexs.decompiler.flash.exporters.MorphShapeExporter;
 import com.jpexs.decompiler.flash.exporters.MovieExporter;
 import com.jpexs.decompiler.flash.exporters.ShapeExporter;
 import com.jpexs.decompiler.flash.exporters.SoundExporter;
+import com.jpexs.decompiler.flash.exporters.SymbolClassExporter;
 import com.jpexs.decompiler.flash.exporters.TextExporter;
 import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -74,6 +75,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ShapeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.SpriteExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.SymbolClassExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.exporters.script.LinkReportExporter;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
@@ -87,6 +89,7 @@ import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ShapeExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.SymbolClassExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.TextExportSettings;
 import com.jpexs.decompiler.flash.exporters.swf.SwfToSwcExporter;
 import com.jpexs.decompiler.flash.exporters.swf.SwfXmlExporter;
@@ -186,6 +189,9 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -331,6 +337,7 @@ public class CommandLineArgumentParser {
             out.println("        button - Buttons (Default format: PNG)");
             out.println("        sound - Sounds (Default format: MP3/WAV/FLV only sound)");
             out.println("        binaryData - Binary data (Default format:  Raw data)");
+            out.println("        symbolClass - Symbol-Class mapping (Default format: CSV)");
             out.println("        text - Texts (Default format: Plain text)");
             out.println("        all - Every resource (but not FLA and XFL)");
             out.println("        fla - Everything to FLA compressed format");
@@ -522,6 +529,10 @@ public class CommandLineArgumentParser {
             out.println(" ...<format> parameter can be specified for Image and Shape tags");
             out.println(" ...valid formats: lossless, lossless2, jpeg2, jpeg3, jpeg4");
             out.println(" ...<methodBodyIndexN> parameter should be specified if and only if the imported entity is an AS3 P-Code");
+
+            out.println(" " + (cnt++) + ") -replace <infile> <outfile> <argsfile>");
+            out.println(" ... same as -replace command, but the rest of arguments is read as lines from a text file <argsfile>");
+
         }
 
         if (filter == null || filter.equals("replacealpha")) {
@@ -2097,6 +2108,7 @@ public class CommandLineArgumentParser {
             "button",
             "sound",
             "binarydata",
+            "symbolclass",
             "text",
             "all",
             "fla",
@@ -2274,6 +2286,11 @@ public class CommandLineArgumentParser {
                 if (exportAll || exportFormats.contains("binarydata")) {
                     System.out.println("Exporting binaryData...");
                     new BinaryDataExporter().exportBinaryData(handler, outDir + (multipleExportTypes ? File.separator + BinaryDataExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new BinaryDataExportSettings(enumFromStr(formats.get("binarydata"), BinaryDataExportMode.class)), evl);
+                }
+
+                if (exportAll || exportFormats.contains("symbolclass")) {
+                    System.out.println("Exporting symbolClass...");
+                    new SymbolClassExporter().exportNames(handler, outDir + (multipleExportTypes ? File.separator + SymbolClassExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new SymbolClassExportSettings(enumFromStr(formats.get("symbolclass"), SymbolClassExportMode.class)), evl);
                 }
 
                 if (exportAll || exportFormats.contains("text")) {
@@ -2904,12 +2921,33 @@ public class CommandLineArgumentParser {
     }
 
     private static void parseReplace(Stack<String> args) {
-        if (args.size() < 4) {
+        if (args.size() < 3) {
             badArguments("replace");
         }
 
         File inFile = new File(args.pop());
         File outFile = new File(args.pop());
+
+        if (args.size() == 3) {
+            System.out.println("Replacing - only single argument passed, taking it as file to load replacements from");
+            try {
+                List<String> lines = Files.readAllLines(Paths.get(args.pop()), StandardCharsets.UTF_8);
+                Collections.reverse(lines);
+
+                args.clear();
+                args.addAll(lines);
+
+            } catch (IOException e) {
+                System.err.println("I/O Error during reading replacements file");
+                System.exit(1);
+            }
+
+            if (args.isEmpty()) {
+                System.err.println("Replacements file is empty.");
+                System.exit(1);
+            }
+        }
+
         try {
             try (FileInputStream is = new FileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
@@ -3004,6 +3042,7 @@ public class CommandLineArgumentParser {
                             }
                         } else {
                             List<ScriptPack> packs = swf.getAS3Packs();
+
                             for (ScriptPack entry : packs) {
                                 if (entry.getClassPath().toString().equals(objectToReplace)) {
                                     found = true;
@@ -3012,7 +3051,7 @@ public class CommandLineArgumentParser {
                                     String repText = Helper.readTextFile(repFile);
                                     ScriptPack pack = entry;
                                     if (Path.getExtension(repFile).equals(".as")) {
-                                        replaceAS3(repText, pack);
+                                        replaceAS3(repFile, repText, pack);
                                     } else {
                                         // todo: get traits
                                         if (args.isEmpty()) {
@@ -3641,8 +3680,8 @@ public class CommandLineArgumentParser {
         ((Tag) abc.parentTag).setModified(true);
     }
 
-    private static void replaceAS3(String as, ScriptPack pack) throws IOException, InterruptedException {
-        System.out.println("Replace AS3");
+    private static void replaceAS3(String asp, String as, ScriptPack pack) throws IOException, InterruptedException {
+        System.out.println("Replacing: " + asp);
         System.out.println("Warning: This feature is EXPERIMENTAL");
         As3ScriptReplacerInterface scriptReplacer = As3ScriptReplacerFactory.createByConfig();
         if (!scriptReplacer.isAvailable()) {

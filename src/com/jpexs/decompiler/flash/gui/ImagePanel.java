@@ -23,17 +23,20 @@ import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.Stage;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.Undefined;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplayListener;
 import com.jpexs.decompiler.flash.gui.player.Zoom;
+import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonSoundTag;
+import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.DisplayObjectCacheKey;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
-import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -41,15 +44,11 @@ import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.ConstantColorColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
-import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
-import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
-import com.jpexs.decompiler.flash.tags.DefineButtonTag;
-import com.jpexs.decompiler.flash.tags.base.DisplayObjectCacheKey;
-import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Reference;
@@ -90,7 +89,6 @@ import java.awt.image.VolatileImage;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -135,7 +133,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private int mouseButton;
 
-    private final JLabel debugLabel = new JLabel("-");
+    private static final String DEFAULT_DEBUG_LABEL_TEXT = " - ";
+
+    private final JLabel debugLabel = new JLabel(DEFAULT_DEBUG_LABEL_TEXT);
 
     private Point cursorPosition = null;
 
@@ -164,6 +164,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private TextTag textTag;
 
     private TextTag newTextTag;
+
+    private boolean showObjectsUnderCursor;
 
     private int msPerFrame;
 
@@ -269,6 +271,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         m.scale(zoom);
 
                         Matrix eMatrix = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).inverse();
+                        eMatrix.translate(_rect.x < 0 ? -_rect.x : 0, _rect.y < 0 ? -_rect.y : 0);
 
                         return transform.preConcatenate(eMatrix).toMATRIX();
                     }
@@ -363,6 +366,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         private boolean allowMove = true;
 
         private Point dragStart = null;
+
+        private synchronized Point getDragStart() {
+            return dragStart;
+        }
+
+        private synchronized void setDragStart(Point dragStart) {
+            this.dragStart = dragStart;
+        }
 
         private synchronized SerializableImage getImg() {
             return _img;
@@ -461,7 +472,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     if (e.getButton() == MouseEvent.BUTTON1) {
-                        dragStart = e.getPoint();
+                        mouseMoved(e); //to correctly calculate mode, because moseMoved event is not called during dragging
+                        setDragStart(e.getPoint());
                     }
                     requestFocusInWindow();
                 }
@@ -481,6 +493,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                         mode = Cursor.DEFAULT_CURSOR;
                     }
+                }
+
+                private void stopDragging() {
+
                 }
 
                 @Override
@@ -534,12 +550,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         if (transform == null) {
                             return;
                         }
-                        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
 
-                        int ex = e.getX() - _rect.x - (int) (_viewRect.xMin * zoomDouble / SWF.unitDivisor);
-                        int ey = e.getY() - _rect.y - (int) (_viewRect.yMin * zoomDouble / SWF.unitDivisor);
-                        int dsx = dragStart.x - _rect.x - (int) (_viewRect.xMin * zoomDouble / SWF.unitDivisor);
-                        int dsy = dragStart.y - _rect.y - (int) (_viewRect.yMin * zoomDouble / SWF.unitDivisor);
+                        int ex = e.getX() - (_rect.x < 0 ? 0 : _rect.x);
+                        int ey = e.getY() - (_rect.y < 0 ? 0 : _rect.y);
+                        int dsx = dragStart.x - (_rect.x < 0 ? 0 : _rect.x);
+                        int dsy = dragStart.y - (_rect.y < 0 ? 0 : _rect.y);
+
                         if (mode == MODE_SHEAR_N) {
 
                             double shearX = -(ex - dsx) / (bounds.getHeight());
@@ -981,9 +997,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             return;
                         }
 
-                        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
-                        int ex = e.getX() - _rect.x - (int) (_viewRect.xMin * zoomDouble / SWF.unitDivisor);
-                        int ey = e.getY() - _rect.y - (int) (_viewRect.yMin * zoomDouble / SWF.unitDivisor);
+                        int ex = e.getX() - (_rect.x < 0 ? 0 : _rect.x);
+                        int ey = e.getY() - (_rect.y < 0 ? 0 : _rect.y);
 
                         boolean left = ex >= bounds.getX() - TOLERANCE_SCALESHEAR && ex <= bounds.getX() + TOLERANCE_SCALESHEAR;
                         boolean right = ex >= bounds.getX() + bounds.getWidth() - TOLERANCE_SCALESHEAR && ex <= bounds.getX() + bounds.getWidth() + TOLERANCE_SCALESHEAR;
@@ -1015,68 +1030,70 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         boolean shearY = ey > bounds.getY() && ey < bounds.getY() + bounds.getHeight();
 
                         Cursor cursor;
+                        int newMode;
                         if (top && left) {
-                            mode = Cursor.NW_RESIZE_CURSOR;
+                            newMode = Cursor.NW_RESIZE_CURSOR;
                             cursor = resizeNWSECursor;
                         } else if (bottom && left) {
-                            mode = Cursor.SW_RESIZE_CURSOR;
+                            newMode = Cursor.SW_RESIZE_CURSOR;
                             cursor = resizeSWNECursor;
                         } else if (top && right) {
-                            mode = Cursor.NE_RESIZE_CURSOR;
+                            newMode = Cursor.NE_RESIZE_CURSOR;
                             cursor = resizeSWNECursor;
                         } else if (bottom && right) {
-                            mode = Cursor.SE_RESIZE_CURSOR;
+                            newMode = Cursor.SE_RESIZE_CURSOR;
                             cursor = resizeNWSECursor;
                         } else if (top && xcenter) {
-                            mode = Cursor.N_RESIZE_CURSOR;
+                            newMode = Cursor.N_RESIZE_CURSOR;
                             cursor = resizeYCursor;
                         } else if (bottom && xcenter) {
-                            mode = Cursor.S_RESIZE_CURSOR;
+                            newMode = Cursor.S_RESIZE_CURSOR;
                             cursor = resizeYCursor;
                         } else if (left && ycenter) {
-                            mode = Cursor.W_RESIZE_CURSOR;
+                            newMode = Cursor.W_RESIZE_CURSOR;
                             cursor = resizeXCursor;
                         } else if (right && ycenter) {
-                            mode = Cursor.E_RESIZE_CURSOR;
+                            newMode = Cursor.E_RESIZE_CURSOR;
                             cursor = resizeXCursor;
                         } else if (registration) {
-                            mode = Cursor.HAND_CURSOR;
+                            newMode = Cursor.HAND_CURSOR;
                             cursor = moveRegPointCursor;
                         } else if (!inBounds && rightRotate && topRotate) {
-                            mode = MODE_ROTATE_NE;
+                            newMode = MODE_ROTATE_NE;
                             cursor = rotateCursor;
                         } else if (!inBounds && rightRotate && bottomRotate) {
-                            mode = MODE_ROTATE_SE;
+                            newMode = MODE_ROTATE_SE;
                             cursor = rotateCursor;
                         } else if (!inBounds && leftRotate && topRotate) {
-                            mode = MODE_ROTATE_NW;
+                            newMode = MODE_ROTATE_NW;
                             cursor = rotateCursor;
                         } else if (!inBounds && leftRotate && bottomRotate) {
-                            mode = MODE_ROTATE_SW;
+                            newMode = MODE_ROTATE_SW;
                             cursor = rotateCursor;
                         } else if (shearY && (left || right)) {
                             if (left) {
-                                mode = MODE_SHEAR_W;
+                                newMode = MODE_SHEAR_W;
                             } else {
-                                mode = MODE_SHEAR_E;
+                                newMode = MODE_SHEAR_E;
                             }
                             cursor = shearYCursor;
                         } else if (shearX && (top || bottom)) {
                             if (top) {
-                                mode = MODE_SHEAR_N;
+                                newMode = MODE_SHEAR_N;
                             } else {
-                                mode = MODE_SHEAR_S;
+                                newMode = MODE_SHEAR_S;
                             }
                             cursor = shearXCursor;
                         } else if (inBounds) {
-                            mode = Cursor.MOVE_CURSOR;
+                            newMode = Cursor.MOVE_CURSOR;
                             cursor = moveCursor;
                         } else {
-                            mode = Cursor.DEFAULT_CURSOR;
+                            newMode = Cursor.DEFAULT_CURSOR;
                             cursor = selectCursor;
                         }
 
                         setCursor(cursor);
+                        mode = newMode;
                     }
                 }
 
@@ -1140,52 +1157,58 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
         }
 
-        private synchronized void calcRect() {
-            _rect = calcRect(zoom);
+        private void calcRect() {
+            synchronized (ImagePanel.this) {
+                synchronized (this) {
+                    _rect = calcRect(zoom);
+                }
+            }
         }
 
-        private synchronized Rectangle calcRect(Zoom z) {
-            if (_img != null || timelined != null) {
-                //int w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
-                //int h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
-                double zoomDouble = z.fit ? getZoomToFit() : z.value;
-                int w1;
-                int h1;
-                if (timelined != null) {
-                    w1 = (int) (timelined.getRectWithStrokes().getWidth() * zoomDouble / SWF.unitDivisor);
-                    h1 = (int) (timelined.getRectWithStrokes().getHeight() * zoomDouble / SWF.unitDivisor);
-                } else {
-                    w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
-                    h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
-                }
+        private Rectangle calcRect(Zoom z) {
+            synchronized (ImagePanel.this) {
+                if (_img != null || timelined != null) {
+                    //int w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
+                    //int h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
+                    double zoomDouble = z.fit ? getZoomToFit() : z.value;
+                    int w1;
+                    int h1;
+                    if (timelined != null) {
+                        w1 = (int) (timelined.getRectWithStrokes().getWidth() * zoomDouble / SWF.unitDivisor);
+                        h1 = (int) (timelined.getRectWithStrokes().getHeight() * zoomDouble / SWF.unitDivisor);
+                    } else {
+                        w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
+                        h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
+                    }
 
-                int w2 = getWidth();
-                int h2 = getHeight();
+                    int w2 = getWidth();
+                    int h2 = getHeight();
 
-                int w;
-                int h;
-                if (autoFit) {
-                    if (w1 <= w2 && h1 <= h2) {
+                    int w;
+                    int h;
+                    if (autoFit) {
+                        if (w1 <= w2 && h1 <= h2) {
+                            w = w1;
+                            h = h1;
+                        } else {
+
+                            h = h1 * w2 / w1;
+                            if (h > h2) {
+                                w = w1 * h2 / h1;
+                                h = h2;
+                            } else {
+                                w = w2;
+                            }
+                        }
+                    } else {
                         w = w1;
                         h = h1;
-                    } else {
-
-                        h = h1 * w2 / w1;
-                        if (h > h2) {
-                            w = w1 * h2 / h1;
-                            h = h2;
-                        } else {
-                            w = w2;
-                        }
                     }
-                } else {
-                    w = w1;
-                    h = h1;
-                }
 
-                setAllowMove(h > h2 || w > w2);
-                Rectangle r2 = new Rectangle(getWidth() / 2 - w / 2 + offsetPoint.x, getHeight() / 2 - h / 2 + offsetPoint.y, w, h);
-                return r2;
+                    setAllowMove(h > h2 || w > w2);
+                    Rectangle r2 = new Rectangle(getWidth() / 2 - w / 2 + offsetPoint.x, getHeight() / 2 - h / 2 + offsetPoint.y, w, h);
+                    return r2;
+                }
             }
             return null;
         }
@@ -1213,10 +1236,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             df.setMinimumFractionDigits(0);
             df.setGroupingUsed(false);
 
-            float frameLoss = 100 - (getFpsIs() / fpsShouldBe * 100);
-
             if (Configuration._debugMode.get()) {
-                g2d.drawString("frameLoss:" + df.format(frameLoss) + "%", 20, 20);
+                g2d.drawString("frameLoss:" + df.format(getFrameLoss()) + "%", 20, 20);
             }
         }
     }
@@ -1264,7 +1285,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             Point p = lastMouseEvent == null ? null : lastMouseEvent.getPoint();
 
-            synchronized (ImagePanel.class) {
+            synchronized (ImagePanel.this) {
                 if (timer == thisTimer) {
                     cursorPosition = p;
                 }
@@ -1274,7 +1295,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private void showSelectedName() {
         if (selectedDepth > -1 && frame > -1 && timelined != null) {
-            DepthState ds = timelined.getTimeline().getFrame(frame).layers.get(selectedDepth);
+            Frame f = timelined.getTimeline().getFrame(frame);
+            if (f == null) {
+                return;
+            }
+            DepthState ds = f.layers.get(selectedDepth);
             if (ds != null) {
                 CharacterTag cht = timelined.getTimeline().swf.getCharacter(ds.characterId);
                 if (cht != null) {
@@ -1288,7 +1313,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (selectedDepth > -1) {
             showSelectedName();
         } else {
-            debugLabel.setText(" - ");
+            debugLabel.setText(DEFAULT_DEBUG_LABEL_TEXT);
         }
     }
 
@@ -1306,7 +1331,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         iconPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                synchronized (ImagePanel.class) {
+                synchronized (ImagePanel.this) {
                     lastMouseEvent = e;
                     redraw();
                 }
@@ -1314,7 +1339,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             @Override
             public void mouseExited(MouseEvent e) {
-                synchronized (ImagePanel.class) {
+                synchronized (ImagePanel.this) {
                     lastMouseEvent = null;
                     hideMouseSelection();
                     redraw();
@@ -1323,7 +1348,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                synchronized (ImagePanel.class) {
+                synchronized (ImagePanel.this) {
                     mouseButton = e.getButton();
                     lastMouseEvent = e;
                     redraw();
@@ -1365,7 +1390,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                synchronized (ImagePanel.class) {
+                synchronized (ImagePanel.this) {
                     mouseButton = 0;
                     lastMouseEvent = e;
                     redraw();
@@ -1382,7 +1407,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         iconPanel.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-                synchronized (ImagePanel.class) {
+                synchronized (ImagePanel.this) {
                     lastMouseEvent = e;
                     redraw();
                 }
@@ -1390,7 +1415,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                synchronized (ImagePanel.class) {
+                synchronized (ImagePanel.this) {
                     lastMouseEvent = e;
                     redraw();
                 }
@@ -1399,8 +1424,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private synchronized void redraw() {
-        if (timer == null && timelined != null) {
+        final Timer thisTimer = timer;
+        if (timelined == null) {
+            return;
+        }
+        if (thisTimer == null) {
             startTimer(timelined.getTimeline(), false);
+        } else {
+            //if there is no frameloss (no frames waiting in the queue), 
+            // then we can draw immediately to avoid long waiting between frames.
+            // This can happen on SWFs with small frameRate
+            if (Float.compare(getFrameLoss(), 0f) == 0) {
+                drawFrame(thisTimer, true);
+            }
         }
     }
 
@@ -1500,7 +1536,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return zoomAvailable;
     }
 
-    public void setTimelined(final Timelined drawable, final SWF swf, int frame) {
+    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor) {
         Stage stage = new Stage(drawable) {
             @Override
             public void callFrame(int frame) {
@@ -1557,7 +1593,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
         };
         lda = new LocalDataArea(stage);
-        synchronized (ImagePanel.class) {
+        synchronized (ImagePanel.this) {
             stopInternal();
             if (drawable instanceof ButtonTag) {
                 frame = ButtonTag.FRAME_UP;
@@ -1599,12 +1635,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
         }
 
-        synchronized (ImagePanel.class) {
+        synchronized (ImagePanel.this) {
             if (!drawReady) {
                 clearImagePanel();
             }
         }
 
+        this.showObjectsUnderCursor = showObjectsUnderCursor;
         fireMediaDisplayStateChanged();
     }
 
@@ -1698,7 +1735,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         stopInternal();
     }
 
-    private void stopAllSounds() {
+    private synchronized void stopAllSounds() {
         for (int i = soundPlayers.size() - 1; i >= 0; i--) {
             SoundTagPlayer pl = soundPlayers.get(i);
             pl.close();
@@ -1714,6 +1751,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             fireMediaDisplayStateChanged();
         }
 
+        showObjectsUnderCursor = false;
         textTag = null;
         newTextTag = null;
         displayObjectCache.clear();
@@ -1751,7 +1789,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
         }
-
         fireMediaDisplayStateChanged();
     }
 
@@ -1986,7 +2023,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private ExportRectangle getViewRect() {
 
         Zoom zoom;
-        synchronized (ImagePanel.class) {
+        synchronized (ImagePanel.this) {
             zoom = this.zoom;
 
             if (timelined == null) {
@@ -2063,14 +2100,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Zoom zoom;
         SWF swf;
 
-        synchronized (ImagePanel.class) {
+        synchronized (ImagePanel.this) {
             timelined = this.timelined;
             lastMouseEvent = this.lastMouseEvent;
         }
 
         boolean shownAgain = false;
 
-        synchronized (ImagePanel.class) {
+        synchronized (ImagePanel.this) {
             frame = this.frame;
             time = this.time;
             if (this.frame == this.prevFrame) {
@@ -2079,8 +2116,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             this.prevFrame = this.frame;
             cursorPosition = this.cursorPosition;
-            if (cursorPosition
-                    != null) {
+            if (cursorPosition != null) {
                 cursorPosition = iconPanel.toImagePoint(cursorPosition);
             }
 
@@ -2094,7 +2130,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return;
         }
 
-        iconPanel.calcRect();
+        synchronized (ImagePanel.this) {
+            iconPanel.calcRect();
+        }
 
         RenderContext renderContext = new RenderContext();
         renderContext.displayObjectCache = displayObjectCache;
@@ -2126,18 +2164,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (display) {
                 Stopwatch sw = Stopwatch.startNew();
 
-                synchronized (lock) {
-                    Reference<Point2D> registrationPointRef = new Reference<>(registrationPoint);
-                    Reference<Rectangle2D> boundsRef = new Reference<>(bounds);
+                synchronized (ImagePanel.this) {
+                    synchronized (lock) {
+                        Reference<Point2D> registrationPointRef = new Reference<>(registrationPoint);
+                        Reference<Rectangle2D> boundsRef = new Reference<>(bounds);
 
-                    _viewRect = getViewRect();
-                    if (_viewRect.getHeight() < 0 || _viewRect.getWidth() < 0) {
-                        img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
-                    } else {
-                        img = getFrame(_viewRect, swf, frame, time, timelined, renderContext, selectedDepth, freeTransformDepth, zoomDouble, registrationPointRef, boundsRef, transform, transformUpdated == null ? null : new Matrix(transformUpdated));
+                        _viewRect = getViewRect();
+                        if (_viewRect.getHeight() < 0 || _viewRect.getWidth() < 0) {
+                            img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
+                        } else {
+                            img = getFrame(_viewRect, swf, frame, time, timelined, renderContext, selectedDepth, freeTransformDepth, zoomDouble, registrationPointRef, boundsRef, transform, transformUpdated == null ? null : new Matrix(transformUpdated));
+                        }
+                        bounds = boundsRef.getVal();
+                        registrationPoint = registrationPointRef.getVal();
                     }
-                    bounds = boundsRef.getVal();
-                    registrationPoint = registrationPointRef.getVal();
                 }
 
                 sw.stop();
@@ -2193,48 +2233,66 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             StringBuilder ret = new StringBuilder();
 
             if (cursorPosition != null) {
-                ret.append(" [").append(cursorPosition.x).append(",").append(cursorPosition.y).append("] : ");
+                ret.append(" [").append(cursorPosition.x).append(",").append(cursorPosition.y).append("]");
+                if (showObjectsUnderCursor) {
+                    ret.append(" : ");
+                }
             }
 
             boolean handCursor = renderContext.mouseOverButton != null;
-            boolean first = true;
-            for (int i = renderContext.stateUnderCursor.size() - 1; i >= 0; i--) {
-                DepthState ds = renderContext.stateUnderCursor.get(i);
-                if (!first) {
-                    ret.append(", ");
+
+            if (showObjectsUnderCursor) {
+
+                boolean first = true;
+                for (int i = renderContext.stateUnderCursor.size() - 1; i >= 0; i--) {
+                    DepthState ds = renderContext.stateUnderCursor.get(i);
+                    if (!first) {
+                        ret.append(", ");
+                    }
+
+                    first = false;
+                    CharacterTag c = swf.getCharacter(ds.characterId);
+                    ret.append(c.toString());
+                    if (ds.depth > 0) {
+                        ret.append(" ");
+                        ret.append(AppStrings.translate("imagePanel.depth"));
+                        ret.append(" ");
+                        ret.append(ds.depth);
+                    }
                 }
 
-                first = false;
-                CharacterTag c = swf.getCharacter(ds.characterId);
-                ret.append(c.toString());
-                if(ds.depth > 0) {
-                    ret.append(" ");
-                    ret.append(AppStrings.translate("imagePanel.depth"));
-                    ret.append(" ");
-                    ret.append(ds.depth);
+                if (first) {
+                    ret.append(DEFAULT_DEBUG_LABEL_TEXT);
                 }
-            }
-
-            if (first) {
-                ret.append(" - ");
             }
 
             ButtonTag lastMouseOverButton;
-            synchronized (ImagePanel.class) {
+            int freeTransformDepth = this.freeTransformDepth;
+            synchronized (ImagePanel.this) {
                 if (timer == thisTimer) {
                     iconPanel.setImg(img);
                     lastMouseOverButton = iconPanel.mouseOverButton;
                     iconPanel.mouseOverButton = renderContext.mouseOverButton;
-                    debugLabel.setText(ret.toString());
-                    if (freeTransformDepth == -1) {
-                        if (handCursor) {
-                            iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                        } else if (iconPanel.hasAllowMove()) {
-                            iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-                        } else {
-                            iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    View.execInEventDispatchLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (ret.length() == 0) {
+                                debugLabel.setText(DEFAULT_DEBUG_LABEL_TEXT);
+                            } else {
+                                debugLabel.setText(ret.toString());
+                            }
+                            if (freeTransformDepth == -1) {
+                                if (handCursor) {
+                                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                                } else if (iconPanel.hasAllowMove()) {
+                                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+                                } else {
+                                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                                }
+                            }
                         }
                     }
+                    );
 
                     if (lastMouseOverButton != renderContext.mouseOverButton) {
                         ButtonTag b = renderContext.mouseOverButton;
@@ -2281,14 +2339,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void playingFinished(MediaDisplay source) {
-                    synchronized (ImagePanel.class) {
+                    synchronized (ImagePanel.this) {
                         sp.close();
                         soundPlayers.remove(sp);
                     }
                 }
             });
 
-            synchronized (ImagePanel.class) {
+            synchronized (ImagePanel.this) {
                 if (timer != null && timer == thisTimer) {
                     soundPlayers.add(sp);
                     sp.play();
@@ -2360,6 +2418,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return fpsIs;
     }
 
+    private synchronized float getFrameLoss() {
+        return 100 - (getFpsIs() / fpsShouldBe * 100);
+    }
+
     private synchronized void setSkippedFrames(int val) {
         skippedFrames = val;
     }
@@ -2389,7 +2451,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             @Override
             public void run() {
                 try {
-                    synchronized (ImagePanel.class) {
+                    synchronized (ImagePanel.this) {
                         if (timer != thisTimer) {
                             return;
                         }
@@ -2399,7 +2461,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     long delay = getMsPerFrame();
                     if (isSingleFrame) {
                         drawFrame(thisTimer, true);
-                        /*synchronized (ImagePanel.class) {
+                        /*synchronized (ImagePanel.this) {
                             thisTimer.cancel();
                             if (timer == thisTimer) {
                                 timer = null;
@@ -2417,13 +2479,23 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                         //How many ticks (= times where frame should be displayed in framerate) are there from hitting play button
                         int ticksFromStart = (int) Math.floor((frameTimeMsIs - startRun) / (double) getMsPerFrame()) + 1;
-                        //Add ticks to first frame when hitting play button, ignoring total framecount => this value can be larger than number of frames in timeline
-                        int frameOverMaxShouldBeNow = startFrame + ticksFromStart;
-                        //Apply maximum frames repating, this is actual frame which should be drawed now
-                        int frameShouldBeNow = frameOverMaxShouldBeNow % frameCount;
 
                         //How many frames are there between last displayed frame and now. For perfect display(=no framedrop), value should be 1
-                        int skipFrames = frameShouldBeNow - curFrame;
+                        int skipFrames;
+                        //Add ticks to first frame when hitting play button, ignoring total framecount => this value can be larger than number of frames in timeline
+                        int frameOverMaxShouldBeNow;
+                        if (stillFrame) {
+                            frameOverMaxShouldBeNow = ticksFromStart;
+                            skipFrames = ticksFromStart - time;
+                        } else {
+                            frameOverMaxShouldBeNow = startFrame + ticksFromStart;
+
+                            //Apply maximum frames repating, this is actual frame which should be drawed now
+                            int frameShouldBeNow = frameOverMaxShouldBeNow % frameCount;
+
+                            skipFrames = frameShouldBeNow - curFrame;
+                        }
+
                         //It is negative for some reason, this will display older frames. Add frameCount to stay in modulu framecount.
                         if (skipFrames < 0) {
                             skipFrames += frameCount;
@@ -2448,7 +2520,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             delay = nextFrameOverMaxTimeMsShouldBe - afterDrawFrameTimeMsIs;
                         }
                     }
-                    synchronized (ImagePanel.class) {
+                    synchronized (ImagePanel.this) {
                         if (timer != thisTimer) {
                             return;
                         }
@@ -2461,8 +2533,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
         };
-        if (timer != null) {
-            timer.schedule(task, msDelay);
+        synchronized (ImagePanel.this) {
+            if (timer != null) {
+                timer.schedule(task, msDelay);
+            }
         }
     }
 

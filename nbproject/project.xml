@@ -278,9 +278,6 @@
                         <location>.gitattributes</location>
                     </source-file>
                     <source-file>
-                        <location>.travis.yml</location>
-                    </source-file>
-                    <source-file>
                         <location>nbproject/project.xml</location>
                     </source-file>
                     <source-file>

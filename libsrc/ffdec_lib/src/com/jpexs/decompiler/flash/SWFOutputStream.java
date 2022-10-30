@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.amf.amf3.Amf3OutputStream;
@@ -1348,10 +1349,10 @@ public class SWFOutputStream extends OutputStream {
                 writeUI8(lineStyleCount);
             }
             for (int i = 0; i < lineStyleCount; i++) {
-                writeLINESTYLE(value.lineStyles[i], shapeNum);
+                writeLINESTYLE((LINESTYLE) value.lineStyles[i], shapeNum);
             }
         } else {
-            lineStyleCount = value.lineStyles.length;
+            lineStyleCount = value.lineStyles2.length;
             if (lineStyleCount >= 0xff) {
                 writeUI8(0xff);
                 writeUI16(lineStyleCount);
@@ -1359,7 +1360,7 @@ public class SWFOutputStream extends OutputStream {
                 writeUI8(lineStyleCount);
             }
             for (int i = 0; i < lineStyleCount; i++) {
-                writeLINESTYLE2((LINESTYLE2) value.lineStyles[i], shapeNum);
+                writeLINESTYLE2((LINESTYLE2) value.lineStyles2[i], shapeNum);
             }
         }
     }
@@ -1388,7 +1389,7 @@ public class SWFOutputStream extends OutputStream {
         writeFILLSTYLEARRAY(value.fillStyles, shapeNum);
         writeLINESTYLEARRAY(value.lineStyles, shapeNum);
         value.numFillBits = getNeededBitsU(value.fillStyles.fillStyles.length);
-        value.numLineBits = getNeededBitsU(value.lineStyles.lineStyles.length);
+        value.numLineBits = getNeededBitsU(shapeNum <= 3 ? value.lineStyles.lineStyles.length : value.lineStyles.lineStyles2.length);
         writeUB(4, value.numFillBits);
         writeUB(4, value.numLineBits);
         writeSHAPERECORDS(value.shapeRecords, value.numFillBits, value.numLineBits, shapeNum);
@@ -1473,7 +1474,7 @@ public class SWFOutputStream extends OutputStream {
                     writeFILLSTYLEARRAY(scr.fillStyles, shapeNum);
                     writeLINESTYLEARRAY(scr.lineStyles, shapeNum);
                     fillBits = getNeededBitsU(scr.fillStyles.fillStyles.length);
-                    lineBits = getNeededBitsU(scr.lineStyles.lineStyles.length);
+                    lineBits = getNeededBitsU(shapeNum <= 3 ? scr.lineStyles.lineStyles.length : scr.lineStyles.lineStyles2.length);
 
                     if (Configuration._debugCopy.get()) {
                         fillBits = Math.max(fillBits, scr.numFillBits);

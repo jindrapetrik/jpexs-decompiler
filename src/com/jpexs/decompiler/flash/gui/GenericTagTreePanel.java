@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.generictageditors.Amf3ValueEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BinaryDataEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.BooleanEditor;
@@ -28,6 +27,8 @@ import com.jpexs.decompiler.flash.gui.generictageditors.FullSized;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
+import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
+import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.types.ARGB;
@@ -504,6 +505,22 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 setBackgroundNonSelectionColor(Color.white);
             }
         }
+
+        @Override
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+             Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+             if (component instanceof JLabel) {
+                 JLabel lab = (JLabel) component;
+                 if (value == tree.getModel().getRoot()) {
+                     if (editedTag != null) {
+                         lab.setIcon(AbstractTagTree.getIconForType(AbstractTagTree.getTreeNodeType(editedTag)));
+                     }
+                 }
+             }
+             return component;
+        }
+        
+        
     }
 
     @Override

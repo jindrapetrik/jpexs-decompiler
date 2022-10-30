@@ -59,5 +59,6 @@ public enum TreeNodeType {
     FILE_ATTRIBUTES,
     METADATA,
     PLACE_OBJECT,
-    REMOVE_OBJECT
+    REMOVE_OBJECT,
+    END
 }

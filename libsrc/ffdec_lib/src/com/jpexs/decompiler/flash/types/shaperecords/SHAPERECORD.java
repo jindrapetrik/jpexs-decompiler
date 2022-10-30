@@ -138,7 +138,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         return ret;
     }
 
-    public static void shapeListToImage(SWF swf, List<SHAPE> shapes, SerializableImage image, int frame, Color color, ColorTransform colorTransform) {
+    public static void shapeListToImage(int shapeNum, SWF swf, List<SHAPE> shapes, SerializableImage image, int frame, Color color, ColorTransform colorTransform) {
         if (shapes.isEmpty()) {
             return;
         }
@@ -219,7 +219,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
 
                 Matrix transformation = Matrix.getTranslateInstance(px, py);
                 transformation.scale(ratio);
-                BitmapExporter.export(swf, shape, color, image, transformation, transformation, colorTransform, true);
+                BitmapExporter.export(shapeNum, swf, shape, color, image, 1 /*FIXME??*/, transformation, transformation, colorTransform, true);
 
                 // draw bounding boxes
                 if (DRAW_BOUNDING_BOX) {

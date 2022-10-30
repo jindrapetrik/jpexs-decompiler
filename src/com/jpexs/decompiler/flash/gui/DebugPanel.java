@@ -20,7 +20,6 @@ import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.messages.in.InBreakAtExt;
 import com.jpexs.debugger.flash.messages.in.InConstantPool;
 import com.jpexs.debugger.flash.messages.in.InFrame;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler.BreakListener;
 import com.jpexs.decompiler.flash.gui.abc.ABCPanel;
 import de.hameister.treetable.MyTreeTable;

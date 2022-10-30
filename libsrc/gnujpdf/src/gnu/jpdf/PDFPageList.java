@@ -79,14 +79,14 @@ public class PDFPageList extends PDFObject {
 
         // now the objects body
         // the Kids array
-        os.write("/Kids ".getBytes());
-        os.write(PDFObject.toArray(pages).getBytes());
-        os.write("\n".getBytes());
+        os.write("/Kids ".getBytes("UTF-8"));
+        os.write(PDFObject.toArray(pages).getBytes("UTF-8"));
+        os.write("\n".getBytes("UTF-8"));
 
         // the number of Kids in this document
-        os.write("/Count ".getBytes());
-        os.write(Integer.toString(pages.size()).getBytes());
-        os.write("\n".getBytes());
+        os.write("/Count ".getBytes("UTF-8"));
+        os.write(Integer.toString(pages.size()).getBytes("UTF-8"));
+        os.write("\n".getBytes("UTF-8"));
 
         // finish off with its footer
         writeEnd(os);

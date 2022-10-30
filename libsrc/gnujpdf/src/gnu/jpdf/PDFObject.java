@@ -117,12 +117,12 @@ public abstract class PDFObject implements Serializable {
      * @exception IOException on error
      */
     public final void writeStart(OutputStream os) throws IOException {
-        os.write(Integer.toString(objser).getBytes());
-        os.write(" 0 obj\n<<\n".getBytes());
+        os.write(Integer.toString(objser).getBytes("UTF-8"));
+        os.write(" 0 obj\n<<\n".getBytes("UTF-8"));
         if (type != null) {
-            os.write("/Type ".getBytes());
-            os.write(type.getBytes());
-            os.write("\n".getBytes());
+            os.write("/Type ".getBytes("UTF-8"));
+            os.write(type.getBytes("UTF-8"));
+            os.write("\n".getBytes("UTF-8"));
         }
     }
 
@@ -137,7 +137,7 @@ public abstract class PDFObject implements Serializable {
      * @exception IOException on error
      */
     public final void writeEnd(OutputStream os) throws IOException {
-        os.write(">>\nendobj\n".getBytes());
+        os.write(">>\nendobj\n".getBytes("UTF-8"));
     }
 
     /**

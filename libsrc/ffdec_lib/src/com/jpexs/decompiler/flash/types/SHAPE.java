@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -76,13 +77,13 @@ public class SHAPE implements NeedsCharacters, Serializable {
         return SHAPERECORD.getBounds(shapeRecords);
     }
 
-    public Shape getOutline(SWF swf, boolean stroked) {
+    public Shape getOutline(int shapeNum, SWF swf, boolean stroked) {
         if (cachedOutline != null) {
             return cachedOutline;
         }
 
         List<GeneralPath> strokes = new ArrayList<>();
-        List<GeneralPath> paths = PathExporter.export(swf, this, strokes);
+        List<GeneralPath> paths = PathExporter.export(shapeNum, swf, this, strokes);
 
         Area area = new Area();
         for (GeneralPath path : paths) {

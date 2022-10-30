@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -177,6 +178,7 @@ public abstract class ImageTag extends DrawableTag {
 
         shape.lineStyles = new LINESTYLEARRAY();
         shape.lineStyles.lineStyles = new LINESTYLE[0];
+        shape.lineStyles.lineStyles2 = new LINESTYLE2[0];
         shape.shapeRecords = new ArrayList<>();
         StyleChangeRecord style = new StyleChangeRecord();
         style.stateFillStyle0 = true;
@@ -227,23 +229,23 @@ public abstract class ImageTag extends DrawableTag {
 
     @Override
     public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked) {
-        return transformation.toTransform().createTransformedShape(getShape().getOutline(swf, stroked));
+        return transformation.toTransform().createTransformedShape(getShape().getOutline(1, swf, stroked));
     }
 
     @Override
     public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode) {
-        BitmapExporter.export(swf, getShape(), null, image, transformation, strokeTransformation, colorTransform, true);
+        BitmapExporter.export(1, swf, getShape(), null, image, unzoom, transformation, strokeTransformation, colorTransform, true);
     }
 
     @Override
     public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
-        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, getShape(), getCharacterId(), exporter, null, colorTransform, 1);
+        SVGShapeExporter shapeExporter = new SVGShapeExporter(1, swf, getShape(), getCharacterId(), exporter, null, colorTransform, 1);
         shapeExporter.export();
     }
 
     @Override
     public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
-        CanvasShapeExporter cse = new CanvasShapeExporter(null, unitDivisor, swf, getShape(), null, 0, 0);
+        CanvasShapeExporter cse = new CanvasShapeExporter(1, null, unitDivisor, swf, getShape(), null, 0, 0);
         cse.export();
         result.append(cse.getShapeData());
     }

@@ -33,32 +33,22 @@ import com.jpexs.decompiler.flash.exporters.settings.FrameExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.SpriteExportSettings;
 import com.jpexs.decompiler.flash.exporters.shape.CanvasShapeExporter;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
-import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
-import com.jpexs.decompiler.flash.tags.DefineEditTextTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
-import com.jpexs.decompiler.flash.tags.DefineText2Tag;
-import com.jpexs.decompiler.flash.tags.DefineTextTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
-import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
-import com.jpexs.decompiler.flash.tags.base.StaticTextTag;
-import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ColorTransform;
-import com.jpexs.decompiler.flash.types.DynamicTextGlyphEntry;
-import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
-import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.filters.BEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.COLORMATRIXFILTER;
 import com.jpexs.decompiler.flash.types.filters.CONVOLUTIONFILTER;
@@ -75,27 +65,12 @@ import gnu.jpdf.PDFGraphics;
 import gnu.jpdf.PDFJob;
 import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Composite;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.Image;
-import java.awt.Paint;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphVector;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
-import java.awt.image.ImageObserver;
-import java.awt.image.RenderedImage;
-import java.awt.image.renderable.RenderableImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
 import java.io.BufferedOutputStream;
@@ -104,7 +79,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.text.AttributedCharacterIterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -446,7 +420,7 @@ public class FrameExporter {
                 }
 
                 int fframe = fframes.get(pos++);
-                BufferedImage result = SWF.frameToImageGet(tim, fframe, fframe, null, 0, tim.displayRect, new Matrix(), null, fusesTransparency ? null : fbackgroundColor, settings.zoom).getBufferedImage();
+                BufferedImage result = SWF.frameToImageGet(tim, fframe, 0, null, 0, tim.displayRect, new Matrix(), null, fusesTransparency ? null : fbackgroundColor, settings.zoom).getBufferedImage();
 
                 if (evl != null) {
                     evl.handleExportedEvent("frame", pos, fframes.size(), tagName);
@@ -587,7 +561,6 @@ public class FrameExporter {
 
         return ret;
     }
-
 
     private static void drawText(float x, float y, Matrix trans, int textColor, Map<Integer, Font> existingFonts, FontTag font, String text, int textHeight, Graphics g) {
         int fontId = font.getFontId();

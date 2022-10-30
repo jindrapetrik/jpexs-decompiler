@@ -158,6 +158,10 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
 
     @Override
     public void resetTimeline() {
+        Cache<CharacterTag, RECT> cache = swf == null ? null : swf.getRectCache();
+        if (cache != null) {
+            cache.remove(this);
+        }
         if (timeline != null) {
             timeline.reset(swf, this, spriteId, getRect());
         }
@@ -321,6 +325,11 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     public void addTag(int index, Tag tag) {
         setModified(true);
         subTags.add(index, tag);
+    }
+
+    @Override
+    public int indexOfTag(Tag tag) {
+        return subTags.indexOf(tag);
     }
 
     @Override

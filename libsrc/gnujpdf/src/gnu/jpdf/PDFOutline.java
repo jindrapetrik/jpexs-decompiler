@@ -203,74 +203,74 @@ public class PDFOutline extends PDFObject implements Serializable {
         // now the objects body
         // These are for kids only
         if (parent != null) {
-            os.write("/Title ".getBytes());
-            os.write(PDFStringHelper.makePDFString(title).getBytes());
-            os.write("\n/Dest [".getBytes());
-            os.write(dest.toString().getBytes());
+            os.write("/Title ".getBytes("UTF-8"));
+            os.write(PDFStringHelper.makePDFString(title).getBytes("UTF-8"));
+            os.write("\n/Dest [".getBytes("UTF-8"));
+            os.write(dest.toString().getBytes("UTF-8"));
 
             if (destMode == FITPAGE) {
-                //os.write(" null null null]\n/Parent ".getBytes());
-                os.write(" /Fit]\n/Parent ".getBytes());
+                //os.write(" null null null]\n/Parent ".getBytes("UTF-8"));
+                os.write(" /Fit]\n/Parent ".getBytes("UTF-8"));
             } else {
-                os.write(" /FitR ".getBytes());
-                os.write(Integer.toString(l).getBytes());
-                os.write(" ".getBytes());
-                os.write(Integer.toString(b).getBytes());
-                os.write(" ".getBytes());
-                os.write(Integer.toString(r).getBytes());
-                os.write(" ".getBytes());
-                os.write(Integer.toString(t).getBytes());
-                os.write("]\n/Parent ".getBytes());
+                os.write(" /FitR ".getBytes("UTF-8"));
+                os.write(Integer.toString(l).getBytes("UTF-8"));
+                os.write(" ".getBytes("UTF-8"));
+                os.write(Integer.toString(b).getBytes("UTF-8"));
+                os.write(" ".getBytes("UTF-8"));
+                os.write(Integer.toString(r).getBytes("UTF-8"));
+                os.write(" ".getBytes("UTF-8"));
+                os.write(Integer.toString(t).getBytes("UTF-8"));
+                os.write("]\n/Parent ".getBytes("UTF-8"));
             }
-            os.write(parent.toString().getBytes());
-            os.write("\n".getBytes());
+            os.write(parent.toString().getBytes("UTF-8"));
+            os.write("\n".getBytes("UTF-8"));
         }
 
         // the number of outlines in this document
         if (parent == null) {
             // were the top level node, so all are open by default
             if (outlines.size() > 0) {
-                os.write("/Count ".getBytes());
-                os.write(Integer.toString(outlines.size()).getBytes());
-                os.write("\n".getBytes());
+                os.write("/Count ".getBytes("UTF-8"));
+                os.write(Integer.toString(outlines.size()).getBytes("UTF-8"));
+                os.write("\n".getBytes("UTF-8"));
             }
         } else {
             // were a decendent, so by default we are closed. Find out how many
             // entries are below us
             int c = descendants();
             if (c > 0) {
-                os.write("/Count ".getBytes());
-                os.write(Integer.toString(-c).getBytes());
-                os.write("\n".getBytes());
+                os.write("/Count ".getBytes("UTF-8"));
+                os.write(Integer.toString(-c).getBytes("UTF-8"));
+                os.write("\n".getBytes("UTF-8"));
             }
         }
 
         // These only valid if we have children
         if (outlines.size() > 0) {
             // the number of the first outline in list
-            os.write("/First ".getBytes());
-            os.write(outlines.elementAt(0).toString().getBytes());
-            os.write("\n".getBytes());
+            os.write("/First ".getBytes("UTF-8"));
+            os.write(outlines.elementAt(0).toString().getBytes("UTF-8"));
+            os.write("\n".getBytes("UTF-8"));
 
             // the number of the last outline in list
-            os.write("/Last ".getBytes());
-            os.write(outlines.elementAt(outlines.size() - 1).toString().getBytes());
-            os.write("\n".getBytes());
+            os.write("/Last ".getBytes("UTF-8"));
+            os.write(outlines.elementAt(outlines.size() - 1).toString().getBytes("UTF-8"));
+            os.write("\n".getBytes("UTF-8"));
         }
 
         if (parent != null) {
             int index = parent.getIndex(this);
             if (index > 0) {
                 // Now if were not the first, then we have a /Prev node
-                os.write("/Prev ".getBytes());
-                os.write(parent.getNode(index - 1).toString().getBytes());
-                os.write("\n".getBytes());
+                os.write("/Prev ".getBytes("UTF-8"));
+                os.write(parent.getNode(index - 1).toString().getBytes("UTF-8"));
+                os.write("\n".getBytes("UTF-8"));
             }
             if (index < parent.getLast()) {
                 // We have a /Next node
-                os.write("/Next ".getBytes());
-                os.write(parent.getNode(index + 1).toString().getBytes());
-                os.write("\n".getBytes());
+                os.write("/Next ".getBytes("UTF-8"));
+                os.write(parent.getNode(index + 1).toString().getBytes("UTF-8"));
+                os.write("\n".getBytes("UTF-8"));
             }
         }
 

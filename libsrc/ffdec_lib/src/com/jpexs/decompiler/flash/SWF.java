@@ -145,7 +145,6 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
-import com.jpexs.decompiler.flash.types.SOUNDENVELOPE;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.SWFField;
@@ -192,6 +191,7 @@ import java.util.Date;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -485,13 +485,10 @@ public final class SWF implements SWFContainerItem, Timelined {
         return null;
     }
 
-    public Map<Integer, Set<Integer>> getDependentCharacters() {
-        if (dependentCharacters == null) {
-            synchronized (this) {
-                if (dependentCharacters == null) {
-                    Map<Integer, Set<Integer>> dep = new HashMap<>();
-                    for (Tag tag : getTags()) {
-                        if (tag instanceof CharacterTag) {
+    public void computeDependentCharacters() {
+        Map<Integer, Set<Integer>> dep = new HashMap<>();
+        for (Tag tag : getTags()) {
+            if (tag instanceof CharacterTag) {
                 int characterId = ((CharacterTag) tag).getCharacterId();
                 Set<Integer> needed = new HashSet<>();
                 tag.getNeededCharacters(needed);
@@ -507,7 +504,14 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
 
-                    dependentCharacters = dep;
+        dependentCharacters = dep;
+    }
+
+    public Map<Integer, Set<Integer>> getDependentCharacters() {
+        if (dependentCharacters == null) {
+            synchronized (this) {
+                if (dependentCharacters == null) {
+                    computeDependentCharacters();
                 }
             }
         }
@@ -549,7 +553,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         return dependents;
     }
-    
+
     public void computeDependentFrames() {
         Map<Integer, Set<Integer>> dep = new HashMap<>();
         for (int i = 0; i < timeline.getFrameCount(); i++) {
@@ -849,7 +853,9 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     private void parseCharacters(Iterable<Tag> list, Map<Integer, CharacterTag> characters, Map<Integer, List<CharacterIdTag>> characterIdTags) {
-        for (Tag t : list) {
+        Iterator<Tag> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            Tag t = iterator.next();
             if (t instanceof CharacterIdTag) {
                 int characterId = ((CharacterIdTag) t).getCharacterId();
                 if (t instanceof CharacterTag) {
@@ -1482,7 +1488,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
     }
 
-      public void assignExportNamesToSymbols() {
+    public void assignExportNamesToSymbols() {
         HashMap<Integer, String> exportNames = new HashMap<>();
         for (Tag t : getTags()) {
             if (t instanceof ExportAssetsTag) {
@@ -2945,8 +2951,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
 
         RECT rect = displayRect;
-        SerializableImage image = new SerializableImage((int) (rect.getWidth() * zoom / SWF.unitDivisor) + 1,
-                (int) (rect.getHeight() * zoom / SWF.unitDivisor) + 1, SerializableImage.TYPE_INT_ARGB_PRE);
+        SerializableImage image = new SerializableImage(
+                rect.getWidth() == 0 ? 1 /*FIXME: is this necessary?*/ : (int) (rect.getWidth() * zoom / SWF.unitDivisor),
+                rect.getHeight() == 0 ? 1 : (int) (rect.getHeight() * zoom / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB_PRE);
         if (backGroundColor == null) {
             image.fillTransparent();
         } else {
@@ -3186,13 +3193,19 @@ public final class SWF implements SWFContainerItem, Timelined {
             updateCharacters();
         }
     }
+    
+    public int indexOfTag(Tag tag) {
+        return tags.indexOf(tag);
+    }
 
     /**
-     * Adds a tag to the SWF If targetTreeItem is: - Frame: adds the tag to the
+     * Adds a tag to the SWF If targetTreeItem is: 
+     * - Frame: adds the tag to the
      * Frame. Frame can be a frame of the main timeline or a DefineSprite frame
-     * - DefineSprite: adds the tag to the end of the DefineSprite's tag list -
-     * Any other tag in the SWF: adds the new tag exactly before the specified
-     * tag - Other: adds the tag to the end of the SWF's tag list
+     * - DefineSprite: adds the tag to the end of the DefineSprite's tag list
+     * - Any other tag in the SWF: adds the new tag exactly before the specified
+     * tag
+     * - Other: adds the tag to the end of the SWF's tag list
      *
      * @param tag
      * @param targetTreeItem
@@ -3209,14 +3222,12 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         tag.setTimelined(timelined);
 
-        ReadOnlyTagList tags = timelined.getTags();
-
         int index;
         if ((tag instanceof DefineScalingGridTag) && (timelined instanceof DefineSpriteTag)) {
             index = this.tags.indexOf(timelined) + 1;
         } else if (frame != null) {
             if (frame.showFrameTag != null) {
-                index = tags.indexOf(frame.showFrameTag);
+                index = timelined.indexOfTag(frame.showFrameTag);
             } else {
                 index = -1;
             }
@@ -3227,11 +3238,12 @@ public final class SWF implements SWFContainerItem, Timelined {
                 ((CharacterIdTag) tag).setCharacterId(((CharacterTag) targetTreeItem).getCharacterId());
             }
 
-            index = tags.indexOf((Tag) targetTreeItem); // todo: honfika: why not index + 1?
+            index = timelined.indexOfTag((Tag) targetTreeItem); // todo: honfika: why not index + 1?
         } else {
             index = -1;
             if (tag instanceof CharacterTag) {
                 // add before the last ShowFrame tag
+                ReadOnlyTagList tags = timelined.getTags();
                 for (int i = tags.size() - 1; i >= 0; i--) {
                     if (tags.get(i) instanceof ShowFrameTag) {
                         index = i;
@@ -3344,6 +3356,8 @@ public final class SWF implements SWFContainerItem, Timelined {
         assignClassesToSymbols();
         clearImageCache();
         updateCharacters();
+        computeDependentCharacters();
+        computeDependentFrames();
     }
 
     @Override

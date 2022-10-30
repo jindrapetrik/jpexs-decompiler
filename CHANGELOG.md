@@ -1,6 +1,48 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- Replace characters references
+- Replace commandline action allows to load replacements list from a textfile
+- SymbolClass export from commandline
+- data-characterId and data-characterName tags to SVG export
+- [#1731] Image viewer zoom support
+- Cloning of tags and frames
+- Changing tag position
+- Tag list view
+- Inserting new tags before and after selection
+- [#1825], [#1737] Adding new frames
+- Context menu icons
+- Icon of tag in raw editor
+- [#1845] Show warning on opening file in Read only mode (binary search, unknown extensions, etc.)
+- [#1845] Show error message on saving in Read only mode, "Save As" must be used
+
+### Fixed
+- [#1834] PlaceObject4 tags appear as Unresolved inside of DefineSprite
+- [#1839] Sprite frames exported incorrectly and repeating
+- [#1838] AS3 - Properly handling of long unsigned values, hex values, default uint values etc.
+- [#1847] Shape viewer and PDF exporter - correct drawing of pure vertical/horizontal shapes (zero width/height)
+- Slow zooming/redrawing on action when SWF has low framerate
+- Correct debug info label position/content on the top of flash viewer to avoid unwanted initial scroll
+- [#1829] Adding extra pixel to the width and height when rendering items (for example to AVI)
+- [#1828] Zero scale layer matrices support
+- [#1828] Incorrect stroke scaling (normal/none/vertical/horizontal)
+- [#1771] DefineShape4 line filled using single color
+- Minimum stroke width should be 1 px
+- [#1828] Closing path in shape strokes from last moveTo only
+- Shape not clipped when clip area ouside of view
+- Sound tag player now uses less memory / threads - does not use Clip sound class
+- Freetransform tool dragging not always started on mousedown
+- [#1695] Freetransform tool vs zooming
+- [#1752] Freetransform tool on sprites with offset
+- [#1711] DefineFont2-3 advance values need to be handled as unsigned (UI16)
+- Leading of the font can be set to negative value
+- Reset configuration button in advanced settings not working
+
+### Changed
+- AS3 integer values are internally (e.g. in the lib) handled as java int type instead of long.
+
 ## [15.1.1] - 2022-07-03
 ### Added
 - Support for loading external images in DefineExternalImage2, DefineSubImage
@@ -2242,7 +2284,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version15.0.0...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version15.1.1...dev
+[15.1.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version15.1.0...version15.1.1
+[15.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version15.0.0...version15.1.0
 [15.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.6.0...version15.0.0
 [14.6.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.5.2...version14.6.0
 [14.5.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version14.5.1...version14.5.2
@@ -2361,15 +2405,29 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1731]: https://www.free-decompiler.com/flash/issues/1731
+[#1825]: https://www.free-decompiler.com/flash/issues/1825
+[#1737]: https://www.free-decompiler.com/flash/issues/1737
+[#1845]: https://www.free-decompiler.com/flash/issues/1845
+[#1834]: https://www.free-decompiler.com/flash/issues/1834
+[#1839]: https://www.free-decompiler.com/flash/issues/1839
+[#1838]: https://www.free-decompiler.com/flash/issues/1838
+[#1847]: https://www.free-decompiler.com/flash/issues/1847
+[#1829]: https://www.free-decompiler.com/flash/issues/1829
+[#1828]: https://www.free-decompiler.com/flash/issues/1828
+[#1771]: https://www.free-decompiler.com/flash/issues/1771
+[#1695]: https://www.free-decompiler.com/flash/issues/1695
+[#1752]: https://www.free-decompiler.com/flash/issues/1752
+[#1711]: https://www.free-decompiler.com/flash/issues/1711
 [#270]: https://www.free-decompiler.com/flash/issues/270
 [#1718]: https://www.free-decompiler.com/flash/issues/1718
+[#1801]: https://www.free-decompiler.com/flash/issues/1801
 [#1761]: https://www.free-decompiler.com/flash/issues/1761
 [#1762]: https://www.free-decompiler.com/flash/issues/1762
 [#1763]: https://www.free-decompiler.com/flash/issues/1763
 [#1766]: https://www.free-decompiler.com/flash/issues/1766
 [#1773]: https://www.free-decompiler.com/flash/issues/1773
 [#1769]: https://www.free-decompiler.com/flash/issues/1769
-[#1801]: https://www.free-decompiler.com/flash/issues/1801
 [#1750]: https://www.free-decompiler.com/flash/issues/1750
 [#1485]: https://www.free-decompiler.com/flash/issues/1485
 [#1681]: https://www.free-decompiler.com/flash/issues/1681

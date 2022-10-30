@@ -121,10 +121,10 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
             return new StringAVM2Item(null, null, (String) r);
         }
         if (r instanceof Long) {
-            return new IntegerValueAVM2Item(null, null, (Long) r);
+            return new FloatValueAVM2Item(null, null, (double) (Long) r);
         }
         if (r instanceof Integer) {
-            return new IntegerValueAVM2Item(null, null, (long) (int) (Integer) r);
+            return new IntegerValueAVM2Item(null, null, (Integer) r);
         }
 
         if (r instanceof Double) {

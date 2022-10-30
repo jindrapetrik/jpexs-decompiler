@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
+import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
@@ -63,7 +64,6 @@ import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinReg;
 import java.awt.AWTException;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
@@ -120,15 +120,11 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
-import jsyntaxpane.SyntaxStyle;
-import jsyntaxpane.SyntaxStyles;
-import jsyntaxpane.TokenType;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 
 /**
@@ -843,6 +839,14 @@ public class Main {
 
         Stopwatch sw = Stopwatch.startNew();
         if (bundle != null) {
+            if (bundle.isReadOnly()) {
+                View.execInEventDispatchLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ViewMessages.showMessageDialog(getMainFrame().getWindow(), AppStrings.translate("warning.readonly").replace("%file%", sourceInfo.getFileTitleOrName()), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningOpeningReadOnly);
+                    }
+                });
+            }
             result.bundle = bundle;
             result.name = new File(sourceInfo.getFileTitleOrName()).getName();
             for (Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
@@ -1315,13 +1319,23 @@ public class Main {
 
                 if (mainFrame != null && fswf != null) {
                     SwfSpecificConfiguration swfConf = Configuration.getSwfSpecificConfiguration(fswf.getShortFileName());
+                    String resourcesPathStr = null;
+                    String tagListPathStr = null;
                     if (swfConf != null) {
-                        String pathStr = swfConf.lastSelectedPath;
-                        if (isInited()) {
-                            mainFrame.getPanel().tagTree.setSelectionPathString(pathStr);
-                        } else {
-                            mainFrame.getPanel().tagTree.setExpandPathString(pathStr);
-                        }
+                        resourcesPathStr = swfConf.lastSelectedPath;                        
+                    }
+                    SwfSpecificCustomConfiguration swfCustomConf = Configuration.getSwfSpecificCustomConfiguration(fswf.getShortFileName());
+                    if (swfCustomConf != null) {
+                        resourcesPathStr = swfCustomConf.getCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_RESOURCES, resourcesPathStr);
+                        tagListPathStr = swfCustomConf.getCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_TAGLIST, null);                        
+                    }
+                    
+                    if (isInited()) {
+                        mainFrame.getPanel().tagTree.setSelectionPathString(resourcesPathStr);
+                        mainFrame.getPanel().tagListTree.setSelectionPathString(tagListPathStr);
+                    } else {
+                        mainFrame.getPanel().tagTree.setExpandPathString(resourcesPathStr);
+                        mainFrame.getPanel().tagListTree.setExpandPathString(tagListPathStr);
                     }
                 }
 
@@ -2332,6 +2346,7 @@ public class Main {
                     openingFiles = true;
                     openFile(sourceInfos, () -> {
                         mainFrame.getPanel().tagTree.setSelectionPathString(Configuration.lastSessionSelection.get());
+                        mainFrame.getPanel().tagListTree.setSelectionPathString(Configuration.lastSessionTagListSelection.get());
                         setSessionLoaded(true);
                     });
                 }

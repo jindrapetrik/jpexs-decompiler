@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types;
 
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.helpers.Helper;
 
 /**
@@ -131,13 +132,13 @@ public class ValueKind {
         String ret = "?";
         switch (value_kind) {
             case CONSTANT_Int:
-                ret = "" + constants.getInt(value_index);
+                ret = EcmaScript.toString(constants.getInt(value_index));
                 break;
             case CONSTANT_UInt:
-                ret = "" + constants.getUInt(value_index);
+                ret = EcmaScript.toString(constants.getUInt(value_index));
                 break;
             case CONSTANT_Double:
-                ret = "" + constants.getDouble(value_index);
+                ret = EcmaScript.toString(constants.getDouble(value_index));
                 break;
             case CONSTANT_DecimalOrFloat:
                 ret = "" + constants.getDecimal(value_index);

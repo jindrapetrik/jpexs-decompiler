@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.morphshape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -85,8 +86,8 @@ public class CanvasMorphShapeExporter extends MorphShapeExporterBase {
 
     protected int fillHeight;
 
-    public CanvasMorphShapeExporter(SWF swf, SHAPE shape, SHAPE endShape, ColorTransform colorTransform, double unitDivisor, int deltaX, int deltaY) {
-        super(shape, endShape, colorTransform);
+    public CanvasMorphShapeExporter(int morphShapeNum, SWF swf, SHAPE shape, SHAPE endShape, ColorTransform colorTransform, double unitDivisor, int deltaX, int deltaY) {
+        super(morphShapeNum, shape, endShape, colorTransform);
         this.deltaX = deltaX;
         this.deltaY = deltaY;
         this.unitDivisor = unitDivisor;

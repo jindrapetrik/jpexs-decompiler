@@ -105,7 +105,7 @@ public class FolderPreviewPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1) {
                     if (selectedIndex > -1) {
-                        mainPanel.setTagTreeSelectedNode(FolderPreviewPanel.this.items.get(selectedIndex));
+                        mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), FolderPreviewPanel.this.items.get(selectedIndex));
                     }
                 }
             }
@@ -149,8 +149,8 @@ public class FolderPreviewPanel extends JPanel {
                 }
 
                 if (e.getButton() == MouseEvent.BUTTON3) {
-                    mainPanel.tagTree.contextPopupMenu.update(new ArrayList<>(selectedItems.values()));
-                    mainPanel.tagTree.contextPopupMenu.show(FolderPreviewPanel.this, e.getX(), e.getY());
+                    mainPanel.getContextPopupMenu().update(new ArrayList<>(selectedItems.values()));
+                    mainPanel.getContextPopupMenu().show(FolderPreviewPanel.this, e.getX(), e.getY());
                 }
                 repaint();
             }
@@ -372,7 +372,7 @@ public class FolderPreviewPanel extends JPanel {
         if (imgSrc == null) {
             DrawableTag drawable = (DrawableTag) treeItem;
             ExportRectangle viewRectangle = new ExportRectangle(0, 0, ow, oh);
-            drawable.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, null, scale, false, viewRectangle, true, Timeline.DRAW_MODE_ALL);
+            drawable.toImage(0, 0, 0, new RenderContext(), image, image, false, m, new Matrix(), m, m, null, scale, false, viewRectangle, true, Timeline.DRAW_MODE_ALL);
         } else {
             Graphics2D g = (Graphics2D) image.getGraphics();
             g.setTransform(m.toTransform());

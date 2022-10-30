@@ -65,15 +65,15 @@ public class PdfGradientShading extends PDFObject {
             os.write(("/ShadingType 2 /ColorSpace /DeviceRGB "
                     + "/Coords [" + matDf.format(coords.xMin) + " " + matDf.format(coords.yMin) + " " + matDf.format(coords.xMax) + " " + matDf.format(coords.yMax) + "] "
                     + "/Domain [0 1] "
-                    + "/Function " + function3.getSerialID() + " 0 R /Extend [true true]\n").getBytes());
+                    + "/Function " + function3.getSerialID() + " 0 R /Extend [true true]\n").getBytes("UTF-8"));
             writeEnd(os);
         }
         if (fgrad instanceof RadialGradientPaint) {
 
             if (useFunctionShading) {
-                os.write("/ShadingType 1\n".getBytes());
-                os.write("/ColorSpace /DeviceRGB\n".getBytes());
-                os.write(("/Function " + radialFunction.getSerialID() + " 0 R\n").getBytes());
+                os.write("/ShadingType 1\n".getBytes("UTF-8"));
+                os.write("/ColorSpace /DeviceRGB\n".getBytes("UTF-8"));
+                os.write(("/Function " + radialFunction.getSerialID() + " 0 R\n").getBytes("UTF-8"));
             } else {
                 RadialGradientPaint radGrad = (RadialGradientPaint) fgrad;
                 os.write(("/ShadingType 3 /ColorSpace /DeviceRGB "
@@ -86,7 +86,7 @@ public class PdfGradientShading extends PDFObject {
                         + radGrad.getRadius()
                         + "] "
                         + "/Domain [0 1] "
-                        + "/Function " + function3.getSerialID() + " 0 R /Extend [true true]\n").getBytes());
+                        + "/Function " + function3.getSerialID() + " 0 R /Extend [true true]\n").getBytes("UTF-8"));
             }
             writeEnd(os);
         }

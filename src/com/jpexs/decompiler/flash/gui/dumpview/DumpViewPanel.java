@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui.dumpview;
 
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
 import com.jpexs.decompiler.flash.gui.FasterScrollPane;

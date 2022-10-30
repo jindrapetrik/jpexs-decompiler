@@ -231,6 +231,7 @@ import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
+import com.jpexs.decompiler.flash.types.ILINESTYLE;
 import com.jpexs.decompiler.flash.types.KERNINGRECORD;
 import com.jpexs.decompiler.flash.types.LANGCODE;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
@@ -1210,17 +1211,16 @@ public class SWFInputStream implements AutoCloseable {
             if (!skipUnusualTags) {
                 doParse = true;
             } else if (tag != null) {
+                if (tag.getId() == FileAttributesTag.ID && level == 0) { // FileAttributes 
+                    if (tag instanceof TagStub) {
+                        tag = resolveTag((TagStub) tag, level, parallel1, skipUnusualTags, lazy);
+                    }
+                    FileAttributesTag fileAttributes = (FileAttributesTag) tag;
+                    if (fileAttributes.actionScript3) {
+                        isAS3 = true;
+                    }
+                }
                 switch (tag.getId()) {
-                    case FileAttributesTag.ID: // FileAttributes
-                        if (tag instanceof TagStub) {
-                            tag = resolveTag((TagStub) tag, level, parallel1, skipUnusualTags, lazy);
-                        }
-                        FileAttributesTag fileAttributes = (FileAttributesTag) tag;
-                        if (fileAttributes.actionScript3) {
-                            isAS3 = true;
-                        }
-                        doParse = true;
-                        break;
                     case DoActionTag.ID:
                     case DoInitActionTag.ID:
                         doParse = !isAS3;
@@ -1228,9 +1228,10 @@ public class SWFInputStream implements AutoCloseable {
                     case ShowFrameTag.ID:
                     case PlaceObjectTag.ID:
                     case PlaceObject2Tag.ID:
+                    case PlaceObject3Tag.ID:
+                    case PlaceObject4Tag.ID:
                     case RemoveObjectTag.ID:
                     case RemoveObject2Tag.ID:
-                    case PlaceObject3Tag.ID: // ?
                     case StartSoundTag.ID:
                     case FrameLabelTag.ID:
                     case SoundStreamHeadTag.ID:
@@ -1247,7 +1248,6 @@ public class SWFInputStream implements AutoCloseable {
                         } else {
                             doParse = true;
                         }
-
                 }
             }
 
@@ -2793,9 +2793,9 @@ public class SWFInputStream implements AutoCloseable {
                 ret.lineStyles[i] = readLINESTYLE(shapeNum, "lineStyle");
             }
         } else {
-            ret.lineStyles = new LINESTYLE2[lineStyleCount];
+            ret.lineStyles2 = new LINESTYLE2[lineStyleCount];
             for (int i = 0; i < lineStyleCount; i++) {
-                ret.lineStyles[i] = readLINESTYLE2(shapeNum, "lineStyle");
+                ret.lineStyles2[i] = readLINESTYLE2(shapeNum, "lineStyle");
             }
         }
         endDumpLevel();

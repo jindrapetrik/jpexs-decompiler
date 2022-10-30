@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.abc.DocsListener;
 import java.awt.BorderLayout;
 import java.awt.Color;

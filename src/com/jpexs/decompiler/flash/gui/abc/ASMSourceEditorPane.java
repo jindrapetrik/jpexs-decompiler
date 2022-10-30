@@ -36,7 +36,6 @@ import com.jpexs.decompiler.flash.docs.As3PCodeOtherDocs;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.GraphDialog;
 import com.jpexs.decompiler.flash.gui.Main;
-import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
 import com.jpexs.decompiler.flash.gui.editor.DebuggableEditorPane;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;

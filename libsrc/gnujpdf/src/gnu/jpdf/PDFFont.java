@@ -150,19 +150,19 @@ public class PDFFont extends PDFObject implements Serializable {
         writeStart(os);
 
         // now the objects body
-        os.write("/Subtype ".getBytes());
-        os.write(type.getBytes());
-        os.write("\n/Name ".getBytes());
-        os.write(name.getBytes());
-        os.write("\n/BaseFont ".getBytes());
-        os.write(font.getBytes());
+        os.write("/Subtype ".getBytes("UTF-8"));
+        os.write(type.getBytes("UTF-8"));
+        os.write("\n/Name ".getBytes("UTF-8"));
+        os.write(name.getBytes("UTF-8"));
+        os.write("\n/BaseFont ".getBytes("UTF-8"));
+        os.write(font.getBytes("UTF-8"));
         // The performance problem in Bug#106693 comments out the
         // encoding line, and removes the /WinAnsiEncoding. I'm going
         // to leave them in, as the Encoding fixes another problem.
-        os.write("\n/Encoding ".getBytes());
-        os.write("/WinAnsiEncoding".getBytes());
-        //os.write(encoding.getBytes());
-        os.write("\n".getBytes());
+        os.write("\n/Encoding ".getBytes("UTF-8"));
+        os.write("/WinAnsiEncoding".getBytes("UTF-8"));
+        //os.write(encoding.getBytes("UTF-8"));
+        os.write("\n".getBytes("UTF-8"));
 
         // finish off with its footer
         writeEnd(os);

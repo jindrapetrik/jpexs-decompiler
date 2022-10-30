@@ -23,8 +23,6 @@ import java.awt.Component;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
-import java.text.DecimalFormat;
-import java.text.ParseException;
 import javax.swing.JFormattedTextField;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;

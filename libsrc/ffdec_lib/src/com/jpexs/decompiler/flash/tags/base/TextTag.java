@@ -422,7 +422,7 @@ public abstract class TextTag extends DrawableTag {
         Graphics2D g = (Graphics2D) image.getGraphics();
         Matrix mat = transformation.clone();
         mat = mat.concatenate(new Matrix(textMatrix));
-        BitmapExporter.export(swf, getBorderShape(borderColor, fillColor, rect), null, image, mat, mat, colorTransform, true);
+        BitmapExporter.export(1, swf, getBorderShape(borderColor, fillColor, rect), null, image, 1 /*FIXME??*/, mat, mat, colorTransform, true);
     }
 
     public static void drawBorderHtmlCanvas(SWF swf, StringBuilder result, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, ColorTransform colorTransform, double unitDivisor) {
@@ -430,7 +430,7 @@ public abstract class TextTag extends DrawableTag {
         result.append("\tctx.save();\r\n");
         result.append("\tctx.transform(").append(mat.scaleX).append(",").append(mat.rotateSkew0).append(",").append(mat.rotateSkew1).append(",").append(mat.scaleY).append(",").append(mat.translateX).append(",").append(mat.translateY).append(");\r\n");
         SHAPE shape = getBorderShape(borderColor, fillColor, rect);
-        CanvasShapeExporter cse = new CanvasShapeExporter(null, unitDivisor, swf, shape, colorTransform, 0, 0);
+        CanvasShapeExporter cse = new CanvasShapeExporter(1, null, unitDivisor, swf, shape, colorTransform, 0, 0);
         cse.export();
         result.append(cse.getShapeData());
         result.append("\tctx.restore();\r\n");
@@ -439,7 +439,7 @@ public abstract class TextTag extends DrawableTag {
     public static void drawBorderSVG(SWF swf, SVGExporter exporter, RGB borderColor, RGB fillColor, RECT rect, MATRIX textMatrix, ColorTransform colorTransform, double zoom) {
         exporter.createSubGroup(new Matrix(textMatrix), null);
         SHAPE shape = getBorderShape(borderColor, fillColor, rect);
-        SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, 0, exporter, null, colorTransform, zoom);
+        SVGShapeExporter shapeExporter = new SVGShapeExporter(1, swf, shape, 0, exporter, null, colorTransform, zoom);
         shapeExporter.export();
         exporter.endGroup();
     }
@@ -512,7 +512,7 @@ public abstract class TextTag extends DrawableTag {
                 }
 
                 if (shape != null) {
-                    BitmapExporter.export(swf, shape, textColor2, image, mat, mat, colorTransform, true);
+                    BitmapExporter.export(1, swf, shape, textColor2, image, 1 /*FIXME??*/, mat, mat, colorTransform, true);
                     if (SHAPERECORD.DRAW_BOUNDING_BOX) {
                         RGB borderColor = new RGBA(Color.black);
                         RGB fillColor = new RGBA(new Color(255, 255, 255, 0));
@@ -756,7 +756,7 @@ public abstract class TextTag extends DrawableTag {
                         if (charId == null) {
                             charId = exporter.getUniqueId(Helper.getValidHtmlId("font_" + font.getFontNameIntag() + "_" + ch));
                             exporter.createDefGroup(null, charId);
-                            SVGShapeExporter shapeExporter = new SVGShapeExporter(swf, shape, 0, exporter, null, colorTransform, zoom);
+                            SVGShapeExporter shapeExporter = new SVGShapeExporter(1, swf, shape, 0, exporter, null, colorTransform, zoom);
                             shapeExporter.export();
                             if (!exporter.endGroup()) {
                                 charId = "";

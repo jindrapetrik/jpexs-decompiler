@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.configuration;
 
 import java.io.Serializable;
@@ -27,5 +28,5 @@ public class SwfSpecificConfiguration implements Serializable {
 
     public Map<String, String> fontPairingMap = new HashMap<>();
 
-    public String lastSelectedPath = null;
+    public String lastSelectedPath = null;            
 }

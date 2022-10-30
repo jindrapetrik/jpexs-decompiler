@@ -510,14 +510,16 @@ public class ActionScript3Parser {
             paramNames.add(s.value.toString());
             s = lex();
             if (!hasRest) {
+                GraphTargetItem currentType;
                 if (s.type == SymbolType.COLON) {
-                    paramTypes.add(type(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, variables));
+                    paramTypes.add(currentType = type(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, variables));
                     s = lex();
                 } else {
-                    paramTypes.add(new UnboundedTypeItem());
+                    paramTypes.add(currentType = new UnboundedTypeItem());
                 }
                 if (s.type == SymbolType.ASSIGN) {
-                    paramValues.add(expression(allOpenedNamespaces, thisType, pkg, new Reference<>(false), importedClasses, openedNamespaces, null, isMethod, isMethod, isMethod, variables, false));
+                    GraphTargetItem currentValue = expression(allOpenedNamespaces, thisType, pkg, new Reference<>(false), importedClasses, openedNamespaces, null, isMethod, isMethod, isMethod, variables, false);
+                    paramValues.add(currentValue);
                     s = lex();
                 } else if (!paramValues.isEmpty()) {
                     throw new AVM2ParseException("Some of parameters do not have default values", lexer.yyline());
@@ -1588,7 +1590,7 @@ public class ActionScript3Parser {
                         //GraphTargetItem firstCommand = command(thisType,pkg,needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables);
                         forExpr = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false);
                         if (forExpr == null) {
-                            forExpr = new TrueItem(null,null);
+                            forExpr = new TrueItem(null, null);
                         }
                         expectedType(SymbolType.SEMICOLON);
                         GraphTargetItem fcom = command(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, true, variables);
@@ -2266,7 +2268,7 @@ public class ActionScript3Parser {
                     ret = new FloatValueAVM2Item(null, null, -(Double) s.value);
 
                 } else if (s.isType(SymbolType.INTEGER)) {
-                    ret = new IntegerValueAVM2Item(null, null, -(Long) s.value);
+                    ret = new IntegerValueAVM2Item(null, null, -(Integer) s.value);
 
                 } else {
                     lexer.pushback(s);
@@ -2360,7 +2362,7 @@ public class ActionScript3Parser {
 
                 break;
             case INTEGER:
-                ret = new IntegerValueAVM2Item(null, null, (Long) s.value);
+                ret = new IntegerValueAVM2Item(null, null, (Integer) s.value);
 
                 break;
             case DOUBLE:

@@ -146,9 +146,13 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                     Configuration.lastSessionFiles.set(sb.toString());
                     Configuration.lastSessionFileTitles.set(sbt.toString());
 
-                    String path = panel.tagTree.getSelectionPathString();
-                    if (path != null) {
-                        Configuration.lastSessionSelection.set(path);
+                    String pathResources = panel.tagTree.getSelectionPathString();
+                    if (pathResources != null) {
+                        Configuration.lastSessionSelection.set(pathResources);
+                    }
+                    String pathTagList = panel.tagListTree.getSelectionPathString();
+                    if (pathTagList != null) {
+                        Configuration.lastSessionTagListSelection.set(pathTagList);
                     }
 
                 }

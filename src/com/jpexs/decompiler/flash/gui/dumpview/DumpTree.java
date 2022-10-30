@@ -72,6 +72,7 @@ import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -92,7 +93,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -184,6 +184,7 @@ public class DumpTree extends JTree {
                             case DefineSoundTag.NAME:
                             case SoundStreamHeadTag.NAME:
                             case SoundStreamHead2Tag.NAME:
+                            case SoundStreamBlockTag.NAME:                                    
                                 nodeType = TreeNodeType.SOUND;
                                 break;
                             case DefineBinaryDataTag.NAME:
@@ -251,42 +252,52 @@ public class DumpTree extends JTree {
 
         final JMenuItem expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
         expandRecursiveMenuItem.addActionListener(this::expandRecursiveButtonActionPerformed);
+        expandRecursiveMenuItem.setIcon(View.getIcon("expand16"));
         contextPopupMenu.add(expandRecursiveMenuItem);
 
         final JMenuItem saveToFileMenuItem = new JMenuItem(mainPanel.translate("contextmenu.saveToFile"));
         saveToFileMenuItem.addActionListener(this::saveToFileButtonActionPerformed);
+        saveToFileMenuItem.setIcon(View.getIcon("saveas16"));
         contextPopupMenu.add(saveToFileMenuItem);
 
         final JMenuItem saveUncompressedToFileMenuItem = new JMenuItem(mainPanel.translate("contextmenu.saveUncompressedToFile"));
         saveUncompressedToFileMenuItem.addActionListener(this::saveUncompressedToFileButtonActionPerformed);
+        saveUncompressedToFileMenuItem.setIcon(View.getIcon("saveas16"));
         contextPopupMenu.add(saveUncompressedToFileMenuItem);
 
         final JMenuItem closeSelectionMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
         closeSelectionMenuItem.addActionListener(this::closeSwfButtonActionPerformed);
+        closeSelectionMenuItem.setIcon(View.getIcon("close16"));
         contextPopupMenu.add(closeSelectionMenuItem);
 
         final JMenuItem parseActionsMenuItem = new JMenuItem(mainPanel.translate("contextmenu.parseActions"));
         parseActionsMenuItem.addActionListener(this::parseActionsButtonActionPerformed);
+        parseActionsMenuItem.setIcon(View.getIcon("parse16"));
         contextPopupMenu.add(parseActionsMenuItem);
 
         final JMenuItem parseAbcMenuItem = new JMenuItem(mainPanel.translate("contextmenu.parseABC"));
         parseAbcMenuItem.addActionListener(this::parseAbcButtonActionPerformed);
+        parseAbcMenuItem.setIcon(View.getIcon("parse16"));
         contextPopupMenu.add(parseAbcMenuItem);
 
         final JMenuItem parseInstructionsMenuItem = new JMenuItem(mainPanel.translate("contextmenu.parseInstructions"));
         parseInstructionsMenuItem.addActionListener(this::parseInstructionsButtonActionPerformed);
+        parseInstructionsMenuItem.setIcon(View.getIcon("parse16"));
         contextPopupMenu.add(parseInstructionsMenuItem);
 
         final JMenuItem gotoTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
         gotoTagMenuItem.addActionListener(this::gotoTagButtonActionPerformed);
+        gotoTagMenuItem.setIcon(View.getIcon("folder16"));
         contextPopupMenu.add(gotoTagMenuItem);
 
         final JMenuItem gotoActionListMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
         gotoActionListMenuItem.addActionListener(this::gotoActionListButtonActionPerformed);
+        gotoActionListMenuItem.setIcon(View.getIcon("folder16"));        
         contextPopupMenu.add(gotoActionListMenuItem);
 
         final JMenuItem gotoMethodMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
         gotoMethodMenuItem.addActionListener(this::gotoMethodButtonActionPerformed);
+        gotoMethodMenuItem.setIcon(View.getIcon("folder16"));
         contextPopupMenu.add(gotoMethodMenuItem);
 
         addMouseListener(new MouseAdapter() {
@@ -490,7 +501,7 @@ public class DumpTree extends JTree {
 
         if (foundTag != null) {
             mainPanel.getMainFrame().getMenu().showResourcesView();
-            mainPanel.setTagTreeSelectedNode(foundTag);
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), foundTag);
         }
     }
 

@@ -102,6 +102,7 @@ import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
 import com.jpexs.decompiler.flash.types.GRADIENT;
 import com.jpexs.decompiler.flash.types.GRADRECORD;
+import com.jpexs.decompiler.flash.types.ILINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
@@ -253,7 +254,7 @@ public class XFLConverter {
         }
     }
 
-    private static String getScaleMode(LINESTYLE lineStyle) {
+    private static String getScaleMode(ILINESTYLE lineStyle) {
         if (lineStyle instanceof LINESTYLE2) {
             LINESTYLE2 ls2 = (LINESTYLE2) lineStyle;
             if (ls2.noHScaleFlag && ls2.noVScaleFlag) {
@@ -270,16 +271,16 @@ public class XFLConverter {
         return "normal";
     }
 
-    private static void convertLineStyle(LINESTYLE ls, int shapeNum, XFLXmlWriter writer) throws XMLStreamException {
+    private static void convertLineStyle(ILINESTYLE ls, int shapeNum, XFLXmlWriter writer) throws XMLStreamException {
         writer.writeStartElement("SolidStroke", new String[]{
             "scaleMode", getScaleMode(ls),
-            "weight", Double.toString(((float) ls.width) / SWF.unitDivisor),});
+            "weight", Double.toString(((float) ls.getWidth()) / SWF.unitDivisor),});
 
         writer.writeStartElement("fill");
         if (!(ls instanceof LINESTYLE2) || !((LINESTYLE2) ls).hasFillFlag) {
-            writer.writeStartElement("SolidColor", new String[]{"color", ls.color.toHexRGB()});
+            writer.writeStartElement("SolidColor", new String[]{"color", ls.getColor().toHexRGB()});
             if (shapeNum >= 3) {
-                writer.writeAttribute("alpha", ((RGBA) ls.color).getAlphaFloat());
+                writer.writeAttribute("alpha", ((RGBA) ls.getColor()).getAlphaFloat());
             }
 
             writer.writeEndElement();
@@ -763,10 +764,10 @@ public class XFLConverter {
                     strokesStr.writeEndElement();
                     lineStyleCount++;
                 }
-            } else if (lineStyles.lineStyles != null) {
-                for (int l = 0; l < lineStyles.lineStyles.length; l++) {
+            } else if (lineStyles.lineStyles2 != null) {
+                for (int l = 0; l < lineStyles.lineStyles2.length; l++) {
                     strokesStr.writeStartElement("StrokeStyle", new String[]{"index", Integer.toString(lineStyleCount + 1)});
-                    convertLineStyle(characters, (LINESTYLE2) lineStyles.lineStyles[l], shapeNum, strokesStr);
+                    convertLineStyle(characters, (LINESTYLE2) lineStyles.lineStyles2[l], shapeNum, strokesStr);
                     strokesStr.writeEndElement();
                     lineStyleCount++;
                 }
@@ -815,8 +816,8 @@ public class XFLConverter {
                             if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0) && morphshape) {
                                 if (shapeNum == 4) {
                                     if (strokeStyleOrig > 0) {
-                                        if (actualLinestyles != null && !((LINESTYLE2) actualLinestyles.lineStyles[strokeStyleOrig]).hasFillFlag) {
-                                            RGBA color = (RGBA) actualLinestyles.lineStyles[strokeStyleOrig].color;
+                                        if (actualLinestyles != null && !((LINESTYLE2) actualLinestyles.lineStyles2[strokeStyleOrig]).hasFillFlag) {
+                                            RGBA color = (RGBA) actualLinestyles.lineStyles2[strokeStyleOrig].getColor();
                                             if (color.alpha == 0 && color.red == 0 && color.green == 0 && color.blue == 0) {
                                                 empty = true;
                                             }
@@ -871,9 +872,9 @@ public class XFLConverter {
                             lineStyleCount++;
                         }
                     } else {
-                        for (int l = 0; l < scr.lineStyles.lineStyles.length; l++) {
+                        for (int l = 0; l < scr.lineStyles.lineStyles2.length; l++) {
                             strokesNewStr.writeStartElement("StrokeStyle", new String[]{"index", Integer.toString(lineStyleCount + 1)});
-                            convertLineStyle(characters, (LINESTYLE2) scr.lineStyles.lineStyles[l], shapeNum, strokesNewStr);
+                            convertLineStyle(characters, (LINESTYLE2) scr.lineStyles.lineStyles2[l], shapeNum, strokesNewStr);
                             strokesNewStr.writeEndElement();
                             lineStyleCount++;
                         }
@@ -914,8 +915,8 @@ public class XFLConverter {
                         if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0) && morphshape) {
                             if (shapeNum == 4) {
                                 if (strokeStyleOrig > 0) {
-                                    if (actualLinestyles != null && !((LINESTYLE2) actualLinestyles.lineStyles[strokeStyleOrig]).hasFillFlag) {
-                                        RGBA color = (RGBA) actualLinestyles.lineStyles[strokeStyleOrig].color;
+                                    if (actualLinestyles != null && !((LINESTYLE2) actualLinestyles.lineStyles2[strokeStyleOrig]).hasFillFlag) {
+                                        RGBA color = (RGBA) actualLinestyles.lineStyles2[strokeStyleOrig].getColor();
                                         if (color.alpha == 0 && color.red == 0 && color.green == 0 && color.blue == 0) {
                                             empty = true;
                                         }
@@ -958,8 +959,8 @@ public class XFLConverter {
                 if ((fillStyle0 <= 0) && (fillStyle1 <= 0) && (strokeStyle > 0) && morphshape) {
                     if (shapeNum == 4) {
                         if (strokeStyleOrig > 0) {
-                            if (actualLinestyles != null && !((LINESTYLE2) actualLinestyles.lineStyles[strokeStyleOrig]).hasFillFlag) {
-                                RGBA color = (RGBA) actualLinestyles.lineStyles[strokeStyleOrig].color;
+                            if (actualLinestyles != null && !((LINESTYLE2) actualLinestyles.lineStyles2[strokeStyleOrig]).hasFillFlag) {
+                                RGBA color = (RGBA) actualLinestyles.lineStyles2[strokeStyleOrig].getColor();
                                 if (color.alpha == 0 && color.red == 0 && color.green == 0 && color.blue == 0) {
                                     empty = true;
                                 }
@@ -3011,7 +3012,6 @@ public class XFLConverter {
             if (hasClipDepth) {
                 continue;
             }*/
-
             boolean nonEmpty = writeLayer(index, depthToFramesList.get(d), d, 0, Integer.MAX_VALUE, -1, writer, nonLibraryShapes, tags, timelineTags, characters, flaVersion, files);
             if (nonEmpty) {
                 index++;

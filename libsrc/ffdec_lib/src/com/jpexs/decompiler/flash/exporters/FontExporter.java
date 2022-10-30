@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters;
 
 import com.google.typography.font.sfntly.Font;
@@ -193,7 +194,7 @@ public class FontExporter {
             char c = t.glyphToChar(i);
             SHAPE s = shapes.get(i);
             final List<FPoint[]> contours = new ArrayList<>();
-            PathExporter seb = new PathExporter(swf, s, null) {
+            PathExporter seb = new PathExporter(1, swf, s, null) {
 
                 private double transformX(double x) {
                     return Math.ceil((double) (x / divider));

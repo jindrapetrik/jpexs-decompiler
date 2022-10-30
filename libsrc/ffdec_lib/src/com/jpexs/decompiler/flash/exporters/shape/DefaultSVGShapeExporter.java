@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -38,8 +39,8 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
 
     protected double zoom;
 
-    public DefaultSVGShapeExporter(SWF swf, SHAPE shape, ColorTransform colorTransform, double zoom) {
-        super(swf, shape, colorTransform);
+    public DefaultSVGShapeExporter(int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform, double zoom) {
+        super(shapeNum, swf, shape, colorTransform);
         this.zoom = zoom;
     }
 

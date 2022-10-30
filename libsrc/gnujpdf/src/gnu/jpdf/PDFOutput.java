@@ -85,11 +85,11 @@ public class PDFOutput {
         //
         // Note: As the encoding is fixed here, we use getBytes().
         //
-        baos.write("%PDF-1.2\n".getBytes());
+        baos.write("%PDF-1.2\n".getBytes("UTF-8"));
 
         // This second comment is advised in the PDF Reference manual
         // page 61
-        baos.write("%\342\343\317\323\n".getBytes());
+        baos.write("%\342\343\317\323\n".getBytes("UTF-8"));
 
         offset = baos.size();
         baos.writeTo(os);
@@ -129,10 +129,10 @@ public class PDFOutput {
         // Also, offset is preserved, and marks the begining of this block.
         // This is required by PDF at the end of the PDF file.
         baos.reset();
-        baos.write("xref\n".getBytes());
+        baos.write("xref\n".getBytes("UTF-8"));
 
         // Now a single subsection for object 0
-        //baos.write("0 1\n0000000000 65535 f \n".getBytes());
+        //baos.write("0 1\n0000000000 65535 f \n".getBytes("UTF-8"));
         // Now scan through the offsets list. The should be in sequence,
         // but just in case:
         int firstid = 0;                    // First id in block
@@ -167,33 +167,33 @@ public class PDFOutput {
         }
 
         // now the trailer object
-        baos.write("trailer\n<<\n".getBytes());
+        baos.write("trailer\n<<\n".getBytes("UTF-8"));
 
         // the number of entries (REQUIRED)
-        baos.write("/Size ".getBytes());
-        baos.write(Integer.toString(offsets.size() + 1).getBytes());
-        baos.write("\n".getBytes());
+        baos.write("/Size ".getBytes("UTF-8"));
+        baos.write(Integer.toString(offsets.size() + 1).getBytes("UTF-8"));
+        baos.write("\n".getBytes("UTF-8"));
 
         // the /Root catalog indirect reference (REQUIRED)
         if (rootID != null) {
-            baos.write("/Root ".getBytes());
-            baos.write(rootID.toString().getBytes());
-            baos.write("\n".getBytes());
+            baos.write("/Root ".getBytes("UTF-8"));
+            baos.write(rootID.toString().getBytes("UTF-8"));
+            baos.write("\n".getBytes("UTF-8"));
         } else {
             throw new IOException("Root object is not present in document");
         }
 
         // the /Info reference (OPTIONAL)
         if (infoID != null) {
-            baos.write("/Info ".getBytes());
-            baos.write(infoID.toString().getBytes());
-            baos.write("\n".getBytes());
+            baos.write("/Info ".getBytes("UTF-8"));
+            baos.write(infoID.toString().getBytes("UTF-8"));
+            baos.write("\n".getBytes("UTF-8"));
         }
 
         // end the trailer object
-        baos.write(">>\nstartxref\n".getBytes());
-        baos.write(Integer.toString(offset).getBytes());
-        baos.write("\n%%EOF\n".getBytes());
+        baos.write(">>\nstartxref\n".getBytes("UTF-8"));
+        baos.write(Integer.toString(offset).getBytes("UTF-8"));
+        baos.write("\n%%EOF\n".getBytes("UTF-8"));
 
         // now flush the stream
         baos.writeTo(os);
@@ -208,15 +208,15 @@ public class PDFOutput {
      * @exception IOException on write error
      */
     protected void writeblock(int firstid, Vector<PDFXref> block) throws IOException {
-        baos.write(Integer.toString(firstid).getBytes());
-        baos.write(" ".getBytes());
-        baos.write(Integer.toString(block.size()).getBytes());
-        baos.write("\n".getBytes());
-        //baos.write("\n0000000000 65535 f\n".getBytes());
+        baos.write(Integer.toString(firstid).getBytes("UTF-8"));
+        baos.write(" ".getBytes("UTF-8"));
+        baos.write(Integer.toString(block.size()).getBytes("UTF-8"));
+        baos.write("\n".getBytes("UTF-8"));
+        //baos.write("\n0000000000 65535 f\n".getBytes("UTF-8"));
 
         for (PDFXref x : block) {
-            baos.write(x.toString().getBytes());
-            baos.write("\n".getBytes());
+            baos.write(x.toString().getBytes("UTF-8"));
+            baos.write("\n".getBytes("UTF-8"));
         }
     }
 } // end class PDFOutput

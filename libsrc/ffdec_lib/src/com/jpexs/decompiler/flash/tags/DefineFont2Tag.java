@@ -89,7 +89,8 @@ public class DefineFont2Tag extends FontTag {
     @Conditional("fontFlagsHasLayout")
     public int fontLeading;
 
-    @SWFType(BasicType.SI16)
+    //Docs Says SI16, but Flash handles this as unsigned. There's probably not such thing as negative advance
+    @SWFType(BasicType.UI16)
     @Conditional("fontFlagsHasLayout")
     public List<Integer> fontAdvanceTable;
 
@@ -182,7 +183,7 @@ public class DefineFont2Tag extends FontTag {
             fontLeading = sis.readSI16("fontLeading");
             fontAdvanceTable = new ArrayList<>();
             for (int i = 0; i < numGlyphs; i++) {
-                fontAdvanceTable.add(sis.readSI16("fontAdvance"));
+                fontAdvanceTable.add(sis.readUI16("fontAdvance"));
             }
             fontBoundsTable = new ArrayList<>();
             for (int i = 0; i < numGlyphs; i++) {
@@ -306,7 +307,7 @@ public class DefineFont2Tag extends FontTag {
             sos.writeUI16(fontDescent);
             sos.writeSI16(fontLeading);
             for (int i = 0; i < numGlyphs; i++) {
-                sos.writeSI16(fontAdvanceTable.get(i));
+                sos.writeUI16(fontAdvanceTable.get(i));
             }
             for (int i = 0; i < numGlyphs; i++) {
                 sos.writeRECT(fontBoundsTable.get(i));

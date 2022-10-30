@@ -149,8 +149,8 @@ public class CanvasShapeExporter extends ShapeExporterBase {
         return shapeData.toString();
     }
 
-    public CanvasShapeExporter(RGB basicFill, double unitDivisor, SWF swf, SHAPE shape, ColorTransform colorTransform, int deltaX, int deltaY) {
-        super(swf, shape, colorTransform);
+    public CanvasShapeExporter(int shapeNum, RGB basicFill, double unitDivisor, SWF swf, SHAPE shape, ColorTransform colorTransform, int deltaX, int deltaY) {
+        super(shapeNum, swf, shape, colorTransform);
         this.swf = swf;
         this.unitDivisor = unitDivisor;
         this.basicFill = basicFill;

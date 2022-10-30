@@ -33,7 +33,6 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import com.sun.jna.Platform;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.KeyEventDispatcher;
@@ -141,6 +140,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
                     } catch (IOException ex) {
                         Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
                     }
+                } else {
+                    ViewMessages.showMessageDialog(mainFrame.getWindow(), translate("error.readonly.cannotSave"), translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
                 Main.stopSaving(savedFile);
             } else if (swf.binaryData != null) {
@@ -185,8 +186,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         if (swf != null) {
             if (saveAs(swf, SaveFileMode.SAVEAS)) {
-                if (swf.swfList != null) { //binarydata won't clear modified on saveas
-                    swf.clearModified();
+                if (swf.swfList != null) { //binarydata won't clear modified on saveas                    
+                    if (!isSwfReadOnly(swf)) {
+                        swf.clearModified();
+                    }
                 }
             }
 
@@ -196,6 +199,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
         return false;
     }
 
+    private boolean isSwfReadOnly(SWF swf) {
+        return swf.swfList != null && swf.swfList.bundle != null && swf.swfList.bundle.isReadOnly();
+    }
+    
     private boolean saveAs(SWF swf, SaveFileMode mode) {
         View.checkAccess();
 
@@ -794,6 +801,20 @@ public abstract class MainFrameMenu implements MenuBuilder {
             titleBuilder.append(swf.getFileTitle());
         }
         mainFrame.setTitle(titleBuilder.toString());
+        
+        if (mainPanel != null) {
+            switch(mainPanel.getCurrentView()){
+                case MainPanel.VIEW_RESOURCES:
+                    setGroupSelection("view", "/file/view/viewResources");
+                    break;
+                case MainPanel.VIEW_TAGLIST:
+                    setGroupSelection("view", "/file/view/viewTagList");
+                    break;
+                case MainPanel.VIEW_DUMP:
+                    setGroupSelection("view", "/file/view/viewHex");
+                    break;
+            }
+        }
     }
 
     private void registerHotKeys() {
@@ -864,6 +885,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         addMenuItem("/file/view", translate("menu.view"), null, null, 0, null, false, null, false);
         addToggleMenuItem("/file/view/viewResources", translate("menu.file.view.resources"), "view", "viewresources16", this::viewResourcesActionPerformed, PRIORITY_MEDIUM, null);
+        addToggleMenuItem("/file/view/viewTagList", translate("menu.file.view.tagList"), "view", "taglist16", this::viewTagListActionPerformed, PRIORITY_MEDIUM, null);
         addToggleMenuItem("/file/view/viewHex", translate("menu.file.view.hex"), "view", "viewhex16", this::viewHexActionPerformed, PRIORITY_MEDIUM, null);
         finishMenu("/file/view");
 
@@ -876,13 +898,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             addMenuItem("/file/exit", translate("menu.file.exit"), "exit32", this::exitActionPerformed, PRIORITY_TOP, null, true, null, false);
         }
 
-        finishMenu("/file");
-
-        if (Configuration.dumpView.get()) {
-            setGroupSelection("view", "/file/view/viewHex");
-        } else {
-            setGroupSelection("view", "/file/view/viewResources");
-        }
+        finishMenu("/file");       
 
         /*
          menu.file.start = Start
@@ -1142,6 +1158,14 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setGroupSelection("view", "/file/view/viewHex");
         setMenuChecked("/tools/timeline", false);
     }
+    
+    private void viewTagListActionPerformed(ActionEvent evt) {
+        Configuration.dumpView.set(false);    
+        MainPanel mainPanel = mainFrame.getPanel();
+        mainPanel.showView(MainPanel.VIEW_TAGLIST);
+        setGroupSelection("view", "/file/view/viewTagList");
+        setMenuChecked("/tools/timeline", false);        
+    }
 
     private void debuggerSwitchActionPerformed(ActionEvent evt) {
         boolean debuggerOn = isMenuChecked("/tools/debugger/debuggerSwitch");
@@ -1162,9 +1186,6 @@ public abstract class MainFrameMenu implements MenuBuilder {
             } else {
                 setGroupSelection("view", null);
             }
-        } else if (Configuration.dumpView.get()) {
-            setGroupSelection("view", "/file/view/viewHex");
-            mainFrame.getPanel().showView(MainPanel.VIEW_DUMP);
         } else {
             setGroupSelection("view", "/file/view/viewResources");
             mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);

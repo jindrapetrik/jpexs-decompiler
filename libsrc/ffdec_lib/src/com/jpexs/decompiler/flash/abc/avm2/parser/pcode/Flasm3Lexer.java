@@ -2226,7 +2226,11 @@ public final class Flasm3Lexer {
           }
         case 115: break;
         case 10: 
-          { return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, Long.parseLong((yytext())));
+          { try {
+                                    return new ParsedSymbol(ParsedSymbol.TYPE_INTEGER, Integer.parseInt((yytext())));  
+                                } catch(NumberFormatException nfe) {
+                                    return new ParsedSymbol(ParsedSymbol.TYPE_FLOAT, Double.parseDouble((yytext())));
+                                }
           }
         case 116: break;
         case 11: 

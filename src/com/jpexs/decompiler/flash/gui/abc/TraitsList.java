@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import java.awt.AlphaComposite;

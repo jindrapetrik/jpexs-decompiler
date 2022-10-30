@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.LineStyle;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FOCALGRADIENT;
+import com.jpexs.decompiler.flash.types.ILINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RGB;
@@ -47,7 +48,7 @@ import java.util.Map;
 public abstract class ShapeExporterBase implements IShapeExporter {
 
     private static final boolean USE_REVERSE_LOOKUP = true;
-    
+
     protected final SHAPE shape;
 
     private final List<FillStyle> _fillStyles;
@@ -60,7 +61,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
     private final ColorTransform colorTransform;
 
-    public ShapeExporterBase(SWF swf, SHAPE shape, ColorTransform colorTransform) {
+    public ShapeExporterBase(int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform) {
         this.shape = shape;
         this.colorTransform = colorTransform;
 
@@ -75,8 +76,14 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                     fillStyles.add(new FillStyle(fillStyle));
                 }
 
-                for (LINESTYLE lineStyle : shapeWithStyle.lineStyles.lineStyles) {
-                    lineStyles.add(new LineStyle(lineStyle));
+                if (shapeNum <= 3) {
+                    for (LINESTYLE lineStyle : shapeWithStyle.lineStyles.lineStyles) {
+                        lineStyles.add(new LineStyle(lineStyle));
+                    }
+                } else {
+                    for (LINESTYLE2 lineStyle : shapeWithStyle.lineStyles.lineStyles2) {
+                        lineStyles.add(new LineStyle(lineStyle));
+                    }
                 }
             }
 
@@ -84,7 +91,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
             List<Map<Integer, List<IEdge>>> fillEdgeMaps = new ArrayList<>();
             List<Map<Integer, List<IEdge>>> lineEdgeMaps = new ArrayList<>();
             try {
-                createEdgeMaps(shape, fillStyles, lineStyles, fillEdgeMaps, lineEdgeMaps);
+                createEdgeMaps(shapeNum, shape, fillStyles, lineStyles, fillEdgeMaps, lineEdgeMaps);
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -124,7 +131,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         endShape();
     }
 
-    private void createEdgeMaps(SHAPE shape, List<FillStyle> fillStyles, List<LineStyle> lineStyles,
+    private void createEdgeMaps(int shapeNum, SHAPE shape, List<FillStyle> fillStyles, List<LineStyle> lineStyles,
             List<Map<Integer, List<IEdge>>> fillEdgeMaps, List<Map<Integer, List<IEdge>>> lineEdgeMaps) {
         int xPos = 0;
         int yPos = 0;
@@ -149,7 +156,11 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                     fillStyleIdxOffset = fillStyles.size();
                     lineStyleIdxOffset = lineStyles.size();
                     appendFillStyles(fillStyles, styleChangeRecord.fillStyles.fillStyles);
-                    appendLineStyles(lineStyles, styleChangeRecord.lineStyles.lineStyles);
+                    if (shapeNum <= 3) {
+                        appendLineStyles(lineStyles, styleChangeRecord.lineStyles.lineStyles);
+                    } else {
+                        appendLineStyles(lineStyles, styleChangeRecord.lineStyles.lineStyles2);
+                    }
                 }
                 // Check if all styles are reset to 0.
                 // This (probably) means that a new group starts with the next record
@@ -332,6 +343,8 @@ public abstract class ShapeExporterBase implements IShapeExporter {
     private void exportLinePath(List<IEdge> path) {
         int posX = Integer.MAX_VALUE;
         int posY = Integer.MAX_VALUE;
+        int lastMoveToX = posX;
+        int lastMoveToY = posY;
         int lineStyleIdx = Integer.MAX_VALUE;
         if (path.size() > 0) {
             boolean autoClose = true;
@@ -374,9 +387,13 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                             miterLimitFactor = lineStyle.miterLimitFactor;
                             hasFillFlag = lineStyle.hasFillFlag;
                         }
+                        RGB lineColor = lineStyle.color;
+                        if (hasFillFlag && lineStyle.fillType.fillStyleType == FILLSTYLE.SOLID) {
+                            lineColor = lineStyle.fillType.color;
+                        }
                         lineStyle(
                                 lineStyle.width,
-                                colorTransform == null ? lineStyle.color : colorTransform.apply(lineStyle.color),
+                                colorTransform == null ? lineColor : colorTransform.apply(lineColor),
                                 pixelHintingFlag,
                                 scaleMode,
                                 startCapStyle,
@@ -419,6 +436,8 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                 }
                 if (posX != e.getFromX() || posY != e.getFromY()) {
                     moveTo(e.getFromX(), e.getFromY());
+                    lastMoveToX = e.getFromX();
+                    lastMoveToY = e.getFromY();
                 }
                 if (e instanceof CurvedEdge) {
                     CurvedEdge c = (CurvedEdge) e;
@@ -429,8 +448,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                 posX = e.getToX();
                 posY = e.getToY();
             }
-            IEdge firstEdge = path.get(0);
-            endLines(autoClose && firstEdge.getFromX() == posX && firstEdge.getFromY() == posY);
+            endLines(autoClose && lastMoveToX == posX && lastMoveToY == posY);
         }
     }
 
@@ -609,6 +627,12 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
     private void appendLineStyles(List<LineStyle> v1, LINESTYLE[] v2) {
         for (LINESTYLE s : v2) {
+            v1.add(new LineStyle(s));
+        }
+    }
+
+    private void appendLineStyles(List<LineStyle> v1, LINESTYLE2[] v2) {
+        for (LINESTYLE2 s : v2) {
             v1.add(new LineStyle(s));
         }
     }
