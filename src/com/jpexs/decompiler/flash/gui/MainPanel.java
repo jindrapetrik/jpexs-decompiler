@@ -3506,7 +3506,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 DumpInfo di = (DumpInfo) treeItem;
                 t = di.getTag();
             }
-
+            if ((t instanceof ShowFrameTag)||(t instanceof PlaceObjectTypeTag)) {
+                //FIXME
+                previewPanel.clear();
+                previewPanel.showEmpty();
+                return;
+            }
             showPreview(t, dumpPreviewPanel, getFrameForTreeItem(t), getTimelinedForTreeItem(treeItem));
         }
     }
@@ -3519,6 +3524,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private int getFrameForTreeItem(TreeItem treeItem) {
         if (treeItem == null) {
+            return -1;
+        }
+        if ((currentView == VIEW_DUMP)||(currentView == VIEW_TIMELINE)) {
             return -1;
         }
         TreePath path = getCurrentTree().getModel().getTreePath(treeItem);
@@ -3536,6 +3544,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private Timelined getTimelinedForTreeItem(TreeItem treeItem) {
         if (treeItem == null) {
+            return null;
+        }
+        
+        if ((currentView == VIEW_DUMP)||(currentView == VIEW_TIMELINE)) {
             return null;
         }
 
