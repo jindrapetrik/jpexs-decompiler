@@ -496,7 +496,7 @@ public abstract class AbstractTagTree extends JTree {
     
     public abstract List<Integer> getNestedTagIds(Tag obj);
     
-    public abstract List<Integer> getFrameNestedTagIds();
+    public abstract List<Integer> getFrameNestedTagIds(boolean inSprite);
     
     public TreeItem getCurrentTreeItem() {
         TreeItem item = (TreeItem) getLastSelectedPathComponent();

@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.gui.AppDialog;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.SelectTagPositionDialog;
 import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.gui.MainPanel;
@@ -717,7 +718,6 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private List<Integer> getAllowedTagTypes(TreeItem item) {
         if (item instanceof FolderItem) {
-            List<Integer> allowedTagTypes;
             FolderItem folderItem = (FolderItem) item;
             SWF swf = item.getSwf();
 
@@ -725,7 +725,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         } else if (item instanceof Tag) {
             return getTree().getNestedTagIds((Tag) item);
         } else if (item instanceof Frame) {
-            return getTree().getFrameNestedTagIds();
+            return getTree().getFrameNestedTagIds(((Frame) item).timeline.timelined instanceof DefineSpriteTag);
         }
 
         return new ArrayList<>();
@@ -736,8 +736,40 @@ public class TagTreeContextMenu extends JPopupMenu {
         void call(ActionEvent evt, TreeItem item, Class<?> cl);
     }
 
+    private void addAddTagMenuFolder(JMenu addTagMenu, String folder, boolean gfx, TreeItem item, AddTagActionLisener listener) {
+        String folderTranslated = AppStrings.translate("node."+folder);
+        JMenu folderMenu = new JMenu(folderTranslated);
+        
+        List<Integer> allowedTagTypes = TagTree.getSwfFolderItemNestedTagIds(folder, gfx);        
+        if (allowedTagTypes.isEmpty()) {
+            return;
+        }
+        addAddTagMenuItems(allowedTagTypes, folderMenu, item, listener);
+        addTagMenu.add(folderMenu);               
+    }
+    
     private void addAddTagMenuItems(List<Integer> allowedTagTypes, JMenu addTagMenu, TreeItem item, AddTagActionLisener listener) {
         if (allowedTagTypes == null) {
+            boolean gfx = mainPanel.getCurrentSwf().gfx;
+            
+            String folders[] = new String[] {
+                TagTreeModel.FOLDER_SHAPES,
+                TagTreeModel.FOLDER_MORPHSHAPES,
+                TagTreeModel.FOLDER_SPRITES,
+                TagTreeModel.FOLDER_TEXTS,
+                TagTreeModel.FOLDER_IMAGES,
+                TagTreeModel.FOLDER_MOVIES,
+                TagTreeModel.FOLDER_SOUNDS,
+                TagTreeModel.FOLDER_BUTTONS,
+                TagTreeModel.FOLDER_FONTS,
+                TagTreeModel.FOLDER_BINARY_DATA,
+                TagTreeModel.FOLDER_FRAMES,
+                TagTreeModel.FOLDER_OTHERS
+            };
+            for (String folder : folders) {
+                addAddTagMenuFolder(addTagMenu, folder, gfx, item, listener);
+            }            
+            
             return;
         }
 

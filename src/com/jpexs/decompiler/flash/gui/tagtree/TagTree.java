@@ -418,8 +418,8 @@ public class TagTree extends AbstractTagTree {
         return TreeNodeType.FOLDER;
     }
 
-    public List<Integer> getSwfFolderItemNestedTagIds(String folderName, boolean gfx) {
-        List<Integer> ret = null;
+    public static List<Integer> getSwfFolderItemNestedTagIds(String folderName, boolean gfx) {
+        List<Integer> ret = new ArrayList<>();
         switch (folderName) {
             case TagTreeModel.FOLDER_SHAPES:
                 ret = Arrays.asList(DefineShapeTag.ID, DefineShape2Tag.ID, DefineShape3Tag.ID, DefineShape4Tag.ID);
@@ -481,7 +481,7 @@ public class TagTree extends AbstractTagTree {
     }
 
     @Override
-    public List<Integer> getFrameNestedTagIds() {
+    public List<Integer> getFrameNestedTagIds(boolean inSprite) {
         return Arrays.asList(PlaceObjectTag.ID, PlaceObject2Tag.ID, PlaceObject3Tag.ID, PlaceObject4Tag.ID,
                 RemoveObjectTag.ID, RemoveObject2Tag.ID, FrameLabelTag.ID,
                 StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
@@ -509,7 +509,7 @@ public class TagTree extends AbstractTagTree {
         if (obj instanceof DefineButton2Tag) {
             return Arrays.asList(DefineButtonSoundTag.ID, DefineScalingGridTag.ID);
         }
-        return null;
+        return new ArrayList<>();
     }
 
     

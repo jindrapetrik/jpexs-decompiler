@@ -66,17 +66,24 @@ public class TagListTree extends AbstractTagTree {
     @Override
     public List<Integer> getNestedTagIds(Tag obj) {
         if (obj instanceof DefineSpriteTag) {
-            return Arrays.asList(PlaceObjectTag.ID, PlaceObject2Tag.ID, PlaceObject3Tag.ID, PlaceObject4Tag.ID,
+            return getSpriteNestedTagIds();
+        }
+        return new ArrayList<>();
+    }
+
+    private List<Integer> getSpriteNestedTagIds() {
+        return Arrays.asList(PlaceObjectTag.ID, PlaceObject2Tag.ID, PlaceObject3Tag.ID, PlaceObject4Tag.ID,
                     RemoveObjectTag.ID, RemoveObject2Tag.ID, ShowFrameTag.ID, FrameLabelTag.ID,
                     StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
                     SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID,
                     DefineScalingGridTag.ID); //scaling grid? FIXME?
-        }
-        return new ArrayList<>(); //FIXME: it should be actually all tags
     }
-
+    
     @Override
-    public List<Integer> getFrameNestedTagIds() {
-        return new ArrayList<>(); //FIXME: it should be alltags for swf timeline, limited for sprite timeline
+    public List<Integer> getFrameNestedTagIds(boolean inSprite) {        
+        if (inSprite) {
+            return getSpriteNestedTagIds();
+        }
+        return null; //null = all possible tags
     }
 }
