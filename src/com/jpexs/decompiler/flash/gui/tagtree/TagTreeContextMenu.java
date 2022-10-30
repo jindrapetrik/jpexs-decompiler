@@ -858,7 +858,11 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         for (Integer tagId : allowedTagTypes) {
             final Class<?> cl = TagIdClassMap.getClassByTagId(tagId);
-            JMenuItem tagItem = new JMenuItem(cl.getSimpleName());
+            String className = cl.getSimpleName();
+            if (className.endsWith("Tag")) {
+                className = className.substring(0, className.length() - 3);
+            }
+            JMenuItem tagItem = new JMenuItem(className);
             TreeNodeType type = getTagNodeType(cl);
             tagItem.setIcon(TagTree.getIconForType(type));
             tagItem.addActionListener((ActionEvent ae) -> {
