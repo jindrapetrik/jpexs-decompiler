@@ -158,7 +158,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem cloneTagMenuItem;
 
-    private JMenu moveTagMenu;
+    private JMenu moveTagToMenu;
 
     private JMenu copyTagMenu;
 
@@ -172,7 +172,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem textSearchMenuItem;
 
-    private JMenuItem setTagPositionMenuItem;
+    private JMenuItem moveTagMenuItem;
 
     private JMenuItem showInResourcesViewTagMenuItem;
 
@@ -250,11 +250,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         importSwfXmlMenuItem = new JMenuItem(mainPanel.translate("contextmenu.importSwfXml"));
         importSwfXmlMenuItem.addActionListener(mainPanel::importSwfXmlActionPerformed);
         add(importSwfXmlMenuItem);
-
-        setTagPositionMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setTagPosition"));
-        setTagPositionMenuItem.addActionListener(this::setTagPositionActionPerformed);
-        add(setTagPositionMenuItem);
-
+        
         showInResourcesViewTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
         showInResourcesViewTagMenuItem.addActionListener(this::showInResourcesViewActionPerformed);
         add(showInResourcesViewTagMenuItem);
@@ -272,8 +268,12 @@ public class TagTreeContextMenu extends JPopupMenu {
         addTagAfterMenu = new JMenu(mainPanel.translate("contextmenu.addTagAfter"));
         add(addTagAfterMenu);
 
-        moveTagMenu = new JMenu(mainPanel.translate("contextmenu.moveTag"));
-        add(moveTagMenu);
+        moveTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.moveTagAround"));
+        moveTagMenuItem.addActionListener(this::setTagPositionActionPerformed);
+        add(moveTagMenuItem);
+
+        moveTagToMenu = new JMenu(mainPanel.translate("contextmenu.moveTag"));
+        add(moveTagToMenu);
 
         copyTagMenu = new JMenu(mainPanel.translate("contextmenu.copyTag"));
         add(copyTagMenu);
@@ -546,14 +546,14 @@ public class TagTreeContextMenu extends JPopupMenu {
         addTagMenu.setVisible(false);
         addTagBeforeMenu.setVisible(false);
         addTagAfterMenu.setVisible(false);
-        moveTagMenu.setVisible(false);
+        moveTagToMenu.setVisible(false);
         copyTagMenu.setVisible(false);
         copyTagWithDependenciesMenu.setVisible(false);
         openSWFInsideTagMenuItem.setVisible(false);
         addAs12ScriptMenuItem.setVisible(false);
         addAs3ClassMenuItem.setVisible(false);
         textSearchMenuItem.setVisible(hasScripts || hasTexts);
-        setTagPositionMenuItem.setVisible(items.size() == 1 && (items.get(0) instanceof Tag));
+        moveTagMenuItem.setVisible(items.size() == 1 && (items.get(0) instanceof Tag));
         showInResourcesViewTagMenuItem.setVisible(items.size() == 1 && mainPanel.getCurrentView() == MainPanel.VIEW_TAGLIST && (!(items.get(0) instanceof ShowFrameTag)));
         showInTagListViewTagMenuItem.setVisible(items.size() == 1 && mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES);
         addFramesMenuItem.setVisible(false);
@@ -683,7 +683,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
 
         if (allSelectedIsInTheSameSwf && allSelectedIsTag && swfs.size() > 1) {
-            moveTagMenu.removeAll();
+            moveTagToMenu.removeAll();
             copyTagMenu.removeAll();
             copyTagWithDependenciesMenu.removeAll();
             for (SWFList targetSwfList : swfs) {
@@ -691,9 +691,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                     if (targetSwf != singleSwf) {
                         JMenuItem swfItem = new JMenuItem(targetSwf.getShortFileName());
                         swfItem.addActionListener((ActionEvent ae) -> {
-                            moveTagActionPerformed(ae, items, targetSwf);
+                            moveTagToActionPerformed(ae, items, targetSwf);
                         });
-                        moveTagMenu.add(swfItem);
+                        moveTagToMenu.add(swfItem);
 
                         swfItem = new JMenuItem(targetSwf.getShortFileName());
                         swfItem.addActionListener((ActionEvent ae) -> {
@@ -709,7 +709,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     }
                 }
             }
-            moveTagMenu.setVisible(true);
+            moveTagToMenu.setVisible(true);
             copyTagMenu.setVisible(true);
             copyTagWithDependenciesMenu.setVisible(true);
         }
@@ -741,7 +741,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     jumpToCharacterMenuItem.setVisible(false);
                     importSwfXmlMenuItem.setVisible(false);
                     addTagMenu.setVisible(false);
-                    moveTagMenu.setVisible(false);
+                    moveTagToMenu.setVisible(false);
                     openSWFInsideTagMenuItem.setVisible(false);
                 }
             }
@@ -956,7 +956,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         return -1;
     }
 
-    private void moveTagActionPerformed(ActionEvent evt, List<TreeItem> items, SWF targetSwf) {
+    private void moveTagToActionPerformed(ActionEvent evt, List<TreeItem> items, SWF targetSwf) {
         SWF sourceSwf = items.get(0).getSwf();
         for (TreeItem item : items) {
             Tag tag = (Tag) item;
