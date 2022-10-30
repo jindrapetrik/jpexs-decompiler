@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [16.0.0] - 2022-10-30
 ### Added
 - Replace characters references
