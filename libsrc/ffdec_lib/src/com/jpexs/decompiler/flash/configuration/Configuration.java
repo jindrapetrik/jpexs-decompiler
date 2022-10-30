@@ -80,7 +80,7 @@ public final class Configuration {
 
     @ConfigurationDefaultInt(10)
     @ConfigurationCategory("decompilation")
-    private static ConfigurationItem<Integer> parallelSpeedUpThreadCount = null;
+    public static ConfigurationItem<Integer> parallelSpeedUpThreadCount = null;
 
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("script")
