@@ -66,7 +66,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
 
     private final JButton textCancelButton;
 
-    private final JButton selectPrevousTagButton;
+    private final JButton selectPreviousTagButton;
 
     private final JButton selectNextTagButton;
 
@@ -107,7 +107,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
         textButtonsPanel.setLayout(new FlowLayout(SwingConstants.WEST));
         textButtonsPanel.setMinimumSize(new Dimension(10, textButtonsPanel.getMinimumSize().height));
 
-        selectPrevousTagButton = createButton(null, "arrowup16", "selectPreviousTag", e -> mainPanel.previousTag());
+        selectPreviousTagButton = createButton(null, "arrowup16", "selectPreviousTag", e -> mainPanel.previousTag());
         selectNextTagButton = createButton(null, "arrowdown16", "selectNextTag", e -> mainPanel.nextTag());
         textAlignLeftButton = createButton(null, "textalignleft16", "text.align.left", e -> textAlign(TextAlign.LEFT));
         textAlignCenterButton = createButton(null, "textaligncenter16", "text.align.center", e -> textAlign(TextAlign.CENTER));
@@ -118,7 +118,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
         changeCaseButton = createButton(null, "textuppercase16", "text.toggleCase", e -> changeCase(0));
         undoChangesButton = createButton(null, "reload16", "text.undo", e -> undoChanges());
 
-        textButtonsPanel.add(selectPrevousTagButton);
+        textButtonsPanel.add(selectPreviousTagButton);
         textButtonsPanel.add(selectNextTagButton);
         textButtonsPanel.add(textAlignLeftButton);
         textButtonsPanel.add(textAlignCenterButton);
@@ -195,6 +195,8 @@ public class TextPanel extends JPanel implements TagEditorPanel {
         increaseTranslateXButton.setVisible(!readOnly);
         changeCaseButton.setVisible(!readOnly);
         undoChangesButton.setVisible(!readOnly);
+        selectPreviousTagButton.setVisible(mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES);
+        selectNextTagButton.setVisible(mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES);
     }
 
     private boolean isModified() {

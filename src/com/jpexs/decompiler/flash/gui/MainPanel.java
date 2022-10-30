@@ -3113,12 +3113,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public boolean previousTag() {
-        JTree tree = null;
-        if (getCurrentView() == VIEW_RESOURCES) {
-            tree = tagTree;
-        } else if (getCurrentView() == VIEW_TAGLIST) {
-            tree = tagTree;
-        }
+        JTree tree = getCurrentTree();
 
         if (tree != null) {
             if (tree.getSelectionRows().length > 0) {
@@ -3136,12 +3131,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public boolean nextTag() {
-        JTree tree = null;
-        if (getCurrentView() == VIEW_RESOURCES) {
-            tree = tagTree;
-        } else if (getCurrentView() == VIEW_TAGLIST) {
-            tree = tagTree;
-        }
+        JTree tree = getCurrentTree();
+        
         if (tree != null) {
             if (tree.getSelectionRows().length > 0) {
                 int row = tree.getSelectionRows()[0];
