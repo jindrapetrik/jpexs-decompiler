@@ -130,5 +130,8 @@ public abstract class AbstractTagTreeModel implements TreeModel {
     }
     
     public abstract void updateSwf(SWF swf);
-        
+    
+    public TreeItem getParent(TreeItem obj) {
+        return (TreeItem)getTreePath(obj).getParentPath().getLastPathComponent();
+    }
 }

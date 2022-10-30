@@ -409,11 +409,6 @@ public class TagTreeModel extends AbstractTagTreeModel {
         return ret;
     }
     
-    //FIXME: put in the AbstractTreeModel
-    public TreeItem getParent(TreeItem obj) {
-        return (TreeItem)getTreePath(obj).getParentPath().getLastPathComponent();
-    }
-
     @Override
     public TreeItem getRoot() {
         return root;
