@@ -793,6 +793,20 @@ public abstract class MainFrameMenu implements MenuBuilder {
             titleBuilder.append(swf.getFileTitle());
         }
         mainFrame.setTitle(titleBuilder.toString());
+        
+        if (mainPanel != null) {
+            switch(mainPanel.getCurrentView()){
+                case MainPanel.VIEW_RESOURCES:
+                    setGroupSelection("view", "/file/view/viewResources");
+                    break;
+                case MainPanel.VIEW_TAGLIST:
+                    setGroupSelection("view", "/file/view/viewTagList");
+                    break;
+                case MainPanel.VIEW_DUMP:
+                    setGroupSelection("view", "/file/view/viewHex");
+                    break;
+            }
+        }
     }
 
     private void registerHotKeys() {
@@ -876,19 +890,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             addMenuItem("/file/exit", translate("menu.file.exit"), "exit32", this::exitActionPerformed, PRIORITY_TOP, null, true, null, false);
         }
 
-        finishMenu("/file");
-
-        switch(Configuration.lastView.get()){
-            case MainPanel.VIEW_RESOURCES:
-                setGroupSelection("view", "/file/view/viewResources");
-                break;
-            case MainPanel.VIEW_TAGLIST:
-                setGroupSelection("view", "/file/view/viewTagList");
-                break;
-            case MainPanel.VIEW_DUMP:
-                setGroupSelection("view", "/file/view/viewHex");
-                break;
-        }
+        finishMenu("/file");       
 
         /*
          menu.file.start = Start

@@ -169,6 +169,11 @@ public class TagTreeContextMenu extends JPopupMenu {
     
     private JMenuItem setTagPositionMenuItem; 
 
+    private JMenuItem showInResourcesViewTagMenuItem;
+    
+    private JMenuItem showInTagListViewTagMenuItem;
+    
+    
     public TagTreeContextMenu(final List<AbstractTagTree> trees, MainPanel mainPanel) {
         this.mainPanel = mainPanel;
         
@@ -239,6 +244,14 @@ public class TagTreeContextMenu extends JPopupMenu {
         setTagPositionMenuItem = new JMenuItem(mainPanel.translate("contextmenu.setTagPosition"));
         setTagPositionMenuItem.addActionListener(this::setTagPositionActionPerformed);
         add(setTagPositionMenuItem);
+        
+        showInResourcesViewTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
+        showInResourcesViewTagMenuItem.addActionListener(this::showInResourcesViewActionPerformed);
+        add(showInResourcesViewTagMenuItem);
+        
+        showInTagListViewTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInTagList"));
+        showInTagListViewTagMenuItem.addActionListener(this::showInTagListViewActionPerformed);
+        add(showInTagListViewTagMenuItem);
         
         addTagMenu = new JMenu(mainPanel.translate("contextmenu.addTag"));
         add(addTagMenu);
@@ -511,6 +524,8 @@ public class TagTreeContextMenu extends JPopupMenu {
         addAs3ClassMenuItem.setVisible(false);
         textSearchMenuItem.setVisible(hasScripts || hasTexts);
         setTagPositionMenuItem.setVisible(items.size() == 1 && (items.get(0) instanceof Tag));
+        showInResourcesViewTagMenuItem.setVisible(items.size() == 1 && mainPanel.getCurrentView() == MainPanel.VIEW_TAGLIST && (!(items.get(0) instanceof ShowFrameTag)));
+        showInTagListViewTagMenuItem.setVisible(items.size() == 1 && mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES);
 
         if (allSelectedIsTag) {
             boolean canUndo = false;
@@ -1857,6 +1872,20 @@ public class TagTreeContextMenu extends JPopupMenu {
         } catch (IOException | InterruptedException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private void showInResourcesViewActionPerformed(ActionEvent evt) {
+        TreeItem item = getTree().getCurrentTreeItem();
+        mainPanel.showView(MainPanel.VIEW_RESOURCES);
+        mainPanel.setTagTreeSelectedNode(mainPanel.tagTree, item);
+        mainPanel.updateMenu();
+    }
+    
+    private void showInTagListViewActionPerformed(ActionEvent evt) {
+        TreeItem item = getTree().getCurrentTreeItem();
+        mainPanel.showView(MainPanel.VIEW_TAGLIST);
+        mainPanel.setTagTreeSelectedNode(mainPanel.tagListTree, item);
+        mainPanel.updateMenu();
     }
     
     private void setTagPositionActionPerformed(ActionEvent evt) {
