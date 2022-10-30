@@ -225,11 +225,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         removeWithDependenciesMenuItem.addActionListener((ActionEvent e) -> {
             removeItemActionPerformed(e, true);
         });
-        add(removeWithDependenciesMenuItem);
-
-        cloneTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.cloneTag"));
-        cloneTagMenuItem.addActionListener(this::cloneTagActionPerformed);
-        add(cloneTagMenuItem);
+        add(removeWithDependenciesMenuItem);      
 
         undoTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.undo"));
         undoTagMenuItem.addActionListener(this::undoTagActionPerformed);
@@ -292,6 +288,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         addTagAfterMenu = new JMenu(mainPanel.translate("contextmenu.addTagAfter"));
         add(addTagAfterMenu);
 
+        cloneTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.cloneTag"));
+        cloneTagMenuItem.addActionListener(this::cloneTagActionPerformed);
+        add(cloneTagMenuItem);
+        
         moveTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.moveTagAround"));
         moveTagMenuItem.addActionListener(this::moveTagActionPerformed);
         add(moveTagMenuItem);
