@@ -159,6 +159,9 @@ public final class Configuration {
 
     @ConfigurationDefaultBoolean(false)
     public static ConfigurationItem<Boolean> useDetailedLogging = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    public static ConfigurationItem<Boolean> warningOpeningReadOnly = null;
 
     /**
      * Debug mode = throwing an error when comparing original file and

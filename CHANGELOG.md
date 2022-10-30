@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
 - [#1825], [#1737] Adding new frames
 - Context menu icons
 - Icon of tag in raw editor
+- [#1845] Show warning on opening file in Read only mode (binary search, unknown extensions, etc.)
+- [#1845] Show error message on saving in Read only mode, "Save As" must be used
 
 ### Fixed
 - [#1834] PlaceObject4 tags appear as Unresolved inside of DefineSprite
@@ -2406,6 +2408,7 @@ All notable changes to this project will be documented in this file.
 [#1731]: https://www.free-decompiler.com/flash/issues/1731
 [#1825]: https://www.free-decompiler.com/flash/issues/1825
 [#1737]: https://www.free-decompiler.com/flash/issues/1737
+[#1845]: https://www.free-decompiler.com/flash/issues/1845
 [#1834]: https://www.free-decompiler.com/flash/issues/1834
 [#1839]: https://www.free-decompiler.com/flash/issues/1839
 [#1838]: https://www.free-decompiler.com/flash/issues/1838

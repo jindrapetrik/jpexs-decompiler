@@ -140,6 +140,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
                     } catch (IOException ex) {
                         Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
                     }
+                } else {
+                    ViewMessages.showMessageDialog(mainFrame.getWindow(), translate("error.readonly.cannotSave"), translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
                 Main.stopSaving(savedFile);
             } else if (swf.binaryData != null) {
@@ -184,8 +186,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         if (swf != null) {
             if (saveAs(swf, SaveFileMode.SAVEAS)) {
-                if (swf.swfList != null) { //binarydata won't clear modified on saveas
-                    swf.clearModified();
+                if (swf.swfList != null) { //binarydata won't clear modified on saveas                    
+                    if (!isSwfReadOnly(swf)) {
+                        swf.clearModified();
+                    }
                 }
             }
 
@@ -195,6 +199,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
         return false;
     }
 
+    private boolean isSwfReadOnly(SWF swf) {
+        return swf.swfList != null && swf.swfList.bundle != null && swf.swfList.bundle.isReadOnly();
+    }
+    
     private boolean saveAs(SWF swf, SaveFileMode mode) {
         View.checkAccess();
 

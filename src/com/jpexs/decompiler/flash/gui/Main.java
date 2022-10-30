@@ -839,6 +839,14 @@ public class Main {
 
         Stopwatch sw = Stopwatch.startNew();
         if (bundle != null) {
+            if (bundle.isReadOnly()) {
+                View.execInEventDispatchLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        ViewMessages.showMessageDialog(getMainFrame().getWindow(), AppStrings.translate("warning.readonly").replace("%file%", sourceInfo.getFileTitleOrName()), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningOpeningReadOnly);
+                    }
+                });
+            }
             result.bundle = bundle;
             result.name = new File(sourceInfo.getFileTitleOrName()).getName();
             for (Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
