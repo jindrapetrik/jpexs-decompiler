@@ -395,9 +395,15 @@ public class SelectTagPositionDialog extends AppDialog {
         setResizable(true);
         View.centerScreen(this);
         View.setWindowIcon(this);
+        
+        calculateEnabled();
     }
 
     public void positionTreeValueChanged(TreeSelectionEvent e) {
+        calculateEnabled();
+    }
+    
+    private void calculateEnabled() {
         MyTreeNode node = (MyTreeNode) positionTree.getLastSelectedPathComponent();
         boolean enabled = true;
         if (node == null || (node.getData() instanceof MyFrame)) {
