@@ -51,13 +51,9 @@ public class TagListTreeCellRenderer extends DefaultTreeCellRenderer {
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-        Object subValue = value;
-        if (value instanceof TagListTreeNode) {
-            subValue = ((TagListTreeNode) value).getData();
-        }
         TreeItem val = null;
-        if (subValue instanceof TreeItem) {
-            val = (TreeItem) subValue;
+        if (value instanceof TreeItem) {
+            val = (TreeItem) value;
         }
 
         if (val != null && !(val instanceof SWFList) && val.getSwf() == null) {
@@ -69,8 +65,8 @@ public class TagListTreeCellRenderer extends DefaultTreeCellRenderer {
         if (renderer instanceof JLabel) {
             JLabel lab = (JLabel) renderer;
 
-            if (subValue instanceof TreeItem) {
-                lab.setIcon(TagTree.getIconForType(TagTree.getTreeNodeType((TreeItem) subValue)));
+            if (value instanceof TreeItem) {
+                lab.setIcon(TagTree.getIconForType(TagTree.getTreeNodeType((TreeItem) value)));
 
                 boolean isReadOnly = false;
                 if (val instanceof Tag) {
