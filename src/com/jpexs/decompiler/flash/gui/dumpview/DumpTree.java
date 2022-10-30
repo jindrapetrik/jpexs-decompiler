@@ -252,42 +252,52 @@ public class DumpTree extends JTree {
 
         final JMenuItem expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
         expandRecursiveMenuItem.addActionListener(this::expandRecursiveButtonActionPerformed);
+        expandRecursiveMenuItem.setIcon(View.getIcon("expand16"));
         contextPopupMenu.add(expandRecursiveMenuItem);
 
         final JMenuItem saveToFileMenuItem = new JMenuItem(mainPanel.translate("contextmenu.saveToFile"));
         saveToFileMenuItem.addActionListener(this::saveToFileButtonActionPerformed);
+        saveToFileMenuItem.setIcon(View.getIcon("saveas16"));
         contextPopupMenu.add(saveToFileMenuItem);
 
         final JMenuItem saveUncompressedToFileMenuItem = new JMenuItem(mainPanel.translate("contextmenu.saveUncompressedToFile"));
         saveUncompressedToFileMenuItem.addActionListener(this::saveUncompressedToFileButtonActionPerformed);
+        saveUncompressedToFileMenuItem.setIcon(View.getIcon("saveas16"));
         contextPopupMenu.add(saveUncompressedToFileMenuItem);
 
         final JMenuItem closeSelectionMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
         closeSelectionMenuItem.addActionListener(this::closeSwfButtonActionPerformed);
+        closeSelectionMenuItem.setIcon(View.getIcon("close16"));
         contextPopupMenu.add(closeSelectionMenuItem);
 
         final JMenuItem parseActionsMenuItem = new JMenuItem(mainPanel.translate("contextmenu.parseActions"));
         parseActionsMenuItem.addActionListener(this::parseActionsButtonActionPerformed);
+        parseActionsMenuItem.setIcon(View.getIcon("parse16"));
         contextPopupMenu.add(parseActionsMenuItem);
 
         final JMenuItem parseAbcMenuItem = new JMenuItem(mainPanel.translate("contextmenu.parseABC"));
         parseAbcMenuItem.addActionListener(this::parseAbcButtonActionPerformed);
+        parseAbcMenuItem.setIcon(View.getIcon("parse16"));
         contextPopupMenu.add(parseAbcMenuItem);
 
         final JMenuItem parseInstructionsMenuItem = new JMenuItem(mainPanel.translate("contextmenu.parseInstructions"));
         parseInstructionsMenuItem.addActionListener(this::parseInstructionsButtonActionPerformed);
+        parseInstructionsMenuItem.setIcon(View.getIcon("parse16"));
         contextPopupMenu.add(parseInstructionsMenuItem);
 
         final JMenuItem gotoTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
         gotoTagMenuItem.addActionListener(this::gotoTagButtonActionPerformed);
+        gotoTagMenuItem.setIcon(View.getIcon("folder16"));
         contextPopupMenu.add(gotoTagMenuItem);
 
         final JMenuItem gotoActionListMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
         gotoActionListMenuItem.addActionListener(this::gotoActionListButtonActionPerformed);
+        gotoActionListMenuItem.setIcon(View.getIcon("folder16"));        
         contextPopupMenu.add(gotoActionListMenuItem);
 
         final JMenuItem gotoMethodMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
         gotoMethodMenuItem.addActionListener(this::gotoMethodButtonActionPerformed);
+        gotoMethodMenuItem.setIcon(View.getIcon("folder16"));
         contextPopupMenu.add(gotoMethodMenuItem);
 
         addMouseListener(new MouseAdapter() {

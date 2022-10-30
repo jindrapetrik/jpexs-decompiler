@@ -213,128 +213,160 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
         expandRecursiveMenuItem.addActionListener(this::expandRecursiveActionPerformed);
+        expandRecursiveMenuItem.setIcon(View.getIcon("expand16"));
         add(expandRecursiveMenuItem);
 
         removeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.remove"));
         removeMenuItem.addActionListener((ActionEvent e) -> {
             removeItemActionPerformed(e, false);
         });
+        removeMenuItem.setIcon(View.getIcon("remove16"));
         add(removeMenuItem);
 
         removeWithDependenciesMenuItem = new JMenuItem(mainPanel.translate("contextmenu.removeWithDependencies"));
         removeWithDependenciesMenuItem.addActionListener((ActionEvent e) -> {
             removeItemActionPerformed(e, true);
         });
+        removeWithDependenciesMenuItem.setIcon(View.getIcon("remove16"));        
         add(removeWithDependenciesMenuItem);      
 
         undoTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.undo"));
         undoTagMenuItem.addActionListener(this::undoTagActionPerformed);
+        undoTagMenuItem.setIcon(View.getIcon("undo16"));   
         add(undoTagMenuItem);
 
         exportSelectionMenuItem = new JMenuItem(mainPanel.translate("menu.file.export.selection"));
         exportSelectionMenuItem.addActionListener(mainPanel::exportSelectionActionPerformed);
+        exportSelectionMenuItem.setIcon(View.getIcon("exportsel16"));  
         add(exportSelectionMenuItem);
 
         replaceMenuItem = new JMenuItem(mainPanel.translate("button.replace"));
         replaceMenuItem.addActionListener(mainPanel::replaceButtonActionPerformed);
+        replaceMenuItem.setIcon(View.getIcon("replaceitem16"));  
         add(replaceMenuItem);
 
         replaceNoFillMenuItem = new JMenuItem(mainPanel.translate("button.replaceNoFill"));
         replaceNoFillMenuItem.addActionListener(mainPanel::replaceNoFillButtonActionPerformed);
+        replaceNoFillMenuItem.setIcon(View.getIcon("replaceitem16"));
         add(replaceNoFillMenuItem);
 
         replaceWithTagMenuItem = new JMenuItem(mainPanel.translate("button.replaceWithTag"));
         replaceWithTagMenuItem.addActionListener(this::replaceWithTagActionPerformed);
+        replaceWithTagMenuItem.setIcon(View.getIcon("replacewithtag16"));
         add(replaceWithTagMenuItem);
 
         replaceRefsWithTagMenuItem = new JMenuItem(mainPanel.translate("button.replaceRefs"));
         replaceRefsWithTagMenuItem.addActionListener(this::replaceRefsWithTagActionPerformed);
+        replaceRefsWithTagMenuItem.setIcon(View.getIcon("replacewithtag16"));
         add(replaceRefsWithTagMenuItem);
 
         rawEditMenuItem = new JMenuItem(mainPanel.translate("contextmenu.rawEdit"));
         rawEditMenuItem.addActionListener(this::rawEditActionPerformed);
+        rawEditMenuItem.setIcon(View.getIcon("rawedit16"));
         add(rawEditMenuItem);
 
         jumpToCharacterMenuItem = new JMenuItem(mainPanel.translate("contextmenu.jumpToCharacter"));
         jumpToCharacterMenuItem.addActionListener(this::jumpToCharacterActionPerformed);
+        jumpToCharacterMenuItem.setIcon(View.getIcon("jumpto16"));
         add(jumpToCharacterMenuItem);
 
         exportJavaSourceMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportJavaSource"));
         exportJavaSourceMenuItem.addActionListener(mainPanel::exportJavaSourceActionPerformed);
+        exportJavaSourceMenuItem.setIcon(View.getIcon("exportjava16"));
         add(exportJavaSourceMenuItem);
 
         exportSwfXmlMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportSwfXml"));
         exportSwfXmlMenuItem.addActionListener(mainPanel::exportSwfXmlActionPerformed);
+        exportSwfXmlMenuItem.setIcon(View.getIcon("exportxml16"));
         add(exportSwfXmlMenuItem);
 
         importSwfXmlMenuItem = new JMenuItem(mainPanel.translate("contextmenu.importSwfXml"));
         importSwfXmlMenuItem.addActionListener(mainPanel::importSwfXmlActionPerformed);
+        importSwfXmlMenuItem.setIcon(View.getIcon("importxml16"));
         add(importSwfXmlMenuItem);
 
         showInResourcesViewTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
         showInResourcesViewTagMenuItem.addActionListener(this::showInResourcesViewActionPerformed);
+        showInResourcesViewTagMenuItem.setIcon(View.getIcon("folder16"));
         add(showInResourcesViewTagMenuItem);
 
         showInTagListViewTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInTagList"));
         showInTagListViewTagMenuItem.addActionListener(this::showInTagListViewActionPerformed);
+        showInTagListViewTagMenuItem.setIcon(View.getIcon("taglist16"));
         add(showInTagListViewTagMenuItem);
 
         addTagMenu = new JMenu(mainPanel.translate("contextmenu.addTag"));
+        addTagMenu.setIcon(View.getIcon("addtag16"));
         add(addTagMenu);
 
         addTagBeforeMenu = new JMenu(mainPanel.translate("contextmenu.addTagBefore"));
+        addTagBeforeMenu.setIcon(View.getIcon("addtag16"));
         add(addTagBeforeMenu);
 
         addTagAfterMenu = new JMenu(mainPanel.translate("contextmenu.addTagAfter"));
+        addTagAfterMenu.setIcon(View.getIcon("addtag16"));
         add(addTagAfterMenu);
 
         cloneTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.cloneTag"));
         cloneTagMenuItem.addActionListener(this::cloneTagActionPerformed);
+        cloneTagMenuItem.setIcon(View.getIcon("copy16"));
         add(cloneTagMenuItem);
         
         moveTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.moveTagAround"));
         moveTagMenuItem.addActionListener(this::moveTagActionPerformed);
+        moveTagMenuItem.setIcon(View.getIcon("move16"));
         add(moveTagMenuItem);
 
         moveTagToMenu = new JMenu(mainPanel.translate("contextmenu.moveTag"));
+        moveTagToMenu.setIcon(View.getIcon("move16"));
         add(moveTagToMenu);
 
         copyTagMenu = new JMenu(mainPanel.translate("contextmenu.copyTag"));
+        copyTagMenu.setIcon(View.getIcon("copy16"));
         add(copyTagMenu);
 
         copyTagWithDependenciesMenu = new JMenu(mainPanel.translate("contextmenu.copyTagWithDependencies"));
+        copyTagWithDependenciesMenu.setIcon(View.getIcon("copy16"));
         add(copyTagWithDependenciesMenu);
 
         openSWFInsideTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.openswfinside"));
+        openSWFInsideTagMenuItem.setIcon(View.getIcon("openinside16"));
+        openSWFInsideTagMenuItem.addActionListener(this::openSwfInsideActionPerformed);        
         add(openSWFInsideTagMenuItem);
-        openSWFInsideTagMenuItem.addActionListener(this::openSwfInsideActionPerformed);
-
+        
         addAs12ScriptMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addScript"));
         addAs12ScriptMenuItem.addActionListener(this::addAs12ScriptActionPerformed);
+        addAs12ScriptMenuItem.setIcon(View.getIcon("scriptadd16"));
         add(addAs12ScriptMenuItem);
 
         addAs3ClassMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addClass"));
         addAs3ClassMenuItem.addActionListener(this::addAs3ClassActionPerformed);
+        addAs3ClassMenuItem.setIcon(View.getIcon("scriptadd16"));
         add(addAs3ClassMenuItem);
 
         addFramesMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addFrames"));
         addFramesMenuItem.addActionListener(this::addFramesActionPerformed);
+        addFramesMenuItem.setIcon(View.getIcon("frameadd16"));
         add(addFramesMenuItem);
 
         addFramesBeforeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addFramesBefore"));
         addFramesBeforeMenuItem.addActionListener(this::addFramesBeforeActionPerformed);
+        addFramesBeforeMenuItem.setIcon(View.getIcon("frameadd16"));
         add(addFramesBeforeMenuItem);
 
         addFramesAfterMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addFramesAfter"));
         addFramesAfterMenuItem.addActionListener(this::addFramesAfterActionPerformed);
+        addFramesAfterMenuItem.setIcon(View.getIcon("frameadd16"));
         add(addFramesAfterMenuItem);
 
         textSearchMenuItem = new JMenuItem(mainPanel.translate("menu.tools.search"));
         textSearchMenuItem.addActionListener(this::textSearchActionPerformed);
+        textSearchMenuItem.setIcon(View.getIcon("search16"));
         add(textSearchMenuItem);
 
         closeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
         closeMenuItem.addActionListener(this::closeSwfActionPerformed);
+        closeMenuItem.setIcon(View.getIcon("close16"));
         add(closeMenuItem);
 
         MouseAdapter adapter = new MouseAdapter() {
@@ -703,18 +735,21 @@ public class TagTreeContextMenu extends JPopupMenu {
                         swfItem.addActionListener((ActionEvent ae) -> {
                             moveTagToActionPerformed(ae, items, targetSwf);
                         });
+                        swfItem.setIcon(View.getIcon("flash16"));
                         moveTagToMenu.add(swfItem);
 
                         swfItem = new JMenuItem(targetSwf.getShortFileName());
                         swfItem.addActionListener((ActionEvent ae) -> {
                             copyTagActionPerformed(ae, items, targetSwf);
                         });
+                        swfItem.setIcon(View.getIcon("flash16"));
                         copyTagMenu.add(swfItem);
 
                         swfItem = new JMenuItem(targetSwf.getShortFileName());
                         swfItem.addActionListener((ActionEvent ae) -> {
                             copyTagWithDependenciesActionPerformed(ae, items, targetSwf);
                         });
+                        swfItem.setIcon(View.getIcon("flash16"));
                         copyTagWithDependenciesMenu.add(swfItem);
                     }
                 }

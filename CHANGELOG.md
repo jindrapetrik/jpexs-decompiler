@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - Tag list view
 - Inserting new tags before and after selection
 - [#1825], [#1737] Adding new frames
+- Context menu icons
 
 ### Fixed
 - [#1834] PlaceObject4 tags appear as Unresolved inside of DefineSprite
