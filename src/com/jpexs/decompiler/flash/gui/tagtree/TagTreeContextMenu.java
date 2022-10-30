@@ -269,7 +269,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         add(addTagAfterMenu);
 
         moveTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.moveTagAround"));
-        moveTagMenuItem.addActionListener(this::setTagPositionActionPerformed);
+        moveTagMenuItem.addActionListener(this::moveTagActionPerformed);
         add(moveTagMenuItem);
 
         moveTagToMenu = new JMenu(mainPanel.translate("contextmenu.moveTag"));
@@ -2096,7 +2096,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         mainPanel.updateMenu();
     }
 
-    private void setTagPositionActionPerformed(ActionEvent evt) {
+    private void moveTagActionPerformed(ActionEvent evt) {
         List<TreeItem> items = getTree().getSelected();
         Tag t = (Tag) items.get(0);
         TreePath path = getTree().getSelectionPath();
