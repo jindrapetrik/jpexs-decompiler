@@ -2193,6 +2193,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                         }
                     }
                     if (f == 0 && !before) { //last showFrameTag not found
+                        if (!tagsList.isEmpty()) { //DefineSprite with some tags but no ShowFrameTag
+                            frameCount++;
+                        }
                         positionToAdd = tagsList.size();
                     }
                 }
