@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - Changing tag position
 - Tag list view
 - Inserting new tags before and after selection
+- [#1825], [#1737] Adding new frames
 
 ### Fixed
 - [#1834] PlaceObject4 tags appear as Unresolved inside of DefineSprite
@@ -2400,6 +2401,8 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1731]: https://www.free-decompiler.com/flash/issues/1731
+[#1825]: https://www.free-decompiler.com/flash/issues/1825
+[#1737]: https://www.free-decompiler.com/flash/issues/1737
 [#1834]: https://www.free-decompiler.com/flash/issues/1834
 [#1839]: https://www.free-decompiler.com/flash/issues/1839
 [#1838]: https://www.free-decompiler.com/flash/issues/1838

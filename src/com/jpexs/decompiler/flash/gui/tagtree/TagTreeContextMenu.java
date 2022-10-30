@@ -178,6 +178,10 @@ public class TagTreeContextMenu extends JPopupMenu {
     
     private JMenuItem showInTagListViewTagMenuItem;
     
+    private JMenuItem addFramesBeforeMenuItem;
+    
+    private JMenuItem addFramesAfterMenuItem;
+    
     
     public TagTreeContextMenu(final List<AbstractTagTree> trees, MainPanel mainPanel) {
         this.mainPanel = mainPanel;
@@ -287,6 +291,14 @@ public class TagTreeContextMenu extends JPopupMenu {
         addAs3ClassMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addClass"));
         addAs3ClassMenuItem.addActionListener(this::addAs3ClassActionPerformed);
         add(addAs3ClassMenuItem);
+        
+        addFramesBeforeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addFramesBefore"));
+        addFramesBeforeMenuItem.addActionListener(this::addFramesBeforeActionPerformed);
+        add(addFramesBeforeMenuItem);
+
+        addFramesAfterMenuItem = new JMenuItem(mainPanel.translate("contextmenu.addFramesAfter"));
+        addFramesAfterMenuItem.addActionListener(this::addFramesAfterActionPerformed);
+        add(addFramesAfterMenuItem);
 
         textSearchMenuItem = new JMenuItem(mainPanel.translate("menu.tools.search"));
         textSearchMenuItem.addActionListener(this::textSearchActionPerformed);
@@ -294,7 +306,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         closeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
         closeMenuItem.addActionListener(this::closeSwfActionPerformed);
-        add(closeMenuItem);
+        add(closeMenuItem);                
 
         MouseAdapter adapter = new MouseAdapter() {
             @Override
@@ -539,6 +551,8 @@ public class TagTreeContextMenu extends JPopupMenu {
         setTagPositionMenuItem.setVisible(items.size() == 1 && (items.get(0) instanceof Tag));
         showInResourcesViewTagMenuItem.setVisible(items.size() == 1 && mainPanel.getCurrentView() == MainPanel.VIEW_TAGLIST && (!(items.get(0) instanceof ShowFrameTag)));
         showInTagListViewTagMenuItem.setVisible(items.size() == 1 && mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES);
+        addFramesBeforeMenuItem.setVisible(false);
+        addFramesAfterMenuItem.setVisible(false);
 
         if (allSelectedIsTag) {
             boolean canUndo = false;
@@ -647,6 +661,11 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             if (firstItem instanceof Tag) {
                 rawEditMenuItem.setVisible(true);
+            }
+            
+            if (firstItem instanceof Frame) {
+                addFramesBeforeMenuItem.setVisible(true);
+                addFramesAfterMenuItem.setVisible(true);                
             }
         }
 
@@ -2117,5 +2136,88 @@ public class TagTreeContextMenu extends JPopupMenu {
             }            
             mainPanel.refreshTree(t.getSwf());
         }
+    }
+    
+    private void addFramesBeforeActionPerformed(ActionEvent evt) {
+        addFrames(true);
+    }
+    
+    private void addFrames(boolean before) {
+        Frame frame = (Frame) getTree().getCurrentTreeItem();
+        if (frame == null) {
+            return;
+        }
+        Timelined timelined = frame.timeline.timelined;
+        
+        while (true) {
+            String frameCountString = ViewMessages.showInputDialog(mainPanel.getMainFrame().getWindow(), AppStrings.translate("message.input.addFrames.howmany"), AppStrings.translate("message.input.addFrames.title"), "1");        
+            if (frameCountString == null) {
+                return;
+            }
+            int frameCount;
+            try {
+                frameCount = Integer.parseInt(frameCountString);
+                if (frameCount < 0) {
+                    continue;
+                }            
+                if (frameCount == 0) {
+                    return;
+                }
+                ReadOnlyTagList tagsList = timelined.getTags();
+                int positionToAdd = -1;
+                if (before && frame.frame == 0) {
+                    positionToAdd = 0;
+                } else {
+                    
+                    //adding frames before frame 0 => at 0
+                    //adding frames before frame 2 => after second ShowFrameTag
+                    
+                    //adding frames after frame 2 => after third ShowFrameTag
+                    //adding frames after frame 0 => after first ShowFrameTag
+                    
+                    int f = 0;
+                    int i = 0;
+                    for (; i < tagsList.size(); i++) {
+                        Tag t = tagsList.get(i);
+                        if (t instanceof ShowFrameTag) {                            
+                            f++;
+                            
+                            if (before && f == frame.frame) {
+                                positionToAdd = i + 1;
+                                break;
+                            }
+                            if (!before && f == frame.frame + 1) {
+                                positionToAdd = i + 1;
+                                break;
+                            }
+                        }
+                    }
+                    if (f == 0 && !before) { //last showFrameTag not found
+                        positionToAdd = tagsList.size();
+                    }
+                }
+                for (int i = 0; i < frameCount; i++) {
+                    ShowFrameTag showFrameTag = new ShowFrameTag(frame.getSwf());
+                    showFrameTag.setTimelined(frame.getSwf());
+                    timelined.addTag(positionToAdd, showFrameTag);
+                }                   
+                timelined.resetTimeline();
+                
+                if(timelined instanceof SWF) {
+                    ((SWF) timelined).frameCount = timelined.getTimeline().getFrameCount();
+                } else if (timelined instanceof DefineSpriteTag) {
+                    ((DefineSpriteTag) timelined).frameCount = timelined.getTimeline().getFrameCount();
+                }
+                mainPanel.refreshTree(frame.getSwf());
+                
+            } catch (NumberFormatException nfe) {
+                continue;
+            }
+            break;
+        }
+    }
+    
+    private void addFramesAfterActionPerformed(ActionEvent evt) {
+        addFrames(false);
     }
 }
