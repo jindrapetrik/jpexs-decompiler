@@ -2,6 +2,8 @@ name: Build and deploy JPEXS FFDec
 
 on:
   push:
+    tags:
+        - version*
     branches: 
         - dev
         - master        
