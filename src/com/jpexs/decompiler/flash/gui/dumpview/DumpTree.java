@@ -491,7 +491,7 @@ public class DumpTree extends JTree {
 
         if (foundTag != null) {
             mainPanel.getMainFrame().getMenu().showResourcesView();
-            mainPanel.setTagTreeSelectedNode(foundTag);
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), foundTag);
         }
     }
 

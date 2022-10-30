@@ -354,7 +354,7 @@ public abstract class AbstractTagTree extends JTree {
             TreePath tp = View.getTreePathByPathStrings(this, Arrays.asList(path));
             if (tp != null) {
                 // the current view is the Resources view, otherwise tp is null
-                mainPanel.setTagTreeSelectedNode((TreeItem) tp.getLastPathComponent());
+                mainPanel.setTagTreeSelectedNode(this, (TreeItem) tp.getLastPathComponent());
             }
         }
     }
@@ -501,5 +501,23 @@ public abstract class AbstractTagTree extends JTree {
     public TreeItem getCurrentTreeItem() {
         TreeItem item = (TreeItem) getLastSelectedPathComponent();
         return item;
+    }
+    
+    public String getSelectionPathString() {
+        StringBuilder sb = new StringBuilder();
+        TreePath path = getSelectionPath();
+        if (path != null) {
+            boolean first = true;
+            for (Object p : path.getPath()) {
+                if (!first) {
+                    sb.append("|");
+                }
+
+                first = false;
+                sb.append(p.toString());
+            }
+        }
+
+        return sb.toString();
     }
 }

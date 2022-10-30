@@ -555,23 +555,7 @@ public class TagTree extends AbstractTagTree {
         return (TagTreeModel) super.getModel();
     }
     
-    public String getSelectionPathString() {
-        StringBuilder sb = new StringBuilder();
-        TreePath path = getSelectionPath();
-        if (path != null) {
-            boolean first = true;
-            for (Object p : path.getPath()) {
-                if (!first) {
-                    sb.append("|");
-                }
-
-                first = false;
-                sb.append(p.toString());
-            }
-        }
-
-        return sb.toString();
-    }
+    
 
     
 }

@@ -878,10 +878,16 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         finishMenu("/file");
 
-        if (Configuration.dumpView.get()) {
-            setGroupSelection("view", "/file/view/viewHex");
-        } else {
-            setGroupSelection("view", "/file/view/viewResources");
+        switch(Configuration.lastView.get()){
+            case MainPanel.VIEW_RESOURCES:
+                setGroupSelection("view", "/file/view/viewResources");
+                break;
+            case MainPanel.VIEW_TAGLIST:
+                setGroupSelection("view", "/file/view/viewTagList");
+                break;
+            case MainPanel.VIEW_DUMP:
+                setGroupSelection("view", "/file/view/viewHex");
+                break;
         }
 
         /*

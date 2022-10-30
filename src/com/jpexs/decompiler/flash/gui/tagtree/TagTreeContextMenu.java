@@ -947,7 +947,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
 
         CharacterIdTag characterIdTag = (CharacterIdTag) itemj;
-        mainPanel.setTagTreeSelectedNode(itemj.getSwf().getCharacter(characterIdTag.getCharacterId()));
+        mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), itemj.getSwf().getCharacter(characterIdTag.getCharacterId()));
     }
 
     private void expandRecursiveActionPerformed(ActionEvent evt) {        

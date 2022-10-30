@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.Version;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
+import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
@@ -1310,13 +1311,23 @@ public class Main {
 
                 if (mainFrame != null && fswf != null) {
                     SwfSpecificConfiguration swfConf = Configuration.getSwfSpecificConfiguration(fswf.getShortFileName());
+                    String resourcesPathStr = null;
+                    String tagListPathStr = null;
                     if (swfConf != null) {
-                        String pathStr = swfConf.lastSelectedPath;
-                        if (isInited()) {
-                            mainFrame.getPanel().tagTree.setSelectionPathString(pathStr);
-                        } else {
-                            mainFrame.getPanel().tagTree.setExpandPathString(pathStr);
-                        }
+                        resourcesPathStr = swfConf.lastSelectedPath;                        
+                    }
+                    SwfSpecificCustomConfiguration swfCustomConf = Configuration.getSwfSpecificCustomConfiguration(fswf.getShortFileName());
+                    if (swfCustomConf != null) {
+                        resourcesPathStr = swfCustomConf.getCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_RESOURCES, resourcesPathStr);
+                        tagListPathStr = swfCustomConf.getCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_TAGLIST, null);                        
+                    }
+                    
+                    if (isInited()) {
+                        mainFrame.getPanel().tagTree.setSelectionPathString(resourcesPathStr);
+                        mainFrame.getPanel().tagListTree.setSelectionPathString(tagListPathStr);
+                    } else {
+                        mainFrame.getPanel().tagTree.setExpandPathString(resourcesPathStr);
+                        mainFrame.getPanel().tagListTree.setExpandPathString(tagListPathStr);
                     }
                 }
 
@@ -2327,6 +2338,7 @@ public class Main {
                     openingFiles = true;
                     openFile(sourceInfos, () -> {
                         mainFrame.getPanel().tagTree.setSelectionPathString(Configuration.lastSessionSelection.get());
+                        mainFrame.getPanel().tagListTree.setSelectionPathString(Configuration.lastSessionTagListSelection.get());
                         setSessionLoaded(true);
                     });
                 }

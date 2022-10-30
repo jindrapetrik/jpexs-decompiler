@@ -35,4 +35,9 @@ public class TagListTreeRoot implements TreeItem {
     public boolean isModified() {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "root";
+    }    
 }
