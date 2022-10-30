@@ -3710,12 +3710,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 reload(true);
                 return true;
-            case VIEW_TIMELINE:
+            case VIEW_TIMELINE:      
                 currentView = view;
                 Configuration.lastView.set(currentView);
                 final SWF swf = getCurrentSwf();
                 if (swf != null) {
-                    TreeItem item = getCurrentTree().getCurrentTreeItem();
+                    TreeItem item = tagTree.getCurrentTreeItem();
                     if (item instanceof TagScript) {
                         item = ((TagScript) item).getTag();
                     }
@@ -3728,6 +3728,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
                     showContentPanelCard(TIMELINE_PANEL);
                     return true;
+                } else {
+                    showView(VIEW_RESOURCES);
                 }
                 return false;
             case VIEW_TAGLIST:
