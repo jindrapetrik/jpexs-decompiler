@@ -191,6 +191,7 @@ import java.util.Date;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -852,7 +853,9 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     private void parseCharacters(Iterable<Tag> list, Map<Integer, CharacterTag> characters, Map<Integer, List<CharacterIdTag>> characterIdTags) {
-        for (Tag t : list) {
+        Iterator<Tag> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            Tag t = iterator.next();
             if (t instanceof CharacterIdTag) {
                 int characterId = ((CharacterIdTag) t).getCharacterId();
                 if (t instanceof CharacterTag) {

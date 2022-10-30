@@ -55,14 +55,7 @@ public class TagListTree extends AbstractTagTree {
     
     @Override
     public List<TreeItem> getSelection(SWF swf) {
-        List<TreeItem> sel;
-        sel = new ArrayList<>();
-
-        for (TreeItem treeItem : mainPanel.folderPreviewPanel.selectedItems.values()) {
-            sel.add(treeItem);
-            getAllSubs(treeItem, sel);
-        }
-        return getSelection(swf, sel);
+        return getSelection(swf, getAllSelected());
     }
     
     @Override

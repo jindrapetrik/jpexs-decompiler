@@ -918,7 +918,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             swf.assignClassesToSymbols();
             swf.assignExportNamesToSymbols();
             mainPanel.refreshTree(swf);
-            mainPanel.setTagTreeSelectedNode(tag);
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), tag);
             genericEditButton.setVisible(true);
             genericSaveButton.setVisible(false);
             genericCancelButton.setVisible(false);
@@ -949,7 +949,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 SWF swf = tag.getSwf();
                 tag.getTimelined().resetTimeline();
                 mainPanel.refreshTree(swf);
-                mainPanel.setTagTreeSelectedNode(tag);
+                mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), tag);
             }
             placeGenericPanel.setEditMode(false, null);
         }

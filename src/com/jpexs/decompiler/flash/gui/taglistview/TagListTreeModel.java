@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.gui.helpers.CollectionChangedEvent;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
@@ -95,6 +96,8 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             return ((Frame) parentNode).allInnerTags.get(index);
         } else if (parentNode instanceof DefineBinaryDataTag) {
             return ((DefineBinaryDataTag) parentNode).innerSwf;
+        } else if (parentNode instanceof ASMSourceContainer) {
+            return ((ASMSourceContainer)parentNode).getSubItems().get(index);
         }
         throw new Error("Unsupported parent type: " + parentNode.getClass().getName());
     }
@@ -116,6 +119,8 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             return  ((DefineSpriteTag) parentNode).getTimeline().getFrameCount();
         } else if (parentNode instanceof DefineBinaryDataTag) {
             return  (((DefineBinaryDataTag) parentNode).innerSwf == null ? 0 : 1);
+        } else if (parentNode instanceof ASMSourceContainer) {
+            return ((ASMSourceContainer)parentNode).getSubItems().size();
         }
 
         return 0;
@@ -156,6 +161,8 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             return ((Frame) parentNode).allInnerTags.indexOf(child);
         } else if (parentNode instanceof DefineBinaryDataTag) {
             return ((DefineBinaryDataTag) parentNode).innerSwf == child ? 0 : -1;
+        } else if (parentNode instanceof ASMSourceContainer) {
+            return ((ASMSourceContainer)parentNode).getSubItems().indexOf(child);
         }
         return -1;
     }
@@ -252,7 +259,9 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             } else {
                 return new ArrayList<>(0);
             }
-        } 
+        } else if (parentNode instanceof ASMSourceContainer) {
+            return ((ASMSourceContainer)parentNode).getSubItems();
+        }
 
         return new ArrayList<>();
     }

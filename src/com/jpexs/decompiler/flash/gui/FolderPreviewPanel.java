@@ -105,7 +105,7 @@ public class FolderPreviewPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1) {
                     if (selectedIndex > -1) {
-                        mainPanel.setTagTreeSelectedNode(FolderPreviewPanel.this.items.get(selectedIndex));
+                        mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), FolderPreviewPanel.this.items.get(selectedIndex));
                     }
                 }
             }

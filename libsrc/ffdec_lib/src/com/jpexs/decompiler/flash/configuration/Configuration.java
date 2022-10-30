@@ -279,7 +279,10 @@ public final class Configuration {
     public static ConfigurationItem<HashMap<String, String>> fontPairingMap = null;
 
     public static ConfigurationItem<HashMap<String, SwfSpecificConfiguration>> swfSpecificConfigs = null;
-
+    
+    public static ConfigurationItem<HashMap<String, SwfSpecificCustomConfiguration>> swfSpecificCustomConfigs = null;
+    
+        
     @ConfigurationDefaultCalendar(0)
     public static ConfigurationItem<Calendar> lastUpdatesCheckDate = null;
 
@@ -525,6 +528,11 @@ public final class Configuration {
     public static ConfigurationItem<String> lastSessionFileTitles = null;
 
     public static ConfigurationItem<String> lastSessionSelection = null;
+    
+    public static ConfigurationItem<String> lastSessionTagListSelection = null;
+    
+    @ConfigurationDefaultInt(0)
+    public static ConfigurationItem<Integer> lastView = null;
 
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
@@ -897,6 +905,26 @@ public final class Configuration {
 
         return swfConf;
     }
+    
+    public static SwfSpecificCustomConfiguration getSwfSpecificCustomConfiguration(String fileName) {
+        HashMap<String, SwfSpecificCustomConfiguration> map = swfSpecificCustomConfigs.get();
+        if (map == null) {
+            map = new HashMap<>();
+            swfSpecificCustomConfigs.set(map);
+        }
+
+        return map.get(fileName);
+    }
+
+    public static SwfSpecificCustomConfiguration getOrCreateSwfSpecificCustomConfiguration(String fileName) {
+        SwfSpecificCustomConfiguration swfConf = getSwfSpecificCustomConfiguration(fileName);
+        if (swfConf == null) {
+            swfConf = new SwfSpecificCustomConfiguration();
+            swfSpecificCustomConfigs.get().put(fileName, swfConf);
+        }
+
+        return swfConf;
+    }
 
     private static String getConfigFile() throws IOException {
         return getFFDecHome() + CONFIG_NAME;
@@ -933,6 +961,7 @@ public final class Configuration {
             oos.writeObject(config);
         } catch (IOException ex) {
             //TODO: move this to GUI
+            ex.printStackTrace();
             JOptionPane.showMessageDialog(null, "Cannot save configuration.", "Error", JOptionPane.ERROR_MESSAGE);
             Logger.getLogger(Configuration.class.getName()).severe("Configuration directory is read only.");
         }

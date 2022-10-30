@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2010-2021 JPEXS, All rights reserved.
+ *  Copyright (C) 2010-2022 JPEXS, All rights reserved.
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
+
 package com.jpexs.decompiler.flash.configuration;
 
 import java.io.Serializable;
@@ -24,9 +25,22 @@ import java.util.Map;
  *
  * @author JPEXS
  */
-public class SwfSpecificConfiguration implements Serializable {
-
-    public Map<String, String> fontPairingMap = new HashMap<>();
-
-    public String lastSelectedPath = null;            
+public class SwfSpecificCustomConfiguration implements Serializable {
+    
+    private Map<String, String> customData = new HashMap<>();
+    
+    public static final String KEY_LAST_SELECTED_PATH_RESOURCES = "lastSelectedPath.resources";
+    public static final String KEY_LAST_SELECTED_PATH_TAGLIST = "lastSelectedPath.taglist";    
+    
+    public String getCustomData(String key, String defaultValue) {
+        if (customData.containsKey(key)) {
+            return customData.get(key);
+        }
+        
+        return defaultValue;
+    }
+    
+    public void setCustomData(String key, String value) {
+        customData.put(key, value);
+    }
 }
