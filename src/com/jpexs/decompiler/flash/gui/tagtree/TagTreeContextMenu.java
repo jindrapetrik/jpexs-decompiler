@@ -665,6 +665,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         if (singleSelect) {
             final TreeItem firstItem = items.get(0);
+            boolean isFolder = firstItem instanceof FolderItem;
 
             if (firstItem instanceof FolderItem) {
                 if (((FolderItem) firstItem).getName().equals(TagTreeModel.FOLDER_SCRIPTS)) {
@@ -695,11 +696,15 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             TreeItem parent = (TreeItem) tree.getModel().getTreePath(firstItem).getParentPath().getLastPathComponent();
             addTagBeforeMenu.removeAll();
-            addAddTagMenuItems(getAllowedTagTypes(parent), addTagBeforeMenu, firstItem, this::addTagBeforeActionPerformed);
+            if (!isFolder) {
+                addAddTagMenuItems(getAllowedTagTypes(parent), addTagBeforeMenu, firstItem, this::addTagBeforeActionPerformed);
+            }
             addTagBeforeMenu.setVisible(addTagBeforeMenu.getItemCount() > 0);
 
             addTagAfterMenu.removeAll();
-            addAddTagMenuItems(getAllowedTagTypes(parent), addTagAfterMenu, firstItem, this::addTagAfterActionPerformed);
+            if (!isFolder) {            
+                addAddTagMenuItems(getAllowedTagTypes(parent), addTagAfterMenu, firstItem, this::addTagAfterActionPerformed);
+            }
             addTagAfterMenu.setVisible(addTagAfterMenu.getItemCount() > 0);
 
             if (tree.getModel().getChildCount(firstItem) > 0) {
