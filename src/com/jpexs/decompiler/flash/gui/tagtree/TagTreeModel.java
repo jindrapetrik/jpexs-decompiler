@@ -94,6 +94,8 @@ public class TagTreeModel extends AbstractTagTreeModel {
     private final Map<SWF, TagTreeSwfInfo> swfInfos = new HashMap<>();
 
     private final boolean addAllFolders;
+    
+    private final Map<TreeItem, TreePath> pathCache = new HashMap<>();
 
     public TagTreeModel(List<SWFList> swfs, boolean addAllFolders) {
         this.swfs = swfs;
@@ -406,7 +408,11 @@ public class TagTreeModel extends AbstractTagTreeModel {
         }
         return ret;
     }
-   
+    
+    //FIXME: put in the AbstractTreeModel
+    public TreeItem getParent(TreeItem obj) {
+        return (TreeItem)getTreePath(obj).getParentPath().getLastPathComponent();
+    }
 
     @Override
     public TreeItem getRoot() {

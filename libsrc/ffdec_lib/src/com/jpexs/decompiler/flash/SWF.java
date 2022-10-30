@@ -3222,14 +3222,12 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         tag.setTimelined(timelined);
 
-        ReadOnlyTagList tags = timelined.getTags();
-
         int index;
         if ((tag instanceof DefineScalingGridTag) && (timelined instanceof DefineSpriteTag)) {
             index = this.tags.indexOf(timelined) + 1;
         } else if (frame != null) {
             if (frame.showFrameTag != null) {
-                index = tags.indexOf(frame.showFrameTag);
+                index = timelined.indexOfTag(frame.showFrameTag);
             } else {
                 index = -1;
             }
@@ -3240,11 +3238,12 @@ public final class SWF implements SWFContainerItem, Timelined {
                 ((CharacterIdTag) tag).setCharacterId(((CharacterTag) targetTreeItem).getCharacterId());
             }
 
-            index = tags.indexOf((Tag) targetTreeItem); // todo: honfika: why not index + 1?
+            index = timelined.indexOfTag((Tag) targetTreeItem); // todo: honfika: why not index + 1?
         } else {
             index = -1;
             if (tag instanceof CharacterTag) {
                 // add before the last ShowFrame tag
+                ReadOnlyTagList tags = timelined.getTags();
                 for (int i = tags.size() - 1; i >= 0; i--) {
                     if (tags.get(i) instanceof ShowFrameTag) {
                         index = i;
