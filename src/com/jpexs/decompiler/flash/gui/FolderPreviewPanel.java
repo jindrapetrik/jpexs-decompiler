@@ -149,7 +149,7 @@ public class FolderPreviewPanel extends JPanel {
                 }
 
                 if (e.getButton() == MouseEvent.BUTTON3) {
-                    mainPanel.getContextPopupMenu().update(new ArrayList<>(selectedItems.values()), mainPanel.getCurrentView());
+                    mainPanel.getContextPopupMenu().update(new ArrayList<>(selectedItems.values()));
                     mainPanel.getContextPopupMenu().show(FolderPreviewPanel.this, e.getX(), e.getY());
                 }
                 repaint();

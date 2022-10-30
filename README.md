@@ -82,7 +82,7 @@ All notable changes are listed in the file [CHANGELOG.md](CHANGELOG.md)
 ## Deployment
 
 ### Nightly builds
-When a commit is pushed/merged into `dev` branch, a new prerelease version is created automatically by the Travis CI.
+When a commit is pushed/merged into `dev` branch, a new prerelease version is created automatically by Github actions CI.
 These prerelease versions are called nightly builds. On releasing a new nightly build, the previous nightly build is removed.
 
 ### Stable versions

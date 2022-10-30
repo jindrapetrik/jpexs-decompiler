@@ -92,7 +92,9 @@ import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
 import com.jpexs.decompiler.flash.gui.helpers.ObservableList;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.taglistview.TagListTree;
-import com.jpexs.decompiler.flash.gui.taglistview.TagListTreeNode;
+import com.jpexs.decompiler.flash.gui.taglistview.TagListTreeModel;
+import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
+import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeContextMenu;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
@@ -256,6 +258,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import jsyntaxpane.DefaultSyntaxKit;
 
 /**
@@ -365,17 +368,111 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private int currentView = VIEW_RESOURCES;
 
     public List<SearchResultsDialog> searchResultsDialogs = new ArrayList<>();
-    
+
     private TagTreeContextMenu contextPopupMenu;
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
+
+    private class MyTreeSelectionModel extends DefaultTreeSelectionModel {
+
+        private boolean isModified() {
+            if (abcPanel != null && abcPanel.isEditing()) {
+                abcPanel.tryAutoSave();
+            }
+
+            if (actionPanel != null && actionPanel.isEditing()) {
+                actionPanel.tryAutoSave();
+            }
+
+            if (previewPanel.isEditing()) {
+                previewPanel.tryAutoSave();
+            }
+
+            if (headerPanel.isEditing()) {
+                headerPanel.tryAutoSave();
+            }
+
+            return (abcPanel != null && abcPanel.isEditing())
+                    || (actionPanel != null && actionPanel.isEditing())
+                    || previewPanel.isEditing() || headerPanel.isEditing();
+        }
+
+        @Override
+        public void addSelectionPath(TreePath path) {
+            if (isModified()) {
+                return;
+            }
+
+            super.addSelectionPath(path);
+        }
+
+        @Override
+        public void addSelectionPaths(TreePath[] paths) {
+            if (isModified()) {
+                return;
+            }
+
+            super.addSelectionPaths(paths);
+        }
+
+        @Override
+        public void setSelectionPath(TreePath path) {
+            if (isModified()) {
+                return;
+            }
+
+            super.setSelectionPath(path);
+        }
+
+        @Override
+        public void setSelectionPaths(TreePath[] pPaths) {
+            if (isModified()) {
+                return;
+            }
+
+            super.setSelectionPaths(pPaths);
+        }
+
+        @Override
+        public void clearSelection() {
+            if (isModified()) {
+                return;
+            }
+
+            super.clearSelection();
+        }
+
+        public void setSelection(TreePath[] selection) {
+            if (isModified()) {
+                return;
+            }
+
+            this.selection = selection;
+        }
+
+        @Override
+        public void removeSelectionPath(TreePath path) {
+            if (isModified()) {
+                return;
+            }
+
+            super.removeSelectionPath(path);
+        }
+
+        @Override
+        public void removeSelectionPaths(TreePath[] paths) {
+            if (isModified()) {
+                return;
+            }
+
+            super.removeSelectionPaths(paths);
+        }
+    }
 
     public TagTreeContextMenu getContextPopupMenu() {
         return contextPopupMenu;
     }
 
-    
-    
     public void setPercent(int percent) {
         View.checkAccess();
 
@@ -513,103 +610,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         UIManager.getDefaults().put("TreeUI", BasicTreeUI.class.getName());
         tagTree = new TagTree(null, this);
         tagTree.addTreeSelectionListener(this);
-        tagTree.setSelectionModel(new DefaultTreeSelectionModel() {
-            private boolean isModified() {
-                if (abcPanel != null && abcPanel.isEditing()) {
-                    abcPanel.tryAutoSave();
-                }
+        tagTree.setSelectionModel(new MyTreeSelectionModel());
 
-                if (actionPanel != null && actionPanel.isEditing()) {
-                    actionPanel.tryAutoSave();
-                }
-
-                if (previewPanel.isEditing()) {
-                    previewPanel.tryAutoSave();
-                }
-
-                if (headerPanel.isEditing()) {
-                    headerPanel.tryAutoSave();
-                }
-
-                return (abcPanel != null && abcPanel.isEditing())
-                        || (actionPanel != null && actionPanel.isEditing())
-                        || previewPanel.isEditing() || headerPanel.isEditing();
-            }
-
-            @Override
-            public void addSelectionPath(TreePath path) {
-                if (isModified()) {
-                    return;
-                }
-
-                super.addSelectionPath(path);
-            }
-
-            @Override
-            public void addSelectionPaths(TreePath[] paths) {
-                if (isModified()) {
-                    return;
-                }
-
-                super.addSelectionPaths(paths);
-            }
-
-            @Override
-            public void setSelectionPath(TreePath path) {
-                if (isModified()) {
-                    return;
-                }
-
-                super.setSelectionPath(path);
-            }
-
-            @Override
-            public void setSelectionPaths(TreePath[] pPaths) {
-                if (isModified()) {
-                    return;
-                }
-
-                super.setSelectionPaths(pPaths);
-            }
-
-            @Override
-            public void clearSelection() {
-                if (isModified()) {
-                    return;
-                }
-
-                super.clearSelection();
-            }
-
-            public void setSelection(TreePath[] selection) {
-                if (isModified()) {
-                    return;
-                }
-
-                this.selection = selection;
-            }
-
-            @Override
-            public void removeSelectionPath(TreePath path) {
-                if (isModified()) {
-                    return;
-                }
-
-                super.removeSelectionPath(path);
-            }
-
-            @Override
-            public void removeSelectionPaths(TreePath[] paths) {
-                if (isModified()) {
-                    return;
-                }
-
-                super.removeSelectionPaths(paths);
-            }
-        });
-
-        tagListTree = new TagListTree(this);
+        tagListTree = new TagListTree(null, this);
         tagListTree.addTreeSelectionListener(this);
+        tagListTree.setSelectionModel(new MyTreeSelectionModel());
 
         DragSource dragSource = DragSource.getDefaultDragSource();
         dragSource.createDefaultDragGestureRecognizer(tagTree, DnDConstants.ACTION_COPY_OR_MOVE, new DragGestureListener() {
@@ -690,7 +695,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         });
 
-        contextPopupMenu = new TagTreeContextMenu(tagTree, tagListTree, this);
+        List<AbstractTagTree> trees = new ArrayList<>();
+        trees.add(tagTree);
+        trees.add(tagListTree);
+
+        contextPopupMenu = new TagTreeContextMenu(trees, this);
 
         dumpTree = new DumpTree(null, this);
         dumpTree.addTreeSelectionListener(this);
@@ -825,7 +834,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         updateUi();
 
         this.swfs.addCollectionChangedListener((e) -> {
-            TagTreeModel ttm = tagTree.getModel();
+            AbstractTagTreeModel ttm = tagTree.getModel();
             if (ttm != null) {
                 if (getCurrentSwf() == null) {
                     tagTree.setSelectionPath(ttm.getTreePath(ttm.getRoot()));
@@ -833,6 +842,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 ttm.updateSwfs(e);
                 tagTree.expandRoot();
                 tagTree.expandFirstLevelNodes();
+            }
+            ttm = tagListTree.getModel();
+            if (ttm != null) {
+                if (getCurrentSwf() == null) {
+                    tagListTree.setSelectionPath(ttm.getTreePath(ttm.getRoot()));
+                }
+                ttm.updateSwfs(e);
+                tagListTree.expandRoot();
+                tagListTree.expandFirstLevelNodes();
             }
 
             DumpTreeModel dtm = dumpTree.getModel();
@@ -842,12 +860,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 View.expandTreeNodes(dumpTree, expandedNodes);
                 dumpTree.expandRoot();
                 dumpTree.expandFirstLevelNodes();
-            }
-
-            if (tagListTree.isInitialized()) {
-                tagListTree.updateSwfs();
-                tagListTree.expandRoot();
-                tagListTree.expandFirstLevelNodes();
             }
 
             if (swfs.isEmpty()) {
@@ -1274,10 +1286,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return tagTree.getSelection(getCurrentSwf());
         } else if (currentView == MainPanel.VIEW_TAGLIST) {
             return tagListTree.getSelection(getCurrentSwf());
-        }        
+        }
         return new ArrayList<>();
     }
-    
+
     public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException, InterruptedException {
 
         List<File> ret = new ArrayList<>();
@@ -1756,38 +1768,31 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             return DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
         } else if (treePanelMode == TreePanelMode.TAGLIST_TREE) {
-            TagListTreeNode node = (TagListTreeNode) tagListTree.getLastSelectedPathComponent();
-            if (node == null) {
-                return null;
-            }
-            TreeItem treeNode = (TreeItem) node.getData();
+            TreeItem treeNode = (TreeItem) tagListTree.getLastSelectedPathComponent();
             if (treeNode == null || treeNode instanceof SWFList) {
                 return null;
             }
+
             return treeNode.getSwf();
         }
 
         return null;
     }
-    
-    private TreeItem getLastSelectedPathComponent() {
+
+    public AbstractTagTree getCurrentTree() {
         if (currentView == VIEW_RESOURCES) {
-            return (TreeItem)tagTree.getLastSelectedPathComponent();
+            return tagTree;
         }
         if (currentView == VIEW_TAGLIST) {
-            TagListTreeNode node = (TagListTreeNode)tagListTree.getLastSelectedPathComponent();
-            if (node == null) {
-                return null;
-            }
-            return (TreeItem) node.getData();
+            return tagListTree;
         }
-        return null;
+        return tagTree; //???
     }
 
     public void gotoFrame(int frame) {
         View.checkAccess();
 
-        TreeItem treeItem = (TreeItem) getLastSelectedPathComponent();
+        TreeItem treeItem = (TreeItem) getCurrentTree().getLastSelectedPathComponent();
         if (treeItem == null) {
             return;
         }
@@ -1939,7 +1944,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         return new LinkedHashSet<>(allSwfs);
     }
-    
+
     private List<TreeItem> getAllSelected() {
         if (currentView == VIEW_RESOURCES) {
             return tagTree.getAllSelected();
@@ -1959,7 +1964,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         return new ArrayList<>();
     }
-    
+
     public void searchInActionScriptOrText(Boolean searchInText, SWF swf, boolean useSelection) {
         View.checkAccess();
 
@@ -2276,24 +2281,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void setTagTreeSelectedNode(TreeItem treeItem) {
-        if (currentView == VIEW_RESOURCES) {
-            TagTreeModel ttm = tagTree.getModel();
-            TreePath tp = ttm.getTreePath(treeItem);
-            if (tp != null) {
-                tagTree.setSelectionPath(tp);
-                tagTree.scrollPathToVisible(tp);
-            } else {
-                showCard(CARDEMPTYPANEL);
-            }
+        if (currentView != VIEW_RESOURCES && currentView != VIEW_TAGLIST) {
+            return;
         }
-        if (currentView == VIEW_TAGLIST) {
-            TreePath tp = tagListTree.getPathForData(treeItem);
-            if (tp != null) {
-                tagListTree.setSelectionPath(tp);
-                tagListTree.scrollPathToVisible(tp);
-            } else {
-                showCard(CARDEMPTYPANEL);
-            }
+        AbstractTagTree tree = getCurrentTree();
+        AbstractTagTreeModel ttm = tree.getModel();
+        TreePath tp = ttm.getTreePath(treeItem);
+        if (tp != null) {
+            tree.setSelectionPath(tp);
+            tree.scrollPathToVisible(tp);
+        } else {
+            showCard(CARDEMPTYPANEL);
         }
     }
 
@@ -3005,7 +3003,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void treeOperation(Runnable runnable) {
-        TreeItem treeItem = getCurrentTreeItem();
+        TreeItem treeItem = getCurrentTree().getCurrentTreeItem();
         tagTree.clearSelection();
         tagListTree.clearSelection();
         runnable.run();
@@ -3013,7 +3011,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         showCard(CARDEMPTYPANEL);
 
         tagTree.updateSwfs(new SWF[0]);
-        tagListTree.updateSwfs();
+        tagListTree.updateSwfs(new SWF[0]);
 
         if (treeItem != null) {
             SWF swf = treeItem.getSwf();
@@ -3036,17 +3034,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         clear();
         showCard(CARDEMPTYPANEL);
         TreeItem treeItem = null;
-        if (currentView == VIEW_RESOURCES) {
-            treeItem = tagTree.getCurrentTreeItem();
-        } else if (currentView == VIEW_TAGLIST) {
-            TagListTreeNode node = (TagListTreeNode) tagListTree.getLastSelectedPathComponent();
-            if (node != null) {
-                treeItem = (TreeItem) node.getData();
-            }
+        if (currentView == VIEW_RESOURCES || currentView == VIEW_TAGLIST) {
+            treeItem = getCurrentTree().getCurrentTreeItem();
         }
 
         tagTree.updateSwfs(swfs);
-        tagListTree.updateSwfs();
+        tagListTree.updateSwfs(swfs);
 
         if (treeItem != null) {
             SWF swf = treeItem.getSwf();
@@ -3127,11 +3120,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public boolean previousTag() {
         JTree tree = null;
         if (getCurrentView() == VIEW_RESOURCES) {
-            tree = tagTree;            
+            tree = tagTree;
         } else if (getCurrentView() == VIEW_TAGLIST) {
-            tree = tagTree;            
+            tree = tagTree;
         }
-        
+
         if (tree != null) {
             if (tree.getSelectionRows().length > 0) {
                 int row = tree.getSelectionRows()[0];
@@ -3143,16 +3136,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
             return true;
         }
-        
+
         return false;
     }
 
     public boolean nextTag() {
         JTree tree = null;
         if (getCurrentView() == VIEW_RESOURCES) {
-            tree = tagTree;            
+            tree = tagTree;
         } else if (getCurrentView() == VIEW_TAGLIST) {
-            tree = tagTree;            
+            tree = tagTree;
         }
         if (tree != null) {
             if (tree.getSelectionRows().length > 0) {
@@ -3297,22 +3290,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    
-    private TreeItem getCurrentTreeItem() {
-        if (currentView == MainPanel.VIEW_RESOURCES) {
-            return tagTree.getCurrentTreeItem();
-        }
-        if (currentView == MainPanel.VIEW_TAGLIST) {
-            TagListTreeNode node = (TagListTreeNode) tagListTree.getLastSelectedPathComponent();
-            if (node != null) {
-                return (TreeItem) node.getData();
-            }
-        }
-        return null;
-    }
-    
     public void replaceNoFillButtonActionPerformed(ActionEvent evt) {
-        TreeItem item = getCurrentTreeItem();
+        TreeItem item = getCurrentTree().getCurrentTreeItem();
         if (item == null) {
             return;
         }
@@ -3354,7 +3333,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void replaceAlphaButtonActionPerformed(ActionEvent evt) {
-        TreeItem item = getCurrentTreeItem();
+        TreeItem item = getCurrentTree().getCurrentTreeItem();
         if (item == null) {
             return;
         }
@@ -3500,17 +3479,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private void valueChanged(Object source, TreePath selectedPath) {
-        TreeItem treeItem = null;
-        if (selectedPath != null) {
-            if (source == tagListTree) {
-                TagListTreeNode node = (TagListTreeNode) selectedPath.getLastPathComponent();
-                if (node != null) {
-                    treeItem = (TreeItem) node.getData();
-                }
-            } else {
-                treeItem = (TreeItem) selectedPath.getLastPathComponent();
-            }
-        }
+        TreeItem treeItem = (TreeItem) selectedPath.getLastPathComponent();
 
         if (treeItem == null) {
             return;
@@ -3553,35 +3522,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         valueChanged(source, e.getPath());
     }
 
-    public TreePath convertViewPath(TreePath path) {
-        if (currentView == VIEW_RESOURCES) {
-            return path;
-        }
-        if (currentView == VIEW_TAGLIST) {
-            Object newPath[] = new Object[path.getPathCount()];
-            for (int i = 0; i < path.getPathCount(); i++) {
-                TagListTreeNode node = (TagListTreeNode) path.getPathComponent(i);
-                newPath[i] = node.getData();
-            }
-            return new TreePath(newPath);
-        }
-        return null;
-    }
-
     private int getFrameForTreeItem(TreeItem treeItem) {
         if (treeItem == null) {
             return -1;
         }
-        TreePath path = null;
-        if (currentView == VIEW_RESOURCES) {
-            path = tagTree.getModel().getTreePath(treeItem);
-        } else if (currentView == VIEW_TAGLIST) {
-            path = tagListTree.getPathForData(treeItem);
-        }
+        TreePath path = getCurrentTree().getModel().getTreePath(treeItem);
         if (path == null) {
             return -1;
         }
-        path = convertViewPath(path);
         for (int i = path.getPathCount() - 1; i >= 0; i--) {
             if (path.getPathComponent(i) instanceof Frame) {
                 Frame frame = (Frame) path.getPathComponent(i);
@@ -3596,16 +3544,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return null;
         }
 
-        TreePath path = null;
-        if (currentView == VIEW_RESOURCES) {
-            path = tagTree.getModel().getTreePath(treeItem);
-        } else if (currentView == VIEW_TAGLIST) {
-            path = tagListTree.getPathForData(treeItem);
-        }
+        TreePath path = getCurrentTree().getModel().getTreePath(treeItem);
         if (path == null) {
             return null;
         }
-        path = convertViewPath(path);
         for (int i = path.getPathCount() - 1; i >= 0; i--) {
             if (path.getPathComponent(i) instanceof Timelined) {
                 return (Timelined) path.getPathComponent(i);
@@ -3688,8 +3630,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 break;
             case VIEW_TAGLIST:
-                if (!tagListTree.isInitialized()) {
-                    tagListTree.setSwfs(swfs);
+                if (tagListTree.getModel() == null) {
+                    TagListTreeModel ttm = new TagListTreeModel(swfs);
+                    tagListTree.setModel(ttm);
                     tagListTree.expandFirstLevelNodes();
                 }
                 break;
@@ -3728,8 +3671,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public boolean showView(int view) {
         View.checkAccess();
 
-        int prevView = currentView;
-        boolean okay = false;
         setTreeModel(view);
         switch (view) {
             case VIEW_DUMP:
@@ -3741,8 +3682,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 treePanelMode = TreePanelMode.DUMP_TREE;
                 showDetail(DETAILCARDEMPTYPANEL);
                 reload(true);
-                okay = true;
-                break;
+                return true;
             case VIEW_RESOURCES:
                 currentView = view;
                 if (!isWelcomeScreen) {
@@ -3760,13 +3700,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 });
 
                 reload(true);
-                okay = true;
-                break;
+                return true;
             case VIEW_TIMELINE:
                 currentView = view;
                 final SWF swf = getCurrentSwf();
                 if (swf != null) {
-                    TreeItem item = getCurrentTreeItem();
+                    TreeItem item = getCurrentTree().getCurrentTreeItem();
                     if (item instanceof TagScript) {
                         item = ((TagScript) item).getTag();
                     }
@@ -3778,11 +3717,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         timelineViewPanel.setTimelined(swf);
                     }
                     showContentPanelCard(TIMELINE_PANEL);
-                    okay = true;
-                    break;
+                    return true;
                 }
-                okay = false;
-                break;
+                return false;
             case VIEW_TAGLIST:
                 currentView = view;
                 if (!isWelcomeScreen) {
@@ -3791,23 +3728,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 showTreePanelCard(TAGLIST_VIEW);
                 treePanelMode = TreePanelMode.TAGLIST_TREE;
                 reload(true);
-                okay = true;
+                return true;
         }
 
-        if (prevView != currentView) {
-            viewChanged();
-        }
-
-        return okay;
-    }
-
-    private void viewChanged() {
-        if (currentView == VIEW_RESOURCES) {
-            valueChanged(tagTree, tagTree.getSelectionPath());
-        }
-        if (currentView == VIEW_TAGLIST) {
-            valueChanged(tagListTree, tagListTree.getSelectionPath());
-        }
+        return false;
     }
 
     private void dumpViewReload(boolean forceReload) {
@@ -3985,17 +3909,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }*/
 
+        AbstractTagTree tree = getCurrentTree();
         TreeItem treeItem = null;
-        if (currentView == VIEW_RESOURCES) {
-            TreePath treePath = tagTree.getSelectionPath();
-            if (treePath != null && tagTree.getModel().treePathExists(treePath)) {
-                treeItem = (TreeItem) treePath.getLastPathComponent();
-            }
-        } else if (currentView == VIEW_TAGLIST) {
-            TagListTreeNode node = (TagListTreeNode) tagListTree.getLastSelectedPathComponent();
-            if (node != null) {
-                treeItem = (TreeItem) node.getData();
-            }
+        TreePath treePath = tree.getSelectionPath();
+        if (treePath != null && tree.getModel().treePathExists(treePath)) {
+            treeItem = (TreeItem) treePath.getLastPathComponent();
         }
 
         // save last selected node to config

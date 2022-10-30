@@ -57,7 +57,7 @@ import javax.swing.tree.TreePath;
  *
  * @author JPEXS
  */
-public class TagTreeModel implements TreeModel {
+public class TagTreeModel extends AbstractTagTreeModel {
 
     public static final String FOLDER_SHAPES = "shapes";
 
@@ -139,38 +139,12 @@ public class TagTreeModel implements TreeModel {
         }
     }
 
+    @Override
     public void updateSwf(SWF swf) {
         swfInfos.clear();
         TreePath changedPath = getTreePath(swf == null ? root : swf);
         fireTreeStructureChanged(new TreeModelEvent(this, changedPath));
-    }
-
-    public void updateNode(TreeItem treeItem) {
-        TreePath changedPath = getTreePath(treeItem);
-        fireTreeStructureChanged(new TreeModelEvent(this, changedPath));
-    }
-
-    public void updateNode(TreePath changedPath) {
-        fireTreeStructureChanged(new TreeModelEvent(this, changedPath.getParentPath()));
-    }
-
-    private void fireTreeNodesRemoved(TreeModelEvent e) {
-        for (TreeModelListener listener : listeners) {
-            listener.treeNodesRemoved(e);
-        }
-    }
-
-    private void fireTreeNodesInserted(TreeModelEvent e) {
-        for (TreeModelListener listener : listeners) {
-            listener.treeNodesInserted(e);
-        }
-    }
-
-    private void fireTreeStructureChanged(TreeModelEvent e) {
-        for (TreeModelListener listener : listeners) {
-            listener.treeStructureChanged(e);
-        }
-    }
+    }       
 
     private List<SoundStreamHeadTypeTag> getSoundStreams(DefineSpriteTag sprite) {
         List<SoundStreamHeadTypeTag> ret = new ArrayList<>();
@@ -388,11 +362,13 @@ public class TagTreeModel implements TreeModel {
         return lastVisibleFrame;
     }
 
+    @Override
     public Frame getFrame(SWF swf, Timelined t, int frame) {
         return searchForFrame(swf, swf, t, frame);
     }
 
-    private List<TreeItem> searchTreeItem(TreeItem obj, TreeItem parent, List<TreeItem> path) {
+    @Override
+    protected List<TreeItem> searchTreeItem(TreeItem obj, TreeItem parent, List<TreeItem> path) {
         List<TreeItem> ret = null;
         for (TreeItem n : getAllChildren(parent)) {
             List<TreeItem> newPath = new ArrayList<>();
@@ -432,28 +408,8 @@ public class TagTreeModel implements TreeModel {
         }
         return ret;
     }
-
-    public TreePath getTreePath(TreeItem obj) {
-        TreePath ret = pathCache.get(obj);
-        
-        if(ret == null) {
-            List<TreeItem> path = new ArrayList<>();
-            path.add(root);
-            if (obj != root) {
-                path = searchTreeItem(obj, root, path);
-            }
-            if (path == null) {
-                return null;
-            }
-
-            TreePath tp = new TreePath(path.toArray(new Object[path.size()]));
-            pathCache.put(obj, tp);
-            return tp;
-        }
-        
-        return ret;
-    }
     
+    //FIXME: put in the AbstractTreeModel
     public TreeItem getParent(TreeItem obj) {
         return (TreeItem)getTreePath(obj).getParentPath().getLastPathComponent();
     }
@@ -498,6 +454,7 @@ public class TagTreeModel implements TreeModel {
         return swfInfo.tagScriptCache;
     }
 
+    @Override
     public List<? extends TreeItem> getAllChildren(Object parent) {
         TreeItem parentNode = (TreeItem) parent;
         if (parentNode == root) {
@@ -691,11 +648,7 @@ public class TagTreeModel implements TreeModel {
     @Override
     public boolean isLeaf(Object node) {
         return (getChildCount(node) == 0);
-    }
-
-    @Override
-    public void valueForPathChanged(TreePath path, Object newValue) {
-    }
+    }  
 
     private int indexOfAdd(int prevSize, int index) {
         if (index == -1) {
@@ -758,39 +711,6 @@ public class TagTreeModel implements TreeModel {
             return indexOfAdd(baseIndex, getMappedCharacters(((CharacterTag) parentNode).getSwf(), (CharacterTag) parentNode).indexOf(childNode));
         }
 
-        throw new Error("Unsupported parent type: " + parentNode.getClass().getName());
-    }
-
-    public boolean treePathExists(TreePath treePath) {
-        TreeItem current = null;
-        for (Object o : treePath.getPath()) {
-            TreeItem item = (TreeItem) o;
-            if (current == null) {
-                if (item != getRoot()) {
-                    return false;
-                }
-
-                current = item;
-            } else {
-                int idx = getIndexOfChild(current, item);
-                if (idx == -1) {
-                    return false;
-                }
-
-                current = item;
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    public void addTreeModelListener(TreeModelListener l) {
-        listeners.add(l);
-    }
-
-    @Override
-    public void removeTreeModelListener(TreeModelListener l) {
-        listeners.remove(l);
-    }
+        return -1;
+    }    
 }
