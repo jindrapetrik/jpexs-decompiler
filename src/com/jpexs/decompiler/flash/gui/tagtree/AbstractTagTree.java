@@ -520,4 +520,95 @@ public abstract class AbstractTagTree extends JTree {
 
         return sb.toString();
     }
+    
+    public static TreeNodeType getTagNodeTypeFromTagClass(Class<?> cl) {                     
+        if ((cl == DefineFontTag.class)
+                || (cl == DefineFont2Tag.class)
+                || (cl == DefineFont3Tag.class)
+                || (cl == DefineFont4Tag.class)
+                || (cl == DefineCompactedFont.class)) {
+            return TreeNodeType.FONT;
+        }
+
+        // DefineText, DefineText2, DefineEditTextTag
+        if (TextTag.class.isAssignableFrom(cl)) {
+            return TreeNodeType.TEXT;
+        }
+
+        // DefineBits, DefineBitsJPEG2, DefineBitsJPEG3, DefineBitsJPEG4, DefineBitsLossless, DefineBitsLossless2
+        if (ImageTag.class.isAssignableFrom(cl)) {
+            return TreeNodeType.IMAGE;
+        }
+
+        // DefineShape, DefineShape2, DefineShape3, DefineShape4
+        if (ShapeTag.class.isAssignableFrom(cl)) {
+            return TreeNodeType.SHAPE;
+        }
+
+        // DefineMorphShape, DefineMorphShape2
+        if (MorphShapeTag.class.isAssignableFrom(cl)) {
+            return TreeNodeType.MORPH_SHAPE;
+        }
+
+        if (cl == DefineSpriteTag.class) {
+            return TreeNodeType.SPRITE;
+        }
+
+        // DefineButton, DefineButton2
+        if (ButtonTag.class.isAssignableFrom(cl)) {
+            return TreeNodeType.BUTTON;
+        }
+
+        if (cl == DefineVideoStreamTag.class) {
+            return TreeNodeType.MOVIE;
+        }
+
+        if ((cl == DefineSoundTag.class) || (cl ==  SoundStreamHeadTag.class) || (cl == SoundStreamHead2Tag.class)) {
+            return TreeNodeType.SOUND;
+        }
+
+        if (cl == DefineBinaryDataTag.class) {
+            return TreeNodeType.BINARY_DATA;
+        }
+
+        if (Configuration.useAsTypeIcons.get()) {
+            if (cl == DoInitActionTag.class) {
+                return TreeNodeType.AS_INIT;
+            }
+            
+            if (cl == DoActionTag.class) {
+                return TreeNodeType.AS_FRAME;
+            }
+        }        
+
+        if (cl == ShowFrameTag.class) {
+            return TreeNodeType.SHOW_FRAME;
+        }
+       
+        if (cl == SetBackgroundColorTag.class) {
+            return TreeNodeType.SET_BACKGROUNDCOLOR;
+        }
+        if (cl == FileAttributesTag.class) {
+            return TreeNodeType.FILE_ATTRIBUTES;
+        }
+        if (cl == MetadataTag.class) {
+            return TreeNodeType.METADATA;
+        }
+        if (PlaceObjectTypeTag.class.isAssignableFrom(cl)) {
+            return TreeNodeType.PLACE_OBJECT;
+        }
+        if (RemoveTag.class.isAssignableFrom(cl)) {
+            return TreeNodeType.REMOVE_OBJECT;
+        }
+        
+        if (cl == EndTag.class) {
+            return TreeNodeType.END;
+        }
+        
+        if (Tag.class.isAssignableFrom(cl)) {
+            return TreeNodeType.OTHER_TAG;
+        }
+        
+        return TreeNodeType.FOLDER;
+    }
 }
