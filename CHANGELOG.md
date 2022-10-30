@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Cloning of tags and frames
 - Changing tag position
 - Tag list view
+- Inserting new tags before and after selection
 
 ### Fixed
 - [#1834] PlaceObject4 tags appear as Unresolved inside of DefineSprite
