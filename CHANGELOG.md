@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- Do not show option to Show in taglist on resource view folders
 
 ## [16.0.0] - 2022-10-30
 ### Added
