@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [16.0.1] - 2022-10-31
 ### Added
 - Allow add tag after header context menu
