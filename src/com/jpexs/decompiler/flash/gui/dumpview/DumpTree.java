@@ -49,6 +49,7 @@ import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
 import com.jpexs.decompiler.flash.tags.DefineFontTag;
 import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
+import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
 import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
@@ -217,6 +218,9 @@ public class DumpTree extends JTree {
                             case RemoveObjectTag.NAME:
                             case RemoveObject2Tag.NAME:
                                 nodeType = TreeNodeType.REMOVE_OBJECT;
+                                break;
+                            case DefineScalingGridTag.NAME:
+                                nodeType = TreeNodeType.SCALING_GRID;
                                 break;
                             default:
                                 nodeType = TreeNodeType.OTHER_TAG;

@@ -1,6 +1,23 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Added
+- Allow add tag after header context menu
+- DefineScalingGrid has icon
+- Adding tag "inside" allows setting character id to original when possible
+
+### Fixed
+- Do not show option to Show in taglist on resource view folders
+- Disallow add tag before header context menu
+- Context menu on tags mapped to other characters like DefineScalingGrid
+- Add tag before/after for frame selection position
+- Add tag (before/after/inside) refactored to more meaningful menus
+
+### Changed
+- Add tag renamed to Add tag inside
+- Clone tag menuitem renamed to just Clone as it clones both tags and frames
+
 ## [16.0.0] - 2022-10-30
 ### Added
 - Replace characters references
