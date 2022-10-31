@@ -162,8 +162,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenu addTagAfterMenu;
 
-    private JMenuItem cloneTagMenuItem;
-
+    private JMenuItem cloneMenuItem;
+    
     private JMenu moveTagToMenu;
 
     private JMenu copyTagMenu;
@@ -289,11 +289,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         addTagAfterMenu.setIcon(View.getIcon("addtag16"));
         add(addTagAfterMenu);
 
-        cloneTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.cloneTag"));
-        cloneTagMenuItem.addActionListener(this::cloneTagActionPerformed);
-        cloneTagMenuItem.setIcon(View.getIcon("copy16"));
-        add(cloneTagMenuItem);
-
+        cloneMenuItem = new JMenuItem(mainPanel.translate("contextmenu.clone"));
+        cloneMenuItem.addActionListener(this::cloneActionPerformed);
+        cloneMenuItem.setIcon(View.getIcon("copy16"));
+        add(cloneMenuItem);
+        
         moveTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.moveTagAround"));
         moveTagMenuItem.addActionListener(this::moveTagActionPerformed);
         moveTagMenuItem.setIcon(View.getIcon("move16"));
@@ -568,7 +568,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         expandRecursiveMenuItem.setVisible(false);
         removeMenuItem.setVisible(canRemove);
         removeWithDependenciesMenuItem.setVisible(canRemove && !allDoNotHaveDependencies);
-        cloneTagMenuItem.setVisible(allSelectedIsTagOrFrame && allSelectedSameParent);
+        cloneMenuItem.setVisible(allSelectedIsTagOrFrame && allSelectedSameParent);
         undoTagMenuItem.setVisible(allSelectedIsTag);
         exportSelectionMenuItem.setEnabled(hasExportableNodes); //?
         replaceMenuItem.setVisible(false);
@@ -2245,7 +2245,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
     }
 
-    private void cloneTagActionPerformed(ActionEvent e) {
+    private void cloneActionPerformed(ActionEvent e) {
         List<TreeItem> items = getTree().getSelected();
         /* Currently useless since all selected items must have the same parent
         * but a better way to detect for parent/child selection 

@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Add tag renamed to Add tag inside
+- Clone tag menuitem renamed to just Clone as it clones both tags and frames
 
 ## [16.0.0] - 2022-10-30
 ### Added
