@@ -88,6 +88,7 @@ import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Reference;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -891,11 +892,23 @@ public class TagTreeContextMenu extends JPopupMenu {
                 allowedInsideSprite = true;
         }
         
-        SWF swf = item.getSwf();        
-        SelectTagPositionDialog selectPositionDialog = new SelectTagPositionDialog(mainPanel.getMainFrame().getWindow(), swf, allowedInsideSprite);
+        SWF swf = item.getSwf();       
+        Timelined selectedTimelined = null;
+        Tag selectedTag = null;
+        if (item instanceof DefineSpriteTag) {
+            selectedTimelined = (DefineSpriteTag) item;
+        }
+        if (item instanceof Frame) {
+            Frame frame = (Frame) item;
+            selectedTimelined = frame.timeline.timelined;
+            if (!frame.allInnerTags.isEmpty()){
+                selectedTag = frame.allInnerTags.get(frame.allInnerTags.size() - 1);
+            }
+        }
+        SelectTagPositionDialog selectPositionDialog = new SelectTagPositionDialog(mainPanel.getMainFrame().getWindow(), swf, selectedTag, selectedTimelined, allowedInsideSprite);
         if (selectPositionDialog.showDialog() == AppDialog.OK_OPTION) {
-            Timelined selectedTimelined = selectPositionDialog.getSelectedTimelined();
-            Tag selectedTag = selectPositionDialog.getSelectedTag();
+            selectedTimelined = selectPositionDialog.getSelectedTimelined();
+            selectedTag = selectPositionDialog.getSelectedTag();
             try {
                 Tag t = (Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf});
                 t.setTimelined(selectedTimelined);
@@ -925,22 +938,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                 timelined = itemTag.getTimelined();
                 index = timelined.indexOfTag(itemTag);
             } else if (item instanceof Frame) {
-                Frame f = (Frame) item;
-                timelined = f.timeline.timelined;
+                Frame frame = (Frame) item;
+                timelined = frame.timeline.timelined;
 
-                if (!f.innerTags.isEmpty()) {
-                    index = timelined.indexOfTag(f.innerTags.get(0));
-                } else if (f.showFrameTag != null) {
-                    index = timelined.indexOfTag(f.showFrameTag);
-                } else {
-                    ReadOnlyTagList inner = timelined.getTags();
-                    for (int i = inner.size() - 1; i > 0; i--) {
-                        if (inner.get(i) instanceof ShowFrameTag) {
-                            index = i + 1;
-                            break;
-                        }
-                    }
-                }
+                index = calcFramePositionToAdd(frame, timelined, true, new Reference<>(false), false);
             }
             
             if (timelined != null) {
@@ -979,22 +980,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                 timelined = itemTag.getTimelined();
                 index = timelined.indexOfTag(itemTag) + 1;
             } else if (item instanceof Frame) {
-                Frame f = (Frame) item;
-                timelined = f.timeline.timelined;
-
-                if (f.showFrameTag != null) {
-                    index = timelined.indexOfTag(f.showFrameTag) + 1;
-                } else if (!f.innerTags.isEmpty()) {
-                    index = timelined.indexOfTag(f.innerTags.get(f.innerTags.size() - 1)) + 1;
-                } else {
-                    ReadOnlyTagList inner = timelined.getTags();
-                    for (int i = inner.size() - 1; i > 0; i--) {
-                        if (inner.get(i) instanceof ShowFrameTag) {
-                            index = i + 1;
-                            break;
-                        }
-                    }
-                }
+                Frame frame = (Frame) item;
+                timelined = frame.timeline.timelined;
+                
+                index = calcFramePositionToAdd(frame, timelined, false, new Reference<>(false), false);
             } else if (item instanceof HeaderItem) {
                 timelined = swf;
                 index = 0;
@@ -2243,6 +2232,51 @@ public class TagTreeContextMenu extends JPopupMenu {
         addFrames(true);
     }
 
+    private int calcFramePositionToAdd(Frame frame, Timelined timelined, boolean before, Reference<Boolean> frameAdd, boolean addingFramesNotTags) {
+        ReadOnlyTagList tagsList = timelined.getTags();
+                int positionToAdd = -1;
+                if (frame == null) {
+                    positionToAdd = tagsList.size();
+                } else {
+                    if (before && frame.frame == 0) {
+                        positionToAdd = 0;
+                    } else {
+
+                        //adding frames before frame 0 => at 0
+                        //adding frames before frame 2 => after second ShowFrameTag
+                        //adding frames after frame 2 => after third ShowFrameTag
+                        //adding frames after frame 0 => after first ShowFrameTag
+                        int f = 0;
+                        int i = 0;
+                        for (; i < tagsList.size(); i++) {
+                            Tag t = tagsList.get(i);
+                            if (t instanceof ShowFrameTag) {
+                                f++;
+
+                                if (before && f == frame.frame) {
+                                    positionToAdd = i;
+                                    if (addingFramesNotTags) {
+                                        positionToAdd++;
+                                    }
+                                    break;
+                                }
+                                if (!before && f == frame.frame + 1) {
+                                    positionToAdd = i + 1;
+                                    break;
+                                }
+                            }
+                        }
+                        if (f == 0 && !before) { //last showFrameTag not found
+                            if (!tagsList.isEmpty()) { //DefineSprite with some tags but no ShowFrameTag
+                                frameAdd.setVal(true);
+                            }
+                            positionToAdd = tagsList.size();
+                        }
+                    }
+                }
+                return positionToAdd;
+    }
+    
     private void addFrames(boolean before) {
         TreeItem item = getTree().getCurrentTreeItem();
         if (item == null) {
@@ -2273,44 +2307,12 @@ public class TagTreeContextMenu extends JPopupMenu {
                 if (frameCount == 0) {
                     return;
                 }
-                ReadOnlyTagList tagsList = timelined.getTags();
-                int positionToAdd = -1;
-                if (frame == null) {
-                    positionToAdd = tagsList.size();
-                } else {
-                    if (before && frame.frame == 0) {
-                        positionToAdd = 0;
-                    } else {
-
-                        //adding frames before frame 0 => at 0
-                        //adding frames before frame 2 => after second ShowFrameTag
-                        //adding frames after frame 2 => after third ShowFrameTag
-                        //adding frames after frame 0 => after first ShowFrameTag
-                        int f = 0;
-                        int i = 0;
-                        for (; i < tagsList.size(); i++) {
-                            Tag t = tagsList.get(i);
-                            if (t instanceof ShowFrameTag) {
-                                f++;
-
-                                if (before && f == frame.frame) {
-                                    positionToAdd = i + 1;
-                                    break;
-                                }
-                                if (!before && f == frame.frame + 1) {
-                                    positionToAdd = i + 1;
-                                    break;
-                                }
-                            }
-                        }
-                        if (f == 0 && !before) { //last showFrameTag not found
-                            if (!tagsList.isEmpty()) { //DefineSprite with some tags but no ShowFrameTag
-                                frameCount++;
-                            }
-                            positionToAdd = tagsList.size();
-                        }
-                    }
+                Reference<Boolean> frameAdd = new Reference<>(false);
+                int positionToAdd = calcFramePositionToAdd(frame, timelined, before, frameAdd, true);
+                if (frameAdd.getVal()) {
+                    frameCount++;
                 }
+                
                 SWF swf = timelined.getTimeline().swf;
                 for (int i = 0; i < frameCount; i++) {
                     ShowFrameTag showFrameTag = new ShowFrameTag(swf);

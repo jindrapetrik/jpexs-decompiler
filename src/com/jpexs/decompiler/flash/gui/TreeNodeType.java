@@ -60,5 +60,6 @@ public enum TreeNodeType {
     METADATA,
     PLACE_OBJECT,
     REMOVE_OBJECT,
+    SCALING_GRID,
     END
 }

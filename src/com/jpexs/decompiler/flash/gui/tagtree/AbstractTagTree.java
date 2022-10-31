@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.tags.DefineFont2Tag;
 import com.jpexs.decompiler.flash.tags.DefineFont3Tag;
 import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
 import com.jpexs.decompiler.flash.tags.DefineFontTag;
+import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
@@ -295,9 +296,13 @@ public abstract class AbstractTagTree extends JTree {
             return TreeNodeType.REMOVE_OBJECT;
         }
         
+        if (t instanceof DefineScalingGridTag) {
+            return TreeNodeType.SCALING_GRID;
+        }
+        
         if (t instanceof EndTag) {
             return TreeNodeType.END;
-        }
+        }                
         
         if (t instanceof Tag) {
             return TreeNodeType.OTHER_TAG;
@@ -467,7 +472,8 @@ public abstract class AbstractTagTree extends JTree {
                 }
                 if (nodeType == TreeNodeType.FONT) {
                     ret.add(d);
-                }
+                }                
+                
                 if (nodeType == TreeNodeType.OTHER_TAG) {
                     if (d instanceof SymbolClassTypeTag) {
                         ret.add(d);
@@ -605,9 +611,13 @@ public abstract class AbstractTagTree extends JTree {
             return TreeNodeType.END;
         }
         
+        if (cl == DefineScalingGridTag.class) {
+            return TreeNodeType.SCALING_GRID;
+        }
+        
         if (Tag.class.isAssignableFrom(cl)) {
             return TreeNodeType.OTHER_TAG;
-        }
+        }                
         
         return TreeNodeType.FOLDER;
     }

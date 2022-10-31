@@ -218,7 +218,24 @@ public class SelectTagPositionDialog extends AppDialog {
         root.addChild(endNode);
     }
 
+    private void selectPath(List<Object> path) {
+        Object[] pathArray = path.toArray(new Object[path.size()]);
+        TreePath tpath = new TreePath(pathArray);
+        positionTree.setSelectionPath(tpath);
+        int row = positionTree.getRowForPath(tpath);
+        if (row != -1) {
+            Rectangle rect = positionTree.getRowBounds(row);
+            rect.width += rect.x;
+            rect.x = 0;
+            positionTree.scrollRectToVisible(rect);
+        }
+    }
+
     private void selectCurrent(MyTreeNode root, Timelined timelined, List<Object> path) {
+
+        if (selectedTag == null && !allowInsideSprites) {
+
+        }
 
         for (int i = 0; i < root.getChildCount(); i++) {
             MyTreeNode node = (MyTreeNode) root.getChildAt(i);
@@ -226,19 +243,19 @@ public class SelectTagPositionDialog extends AppDialog {
             List<Object> subPath = new ArrayList<>(path);
             subPath.add(node);
 
-            if (node.getData() == selectedTag && timelined == selectedTimelined) {
-                Object[] pathArray = subPath.toArray(new Object[subPath.size()]);
-                TreePath tpath = new TreePath(pathArray);
-                positionTree.setSelectionPath(tpath);
-                int row = positionTree.getRowForPath(tpath);
-                if (row != -1) {
-                    Rectangle rect = positionTree.getRowBounds(row);
-                    rect.width += rect.x;
-                    rect.x = 0;
-                    positionTree.scrollRectToVisible(rect);
-                }
+            if (timelined == selectedTimelined && ((node.getData() == selectedTag))) {
+                selectPath(subPath);
                 return;
             }
+            if (timelined == selectedTimelined && (node.getData() instanceof MyTimelineEnd) && selectedTag == null) {
+                selectPath(subPath);
+                return;
+            }
+            if ((selectedTimelined instanceof DefineSpriteTag) && !allowInsideSprites && node.getData() == selectedTimelined) {
+                selectPath(subPath);
+                return;
+            }
+        
 
             if (node.getData() instanceof DefineSpriteTag) {
                 selectCurrent(node, (DefineSpriteTag) node.getData(), subPath);
@@ -255,7 +272,7 @@ public class SelectTagPositionDialog extends AppDialog {
     private static class PositionTreeCellRenderer extends DefaultTreeCellRenderer {
 
         private boolean selected;
-               
+
         public PositionTreeCellRenderer() {
             if (View.isOceanic()) {
                 setUI(new BasicLabelUI());
@@ -278,12 +295,12 @@ public class SelectTagPositionDialog extends AppDialog {
                 if (subValue instanceof MyTimelineEnd) {
                     lab.setIcon(TagTree.getIconForType(TreeNodeType.END));
                 }
-                
+
                 if (subValue instanceof MyFrame) {
                     lab.setIcon(TagTree.getIconForType(TreeNodeType.FRAME));
                 }
                 if (subValue instanceof TreeItem) {
-                    lab.setIcon(TagTree.getIconForType(TagTree.getTreeNodeType((TreeItem)subValue)));
+                    lab.setIcon(TagTree.getIconForType(TagTree.getTreeNodeType((TreeItem) subValue)));
                 }
             }
             return renderer;
@@ -374,7 +391,7 @@ public class SelectTagPositionDialog extends AppDialog {
         positionTree.addTreeSelectionListener(this::spriteValueChanged);
         positionTree.addTreeSelectionListener(this::positionTreeValueChanged);
         positionTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        
+
         previewPanel = new PreviewPanel(Main.getMainFrame().getPanel(), null);
         previewPanel.setReadOnly(true);
         previewPanel.setPreferredSize(new Dimension(300, 1));
@@ -395,14 +412,14 @@ public class SelectTagPositionDialog extends AppDialog {
         setResizable(true);
         View.centerScreen(this);
         View.setWindowIcon(this);
-        
+
         calculateEnabled();
     }
 
     public void positionTreeValueChanged(TreeSelectionEvent e) {
         calculateEnabled();
     }
-    
+
     private void calculateEnabled() {
         MyTreeNode node = (MyTreeNode) positionTree.getLastSelectedPathComponent();
         boolean enabled = true;
