@@ -2,8 +2,12 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Allow add tag after header context menu
+
 ### Fixed
 - Do not show option to Show in taglist on resource view folders
+- Disallow add tag before header context menu
 
 ## [16.0.0] - 2022-10-30
 ### Added

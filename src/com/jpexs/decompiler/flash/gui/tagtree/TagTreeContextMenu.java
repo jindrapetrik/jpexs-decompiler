@@ -78,6 +78,7 @@ import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
+import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
@@ -674,7 +675,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             TreeItem parent = (TreeItem) tree.getModel().getTreePath(firstItem).getParentPath().getLastPathComponent();
             addTagBeforeMenu.removeAll();
-            if (!isFolder) {
+            if (!isFolder && !(firstItem instanceof HeaderItem)) {
                 addAddTagMenuItems(getAllowedTagTypes(parent), addTagBeforeMenu, firstItem, this::addTagBeforeActionPerformed);
             }
             addTagBeforeMenu.setVisible(addTagBeforeMenu.getItemCount() > 0);
@@ -941,7 +942,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     }
                 }
             }
-
+            
             if (timelined != null) {
                 if (index == -1) {
                     timelined.addTag(t);
@@ -994,6 +995,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                         }
                     }
                 }
+            } else if (item instanceof HeaderItem) {
+                timelined = swf;
+                index = 0;
             }
 
             if (timelined != null) {
