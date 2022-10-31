@@ -94,7 +94,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
     private final Map<SWF, TagTreeSwfInfo> swfInfos = new HashMap<>();
 
     private final boolean addAllFolders;
-    
+
     private final Map<TreeItem, TreePath> pathCache = new HashMap<>();
 
     public TagTreeModel(List<SWFList> swfs, boolean addAllFolders) {
@@ -144,7 +144,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
         swfInfos.clear();
         TreePath changedPath = getTreePath(swf == null ? root : swf);
         fireTreeStructureChanged(new TreeModelEvent(this, changedPath));
-    }       
+    }
 
     private List<SoundStreamHeadTypeTag> getSoundStreams(DefineSpriteTag sprite) {
         List<SoundStreamHeadTypeTag> ret = new ArrayList<>();
@@ -408,7 +408,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
         }
         return ret;
     }
-    
+
     @Override
     public TreeItem getRoot() {
         return root;
@@ -454,9 +454,9 @@ public class TagTreeModel extends AbstractTagTreeModel {
         TreeItem parentNode = (TreeItem) parent;
         List<TreeItem> result = new ArrayList<>();
         if (parentNode instanceof CharacterTag) {
-            result = getMappedCharacters(((CharacterTag) parentNode).getSwf(), (CharacterTag) parentNode);            
+            result = new ArrayList<>(getMappedCharacters(((CharacterTag) parentNode).getSwf(), (CharacterTag) parentNode));
         }
-        
+
         if (parentNode == root) {
             for (SWFList swfList : swfs) {
                 if (!swfList.isBundle()) {
@@ -528,7 +528,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
 
     @Override
     public TreeItem getChild(Object parent, int index) {
-        if(getChildCount(parent) == 0) {
+        if (getChildCount(parent) == 0) {
             return null;
         }
         TreeItem parentNode = (TreeItem) parent;
@@ -644,7 +644,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
     @Override
     public boolean isLeaf(Object node) {
         return (getChildCount(node) == 0);
-    }  
+    }
 
     private int indexOfAdd(int prevSize, int index) {
         if (index == -1) {
@@ -708,5 +708,5 @@ public class TagTreeModel extends AbstractTagTreeModel {
         }
 
         return -1;
-    }    
+    }
 }
