@@ -2754,32 +2754,47 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void exportJavaSource() {
         List<TreeItem> sel = getSelected();
-        for (TreeItem item : sel) {
-            if (item instanceof SWF) {
-                SWF swf = (SWF) item;
-                final String selFile = selectExportDir();
-                if (selFile != null) {
-                    Main.startWork(translate("work.exporting") + "...", null);
+        Set<SWF> swfs = new LinkedHashSet<>();
 
-                    try {
-                        new SwfJavaExporter().exportJavaCode(swf, selFile);
-                        Main.stopWork();
-                    } catch (IOException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    }
-                }
+        for (TreeItem item : sel) {
+            if (item instanceof SWFList) {
+                SWFList list = (SWFList) item;
+                swfs.addAll(list);
+            } else {
+                swfs.add(item.getSwf());
             }
         }
+        
+        
+        for (SWF item : swfs) {
+            SWF swf = (SWF) item;
+            final String selFile = selectExportDir();
+            if (selFile != null) {
+                Main.startWork(translate("work.exporting") + "...", null);
+
+                try {
+                    new SwfJavaExporter().exportJavaCode(swf, selFile);
+                    Main.stopWork();
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            }
+        }        
     }
 
     public void exportSwfXml() {
         View.checkAccess();
 
         List<TreeItem> sel = getSelected();
-        Set<SWF> swfs = new HashSet<>();
+        Set<SWF> swfs = new LinkedHashSet<>();
 
         for (TreeItem item : sel) {
-            swfs.add(item.getSwf());
+            if (item instanceof SWFList) {
+                SWFList list = (SWFList) item;
+                swfs.addAll(list);
+            } else {
+                swfs.add(item.getSwf());
+            }
         }
 
         for (SWF swf : swfs) {
@@ -2804,9 +2819,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importXml"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportXmlInfo);
 
         List<TreeItem> sel = getSelected();
-        Set<SWF> swfs = new HashSet<>();
+        Set<SWF> swfs = new LinkedHashSet<>();
+
         for (TreeItem item : sel) {
-            swfs.add(item.getSwf());
+            if (item instanceof SWFList) {
+                SWFList list = (SWFList) item;
+                swfs.addAll(list);
+            } else {
+                swfs.add(item.getSwf());
+            }
         }
         if (swfs.size() > 1) {
             return;

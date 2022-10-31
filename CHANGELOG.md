@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- SWF Add tag before/after menuitem
+- Context menu on bundles (ZIP, SWC, binarysearch, etc...)
 
 ## [16.0.1] - 2022-10-31
 ### Added

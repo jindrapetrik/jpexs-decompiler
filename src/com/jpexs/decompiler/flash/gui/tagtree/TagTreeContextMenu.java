@@ -847,8 +847,11 @@ public class TagTreeContextMenu extends JPopupMenu {
     {
         AddTagActionListener listener = this::addTagInsideActionPerformed;
         Map<Integer, TagTypeInfo> classes = Tag.getKnownClasses();
-        
-        boolean gfx = mainPanel.getCurrentSwf().gfx;
+        SWF currentSwf = mainPanel.getCurrentSwf();
+        if (currentSwf == null) {
+            return;
+        }
+        boolean gfx = currentSwf.gfx;
         
         
         if (item instanceof SWF) {
@@ -907,9 +910,19 @@ public class TagTreeContextMenu extends JPopupMenu {
         TreeItem parent = (TreeItem) getTree().getModel().getTreePath(item).getParentPath().getLastPathComponent();
         Map<Integer, TagTypeInfo> classes = Tag.getKnownClasses();
         
-        boolean gfx = mainPanel.getCurrentSwf().gfx;
+        SWF currentSwf = mainPanel.getCurrentSwf();
+        
+        if (currentSwf == null) {
+            return;
+        }
+        
+        boolean gfx = currentSwf.gfx;
         boolean insideFrame = false;
         boolean insideSprite = false;               
+        
+        if (item instanceof SWF) {
+            return;
+        }                
         
         if (item instanceof Frame) {
             insideFrame = true;
