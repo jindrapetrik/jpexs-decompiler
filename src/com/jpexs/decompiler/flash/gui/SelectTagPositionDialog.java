@@ -78,6 +78,8 @@ public class SelectTagPositionDialog extends AppDialog {
     private Timelined selectedTimelined = null;
     private boolean allowInsideSprites;
 
+    private boolean selectNext;
+    
     private static class MyTreeNode implements TreeNode {
 
         private final List<TreeNode> children = new ArrayList<>();
@@ -242,9 +244,14 @@ public class SelectTagPositionDialog extends AppDialog {
 
             List<Object> subPath = new ArrayList<>(path);
             subPath.add(node);
+            
+            List<Object> nextPath = new ArrayList<>(path);
+            if (i + 1 < root.getChildCount()) {
+                nextPath.add(root.getChildAt(i + 1));
+            }
 
             if (timelined == selectedTimelined && ((node.getData() == selectedTag))) {
-                selectPath(subPath);
+                selectPath(selectNext ? nextPath : subPath);
                 return;
             }
             if (timelined == selectedTimelined && (node.getData() instanceof MyTimelineEnd) && selectedTag == null) {
@@ -252,7 +259,7 @@ public class SelectTagPositionDialog extends AppDialog {
                 return;
             }
             if ((selectedTimelined instanceof DefineSpriteTag) && !allowInsideSprites && node.getData() == selectedTimelined) {
-                selectPath(subPath);
+                selectPath(nextPath);
                 return;
             }
         
@@ -266,7 +273,7 @@ public class SelectTagPositionDialog extends AppDialog {
     }
 
     public SelectTagPositionDialog(Window parent, SWF swf, boolean allowInsideSprites) {
-        this(parent, swf, null, null, allowInsideSprites);
+        this(parent, swf, null, null, allowInsideSprites, false);
     }
 
     private static class PositionTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -307,12 +314,13 @@ public class SelectTagPositionDialog extends AppDialog {
         }
     }
 
-    public SelectTagPositionDialog(Window parent, SWF swf, Tag selectedTag, Timelined selectedTimelined, boolean allowInsideSprites) {
+    public SelectTagPositionDialog(Window parent, SWF swf, Tag selectedTag, Timelined selectedTimelined, boolean allowInsideSprites, boolean selectNext) {
         super(parent);
         this.swf = swf;
         this.selectedTag = selectedTag;
         this.selectedTimelined = selectedTimelined;
         this.allowInsideSprites = allowInsideSprites;
+        this.selectNext = selectNext;
         setTitle(translate("dialog.title"));
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         Container cnt = getContentPane();

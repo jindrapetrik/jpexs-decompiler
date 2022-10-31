@@ -295,41 +295,7 @@ public class TagTree extends AbstractTagTree {
 
         return ret;
     }
-
-    @Override
-    public List<Integer> getFrameNestedTagIds(boolean inSprite) {
-        return Arrays.asList(PlaceObjectTag.ID, PlaceObject2Tag.ID, PlaceObject3Tag.ID, PlaceObject4Tag.ID,
-                RemoveObjectTag.ID, RemoveObject2Tag.ID, FrameLabelTag.ID,
-                StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
-                SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID);
-    }
-
-    @Override
-    public List<Integer> getNestedTagIds(Tag obj) {
-        if (obj instanceof DefineSpriteTag) {
-            return Arrays.asList(PlaceObjectTag.ID, PlaceObject2Tag.ID, PlaceObject3Tag.ID, PlaceObject4Tag.ID,
-                    RemoveObjectTag.ID, RemoveObject2Tag.ID, ShowFrameTag.ID, FrameLabelTag.ID,
-                    StartSoundTag.ID, StartSound2Tag.ID, VideoFrameTag.ID,
-                    SoundStreamBlockTag.ID, SoundStreamHeadTag.ID, SoundStreamHead2Tag.ID,
-                    DefineScalingGridTag.ID);
-        }
-        if (obj instanceof FontTag) {
-            return Arrays.asList(DefineFontNameTag.ID, DefineFontAlignZonesTag.ID, DefineFontInfoTag.ID, DefineFontInfo2Tag.ID);
-        }
-        if (obj instanceof TextTag) {
-            return Arrays.asList(CSMTextSettingsTag.ID);
-        }
-        if (obj instanceof DefineButtonTag) {
-            return Arrays.asList(DefineButtonCxformTag.ID, DefineButtonSoundTag.ID, DefineScalingGridTag.ID);
-        }
-        if (obj instanceof DefineButton2Tag) {
-            return Arrays.asList(DefineButtonSoundTag.ID, DefineScalingGridTag.ID);
-        }
-        return new ArrayList<>();
-    }
-
-    
-
+ 
     @Override
     public List<TreeItem> getSelection(SWF swf) {
         List<TreeItem> sel;

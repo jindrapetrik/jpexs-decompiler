@@ -307,7 +307,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
         return knownTagInfosByName;
     }
-
+    
     private static void addTagInfo(Map<Integer, TagTypeInfo> map, Map<String, TagTypeInfo> map2, int id, Class cls, String name) {
         map.put(id, new TagTypeInfo(id, cls, name));
         map2.put(name, new TagTypeInfo(id, cls, name));
