@@ -452,8 +452,12 @@ public class TagTreeModel extends AbstractTagTreeModel {
     @Override
     public List<? extends TreeItem> getAllChildren(Object parent) {
         TreeItem parentNode = (TreeItem) parent;
+        List<TreeItem> result = new ArrayList<>();
+        if (parentNode instanceof CharacterTag) {
+            result = getMappedCharacters(((CharacterTag) parentNode).getSwf(), (CharacterTag) parentNode);            
+        }
+        
         if (parentNode == root) {
-            List<TreeItem> result = new ArrayList<>(swfs.size());
             for (SWFList swfList : swfs) {
                 if (!swfList.isBundle()) {
                     result.add(swfList.get(0));
@@ -470,11 +474,11 @@ public class TagTreeModel extends AbstractTagTreeModel {
         } else if (parentNode instanceof Frame) {
             return ((Frame) parentNode).innerTags;
         } else if (parentNode instanceof DefineSpriteTag) {
-            return ((DefineSpriteTag) parentNode).getTimeline().getFrames();
+            result.addAll(((DefineSpriteTag) parentNode).getTimeline().getFrames());
+            return result;
         } else if (parentNode instanceof DefineBinaryDataTag) {
             DefineBinaryDataTag binaryDataTag = (DefineBinaryDataTag) parentNode;
             if (binaryDataTag.innerSwf != null) {
-                List<SWF> result = new ArrayList<>(1);
                 result.add(((DefineBinaryDataTag) parentNode).innerSwf);
                 return result;
             } else {
@@ -484,7 +488,6 @@ public class TagTreeModel extends AbstractTagTreeModel {
             return ((AS2Package) parentNode).getAllChildren();
         } else if (parentNode instanceof FrameScript) {
             Frame parentFrame = ((FrameScript) parentNode).getFrame();
-            List<TreeItem> result = new ArrayList<>();
             result.addAll(parentFrame.actionContainers);
             result.addAll(parentFrame.actions);
             for (int i = 0; i < result.size(); i++) {
@@ -518,11 +521,9 @@ public class TagTreeModel extends AbstractTagTreeModel {
             } else {
                 return new ArrayList<>();
             }
-        } else if (parentNode instanceof CharacterTag) {
-            return getMappedCharacters(((CharacterTag) parentNode).getSwf(), (CharacterTag) parentNode);
         }
 
-        return new ArrayList<>();
+        return result;
     }
 
     @Override

@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Do not show option to Show in taglist on resource view folders
 - Disallow add tag before header context menu
+- Context menu on tags mapped to other characters like DefineScalingGrid
 
 ## [16.0.0] - 2022-10-30
 ### Added
