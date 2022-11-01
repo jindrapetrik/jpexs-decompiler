@@ -130,6 +130,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private JPanel displayWithPreview;
 
     // Image tag buttons
+    private JButton replaceShapeButton;
+    
+    private JButton replaceShapeUpdateBoundsButton;
+    
+    private JButton replaceSoundButton;
+    
     private JButton replaceImageButton;
 
     private JButton replaceImageAlphaButton;
@@ -252,8 +258,23 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         parametersPanel.add(displayWithPreview, BorderLayout.CENTER);
         setRightComponent(parametersPanel);
     }
-
+    
     private JPanel createImageButtonsPanel() {
+        replaceShapeButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replaceshape16"));
+        replaceShapeButton.setMargin(new Insets(3, 3, 3, 10));
+        replaceShapeButton.addActionListener(mainPanel::replaceButtonActionPerformed);
+        replaceShapeButton.setVisible(false);
+        
+        replaceShapeUpdateBoundsButton = new JButton(mainPanel.translate("button.replaceNoFill"), View.getIcon("replaceshape16"));
+        replaceShapeUpdateBoundsButton.setMargin(new Insets(3, 3, 3, 10));
+        replaceShapeUpdateBoundsButton.addActionListener(mainPanel::replaceNoFillButtonActionPerformed);
+        replaceShapeUpdateBoundsButton.setVisible(false);
+        
+        replaceSoundButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replacesound16"));
+        replaceSoundButton.setMargin(new Insets(3, 3, 3, 10));
+        replaceSoundButton.addActionListener(mainPanel::replaceButtonActionPerformed);
+        replaceSoundButton.setVisible(false);
+        
         replaceImageButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replaceimage16"));
         replaceImageButton.setMargin(new Insets(3, 3, 3, 10));
         replaceImageButton.addActionListener(mainPanel::replaceButtonActionPerformed);
@@ -275,6 +296,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         nextFontsButton.setVisible(false);
 
         ButtonsPanel imageButtonsPanel = new ButtonsPanel();
+        imageButtonsPanel.add(replaceSoundButton);
+        imageButtonsPanel.add(replaceShapeButton);
+        imageButtonsPanel.add(replaceShapeUpdateBoundsButton);
         imageButtonsPanel.add(replaceImageButton);
         imageButtonsPanel.add(replaceImageAlphaButton);
         imageButtonsPanel.add(prevFontsButton);
@@ -726,17 +750,22 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeFreeTransformButton.setVisible(!readOnly);
     }
 
-    public void setImageReplaceButtonVisible(boolean show, boolean showAlpha) {
+    public void setImageReplaceButtonVisible(boolean showImage, boolean showAlpha, boolean showShape, boolean showSound) {
         if (readOnly) {
-            show = false;
+            showImage = false;
             showAlpha = false;
+            showShape = false;
+            showSound = false;
         }
-        replaceImageButton.setVisible(show);
+        replaceImageButton.setVisible(showImage);
         replaceImageAlphaButton.setVisible(showAlpha);
+        replaceShapeButton.setVisible(showShape);
+        replaceShapeUpdateBoundsButton.setVisible(showShape);
+        replaceSoundButton.setVisible(showSound);
         prevFontsButton.setVisible(false);
         nextFontsButton.setVisible(false);
     }
-
+    
     private void createAndRunTempSwf(TreeItem treeItem) {
         try {
             File extTempFile = File.createTempFile("ffdec_viewext_", ".swf");

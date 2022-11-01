@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - Copy/move tag to for SWFs inside bundles and/or DefineBinaryData
+- Replace button under shape and DefineSound display (previously, only context menu allowed that)
 
 ### Fixed
 - SWF Add tag before/after menuitem

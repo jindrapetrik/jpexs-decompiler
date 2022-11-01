@@ -3860,7 +3860,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showUnknownPanel(unknownTag);
         } else if (treeItem instanceof ImageTag) {
             ImageTag imageTag = (ImageTag) treeItem;
-            previewPanel.setImageReplaceButtonVisible(!((Tag) imageTag).isReadOnly() && imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag);
+            previewPanel.setImageReplaceButtonVisible(!((Tag) imageTag).isReadOnly() && imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag, false, false);
             SWF imageSWF = makeTimelinedImage(imageTag);
             previewPanel.showImagePanel(imageSWF, imageSWF, 0, false);
 
@@ -3875,6 +3875,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             previewPanel.setParametersPanelVisible(false);
+            if (treeItem instanceof ShapeTag) {
+                previewPanel.setImageReplaceButtonVisible(false, false, !((Tag) treeItem).isReadOnly(), false);
+            }
             previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true);
         } else if (treeItem instanceof Frame && internalViewer) {
             Frame fn = (Frame) treeItem;
@@ -3890,7 +3893,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showImagePanel(timelinedContainer, swf, frame, true);
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
-            previewPanel.setImageReplaceButtonVisible(((Tag) treeItem).isReadOnly() && (treeItem instanceof DefineSoundTag), false);
+            previewPanel.setImageReplaceButtonVisible(false, false, false, !((Tag) treeItem).isReadOnly() && (treeItem instanceof DefineSoundTag));
             try {
                 SoundTagPlayer soundThread = new SoundTagPlayer(null, (SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
                 previewPanel.setMedia(soundThread);
@@ -3980,8 +3983,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         previewPanel.clear();
         stopFlashPlayer();
 
-        previewPanel.setImageReplaceButtonVisible(false, false);
-
+        previewPanel.setImageReplaceButtonVisible(false, false, false, false);
+        
         boolean internalViewer = !isAdobeFlashPlayerEnabled();
 
         if (treeItem instanceof ScriptPack) {
