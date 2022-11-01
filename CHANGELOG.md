@@ -14,6 +14,9 @@ All notable changes to this project will be documented in this file.
 - Raw editor now checks whether field value can be placed inside this kind of tag
 - Refreshing parent tags and/or timelines on raw editor save
 
+### Changed
+- Do not show export name (class) in DoInitAction in Tag list view instead of tag name
+
 ## [16.0.1] - 2022-10-31
 ### Added
 - Allow add tag after header context menu
