@@ -69,6 +69,7 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.StringTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
+import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
@@ -1321,7 +1322,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     public void hilightScript(SWF swf, String name) {
         View.checkAccess();
 
-        TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
+        TagTreeModel ttm = (TagTreeModel) mainPanel.getCurrentTree().getModel();
         TreeItem scriptsNode = ttm.getScriptsNode(swf);
         if (scriptsNode instanceof ClassesListTreeModel) {
             ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
@@ -1349,15 +1350,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     public void hilightScript(ScriptPack pack) {
         View.checkAccess();
 
-        TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
+        AbstractTagTreeModel ttm = mainPanel.getCurrentTree().getModel();
         TreePath tp = ttm.getTreePath(pack);
         if (tp == null) {
             mainPanel.closeTagTreeSearch();
             tp = ttm.getTreePath(pack);
         }
 
-        mainPanel.tagTree.setSelectionPath(tp);
-        mainPanel.tagTree.scrollPathToVisible(tp);
+        mainPanel.getCurrentTree().setSelectionPath(tp);
+        mainPanel.getCurrentTree().scrollPathToVisible(tp);
     }
 
     @Override

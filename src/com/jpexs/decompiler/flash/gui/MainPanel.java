@@ -2754,32 +2754,47 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void exportJavaSource() {
         List<TreeItem> sel = getSelected();
-        for (TreeItem item : sel) {
-            if (item instanceof SWF) {
-                SWF swf = (SWF) item;
-                final String selFile = selectExportDir();
-                if (selFile != null) {
-                    Main.startWork(translate("work.exporting") + "...", null);
+        Set<SWF> swfs = new LinkedHashSet<>();
 
-                    try {
-                        new SwfJavaExporter().exportJavaCode(swf, selFile);
-                        Main.stopWork();
-                    } catch (IOException ex) {
-                        logger.log(Level.SEVERE, null, ex);
-                    }
-                }
+        for (TreeItem item : sel) {
+            if (item instanceof SWFList) {
+                SWFList list = (SWFList) item;
+                swfs.addAll(list);
+            } else {
+                swfs.add(item.getSwf());
             }
         }
+        
+        
+        for (SWF item : swfs) {
+            SWF swf = (SWF) item;
+            final String selFile = selectExportDir();
+            if (selFile != null) {
+                Main.startWork(translate("work.exporting") + "...", null);
+
+                try {
+                    new SwfJavaExporter().exportJavaCode(swf, selFile);
+                    Main.stopWork();
+                } catch (IOException ex) {
+                    logger.log(Level.SEVERE, null, ex);
+                }
+            }
+        }        
     }
 
     public void exportSwfXml() {
         View.checkAccess();
 
         List<TreeItem> sel = getSelected();
-        Set<SWF> swfs = new HashSet<>();
+        Set<SWF> swfs = new LinkedHashSet<>();
 
         for (TreeItem item : sel) {
-            swfs.add(item.getSwf());
+            if (item instanceof SWFList) {
+                SWFList list = (SWFList) item;
+                swfs.addAll(list);
+            } else {
+                swfs.add(item.getSwf());
+            }
         }
 
         for (SWF swf : swfs) {
@@ -2804,9 +2819,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importXml"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportXmlInfo);
 
         List<TreeItem> sel = getSelected();
-        Set<SWF> swfs = new HashSet<>();
+        Set<SWF> swfs = new LinkedHashSet<>();
+
         for (TreeItem item : sel) {
-            swfs.add(item.getSwf());
+            if (item instanceof SWFList) {
+                SWFList list = (SWFList) item;
+                swfs.addAll(list);
+            } else {
+                swfs.add(item.getSwf());
+            }
         }
         if (swfs.size() > 1) {
             return;
@@ -3777,7 +3798,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         } catch (IOException ex) {
                             //ignore
                         }
-                    }
+                    }                    
                 } catch (InterruptedException ex) {
                     //ignore
                 }
@@ -3794,6 +3815,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             protected void done() {
                 View.execInEventDispatch(() -> {
                     Main.loadingDialog.setVisible(false);
+                    refreshTree();
                     Main.stopWork();
                 });
             }
@@ -3838,7 +3860,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showUnknownPanel(unknownTag);
         } else if (treeItem instanceof ImageTag) {
             ImageTag imageTag = (ImageTag) treeItem;
-            previewPanel.setImageReplaceButtonVisible(!((Tag) imageTag).isReadOnly() && imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag);
+            previewPanel.setImageReplaceButtonVisible(!((Tag) imageTag).isReadOnly() && imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag, false, false);
             SWF imageSWF = makeTimelinedImage(imageTag);
             previewPanel.showImagePanel(imageSWF, imageSWF, 0, false);
 
@@ -3853,6 +3875,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             previewPanel.setParametersPanelVisible(false);
+            if (treeItem instanceof ShapeTag) {
+                previewPanel.setImageReplaceButtonVisible(false, false, !((Tag) treeItem).isReadOnly(), false);
+            }
             previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true);
         } else if (treeItem instanceof Frame && internalViewer) {
             Frame fn = (Frame) treeItem;
@@ -3868,7 +3893,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showImagePanel(timelinedContainer, swf, frame, true);
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
-            previewPanel.setImageReplaceButtonVisible(((Tag) treeItem).isReadOnly() && (treeItem instanceof DefineSoundTag), false);
+            previewPanel.setImageReplaceButtonVisible(false, false, false, !((Tag) treeItem).isReadOnly() && (treeItem instanceof DefineSoundTag));
             try {
                 SoundTagPlayer soundThread = new SoundTagPlayer(null, (SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
                 previewPanel.setMedia(soundThread);
@@ -3958,8 +3983,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         previewPanel.clear();
         stopFlashPlayer();
 
-        previewPanel.setImageReplaceButtonVisible(false, false);
-
+        previewPanel.setImageReplaceButtonVisible(false, false, false, false);
+        
         boolean internalViewer = !isAdobeFlashPlayerEnabled();
 
         if (treeItem instanceof ScriptPack) {

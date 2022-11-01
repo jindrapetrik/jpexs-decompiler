@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import static com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree.getSelection;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.List;
 
@@ -44,4 +45,20 @@ public class TagListTree extends AbstractTagTree {
         return (TagListTreeModel) super.getModel();
     }   
 
+    @Override
+    public String convertValueToText(Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        if (value instanceof DoInitActionTag) {
+            DoInitActionTag tag = (DoInitActionTag) value;
+            return DoInitActionTag.NAME + " (" + tag.spriteId + ")";
+        }
+        if(value != null) {
+            String sValue = value.toString();
+            if (sValue != null) {
+                return sValue;
+            }
+        }
+        return "";
+    }
+
+    
 }

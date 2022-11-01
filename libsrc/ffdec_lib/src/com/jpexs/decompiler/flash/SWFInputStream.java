@@ -318,7 +318,11 @@ public class SWFInputStream implements AutoCloseable {
     private SWF swf;
 
     public DumpInfo dumpInfo;
+    
+    private byte[] data;
 
+    private int limit;
+    
     public void addPercentListener(ProgressListener listener) {
         listeners.add(listener);
     }
@@ -358,6 +362,8 @@ public class SWFInputStream implements AutoCloseable {
     public SWFInputStream(SWF swf, byte[] data, long startingPos, int limit) throws IOException {
         this.swf = swf;
         this.startingPos = startingPos;
+        this.data = data;
+        this.limit = limit;
         is = new MemoryInputStream(data, 0, limit);
     }
 
@@ -810,10 +816,10 @@ public class SWFInputStream implements AutoCloseable {
 
         newDumpLevel(name, "bytes", specialType, specialValue);
 
-        int startPos = (int) getPos();
+        int startPos = (int) is.getPos();
         skipBytesEx(count);
         endDumpLevel();
-        return new ByteArrayRange(swf.uncompressedData, startPos, (int) count);
+        return new ByteArrayRange(data, startPos, (int) count);
     }
 
     /**

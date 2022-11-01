@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
@@ -85,6 +86,7 @@ public class BUTTONRECORD implements Serializable {
     /**
      * If within DefineButton2Tag: Character color transform
      */
+    @Conditional(tags = {DefineButton2Tag.ID})
     public CXFORMWITHALPHA colorTransform;
 
     /**
@@ -92,6 +94,7 @@ public class BUTTONRECORD implements Serializable {
      * this button
      */
     @SWFArray("filter")
+    @Conditional(value = "buttonHasFilterList", tags = {DefineButton2Tag.ID})
     public List<FILTER> filterList;
 
     /**

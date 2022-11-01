@@ -158,7 +158,7 @@ public class FontPanel extends JPanel {
     }
 
     private void fontAddChars(FontTag ft, Set<Integer> selChars, Font font) {
-        FontTag f = (FontTag) mainPanel.tagTree.getCurrentTreeItem();
+        FontTag f = (FontTag) mainPanel.getCurrentTree().getCurrentTreeItem();
         String oldchars = f.getCharacters();
         for (int ic : selChars) {
             char c = (char) ic;
@@ -228,7 +228,7 @@ public class FontPanel extends JPanel {
     }
 
     private void fontRemoveChars(FontTag ft, Set<Integer> selChars) {
-        FontTag f = (FontTag) mainPanel.tagTree.getCurrentTreeItem();
+        FontTag f = (FontTag) mainPanel.getCurrentTree().getCurrentTreeItem();
 
         for (int ic : selChars) {
             char c = (char) ic;
@@ -563,7 +563,7 @@ public class FontPanel extends JPanel {
     private void fontAddCharsButtonActionPerformed(ActionEvent evt) {
         String newchars = fontAddCharactersField.getText();
 
-        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
         if (item instanceof FontTag) {
             FontTag ft = (FontTag) item;
             Set<Integer> selChars = new TreeSet<>();
@@ -582,7 +582,7 @@ public class FontPanel extends JPanel {
     private void fontRemoveCharsButtonActionPerformed(ActionEvent evt) {
         String newchars = fontAddCharactersField.getText();
 
-        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
         if (item instanceof FontTag) {
             FontTag ft = (FontTag) item;
             Set<Integer> selChars = new TreeSet<>();
@@ -599,7 +599,7 @@ public class FontPanel extends JPanel {
     }
 
     private void fontEmbedButtonActionPerformed(ActionEvent evt) {
-        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
         if (item instanceof FontTag) {
             FontTag ft = (FontTag) item;
             FontEmbedDialog fed = new FontEmbedDialog(Main.getDefaultDialogsOwner(), ft.hasLayout() || ft.getCharacterCount() == 0, (FontFace) fontFaceSelection.getSelectedItem(), fontAddCharactersField.getText());
@@ -641,7 +641,7 @@ public class FontPanel extends JPanel {
         if (!allowSave) {
             return;
         }
-        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
         if (item instanceof FontTag) {
             FontTag f = (FontTag) item;
             SWF swf = f.getSwf();
@@ -705,7 +705,7 @@ public class FontPanel extends JPanel {
 
         }
 
-        mainPanel.tagTree.repaint();
+        mainPanel.getCurrentTree().repaint();
         fontTag.setModified(true);
         setEditable(false);
     }
@@ -730,7 +730,7 @@ public class FontPanel extends JPanel {
     }
 
     private void importTTFButtonActionPerformed(ActionEvent evt) {
-        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
         if (item instanceof FontTag) {
             FontTag ft = (FontTag) item;
 

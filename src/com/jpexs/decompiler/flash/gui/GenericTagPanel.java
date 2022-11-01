@@ -571,7 +571,7 @@ public class GenericTagPanel extends JPanel implements ChangeListener {
                                 }
                             }
                         }
-                        boolean ok = ev.eval(fields);
+                        boolean ok = ev.eval(fields, tag.getId());
                         if (conditionMet) {
                             conditionMet = ok;
                         }
