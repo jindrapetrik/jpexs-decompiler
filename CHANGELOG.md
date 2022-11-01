@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - SWF Add tag before/after menuitem
 - Context menu on bundles (ZIP, SWC, binarysearch, etc...)
 - Reloading SWF inside DefineBinaryData
+- Working with byte ranges - caused problems when cloning tags
 
 ## [16.0.1] - 2022-10-31
 ### Added
