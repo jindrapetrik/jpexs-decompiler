@@ -862,7 +862,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void editMetadataButtonActionPerformed(ActionEvent evt) {
-        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
         if (item == null) {
             return;
         }
@@ -891,7 +891,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void editGenericTagButtonActionPerformed(ActionEvent evt) {
-        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
         if (item == null) {
             return;
         }
@@ -970,7 +970,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void freeTransformPlaceTagButtonActionPerformed(ActionEvent evt) {
-        TreeItem item = mainPanel.tagTree.getCurrentTreeItem();
+        TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
         if (item == null) {
             return;
         }

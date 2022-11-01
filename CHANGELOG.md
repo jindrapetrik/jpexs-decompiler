@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - All "mapped" tags have character id in parenthesis in the tag tree
 - Raw editor now checks whether field value can be placed inside this kind of tag
 - Refreshing parent tags and/or timelines on raw editor save
+- Items could not be edited on taglist view (for example raw edit)
 
 ### Changed
 - Do not show export name (class) in DoInitAction in Tag list view instead of tag name
