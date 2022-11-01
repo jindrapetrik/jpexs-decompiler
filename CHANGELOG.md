@@ -2,9 +2,13 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Copy/move tag to for SWFs inside bundles and/or DefineBinaryData
+
 ### Fixed
 - SWF Add tag before/after menuitem
 - Context menu on bundles (ZIP, SWC, binarysearch, etc...)
+- Reloading SWF inside DefineBinaryData
 
 ## [16.0.1] - 2022-10-31
 ### Added

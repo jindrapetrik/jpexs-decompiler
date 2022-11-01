@@ -3798,7 +3798,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         } catch (IOException ex) {
                             //ignore
                         }
-                    }
+                    }                    
                 } catch (InterruptedException ex) {
                     //ignore
                 }
@@ -3815,6 +3815,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             protected void done() {
                 View.execInEventDispatch(() -> {
                     Main.loadingDialog.setVisible(false);
+                    refreshTree();
                     Main.stopWork();
                 });
             }
