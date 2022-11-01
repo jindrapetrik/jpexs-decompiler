@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [16.0.2] - 2022-11-01
 ### Added
 - Copy/move tag to for SWFs inside bundles and/or DefineBinaryData
 - Replace button under shape and DefineSound display (previously, only context menu allowed that)
