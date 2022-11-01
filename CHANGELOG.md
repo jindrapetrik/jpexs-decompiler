@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Context menu on bundles (ZIP, SWC, binarysearch, etc...)
 - Reloading SWF inside DefineBinaryData
 - Working with byte ranges - caused problems when cloning tags
+- All "mapped" tags have character id in parenthesis in the tag tree
 
 ## [16.0.1] - 2022-10-31
 ### Added

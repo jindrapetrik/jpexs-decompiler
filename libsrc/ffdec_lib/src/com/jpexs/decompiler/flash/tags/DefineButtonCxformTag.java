@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -90,5 +91,10 @@ public class DefineButtonCxformTag extends Tag implements CharacterIdTag {
     @Override
     public void setCharacterId(int characterId) {
         this.buttonId = characterId;
+    }
+    
+    @Override
+    public String toString() {
+        return super.toString() + " (" + buttonId + ")";
     }
 }

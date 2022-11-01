@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.base;
 
 import com.jpexs.decompiler.flash.SWF;
@@ -60,4 +61,9 @@ public abstract class FontInfoTag extends Tag implements CharacterIdTag {
     public abstract boolean getFontFlagsItalic();
 
     public abstract void setFontFlagsItalic(boolean value);
+    
+    @Override
+    public String toString() {
+        return super.toString() + " (" + fontID + ")";
+    }
 }
