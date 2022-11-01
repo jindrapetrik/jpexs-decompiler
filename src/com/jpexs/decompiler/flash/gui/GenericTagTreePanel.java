@@ -31,6 +31,9 @@ import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
@@ -1017,6 +1020,16 @@ public class GenericTagTreePanel extends GenericTagPanel {
         assignTag(tag, editedTag);
         tag.setModified(true);
         tag.setSwf(swf);
+        if (tag instanceof Timelined) {
+            ((Timelined)tag).resetTimeline();
+        }
+        //For example DefineButton and its DefineButtonCxForm
+        if ((tag instanceof CharacterIdTag) && (!(tag instanceof CharacterTag))) {
+            CharacterTag parentCharacter = swf.getCharacter(((CharacterIdTag)tag).getCharacterId());
+            if (parentCharacter instanceof Timelined) {
+                ((Timelined)parentCharacter).resetTimeline();
+            }
+        }
         return true;
     }
 
