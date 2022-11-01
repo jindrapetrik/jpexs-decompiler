@@ -902,7 +902,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         private Object getChild(Object parent, int index, boolean limited) {
             if (parent == mtroot) {
-                return new FieldNode(mtroot, mtroot, filterFields(this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited).get(index), -1);
+                return new FieldNode(mtroot, mtroot, filterFields(this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited, mtroot.getId()).get(index), -1);
             }
             FieldNode fnode = (FieldNode) parent;
             Field field = fnode.fieldSet.get(FIELD_INDEX);
@@ -910,7 +910,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 return new FieldNode(mtroot, fnode.obj, fnode.fieldSet, index);
             }
             parent = fnode.getValue(FIELD_INDEX);
-            return new FieldNode(mtroot, parent, filterFields(this, getNodePathName(fnode), parent.getClass(), limited).get(index), -1);
+            return new FieldNode(mtroot, parent, filterFields(this, getNodePathName(fnode), parent.getClass(), limited, mtroot.getId()).get(index), -1);
         }
 
         @Override
@@ -925,7 +925,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         private int getChildCount(Object parent, boolean limited) {
             if (parent == mtroot) {
-                return filterFields(this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited).size();
+                return filterFields(this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited, mtroot.getId()).size();
             }
             FieldNode fnode = (FieldNode) parent;
             if (isLeaf(fnode)) {
@@ -946,7 +946,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
             }
             parent = fnode.getValue(FIELD_INDEX);
 
-            return filterFields(this, getNodePathName(fnode), parent.getClass(), limited).size();
+            return filterFields(this, getNodePathName(fnode), parent.getClass(), limited, mtroot.getId()).size();
         }
 
         @Override
@@ -1109,7 +1109,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
     }
 
-    private static List<FieldSet> filterFields(MyTreeModel mod, String parentPath, Class<?> cls, boolean limited) {
+    private static List<FieldSet> filterFields(MyTreeModel mod, String parentPath, Class<?> cls, boolean limited, int parentTagId) {
         List<FieldSet> ret = new ArrayList<>();
         List<Field> fields = getAvailableFields(cls);
         Map<String, List<Field>> tables = new HashMap<>();
@@ -1142,7 +1142,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                 fieldMap.put(sf, true);
                             }
                         }
-                        if (!ev.eval(fieldMap)) {
+                        if (!ev.eval(fieldMap, parentTagId)) {
                             continue;
                         }
                     } catch (AnnotationParseException | IllegalArgumentException | IllegalAccessException ex) {

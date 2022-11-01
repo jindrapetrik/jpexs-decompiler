@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Reloading SWF inside DefineBinaryData
 - Working with byte ranges - caused problems when cloning tags
 - All "mapped" tags have character id in parenthesis in the tag tree
+- Raw editor now checks whether field value can be placed inside this kind of tag
 
 ## [16.0.1] - 2022-10-31
 ### Added

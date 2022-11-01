@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
+import com.jpexs.decompiler.flash.tags.DefineMorphShapeTag;
+import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import java.io.Serializable;
 
 /**
@@ -24,8 +27,10 @@ import java.io.Serializable;
  */
 public class MORPHLINESTYLEARRAY implements Serializable {
 
+    @Conditional(tags = {DefineMorphShapeTag.ID})
     public MORPHLINESTYLE[] lineStyles;
 
+    @Conditional(tags = {DefineMorphShape2Tag.ID})
     public MORPHLINESTYLE2[] lineStyles2;
 
     public LINESTYLEARRAY getLineStylesAt(int shapeNum, int ratio) {
