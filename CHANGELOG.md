@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#1817] PDF export - now storing JPEG images without recompression to PNG
 - [#1816] PDF export - leaking temporary files when frame has embedded texts
+- PDF export - reusing images when used as pattern vs standalone
 
 ## [16.0.2] - 2022-11-01
 ### Added
