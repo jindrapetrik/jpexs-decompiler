@@ -57,6 +57,7 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
     private int width;
     private int height;
     private Image img;
+    private byte[] jpegImageData;
     private String name;
 
     private String mask;
@@ -87,6 +88,10 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
         this(img, null, false);
     }
 
+    public boolean isInterpolate() {
+        return interpolate;
+    }   
+    
     /**
      * Creates a new <code>PDFImage</code> instance.
      *
@@ -106,8 +111,21 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
         setImage(img, x, y, img.getWidth(this), img.getHeight(this), obs);
     }
 
+    public PDFImage(byte jpegImageData[], int x, int y, int w, int h, ImageObserver obs, String mask, boolean interpolate) {
+        this();
+        objwidth = w;
+        objheight = h;
+        this.mask = mask;
+        this.interpolate = interpolate;
+        setJpegImageData(jpegImageData, w, h);
+    }
+
     public PDFImage(Image img, int x, int y, int w, int h, ImageObserver obs) {
         this(img, x, y, w, h, obs, null, false);
+    }
+
+    public PDFImage(byte jpegImageData[], int x, int y, int w, int h, ImageObserver obs) {
+        this(jpegImageData, x, y, w, h, obs, null, false);
     }
 
     /**
@@ -176,6 +194,14 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
      */
     public void setImage(Image img, int x, int y, int w, int h, ImageObserver obs) {
         this.img = img;
+        this.jpegImageData = null;
+        width = w;
+        height = h;
+    }
+
+    public void setJpegImageData(byte[] jpegImageData, int w, int h) {
+        this.jpegImageData = jpegImageData;
+        this.img = null;
         width = w;
         height = h;
     }
@@ -278,14 +304,23 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
     os.write(">\nendstream\nendobj\n\n".getBytes("UTF-8"));
          */
         ByteArrayOutputStream b = new ByteArrayOutputStream();
-        DeflaterOutputStream dos = new DeflaterOutputStream(b);
-        buf.writeTo(dos);
-        dos.finish();
-        dos.close();
+
+        if (jpegImageData == null) {
+            DeflaterOutputStream dos = new DeflaterOutputStream(b);
+            buf.writeTo(dos);
+            dos.finish();
+            dos.close();
+        } else {
+            buf.writeTo(b);
+        }
 
         // FlatDecode is compatible with the java.util.zip.Deflater class
         //os.write("/Filter [/FlateDecode /ASCIIHexDecode]\n".getBytes("UTF-8"));
-        os.write("/Filter [/FlateDecode /ASCII85Decode]\n".getBytes("UTF-8"));
+        if (jpegImageData != null) {
+            os.write("/Filter /DCTDecode\n".getBytes("UTF-8"));
+        } else {
+            os.write("/Filter [/FlateDecode /ASCII85Decode]\n".getBytes("UTF-8"));
+        }
         os.write("/Length ".getBytes("UTF-8"));
         os.write(Integer.toString(b.size()).getBytes("UTF-8"));
         os.write("\n>>\nstream\n".getBytes("UTF-8"));
@@ -324,45 +359,49 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
         //System.err.println("Processing image "+width+"x"+height+" pixels");
         ByteArrayOutputStream bos = getStream();
 
-        int w = width;
-        int h = height;
-        int x = 0;
-        int y = 0;
-        int[] pixels = new int[w * h];
-        PixelGrabber pg = new PixelGrabber(img, x, y, w, h, pixels, 0, w);
-        try {
-            pg.grabPixels();
-        } catch (InterruptedException e) {
-            System.err.println("interrupted waiting for pixels!");
-            return;
-        }
-        if ((pg.getStatus() & ImageObserver.ABORT) != 0) {
-            System.err.println("image fetch aborted or errored");
-            return;
-        }
-        StringBuffer out = new StringBuffer();
-        for (int j = 0; j < h; j++) {
-            for (int i = 0; i < w; i++) {
-                //System.out.print("p[" + j * w + i+ "]=" + pixels[j * w + i] + ".");
-                out.append(handlePixel(x + i, y + j, pixels[j * w + i]));
-                if (out.toString().length() >= 8) {
-                    String tuple = out.substring(0, 8);
-                    out.delete(0, 8);
-                    // Convert !!!!! to 'z'
-                    String encTuple = base85Encoding(tuple);
-                    if (encTuple.equals("!!!!!")) {
-                        encTuple = "z";
+        if (jpegImageData != null) {
+            bos.write(jpegImageData);
+        } else {
+            int w = width;
+            int h = height;
+            int x = 0;
+            int y = 0;
+            int[] pixels = new int[w * h];
+            PixelGrabber pg = new PixelGrabber(img, x, y, w, h, pixels, 0, w);
+            try {
+                pg.grabPixels();
+            } catch (InterruptedException e) {
+                System.err.println("interrupted waiting for pixels!");
+                return;
+            }
+            if ((pg.getStatus() & ImageObserver.ABORT) != 0) {
+                System.err.println("image fetch aborted or errored");
+                return;
+            }
+            StringBuffer out = new StringBuffer();
+            for (int j = 0; j < h; j++) {
+                for (int i = 0; i < w; i++) {
+                    //System.out.print("p[" + j * w + i+ "]=" + pixels[j * w + i] + ".");
+                    out.append(handlePixel(x + i, y + j, pixels[j * w + i]));
+                    if (out.toString().length() >= 8) {
+                        String tuple = out.substring(0, 8);
+                        out.delete(0, 8);
+                        // Convert !!!!! to 'z'
+                        String encTuple = base85Encoding(tuple);
+                        if (encTuple.equals("!!!!!")) {
+                            encTuple = "z";
+                        }
+                        bos.write(encTuple.getBytes("UTF-8"));
                     }
-                    bos.write(encTuple.getBytes("UTF-8"));
                 }
             }
-        }
-        // This should be the only partial tuple case,
+            // This should be the only partial tuple case,
 
-        String lastTuple = base85Encoding(out.toString());
-        //System.out.println("lastTuple: " + lastTuple);
-        bos.write(lastTuple.getBytes("UTF-8"));
-        bos.write("~".getBytes("UTF-8"));
+            String lastTuple = base85Encoding(out.toString());
+            //System.out.println("lastTuple: " + lastTuple);
+            bos.write(lastTuple.getBytes("UTF-8"));
+            bos.write("~".getBytes("UTF-8"));
+        }
 
         //System.out.println("Processing done");
         // this will write the actual stream

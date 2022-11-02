@@ -589,7 +589,7 @@ public class FrameExporter {
                 }
             } else {
                 FontExporter fe = new FontExporter();
-                File tempFile;
+                File tempFile = null;
                 try {
                     tempFile = File.createTempFile("ffdec_font_export_", ".ttf");
                     fe.exportFont(font, FontExportMode.TTF, tempFile);
@@ -598,6 +598,9 @@ public class FrameExporter {
                     g2.setTtfFont(f, tempFile);
                 } catch (IOException ex) {
                     Logger.getLogger(FrameExporter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (tempFile != null && tempFile.exists()) {
+                    tempFile.delete();
                 }
             }
         }

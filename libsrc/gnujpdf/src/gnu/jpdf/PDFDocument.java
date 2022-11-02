@@ -21,6 +21,7 @@
 package gnu.jpdf;
 
 import java.awt.FontFormatException;
+import java.awt.Image;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -28,8 +29,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -101,6 +104,25 @@ public class PDFDocument implements Serializable {
      */
     protected PDFObject defaultOutlineBorder;
 
+    //JPEXS: cache for already used images
+    private final Map<ImageInterpolate, PDFImage> usedImages = new HashMap<ImageInterpolate, PDFImage>();
+    
+    
+    public boolean isImageCached(Image image, boolean interpolate) {        
+        return usedImages.containsKey(new ImageInterpolate(image, interpolate));
+    }            
+    
+    public PDFImage getCachedImage(Image image, boolean interpolate) {
+        if (!isImageCached(image, interpolate)) {
+            return null;
+        }
+        return usedImages.get(new ImageInterpolate(image, interpolate));
+    }
+    
+    public void cacheImage(Image image, PDFImage pdfImage) {
+        usedImages.put(new ImageInterpolate(image, pdfImage.isInterpolate()), pdfImage);
+    }
+    
     /**
      * <p>
      * This page mode indicates that the document should be opened just with the

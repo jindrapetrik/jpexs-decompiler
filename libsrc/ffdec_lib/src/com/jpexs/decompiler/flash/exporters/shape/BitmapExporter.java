@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.exporters.ImageTagBufferedImage;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -46,6 +47,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -363,8 +365,12 @@ public class BitmapExporter extends ShapeExporterBase {
                 if (colorTransform != null) {
                     img = colorTransform.apply(img);
                 }
-
-                fillPaint = new TexturePaint(img.getBufferedImage(), new java.awt.Rectangle(img.getWidth(), img.getHeight()));
+                BufferedImage bufImg = img.getBufferedImage();
+                if (colorTransform == null) {
+                    bufImg = new ImageTagBufferedImage(imageTag, bufImg);
+                }
+                fillPaint = new TexturePaint(bufImg, new java.awt.Rectangle(img.getWidth(), img.getHeight()));
+               
                 fillTransform = matrix.toTransform();
                 fillRepeat = repeat;
                 fillSmooth = smooth;
@@ -670,7 +676,7 @@ public class BitmapExporter extends ShapeExporterBase {
                         double minY = rect.yMin;
                         graphics.fill(new Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
                     }
-                } else {
+                } else {                    
                     graphics.drawImage(((TexturePaint) fillPaint).getImage(), 0, 0, null);
                 }
                 graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, interpolationBefore);
