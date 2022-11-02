@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#1817] PDF export - now storing JPEG images without recompression to PNG
 - [#1816] PDF export - leaking temporary files when frame has embedded texts
 - PDF export - reusing images when used as pattern vs standalone
+- [#1859] AS3 P-code editing not working due to integer/long casting
 
 ## [16.0.2] - 2022-11-01
 ### Added
@@ -2451,6 +2452,7 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1817]: https://www.free-decompiler.com/flash/issues/1817
 [#1816]: https://www.free-decompiler.com/flash/issues/1816
+[#1859]: https://www.free-decompiler.com/flash/issues/1859
 [#1731]: https://www.free-decompiler.com/flash/issues/1731
 [#1825]: https://www.free-decompiler.com/flash/issues/1825
 [#1737]: https://www.free-decompiler.com/flash/issues/1737

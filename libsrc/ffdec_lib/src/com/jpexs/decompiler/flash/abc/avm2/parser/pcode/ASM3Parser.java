@@ -218,7 +218,7 @@ public class ASM3Parser {
         expected(ParsedSymbol.TYPE_KEYWORD_SLOTID, "slotid", lexer);
         symb = lexer.lex();
         expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
-        int slotid = (int) (long) (Long) symb.value;
+        int slotid = (int) (Integer) symb.value;
         expected(ParsedSymbol.TYPE_KEYWORD_TYPE, "type", lexer);
         int type = parseMultiName(constants, lexer);
         symb = lexer.lex();
@@ -495,7 +495,7 @@ public class ASM3Parser {
                     value_index = 0;
                 } else {
                     expected(value, ParsedSymbol.TYPE_INTEGER, "UInteger");
-                    value_index = constants.getUIntId((Long) value.value, true);
+                    value_index = constants.getUIntId((Integer) value.value, true);
                 }
 
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
@@ -688,7 +688,7 @@ public class ASM3Parser {
                             expected(ParsedSymbol.TYPE_KEYWORD_DISPID, "dispid", lexer);
                             symb = lexer.lex();
                             expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
-                            tm.disp_id = (int) (long) (Long) symb.value;
+                            tm.disp_id = (int) (Integer) symb.value;
 
                             break;
                         case ParsedSymbol.TYPE_KEYWORD_FUNCTION:
@@ -736,28 +736,28 @@ public class ASM3Parser {
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_MAXSTACK) {
                 symb = lexer.lex();
                 expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
-                body.max_stack = (int) (long) (Long) symb.value;
+                body.max_stack = (int) (Integer) symb.value;
                 continue;
             }
 
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_LOCALCOUNT) {
                 symb = lexer.lex();
                 expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
-                body.max_regs = (int) (long) (Long) symb.value;
+                body.max_regs = (int) (Integer) symb.value;
                 continue;
             }
 
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_INITSCOPEDEPTH) {
                 symb = lexer.lex();
                 expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
-                body.init_scope_depth = (int) (long) (Long) symb.value;
+                body.init_scope_depth = (int) (Integer) symb.value;
                 continue;
             }
 
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_MAXSCOPEDEPTH) {
                 symb = lexer.lex();
                 expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
-                body.max_scope_depth = (int) (long) (Long) symb.value;
+                body.max_scope_depth = (int) (Integer) symb.value;
                 continue;
             }
 
@@ -884,7 +884,7 @@ public class ASM3Parser {
                     ex.name_index = checkMultinameIndex(constants, (int) (long) (Long) exName.value, lexer.yyline());
                     ex.type_index = checkMultinameIndex(constants, (int) (long) (Long) exType.value, lexer.yyline());
                     exceptions.add(ex);
-                    exceptionIndices.add((int) (long) (Long) exIndex.value);
+                    exceptionIndices.add((int) (Integer) exIndex.value);
                     continue;
                 }
                 String insName = (String) symb.value;
@@ -953,7 +953,7 @@ public class ASM3Parser {
                                     if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                                         operandsList.add(0);
                                     } else if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
-                                        long intVal = (Long) parsedOperand.value;
+                                        long intVal = (Integer) parsedOperand.value;
                                         int iid = constants.getUIntId(intVal, false);
                                         if (iid == -1) {
                                             if ((missingHandler != null) && (missingHandler.missingUInt(intVal))) {
@@ -974,7 +974,7 @@ public class ASM3Parser {
 
                                         double doubleVal = 0;
                                         if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
-                                            doubleVal = (Long) parsedOperand.value;
+                                            doubleVal = (Integer) parsedOperand.value;
                                         }
                                         if (parsedOperand.type == ParsedSymbol.TYPE_FLOAT) {
                                             doubleVal = (Double) parsedOperand.value;
@@ -999,7 +999,7 @@ public class ASM3Parser {
 
                                         float floatVal = 0;
                                         if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
-                                            floatVal = (Long) parsedOperand.value;
+                                            floatVal = (Integer) parsedOperand.value;
                                         }
                                         if (parsedOperand.type == ParsedSymbol.TYPE_FLOAT) {
                                             floatVal = (float) (double) (Double) parsedOperand.value;
@@ -1026,7 +1026,7 @@ public class ASM3Parser {
                                             if ((parsedOperand.type == ParsedSymbol.TYPE_INTEGER) || (parsedOperand.type == ParsedSymbol.TYPE_FLOAT)) {
                                                 float floatVal = 0;
                                                 if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
-                                                    floatVal = (Long) parsedOperand.value;
+                                                    floatVal = (Integer) parsedOperand.value;
                                                 }
                                                 if (parsedOperand.type == ParsedSymbol.TYPE_FLOAT) {
                                                     floatVal = (float) (double) (Double) parsedOperand.value;
@@ -1096,7 +1096,7 @@ public class ASM3Parser {
                                             operandsList.add(0);
                                         }
                                     } else if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) { //old syntax
-                                        int patCount = (int) (long) (Long) parsedOperand.value;
+                                        int patCount = (int) (Integer) parsedOperand.value;
                                         operandsList.add(patCount);
 
                                         for (int c = 0; c <= patCount; c++) {
@@ -1128,13 +1128,13 @@ public class ASM3Parser {
                                     break;
                                 default:
                                     if (parsedOperand.type == ParsedSymbol.TYPE_INTEGER) {
-                                        long val = (long) (Long) parsedOperand.value;
+                                        int val = (int) (Integer) parsedOperand.value;
                                         if (def instanceof PushShortIns) {
                                             if (val < Short.MIN_VALUE || val > Short.MAX_VALUE) {
                                                 throw new AVM2ParseException("Short value expected (" + Short.MIN_VALUE + " to " + Short.MAX_VALUE + "). Use pushint to push larger values", lexer.yyline());
                                             }
                                         }
-                                        operandsList.add((int) val);
+                                        operandsList.add(val);
                                     } else {
                                         throw new AVM2ParseException("Integer expected", lexer.yyline());
                                     }
