@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [16.0.3] - 2022-11-02
 ### Fixed
 - [#1817] PDF export - now storing JPEG images without recompression to PNG
