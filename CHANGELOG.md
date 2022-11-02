@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#1817] PDF export - now storing JPEG images without recompression to PNG
+- [#1816] PDF export - leaking temporary files when frame has embedded texts
 
 ## [16.0.2] - 2022-11-01
 ### Added
@@ -2448,6 +2449,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1817]: https://www.free-decompiler.com/flash/issues/1817
+[#1816]: https://www.free-decompiler.com/flash/issues/1816
 [#1731]: https://www.free-decompiler.com/flash/issues/1731
 [#1825]: https://www.free-decompiler.com/flash/issues/1825
 [#1737]: https://www.free-decompiler.com/flash/issues/1737
