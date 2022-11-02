@@ -88,6 +88,10 @@ public class PDFImage extends PDFStream implements ImageObserver, Serializable {
         this(img, null, false);
     }
 
+    public boolean isInterpolate() {
+        return interpolate;
+    }   
+    
     /**
      * Creates a new <code>PDFImage</code> instance.
      *

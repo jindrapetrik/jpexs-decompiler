@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 import java.util.WeakHashMap;
@@ -104,22 +105,22 @@ public class PDFDocument implements Serializable {
     protected PDFObject defaultOutlineBorder;
 
     //JPEXS: cache for already used images
-    private final Map<Image, PDFImage> usedImages = new WeakHashMap<Image, PDFImage>();
+    private final Map<ImageInterpolate, PDFImage> usedImages = new HashMap<ImageInterpolate, PDFImage>();
     
     
-    public boolean isImageCached(Image image) {
-        return usedImages.containsKey(image);
+    public boolean isImageCached(Image image, boolean interpolate) {        
+        return usedImages.containsKey(new ImageInterpolate(image, interpolate));
     }            
     
-    public PDFImage getCachedImage(Image image) {
-        if (!isImageCached(image)) {
+    public PDFImage getCachedImage(Image image, boolean interpolate) {
+        if (!isImageCached(image, interpolate)) {
             return null;
         }
-        return usedImages.get(image);
+        return usedImages.get(new ImageInterpolate(image, interpolate));
     }
     
     public void cacheImage(Image image, PDFImage pdfImage) {
-        usedImages.put(image, pdfImage);
+        usedImages.put(new ImageInterpolate(image, pdfImage.isInterpolate()), pdfImage);
     }
     
     /**
