@@ -145,6 +145,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -592,7 +593,6 @@ public class XFLConverter {
                         if (distance(prevPoint, startPoint) <= maxDistance) { //start and end of the path near => close
                             prevPoint.x = startPoint.x;
                             prevPoint.y = startPoint.y;
-                            System.err.println("CLOSED");
                         }
                     }
                     startPoint = currentPoint;
@@ -991,7 +991,7 @@ public class XFLConverter {
         if (currentLayer.length() > 0) {
             currentLayer.writeEndElement(); // edges
             currentLayer.writeEndElement(); // DOMShape
-
+            
             if (currentLayer.length() > 0 && hasEdge) { //no empty layers
                 layers.add(currentLayer.toString());
             }
@@ -2392,7 +2392,7 @@ public class XFLConverter {
                         } else if (character != null) {
                             if (character instanceof MorphShapeTag) {
                                 MorphShapeTag m = (MorphShapeTag) character;
-                                convertShape(characters, matrix, 3, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false, elementsWriter);
+                                convertShape(characters, matrix, m.getShapeNum() == 1 ? 3 : 4, m.getStartEdges().shapeRecords, m.getFillStyles().getStartFillStyles(), m.getLineStyles().getStartLineStyles(m.getShapeNum()), true, false, elementsWriter);
                                 shapeTween = true;
                             } else {
                                 shapeTween = false;

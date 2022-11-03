@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+- [#1860] FLA export - EmptyStackException during exporting MorphShapes
 
 ## [16.0.3] - 2022-11-02
 ### Fixed
@@ -2328,7 +2329,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.2...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.3...dev
+[16.0.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.2...version16.0.3
 [16.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.1...version16.0.2
 [16.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.0...version16.0.1
 [16.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version15.1.1...version16.0.0
@@ -2452,6 +2454,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1860]: https://www.free-decompiler.com/flash/issues/1860
 [#1817]: https://www.free-decompiler.com/flash/issues/1817
 [#1816]: https://www.free-decompiler.com/flash/issues/1816
 [#1859]: https://www.free-decompiler.com/flash/issues/1859
