@@ -26,12 +26,14 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -2629,7 +2631,7 @@ public class XFLConverter {
             try {
                 constructorBody.convert(new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
 
-                Map<Integer, Integer> frameToTraitMultiname = new HashMap<>();
+                Map<Integer, Multiname> frameToTraitMultiname = new HashMap<>();
 
                 //find all addFrameScript(xx,this.method) in constructor
                 /*
@@ -2657,13 +2659,16 @@ public class XFLConverter {
                                         if (callProp.arguments.get(i) instanceof IntegerValueAVM2Item) {
                                             IntegerValueAVM2Item frameItem = (IntegerValueAVM2Item) callProp.arguments.get(i);
                                             int frame = frameItem.intValue();
-                                            if (callProp.arguments.get(i + 1) instanceof GetPropertyAVM2Item) {
+                                            if (callProp.arguments.get(i + 1) instanceof GetLexAVM2Item) {
+                                                GetLexAVM2Item lex = (GetLexAVM2Item) callProp.arguments.get(i + 1);
+                                                frameToTraitMultiname.put(frame, lex.propertyName);
+                                            } else if (callProp.arguments.get(i + 1) instanceof GetPropertyAVM2Item) {
                                                 GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) callProp.arguments.get(i + 1);
                                                 if (getProp.object instanceof ThisAVM2Item) {
                                                     if (getProp.propertyName instanceof FullMultinameAVM2Item) {
                                                         FullMultinameAVM2Item framePropName = (FullMultinameAVM2Item) getProp.propertyName;
                                                         int multinameIndex = framePropName.multinameIndex;
-                                                        frameToTraitMultiname.put(frame, multinameIndex);
+                                                        frameToTraitMultiname.put(frame, abc.constants.getMultiname(multinameIndex));
                                                     }
                                                 }
                                             }
@@ -2674,15 +2679,16 @@ public class XFLConverter {
                         }
                     }
                 }
-                Map<Integer, TraitMethodGetterSetter> multinameToMethodTrait = new HashMap<>();
+                Map<Multiname, TraitMethodGetterSetter> multinameToMethodTrait = new HashMap<>();
                 for (Trait trait : instanceInfo.instance_traits.traits) {
                     if (trait instanceof TraitMethodGetterSetter) {
-                        multinameToMethodTrait.put(trait.name_index, (TraitMethodGetterSetter) trait);
+                        Multiname m = abc.constants.getMultiname(trait.name_index);
+                        multinameToMethodTrait.put(abc.constants.getMultiname(trait.name_index), (TraitMethodGetterSetter) trait);
                     }
                 }
 
                 for (int frame : frameToTraitMultiname.keySet()) {
-                    int multiName = frameToTraitMultiname.get(frame);
+                    Multiname multiName = frameToTraitMultiname.get(frame);
                     if (multinameToMethodTrait.containsKey(multiName)) {
                         TraitMethodGetterSetter methodTrait = multinameToMethodTrait.get(multiName);
                         int methodIndex = methodTrait.method_info;
@@ -2721,6 +2727,10 @@ public class XFLConverter {
         }
         if (!script.isEmpty()) {
             script = "#initclip\r\n" + script + "#endinitclip\r\n";
+        }
+        
+        if (spriteId == 320) {
+            System.err.println("xxx");
         }
 
         Map<Integer, String> frameToScriptMap = new HashMap<>();
