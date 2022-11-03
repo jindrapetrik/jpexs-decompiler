@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - Expand correct tree on SWF load
 - [#1679] FLA export - MorphShapes (shape tween)
 - [#1860], [#1732], [#1837] FLA export - AS3 - missing framescripts on the timeline
+- Flash viewer - dropshadow filter hideobject(compositeSource) parameter
 
 ## [16.0.3] - 2022-11-02
 ### Fixed
