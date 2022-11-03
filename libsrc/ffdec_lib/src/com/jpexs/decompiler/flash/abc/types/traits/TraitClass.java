@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
@@ -282,7 +283,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
                                     if ("addFrameScript".equals(propName.resolvedMultinameName)) {
                                         for (int i = 0; i < callProp.arguments.size(); i += 2) {
                                             if (callProp.arguments.get(i) instanceof IntegerValueAVM2Item) {
-                                                if (callProp.arguments.get(i + 1) instanceof GetPropertyAVM2Item) {
+                                                if (callProp.arguments.get(i + 1) instanceof GetLexAVM2Item) {
+                                                    GetLexAVM2Item lex = (GetLexAVM2Item) callProp.arguments.get(i + 1);
+                                                    frameTraitNames.add(abc.constants.getMultinameId(lex.propertyName, false));
+                                                } else if (callProp.arguments.get(i + 1) instanceof GetPropertyAVM2Item) {
                                                     GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) callProp.arguments.get(i + 1);
                                                     if (getProp.object instanceof ThisAVM2Item) {
                                                         if (getProp.propertyName instanceof FullMultinameAVM2Item) {

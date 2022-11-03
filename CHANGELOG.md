@@ -1,6 +1,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- [#1860] FLA export - EmptyStackException during exporting MorphShape
+- [#1782] FLA export - exporting from SWF files inside bundles (like binarysearch)
+- Expand correct tree on SWF load
+- [#1679] FLA export - MorphShapes (shape tween)
+- [#1860], [#1732], [#1837] FLA export - AS3 - missing framescripts on the timeline
+- Flash viewer - dropshadow filter hideobject(compositeSource) parameter
+
 ## [16.0.3] - 2022-11-02
 ### Fixed
 - [#1817] PDF export - now storing JPEG images without recompression to PNG
@@ -2326,7 +2335,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.2...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.3...dev
+[16.0.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.2...version16.0.3
 [16.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.1...version16.0.2
 [16.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.0...version16.0.1
 [16.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version15.1.1...version16.0.0
@@ -2450,6 +2460,11 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1860]: https://www.free-decompiler.com/flash/issues/1860
+[#1782]: https://www.free-decompiler.com/flash/issues/1782
+[#1679]: https://www.free-decompiler.com/flash/issues/1679
+[#1732]: https://www.free-decompiler.com/flash/issues/1732
+[#1837]: https://www.free-decompiler.com/flash/issues/1837
 [#1817]: https://www.free-decompiler.com/flash/issues/1817
 [#1816]: https://www.free-decompiler.com/flash/issues/1816
 [#1859]: https://www.free-decompiler.com/flash/issues/1859

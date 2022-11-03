@@ -924,7 +924,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void load(SWFList newSwfs, boolean first) {
         View.checkAccess();
 
-        List<List<String>> expandedNodes = View.getExpandedNodes(tagTree);
+        List<List<String>> expandedNodes = View.getExpandedNodes(getCurrentTree());
         previewPanel.clear();
 
         swfs.add(newSwfs);
@@ -935,7 +935,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         doFilter();
         reload(false);
-        View.expandTreeNodes(tagTree, expandedNodes);
+        View.expandTreeNodes(getCurrentTree(), expandedNodes);
     }
 
     public ABCPanel getABCPanel() {
@@ -2416,9 +2416,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         fc.setCurrentDirectory(new File(selDir));
         if (!selDir.endsWith(File.separator)) {
             selDir += File.separator;
+        }        
+        String swfShortName = swf.getShortFileName();
+        if ("".equals(swfShortName)) {
+            swfShortName = "untitled.swf";
         }
-        String fileName = new File(swf.getFile()).getName();
-        fileName = fileName.substring(0, fileName.length() - 4) + ".fla";
+        String fileName;
+        if (swfShortName.contains(".")) {
+            fileName = swfShortName.substring(0, swfShortName.lastIndexOf(".")) + ".fla";
+        } else {
+            fileName = swfShortName + ".fla";
+        }
+        final String fSwfShortName = swfShortName;
+        
         fc.setSelectedFile(new File(selDir + fileName));
         List<FileFilter> flaFilters = new ArrayList<>();
         List<FileFilter> xflFilters = new ArrayList<>();
@@ -2484,9 +2494,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     try {
                         AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
                         if (compressed) {
-                            swf.exportFla(errorHandler, selfile.getAbsolutePath(), new File(swf.getFile()).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion);
+                            swf.exportFla(errorHandler, selfile.getAbsolutePath(), fSwfShortName, ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion);
                         } else {
-                            swf.exportXfl(errorHandler, selfile.getAbsolutePath(), new File(swf.getFile()).getName(), ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion);
+                            swf.exportXfl(errorHandler, selfile.getAbsolutePath(), fSwfShortName, ApplicationInfo.APPLICATION_NAME, ApplicationInfo.applicationVerName, ApplicationInfo.version, Configuration.parallelSpeedUp.get(), selectedVersion);
                         }
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, "FLA export error", ex);

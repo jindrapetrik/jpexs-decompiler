@@ -93,7 +93,7 @@ public class DROPSHADOWFILTER extends FILTER {
 
     @Override
     public SerializableImage apply(SerializableImage src, double zoom) {
-        return Filtering.dropShadow(src, (int) Math.round(blurX * zoom), (int) Math.round(blurY * zoom), (int) (angle * 180 / Math.PI), distance * zoom, dropShadowColor.toColor(), innerShadow, passes, strength, knockout);
+        return Filtering.dropShadow(src, (int) Math.round(blurX * zoom), (int) Math.round(blurY * zoom), (int) (angle * 180 / Math.PI), distance * zoom, dropShadowColor.toColor(), innerShadow, passes, strength, knockout, compositeSource);
     }
 
     @Override
