@@ -47,10 +47,13 @@ import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.EndTag;
+import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -78,6 +81,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -1458,6 +1462,29 @@ public class Main {
         View.checkAccess();
 
         return openFile(newSourceInfos, executeAfterOpen, null);
+    }
+    
+    public static void newFile() {
+        View.checkAccess();
+        if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
+            sourceInfos.clear();
+            mainFrame.getPanel().closeAll(false);
+            mainFrame.setVisible(false);
+            Helper.freeMem();            
+        }
+        SWFSourceInfo sourceInfo = new SWFSourceInfo(new ByteArrayInputStream(new byte[0]), "", "newfile.swf");
+        sourceInfos.add(sourceInfo);
+        SWFList list = new SWFList();        
+        list.sourceInfo = sourceInfo;
+        SWF swf = new SWF();
+        swf.setFile("");        
+        swf.displayRect = new RECT(0, 20 * 400, 0, 20 * 300);
+        swf.version = 17;   
+        swf.addTag(new FileAttributesTag(swf));
+        swf.hasEndTag = true;
+        list.add(swf);
+        swf.swfList = list;
+        mainFrame.getPanel().load(list, true);
     }
 
     public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos, Runnable executeAfterOpen, int[] reloadIndices) {
