@@ -172,6 +172,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
         return saved;
     }
 
+    protected void newActionPerformed(ActionEvent evt) {
+        Main.newFile();
+    }
+    
     protected boolean saveActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return false;
@@ -865,7 +869,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/file/saveAsExe", translate("menu.file.saveasexe"), "saveasexe16", this::saveAsExeActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/reload", translate("menu.file.reload"), "reload16", this::reloadActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("CTRL+SHIFT+R"), false);
         addMenuItem("/file/reloadAll", translate("menu.file.reloadAll"), "reload16", this::reloadAllActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-
+        addMenuItem("/file/new", translate("menu.file.new"), "newswf32", this::newActionPerformed, PRIORITY_TOP, null, true, null, false);
+        
         addSeparator("/file");
 
         addMenuItem("/file/export", translate("menu.export"), null, null, 0, null, false, null, false);
@@ -884,8 +889,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         addMenuItem("/file/start", translate("menu.file.start"), null, null, 0, null, false, null, false);
         addMenuItem("/file/start/run", translate("menu.file.start.run"), "play32", this::runActionPerformed, PRIORITY_TOP, null, true, new HotKey("F6"), false);
-        addMenuItem("/file/start/debug", translate("menu.file.start.debug"), "debug32", this::debugActionPerformed, PRIORITY_TOP, null, true, new HotKey("CTRL+F5"), false);
         addMenuItem("/file/start/stop", translate("menu.file.start.stop"), "stop32", this::stopActionPerformed, PRIORITY_TOP, null, true, null, false);
+        addMenuItem("/file/start/debug", translate("menu.file.start.debug"), "debug32", this::debugActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("CTRL+F5"), false);
         addMenuItem("/file/start/debugpcode", translate("menu.file.start.debugpcode"), "debug32", this::debugPCodeActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         finishMenu("/file/start");
 
