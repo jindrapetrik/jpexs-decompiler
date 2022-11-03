@@ -2,7 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-- [#1860] FLA export - EmptyStackException during exporting MorphShapes
+- [#1860] FLA export - EmptyStackException during exporting MorphShape
+- [#1782] FLA export - exporting from SWF files inside bundles (like binarysearch)
 
 ## [16.0.3] - 2022-11-02
 ### Fixed
@@ -2455,6 +2456,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1860]: https://www.free-decompiler.com/flash/issues/1860
+[#1782]: https://www.free-decompiler.com/flash/issues/1782
 [#1817]: https://www.free-decompiler.com/flash/issues/1817
 [#1816]: https://www.free-decompiler.com/flash/issues/1816
 [#1859]: https://www.free-decompiler.com/flash/issues/1859
