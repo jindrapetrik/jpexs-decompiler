@@ -1,0 +1,111 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveHasPrompted="true">
+     <timelines>
+          <DOMTimeline name="Scene 1" currentFrame="7">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" duration="9" tweenType="shape" keyMode="17922">
+                                   <MorphShape>
+                                        <morphSegments>
+                                             <MorphSegment startPointA="#4.9C, 8.75" startPointB="#B.A4, #10.9A" strokeIndex1="0" strokeIndex2="1">
+                                                  <MorphCurves controlPointA="#7.DA, 8.75" anchorPointA="#B.18, 8.75" controlPointB="#B.A4, #D.72" anchorPointB="#D.B, #B.37"/>
+                                                  <MorphCurves controlPointA="#E.2B, 8.75" anchorPointA="#11.3E, 8.75" controlPointB="#F.BD, #8.FC" anchorPointB="#12.A2, #8.FC"/>
+                                                  <MorphCurves controlPointA="#11.9B, 8.75" anchorPointA="#11.F8, 8.75" controlPointB="#12.F7, #8.FC" anchorPointB="#13.49, #9.03"/>
+                                                  <MorphCurves controlPointA="#11.F8, #B.73" anchorPointA="#11.F8, #E.26" controlPointB="#15.C3, #9.3D" anchorPointB="#17.93, #B.37"/>
+                                                  <MorphCurves controlPointA="#11.F8, #11.63" anchorPointA="#11.F8, #14.A" controlPointB="#19.A, #D.72" anchorPointB="#19.A, #10.9A"/>
+                                                  <MorphCurves controlPointA="#E.BA, #14.A" anchorPointA="#B.7C, #14.A" controlPointB="#19.A, #13.C2" anchorPointB="#17.93, #15.FD"/>
+                                                  <MorphCurves controlPointA="#8.69, #14.A" anchorPointA="#5.56, #14.A" controlPointB="#15.87, #18.38" anchorPointB="#12.A2, #18.38"/>
+                                                  <MorphCurves controlPointA="#4.F9, #14.A" anchorPointA="#4.9C, #14.A" controlPointB="#12.4C, #18.38" anchorPointB="#11.F9, #18.3"/>
+                                                  <MorphCurves controlPointA="#4.9C, #11.EE" anchorPointA="#4.9C, #F.3C" controlPointB="15.5, #17.F6" anchorPointB="#D.B, #15.FD"/>
+                                                  <MorphCurves controlPointA="#4.9C, #B.FE" anchorPointA="#4.9C, 8.75" controlPointB="#B.A4, #13.C2" anchorPointB="#B.A4, #10.9A"/>
+                                             </MorphSegment>
+                                             <MorphSegment startPointA="#4.9C, 8.75" startPointB="#B.A4, #10.9A" strokeIndex1="0" strokeIndex2="1" fillIndex1="0" fillIndex2="1">
+                                                  <MorphCurves controlPointA="#7.DA, 8.75" anchorPointA="#B.18, 8.75" controlPointB="#B.A4, #D.72" anchorPointB="#D.B, #B.37"/>
+                                                  <MorphCurves controlPointA="#E.2B, 8.75" anchorPointA="#11.3E, 8.75" controlPointB="#F.BD, #8.FC" anchorPointB="#12.A2, #8.FC"/>
+                                                  <MorphCurves controlPointA="#11.9B, 8.75" anchorPointA="#11.F8, 8.75" controlPointB="#12.F7, #8.FC" anchorPointB="#13.49, #9.03"/>
+                                                  <MorphCurves controlPointA="#11.F8, #B.73" anchorPointA="#11.F8, #E.26" controlPointB="#15.C3, #9.3D" anchorPointB="#17.93, #B.37"/>
+                                                  <MorphCurves controlPointA="#11.F8, #11.63" anchorPointA="#11.F8, #14.A" controlPointB="#19.A, #D.72" anchorPointB="#19.A, #10.9A"/>
+                                                  <MorphCurves controlPointA="#E.BA, #14.A" anchorPointA="#B.7C, #14.A" controlPointB="#19.A, #13.C2" anchorPointB="#17.93, #15.FD"/>
+                                                  <MorphCurves controlPointA="#8.69, #14.A" anchorPointA="#5.56, #14.A" controlPointB="#15.87, #18.38" anchorPointB="#12.A2, #18.38"/>
+                                                  <MorphCurves controlPointA="#4.F9, #14.A" anchorPointA="#4.9C, #14.A" controlPointB="#12.4C, #18.38" anchorPointB="#11.F9, #18.3"/>
+                                                  <MorphCurves controlPointA="#4.9C, #11.EE" anchorPointA="#4.9C, #F.3C" controlPointB="15.5, #17.F6" anchorPointB="#D.B, #15.FD"/>
+                                                  <MorphCurves controlPointA="#4.9C, #B.FE" anchorPointA="#4.9C, 8.75" controlPointB="#B.A4, #13.C2" anchorPointB="#B.A4, #10.9A"/>
+                                             </MorphSegment>
+                                        </morphSegments>
+                                        <morphHintsList/>
+                                   </MorphShape>
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor color="#FF0000"/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <strokes>
+                                                  <StrokeStyle index="1">
+                                                       <SolidStroke scaleMode="normal">
+                                                            <fill>
+                                                                 <SolidColor/>
+                                                            </fill>
+                                                       </SolidStroke>
+                                                  </StrokeStyle>
+                                             </strokes>
+                                             <edges>
+                                                  <Edge fillStyle1="1" strokeStyle="1" edges="!4600 2240S6|4600 5280!4600 5280|1180 5280!1180 5280|1180 2240!1180 2240|4600 2240"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="9" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor color="#00FF00"/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <strokes>
+                                                  <StrokeStyle index="1">
+                                                       <SolidStroke scaleMode="normal" weight="5">
+                                                            <fill>
+                                                                 <SolidColor color="#0000FF"/>
+                                                            </fill>
+                                                       </SolidStroke>
+                                                  </StrokeStyle>
+                                             </strokes>
+                                             <edges>
+                                                  <Edge fillStyle1="1" strokeStyle="1" edges="!4770 2300[5511 2300 6035 2871!6035 2871[6560 3442 6560 4250!6560 4250[6560 5058 6035 5629!6035 5629[5511 6200 4770 6200!4770 6200[4029 6200 3504 5629!3504 5629[2980 5058 2980 4250!2980 4250[2980 3442 3504 2871!3504 2871[4029 2300 4770
+ 2300"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="1451" publishTime="1667490195" publishDebug="true"/>
+          <PublishItem publishSize="2719" publishTime="1667389449" publishDebug="true"/>
+          <PublishItem publishSize="2649" publishTime="1667386713" publishDebug="true"/>
+          <PublishItem publishSize="73201" publishTime="1667385509" publishDebug="true"/>
+          <PublishItem publishSize="73178" publishTime="1667381356" publishDebug="true"/>
+          <PublishItem publishSize="5049" publishTime="1666994617" publishDebug="true"/>
+          <PublishItem publishSize="5049" publishTime="1666994596" publishDebug="true"/>
+          <PublishItem publishSize="5049" publishTime="1666993938" publishDebug="true"/>
+          <PublishItem publishSize="4703" publishTime="1666992917" publishDebug="true"/>
+          <PublishItem publishSize="1698" publishTime="1666992572" publishDebug="true"/>
+          <PublishItem publishSize="4838" publishTime="1666991799" publishDebug="true"/>
+          <PublishItem publishSize="4650" publishTime="1666990748" publishDebug="true"/>
+          <PublishItem publishSize="1768" publishTime="1666990677" publishDebug="true"/>
+          <PublishItem publishSize="2200" publishTime="1666627820" publishDebug="true"/>
+          <PublishItem publishSize="1125" publishTime="1666556069" publishDebug="true"/>
+          <PublishItem publishSize="13203" publishTime="1666511487" publishDebug="true"/>
+          <PublishItem publishSize="1120" publishTime="1666446694" publishDebug="true"/>
+          <PublishItem publishSize="601" publishTime="1666446684" publishDebug="true"/>
+          <PublishItem publishSize="603" publishTime="1666444758" publishDebug="true"/>
+          <PublishItem publishSize="1119" publishTime="1666444620" publishDebug="true"/>
+     </publishHistory>
+</DOMDocument>
