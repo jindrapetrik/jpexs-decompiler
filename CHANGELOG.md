@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [16.0.4] - 2022-11-03
 ### Fixed
 - [#1860] FLA export - EmptyStackException during exporting MorphShape
