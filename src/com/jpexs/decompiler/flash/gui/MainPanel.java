@@ -924,7 +924,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void load(SWFList newSwfs, boolean first) {
         View.checkAccess();
 
-        List<List<String>> expandedNodes = View.getExpandedNodes(tagTree);
+        List<List<String>> expandedNodes = View.getExpandedNodes(getCurrentTree());
         previewPanel.clear();
 
         swfs.add(newSwfs);
@@ -935,7 +935,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         doFilter();
         reload(false);
-        View.expandTreeNodes(tagTree, expandedNodes);
+        View.expandTreeNodes(getCurrentTree(), expandedNodes);
     }
 
     public ABCPanel getABCPanel() {

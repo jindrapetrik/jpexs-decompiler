@@ -2,8 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
 - [#1860] FLA export - EmptyStackException during exporting MorphShape
 - [#1782] FLA export - exporting from SWF files inside bundles (like binarysearch)
+- Expand correct tree on SWF load
 
 ## [16.0.3] - 2022-11-02
 ### Fixed
