@@ -556,8 +556,9 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public void computeDependentFrames() {
         Map<Integer, Set<Integer>> dep = new HashMap<>();
-        for (int i = 0; i < timeline.getFrameCount(); i++) {
-            Frame frame = timeline.getFrame(i);
+        Timeline tim = getTimeline();
+        for (int i = 0; i < tim.getFrameCount(); i++) {
+            Frame frame = tim.getFrame(i);
             Set<Integer> needed = new HashSet<>();
             frame.getNeededCharacters(needed);
             for (Integer needed1 : needed) {
