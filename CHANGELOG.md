@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
-- [#1459], [#1832], [#1849] AS1/2 direct editarion - Error dialog when saved value (UI16, SI16, ...) exceeds its limit and this code cannot be saved.
+- [#1459], [#1832], [#1849] AS1/2 direct editation - Error dialog when saved value (UI16, SI16, ...) exceeds its limit and this code cannot be saved.
 
 ### Fixed
 - Flash viewer - subtract blend mode
