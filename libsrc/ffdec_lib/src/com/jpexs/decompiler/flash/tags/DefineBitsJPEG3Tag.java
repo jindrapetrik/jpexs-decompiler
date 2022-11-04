@@ -175,11 +175,10 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     @Override
     public InputStream getOriginalImageData() {
         if (bitmapAlphaData.getLength() == 0) { // No alpha
-            int errorLength = hasErrorHeader(imageData) ? 4 : 0;
             JpegFixer jpegFixer = new JpegFixer();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try {
-                jpegFixer.fixJpeg(new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + errorLength, imageData.getLength() - errorLength), baos);
+                jpegFixer.fixJpeg(new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength()), baos);
             } catch (IOException ex) {
                 Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -192,11 +191,10 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     @Override
     protected SerializableImage getImage() {
         try {
-            int errorLength = hasErrorHeader(imageData) ? 4 : 0;
             JpegFixer jpegFixer = new JpegFixer();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             try {
-                jpegFixer.fixJpeg(new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + errorLength, imageData.getLength() - errorLength), baos);
+                jpegFixer.fixJpeg(new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength()), baos);
             } catch (IOException ex) {
                 Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, null, ex);
             }

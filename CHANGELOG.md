@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - Flash viewer - subtract blend mode
+- [#1712], [#1857] JPEG images errors fixer
 
 ## [16.0.4] - 2022-11-03
 ### Fixed
@@ -2339,7 +2340,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.3...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.4...dev
+[16.0.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.3...version16.0.4
 [16.0.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.2...version16.0.3
 [16.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.1...version16.0.2
 [16.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.0...version16.0.1
@@ -2464,6 +2466,8 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1712]: https://www.free-decompiler.com/flash/issues/1712
+[#1857]: https://www.free-decompiler.com/flash/issues/1857
 [#1860]: https://www.free-decompiler.com/flash/issues/1860
 [#1782]: https://www.free-decompiler.com/flash/issues/1782
 [#1679]: https://www.free-decompiler.com/flash/issues/1679
