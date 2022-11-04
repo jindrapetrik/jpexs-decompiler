@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#1459], [#1832], [#1849] AS1/2 direct editarion - Error dialog when saved value (UI16, SI16, ...) exceeds its limit and this code cannot be saved.
+
 ### Fixed
 - Flash viewer - subtract blend mode
 - [#1712], [#1857] JPEG images errors fixer
@@ -2466,6 +2469,9 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1459]: https://www.free-decompiler.com/flash/issues/1459
+[#1832]: https://www.free-decompiler.com/flash/issues/1832
+[#1849]: https://www.free-decompiler.com/flash/issues/1849
 [#1712]: https://www.free-decompiler.com/flash/issues/1712
 [#1857]: https://www.free-decompiler.com/flash/issues/1857
 [#1860]: https://www.free-decompiler.com/flash/issues/1860

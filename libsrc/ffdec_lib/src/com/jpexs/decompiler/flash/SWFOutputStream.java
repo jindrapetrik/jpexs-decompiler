@@ -167,7 +167,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeUI8(int value) throws IOException {
         if (value > 0xff) {
-            throw new IllegalArgumentException("Value is too large for UI8: " + value);
+            throw new ValueTooLargeException("UI8", value);
         }
 
         write(value);
@@ -224,7 +224,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeUI32(long value) throws IOException {
         if (value > 0xffffffffL) {
-            throw new IllegalArgumentException("Value is too large for UI32: " + value);
+            throw new ValueTooLargeException("UI32", value);
         }
 
         write((int) (value & 0xff));
@@ -241,7 +241,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeUI16(int value) throws IOException {
         if (value > 0xffff) {
-            throw new IllegalArgumentException("Value is too large for UI16: " + value);
+            throw new ValueTooLargeException("UI16", value);
         }
 
         write((int) (value & 0xff));
@@ -256,7 +256,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeSI32(long value) throws IOException {
         if (value > 0x7fffffffL) {
-            throw new IllegalArgumentException("Value is too large for SI32: " + value);
+            throw new ValueTooLargeException("SI32", value);
         }
 
         writeUI32(value);
@@ -271,8 +271,7 @@ public class SWFOutputStream extends OutputStream {
     public void writeSI16(int value) throws IOException {
 
         if (value > 0x7fff) {
-            Logger.getLogger(SWFOutputStream.class.getName()).log(Level.WARNING, "Value is too large for SI16: " + value + ", 0 written", new Exception());
-            value = 0;
+            throw new ValueTooLargeException("SI16", value);
         }
 
         writeUI16(value);
@@ -286,7 +285,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeSI8(int value) throws IOException {
         if (value > 0x7ff) {
-            throw new IllegalArgumentException("Value is too large for SI8: " + value);
+            throw new ValueTooLargeException("SI8", value);
         }
 
         writeUI8(value);
