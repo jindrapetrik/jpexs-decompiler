@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.filters;
 
 import java.awt.Composite;
@@ -350,10 +351,10 @@ public final class BlendComposite implements Composite {
                     return new Blender() {
                         @Override
                         public void blend(int[] src, int[] dst, int[] result) {
-                            result[0] = Math.max(0, src[0] + dst[0] - 256);
-                            result[1] = Math.max(0, src[1] + dst[1] - 256);
-                            result[2] = Math.max(0, src[2] + dst[2] - 256);
-                            result[3] = Math.min(255, src[3] + dst[3] - (src[3] * dst[3]) / 255);
+                            result[0] = Math.max(0, dst[0] - src[0]);
+                            result[1] = Math.max(0, dst[1] - src[1]);
+                            result[2] = Math.max(0, dst[2] - src[2]);
+                            result[3] = Math.min(255, src[3] + dst[3] - 256 - (src[3] * dst[3]) / 255);
                         }
                     };
             }
