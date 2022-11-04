@@ -126,11 +126,10 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
 
     @Override
     public InputStream getOriginalImageData() {
-        int errorLength = hasErrorHeader(imageData) ? 4 : 0;
         JpegFixer jpegFixer = new JpegFixer();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            jpegFixer.fixJpeg(new ByteArrayInputStream(imageData.getArray(), imageData.getPos() + errorLength, imageData.getLength() - errorLength), baos);
+            jpegFixer.fixJpeg(new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength()), baos);
         } catch (IOException ex) {
             Logger.getLogger(DefineBitsJPEG2Tag.class.getName()).log(Level.SEVERE, null, ex);
         }
