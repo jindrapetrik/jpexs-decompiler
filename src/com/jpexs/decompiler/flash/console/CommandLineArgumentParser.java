@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.SWFCompression;
 import com.jpexs.decompiler.flash.SWFSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
+import com.jpexs.decompiler.flash.ValueTooLargeException;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -3615,6 +3616,9 @@ public class CommandLineArgumentParser {
         ActionScript2Parser par = new ActionScript2Parser(src.getSwf(), src);
         try {
             src.setActions(par.actionsFromString(as));
+        } catch (ValueTooLargeException ex) {
+            System.err.println("Script or some of its functions are too large");
+            System.exit(1);
         } catch (ActionParseException ex) {
             System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
             System.exit(1);

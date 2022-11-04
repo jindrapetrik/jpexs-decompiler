@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.importers;
 
+import com.jpexs.decompiler.flash.ValueTooLargeException;
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParser;
@@ -83,6 +84,8 @@ public class AS2ScriptImporter {
                 ActionScript2Parser par = new ActionScript2Parser(asm.getSwf(), asm);
                 try {
                     asm.setActions(par.actionsFromString(txt));
+                } catch (ValueTooLargeException ex) {
+                    logger.log(Level.SEVERE, "Script or some of its functions are too large, file: {0}", fileName);
                 } catch (ActionParseException ex) {
                     logger.log(Level.SEVERE, "%error% on line %line%, file: %file%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)).replace("%file%", fileName), ex);
                 } catch (CompilationException ex) {
