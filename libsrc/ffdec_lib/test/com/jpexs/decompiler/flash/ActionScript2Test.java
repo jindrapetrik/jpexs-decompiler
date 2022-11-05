@@ -2393,4 +2393,21 @@ public class ActionScript2Test extends ActionScript2TestBase {
                 + "var b = 5.2.toString();\r\n"
         );
     }
+
+    @Test
+    public void frame86_tryInsideForInTest() {
+        compareSrc(86, "trace(\"tryInsideForInTest\");\r\n"
+                + "var obj = {};\r\n"
+                + "for(var thing in obj)\r\n"
+                + "{\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"a\");\r\n"
+                + "}\r\n"
+                + "catch(error:Object)\r\n"
+                + "{\r\n"
+                + "}\r\n"
+                + "}\r\n"
+        );
+    }
 }
