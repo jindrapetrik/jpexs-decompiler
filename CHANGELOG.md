@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 - Flash viewer - subtract blend mode
 - [#1712], [#1857] JPEG images errors fixer
 - Ignore missing font on DefineEditText
-- GFX: Drawing missing DefineExternalImage/2 as red instead of throwing exception
+- GFX: Drawing missing DefineExternalImage/2, DefineSubImage as red instead of throwing exception
 - GFX: DefineExternalImage2 properly saving characterId
 - Hex view refreshing after selecting Unknown tag
 

@@ -24,7 +24,9 @@ import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -123,22 +125,32 @@ public class DefineSubImage extends ImageTag {
         if (serImage == null) {
             DefineExternalImage2 image = (DefineExternalImage2) swf.getImage(imageCharacterId | 0x8000);
 
-            Path imagePath = Paths.get(image.getSwf().getFile()).getParent().resolve(Paths.get(image.fileName));
-            byte[] imageData;
-            try {
-                imageData = Files.readAllBytes(imagePath);
-            } catch (IOException e) {
-                return null;
+            Path imagePath = image.getSwf().getFile() == null ? null : Paths.get(image.getSwf().getFile()).getParent().resolve(Paths.get(image.fileName));
+            if (imagePath != null && imagePath.toFile().exists()) {
+                try {
+                    byte[] imageData = Files.readAllBytes(imagePath);
+                    int[] pixels = DDSReader.read(imageData, DDSReader.ARGB, 0);
+                    BufferedImage bufImage = new BufferedImage(DDSReader.getWidth(imageData), DDSReader.getHeight(imageData), BufferedImage.TYPE_INT_ARGB);
+                    bufImage.getRaster().setDataElements(0, 0, bufImage.getWidth(), bufImage.getHeight(), pixels);
+                    Image scaled = bufImage.getScaledInstance(image.targetWidth, image.targetHeight, Image.SCALE_DEFAULT);
+                    bufImage = new BufferedImage(x2 - x1, y2 - y1, BufferedImage.TYPE_INT_ARGB);
+                    bufImage.getGraphics().drawImage(scaled, -x1, -y1, null);
+                    serImage = new SerializableImage(bufImage);
+                } catch (IOException e) {
+                    createFailedImage();
+                }               
+            } else {
+                createFailedImage();
             }
-            int[] pixels = DDSReader.read(imageData, DDSReader.ARGB, 0);
-            BufferedImage bufImage = new BufferedImage(DDSReader.getWidth(imageData), DDSReader.getHeight(imageData), BufferedImage.TYPE_INT_ARGB);
-            bufImage.getRaster().setDataElements(0, 0, bufImage.getWidth(), bufImage.getHeight(), pixels);
-            Image scaled = bufImage.getScaledInstance(image.targetWidth, image.targetHeight, Image.SCALE_DEFAULT);
-            bufImage = new BufferedImage(x2 - x1, y2 - y1, BufferedImage.TYPE_INT_ARGB);
-            bufImage.getGraphics().drawImage(scaled, -x1, -y1, null);
-            serImage = new SerializableImage(bufImage);
         }
         return serImage;
+    }
+
+    private void createFailedImage() {
+        serImage = new SerializableImage(x2 - x1, y2 - y1, BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics g = serImage.getGraphics();
+        g.setColor(Color.red);
+        g.fillRect(0, 0, x2 - x1, y2 - y1);
     }
 
     @Override
