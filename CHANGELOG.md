@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Hex view refreshing after selecting Unknown tag
 - [#1818] GFX: Importing XML
 - GFX: Correct refreshing image when raw editing DefineExternalImage/2, DefineSubImage
+- GFX: DefineExternalImage/2, DefineSubImage disallow not working replace button in favor of raw editing
 
 ## [16.0.4] - 2022-11-03
 ### Fixed

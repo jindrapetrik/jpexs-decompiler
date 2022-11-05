@@ -124,11 +124,14 @@ public class DefineSubImage extends ImageTag {
 
     @Override
     public void setImage(byte[] data) throws IOException {
-        serImage = new SerializableImage(ImageHelper.read(data));
-        clearCache();
-        setModified(true);
+        
     }
 
+    @Override
+    public boolean importSupported() {
+        return false;
+    }
+        
     @Override
     public ImageFormat getImageFormat() {
         return ImageFormat.PNG;
