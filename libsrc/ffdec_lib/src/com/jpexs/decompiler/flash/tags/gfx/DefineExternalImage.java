@@ -198,4 +198,9 @@ public class DefineExternalImage extends ImageTag {
             }
         }
     }
+    
+    @Override
+    public boolean importSupported() {
+        return false;
+    }
 }
