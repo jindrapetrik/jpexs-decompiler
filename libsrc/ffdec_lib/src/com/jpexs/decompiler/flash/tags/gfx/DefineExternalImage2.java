@@ -138,7 +138,7 @@ public class DefineExternalImage2 extends ImageTag {
 
         serImage = new SerializableImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics g = serImage.getGraphics();
-        g.setColor(Color.red);
+        g.setColor(SWF.ERROR_COLOR);
         g.fillRect(0, 0, targetWidth, targetHeight);
         cachedImageFilename = null;
     }

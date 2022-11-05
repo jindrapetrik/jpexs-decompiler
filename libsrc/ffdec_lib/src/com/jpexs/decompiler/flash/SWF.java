@@ -377,6 +377,11 @@ public final class SWF implements SWFContainerItem, Timelined {
             "CFX", // Compressed ScaleForm GFx
             "ABC" // Non-standard LZMA compressed Flash
     );
+    
+    /**
+     * Color to paint when there is an error (missing image, ...)
+     */
+    public static final Color ERROR_COLOR = Color.red;
 
     public void updateCharacters() {
         characters = null;

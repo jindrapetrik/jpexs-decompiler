@@ -277,7 +277,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
             }
         }
 
-        fillData.append("\tctx.fillStyle=").append(color(Color.RED.getRGB())).append(";\r\n");
+        fillData.append("\tctx.fillStyle=").append(color(SWF.ERROR_COLOR.getRGB())).append(";\r\n");
     }
 
     @Override

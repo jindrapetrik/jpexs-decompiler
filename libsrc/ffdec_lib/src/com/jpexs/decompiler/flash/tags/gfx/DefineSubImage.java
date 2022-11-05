@@ -158,7 +158,7 @@ public class DefineSubImage extends ImageTag {
         }
         serImage = new SerializableImage(x2 - x1, y2 - y1, BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics g = serImage.getGraphics();
-        g.setColor(Color.red);
+        g.setColor(SWF.ERROR_COLOR);
         g.fillRect(0, 0, x2 - x1, y2 - y1);
         cachedImageFilename = null;
         cachedX1 = x1;
