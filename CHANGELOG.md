@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - Flash viewer - subtract blend mode
-- [#1712], [#1857] JPEG images errors fixer
+- [#1712], [#1857], [#1455] JPEG images errors fixer
 - Ignore missing font on DefineEditText
 - GFX: Drawing missing DefineExternalImage/2, DefineSubImage as red instead of throwing exception
 - GFX: DefineExternalImage2 properly saving characterId
@@ -2484,6 +2484,7 @@ All notable changes to this project will be documented in this file.
 [#1849]: https://www.free-decompiler.com/flash/issues/1849
 [#1712]: https://www.free-decompiler.com/flash/issues/1712
 [#1857]: https://www.free-decompiler.com/flash/issues/1857
+[#1455]: https://www.free-decompiler.com/flash/issues/1455
 [#1818]: https://www.free-decompiler.com/flash/issues/1818
 [#1727]: https://www.free-decompiler.com/flash/issues/1727
 [#1666]: https://www.free-decompiler.com/flash/issues/1666
