@@ -133,7 +133,7 @@ public class DumpInfo implements TreeItem {
                 SWFInputStream sis = tagStub.getDataStream();
                 sis.seek(tagStub.getDataPos());
                 sis.dumpInfo = this;
-                resolvedTag = SWFInputStream.resolveTag(tagStub, 0, false, true, false);
+                resolvedTag = SWFInputStream.resolveTag(tagStub, 0, false, true, false, false);
             } catch (InterruptedException | IOException ex) {
                 Logger.getLogger(DumpInfo.class.getName()).log(Level.SEVERE, null, ex);
             }

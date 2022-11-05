@@ -318,11 +318,11 @@ public class SWFInputStream implements AutoCloseable {
     private SWF swf;
 
     public DumpInfo dumpInfo;
-    
+
     private byte[] data;
 
     private int limit;
-    
+
     public void addPercentListener(ProgressListener listener) {
         listeners.add(listener);
     }
@@ -1162,7 +1162,7 @@ public class SWFInputStream implements AutoCloseable {
         public Tag call() throws Exception {
             DumpInfo di = dumpInfo;
             try {
-                Tag t = resolveTag(tag, level, parallel, skipUnusualTags, lazy);
+                Tag t = resolveTag(tag, level, parallel, skipUnusualTags, lazy, true);
                 if (dumpInfo != null && t != null) {
                     dumpInfo.name = t.getName();
                 }
@@ -1219,14 +1219,15 @@ public class SWFInputStream implements AutoCloseable {
             } else if (tag != null) {
                 if (tag.getId() == FileAttributesTag.ID && level == 0) { // FileAttributes 
                     if (tag instanceof TagStub) {
-                        tag = resolveTag((TagStub) tag, level, parallel1, skipUnusualTags, lazy);
+                        tag = resolveTag((TagStub) tag, level, parallel1, skipUnusualTags, lazy, true);
                     }
                     FileAttributesTag fileAttributes = (FileAttributesTag) tag;
                     if (fileAttributes.actionScript3) {
                         isAS3 = true;
                     }
                 }
-                switch (tag.getId()) {
+                doParse = true;
+                /*switch (tag.getId()) {
                     case DoActionTag.ID:
                     case DoInitActionTag.ID:
                         doParse = !isAS3;
@@ -1254,11 +1255,11 @@ public class SWFInputStream implements AutoCloseable {
                         } else {
                             doParse = true;
                         }
-                }
+                }*/
             }
 
             if (parseTags && !parallel1 && doParse && (tag instanceof TagStub)) {
-                tag = resolveTag((TagStub) tag, level, parallel, skipUnusualTags, lazy);
+                tag = resolveTag((TagStub) tag, level, parallel, skipUnusualTags, lazy, true);
             }
             DumpInfo di = dumpInfo;
             if (di != null && tag != null) {
@@ -1313,7 +1314,7 @@ public class SWFInputStream implements AutoCloseable {
         return tags;
     }
 
-    public static Tag resolveTag(TagStub tag, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws InterruptedException {
+    public static Tag resolveTag(TagStub tag, int level, boolean parallel, boolean skipUnusualTags, boolean lazy, boolean logErrors) throws InterruptedException {
         Tag ret;
 
         ByteArrayRange data = tag.getOriginalRange();
@@ -1609,8 +1610,10 @@ public class SWFInputStream implements AutoCloseable {
                 ret.remainingData = sis.readByteRangeEx(sis.available(), "remaining");
             }
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, "Error during tag reading. SWF: " + swf.getShortFileName() + " ID: " + tag.getId() + " name: " + tag.getName() + " pos: " + data.getPos(), ex);
-            ret = new TagStub(swf, tag.getId(), "ErrorTag", data, null);
+            if (logErrors) {
+                logger.log(Level.SEVERE, "Error during tag reading. SWF: " + swf.getShortFileName() + " ID: " + tag.getId() + " name: " + tag.getName() + " pos: " + data.getPos(), ex);
+            }
+            ret = new TagStub(swf, tag.getId(), "Error", data, null);
         }
         ret.forceWriteAsLong = tag.forceWriteAsLong;
         ret.setTimelined(tag.getTimelined());
@@ -1665,7 +1668,7 @@ public class SWFInputStream implements AutoCloseable {
         if (resolve) {
             DumpInfo di = dumpInfo;
             try {
-                ret = resolveTag(tagStub, level, parallel, skipUnusualTags, lazy);
+                ret = resolveTag(tagStub, level, parallel, skipUnusualTags, lazy, true);
             } catch (Exception ex) {
                 tagDataStream.endDumpLevelUntil(di);
                 logger.log(Level.SEVERE, "Problem in " + timelined.toString(), ex);

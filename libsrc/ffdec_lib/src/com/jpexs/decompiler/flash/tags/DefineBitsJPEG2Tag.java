@@ -30,6 +30,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.JpegFixer;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -152,7 +153,11 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
             Logger.getLogger(DefineBitsJPEG2Tag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
         }
 
-        return null;
+        SerializableImage img = new SerializableImage(1, 1, BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics g = img.getGraphics();
+        g.setColor(SWF.ERROR_COLOR);
+        g.fillRect(0, 0, 1, 1);
+        return img;
     }
 
     @Override
@@ -167,6 +172,6 @@ public class DefineBitsJPEG2Tag extends ImageTag implements AloneTag {
             Logger.getLogger(DefineBitsJPEG2Tag.class.getName()).log(Level.SEVERE, "Failed to get image dimension", ex);
         }
 
-        return null;
+        return new Dimension(1, 1);
     }
 }

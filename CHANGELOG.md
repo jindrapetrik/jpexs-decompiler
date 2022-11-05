@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - [#1459], [#1832], [#1849] AS1/2 direct editation - Error dialog when saved value (UI16, SI16, ...) exceeds its limit and this code cannot be saved.
+- Attach tag menu (Like DefineScaling grid to DefineSprite, etc.)
+- Better tag error handling - these tags now got error icon
 
 ### Fixed
 - Flash viewer - subtract blend mode
@@ -18,6 +20,9 @@ All notable changes to this project will be documented in this file.
 - [#1795] AS3 P-code - optional (default parameter values) saving
 - [#1785] AS1/2 try..catch block in for..in
 - [#1770] Links in basictag info (like needed/dependent characters) were barely visible on most themes
+
+### Changed
+- [#1455] All tag types are now allowed inside DefineSprite
 
 ## [16.0.4] - 2022-11-03
 ### Fixed

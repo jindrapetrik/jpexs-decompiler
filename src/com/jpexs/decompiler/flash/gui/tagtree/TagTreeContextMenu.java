@@ -159,6 +159,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenu addTagInsideMenu;
 
+    private JMenu attachTagMenu;
+
     private JMenu addTagBeforeMenu;
 
     private JMenu addTagAfterMenu;
@@ -190,12 +192,10 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem addFramesBeforeMenuItem;
 
     private JMenuItem addFramesAfterMenuItem;
-    
+
     private static final int KIND_MOVETO = 0;
     private static final int KIND_COPYTO = 1;
     private static final int KIND_COPYTODEPS = 2;
-
-
 
     public TagTreeContextMenu(final List<AbstractTagTree> trees, MainPanel mainPanel) {
         this.mainPanel = mainPanel;
@@ -287,6 +287,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         addTagInsideMenu = new JMenu(mainPanel.translate("contextmenu.addTagInside"));
         addTagInsideMenu.setIcon(View.getIcon("addtag16"));
         add(addTagInsideMenu);
+
+        attachTagMenu = new JMenu(mainPanel.translate("contextmenu.attachTag"));
+        attachTagMenu.setIcon(View.getIcon("addtag16"));
+        add(attachTagMenu);
 
         addTagBeforeMenu = new JMenu(mainPanel.translate("contextmenu.addTagBefore"));
         addTagBeforeMenu.setIcon(View.getIcon("addtag16"));
@@ -589,6 +593,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         importSwfXmlMenuItem.setVisible(allSelectedIsSwf);
         closeMenuItem.setVisible(allSelectedIsSwf);
         addTagInsideMenu.setVisible(false);
+        attachTagMenu.setVisible(false);
         addTagBeforeMenu.setVisible(false);
         addTagAfterMenu.setVisible(false);
         moveTagToMenu.setVisible(false);
@@ -697,6 +702,10 @@ public class TagTreeContextMenu extends JPopupMenu {
             addTagInsideMenu.removeAll();
             addAddTagInsideMenuItems(firstItem);
             addTagInsideMenu.setVisible(addTagInsideMenu.getItemCount() > 0);
+
+            attachTagMenu.removeAll();
+            addAttachTagMenuItems(firstItem);
+            attachTagMenu.setVisible(attachTagMenu.getItemCount() > 0);
 
             addTagBeforeMenu.removeAll();
 
@@ -823,6 +832,12 @@ public class TagTreeContextMenu extends JPopupMenu {
         addTagMenu.add(folderMenu);
     }
 
+    private void addAttachTagMenuItems(TreeItem item) {
+        AddTagActionListener listener = this::attachTagActionPerformed;
+        List<Integer> mapped = AbstractTagTree.getMappedTagIdsForClass(item.getClass());
+        addAddTagMenuItems(mapped, attachTagMenu, item, listener);
+    }
+
     private void addAddTagInsideMenuItems(TreeItem item) {
         AddTagActionListener listener = this::addTagInsideActionPerformed;
         Map<Integer, TagTypeInfo> classes = Tag.getKnownClasses();
@@ -840,48 +855,34 @@ public class TagTreeContextMenu extends JPopupMenu {
         if (item instanceof DefineSpriteTag) {
             addAddTagMenuItems(AbstractTagTree.getFrameNestedTagIds(), addTagInsideMenu, item, listener);
             addTagInsideMenu.addSeparator();
-            addAddTagMenuItems(AbstractTagTree.getMappedTagIdsForClass(DefineSpriteTag.class), addTagInsideMenu, item, listener);
+            addTagInsideMenu.add(createOthersMenu(item, listener));
             return;
         }
 
         if (item instanceof Frame) {
             Frame frame = (Frame) item;
             boolean insideSprite = frame.timeline.timelined instanceof DefineSpriteTag;
-            if (insideSprite) {
-                addAddTagMenuItems(AbstractTagTree.getFrameNestedTagIds(), addTagInsideMenu, item, listener);
+            if (mainPanel.getCurrentView() == MainPanel.VIEW_TAGLIST) {
+                addAddTagMenuItems(null, addTagInsideMenu, item, listener);
+                return;
             } else {
-                if (mainPanel.getCurrentView() == MainPanel.VIEW_TAGLIST) {
-                    addAddTagMenuItems(null, addTagInsideMenu, item, listener);
-                    return;
-                }
                 addAddTagMenuItems(AbstractTagTree.getFrameNestedTagIds(), addTagInsideMenu, item, listener);
-                if (!insideSprite) {
-                    addTagInsideMenu.addSeparator();
-                    addTagInsideMenu.add(createOthersMenu(item, listener));
-                }
+                addTagInsideMenu.addSeparator();
+                addTagInsideMenu.add(createOthersMenu(item, listener));
             }
             return;
         }
 
         if (item instanceof FolderItem) {
             List<Integer> allowedTagTypes = new ArrayList<>(TagTree.getSwfFolderItemNestedTagIds(((FolderItem) item).getName(), gfx));
-
-            Set<Integer> mappedTagTypes = new LinkedHashSet<>();
-            for (int i : allowedTagTypes) {
-                mappedTagTypes.addAll(AbstractTagTree.getMappedTagIdsForClass(classes.get(i).getCls()));
-            }
             addAddTagMenuItems(allowedTagTypes, addTagInsideMenu, item, listener);
-            if (!allowedTagTypes.isEmpty() && !mappedTagTypes.isEmpty()) {
-                addTagInsideMenu.addSeparator();
-            }
-            addAddTagMenuItems(new ArrayList<Integer>(mappedTagTypes), addTagInsideMenu, item, listener);
             return;
         }
 
-        if (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES) {
+        /*if (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES) {
             List<Integer> mapped = AbstractTagTree.getMappedTagIdsForClass(item.getClass());
             addAddTagMenuItems(mapped, addTagInsideMenu, item, listener);
-        }
+        }*/
     }
 
     private void addAddTagBeforeAfterMenuItems(boolean before, JMenu addTagMenu, TreeItem item, AddTagActionListener listener) {
@@ -921,28 +922,17 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             addAddTagMenuItems(AbstractTagTree.getFrameNestedTagIds(), addTagMenu, item, listener);
-            if (!insideSprite) {
-                addTagMenu.addSeparator();
-                addTagMenu.add(createOthersMenu(item, listener));
-            }
+            addTagMenu.addSeparator();
+            addTagMenu.add(createOthersMenu(item, listener));
+            
             return;
         }
 
         if (parent instanceof FolderItem) {
             List<Integer> allowedTagTypes = new ArrayList<>(TagTree.getSwfFolderItemNestedTagIds(((FolderItem) parent).getName(), gfx));
 
-            Set<Integer> mappedTagTypes = new LinkedHashSet<>();
-            for (int i : allowedTagTypes) {
-                mappedTagTypes.addAll(AbstractTagTree.getMappedTagIdsForClass(classes.get(i).getCls()));
-            }
-            addAddTagMenuItems(allowedTagTypes, addTagMenu, item, listener);
-            if (!allowedTagTypes.isEmpty() && !mappedTagTypes.isEmpty()) {
-                addTagMenu.addSeparator();
-            }
-            addAddTagMenuItems(new ArrayList<Integer>(mappedTagTypes), addTagMenu, item, listener);
-            if (!allowedTagTypes.isEmpty() && !mappedTagTypes.isEmpty()) {
-                addTagMenu.addSeparator();
-            }
+            addAddTagMenuItems(allowedTagTypes, addTagMenu, item, listener);            
+            addTagMenu.addSeparator();
             addTagMenu.add(createOthersMenu(item, listener));
             return;
         }
@@ -1007,25 +997,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
             Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        boolean allowedInsideSprite = false;
-        switch (id) {
-            case ShowFrameTag.ID:
-            case PlaceObjectTag.ID:
-            case PlaceObject2Tag.ID:
-            case PlaceObject3Tag.ID:
-            case PlaceObject4Tag.ID:
-            case RemoveObjectTag.ID:
-            case RemoveObject2Tag.ID:
-            case StartSoundTag.ID:
-            case FrameLabelTag.ID:
-            case SoundStreamHeadTag.ID:
-            case SoundStreamHead2Tag.ID:
-            case SoundStreamBlockTag.ID:
-            case VideoFrameTag.ID:
-            case EndTag.ID:
-                allowedInsideSprite = true;
-        }
+        }       
 
         SWF swf = item.getSwf();
         Timelined selectedTimelined = null;
@@ -1041,29 +1013,16 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
         } else if (item instanceof FolderItem) {
             selectedTimelined = item.getSwf();
-        } else if (item instanceof Tag) {
-            selectedTimelined = item.getSwf(); //mapped tags
-            selectedTag = (Tag) item;
-            selectNext = true;
         } else if (item instanceof SWF) {
             selectedTimelined = (SWF) item;
         }
 
-        SelectTagPositionDialog selectPositionDialog = new SelectTagPositionDialog(mainPanel.getMainFrame().getWindow(), swf, selectedTag, selectedTimelined, allowedInsideSprite, selectNext);
+        SelectTagPositionDialog selectPositionDialog = new SelectTagPositionDialog(mainPanel.getMainFrame().getWindow(), swf, selectedTag, selectedTimelined, true, selectNext);
         if (selectPositionDialog.showDialog() == AppDialog.OK_OPTION) {
             selectedTimelined = selectPositionDialog.getSelectedTimelined();
             selectedTag = selectPositionDialog.getSelectedTag();
             try {
                 Tag t = (Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf});
-
-                //it's "inside", add mapping
-                if (AbstractTagTree.getMappedTagIdsForClass(item.getClass()).contains(id)) {
-                    if ((t instanceof CharacterIdTag) && (!(t instanceof CharacterTag)) && (item instanceof CharacterTag)) {
-                        CharacterIdTag chit = (CharacterIdTag) t;
-                        chit.setCharacterId(((CharacterTag) item).getCharacterId());
-                    }
-                }
-
                 t.setTimelined(selectedTimelined);
                 if (selectedTag == null) {
                     selectedTimelined.addTag(t);
@@ -2340,28 +2299,9 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         if (timelined == null) { //should not happen
             return;
-        }
+        }    
 
-        boolean allowedInsideSprite = false;
-        switch (t.getId()) {
-            case ShowFrameTag.ID:
-            case PlaceObjectTag.ID:
-            case PlaceObject2Tag.ID:
-            case PlaceObject3Tag.ID:
-            case PlaceObject4Tag.ID:
-            case RemoveObjectTag.ID:
-            case RemoveObject2Tag.ID:
-            case StartSoundTag.ID:
-            case FrameLabelTag.ID:
-            case SoundStreamHeadTag.ID:
-            case SoundStreamHead2Tag.ID:
-            case SoundStreamBlockTag.ID:
-            case VideoFrameTag.ID:
-            case EndTag.ID:
-                allowedInsideSprite = true;
-        }
-
-        SelectTagPositionDialog dialog = new SelectTagPositionDialog(Main.getDefaultDialogsOwner(), t.getSwf(), t, timelined, allowedInsideSprite, false);
+        SelectTagPositionDialog dialog = new SelectTagPositionDialog(Main.getDefaultDialogsOwner(), t.getSwf(), t, timelined, true, false);
         if (dialog.showDialog() == AppDialog.OK_OPTION) {
             Tag selectedTag = dialog.getSelectedTag();
             Timelined selectedTimelined = dialog.getSelectedTimelined();
@@ -2538,6 +2478,38 @@ public class TagTreeContextMenu extends JPopupMenu {
                     addCopyMoveToMenus(kind, menu, items, name + " / " + t.getTagName() + " (" + ((DefineBinaryDataTag) t).getCharacterId() + ")", binaryData.innerSwf);
                 }
             }
+        }
+    }
+
+    private void attachTagActionPerformed(ActionEvent evt, TreeItem item, Class<?> cl) {
+        int id = -1;
+        try {
+            id = cl.getDeclaredField("ID").getInt(null);
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+            Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Timelined selectedTimelined = ((Tag) item).getTimelined();
+        Tag tagToAttachTo = ((Tag) item);
+        SWF swf = ((Tag) item).getSwf();
+        try {
+            Tag t = (Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf});
+
+            //add mapping
+            if (AbstractTagTree.getMappedTagIdsForClass(item.getClass()).contains(id)) {
+                if ((t instanceof CharacterIdTag) && (!(t instanceof CharacterTag)) && (item instanceof CharacterTag)) {
+                    CharacterIdTag chit = (CharacterIdTag) t;
+                    chit.setCharacterId(((CharacterTag) item).getCharacterId());
+                }
+            }
+
+            t.setTimelined(selectedTimelined);
+            selectedTimelined.addTag(selectedTimelined.indexOfTag(tagToAttachTo) + 1, t);
+            selectedTimelined.resetTimeline();
+            swf.updateCharacters();
+            mainPanel.refreshTree(swf);
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), t);
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException | InvocationTargetException ex) {
+            logger.log(Level.SEVERE, null, ex);
         }
     }
 }

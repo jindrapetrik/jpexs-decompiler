@@ -71,6 +71,7 @@ import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.tags.StartSound2Tag;
 import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
@@ -326,6 +327,10 @@ public abstract class AbstractTagTree extends JTree {
         if (t instanceof EndTag) {
             return TreeNodeType.END;
         }                
+        
+        if (t instanceof TagStub) {
+            return TreeNodeType.ERROR;
+        }
         
         if (t instanceof Tag) {
             return TreeNodeType.OTHER_TAG;
