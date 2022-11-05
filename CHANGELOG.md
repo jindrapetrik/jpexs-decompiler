@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Ignore missing font on DefineEditText
 - GFX: Drawing missing DefineExternalImage/2 as red instead of throwing exception
 - GFX: DefineExternalImage2 properly saving characterId
+- Hex view refreshing after selecting Unknown tag
 
 ## [16.0.4] - 2022-11-03
 ### Fixed

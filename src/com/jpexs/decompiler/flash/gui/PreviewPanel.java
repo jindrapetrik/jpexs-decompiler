@@ -719,6 +719,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         } else {
             unknownHexView.setData(unknownTag.unknownData.getRangeData(), null, null);
         }
+        unknownHexView.repaint();
         parametersPanel.setVisible(false);
     }
 
