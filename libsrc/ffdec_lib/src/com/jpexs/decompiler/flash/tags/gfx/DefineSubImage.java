@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Set;
 import net.npe.dds.DDSReader;
 
@@ -60,6 +61,18 @@ public class DefineSubImage extends ImageTag {
 
     @HideInRawEdit
     private SerializableImage serImage;
+
+    @HideInRawEdit
+    private String cachedImageFilename = null;
+
+    @HideInRawEdit
+    private Integer cachedX1 = null;
+    @HideInRawEdit
+    private Integer cachedY1 = null;
+    @HideInRawEdit
+    private Integer cachedX2 = null;
+    @HideInRawEdit
+    private Integer cachedY2 = null;
 
     /**
      * Gets data bytes
@@ -95,11 +108,9 @@ public class DefineSubImage extends ImageTag {
         x1 = 0;
         x2 = 1;
         y1 = 0;
-        y2 = 1;        
+        y2 = 1;
         createFailedImage();
     }
-    
-    
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
@@ -135,35 +146,25 @@ public class DefineSubImage extends ImageTag {
 
     @Override
     protected SerializableImage getImage() {
-        if (serImage == null) {
-            DefineExternalImage2 image = (DefineExternalImage2) swf.getImage(imageCharacterId | 0x8000);
-
-            Path imagePath = image.getSwf().getFile() == null ? null : Paths.get(image.getSwf().getFile()).getParent().resolve(Paths.get(image.fileName));
-            if (imagePath != null && imagePath.toFile().exists()) {
-                try {
-                    byte[] imageData = Files.readAllBytes(imagePath);
-                    int[] pixels = DDSReader.read(imageData, DDSReader.ARGB, 0);
-                    BufferedImage bufImage = new BufferedImage(DDSReader.getWidth(imageData), DDSReader.getHeight(imageData), BufferedImage.TYPE_INT_ARGB);
-                    bufImage.getRaster().setDataElements(0, 0, bufImage.getWidth(), bufImage.getHeight(), pixels);
-                    Image scaled = bufImage.getScaledInstance(image.targetWidth, image.targetHeight, Image.SCALE_DEFAULT);
-                    bufImage = new BufferedImage(x2 - x1, y2 - y1, BufferedImage.TYPE_INT_ARGB);
-                    bufImage.getGraphics().drawImage(scaled, -x1, -y1, null);
-                    serImage = new SerializableImage(bufImage);
-                } catch (IOException e) {
-                    createFailedImage();
-                }               
-            } else {
-                createFailedImage();
-            }
-        }
+        initImage();
         return serImage;
     }
 
     private void createFailedImage() {
+        if (x2 - x1 <= 0 || y2 - y1 <= 0) {
+            serImage = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+            serImage.fillTransparent();
+            return;
+        }
         serImage = new SerializableImage(x2 - x1, y2 - y1, BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics g = serImage.getGraphics();
         g.setColor(Color.red);
         g.fillRect(0, 0, x2 - x1, y2 - y1);
+        cachedImageFilename = null;
+        cachedX1 = x1;
+        cachedX2 = x2;
+        cachedY1 = y1;
+        cachedY2 = y2;
     }
 
     @Override
@@ -174,5 +175,53 @@ public class DefineSubImage extends ImageTag {
     @Override
     public void getNeededCharacters(Set<Integer> needed) {
         needed.add(imageCharacterId | 0x8000);
+    }
+
+    private void initImage() {
+        DefineExternalImage2 image = (DefineExternalImage2) swf.getImage(imageCharacterId | 0x8000);
+
+        if (image == null) {
+            createFailedImage();
+            return;
+        }
+        int targetWidth = x2 - x1;
+        int targetHeight = y2 - y1;
+
+        if (!Objects.equals(cachedImageFilename, image.fileName)
+                || !Objects.equals(cachedX1, (Integer) x1)
+                || !Objects.equals(cachedX2, (Integer) x2)
+                || !Objects.equals(cachedY1, (Integer) y1)
+                || !Objects.equals(cachedY2, (Integer) y2)
+                || (serImage != null && (serImage.getWidth() != targetWidth || serImage.getHeight() != targetHeight))) {
+
+            if (targetWidth <= 0 || targetHeight <= 0) {
+                serImage = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+                serImage.fillTransparent();
+                return;
+            }
+
+            Path imagePath = image.getSwf().getFile() == null ? null : Paths.get(image.getSwf().getFile()).getParent().resolve(Paths.get(image.fileName));
+            if (imagePath != null && imagePath.toFile().exists()) {
+                try {
+                    byte[] imageData = Files.readAllBytes(imagePath);
+                    int[] pixels = DDSReader.read(imageData, DDSReader.ARGB, 0);
+                    BufferedImage bufImage = new BufferedImage(DDSReader.getWidth(imageData), DDSReader.getHeight(imageData), BufferedImage.TYPE_INT_ARGB);
+                    bufImage.getRaster().setDataElements(0, 0, bufImage.getWidth(), bufImage.getHeight(), pixels);
+                    Image scaled = bufImage.getScaledInstance(image.targetWidth, image.targetHeight, Image.SCALE_DEFAULT);
+                    bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+                    bufImage.getGraphics().drawImage(scaled, -x1, -y1, null);
+                    serImage = new SerializableImage(bufImage);
+                    cachedImageFilename = image.fileName;
+                    cachedX1 = x1;
+                    cachedX2 = x2;
+                    cachedY1 = y1;
+                    cachedY2 = y2;
+                } catch (IOException e) {
+                    createFailedImage();
+                }
+            } else {
+                createFailedImage();
+            }
+        }
     }
 }
