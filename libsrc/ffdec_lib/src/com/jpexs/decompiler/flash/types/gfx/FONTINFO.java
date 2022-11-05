@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.gfx;
 
 import java.io.IOException;
@@ -28,6 +29,10 @@ public class FONTINFO implements Serializable {
 
     public GLYPHIDX[] glyphIndices;
 
+    public FONTINFO() {
+        glyphIndices = new GLYPHIDX[0];
+    }            
+    
     public FONTINFO(int fontId, int numGlyphs, GLYPHIDX[] glyphIndices) {
         this.fontId = fontId;
         this.glyphIndices = glyphIndices;

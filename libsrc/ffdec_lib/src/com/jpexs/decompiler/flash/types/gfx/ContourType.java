@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.gfx;
 
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
@@ -74,6 +75,10 @@ public class ContourType implements Serializable {
         edges = edgesList.toArray(new EdgeType[edgesList.size()]);
     }
 
+    public ContourType() {
+        edges = new EdgeType[0];
+    }
+    
     public ContourType(GFxInputStream sis, long fontOffset) throws IOException {
         moveToX = sis.readSI15("moveToX");
         moveToY = sis.readSI15("moveToY");

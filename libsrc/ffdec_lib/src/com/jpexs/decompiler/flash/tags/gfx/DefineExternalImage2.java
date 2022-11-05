@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.gfx;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
@@ -68,7 +69,7 @@ public class DefineExternalImage2 extends ImageTag {
 
     @HideInRawEdit
     private SerializableImage serImage;
-
+    
     /**
      * Gets data bytes
      *
@@ -100,6 +101,15 @@ public class DefineExternalImage2 extends ImageTag {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
+
+    public DefineExternalImage2(SWF swf) {
+        super(swf, ID, NAME, null);
+        exportName = "";
+        fileName = "";
+        targetWidth = 1;
+        targetHeight = 1;
+        createFailedImage();
+    }        
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {

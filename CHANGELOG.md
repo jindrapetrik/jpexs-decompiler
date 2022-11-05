@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - GFX: Drawing missing DefineExternalImage/2, DefineSubImage as red instead of throwing exception
 - GFX: DefineExternalImage2 properly saving characterId
 - Hex view refreshing after selecting Unknown tag
+- [#1818] GFX: Importing XML
 
 ## [16.0.4] - 2022-11-03
 ### Fixed
@@ -2478,6 +2479,7 @@ All notable changes to this project will be documented in this file.
 [#1849]: https://www.free-decompiler.com/flash/issues/1849
 [#1712]: https://www.free-decompiler.com/flash/issues/1712
 [#1857]: https://www.free-decompiler.com/flash/issues/1857
+[#1818]: https://www.free-decompiler.com/flash/issues/1818
 [#1860]: https://www.free-decompiler.com/flash/issues/1860
 [#1782]: https://www.free-decompiler.com/flash/issues/1782
 [#1679]: https://www.free-decompiler.com/flash/issues/1679

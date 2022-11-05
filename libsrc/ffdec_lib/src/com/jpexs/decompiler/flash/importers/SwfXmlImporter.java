@@ -95,6 +95,15 @@ import com.jpexs.decompiler.flash.types.filters.DROPSHADOWFILTER;
 import com.jpexs.decompiler.flash.types.filters.GLOWFILTER;
 import com.jpexs.decompiler.flash.types.filters.GRADIENTBEVELFILTER;
 import com.jpexs.decompiler.flash.types.filters.GRADIENTGLOWFILTER;
+import com.jpexs.decompiler.flash.types.gfx.ContourType;
+import com.jpexs.decompiler.flash.types.gfx.EdgeType;
+import com.jpexs.decompiler.flash.types.gfx.FONTINFO;
+import com.jpexs.decompiler.flash.types.gfx.FontType;
+import com.jpexs.decompiler.flash.types.gfx.GLYPHIDX;
+import com.jpexs.decompiler.flash.types.gfx.GlyphInfoType;
+import com.jpexs.decompiler.flash.types.gfx.GlyphType;
+import com.jpexs.decompiler.flash.types.gfx.KerningPairType;
+import com.jpexs.decompiler.flash.types.gfx.TEXGLYPH;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
@@ -168,7 +177,11 @@ public class SwfXmlImporter {
             AVM2ConstantPool.class, Decimal.class, Namespace.class, NamespaceSet.class, Multiname.class, MethodInfo.class, MetadataInfo.class,
             ValueKind.class, InstanceInfo.class, Traits.class, TraitClass.class, TraitFunction.class,
             TraitMethodGetterSetter.class, TraitSlotConst.class, ClassInfo.class, ScriptInfo.class, MethodBody.class,
-            ABCException.class, ABCVersion.class, Amf3Value.class};
+            ABCException.class, ABCVersion.class, Amf3Value.class,
+            //GFX:
+            ContourType.class, EdgeType.class, FONTINFO.class, FontType.class, GLYPHIDX.class,
+            GlyphInfoType.class, GlyphType.class, KerningPairType.class, TEXGLYPH.class
+        };
         
         for (Class cls2 : knownObjects) {
             if (!ReflectionTools.canInstantiateDefaultConstructor(cls2)) {
