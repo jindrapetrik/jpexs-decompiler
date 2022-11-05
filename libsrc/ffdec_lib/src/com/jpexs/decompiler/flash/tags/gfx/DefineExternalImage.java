@@ -104,28 +104,36 @@ public class DefineExternalImage extends ImageTag {
 
         if (bitmapFormat == BITMAP_FORMAT_TGA) {
             serImage = new SerializableImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB_PRE);
-            Graphics g =serImage.getGraphics();
+            Graphics g = serImage.getGraphics();
             g.setColor(Color.red);
-            g.fillRect(0,0, targetWidth, targetHeight);
+            g.fillRect(0, 0, targetWidth, targetHeight);
             return;
         }
 
         Path imagePath = sis.getSwf().getFile() == null ? null : Paths.get(sis.getSwf().getFile()).getParent().resolve(Paths.get(fileName));
         if (imagePath != null && imagePath.toFile().exists()) {
-            byte[] imageData = Files.readAllBytes(imagePath);
-            int[] pixels = DDSReader.read(imageData, DDSReader.ARGB, 0);
-            BufferedImage bufImage = new BufferedImage(DDSReader.getWidth(imageData), DDSReader.getHeight(imageData), BufferedImage.TYPE_INT_ARGB);
-            bufImage.getRaster().setDataElements(0, 0, bufImage.getWidth(), bufImage.getHeight(), pixels);
-            Image scaled = bufImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
-            bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
-            bufImage.getGraphics().drawImage(scaled, 0, 0, null);
-            serImage = new SerializableImage(bufImage);
+            try {
+                byte[] imageData = Files.readAllBytes(imagePath);
+                int[] pixels = DDSReader.read(imageData, DDSReader.ARGB, 0);
+                BufferedImage bufImage = new BufferedImage(DDSReader.getWidth(imageData), DDSReader.getHeight(imageData), BufferedImage.TYPE_INT_ARGB);
+                bufImage.getRaster().setDataElements(0, 0, bufImage.getWidth(), bufImage.getHeight(), pixels);
+                Image scaled = bufImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+                bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+                bufImage.getGraphics().drawImage(scaled, 0, 0, null);
+                serImage = new SerializableImage(bufImage);
+            } catch (IOException ex) {
+                createFailedImage();
+            }
         } else {
-            serImage = new SerializableImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB_PRE);
-            Graphics g =serImage.getGraphics();
-            g.setColor(Color.red);
-            g.fillRect(0,0, targetWidth, targetHeight);
+            createFailedImage();
         }
+    }
+
+    private void createFailedImage() {
+        serImage = new SerializableImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics g = serImage.getGraphics();
+        g.setColor(Color.red);
+        g.fillRect(0, 0, targetWidth, targetHeight);
     }
 
     @Override
