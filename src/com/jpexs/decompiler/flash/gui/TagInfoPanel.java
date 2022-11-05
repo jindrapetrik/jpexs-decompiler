@@ -193,13 +193,23 @@ public class TagInfoPanel extends JPanel {
                     + "td { border: 1px solid #e4e4e4; }"
                     + "html { border: 1px solid #789AC4; }";
         } else {
+            Color bgColor = UIManager.getColor("Table.background");
+            int light = (bgColor.getRed() + bgColor.getGreen() + bgColor.getBlue()) / 3;
+            boolean nightMode = light <= 128;
+            
+            Color linkColor = Color.blue;
+            if (nightMode) {
+                linkColor = new Color(0x88,0x88,0xff);
+            }
+            
             bodyRule += "background-color: " + getUIColorToHex("Table.background") + ";"
                     + "color:" + getUIColorToHex("Table.foreground") + ";"
                     + "padding:1px;"
                     + "}"
                     + "td { border: 1px solid " + getUIColorToHex("Table.gridColor") + "; }"
                     + "html { border: 1px solid " + getUIColorToHex("Table.gridColor") + "; }"
-                    + "a {color: " + getUIColorToHex("List.selectionBackground") + "}";
+                    + "a {color: " + getColorToHex(linkColor) + "}"
+                    ;
         }
 
         ((HTMLDocument) editorPane.getDocument()).getStyleSheet().addRule(bodyRule);
@@ -209,8 +219,11 @@ public class TagInfoPanel extends JPanel {
         editorPane.setEditable(false);
     }
 
+    private static String getColorToHex(Color c) {
+        return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
+    }
     private static String getUIColorToHex(String name) {
         Color c = UIManager.getColor(name);
-        return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
+        return getColorToHex(c);
     }
 }
