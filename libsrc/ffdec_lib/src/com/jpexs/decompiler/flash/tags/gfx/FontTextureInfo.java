@@ -12,9 +12,11 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.tags.gfx;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -96,6 +98,13 @@ public class FontTextureInfo extends Tag {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
+
+    public FontTextureInfo(SWF swf) {
+        super(swf, ID, NAME, null);
+        fileName = "";
+    }
+    
+    
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.gfx;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
@@ -87,6 +88,18 @@ public class DefineSubImage extends ImageTag {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
+
+    public DefineSubImage(SWF swf) {
+        super(swf, ID, NAME, null);
+        characterID = swf.getNextCharacterId();
+        x1 = 0;
+        x2 = 1;
+        y1 = 0;
+        y2 = 1;        
+        createFailedImage();
+    }
+    
+    
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {

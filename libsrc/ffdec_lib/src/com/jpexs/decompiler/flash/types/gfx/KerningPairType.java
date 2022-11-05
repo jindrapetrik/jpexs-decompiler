@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.gfx;
 
 import java.io.IOException;
@@ -30,6 +31,11 @@ public class KerningPairType implements Serializable {
 
     public int advance;
 
+    public KerningPairType() {
+    }
+
+    
+    
     public KerningPairType(int char1, int char2, int advance) {
         this.char1 = char1;
         this.char2 = char2;

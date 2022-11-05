@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.gfx;
 
 import com.jpexs.decompiler.flash.types.RECT;
@@ -34,6 +35,15 @@ public class GlyphType implements Serializable {
     public int[] boundingBox;
 
     public ContourType[] contours;
+
+    public GlyphType() {
+        contours = new ContourType[0];
+        boundingBox = new int[4];
+        boundingBox[2] = 1; //xmax
+        boundingBox[3] = 1; //ymax
+    }
+    
+    
 
     public GlyphType(List<SHAPERECORD> records) {
         RECT bounds = SHAPERECORD.getBounds(records);

@@ -12,7 +12,8 @@
  * Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library. */
+ * License along with this library.
+ */
 package com.jpexs.decompiler.flash.types.gfx;
 
 import java.io.IOException;
@@ -28,6 +29,9 @@ public class GLYPHIDX implements Serializable {
 
     public int indexInTexture;
 
+    public GLYPHIDX() {
+    }    
+    
     public GLYPHIDX(int indexInFont, int indexInTexture) {
         this.indexInFont = indexInFont;
         this.indexInTexture = indexInTexture;

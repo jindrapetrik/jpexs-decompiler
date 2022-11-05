@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.gfx;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
@@ -92,6 +93,17 @@ public class DefineExternalImage extends ImageTag {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
+
+    public DefineExternalImage(SWF swf) {
+        super(swf, ID, NAME, null);
+        exportName = "";
+        fileName = "";
+        targetWidth = 1;
+        targetHeight = 1;
+        createFailedImage();
+    }
+    
+    
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
