@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 - GFX: Drawing missing DefineExternalImage/2, DefineSubImage as red instead of throwing exception
 - GFX: DefineExternalImage2 properly saving characterId
 - Hex view refreshing after selecting Unknown tag
-- [#1818] GFX: Importing XML
+- [#1818], [#1727] GFX: Importing XML
 - GFX: Correct refreshing image when raw editing DefineExternalImage/2, DefineSubImage
 - GFX: DefineExternalImage/2, DefineSubImage disallow not working replace button in favor of raw editing
 - [#1795] AS3 P-code - optional (default parameter values) saving
@@ -2485,6 +2485,7 @@ All notable changes to this project will be documented in this file.
 [#1712]: https://www.free-decompiler.com/flash/issues/1712
 [#1857]: https://www.free-decompiler.com/flash/issues/1857
 [#1818]: https://www.free-decompiler.com/flash/issues/1818
+[#1727]: https://www.free-decompiler.com/flash/issues/1727
 [#1795]: https://www.free-decompiler.com/flash/issues/1795
 [#1785]: https://www.free-decompiler.com/flash/issues/1785
 [#1770]: https://www.free-decompiler.com/flash/issues/1770
