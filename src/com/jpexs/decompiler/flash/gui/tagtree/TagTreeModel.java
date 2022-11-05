@@ -146,33 +146,21 @@ public class TagTreeModel extends AbstractTagTreeModel {
         fireTreeStructureChanged(new TreeModelEvent(this, changedPath));
     }
 
-    private List<SoundStreamHeadTypeTag> getSoundStreams(DefineSpriteTag sprite) {
-        List<SoundStreamHeadTypeTag> ret = new ArrayList<>();
-        for (Tag t : sprite.getTags()) {
-            if (t instanceof SoundStreamHeadTypeTag) {
-                ret.add((SoundStreamHeadTypeTag) t);
-            }
-        }
-        return ret;
-    }
-
-    private void createTagList(SWF swf) {
-        List<TreeItem> nodeList = new ArrayList<>();
-        List<TreeItem> frames = new ArrayList<>();
-        List<TreeItem> shapes = new ArrayList<>();
-        List<TreeItem> morphShapes = new ArrayList<>();
-        List<TreeItem> sprites = new ArrayList<>();
-        List<TreeItem> buttons = new ArrayList<>();
-        List<TreeItem> images = new ArrayList<>();
-        List<TreeItem> fonts = new ArrayList<>();
-        List<TreeItem> texts = new ArrayList<>();
-        List<TreeItem> movies = new ArrayList<>();
-        List<TreeItem> sounds = new ArrayList<>();
-        List<TreeItem> binaryData = new ArrayList<>();
-        List<TreeItem> others = new ArrayList<>();
-        List<FolderItem> emptyFolders = new ArrayList<>();
-        Map<Integer, List<TreeItem>> mappedTags = new HashMap<>();
-        for (Tag t : swf.getTags()) {
+    private void walkTimelinedTagList(Timelined timelined,
+            Map<Integer, List<TreeItem>> mappedTags,
+            List<TreeItem> shapes,
+            List<TreeItem> morphShapes,
+            List<TreeItem> sprites,
+            List<TreeItem> buttons,
+            List<TreeItem> images,
+            List<TreeItem> fonts,
+            List<TreeItem> texts,
+            List<TreeItem> movies,
+            List<TreeItem> sounds,
+            List<TreeItem> binaryData,
+            List<TreeItem> others
+    ) {
+        for (Tag t : timelined.getTags()) {
             TreeNodeType ttype = TagTree.getTreeNodeType(t);
             switch (ttype) {
                 case SHAPE:
@@ -183,7 +171,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
                     break;
                 case SPRITE:
                     sprites.add(t);
-                    sounds.addAll(getSoundStreams((DefineSpriteTag) t));
+                    walkTimelinedTagList((DefineSpriteTag) t, mappedTags, shapes, morphShapes, sprites, buttons, images, fonts, texts, movies, sounds, binaryData, others);
                     break;
                 case BUTTON:
                     buttons.add(t);
@@ -214,6 +202,12 @@ public class TagTreeModel extends AbstractTagTreeModel {
                         boolean parentFound = false;
                         if ((t instanceof CharacterIdTag) && !(t instanceof CharacterTag)) {
                             CharacterIdTag chit = (CharacterIdTag) t;
+                            SWF swf;
+                            if (timelined instanceof SWF) {
+                                swf = (SWF) timelined;
+                            } else {
+                                swf = ((DefineSpriteTag) timelined).getSwf();
+                            }
                             if (swf.getCharacter(chit.getCharacterId()) != null) {
                                 parentFound = true;
                                 if (!mappedTags.containsKey(chit.getCharacterId())) {
@@ -229,6 +223,25 @@ public class TagTreeModel extends AbstractTagTreeModel {
                     break;
             }
         }
+    }
+
+    private void createTagList(SWF swf) {
+        List<TreeItem> nodeList = new ArrayList<>();
+        List<TreeItem> frames = new ArrayList<>();
+        List<TreeItem> shapes = new ArrayList<>();
+        List<TreeItem> morphShapes = new ArrayList<>();
+        List<TreeItem> sprites = new ArrayList<>();
+        List<TreeItem> buttons = new ArrayList<>();
+        List<TreeItem> images = new ArrayList<>();
+        List<TreeItem> fonts = new ArrayList<>();
+        List<TreeItem> texts = new ArrayList<>();
+        List<TreeItem> movies = new ArrayList<>();
+        List<TreeItem> sounds = new ArrayList<>();
+        List<TreeItem> binaryData = new ArrayList<>();
+        List<TreeItem> others = new ArrayList<>();
+        List<FolderItem> emptyFolders = new ArrayList<>();
+        Map<Integer, List<TreeItem>> mappedTags = new HashMap<>();
+        walkTimelinedTagList(swf, mappedTags, shapes, morphShapes, sprites, buttons, images, fonts, texts, movies, sounds, binaryData, others);
 
         Timeline timeline = swf.getTimeline();
         int frameCount = timeline.getFrameCount();

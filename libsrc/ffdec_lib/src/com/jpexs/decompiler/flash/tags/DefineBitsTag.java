@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -209,7 +210,11 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
             }
         }
 
-        return null;
+        SerializableImage img = new SerializableImage(1, 1, BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics g = img.getGraphics();
+        g.setColor(SWF.ERROR_COLOR);
+        g.fillRect(0, 0, 1, 1);
+        return img;
     }
 
     @Override
@@ -227,7 +232,7 @@ public class DefineBitsTag extends ImageTag implements TagChangedListener {
             }
         }
 
-        return null;
+        return new Dimension(1, 1);
     }
 
     @Override

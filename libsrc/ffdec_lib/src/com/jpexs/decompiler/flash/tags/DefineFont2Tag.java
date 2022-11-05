@@ -189,10 +189,12 @@ public class DefineFont2Tag extends FontTag {
             for (int i = 0; i < numGlyphs; i++) {
                 fontBoundsTable.add(sis.readRECT("rect"));
             }
-            int kerningCount = sis.readUI16("kerningCount");
             fontKerningTable = new ArrayList<>();
-            for (int i = 0; i < kerningCount; i++) {
-                fontKerningTable.add(sis.readKERNINGRECORD(fontFlagsWideCodes, "record"));
+            if (sis.available() > 0) { //should always be available, but happened in #1455, god knows why
+                int kerningCount = sis.readUI16("kerningCount");            
+                for (int i = 0; i < kerningCount; i++) {
+                    fontKerningTable.add(sis.readKERNINGRECORD(fontFlagsWideCodes, "record"));
+                }
             }
         }
     }

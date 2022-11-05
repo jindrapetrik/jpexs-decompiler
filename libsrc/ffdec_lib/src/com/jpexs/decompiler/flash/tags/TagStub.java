@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,5 +67,14 @@ public class TagStub extends Tag {
 
     public SWFInputStream getDataStream() {
         return dataStream;
+    }
+
+    @Override
+    public String toString() {
+        Map<Integer, TagTypeInfo> classes = Tag.getKnownClasses();
+        if (classes.containsKey(id)) {
+            return tagName + " - " + classes.get(id).getName();
+        }
+        return tagName + " [ID = " + id + "]";
     }
 }

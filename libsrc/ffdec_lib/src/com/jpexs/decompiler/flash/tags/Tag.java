@@ -429,7 +429,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         SWFInputStream tagDataStream = new SWFInputStream(swf, data, getDataPos(), data.length);
         TagStub copy = new TagStub(swf, getId(), "Unresolved", getOriginalRange(), tagDataStream);
         copy.forceWriteAsLong = forceWriteAsLong;
-        return SWFInputStream.resolveTag(copy, 0, false, true, false);
+        return SWFInputStream.resolveTag(copy, 0, false, true, false, false);
     }
 
     public Tag getOriginalTag() throws InterruptedException, IOException {
@@ -437,7 +437,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         SWFInputStream tagDataStream = new SWFInputStream(swf, data, getDataPos(), data.length);
         TagStub copy = new TagStub(swf, getId(), "Unresolved", getOriginalRange(), tagDataStream);
         copy.forceWriteAsLong = forceWriteAsLong;
-        return SWFInputStream.resolveTag(copy, 0, false, true, false);
+        return SWFInputStream.resolveTag(copy, 0, false, true, false, false);
     }
 
     public boolean canUndo() {

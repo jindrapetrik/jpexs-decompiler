@@ -16,10 +16,13 @@
  */
 package com.jpexs.decompiler.flash.helpers;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.helpers.Helper;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;
@@ -67,6 +70,14 @@ public class ImageHelper {
             }
         }
 
+        if (in == null) {
+            BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB_PRE);
+            Graphics g = img.getGraphics();
+            g.setColor(SWF.ERROR_COLOR);
+            g.fillRect(0, 0, 1, 1);
+            return img;
+        }
+        
         int type = in.getType();
         if (type != BufferedImage.TYPE_INT_ARGB_PRE && type != BufferedImage.TYPE_INT_RGB) {
             // convert to ARGB
