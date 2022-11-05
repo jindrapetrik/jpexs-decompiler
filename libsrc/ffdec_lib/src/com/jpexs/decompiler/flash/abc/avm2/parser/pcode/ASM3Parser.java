@@ -1230,6 +1230,8 @@ public class ASM3Parser {
             for (int i = 0; i < optional.size(); i++) {
                 info.optional[i] = optional.get(i);
             }
+        } else {
+            info.optional = new ValueKind[0];
         }
         abc.refreshMultinameNamespaceSuffixes();
         return code;

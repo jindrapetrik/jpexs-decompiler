@@ -342,7 +342,7 @@ public class MethodInfo {
             } else {
                 writer.hilightSpecial(constants.getMultiname(param_types[i]).getName(constants, fullyQualifiedNames, false, true), HighlightSpecialType.PARAM, i);
             }
-            if (optional != null) {
+            if (optional != null && flagHas_optional()) {
                 if (i >= param_types.length - optional.length) {
                     int optionalIndex = i - (param_types.length - optional.length);
                     writer.appendNoHilight(" = ");
