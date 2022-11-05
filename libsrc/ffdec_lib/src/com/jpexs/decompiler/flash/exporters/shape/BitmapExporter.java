@@ -378,8 +378,7 @@ public class BitmapExporter extends ShapeExporterBase {
             }
         }
 
-        // fill with red in case any error
-        fillPaint = Color.RED;
+        fillPaint = SWF.ERROR_COLOR;
         fillTransform = matrix.toTransform();
     }
 
@@ -576,8 +575,7 @@ public class BitmapExporter extends ShapeExporterBase {
             }
         }
 
-        // fill with red in case any error
-        linePaint = Color.RED;
+        linePaint = SWF.ERROR_COLOR;
         lineTransform = matrix.toTransform();
     }
 
