@@ -1154,7 +1154,7 @@ public class DefineEditTextTag extends TextTag {
             } else {
                 for (SameStyleTextRecord tr : line) {
                     width += tr.width;
-                    int lineHeight = tr.style.font.hasLayout() ? (int) Math.round(tr.style.fontHeight * tr.style.font.getAscent() / tr.style.font.getDivider() / 1024.0) + tr.style.fontLeading
+                    int lineHeight = (tr.style.font != null /*Font missing*/) && tr.style.font.hasLayout() ? (int) Math.round(tr.style.fontHeight * tr.style.font.getAscent() / tr.style.font.getDivider() / 1024.0) + tr.style.fontLeading
                             : tr.style.fontHeight + tr.style.fontLeading;
                     if (tr.style.font != null && !firstLine && tr.style.font.hasLayout()) {
                         lineHeight += (int) Math.round(tr.style.fontHeight * tr.style.font.getDescent() / tr.style.font.getDivider() / 1024.0);

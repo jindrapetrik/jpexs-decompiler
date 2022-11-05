@@ -24,7 +24,9 @@ import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -75,7 +77,7 @@ public class DefineExternalImage2 extends ImageTag {
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
-        sos.writeUI16(characterID);
+        sos.writeUI16(characterID - 0x8000);
         sos.writeUI16(unknownID);
         sos.writeUI16(bitmapFormat);
         sos.writeUI16(targetWidth);
@@ -108,22 +110,33 @@ public class DefineExternalImage2 extends ImageTag {
         targetHeight = sis.readUI16("targetHeight");
         exportName = sis.readNetString("exportName");
         fileName = sis.readNetString("fileName");
-        if (sis.available() > 0) { //there is usually one zero byte, bod knows why
+        if (sis.available() > 0) { //there is usually one zero byte, god knows why
             extraData = sis.readBytesEx(sis.available(), "extraData");
         }
         if (bitmapFormat == BITMAP_FORMAT_TGA) {
-          return;
+            serImage = new SerializableImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB_PRE);
+            Graphics g = serImage.getGraphics();
+            g.setColor(Color.red);
+            g.fillRect(0, 0, targetWidth, targetHeight);
+            return;
         }
 
-        Path imagePath = Paths.get(sis.getSwf().getFile()).getParent().resolve(Paths.get(fileName));
-        byte[] imageData = Files.readAllBytes(imagePath);
-        int [] pixels = DDSReader.read(imageData, DDSReader.ARGB, 0);
-        BufferedImage bufImage = new BufferedImage(DDSReader.getWidth(imageData), DDSReader.getHeight(imageData), BufferedImage.TYPE_INT_ARGB);
-        bufImage.getRaster().setDataElements(0, 0, bufImage.getWidth(), bufImage.getHeight(), pixels);
-        Image scaled = bufImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
-        bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
-        bufImage.getGraphics().drawImage(scaled, 0, 0, null);
-        serImage = new SerializableImage(bufImage);
+        Path imagePath = sis.getSwf().getFile() == null ? null : Paths.get(sis.getSwf().getFile()).getParent().resolve(Paths.get(fileName));
+        if (imagePath != null && imagePath.toFile().exists()) {
+            byte[] imageData = Files.readAllBytes(imagePath);
+            int[] pixels = DDSReader.read(imageData, DDSReader.ARGB, 0);
+            BufferedImage bufImage = new BufferedImage(DDSReader.getWidth(imageData), DDSReader.getHeight(imageData), BufferedImage.TYPE_INT_ARGB);
+            bufImage.getRaster().setDataElements(0, 0, bufImage.getWidth(), bufImage.getHeight(), pixels);
+            Image scaled = bufImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_DEFAULT);
+            bufImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
+            bufImage.getGraphics().drawImage(scaled, 0, 0, null);
+            serImage = new SerializableImage(bufImage);
+        } else {
+            serImage = new SerializableImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB_PRE);
+            Graphics g = serImage.getGraphics();
+            g.setColor(Color.red);
+            g.fillRect(0, 0, targetWidth, targetHeight);
+        }
     }
 
     @Override
