@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - GFX: DefineExternalImage2 properly saving characterId
 - Hex view refreshing after selecting Unknown tag
 - [#1818] GFX: Importing XML
+- GFX: Correct refreshing image when raw editing DefineExternalImage/2, DefineSubImage
 
 ## [16.0.4] - 2022-11-03
 ### Fixed
