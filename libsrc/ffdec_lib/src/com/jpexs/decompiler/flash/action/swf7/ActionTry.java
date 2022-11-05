@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.CastOpActionItem;
 import com.jpexs.decompiler.flash.action.model.DefineLocalActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.model.clauses.TryActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
@@ -290,7 +291,6 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         if (catchBlockFlag) {
             List<GraphTargetItem> body = contents.get(1);
             if (catchInRegisterFlag) {
-                //catchName = new DirectValueActionItem(this, lineStartItem, -1, new RegisterNumber(this.catchRegister), new ArrayList<>());            
                 if (body.size() >= 2) {
                     int pos = 0;
                     loopex:
@@ -298,9 +298,20 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
                         PushItem pi = (PushItem) body.get(pos);
                         if (pi.value instanceof CastOpActionItem) {
                             CastOpActionItem co = (CastOpActionItem) pi.value;
-                            if ((co.object instanceof DirectValueActionItem) && (((DirectValueActionItem) co.object).value instanceof RegisterNumber)) {
-                                RegisterNumber rn = (RegisterNumber) ((DirectValueActionItem) co.object).value;
-                                if (rn.number == catchRegister) {
+                            if (((co.object instanceof DirectValueActionItem) && (((DirectValueActionItem) co.object).value instanceof RegisterNumber))
+                                    || (co.object instanceof TemporaryRegister) //Can be in for in loop
+                                    ) {
+                                int regNumber;
+
+                                if (co.object instanceof TemporaryRegister) {
+                                    TemporaryRegister tr = (TemporaryRegister) co.object;
+                                    regNumber = tr.getRegId();
+                                } else {
+                                    RegisterNumber rn = (RegisterNumber) ((DirectValueActionItem) co.object).value;
+                                    regNumber = rn.number;
+                                }
+
+                                if (regNumber == catchRegister) {
                                     catchExceptionTypes.add(co.constructor);
                                     if (body.get(pos + 1) instanceof IfItem) {
                                         IfItem ifi = (IfItem) body.get(pos + 1);
@@ -348,11 +359,17 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
                                                 }
                                             }
                                         }
-
                                     }
+                                    break;
+                                } else {
+                                    break;
                                 }
+                            } else {
+                                break;
                             }
 
+                        } else {
+                            break;
                         }
                     }
                     if (body.get(pos) instanceof DefineLocalActionItem) {
