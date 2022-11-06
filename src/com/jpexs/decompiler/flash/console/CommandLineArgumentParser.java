@@ -67,6 +67,7 @@ import com.jpexs.decompiler.flash.exporters.amf.amf3.Amf3Exporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ButtonExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FrameExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
@@ -316,7 +317,7 @@ public class CommandLineArgumentParser {
             out.println(" " + (cnt++) + ") <infile> [<infile2> <infile3> ...]");
             out.println(" ...opens SWF file(s) with the decompiler GUI");
         }
-
+       
         if (filter == null || filter.equals("proxy")) {
             out.println(" " + (cnt++) + ") -proxy [-P<port>]");
             out.println("  ...auto start proxy in the tray. Optional parameter -P specifies port for proxy. Defaults to 55555. ");
@@ -658,6 +659,12 @@ public class CommandLineArgumentParser {
             out.println("  ...<outfile>: Where to save merged file");
             out.println("  ...<swffile>: Input SWF file");
         }
+        
+        if (filter == null || filter.equals("swf2exe")) {
+            out.println(" " + (cnt++) + ") -swf2exe <exportMode> <outfile> <swffile>");
+            out.println(" ...export SWF to executable file");
+            out.println(" ...<exportMode>: wrapper|projector_win||projector_mac|projector_linux");
+        }        
 
         printCmdLineUsageExamples(out, filter);
     }
@@ -874,7 +881,9 @@ public class CommandLineArgumentParser {
             command = nextParam.substring(1);
         }
 
-        if (command.equals("abcmerge")) {
+        if (command.equals("swf2exe")) {
+            parseSwf2Exe(args);
+        } else if (command.equals("abcmerge")) {
             parseAbcMerge(args);
         } else if (command.equals("swf2swc")) {
             parseSwf2Swc(args);
@@ -1112,6 +1121,19 @@ public class CommandLineArgumentParser {
         setConfigurations(args.pop());
     }
 
+    private static void parseSwf2Exe(Stack<String> args) {
+        if (args.size() != 3) {
+            badArguments("swf2exe");            
+        }
+        final String type = args.pop();
+        final File outFile = new File(args.pop());
+        final File swfFile = new File(args.pop());
+        ExeExportMode exportMode = enumFromStr(type, ExeExportMode.class);
+        processReadSWF(swfFile, null, (SWF swf, OutputStream stdout) -> {           
+           Main.saveFileToExe(swf, exportMode, outFile);
+        });
+    }
+    
     private static void parseAbcMerge(Stack<String> args) {
         if (args.size() < 2) {
             badArguments("abcmerge");
