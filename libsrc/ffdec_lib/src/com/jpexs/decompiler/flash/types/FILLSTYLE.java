@@ -91,6 +91,9 @@ public class FILLSTYLE implements NeedsCharacters, FieldChangeObserver, Serializ
                 || (fillStyleType == CLIPPED_BITMAP)
                 || (fillStyleType == NON_SMOOTHED_REPEATING_BITMAP)
                 || (fillStyleType == NON_SMOOTHED_CLIPPED_BITMAP)) {
+            if (bitmapId == 65535) { //In some cases, this special value is used, but is not used. Ignore it. (#1851)
+                return;
+            }
             needed.add(bitmapId);
         }
     }
