@@ -3528,13 +3528,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 DumpInfo di = (DumpInfo) treeItem;
                 t = di.getTag();
             }
-            if ((t instanceof ShowFrameTag)||(t instanceof PlaceObjectTypeTag)) {
-                //FIXME
-                previewPanel.clear();
-                previewPanel.showEmpty();
-                return;
-            }
-            showPreview(t, dumpPreviewPanel, getFrameForTreeItem(t), getTimelinedForTreeItem(treeItem));
+            showPreview(t, dumpPreviewPanel, getFrameForTreeItem(t), getTimelinedForTreeItem(t));
         }
     }
 
@@ -3548,7 +3542,24 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (treeItem == null) {
             return -1;
         }
-        if ((currentView == VIEW_DUMP)||(currentView == VIEW_TIMELINE)) {
+        if (currentView == VIEW_DUMP){
+            if (treeItem instanceof Tag) {
+                Tag t = (Tag) treeItem;
+                ReadOnlyTagList tags = t.getTimelined().getTags();
+                int frame = 0;                
+                for (int i = 0; i < tags.size(); i++) {
+                    if (tags.get(i) == t) {
+                        return frame;
+                    }
+                    if (tags.get(i) instanceof ShowFrameTag) {
+                        frame++;
+                    }                    
+                }                
+            }
+            return -1;
+        }
+            
+        if(currentView == VIEW_TIMELINE) {               
             return -1;
         }
         TreePath path = getCurrentTree().getModel().getTreePath(treeItem);
@@ -3569,9 +3580,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return null;
         }
         
-        if ((currentView == VIEW_DUMP)||(currentView == VIEW_TIMELINE)) {
-            return null;
+        if (currentView == VIEW_DUMP) {
+            if (treeItem instanceof Tag) {
+                Tag t = (Tag) treeItem;
+                return t.getTimelined();
+            }
+            return null;        
         }
+        if (currentView == VIEW_TIMELINE) {
+            return null;
+        }        
 
         TreePath path = getCurrentTree().getModel().getTreePath(treeItem);
         if (path == null) {
