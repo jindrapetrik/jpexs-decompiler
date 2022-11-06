@@ -78,6 +78,7 @@ import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.awt.Color;
@@ -489,19 +490,29 @@ public class DumpTree extends JTree {
         repaint();
     }
 
+    private Tag searchTimelinedForTag(Timelined timelined, long address) {
+        for (Tag tag : timelined.getTags()) {
+            if (tag.getOriginalRange().getPos() == address) {
+                return tag;                
+            }
+            if (tag instanceof DefineSpriteTag) {
+                Tag subSpriteFound = searchTimelinedForTag(((DefineSpriteTag)tag), address);
+                if (subSpriteFound != null) {
+                    return subSpriteFound;
+                }
+            }
+        }
+        return null;
+    }
+    
     private void gotoTagButtonActionPerformed(ActionEvent evt) {
         TreePath[] paths = getSelectionPaths();
         DumpInfoSpecial dumpInfo = (DumpInfoSpecial) paths[0].getLastPathComponent();
 
         SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
         long address = (long) (Long) dumpInfo.specialValue;
-        Tag foundTag = null;
-        for (Tag tag : swf.getTags()) {
-            if (tag.getOriginalRange().getPos() == address) {
-                foundTag = tag;
-                break;
-            }
-        }
+        
+        Tag foundTag = searchTimelinedForTag(swf, address);
 
         if (foundTag != null) {
             mainPanel.getMainFrame().getMenu().showResourcesView();
