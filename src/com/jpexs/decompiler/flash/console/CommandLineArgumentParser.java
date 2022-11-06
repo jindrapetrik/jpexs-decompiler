@@ -756,6 +756,10 @@ public class CommandLineArgumentParser {
             out.println(PREFIX + "-removeInstanceMetadata -instance myobj myfile.swf");
             exampleFound = true;
         }
+        
+        if (filter == null || filter.equals("swf2exe")) {
+            out.println(PREFIX + "-swf2exe wrapper result.exe myfile.swf");
+        }
 
         if (!exampleFound) {
             out.println("Sorry, no example found for command " + filter + ", Let us know in issue tracker when you need it.");
