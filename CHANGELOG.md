@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Show in Hex dump command from other views for tags
 - Show in Taglist command from dump view for tags
 - Create new empty SWF file
+- Checking missing needed character tags and their proper position (Marking them as red - with tooltip)
 
 ### Fixed
 - Flash viewer - subtract blend mode

@@ -230,6 +230,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -373,6 +374,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private TagTreeContextMenu contextPopupMenu;
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
+    
+    private Map<TreeItem, Set<Integer>> missingNeededCharacters = new WeakHashMap<>();
+    
+    private Thread calculateMissingNeededThread;
 
     private class MyTreeSelectionModel extends DefaultTreeSelectionModel {
 
@@ -882,6 +887,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         //Opening files with drag&drop to main window
         enableDrop(true);
+        calculateMissingNeededThread = new Thread() {
+            @Override
+            public void run() {
+                while(true) {
+                    calculateMissingNeededCharacters();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        return;
+                    }
+                }
+            }            
+        };
+        calculateMissingNeededThread.start();
     }
 
     public void closeTagTreeSearch() {
@@ -4475,5 +4494,31 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         setDropTarget(null);
         disposeInner(this);
         Helper.emptyObject(this);
+        if (calculateMissingNeededThread != null) {
+            calculateMissingNeededThread.interrupt();
+        }
     }
+    
+    private static void calculateMissingNeededCharacters(Map<TreeItem, Set<Integer>> missingNeededCharacters, Timelined tim) {
+        for (Tag t: tim.getTags()) {
+            missingNeededCharacters.put(t, t.getMissingNeededCharacters());
+            if (t instanceof DefineSpriteTag) {
+                calculateMissingNeededCharacters(missingNeededCharacters, (DefineSpriteTag) t);
+            }
+        }        
+    }
+    
+    public void calculateMissingNeededCharacters() {
+        Map<TreeItem, Set<Integer>> missingNeededCharacters = new WeakHashMap<>();
+        List<SWFList> swfsLists = new ArrayList<>(swfs);
+        for (SWFList swfList : swfsLists) {
+            for (SWF swf : swfList) {
+                calculateMissingNeededCharacters(missingNeededCharacters, swf);
+            }
+        }
+        this.missingNeededCharacters = missingNeededCharacters;
+        tagTree.setMissingNeededCharacters(missingNeededCharacters);
+        tagListTree.setMissingNeededCharacters(missingNeededCharacters);
+    }
+    
 }
