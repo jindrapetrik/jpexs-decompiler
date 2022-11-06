@@ -79,6 +79,7 @@ import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.awt.Color;
@@ -186,7 +187,7 @@ public class DumpTree extends JTree {
                             case DefineSoundTag.NAME:
                             case SoundStreamHeadTag.NAME:
                             case SoundStreamHead2Tag.NAME:
-                            case SoundStreamBlockTag.NAME:                                    
+                            case SoundStreamBlockTag.NAME:
                                 nodeType = TreeNodeType.SOUND;
                                 break;
                             case DefineBinaryDataTag.NAME:
@@ -290,14 +291,19 @@ public class DumpTree extends JTree {
         parseInstructionsMenuItem.setIcon(View.getIcon("parse16"));
         contextPopupMenu.add(parseInstructionsMenuItem);
 
-        final JMenuItem gotoTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
-        gotoTagMenuItem.addActionListener(this::gotoTagButtonActionPerformed);
-        gotoTagMenuItem.setIcon(View.getIcon("folder16"));
-        contextPopupMenu.add(gotoTagMenuItem);
+        final JMenuItem showInResourcesTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
+        showInResourcesTagMenuItem.addActionListener(this::showInResourcesTagButtonActionPerformed);
+        showInResourcesTagMenuItem.setIcon(View.getIcon("folder16"));
+        contextPopupMenu.add(showInResourcesTagMenuItem);
+
+        final JMenuItem showInTagListTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInTagList"));
+        showInTagListTagMenuItem.addActionListener(this::showInTagListTagButtonActionPerformed);
+        showInTagListTagMenuItem.setIcon(View.getIcon("taglist16"));
+        contextPopupMenu.add(showInTagListTagMenuItem);
 
         final JMenuItem gotoActionListMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
         gotoActionListMenuItem.addActionListener(this::gotoActionListButtonActionPerformed);
-        gotoActionListMenuItem.setIcon(View.getIcon("folder16"));        
+        gotoActionListMenuItem.setIcon(View.getIcon("folder16"));
         contextPopupMenu.add(gotoActionListMenuItem);
 
         final JMenuItem gotoMethodMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
@@ -328,7 +334,8 @@ public class DumpTree extends JTree {
                     parseActionsMenuItem.setVisible(false);
                     parseAbcMenuItem.setVisible(false);
                     parseInstructionsMenuItem.setVisible(false);
-                    gotoTagMenuItem.setVisible(false);
+                    showInResourcesTagMenuItem.setVisible(false);
+                    showInTagListTagMenuItem.setVisible(false);
                     gotoActionListMenuItem.setVisible(false);
                     gotoMethodMenuItem.setVisible(false);
 
@@ -365,7 +372,8 @@ public class DumpTree extends JTree {
 
                         switch (specialType) {
                             case TAG:
-                                gotoTagMenuItem.setVisible(true);
+                                showInResourcesTagMenuItem.setVisible(true);
+                                showInTagListTagMenuItem.setVisible(true);
                                 break;
                             case ACTION_BYTES:
                                 gotoActionListMenuItem.setVisible(true);
@@ -417,7 +425,7 @@ public class DumpTree extends JTree {
         fc.setCurrentDirectory(new File(selDir));
         if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             File sf = Helper.fixDialogFile(fc.getSelectedFile());
-            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(sf))) {
+            try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(sf))) {
                 byte[] data = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf().originalUncompressedData;
                 if (decompress) {
                     fos.write(SWFInputStream.uncompressByteArray(data, (int) dumpInfo.startByte, (int) (dumpInfo.getEndByte() - dumpInfo.startByte + 1)));
@@ -493,10 +501,10 @@ public class DumpTree extends JTree {
     private Tag searchTimelinedForTag(Timelined timelined, long address) {
         for (Tag tag : timelined.getTags()) {
             if (tag.getOriginalRange().getPos() == address) {
-                return tag;                
+                return tag;
             }
             if (tag instanceof DefineSpriteTag) {
-                Tag subSpriteFound = searchTimelinedForTag(((DefineSpriteTag)tag), address);
+                Tag subSpriteFound = searchTimelinedForTag(((DefineSpriteTag) tag), address);
                 if (subSpriteFound != null) {
                     return subSpriteFound;
                 }
@@ -504,14 +512,29 @@ public class DumpTree extends JTree {
         }
         return null;
     }
-    
-    private void gotoTagButtonActionPerformed(ActionEvent evt) {
+
+    private void showInTagListTagButtonActionPerformed(ActionEvent evt) {
         TreePath[] paths = getSelectionPaths();
         DumpInfoSpecial dumpInfo = (DumpInfoSpecial) paths[0].getLastPathComponent();
 
         SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
         long address = (long) (Long) dumpInfo.specialValue;
-        
+
+        Tag foundTag = searchTimelinedForTag(swf, address);
+
+        if (foundTag != null) {
+            mainPanel.getMainFrame().getMenu().showTagListView();
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), foundTag);
+        }
+    }
+
+    private void showInResourcesTagButtonActionPerformed(ActionEvent evt) {
+        TreePath[] paths = getSelectionPaths();
+        DumpInfoSpecial dumpInfo = (DumpInfoSpecial) paths[0].getLastPathComponent();
+
+        SWF swf = DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
+        long address = (long) (Long) dumpInfo.specialValue;
+
         Tag foundTag = searchTimelinedForTag(swf, address);
 
         if (foundTag != null) {
@@ -564,6 +587,43 @@ public class DumpTree extends JTree {
         expandPath(new TreePath(new Object[]{root}));
         for (int i = 0; i < childCount; i++) {
             expandPath(new TreePath(new Object[]{root, dtm.getChild(root, i)}));
+        }
+    }
+
+    public void setSelectedTag(Tag tag) {
+        DumpTreeModel model = getModel();
+        DumpInfo d = model.getRoot();
+        for (DumpInfo sd : d.getChildInfos()) {
+            if (sd instanceof DumpInfoSwfNode) {
+                DumpInfoSwfNode si = (DumpInfoSwfNode) sd;
+                if (si.getSwf() == tag.getSwf()) {
+
+                    long address = tag.getOriginalRange().getPos();
+                    DumpInfo di = si;
+                    while (model.getChildCount(di) > 0) {
+                        boolean found = false;
+                        for (DumpInfo child : di.getChildInfos()) {
+                            if (child.startByte > address) {
+                                break;
+                            }
+                            if (child.getEndByte() >= address) {
+                                di = child;
+                                found = true;
+                            }
+                        }
+                        if (!found) {
+                            break;
+                        }
+                    }
+                    di = di.parent; // tagId is selected, lets select the tag instead
+                    TreePath selPath = model.getDumpInfoPath(di);
+                    if (selPath != null) {
+                        setSelectionPath(selPath);
+                        scrollPathToVisible(selPath);
+                    }
+                    break;
+                }
+            }
         }
     }
 }

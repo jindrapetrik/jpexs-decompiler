@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.amf.amf3.ListSet;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.SelectTagPositionDialog;
@@ -92,7 +93,6 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -186,6 +186,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem showInResourcesViewTagMenuItem;
 
     private JMenuItem showInTagListViewTagMenuItem;
+    
+    private JMenuItem showInHexDumpViewTagMenuItem;
 
     private JMenuItem addFramesMenuItem;
 
@@ -283,6 +285,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         showInTagListViewTagMenuItem.addActionListener(this::showInTagListViewActionPerformed);
         showInTagListViewTagMenuItem.setIcon(View.getIcon("taglist16"));
         add(showInTagListViewTagMenuItem);
+        
+        showInHexDumpViewTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInHexDump"));
+        showInHexDumpViewTagMenuItem.addActionListener(this::showInHexDumpViewActionPerformed);
+        showInHexDumpViewTagMenuItem.setIcon(View.getIcon("viewhex16"));
+        add(showInHexDumpViewTagMenuItem);
 
         addTagInsideMenu = new JMenu(mainPanel.translate("contextmenu.addTagInside"));
         addTagInsideMenu.setIcon(View.getIcon("addtag16"));
@@ -606,6 +613,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         moveTagMenuItem.setVisible(items.size() == 1 && (items.get(0) instanceof Tag));
         showInResourcesViewTagMenuItem.setVisible(false);
         showInTagListViewTagMenuItem.setVisible(false);
+        showInHexDumpViewTagMenuItem.setVisible(false);      
         addFramesMenuItem.setVisible(false);
         addFramesBeforeMenuItem.setVisible(false);
         addFramesAfterMenuItem.setVisible(false);
@@ -749,6 +757,10 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             if (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES && !isFolder) {
                 showInTagListViewTagMenuItem.setVisible(true);
+            }
+            
+            if (firstItem instanceof Tag) {
+                showInHexDumpViewTagMenuItem.setVisible(true);
             }
         }
 
@@ -2283,6 +2295,16 @@ public class TagTreeContextMenu extends JPopupMenu {
         TreeItem item = getTree().getCurrentTreeItem();
         mainPanel.showView(MainPanel.VIEW_TAGLIST);
         mainPanel.setTagTreeSelectedNode(mainPanel.tagListTree, item);
+        mainPanel.updateMenu();
+    }
+    
+    private void showInHexDumpViewActionPerformed(ActionEvent evt) {
+        if (mainPanel.isModified()) {
+            ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("message.warning.hexViewNotUpToDate"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningHexViewNotUpToDate);
+        }
+        TreeItem item = getTree().getCurrentTreeItem();
+        mainPanel.showView(MainPanel.VIEW_DUMP);
+        mainPanel.dumpTree.setSelectedTag((Tag) item);
         mainPanel.updateMenu();
     }
 
