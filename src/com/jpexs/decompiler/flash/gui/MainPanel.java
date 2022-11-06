@@ -1131,6 +1131,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         mainMenu.updateComponents(null);
         previewPanel.clear();
+        dumpPreviewPanel.clear();
         return true;
     }
 
