@@ -171,7 +171,7 @@ public class AdobeFlashExecutor {
                 actions2.add(new ActionReturn());
 
                 doaTag.setActions(actions2);
-                swf.addTag(doaTag, asm);
+                swf.addTagBefore(doaTag, (Tag) asm);
 
                 i++;
             }

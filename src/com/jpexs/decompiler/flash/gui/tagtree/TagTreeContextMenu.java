@@ -2454,7 +2454,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 SWF swf = timelined.getTimeline().swf;
                 for (int i = 0; i < frameCount; i++) {
                     ShowFrameTag showFrameTag = new ShowFrameTag(swf);
-                    showFrameTag.setTimelined(swf);
+                    showFrameTag.setTimelined(timelined);
                     timelined.addTag(positionToAdd, showFrameTag);
                 }
                 timelined.resetTimeline();

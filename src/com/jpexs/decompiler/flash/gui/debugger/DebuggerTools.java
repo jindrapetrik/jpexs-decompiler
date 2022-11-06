@@ -204,8 +204,8 @@ public class DebuggerTools {
                         }
                     }
                     //Add to target SWF
-                    ((Tag) ds).setSwf(swf);
-                    swf.addTag((Tag) ds, (Tag) firstAbc);
+                    ((Tag) ds).setSwf(swf);                    
+                    swf.addTagBefore((Tag) ds, (Tag) firstAbc);
                     swf.getAbcList().add(swf.getAbcList().indexOf(firstAbc), ds);
                     ((Tag) ds).setModified(true);
 

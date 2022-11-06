@@ -3217,83 +3217,24 @@ public final class SWF implements SWFContainerItem, Timelined {
     
     public int indexOfTag(Tag tag) {
         return tags.indexOf(tag);
-    }
-
-    /**
-     * Adds a tag to the SWF If targetTreeItem is: 
-     * - Frame: adds the tag to the
-     * Frame. Frame can be a frame of the main timeline or a DefineSprite frame
-     * - DefineSprite: adds the tag to the end of the DefineSprite's tag list
-     * - Any other tag in the SWF: adds the new tag exactly before the specified
-     * tag
-     * - Other: adds the tag to the end of the SWF's tag list
-     *
-     * @param tag
-     * @param targetTreeItem
-     */
-    public void addTag(Tag tag, TreeItem targetTreeItem) {
-        SWF swf = tag.getSwf();
-        Frame frame = targetTreeItem instanceof Frame ? (Frame) targetTreeItem : null;
-        Timelined timelined;
-        if (frame != null) {
-            timelined = frame.timeline.timelined;
-        } else {
-            timelined = swf.getTimelined(targetTreeItem);
+    }  
+    
+    public static void addTagBefore(Tag newTag, Tag targetTag) {       
+        Timelined tim = targetTag.getTimelined();
+        int index = tim.indexOfTag(targetTag);
+        if (index < 0) {
+            return;
         }
-
-        tag.setTimelined(timelined);
-
-        int index;
-        if ((tag instanceof DefineScalingGridTag) && (timelined instanceof DefineSpriteTag)) {
-            index = this.tags.indexOf(timelined) + 1;
-        } else if (frame != null) {
-            if (frame.showFrameTag != null) {
-                index = timelined.indexOfTag(frame.showFrameTag);
-            } else {
-                index = -1;
-            }
-        } else if (timelined instanceof DefineSpriteTag) {
-            index = -1;
-        } else if (targetTreeItem instanceof Tag) {
-            if (tag instanceof CharacterIdTag && !(tag instanceof CharacterTag) && targetTreeItem instanceof CharacterTag) {
-                ((CharacterIdTag) tag).setCharacterId(((CharacterTag) targetTreeItem).getCharacterId());
-            }
-
-            index = timelined.indexOfTag((Tag) targetTreeItem); // todo: honfika: why not index + 1?
-        } else {
-            index = -1;
-            if (tag instanceof CharacterTag) {
-                // add before the last ShowFrame tag
-                ReadOnlyTagList tags = timelined.getTags();
-                for (int i = tags.size() - 1; i >= 0; i--) {
-                    if (tags.get(i) instanceof ShowFrameTag) {
-                        index = i;
-                        break;
-                    }
-                }
-            }
+        tim.addTag(index, newTag);
+        tim.resetTimeline();
+        if (tim instanceof DefineSpriteTag) {
+            DefineSpriteTag sprite = (DefineSpriteTag) tim;
+            sprite.frameCount = tim.getTimeline().getFrameCount();
+        } else if (tim instanceof SWF) {
+            SWF swf = (SWF) tim;
+            swf.frameCount = tim.getTimeline().getFrameCount();
         }
-
-        if ((tag instanceof DefineScalingGridTag) && (timelined instanceof DefineSpriteTag)) {
-            DefineScalingGridTag scalingGrid = (DefineScalingGridTag) tag;
-            scalingGrid.characterId = ((DefineSpriteTag) timelined).spriteId;
-            this.addTag(index, tag);
-        } else {
-            if (index > -1) {
-                timelined.addTag(index, tag);
-            } else {
-                timelined.addTag(tag);
-            }
-            timelined.resetTimeline();
-
-            if (timelined instanceof DefineSpriteTag) {
-                DefineSpriteTag sprite = (DefineSpriteTag) timelined;
-                sprite.frameCount = timelined.getTimeline().getFrameCount();
-            }
-            if (timelined == this) {
-                frameCount = getTimeline().getFrameCount();
-            }
-        }
+        newTag.setTimelined(tim);
     }
 
     public Timelined getTimelined(TreeItem treeItem) {
