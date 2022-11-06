@@ -500,9 +500,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         return null;
     }
 
-    public void computeDependentCharacters() {
-        Map<Integer, Set<Integer>> dep = new HashMap<>();
-        for (Tag tag : getTags()) {
+    
+    private void computeDependentCharacters(Timelined timelined, Map<Integer, Set<Integer>> dep) {
+        for (Tag tag : timelined.getTags()) {
             if (tag instanceof CharacterTag) {
                 int characterId = ((CharacterTag) tag).getCharacterId();
                 Set<Integer> needed = new HashSet<>();
@@ -517,7 +517,14 @@ public final class SWF implements SWFContainerItem, Timelined {
                     s.add(characterId);
                 }
             }
+            if (tag instanceof DefineSpriteTag) {
+                computeDependentCharacters((DefineSpriteTag) tag, dep);
+            }
         }
+    }
+    public void computeDependentCharacters() {
+        Map<Integer, Set<Integer>> dep = new HashMap<>();
+        computeDependentCharacters(this, dep);
 
         dependentCharacters = dep;
     }
@@ -2953,16 +2960,18 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     private void removeTagWithDependenciesFromTimeline(Tag toRemove, Timeline timeline) {
-        Map<Integer, Integer> stage = new HashMap<>();
-        Set<Integer> dependingChars = new HashSet<>();
-        Timelined timelined = timeline.timelined;
-        ReadOnlyTagList tags = timelined.getTags();
+        Set<Integer> dependingChars = new HashSet<>();        
         if (toRemove instanceof CharacterTag) {
             int characterId = ((CharacterTag) toRemove).getCharacterId();
             dependingChars = getDependentCharacters(characterId);
             dependingChars.add(characterId);
         }
-
+        removeTagWithDependenciesFromTimeline(toRemove, timeline, dependingChars);
+    }
+    private void removeTagWithDependenciesFromTimeline(Tag toRemove, Timeline timeline, Set<Integer> dependingChars) {
+        Map<Integer, Integer> stage = new HashMap<>();
+        Timelined timelined = timeline.timelined;
+        ReadOnlyTagList tags = timelined.getTags();        
         for (int i = 0; i < tags.size(); i++) {
             Tag t = tags.get(i);
             if (t instanceof RemoveTag) {
@@ -3012,7 +3021,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
 
             if (t instanceof Timelined) {
-                removeTagWithDependenciesFromTimeline(toRemove, ((Timelined) t).getTimeline());
+                removeTagWithDependenciesFromTimeline(toRemove, ((Timelined) t).getTimeline(), dependingChars);
             }
         }
     }
