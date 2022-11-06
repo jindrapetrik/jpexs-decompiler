@@ -1119,6 +1119,62 @@ public class Main {
         saveFile(swf, outfile, SaveFileMode.SAVE, null);
     }
 
+    public static void saveFileToExe(SWF swf, ExeExportMode exeExportMode, File tmpFile) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(tmpFile);  BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+            switch (exeExportMode) {
+                case WRAPPER:
+                    InputStream exeStream = View.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/Swf2Exe.bin");
+                    Helper.copyStream(exeStream, bos);
+                    int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
+                    int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
+                    bos.write(width & 0xff);
+                    bos.write((width >> 8) & 0xff);
+                    bos.write((width >> 16) & 0xff);
+                    bos.write((width >> 24) & 0xff);
+                    bos.write(height & 0xff);
+                    bos.write((height >> 8) & 0xff);
+                    bos.write((height >> 16) & 0xff);
+                    bos.write((height >> 24) & 0xff);
+                    bos.write(Configuration.saveAsExeScaleMode.get());
+                    break;
+                case PROJECTOR_WIN:
+                case PROJECTOR_MAC:
+                case PROJECTOR_LINUX:
+                    File projectorFile = Configuration.getProjectorFile(exeExportMode);
+                    if (projectorFile == null) {
+                        String message = "Projector not found, please place it to " + Configuration.getProjectorPath();
+                        logger.log(Level.SEVERE, message);
+                        throw new IOException(message);
+                    }
+                    Helper.copyStream(new FileInputStream(projectorFile), bos);
+                    bos.flush();
+                    break;
+            }
+            
+            long pos = fos.getChannel().position();
+            swf.saveTo(bos);
+
+            switch (exeExportMode) {
+                case PROJECTOR_WIN:
+                case PROJECTOR_MAC:
+                case PROJECTOR_LINUX:
+                    bos.flush();
+                    int swfSize = (int) (fos.getChannel().position() - pos);
+
+                    // write magic number
+                    bos.write(0x56);
+                    bos.write(0x34);
+                    bos.write(0x12);
+                    bos.write(0xfa);
+
+                    bos.write(swfSize & 0xff);
+                    bos.write((swfSize >> 8) & 0xff);
+                    bos.write((swfSize >> 16) & 0xff);
+                    bos.write((swfSize >> 24) & 0xff);
+            }            
+        }
+    }
+
     public static void saveFile(SWF swf, String outfile, SaveFileMode mode, ExeExportMode exeExportMode) throws IOException {
         File savedFile = new File(outfile);
         startSaving(savedFile);
@@ -1128,60 +1184,13 @@ public class Main {
         }
         File outfileF = new File(outfile);
         File tmpFile = new File(outfile + ".tmp");
-        try (FileOutputStream fos = new FileOutputStream(tmpFile);  BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+
+        try {
             if (mode == SaveFileMode.EXE) {
-                switch (exeExportMode) {
-                    case WRAPPER:
-                        InputStream exeStream = View.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/Swf2Exe.bin");
-                        Helper.copyStream(exeStream, bos);
-                        int width = swf.displayRect.Xmax - swf.displayRect.Xmin;
-                        int height = swf.displayRect.Ymax - swf.displayRect.Ymin;
-                        bos.write(width & 0xff);
-                        bos.write((width >> 8) & 0xff);
-                        bos.write((width >> 16) & 0xff);
-                        bos.write((width >> 24) & 0xff);
-                        bos.write(height & 0xff);
-                        bos.write((height >> 8) & 0xff);
-                        bos.write((height >> 16) & 0xff);
-                        bos.write((height >> 24) & 0xff);
-                        bos.write(Configuration.saveAsExeScaleMode.get());
-                        break;
-                    case PROJECTOR_WIN:
-                    case PROJECTOR_MAC:
-                    case PROJECTOR_LINUX:
-                        File projectorFile = Configuration.getProjectorFile(exeExportMode);
-                        if (projectorFile == null) {
-                            String message = "Projector not found, please place it to " + Configuration.getProjectorPath();
-                            logger.log(Level.SEVERE, message);
-                            throw new IOException(message);
-                        }
-                        Helper.copyStream(new FileInputStream(projectorFile), bos);
-                        bos.flush();
-                        break;
-                }
-            }
-
-            long pos = fos.getChannel().position();
-            swf.saveTo(bos);
-
-            if (mode == SaveFileMode.EXE) {
-                switch (exeExportMode) {
-                    case PROJECTOR_WIN:
-                    case PROJECTOR_MAC:
-                    case PROJECTOR_LINUX:
-                        bos.flush();
-                        int swfSize = (int) (fos.getChannel().position() - pos);
-
-                        // write magic number
-                        bos.write(0x56);
-                        bos.write(0x34);
-                        bos.write(0x12);
-                        bos.write(0xfa);
-
-                        bos.write(swfSize & 0xff);
-                        bos.write((swfSize >> 8) & 0xff);
-                        bos.write((swfSize >> 16) & 0xff);
-                        bos.write((swfSize >> 24) & 0xff);
+                saveFileToExe(swf, exeExportMode, tmpFile);
+            } else {
+                try (FileOutputStream fos = new FileOutputStream(tmpFile);  BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+                    swf.saveTo(bos);
                 }
             }
         } catch (Throwable t) {
@@ -1359,7 +1368,7 @@ public class Main {
             Helper.freeMem();
             showModeFrame();
             return true;
-        } else {            
+        } else {
             for (int i = sourceInfos.size() - 1; i >= 0; i--) {
                 if (sourceInfos.get(i).isEmpty()) {
                     sourceInfos.remove(i);
@@ -1492,8 +1501,8 @@ public class Main {
             swf.setFileTitle(fileTitle);
 
             swf.displayRect = new RECT(
-                    newFileDialog.getXMin(), 
-                    newFileDialog.getXMax(), 
+                    newFileDialog.getXMin(),
+                    newFileDialog.getXMax(),
                     newFileDialog.getYMin(),
                     newFileDialog.getYmax()
             );
@@ -1506,23 +1515,23 @@ public class Main {
             if (newFileDialog.isAs3()) {
                 f.actionScript3 = true;
             }
-            Tag t = f;            
+            Tag t = f;
             t.setTimelined(swf);
-            swf.addTag(t); 
+            swf.addTag(t);
             t = new SetBackgroundColorTag(swf, new RGB(newFileDialog.getBackgroundColor()));
             t.setTimelined(swf);
             swf.addTag(t);
             t = new ShowFrameTag(swf);
             t.setTimelined(swf);
-            swf.addTag(t);      
+            swf.addTag(t);
             swf.frameCount = 1;
             swf.hasEndTag = true;
             list.add(swf);
             swf.swfList = list;
             mainFrame.getPanel().load(list, true);
-            
+
             //select first frame
-            mainFrame.getPanel().setTagTreeSelectedNode(mainFrame.getPanel().getCurrentTree(), swf.getTimeline().getFrame(0));                        
+            mainFrame.getPanel().setTagTreeSelectedNode(mainFrame.getPanel().getCurrentTree(), swf.getTimeline().getFrame(0));
         }
     }
 
