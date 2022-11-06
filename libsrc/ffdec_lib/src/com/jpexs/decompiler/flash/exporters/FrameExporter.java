@@ -169,6 +169,10 @@ public class FrameExporter {
 
     public List<File> exportFrames(AbortRetryIgnoreHandler handler, String outdir, final SWF swf, int containerId, List<Integer> frames, final FrameExportSettings settings, final EventListener evl) throws IOException, InterruptedException {
         final List<File> ret = new ArrayList<>();
+        if (Thread.currentThread().isInterrupted()) {
+            return ret;
+        }
+        
         if (swf.getTags().isEmpty()) {
             return ret;
         }
@@ -230,6 +234,10 @@ public class FrameExporter {
                     }
                     ret.add(f);
                 }, handler).run();
+                
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
 
                 if (evl != null) {
                     Tag parentTag = tim.getParentTag();
@@ -398,6 +406,9 @@ public class FrameExporter {
 
             @Override
             public boolean hasNext() {
+                if (Thread.currentThread().isInterrupted()) {
+                    return false;
+                }
                 return fframes.size() > pos;
             }
 
@@ -407,7 +418,7 @@ public class FrameExporter {
             }
 
             @Override
-            public BufferedImage next() {
+            public BufferedImage next() {                
                 if (!hasNext()) {
                     return null;
                 }
@@ -421,7 +432,9 @@ public class FrameExporter {
 
                 int fframe = fframes.get(pos++);
                 BufferedImage result = SWF.frameToImageGet(tim, fframe, 0, null, 0, tim.displayRect, new Matrix(), null, fusesTransparency ? null : fbackgroundColor, settings.zoom).getBufferedImage();
-
+                if (Thread.currentThread().isInterrupted()) {
+                    return null;
+                }
                 if (evl != null) {
                     evl.handleExportedEvent("frame", pos, fframes.size(), tagName);
                 }
@@ -443,7 +456,10 @@ public class FrameExporter {
                     final int fi = i;
                     new RetryTask(() -> {
                         File f = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".bmp");
-                        BMPFile.saveBitmap(frameImages.next(), f);
+                        BufferedImage img = frameImages.next();
+                        if (img != null) {
+                            BMPFile.saveBitmap(img, f);
+                        }
                         ret.add(f);
                     }, handler).run();
                 }
@@ -453,8 +469,11 @@ public class FrameExporter {
                     final int fi = i;
                     new RetryTask(() -> {
                         File file = new File(foutdir + File.separator + (fframes.get(fi) + 1) + ".png");
-                        ImageHelper.write(frameImages.next(), ImageFormat.PNG, file);
-                        ret.add(file);
+                        BufferedImage img = frameImages.next();
+                        if (img != null) {
+                            ImageHelper.write(img, ImageFormat.PNG, file);
+                            ret.add(file);
+                        }
                     }, handler).run();
                 }
 
@@ -537,11 +556,10 @@ public class FrameExporter {
                                 ex.printStackTrace();
                             }
                             g.dispose();
-                            /*if (frameImages.hasNext()) {
-                                img = frameImages.next();
-                            } else {
-                                break;
-                            }*/
+
+                            if (Thread.currentThread().isInterrupted()) {
+                                return;
+                            }
                             pos++;
                         }
 
@@ -626,7 +644,11 @@ public class FrameExporter {
         try {
             out.write(0, img0, 1);
             while (images.hasNext()) {
-                out.write(0, images.next(), 1);
+                BufferedImage img = images.next();
+                if (img == null) {
+                    break;
+                }
+                out.write(0, img, 1);
             }
         } finally {
             out.close();
@@ -643,7 +665,11 @@ public class FrameExporter {
         encoder.start(file.getAbsolutePath());
         encoder.setDelay((int) (1000.0 / frameRate));
         while (images.hasNext()) {
-            encoder.addFrame(images.next());
+            BufferedImage img = images.next();
+            if (img == null) {
+                break;
+            }
+            encoder.addFrame(img);
         }
 
         encoder.finish();
@@ -660,7 +686,11 @@ public class FrameExporter {
             writer.writeToSequence(img0);
 
             while (images.hasNext()) {
-                writer.writeToSequence(images.next());
+                BufferedImage img = images.next();
+                if (img == null) {
+                    break;
+                }
+                writer.writeToSequence(img);
             }
 
             writer.close();
@@ -682,6 +712,10 @@ public class FrameExporter {
         int maxDepth = timeline.getMaxDepth();
         Stack<Integer> clipDepths = new Stack<>();
         for (int frame : frames) {
+            
+            if (Thread.currentThread().isInterrupted()) {
+                break;
+            }
             result.append("\t\tcase ").append(frame).append(":\r\n");
             Frame frameObj = timeline.getFrame(frame);
             for (int i = 1; i <= maxDepth + 1; i++) {

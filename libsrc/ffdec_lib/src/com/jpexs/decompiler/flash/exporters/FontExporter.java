@@ -61,6 +61,10 @@ public class FontExporter {
 
     public List<File> exportFonts(AbortRetryIgnoreHandler handler, String outdir, ReadOnlyTagList tags, final FontExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
+        if (Thread.currentThread().isInterrupted()) {
+            return ret;
+        }
+        
         if (tags.isEmpty()) {
             return ret;
         }
@@ -97,6 +101,10 @@ public class FontExporter {
                 }, handler).run();
 
                 ret.add(file);
+
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
 
                 if (evl != null) {
                     evl.handleExportedEvent("font", currentIndex, count, t.getName());

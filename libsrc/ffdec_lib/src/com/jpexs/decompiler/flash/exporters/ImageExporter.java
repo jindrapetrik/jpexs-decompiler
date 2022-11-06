@@ -45,6 +45,10 @@ public class ImageExporter {
 
     public List<File> exportImages(AbortRetryIgnoreHandler handler, String outdir, ReadOnlyTagList tags, ImageExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
+        if (Thread.currentThread().isInterrupted()) {
+            return ret;
+        }
+        
         if (tags.isEmpty()) {
             return ret;
         }
@@ -102,6 +106,10 @@ public class ImageExporter {
                         }
                     }, handler).run();
                     ret.add(file);
+                }
+                
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
                 }
 
                 if (evl != null) {

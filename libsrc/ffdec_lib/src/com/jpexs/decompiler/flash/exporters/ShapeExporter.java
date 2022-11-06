@@ -65,6 +65,10 @@ public class ShapeExporter {
 
     public List<File> exportShapes(AbortRetryIgnoreHandler handler, final String outdir, final SWF swf, ReadOnlyTagList tags, final ShapeExportSettings settings, EventListener evl, double unzoom) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
+        if (Thread.currentThread().isInterrupted()) {
+            return ret;
+        }
+        
         if (tags.isEmpty()) {
             return ret;
         }
@@ -159,6 +163,9 @@ public class ShapeExporter {
                 }, handler).run();
                 ret.add(file);
 
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
                 if (evl != null) {
                     evl.handleExportedEvent("shape", currentIndex, count, t.getName());
                 }

@@ -777,6 +777,14 @@ public class Main {
     public static void startWork(String name, CancellableWorker worker) {
         startWork(name, -1, worker);
     }
+    
+    public static void continueWork(String name) {
+        continueWork(name, -1);
+    }
+    
+    public static void continueWork(String name, final int percent) {
+        startWork(name, percent, mainFrame.getPanel().getCurrentWorker());
+    }
 
     public static void startWork(final String name, final int percent, final CancellableWorker worker) {
         working = true;
@@ -1075,7 +1083,7 @@ public class Main {
                         text += " " + type;
                     }
 
-                    startWork(text + " " + index + "/" + count + " " + data, null);
+                    continueWork(text + " " + index + "/" + count + " " + data);
                 }
 
                 @Override
@@ -1085,7 +1093,7 @@ public class Main {
                         text += " " + type;
                     }
 
-                    startWork(text + " " + index + "/" + count + " " + data, null);
+                    continueWork(text + " " + index + "/" + count + " " + data);
                 }
 
                 @Override
@@ -1094,16 +1102,16 @@ public class Main {
                         throw new Error("Event is not supported by this handler.");
                     }
                     if (event.equals("getVariables")) {
-                        startWork(AppStrings.translate("work.gettingvariables") + "..." + (String) data, null);
+                        continueWork(AppStrings.translate("work.gettingvariables") + "..." + (String) data);
                     }
                     if (event.equals("deobfuscate")) {
-                        startWork(AppStrings.translate("work.deobfuscating") + "..." + (String) data, null);
+                        continueWork(AppStrings.translate("work.deobfuscating") + "..." + (String) data);
                     }
                     if (event.equals("deobfuscate_pcode")) {
                         startWork(AppStrings.translate("work.deobfuscating_pcode") + "..." + (String) data, deobfuscatePCodeWorker);
                     }
                     if (event.equals("rename")) {
-                        startWork(AppStrings.translate("work.renaming") + "..." + (String) data, null);
+                        continueWork(AppStrings.translate("work.renaming") + "..." + (String) data);
                     }
                     if (event.equals("importing_as")) {
                         startWork(AppStrings.translate("work.importing_as") + "..." + (String) data, importWorker);

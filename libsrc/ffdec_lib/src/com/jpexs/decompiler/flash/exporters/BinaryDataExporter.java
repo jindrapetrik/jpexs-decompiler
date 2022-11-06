@@ -41,6 +41,10 @@ public class BinaryDataExporter {
 
     public List<File> exportBinaryData(AbortRetryIgnoreHandler handler, String outdir, ReadOnlyTagList tags, BinaryDataExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
+        if (Thread.currentThread().isInterrupted()) {
+            return ret;
+        }
+        
         if (tags.isEmpty()) {
             return ret;
         }
@@ -77,6 +81,10 @@ public class BinaryDataExporter {
 
                 ret.add(file);
 
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
+        
                 if (evl != null) {
                     evl.handleExportedEvent("binarydata", currentIndex, count, t.getName());
                 }

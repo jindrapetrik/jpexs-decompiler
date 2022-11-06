@@ -57,6 +57,10 @@ public class MorphShapeExporter {
     //TODO: implement morphshape export. How to handle 65536 frames?
     public List<File> exportMorphShapes(AbortRetryIgnoreHandler handler, final String outdir, ReadOnlyTagList tags, final MorphShapeExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
+        if (Thread.currentThread().isInterrupted()) {
+            return ret;
+        }
+        
         if (tags.isEmpty()) {
             return ret;
         }
@@ -132,6 +136,9 @@ public class MorphShapeExporter {
                 }, handler).run();
                 ret.add(file);
 
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
                 if (evl != null) {
                     evl.handleExportedEvent("morphshape", currentIndex, count, t.getName());
                 }

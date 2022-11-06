@@ -45,6 +45,10 @@ public class SymbolClassExporter {
 
     public List<File> exportNames(AbortRetryIgnoreHandler handler, final String outdir, ReadOnlyTagList tags, SymbolClassExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
+        if (Thread.currentThread().isInterrupted()) {
+            return ret;
+        }
+        
         int count = 0;
         for (Tag t : tags) {
             if (t instanceof ExportAssetsTag || t instanceof SymbolClassTag) {
@@ -73,6 +77,9 @@ public class SymbolClassExporter {
                         for (int i = 0; i < sct.tags.size(); i++) {
                             writer.append(sct.tags.get(i) + ";" + sct.names.get(i) + Helper.newLine);
                         }
+                    }
+                    if (Thread.currentThread().isInterrupted()) {
+                        break;
                     }
                 }
             }

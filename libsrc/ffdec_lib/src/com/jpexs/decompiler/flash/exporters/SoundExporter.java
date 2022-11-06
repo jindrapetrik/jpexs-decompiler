@@ -53,6 +53,10 @@ public class SoundExporter {
 
     public List<File> exportSounds(AbortRetryIgnoreHandler handler, String outdir, ReadOnlyTagList tags, final SoundExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
+        if (Thread.currentThread().isInterrupted()) {
+            return ret;
+        }
+        
         if (tags.isEmpty()) {
             return ret;
         }
@@ -106,6 +110,10 @@ public class SoundExporter {
                 }, handler).run();
 
                 ret.add(file);
+
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
 
                 if (evl != null) {
                     evl.handleExportedEvent("sound", currentIndex, count, t.getName());

@@ -52,6 +52,9 @@ public class MovieExporter {
 
     public List<File> exportMovies(AbortRetryIgnoreHandler handler, String outdir, ReadOnlyTagList tags, final MovieExportSettings settings, EventListener evl) throws IOException, InterruptedException {
         List<File> ret = new ArrayList<>();
+        if (Thread.currentThread().isInterrupted()) {
+            return ret;
+        }
         if (tags.isEmpty()) {
             return ret;
         }
@@ -85,6 +88,9 @@ public class MovieExporter {
                     }
                 }, handler).run();
 
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
                 if (evl != null) {
                     evl.handleExportedEvent("movie", currentIndex, count, t.getName());
                 }
