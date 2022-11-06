@@ -3996,4 +3996,8 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         return false;
     }
+
+    public void setFileTitle(String fileTitle) {
+        this.fileTitle = fileTitle;
+    }        
 }

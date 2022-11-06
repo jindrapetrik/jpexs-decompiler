@@ -49,11 +49,14 @@ import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
+import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImportTag;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
@@ -432,7 +435,7 @@ public class Main {
                     //Read again, because line file offsets changed with adding debug tags
                     //TODO: handle somehow without rereading?
                     instrSWF = null;
-                    try (FileInputStream fis = new FileInputStream(fTempFile)) {
+                    try ( FileInputStream fis = new FileInputStream(fTempFile)) {
                         instrSWF = new SWF(fis, false, false);
                     } catch (InterruptedException ex) {
                         logger.log(Level.SEVERE, null, ex);
@@ -478,7 +481,7 @@ public class Main {
 
     private static void prepareSwf(SwfPreparation prep, File toPrepareFile, File origFile, List<File> tempFiles) throws IOException, InterruptedException {
         SWF instrSWF = null;
-        try (FileInputStream fis = new FileInputStream(toPrepareFile)) {
+        try ( FileInputStream fis = new FileInputStream(toPrepareFile)) {
             instrSWF = new SWF(fis, toPrepareFile.getAbsolutePath(), origFile == null ? "unknown.swf" : origFile.getName(), false);
         } catch (InterruptedException ex) {
             logger.log(Level.SEVERE, null, ex);
@@ -504,7 +507,7 @@ public class Main {
             if (prep != null) {
                 instrSWF = prep.prepare(instrSWF);
             }
-            try (FileOutputStream fos = new FileOutputStream(toPrepareFile)) {
+            try ( FileOutputStream fos = new FileOutputStream(toPrepareFile)) {
                 instrSWF.saveTo(fos);
             }
         }
@@ -548,7 +551,7 @@ public class Main {
         try {
             tempFile = File.createTempFile("ffdec_run_", ".swf");
 
-            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+            try ( FileOutputStream fos = new FileOutputStream(tempFile)) {
                 swf.saveTo(fos);
             }
 
@@ -595,7 +598,7 @@ public class Main {
                 @Override
                 protected Object doInBackground() throws Exception {
 
-                    try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
+                    try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
                         swf.saveTo(fos);
                     }
                     prepareSwf(new SwfDebugPrepare(doPCode), fTempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempFiles);
@@ -611,7 +614,6 @@ public class Main {
                 protected void onStart() {
                     swfPrepareWorker = this;
                 }
-
 
                 @Override
                 protected void done() {
@@ -939,7 +941,7 @@ public class Main {
                                 }
                                 // try .gfx if .swf failed
                                 if (url.endsWith(".swf")) {
-                                    File gfx = new File(new File(file).getParentFile(), url.substring(0, url.length()-4)+".gfx");
+                                    File gfx = new File(new File(file).getParentFile(), url.substring(0, url.length() - 4) + ".gfx");
                                     if (gfx.exists()) {
                                         try {
                                             return open(new FileInputStream(gfx), gfx.getAbsolutePath(), gfx.getName());
@@ -1126,8 +1128,7 @@ public class Main {
         }
         File outfileF = new File(outfile);
         File tmpFile = new File(outfile + ".tmp");
-        try (FileOutputStream fos = new FileOutputStream(tmpFile);
-                BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+        try (FileOutputStream fos = new FileOutputStream(tmpFile);  BufferedOutputStream bos = new BufferedOutputStream(fos)) {
             if (mode == SaveFileMode.EXE) {
                 switch (exeExportMode) {
                     case WRAPPER:
@@ -1326,14 +1327,14 @@ public class Main {
                     String resourcesPathStr = null;
                     String tagListPathStr = null;
                     if (swfConf != null) {
-                        resourcesPathStr = swfConf.lastSelectedPath;                        
+                        resourcesPathStr = swfConf.lastSelectedPath;
                     }
                     SwfSpecificCustomConfiguration swfCustomConf = Configuration.getSwfSpecificCustomConfiguration(fswf.getShortFileName());
                     if (swfCustomConf != null) {
                         resourcesPathStr = swfCustomConf.getCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_RESOURCES, resourcesPathStr);
-                        tagListPathStr = swfCustomConf.getCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_TAGLIST, null);                        
+                        tagListPathStr = swfCustomConf.getCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_TAGLIST, null);
                     }
-                    
+
                     if (isInited()) {
                         mainFrame.getPanel().tagTree.setSelectionPathString(resourcesPathStr);
                         mainFrame.getPanel().tagListTree.setSelectionPathString(tagListPathStr);
@@ -1463,28 +1464,50 @@ public class Main {
 
         return openFile(newSourceInfos, executeAfterOpen, null);
     }
-    
+
     public static void newFile() {
         View.checkAccess();
-        if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
-            sourceInfos.clear();
-            mainFrame.getPanel().closeAll(false);
-            mainFrame.setVisible(false);
-            Helper.freeMem();            
+
+        NewFileDialog newFileDialog = new NewFileDialog(getDefaultDialogsOwner());
+        if (newFileDialog.showDialog() == AppDialog.OK_OPTION) {
+            if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
+                sourceInfos.clear();
+                mainFrame.getPanel().closeAll(false);
+                mainFrame.setVisible(false);
+                Helper.freeMem();
+            }
+            String fileTitle = AppStrings.translate("new.filename") + ".swf";
+            SWFSourceInfo sourceInfo = new SWFSourceInfo(new ByteArrayInputStream(new byte[0]), null, fileTitle);
+            sourceInfos.add(sourceInfo);
+            SWFList list = new SWFList();
+            list.sourceInfo = sourceInfo;
+            SWF swf = new SWF();
+            swf.setFile(null);
+            swf.setFileTitle(fileTitle);
+
+            swf.displayRect = new RECT(
+                    newFileDialog.getXMin(), 
+                    newFileDialog.getXMax(), 
+                    newFileDialog.getYMin(),
+                    newFileDialog.getYmax()
+            );
+            swf.compression = newFileDialog.getCompression();
+            swf.version = newFileDialog.getVersionNumber();
+            Tag t;
+            t = new FileAttributesTag(swf);
+            t.setTimelined(swf);
+            swf.addTag(t); 
+            t = new SetBackgroundColorTag(swf, new RGB(newFileDialog.getBackgroundColor()));
+            t.setTimelined(swf);
+            swf.addTag(t);
+            t = new ShowFrameTag(swf);
+            t.setTimelined(swf);
+            swf.addTag(t);            
+            swf.hasEndTag = true;
+            list.add(swf);
+            swf.swfList = list;
+            mainFrame.getPanel().load(list, true);
         }
-        SWFSourceInfo sourceInfo = new SWFSourceInfo(new ByteArrayInputStream(new byte[0]), "", "newfile.swf");
-        sourceInfos.add(sourceInfo);
-        SWFList list = new SWFList();        
-        list.sourceInfo = sourceInfo;
-        SWF swf = new SWF();
-        swf.setFile("");        
-        swf.displayRect = new RECT(0, 20 * 400, 0, 20 * 300);
-        swf.version = 17;   
-        swf.addTag(new FileAttributesTag(swf));
-        swf.hasEndTag = true;
-        list.add(swf);
-        swf.swfList = list;
-        mainFrame.getPanel().load(list, true);
     }
 
     public static OpenFileResult openFile(SWFSourceInfo[] newSourceInfos, Runnable executeAfterOpen, int[] reloadIndices) {
@@ -2617,7 +2640,7 @@ public class Main {
 
         if (!versions.isEmpty()) {
             View.execInEventDispatch(() -> {
-                NewVersionDialog newVersionDialog = new NewVersionDialog(mainFrame == null ? null :mainFrame.getWindow(), versions);
+                NewVersionDialog newVersionDialog = new NewVersionDialog(mainFrame == null ? null : mainFrame.getWindow(), versions);
                 newVersionDialog.setVisible(true);
                 Configuration.lastUpdatesCheckDate.set(Calendar.getInstance());
             });
