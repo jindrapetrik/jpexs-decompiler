@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.TreePath;
 
@@ -274,7 +275,7 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             newPath.addAll(path);
             newPath.add(n);
 
-            if (obj.equals(n)) {
+            if (Objects.equals(obj, n)) {
                 return newPath;
             }
 

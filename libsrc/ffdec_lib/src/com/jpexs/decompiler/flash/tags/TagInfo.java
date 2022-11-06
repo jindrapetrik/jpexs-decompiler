@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.SWF;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,8 +28,17 @@ import java.util.Map;
  */
 public class TagInfo {
 
+    private SWF swf;            
     private final Map<String, List<TagInfoItem>> infos = new LinkedHashMap<>();
 
+    public TagInfo(SWF swf) {
+        this.swf = swf;
+    }
+
+    public SWF getSwf() {
+        return swf;
+    }        
+    
     public void addInfo(String categoryName, String name, Object value) {
         categoryName = "general"; // temporary add everything to general catagory
         List<TagInfoItem> category = infos.get(categoryName);
