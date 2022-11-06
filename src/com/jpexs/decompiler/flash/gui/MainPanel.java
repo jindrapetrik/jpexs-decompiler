@@ -887,7 +887,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         //Opening files with drag&drop to main window
         enableDrop(true);
-        calculateMissingNeededThread = new Thread() {
+        calculateMissingNeededThread = new Thread("calculateMissingNeededThread") {
             @Override
             public void run() {
                 while(true) {
