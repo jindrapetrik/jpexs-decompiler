@@ -4056,7 +4056,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (treeItem instanceof Tag) {
             Tag tag = (Tag) treeItem;
-            TagInfo tagInfo = new TagInfo();
+            TagInfo tagInfo = new TagInfo(treeItem.getSwf());
             tag.getTagInfo(tagInfo);
             if (!tagInfo.isEmpty()) {
                 tagInfoPanel.setTagInfos(tagInfo);
@@ -4071,7 +4071,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             frame.getNeededCharacters(needed);
 
             if (!needed.isEmpty()) {
-                TagInfo tagInfo = new TagInfo();
+                TagInfo tagInfo = new TagInfo(treeItem.getSwf());
                 tagInfo.addInfo("general", "neededCharacters", Helper.joinStrings(needed, ", "));
                 tagInfoPanel.setTagInfos(tagInfo);
                 showDetail(DETAILCARDTAGINFO);

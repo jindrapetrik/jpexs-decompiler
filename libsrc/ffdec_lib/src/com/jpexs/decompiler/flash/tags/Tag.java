@@ -603,6 +603,9 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             return needed;
         }
         Timelined tim = getTimelined();
+        if (tim == null) {
+            return needed;
+        }
         ReadOnlyTagList tags = tim.getTags();
         for (int i = tags.indexOf(this) - 1; i >= -1; i--) {
             if (i == -1) {

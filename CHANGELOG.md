@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Create new empty SWF file
 - Checking missing needed character tags and their proper position (Marking them as red - with tooltip)
 - [#1432] Save as EXE from commandline
+- [#1232] Needed/dependent characters list in basic tag info can be expanded to show tag names
 
 ### Fixed
 - Flash viewer - subtract blend mode
@@ -2503,6 +2504,7 @@ All notable changes to this project will be documented in this file.
 [#1832]: https://www.free-decompiler.com/flash/issues/1832
 [#1849]: https://www.free-decompiler.com/flash/issues/1849
 [#1432]: https://www.free-decompiler.com/flash/issues/1432
+[#1232]: https://www.free-decompiler.com/flash/issues/1232
 [#1712]: https://www.free-decompiler.com/flash/issues/1712
 [#1857]: https://www.free-decompiler.com/flash/issues/1857
 [#1455]: https://www.free-decompiler.com/flash/issues/1455
