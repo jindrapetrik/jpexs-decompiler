@@ -109,6 +109,10 @@ public class MainFrameStatusPanel extends JPanel {
         statusLabel.setText(s);
     }
 
+    public CancellableWorker getCurrentWorker() {
+        return currentWorker;
+    }   
+    
     public void setWorkStatus(String s, CancellableWorker worker) {
         if (s.isEmpty()) {
             loadingPanel.setVisible(false);

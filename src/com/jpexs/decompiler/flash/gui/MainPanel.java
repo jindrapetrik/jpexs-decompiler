@@ -529,6 +529,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         statusPanel.setWorkStatus(s, worker);
         mainMenu.updateComponents();
     }
+    
+    public CancellableWorker getCurrentWorker() {
+        return statusPanel.getCurrentWorker();
+    }
 
     private JPanel createWelcomePanel() {
         JPanel welcomePanel = new JPanel();
