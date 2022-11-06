@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - [#1770] Links in basictag info (like needed/dependent characters) were barely visible on most themes
 - Show in Resource command from Hex dump not working for tags inside DefineSprite
 - File did not appear modified when only header was modified
+- Copy / Move to tag tree refreshing
 
 ### Changed
 - [#1455] All tag types are now allowed inside DefineSprite

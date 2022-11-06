@@ -270,9 +270,9 @@ public class Timeline {
         frame.layersChanged = true;
         boolean newFrameNeeded = false;
         for (Tag t : timelined.getTags()) {
+            newFrameNeeded = true;
             boolean isNested = ShowFrameTag.isNestedTagType(t.getId());
             if (isNested) {
-                newFrameNeeded = true;
                 frame.innerTags.add(t);
             }
             frame.allInnerTags.add(t);
@@ -289,25 +289,20 @@ public class Timeline {
             }
 
             if (t instanceof FrameLabelTag) {
-                newFrameNeeded = true;
                 frame.label = ((FrameLabelTag) t).getLabelName();
                 frame.namedAnchor = ((FrameLabelTag) t).isNamedAnchor();
                 labelToFrame.put(frame.label, frames.size());
             } else if (t instanceof StartSoundTag) {
-                newFrameNeeded = true;
                 frame.sounds.add(((StartSoundTag) t).soundId);
                 frame.soundClasses.add(null);
                 frame.soundInfos.add(((StartSoundTag) t).soundInfo);
             } else if (t instanceof StartSound2Tag) {
-                newFrameNeeded = true;
                 frame.sounds.add(-1);
                 frame.soundClasses.add(((StartSound2Tag) t).soundClassName);
                 frame.soundInfos.add(((StartSoundTag) t).soundInfo);
             } else if (t instanceof SetBackgroundColorTag) {
-                newFrameNeeded = true;
                 frame.backgroundColor = ((SetBackgroundColorTag) t).backgroundColor;
             } else if (t instanceof PlaceObjectTypeTag) {
-                newFrameNeeded = true;
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
                 int depth = po.getDepth();
                 DepthState fl = frame.layers.get(depth);
@@ -382,13 +377,11 @@ public class Timeline {
                 }
                 fl.key = characterId != -1;
             } else if (t instanceof RemoveTag) {
-                newFrameNeeded = true;
                 RemoveTag r = (RemoveTag) t;
                 int depth = r.getDepth();
                 frame.layers.remove(depth);
                 frame.layersChanged = true;
             } else if (t instanceof DoActionTag) {
-                newFrameNeeded = true;
                 frame.actions.add((DoActionTag) t);
                 actionFrames.put((DoActionTag) t, frame.frame);
             } else if (t instanceof ShowFrameTag) {
