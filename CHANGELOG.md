@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - File did not appear modified when only header was modified
 - Copy / Move to tag tree refreshing
 - Preview of PlaceObject and ShowFrame in the Dump view
+- FileAttributes tag exception in the Dump view
 
 ### Changed
 - [#1455] All tag types are now allowed inside DefineSprite
