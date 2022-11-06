@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -444,5 +445,15 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     @Override
     public RECT getRectWithStrokes() {
         return getRect(); //?
+    }
+    
+    @Override
+    public Set<Integer> getMissingNeededCharacters() {
+        Set<Integer> ret = new LinkedHashSet<>();
+        for (Tag tag : getTags()) {
+            Set<Integer> sub = tag.getMissingNeededCharacters();
+            ret.addAll(sub);
+        }
+        return ret;
     }
 }

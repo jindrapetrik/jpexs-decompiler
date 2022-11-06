@@ -89,6 +89,7 @@ import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.FrameScript;
 import com.jpexs.decompiler.flash.timeline.TagScript;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
@@ -102,8 +103,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 import javax.swing.Icon;
 import javax.swing.JTree;
+import javax.swing.ToolTipManager;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
@@ -118,6 +122,8 @@ public abstract class AbstractTagTree extends JTree {
     protected final MainPanel mainPanel;
 
     private static final Map<TreeNodeType, Icon> ICONS;
+    
+    protected Map<TreeItem, Set<Integer>> missingNeededCharacters = new WeakHashMap<>();
 
     static {
         ICONS = new HashMap<>();
@@ -129,6 +135,15 @@ public abstract class AbstractTagTree extends JTree {
         }
     }
 
+    public Map<TreeItem, Set<Integer>> getMissingNeededCharacters() {
+        return missingNeededCharacters;
+    }  
+    
+    public void setMissingNeededCharacters(Map<TreeItem, Set<Integer>> missingNeededCharacters) {
+        this.missingNeededCharacters = missingNeededCharacters;
+        repaint();
+    }           
+    
     public static Icon getIconForType(TreeNodeType t) {
         return ICONS.get(t);
     }
@@ -149,6 +164,7 @@ public abstract class AbstractTagTree extends JTree {
                 }
             }
         });
+        ToolTipManager.sharedInstance().registerComponent(this);
     }
     
     public static TreeNodeType getTreeNodeType(TreeItem t) {

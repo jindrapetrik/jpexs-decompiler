@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.gui.taglistview;
 
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -26,6 +28,10 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.plaf.basic.BasicLabelUI;
@@ -94,6 +100,24 @@ public class TagListTreeCellRenderer extends DefaultTreeCellRenderer {
                         setForeground(new Color(0xcc, 0xcc, 0xcc));
                     } else {
                         setForeground(Color.BLACK);
+                    }
+                }
+                setToolTipText(null);
+                AbstractTagTree aTree = (AbstractTagTree) tree;
+                Map<TreeItem, Set<Integer>> allMissingNeededCharacters = aTree.getMissingNeededCharacters();
+                if (allMissingNeededCharacters.containsKey((TreeItem)value)) {
+                    Set<Integer> missingNeededCharacters = allMissingNeededCharacters.get(value);
+                    if (!missingNeededCharacters.isEmpty()) {
+                        List<String> missingAsStr = new ArrayList<>();
+                        for (int v:missingNeededCharacters) {
+                            missingAsStr.add("" + v);
+                        }
+                        if (missingAsStr.size() == 1) {
+                            lab.setToolTipText(AppStrings.translate("error.missing.characterTag.single").replace("%tag%", missingAsStr.get(0)));
+                        } else {
+                            lab.setToolTipText(AppStrings.translate("error.missing.characterTag.multi").replace("%tags%",String.join(", ", missingAsStr)));
+                        }
+                        lab.setForeground(Color.red);                       
                     }
                 }
             }

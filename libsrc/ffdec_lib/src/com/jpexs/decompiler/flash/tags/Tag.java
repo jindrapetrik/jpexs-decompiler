@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
@@ -593,6 +594,37 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     @Override
     public void getNeededCharacters(Set<Integer> needed) {
+    }
+    
+    public Set<Integer> getMissingNeededCharacters() {
+        Set<Integer> needed = new LinkedHashSet<>();
+        getNeededCharacters(needed);
+        if (needed.isEmpty()) {
+            return needed;
+        }
+        Timelined tim = getTimelined();
+        ReadOnlyTagList tags = tim.getTags();
+        for (int i = tags.indexOf(this) - 1; i >= -1; i--) {
+            if (i == -1) {
+                if (tim instanceof SWF) {
+                    break;
+                } else {
+                    Timelined parent = ((Tag) tim).getTimelined();
+                    tags = parent.getTags();
+                    i = tags.indexOf((Tag) tim);
+                    tim = parent;
+                    continue;
+                }
+            }
+            if (tags.get(i) instanceof CharacterTag) {
+                int charId = ((CharacterTag) tags.get(i)).getCharacterId();
+                needed.remove(charId);
+                if (needed.isEmpty()) {
+                    return needed;
+                }
+            }
+        }        
+        return needed;
     }
 
     @Override

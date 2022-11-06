@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.View;
@@ -129,6 +130,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.JTree;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -224,6 +227,25 @@ public class TagTree extends AbstractTagTree {
                     setForeground(Color.BLACK);
                 }
             }
+            setToolTipText(null);
+            
+            AbstractTagTree aTree = (AbstractTagTree) tree;
+                Map<TreeItem, Set<Integer>> allMissingNeededCharacters = aTree.getMissingNeededCharacters();
+                if (allMissingNeededCharacters.containsKey((TreeItem)value)) {
+                    Set<Integer> missingNeededCharacters = allMissingNeededCharacters.get(value);
+                    if (!missingNeededCharacters.isEmpty()) {
+                        List<String> missingAsStr = new ArrayList<>();
+                        for (int v:missingNeededCharacters) {
+                            missingAsStr.add("" + v);
+                        }
+                        if (missingAsStr.size() == 1) {
+                            setToolTipText(AppStrings.translate("error.missing.characterTag.single").replace("%tag%", missingAsStr.get(0)));
+                        } else {
+                            setToolTipText(AppStrings.translate("error.missing.characterTag.multi").replace("%tags%",String.join(", ", missingAsStr)));
+                        }
+                        setForeground(Color.red);                       
+                    }
+                }
 
             return this;
         }

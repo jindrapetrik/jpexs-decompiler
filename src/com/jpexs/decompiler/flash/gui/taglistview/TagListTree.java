@@ -32,7 +32,7 @@ public class TagListTree extends AbstractTagTree {
     
     public TagListTree(TagListTreeModel model, MainPanel mainPanel) {
         super(model, mainPanel);        
-        setCellRenderer(new TagListTreeCellRenderer());        
+        setCellRenderer(new TagListTreeCellRenderer());     
     }               
     
     @Override
