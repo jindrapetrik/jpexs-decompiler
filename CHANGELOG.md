@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
 - Copy / Move to tag tree refreshing
 - Preview of PlaceObject and ShowFrame in the Dump view
 - FileAttributes tag exception in the Dump view
+- Adding new frames did not set correct timelined to ShowFrame
 
 ### Changed
 - [#1455] All tag types are now allowed inside DefineSprite
