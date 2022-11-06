@@ -1159,6 +1159,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void moveTagToActionPerformed(ActionEvent evt, List<TreeItem> items, SWF targetSwf) {
+        ReadOnlyTagList tags = targetSwf.getTags();;
+        boolean lastIsShowFrame = !tags.isEmpty() && (tags.get(tags.size() - 1) instanceof ShowFrameTag);
         SWF sourceSwf = items.get(0).getSwf();
         for (TreeItem item : items) {
             Tag tag = (Tag) item;
@@ -1170,6 +1172,9 @@ public class TagTreeContextMenu extends JPopupMenu {
             tag.setModified(true);
         }
 
+        if (lastIsShowFrame) {
+            targetSwf.frameCount++;
+        }
         sourceSwf.assignExportNamesToSymbols();
         targetSwf.assignExportNamesToSymbols();
         sourceSwf.assignClassesToSymbols();
@@ -1185,16 +1190,25 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void copyTagToActionPerformed(ActionEvent evt, List<TreeItem> items, SWF targetSwf) {
         try {
+            ReadOnlyTagList tags = targetSwf.getTags();;
+            boolean lastIsShowFrame = !tags.isEmpty() && (tags.get(tags.size() - 1) instanceof ShowFrameTag);
             for (TreeItem item : items) {
                 Tag tag = (Tag) item;
                 Tag copyTag = tag.cloneTag();
                 copyTag.setSwf(targetSwf, true);
+                copyTag.setTimelined(targetSwf);
                 targetSwf.addTag(copyTag);
                 checkUniqueCharacterId(copyTag);
                 targetSwf.updateCharacters();
                 copyTag.setModified(true);
             }
-
+            
+            if (lastIsShowFrame) {
+                targetSwf.frameCount++;
+            }
+            
+            targetSwf.resetTimelines(targetSwf);
+            
             targetSwf.assignExportNamesToSymbols();
             targetSwf.assignClassesToSymbols();
             targetSwf.clearImageCache();
@@ -1207,6 +1221,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void copyTagWithDependenciesToActionPerformed(ActionEvent evt, List<TreeItem> items, SWF targetSwf) {
         try {
+            ReadOnlyTagList tags = targetSwf.getTags();;
+            boolean lastIsShowFrame = !tags.isEmpty() && (tags.get(tags.size() - 1) instanceof ShowFrameTag);
             SWF sourceSwf = items.get(0).getSwf();
             for (TreeItem item : items) {
                 Set<Tag> copiedTags = new HashSet<>();
@@ -1266,6 +1282,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                         newTag.replaceCharacter(oldCharacterId, newCharacterId);
                     }
                 }
+            }
+            
+            if (lastIsShowFrame) {
+                targetSwf.frameCount++;
             }
 
             targetSwf.assignExportNamesToSymbols();
