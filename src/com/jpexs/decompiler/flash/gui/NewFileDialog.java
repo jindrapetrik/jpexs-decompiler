@@ -148,7 +148,7 @@ public class NewFileDialog extends AppDialog {
         widthEditor.setPreferredSize(new Dimension(80, widthEditor.getPreferredSize().height));
         heightEditor.setPreferredSize(new Dimension(80, heightEditor.getPreferredSize().height));
         displayRectEditorPanel.add(widthEditor);
-        displayRectEditorPanel.add(new JLabel("x"));
+        displayRectEditorPanel.add(new JLabel("×"));
         displayRectEditorPanel.add(heightEditor);
         displayRectEditorPanel.add(unitComboBox);
 
