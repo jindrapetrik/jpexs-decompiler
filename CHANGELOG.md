@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - [#1795] AS3 P-code - optional (default parameter values) saving
 - [#1785] AS1/2 try..catch block in for..in
 - [#1770] Links in basictag info (like needed/dependent characters) were barely visible on most themes
+- Show in Resource command from Hex dump not working for tags inside DefineSprite
 
 ### Changed
 - [#1455] All tag types are now allowed inside DefineSprite
