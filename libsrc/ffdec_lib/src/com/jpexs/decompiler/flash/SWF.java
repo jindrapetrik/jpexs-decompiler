@@ -1187,6 +1187,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     public SWF() {
         version = SWF.DEFAULT_VERSION;
         displayRect = new RECT(0, 1, 0, 1);
+        dumpInfo = new DumpInfoSwfNode(this, "rootswf", "", null, 0, 0);        
     }
 
     /**
