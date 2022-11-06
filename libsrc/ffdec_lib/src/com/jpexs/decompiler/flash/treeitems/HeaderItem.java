@@ -45,6 +45,6 @@ public class HeaderItem implements TreeItem {
 
     @Override
     public boolean isModified() {
-        return false; //??
+        return swf.isHeaderModified();
     }
 }

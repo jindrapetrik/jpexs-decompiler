@@ -50,6 +50,8 @@ public class NewFileDialog extends AppDialog {
     private final JPanel compressionEditorPanel = new JPanel();
 
     private final JComboBox<ComboBoxItem<SWFCompression>> compressionComboBox = new JComboBox<>();
+    
+    private final JComboBox<String> unitComboBox = new JComboBox<>();
 
     private final JPanel versionEditorPanel = new JPanel();
 
@@ -71,13 +73,9 @@ public class NewFileDialog extends AppDialog {
 
     private final JPanel displayRectEditorPanel = new JPanel();
 
-    private final JSpinner xMinEditor = new JSpinner();
-
-    private final JSpinner xMaxEditor = new JSpinner();
-
-    private final JSpinner yMinEditor = new JSpinner();
-
-    private final JSpinner yMaxEditor = new JSpinner();
+    private final JSpinner widthEditor = new JSpinner();
+   
+    private final JSpinner heightEditor = new JSpinner();
 
     private final JPanel warningPanel = new JPanel();
 
@@ -104,7 +102,7 @@ public class NewFileDialog extends AppDialog {
                 TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED,
                 TableLayout.PREFERRED, TableLayout.PREFERRED, TableLayout.PREFERRED,
                 TableLayout.PREFERRED}
-        }));
+        }));        
 
         FlowLayout layout = new FlowLayout(SwingConstants.WEST);
         layout.setHgap(0);
@@ -134,20 +132,19 @@ public class NewFileDialog extends AppDialog {
         frameRateEditor.setPreferredSize(new Dimension(80, frameRateEditor.getPreferredSize().height));
         frameRateEditorPanel.add(frameRateEditor);
 
+        
+        unitComboBox.addItem(translate("unit.pixels"));
+        unitComboBox.addItem(translate("unit.twips"));
+        
+        
         displayRectEditorPanel.setLayout(layout);
         displayRectEditorPanel.setMinimumSize(new Dimension(10, displayRectEditorPanel.getMinimumSize().height));
-        xMinEditor.setPreferredSize(new Dimension(80, xMinEditor.getPreferredSize().height));
-        xMaxEditor.setPreferredSize(new Dimension(80, xMaxEditor.getPreferredSize().height));
-        yMinEditor.setPreferredSize(new Dimension(80, yMinEditor.getPreferredSize().height));
-        yMaxEditor.setPreferredSize(new Dimension(80, yMaxEditor.getPreferredSize().height));
-        displayRectEditorPanel.add(xMinEditor);
-        displayRectEditorPanel.add(new JLabel(","));
-        displayRectEditorPanel.add(yMinEditor);
-        displayRectEditorPanel.add(new JLabel(" => "));
-        displayRectEditorPanel.add(xMaxEditor);
-        displayRectEditorPanel.add(new JLabel(","));
-        displayRectEditorPanel.add(yMaxEditor);
-        displayRectEditorPanel.add(new JLabel(" twips"));
+        widthEditor.setPreferredSize(new Dimension(80, widthEditor.getPreferredSize().height));
+        heightEditor.setPreferredSize(new Dimension(80, heightEditor.getPreferredSize().height));
+        displayRectEditorPanel.add(widthEditor);
+        displayRectEditorPanel.add(new JLabel("x"));
+        displayRectEditorPanel.add(heightEditor);
+        displayRectEditorPanel.add(unitComboBox);
 
         warningLabel.setIcon(View.getIcon("warning16"));
         warningPanel.setLayout(layout);
@@ -187,7 +184,7 @@ public class NewFileDialog extends AppDialog {
         propertiesPanel.add(gfxCheckBox, "1,2");
         propertiesPanel.add(new JLabel(AppStrings.translate("header.framerate")), "0,3");
         propertiesPanel.add(frameRateEditorPanel, "1,3");
-        propertiesPanel.add(new JLabel(AppStrings.translate("header.displayrect")), "0,4");
+        propertiesPanel.add(new JLabel(translate("canvas.size")), "0,4");
         propertiesPanel.add(displayRectEditorPanel, "1,4");
         propertiesPanel.add(warningPanel, "0,5,1,5");
         propertiesPanel.add(new JLabel(translate("background.color")), "0,6");
@@ -207,15 +204,16 @@ public class NewFileDialog extends AppDialog {
         buttonsPanel.add(cancelButton);
         cnt.add(buttonsPanel, BorderLayout.SOUTH);
         
-        //TableLayoutHelper.addTableSpaces(tl, 10);   
+        TableLayoutHelper.addTableSpaces(tl, 4);   
         pack();
         setResizable(false);
         View.centerScreen(this);
         View.setWindowIcon(this);
         setModal(true);
         
-        xMaxEditor.setValue(20 * 550);
-        yMaxEditor.setValue(20 * 400);
+        widthEditor.setValue(550);
+        heightEditor.setValue(400);
+        unitComboBox.setSelectedIndex(0);
         frameRateEditor.setValue(24);
         compressionComboBox.setSelectedIndex(1);
         versionEditor.setValue(17);        
@@ -287,21 +285,25 @@ public class NewFileDialog extends AppDialog {
         return gfxCheckBox.isSelected();
     }
     
-    public int getFrameRate() {
-        return (int) ((Number) (frameRateEditor.getModel().getValue())).floatValue();
+    public float getFrameRate() {
+        return ((Number) (frameRateEditor.getModel().getValue())).floatValue();
     }
     
     public int getXMin() {
-        return (int) xMinEditor.getModel().getValue();
+        return 0;
     }
     public int getXMax() {
-        return (int) xMaxEditor.getModel().getValue();
+        return getUnitMultiplier() * (int) widthEditor.getModel().getValue();
     }
     public int getYMin() {
-        return (int) yMinEditor.getModel().getValue();
+        return 0;
     }
     public int getYmax() {
-        return (int) yMaxEditor.getModel().getValue();
+        return getUnitMultiplier() * (int)heightEditor.getModel().getValue();
+    }
+    
+    private int getUnitMultiplier() {
+        return unitComboBox.getSelectedIndex() == 0 ? 20 : 1;
     }
     
     public Color getBackgroundColor() {
