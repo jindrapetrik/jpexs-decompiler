@@ -80,6 +80,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
 import java.awt.Color;
@@ -591,14 +592,17 @@ public class DumpTree extends JTree {
     }
 
     public void setSelectedTag(Tag tag) {
+        ByteArrayRange range = tag.getOriginalRange();
+        if (range == null) {
+            return;
+        }
+        long address = range.getPos();
         DumpTreeModel model = getModel();
         DumpInfo d = model.getRoot();
         for (DumpInfo sd : d.getChildInfos()) {
             if (sd instanceof DumpInfoSwfNode) {
                 DumpInfoSwfNode si = (DumpInfoSwfNode) sd;
-                if (si.getSwf() == tag.getSwf()) {
-
-                    long address = tag.getOriginalRange().getPos();
+                if (si.getSwf() == tag.getSwf()) {                    
                     DumpInfo di = si;
                     while (model.getChildCount(di) > 0) {
                         boolean found = false;
