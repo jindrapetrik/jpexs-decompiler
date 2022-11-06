@@ -4491,12 +4491,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void dispose() {
-        setDropTarget(null);
-        disposeInner(this);
-        Helper.emptyObject(this);
         if (calculateMissingNeededThread != null) {
             calculateMissingNeededThread.interrupt();
         }
+        setDropTarget(null);
+        disposeInner(this);
+        Helper.emptyObject(this);        
     }
     
     private static void calculateMissingNeededCharacters(Map<TreeItem, Set<Integer>> missingNeededCharacters, Timelined tim) {
