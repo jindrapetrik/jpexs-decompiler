@@ -37,7 +37,18 @@ public class SWFSourceInfo {
     private final String fileTitle;
 
     private final boolean detectBundle;
+    
+    private boolean empty = false;
 
+    public SWFSourceInfo(String fileTitle) {
+        this(null, null, fileTitle, false);
+        empty = true;
+    }
+
+    public boolean isEmpty() {
+        return empty;
+    }        
+    
     public SWFSourceInfo(InputStream inputStream, String file, String fileTitle) {
         this(inputStream, file, fileTitle, true);
     }
