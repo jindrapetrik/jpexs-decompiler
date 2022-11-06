@@ -1359,7 +1359,12 @@ public class Main {
             Helper.freeMem();
             showModeFrame();
             return true;
-        } else {
+        } else {            
+            for (int i = sourceInfos.size() - 1; i >= 0; i--) {
+                if (sourceInfos.get(i).isEmpty()) {
+                    sourceInfos.remove(i);
+                }
+            }
             SWFSourceInfo[] sourceInfosCopy = new SWFSourceInfo[sourceInfos.size()];
             sourceInfos.toArray(sourceInfosCopy);
             sourceInfos.clear();
@@ -1478,7 +1483,7 @@ public class Main {
             }
             String ext = newFileDialog.isGfx() ? "gfx" : "swf";
             String fileTitle = AppStrings.translate("new.filename") + "." + ext;
-            SWFSourceInfo sourceInfo = new SWFSourceInfo(new ByteArrayInputStream(new byte[0]), null, fileTitle);
+            SWFSourceInfo sourceInfo = new SWFSourceInfo(fileTitle);
             sourceInfos.add(sourceInfo);
             SWFList list = new SWFList();
             list.sourceInfo = sourceInfo;

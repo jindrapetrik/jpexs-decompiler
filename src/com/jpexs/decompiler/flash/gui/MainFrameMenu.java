@@ -731,6 +731,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         boolean hasDebugger = hasAbc && DebuggerTools.hasDebugger(swf);
         MainPanel mainPanel = mainFrame.getPanel();
         boolean swfLoaded = mainPanel != null ? !mainPanel.getSwfs().isEmpty() : false;
+        boolean swfIsNew = swfSelected && swf.swfList != null && swf.swfList.sourceInfo.isEmpty();
 
         setMenuEnabled("_/open", !isWorking);
         setMenuEnabled("/file/open", !isWorking);
@@ -743,7 +744,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/file/close", swfSelected && !isWorking);
         setMenuEnabled("_/closeAll", swfLoaded && !isWorking);
         setMenuEnabled("/file/closeAll", swfLoaded && !isWorking);
-        setMenuEnabled("/file/reload", swfSelected && !isWorking);
+        setMenuEnabled("/file/reload", swfSelected && !swfIsNew && !isWorking);
 
         setMenuEnabled("/file/export", swfSelected);
         setMenuEnabled("_/exportAll", swfSelected && !isWorking);
