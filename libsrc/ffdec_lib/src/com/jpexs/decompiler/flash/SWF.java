@@ -364,6 +364,8 @@ public final class SWF implements SWFContainerItem, Timelined {
     private Map<String, ASMSource> asmsCache;
 
     private Set<Integer> cyclicCharacters = null;
+    
+    private boolean headerModified = false;
 
     private static final DecompilerPool decompilerPool = new DecompilerPool();
 
@@ -383,6 +385,14 @@ public final class SWF implements SWFContainerItem, Timelined {
      */
     public static final Color ERROR_COLOR = Color.red;
 
+    public void setHeaderModified(boolean headerModified) {
+        this.headerModified = headerModified;
+    }   
+
+    public boolean isHeaderModified() {
+        return headerModified;
+    }       
+    
     public void updateCharacters() {
         characters = null;
         characterIdTags = null;
@@ -1132,8 +1142,12 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     @Override
-    public boolean isModified() {
+    public boolean isModified() {       
         if (isModified) {
+            return true;
+        }
+        
+        if (headerModified) {
             return true;
         }
 

@@ -1493,6 +1493,8 @@ public class Main {
             );
             swf.compression = newFileDialog.getCompression();
             swf.version = newFileDialog.getVersionNumber();
+            swf.frameRate = newFileDialog.getFrameRate();
+            swf.setHeaderModified(true);
             Tag t;
             t = new FileAttributesTag(swf);
             t.setTimelined(swf);
@@ -1507,6 +1509,9 @@ public class Main {
             list.add(swf);
             swf.swfList = list;
             mainFrame.getPanel().load(list, true);
+            
+            //select first frame
+            mainFrame.getPanel().setTagTreeSelectedNode(mainFrame.getPanel().getCurrentTree(), swf.getTimeline().getFrame(0));                        
         }
     }
 

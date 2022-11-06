@@ -230,8 +230,10 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         swf.displayRect.Xmax = (int) xMaxEditor.getModel().getValue();
         swf.displayRect.Ymin = (int) yMinEditor.getModel().getValue();
         swf.displayRect.Ymax = (int) yMaxEditor.getModel().getValue();
+        swf.setHeaderModified(true);
 
         load(swf);
+        Main.getMainFrame().getPanel().repaintTree();
         setEditMode(false);
     }
 
