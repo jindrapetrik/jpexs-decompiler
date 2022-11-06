@@ -661,8 +661,8 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         }
     }
 
-    public void getDependentCharacters(Set<Integer> dependent) {
-        for (Tag tag : swf.getTags()) {
+    private void getDependentCharactersOnTimelined(Timelined timelined, Set<Integer> dependent) {
+        for (Tag tag : timelined.getTags()) {
             if (tag instanceof CharacterTag) {
                 Set<Integer> needed = new HashSet<>();
                 tag.getNeededCharactersDeep(needed);
@@ -673,7 +673,14 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                     }
                 }
             }
+            if (tag instanceof DefineSpriteTag) {
+                getDependentCharactersOnTimelined((DefineSpriteTag) tag, dependent);
+            }
         }
+    }
+    
+    public void getDependentCharacters(Set<Integer> dependent) {
+        getDependentCharactersOnTimelined(swf, dependent);        
     }
 
     public void getTagInfo(TagInfo tagInfo) {
