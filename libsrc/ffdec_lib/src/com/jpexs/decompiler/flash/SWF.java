@@ -1172,6 +1172,8 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
 
+        
+        headerModified = false;
         isModified = false;
 
         try {
