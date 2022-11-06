@@ -811,51 +811,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
 
         return null;
-    }
-
-    public void fixCharactersOrder(boolean checkAll) {
-        Set<Integer> addedCharacterIds = new HashSet<>();
-        Set<CharacterTag> movedTags = new HashSet<>();
-        for (int i = 0; i < tags.size(); i++) {
-            Tag tag = tags.get(i);
-            if (checkAll || tag.isModified()) {
-                Set<Integer> needed = new HashSet<>();
-                tag.getNeededCharacters(needed);
-                if (tag instanceof CharacterTag) {
-                    CharacterTag characterTag = (CharacterTag) tag;
-                    needed.remove(characterTag.getCharacterId());
-                }
-                boolean moved = false;
-                for (Integer id : needed) {
-                    if (!addedCharacterIds.contains(id)) {
-                        CharacterTag neededCharacter = getCharacter(id);
-                        if (neededCharacter == null) {
-                            continue;
-                        }
-
-                        if (movedTags.contains(neededCharacter)) {
-                            logger.log(Level.SEVERE, "Fixing characters order failed, recursion detected.");
-                            return;
-                        }
-
-                        // move the needed character to the current position
-                        tags.remove(neededCharacter);
-                        tags.add(i, neededCharacter);
-                        movedTags.add(neededCharacter);
-                        moved = true;
-                    }
-                }
-
-                if (moved) {
-                    i--;
-                    continue;
-                }
-            }
-            if (tag instanceof CharacterTag) {
-                addedCharacterIds.add(((CharacterTag) tag).getCharacterId());
-            }
-        }
-    }
+    }   
 
     public void resetTimelines(Timelined timelined) {
         timelined.resetTimeline();
@@ -1007,9 +963,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         return saveToByteArray(gfx);
     }
 
-    private byte[] saveToByteArray(boolean gfx) throws IOException {
-        fixCharactersOrder(false);
-
+    private byte[] saveToByteArray(boolean gfx) throws IOException {        
         byte[] data;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 SWFOutputStream sos = new SWFOutputStream(baos, version)) {

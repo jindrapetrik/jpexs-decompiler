@@ -33,6 +33,9 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - [#1455] All tag types are now allowed inside DefineSprite
 
+### Removed
+- Auto fixing character tags order based on dependencies during saving
+
 ## [16.0.4] - 2022-11-03
 ### Fixed
 - [#1860] FLA export - EmptyStackException during exporting MorphShape
