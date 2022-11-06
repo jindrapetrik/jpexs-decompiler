@@ -543,7 +543,7 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("replacecharacter")) {
             out.println(" " + (cnt++) + ") -replaceCharacter <infile> <outfile> <characterId1> <newCharacterId1> [<characterId2> <newCharacterId2>]...");
-            out.println(" ...replaces a character tag with another chatacter tag from the same SWF");
+            out.println(" ...replaces a character tag with another character tag from the same SWF");
         }
 
         if (filter == null || filter.equals("replacecharacterid")) {
@@ -551,7 +551,7 @@ public class CommandLineArgumentParser {
             out.println(" " + (cnt++) + ") -replaceCharacterId <infile> <outfile> (pack|sort)");
             out.println(" ...replaces the <oldId1> character id with <newId1>");
             out.println(" ...pack: removes the spaces between the character ids (1,4,3 => 1,3,2)");
-            out.println(" ...sort: assigns increasing IDs to the chatacter tags + pack (1,4,3 => 1,2,3)");
+            out.println(" ...sort: assigns increasing IDs to the character tags + pack (1,4,3 => 1,2,3)");
             out.println("    DO NOT PUT space between comma (,) and next value.");
         }
 

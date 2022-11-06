@@ -1148,7 +1148,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (swf.getCharacter(characterId) != null) {
                 int newCharacterId = swf.getNextCharacterId();
                 characterTag.setCharacterId(newCharacterId);
-                logger.log(Level.WARNING, "Target SWF already contained chatacter tag with id = {0} => id changed to {1}", new Object[]{characterId, newCharacterId});
+                logger.log(Level.WARNING, "Target SWF already contained character tag with id = {0} => id changed to {1}", new Object[]{characterId, newCharacterId});
                 return newCharacterId;
             }
 
