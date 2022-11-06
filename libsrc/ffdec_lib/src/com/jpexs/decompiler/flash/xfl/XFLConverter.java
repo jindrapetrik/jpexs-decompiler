@@ -2727,11 +2727,7 @@ public class XFLConverter {
         }
         if (!script.isEmpty()) {
             script = "#initclip\r\n" + script + "#endinitclip\r\n";
-        }
-        
-        if (spriteId == 320) {
-            System.err.println("xxx");
-        }
+        }        
 
         Map<Integer, String> frameToScriptMap = new HashMap<>();
 
