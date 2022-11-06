@@ -1476,7 +1476,8 @@ public class Main {
                 mainFrame.setVisible(false);
                 Helper.freeMem();
             }
-            String fileTitle = AppStrings.translate("new.filename") + ".swf";
+            String ext = newFileDialog.isGfx() ? "gfx" : "swf";
+            String fileTitle = AppStrings.translate("new.filename") + "." + ext;
             SWFSourceInfo sourceInfo = new SWFSourceInfo(new ByteArrayInputStream(new byte[0]), null, fileTitle);
             sourceInfos.add(sourceInfo);
             SWFList list = new SWFList();
@@ -1494,9 +1495,13 @@ public class Main {
             swf.compression = newFileDialog.getCompression();
             swf.version = newFileDialog.getVersionNumber();
             swf.frameRate = newFileDialog.getFrameRate();
+            swf.gfx = newFileDialog.isGfx();
             swf.setHeaderModified(true);
-            Tag t;
-            t = new FileAttributesTag(swf);
+            FileAttributesTag f = new FileAttributesTag(swf);
+            if (newFileDialog.isAs3()) {
+                f.actionScript3 = true;
+            }
+            Tag t = f;            
             t.setTimelined(swf);
             swf.addTag(t); 
             t = new SetBackgroundColorTag(swf, new RGB(newFileDialog.getBackgroundColor()));
@@ -1504,7 +1509,8 @@ public class Main {
             swf.addTag(t);
             t = new ShowFrameTag(swf);
             t.setTimelined(swf);
-            swf.addTag(t);            
+            swf.addTag(t);      
+            swf.frameCount = 1;
             swf.hasEndTag = true;
             list.add(swf);
             swf.swfList = list;

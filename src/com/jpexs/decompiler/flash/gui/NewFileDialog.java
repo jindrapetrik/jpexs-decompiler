@@ -28,6 +28,7 @@ import java.awt.Graphics;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
@@ -35,6 +36,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
@@ -80,6 +82,10 @@ public class NewFileDialog extends AppDialog {
     private final JPanel warningPanel = new JPanel();
 
     private final JLabel warningLabel = new JLabel();
+    
+    private final JRadioButton actionScript12RadioButton = new JRadioButton(translate("script.type.actionscript1_2"));
+    
+    private final JRadioButton actionScript3RadioButton = new JRadioButton(translate("script.type.actionscript3"));
     
     private JButton backgroundColorButton;
 
@@ -175,7 +181,17 @@ public class NewFileDialog extends AppDialog {
         
         JPanel backgroundColorPanel = new JPanel(new BorderLayout());
         backgroundColorPanel.add(backgroundColorButton, BorderLayout.WEST);
-                
+        
+        actionScript3RadioButton.setSelected(true);
+        
+        ButtonGroup actionScriptTypeGroup = new ButtonGroup();
+        actionScriptTypeGroup.add(actionScript12RadioButton);
+        actionScriptTypeGroup.add(actionScript3RadioButton);
+        
+        JPanel actionScriptTypePanel = new JPanel(new FlowLayout());
+        actionScriptTypePanel.add(actionScript12RadioButton);
+        actionScriptTypePanel.add(actionScript3RadioButton);
+        
         propertiesPanel.add(new JLabel(AppStrings.translate("header.compression")), "0,0");
         propertiesPanel.add(compressionEditorPanel, "1,0");
         propertiesPanel.add(new JLabel(AppStrings.translate("header.version")), "0,1");
@@ -187,10 +203,12 @@ public class NewFileDialog extends AppDialog {
         propertiesPanel.add(new JLabel(translate("canvas.size")), "0,4");
         propertiesPanel.add(displayRectEditorPanel, "1,4");
         propertiesPanel.add(warningPanel, "0,5,1,5");
-        propertiesPanel.add(new JLabel(translate("background.color")), "0,6");
-                
+        propertiesPanel.add(new JLabel(translate("background.color")), "0,6");                
         propertiesPanel.add(backgroundColorPanel, "1,6");
+        propertiesPanel.add(new JLabel(translate("script.type")), "0,7");                
+        propertiesPanel.add(actionScriptTypePanel, "1,7");
 
+        
         cnt.add(propertiesPanel, BorderLayout.CENTER);
 
         
@@ -308,5 +326,9 @@ public class NewFileDialog extends AppDialog {
     
     public Color getBackgroundColor() {
         return backgroundColorButton.getBackground();
+    }
+    
+    public boolean isAs3() {
+        return actionScript3RadioButton.isSelected();
     }
 }
