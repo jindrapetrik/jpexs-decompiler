@@ -4153,66 +4153,89 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         previewPanel.showTextComparePanel(textTag, newTextTag);
     }
 
-    private void showFolderPreview(FolderItem item) {
-        List<TreeItem> folderPreviewItems = new ArrayList<>();
-        String folderName = item.getName();
-        SWF swf = item.swf;
+    private void addFolderPreviewItems(List<TreeItem> folderPreviewItems, String folderName, Timelined timelined) {
         switch (folderName) {
             case TagTreeModel.FOLDER_SHAPES:
-                for (Tag tag : swf.getTags()) {
+                for (Tag tag : timelined.getTags()) {
                     if (tag instanceof ShapeTag) {
                         folderPreviewItems.add(tag);
+                    }
+                    if (tag instanceof DefineSpriteTag) {
+                        addFolderPreviewItems(folderPreviewItems, folderName, (DefineSpriteTag) tag);
                     }
                 }
                 break;
             case TagTreeModel.FOLDER_MORPHSHAPES:
-                for (Tag tag : swf.getTags()) {
+                for (Tag tag : timelined.getTags()) {
                     if (tag instanceof MorphShapeTag) {
                         folderPreviewItems.add(tag);
+                    }
+                    if (tag instanceof DefineSpriteTag) {
+                        addFolderPreviewItems(folderPreviewItems, folderName, (DefineSpriteTag) tag);
                     }
                 }
                 break;
             case TagTreeModel.FOLDER_SPRITES:
-                for (Tag tag : swf.getTags()) {
+                for (Tag tag : timelined.getTags()) {
                     if (tag instanceof DefineSpriteTag) {
                         folderPreviewItems.add(tag);
+                        addFolderPreviewItems(folderPreviewItems, folderName, (DefineSpriteTag) tag);                    
                     }
                 }
                 break;
             case TagTreeModel.FOLDER_BUTTONS:
-                for (Tag tag : swf.getTags()) {
+                for (Tag tag : timelined.getTags()) {
                     if (tag instanceof ButtonTag) {
                         folderPreviewItems.add(tag);
+                    }
+                    if (tag instanceof DefineSpriteTag) {
+                        addFolderPreviewItems(folderPreviewItems, folderName, (DefineSpriteTag) tag);
                     }
                 }
                 break;
             case TagTreeModel.FOLDER_FONTS:
-                for (Tag tag : swf.getTags()) {
+                for (Tag tag : timelined.getTags()) {
                     if (tag instanceof FontTag) {
                         folderPreviewItems.add(tag);
+                    }
+                    if (tag instanceof DefineSpriteTag) {
+                        addFolderPreviewItems(folderPreviewItems, folderName, (DefineSpriteTag) tag);
                     }
                 }
                 break;
             case TagTreeModel.FOLDER_FRAMES:
-                for (Frame frame : swf.getTimeline().getFrames()) {
+                for (Frame frame : timelined.getTimeline().getFrames()) {
                     folderPreviewItems.add(frame);
                 }
                 break;
             case TagTreeModel.FOLDER_IMAGES:
-                for (Tag tag : swf.getTags()) {
+                for (Tag tag : timelined.getTags()) {
                     if (tag instanceof ImageTag) {
                         folderPreviewItems.add(tag);
+                    }
+                    if (tag instanceof DefineSpriteTag) {
+                        addFolderPreviewItems(folderPreviewItems, folderName, (DefineSpriteTag) tag);
                     }
                 }
                 break;
             case TagTreeModel.FOLDER_TEXTS:
-                for (Tag tag : swf.getTags()) {
+                for (Tag tag : timelined.getTags()) {
                     if (tag instanceof TextTag) {
                         folderPreviewItems.add(tag);
+                    }
+                    if (tag instanceof DefineSpriteTag) {
+                        addFolderPreviewItems(folderPreviewItems, folderName, (DefineSpriteTag) tag);
                     }
                 }
                 break;
         }
+    }
+    
+    private void showFolderPreview(FolderItem item) {
+        List<TreeItem> folderPreviewItems = new ArrayList<>();
+        String folderName = item.getName();
+        SWF swf = item.swf;
+        addFolderPreviewItems(folderPreviewItems, folderName, swf);
 
         folderPreviewPanel.setItems(folderPreviewItems);
         showCard(CARDFOLDERPREVIEWPANEL);
