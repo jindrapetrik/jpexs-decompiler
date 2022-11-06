@@ -1203,7 +1203,6 @@ public class SWFInputStream implements AutoCloseable {
         }
         List<Tag> tags = new ArrayList<>();
         Tag tag;
-        boolean isAS3 = false;
         while (available() > 0) {
             long pos = getPos();
             newDumpLevel(null, "TAG", DumpInfoSpecialType.TAG, getPos());
@@ -1214,49 +1213,6 @@ public class SWFInputStream implements AutoCloseable {
             }
 
             boolean doParse = true;
-            if (!skipUnusualTags) {
-                doParse = true;
-            } else if (tag != null) {
-                if (tag.getId() == FileAttributesTag.ID && level == 0) { // FileAttributes 
-                    if (tag instanceof TagStub) {
-                        tag = resolveTag((TagStub) tag, level, parallel1, skipUnusualTags, lazy, true);
-                    }
-                    FileAttributesTag fileAttributes = (FileAttributesTag) tag;
-                    if (fileAttributes.actionScript3) {
-                        isAS3 = true;
-                    }
-                }
-                doParse = true;
-                /*switch (tag.getId()) {
-                    case DoActionTag.ID:
-                    case DoInitActionTag.ID:
-                        doParse = !isAS3;
-                        break;
-                    case ShowFrameTag.ID:
-                    case PlaceObjectTag.ID:
-                    case PlaceObject2Tag.ID:
-                    case PlaceObject3Tag.ID:
-                    case PlaceObject4Tag.ID:
-                    case RemoveObjectTag.ID:
-                    case RemoveObject2Tag.ID:
-                    case StartSoundTag.ID:
-                    case FrameLabelTag.ID:
-                    case SoundStreamHeadTag.ID:
-                    case SoundStreamHead2Tag.ID:
-                    case SoundStreamBlockTag.ID:
-                    case VideoFrameTag.ID:
-                    case EndTag.ID:
-                        doParse = true;
-                        break;
-                    default:
-                        if (level > 0) { //No such tags in DefineSprite allowed
-                            logger.log(Level.FINE, "Tag({0}) found in DefineSprite => Ignored", tag.getId());
-                            doParse = false;
-                        } else {
-                            doParse = true;
-                        }
-                }*/
-            }
 
             if (parseTags && !parallel1 && doParse && (tag instanceof TagStub)) {
                 tag = resolveTag((TagStub) tag, level, parallel, skipUnusualTags, lazy, true);
