@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [16.1.0] - 2022-11-06
 ### Added
 - [#1459], [#1832], [#1849] AS1/2 direct editation - Error dialog when saved value (UI16, SI16, ...) exceeds its limit and this code cannot be saved.
 - Attach tag menu (Like DefineScaling grid to DefineSprite, etc.)
