@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 - [#1459], [#1832], [#1849] AS1/2 direct editation - Error dialog when saved value (UI16, SI16, ...) exceeds its limit and this code cannot be saved.
 - Attach tag menu (Like DefineScaling grid to DefineSprite, etc.)
 - Better tag error handling - these tags now got error icon
+- Show in Hex dump command from other views for tags
+- Show in Taglist command from dump view for tags
 
 ### Fixed
 - Flash viewer - subtract blend mode

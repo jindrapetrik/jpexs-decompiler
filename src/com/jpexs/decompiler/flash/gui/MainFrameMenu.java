@@ -1146,6 +1146,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
         viewResourcesActionPerformed(null);
     }
 
+    public void showTagListView() {
+        viewTagListActionPerformed(null);
+    }
+    
     private void viewResourcesActionPerformed(ActionEvent evt) {
         Configuration.dumpView.set(false);
         mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
