@@ -123,9 +123,12 @@ import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -142,17 +145,35 @@ import javax.swing.tree.TreePath;
  * @author JPEXS
  */
 public class TagTree extends AbstractTagTree {
+
     public static class TagTreeCellRenderer extends DefaultTreeCellRenderer {
 
         private Font plainFont;
 
         private Font boldFont;
 
+        private boolean semiTransparent = false;
+
         public TagTreeCellRenderer() {
             setUI(new BasicLabelUI());
             setOpaque(false);
             if (View.isOceanic()) {
                 setBackgroundNonSelectionColor(Color.white);
+            }
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+
+            if (semiTransparent) {
+                if (getIcon() != null) {
+                    Color color = getBackground();
+                    Graphics2D g2d = (Graphics2D) g;
+                    g2d.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha() / 2));
+                    g2d.setComposite(AlphaComposite.SrcOver);
+                    g2d.fillRect(0, 0, getWidth(), getHeight());
+                }
             }
         }
 
@@ -228,34 +249,39 @@ public class TagTree extends AbstractTagTree {
                 }
             }
             setToolTipText(null);
-            
+
             AbstractTagTree aTree = (AbstractTagTree) tree;
-                Map<TreeItem, Set<Integer>> allMissingNeededCharacters = aTree.getMissingNeededCharacters();
-                if (allMissingNeededCharacters.containsKey((TreeItem)value)) {
-                    Set<Integer> missingNeededCharacters = allMissingNeededCharacters.get(value);
-                    if (!missingNeededCharacters.isEmpty()) {
-                        List<String> missingAsStr = new ArrayList<>();
-                        for (int v:missingNeededCharacters) {
-                            missingAsStr.add("" + v);
-                        }
-                        if (missingAsStr.size() == 1) {
-                            setToolTipText(AppStrings.translate("error.missing.characterTag.single").replace("%tag%", missingAsStr.get(0)));
-                        } else {
-                            setToolTipText(AppStrings.translate("error.missing.characterTag.multi").replace("%tags%",String.join(", ", missingAsStr)));
-                        }
-                        setForeground(Color.red);                       
+            Map<TreeItem, Set<Integer>> allMissingNeededCharacters = aTree.getMissingNeededCharacters();
+            if (allMissingNeededCharacters.containsKey((TreeItem) value)) {
+                Set<Integer> missingNeededCharacters = allMissingNeededCharacters.get(value);
+                if (!missingNeededCharacters.isEmpty()) {
+                    List<String> missingAsStr = new ArrayList<>();
+                    for (int v : missingNeededCharacters) {
+                        missingAsStr.add("" + v);
                     }
+                    if (missingAsStr.size() == 1) {
+                        setToolTipText(AppStrings.translate("error.missing.characterTag.single").replace("%tag%", missingAsStr.get(0)));
+                    } else {
+                        setToolTipText(AppStrings.translate("error.missing.characterTag.multi").replace("%tags%", String.join(", ", missingAsStr)));
+                    }
+                    setForeground(Color.red);
                 }
+            }
+
+            semiTransparent = false;
+            if (aTree.getMainPanel().isClipboardCut() && aTree.getMainPanel().clipboardContains(val)) {
+                semiTransparent = true;
+            }
 
             return this;
         }
     }
 
     public TagTree(TagTreeModel treeModel, MainPanel mainPanel) {
-        super(treeModel, mainPanel);                        
+        super(treeModel, mainPanel);
         setCellRenderer(new TagTreeCellRenderer());
     }
-    
+
     public static List<Integer> getSwfFolderItemNestedTagIds(String folderName, boolean gfx) {
         List<Integer> ret = new ArrayList<>();
         switch (folderName) {
@@ -317,7 +343,7 @@ public class TagTree extends AbstractTagTree {
 
         return ret;
     }
- 
+
     @Override
     public List<TreeItem> getSelection(SWF swf) {
         List<TreeItem> sel;
@@ -358,8 +384,5 @@ public class TagTree extends AbstractTagTree {
     public TagTreeModel getModel() {
         return (TagTreeModel) super.getModel();
     }
-    
-    
 
-    
 }

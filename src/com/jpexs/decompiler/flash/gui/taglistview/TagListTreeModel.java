@@ -152,6 +152,9 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             if (header == child) {
                 return 0;
             }
+            if (!(child instanceof Frame)) {
+                return -1;
+            }
             return ((Frame)child).frame + 1;
         } else if (parentNode instanceof DefineSpriteTag) {
             if (((Frame)child).timeline != ((DefineSpriteTag)parentNode).getTimeline()) {

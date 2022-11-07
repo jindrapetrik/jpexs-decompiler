@@ -218,8 +218,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -379,6 +382,67 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     
     private Thread calculateMissingNeededThread;
 
+    private List<WeakReference<TreeItem>> orderedClipboard = new ArrayList<>();
+    private Map<TreeItem, Boolean> clipboard = new WeakHashMap<>();
+    
+    private boolean clipboardCut = false;
+    
+    public void gcClipboard() {
+        for (int i = orderedClipboard.size() - 1; i >= 0; i--) {
+            WeakReference<TreeItem> ref = orderedClipboard.get(i);
+            TreeItem item = ref.get();
+            if (item != null) {
+                if (item.getSwf() == null) {
+                    orderedClipboard.remove(i);
+                    clipboard.remove(item);
+                }
+            }
+        }
+    }
+    
+    public void emptyClipboard() {
+        copyToClipboard(new ArrayList<>());
+    }
+    
+    public void copyToClipboard(Collection<TreeItem> items) {
+        orderedClipboard.clear();
+        clipboard.clear();
+        for (TreeItem item : items) {
+            orderedClipboard.add(new WeakReference<>(item));
+            clipboard.put(item, true);
+        }
+        clipboardCut = false;
+    }
+    
+    public void cutToClipboard(Collection<TreeItem> items) {
+        copyToClipboard(items);
+        clipboardCut = true;        
+    }
+    
+    public boolean clipboardContains(TreeItem item) {
+        return clipboard.containsKey(item);
+    }
+    
+    public boolean clipboardEmpty() {
+        return clipboard.isEmpty();
+    }
+    
+    public Set<TreeItem> getClipboardContents() {
+        Set<TreeItem> ret = new LinkedHashSet<>();
+        for (WeakReference<TreeItem> ref : orderedClipboard) {
+            TreeItem item = ref.get();
+            if (item != null) {
+                ret.add(item);
+            }
+        }
+        return ret;
+    }
+
+    public boolean isClipboardCut() {
+        return clipboardCut;
+    }    
+    
+    
     private class MyTreeSelectionModel extends DefaultTreeSelectionModel {
 
         private boolean isModified() {
@@ -939,6 +1003,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             updateUi(swf);
         }
 
+        gcClipboard();
         doFilter();
         reload(false);
         View.expandTreeNodes(tagTree, expandedNodes);
@@ -955,6 +1020,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (swf != null) {
             updateUi(swf);
         }
+        
+        gcClipboard();
 
         doFilter();
         reload(false);
@@ -1097,6 +1164,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         refreshTree();
 
+        gcClipboard();
         mainMenu.updateComponents(null);
         previewPanel.clear();
 
@@ -1152,6 +1220,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         refreshTree();
 
+        gcClipboard();
+        
         mainMenu.updateComponents(null);
         previewPanel.clear();
         dumpPreviewPanel.clear();
