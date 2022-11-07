@@ -759,7 +759,11 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> showImportImageInfo = null;
-
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> autoPlaySwfs = null;
+        
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

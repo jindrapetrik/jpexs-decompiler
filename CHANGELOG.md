@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - [#1755] Copy tags to tag clipboard and paste them elsewhere
 - [#1460] Bulk importing images
 - Bulk importing scripts/text/images added to SWF context menu
+- [#1465] Configuration option to disable SWF preview autoplay
 
 ### Fixed
 - FLA export printing xxx string on exporting character with id 320
@@ -2520,6 +2521,7 @@ All notable changes to this project will be documented in this file.
 [#1414]: https://www.free-decompiler.com/flash/issues/1414
 [#1755]: https://www.free-decompiler.com/flash/issues/1755
 [#1460]: https://www.free-decompiler.com/flash/issues/1460
+[#1465]: https://www.free-decompiler.com/flash/issues/1465
 [#1862]: https://www.free-decompiler.com/flash/issues/1862
 [#1459]: https://www.free-decompiler.com/flash/issues/1459
 [#1832]: https://www.free-decompiler.com/flash/issues/1832

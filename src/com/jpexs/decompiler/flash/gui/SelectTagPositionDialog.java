@@ -477,9 +477,9 @@ public class SelectTagPositionDialog extends AppDialog {
             int f = ((MyFrame) tnode.getData()).frame;
             Object parent = ((MyTreeNode) tnode.getParent()).getData();
             if (parent instanceof DefineSpriteTag) {
-                previewPanel.showImagePanel((DefineSpriteTag) parent, swf, f - 1, true);
+                previewPanel.showImagePanel((DefineSpriteTag) parent, swf, f - 1, true, true);
             } else {
-                previewPanel.showImagePanel(swf, swf, f - 1, true);
+                previewPanel.showImagePanel(swf, swf, f - 1, true, true);
             }
         } else {
             previewPanel.showEmpty();
