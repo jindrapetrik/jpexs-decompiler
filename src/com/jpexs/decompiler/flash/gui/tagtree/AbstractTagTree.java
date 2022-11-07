@@ -466,7 +466,7 @@ public abstract class AbstractTagTree extends JTree {
             if (d instanceof SWFList) {
                 continue;
             }
-            if (d.getSwf() != swf) {
+            if (swf != null && d.getSwf() != swf) {
                 continue;
             }
 
