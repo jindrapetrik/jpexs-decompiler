@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - FLA export printing xxx string on exporting character with id 320
+- Copy to with dependencies does not refresh timeline
 
 ## [16.1.0] - 2022-11-06
 ### Added
