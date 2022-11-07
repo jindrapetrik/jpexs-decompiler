@@ -1237,6 +1237,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                         copyTag = neededTag.cloneTag();
                         copyTag.setSwf(targetSwf, true);
                         targetSwf.addTag(copyTag);
+                        copyTag.setTimelined(targetSwf);
                         int oldCharacterId = neededTag.getCharacterId();
                         int newCharacterId = checkUniqueCharacterId(copyTag);
                         changedCharacterIds.put(oldCharacterId, newCharacterId);
@@ -1250,8 +1251,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
 
                 copyTag = tag.cloneTag();
-                copyTag.setSwf(targetSwf, true);
+                copyTag.setSwf(targetSwf, true);                
                 targetSwf.addTag(copyTag);
+                copyTag.setTimelined(targetSwf);
                 if (tag instanceof CharacterTag) {
                     CharacterTag characterTag = (CharacterTag) copyTag;
                     int oldCharacterId = characterTag.getCharacterId();
