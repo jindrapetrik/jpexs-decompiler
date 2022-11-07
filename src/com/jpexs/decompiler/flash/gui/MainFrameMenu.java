@@ -266,6 +266,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         mainFrame.getPanel().importScript(swf);
     }
+    
+    protected void importImagesActionPerformed(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+        mainFrame.getPanel().importImage(swf);
+    }
 
     protected void importSymbolClassActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
@@ -758,7 +765,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("/file/import", swfSelected);
         setMenuEnabled("/file/import/importText", swfSelected && !isWorking);
         setMenuEnabled("/file/import/importScript", swfSelected && !isWorking);
-        setMenuEnabled("/file/import/importSymbolClass", swfSelected && !isWorking);
+        setMenuEnabled("/file/import/importOther", swfSelected && !isWorking);        
         setMenuEnabled("/file/import/importXml", swfSelected && !isWorking);
 
         setMenuEnabled("/tools/deobfuscation", swfSelected);
@@ -885,7 +892,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/file/import/importXml", translate("menu.file.import.xml"), "importxml32", this::importXmlActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/file/import/importText", translate("menu.file.import.text"), "importtext32", this::importTextActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/import/importScript", translate("menu.file.import.script"), "importscript32", this::importScriptActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/import/importSymbolClass", translate("menu.file.import.symbolClass"), "importsymbolclass32", this::importSymbolClassActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/file/import/importOther", translate("menu.file.import.other"), "importother32", null, PRIORITY_MEDIUM, null, false, null, false);        
+        addMenuItem("/file/import/importOther/importImages", translate("menu.file.import.images"), "importimage32", this::importImagesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/file/import/importOther/importSymbolClass", translate("menu.file.import.symbolClass"), "importsymbolclass32", this::importSymbolClassActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        finishMenu("/file/import/importOther");
         finishMenu("/file/import");
 
         addMenuItem("/file/start", translate("menu.file.start"), null, null, 0, null, false, null, false);

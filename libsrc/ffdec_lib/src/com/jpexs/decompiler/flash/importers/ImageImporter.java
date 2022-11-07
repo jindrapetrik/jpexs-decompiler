@@ -97,8 +97,9 @@ public class ImageImporter extends TagImporter {
             }
 
             imageTag.setModified(true);
-            swf.replaceTag(it, imageTag);
+            it.getTimelined().replaceTag(it, imageTag);
             swf.updateCharacters();
+            swf.resetTimelines(swf);
             return imageTag;
         }
 

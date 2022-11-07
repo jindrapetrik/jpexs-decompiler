@@ -20,7 +20,7 @@ package com.jpexs.decompiler.flash.exporters.modes;
  *
  * @author JPEXS
  */
-public enum ImageExportMode {
-
+public enum ImageExportMode {    
+    
     PNG_GIF_JPEG, PNG, JPEG, BMP
 }

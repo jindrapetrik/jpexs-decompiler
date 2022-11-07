@@ -755,6 +755,10 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> showImportXmlInfo = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> showImportImageInfo = null;
 
     private enum OSId {
         WINDOWS, OSX, UNIX
