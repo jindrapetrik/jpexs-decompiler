@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Copy to with dependencies does not set the timelined, that can result to missing dependencies (red tags in the tree)
 - Double warning/error when copy to / move to and same character id already exists
 - [#1862] Exporting selection to subfolders by SWFname when multiple SWFs selected
+- Java code export indentation
 
 ## [16.1.0] - 2022-11-06
 ### Added
