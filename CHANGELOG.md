@@ -6,12 +6,14 @@ All notable changes to this project will be documented in this file.
 - [#1414] Cancelling in-progress exportation
 - [#1755] Copy tags to tag clipboard and paste them elsewhere
 - [#1460] Bulk importing images
+- Bulk importing scripts/text/images added to SWF context menu
 
 ### Fixed
 - FLA export printing xxx string on exporting character with id 320
 - Copy to with dependencies does not refresh timeline
 - Copy to with dependencies does not set the timelined, that can result to missing dependencies (red tags in the tree)
 - Double warning/error when copy to / move to and same character id already exists
+- [#1862] Exporting selection to subfolders by SWFname when multiple SWFs selected
 
 ## [16.1.0] - 2022-11-06
 ### Added
@@ -2516,6 +2518,7 @@ All notable changes to this project will be documented in this file.
 [#1414]: https://www.free-decompiler.com/flash/issues/1414
 [#1755]: https://www.free-decompiler.com/flash/issues/1755
 [#1460]: https://www.free-decompiler.com/flash/issues/1460
+[#1862]: https://www.free-decompiler.com/flash/issues/1862
 [#1459]: https://www.free-decompiler.com/flash/issues/1459
 [#1832]: https://www.free-decompiler.com/flash/issues/1832
 [#1849]: https://www.free-decompiler.com/flash/issues/1849

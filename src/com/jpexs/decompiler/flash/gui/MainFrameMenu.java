@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
@@ -175,7 +176,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     protected void newActionPerformed(ActionEvent evt) {
         Main.newFile();
     }
-    
+
     protected boolean saveActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return false;
@@ -206,7 +207,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     private boolean isSwfReadOnly(SWF swf) {
         return swf.swfList != null && swf.swfList.bundle != null && swf.swfList.bundle.isReadOnly();
     }
-    
+
     private boolean saveAs(SWF swf, SaveFileMode mode) {
         View.checkAccess();
 
@@ -266,7 +267,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         mainFrame.getPanel().importScript(swf);
     }
-    
+
     protected void importImagesActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
@@ -564,7 +565,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             if (!Configuration.showCloseConfirmation.get() || ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                 if (swf.swfList == null) {
                     if (swf.binaryData != null) {
-                        mainFrame.getPanel().loadFromBinaryTag(swf.binaryData);                        
+                        mainFrame.getPanel().loadFromBinaryTag(swf.binaryData);
                     }
                 } else {
                     Main.reloadFile(swf.swfList);
@@ -740,6 +741,22 @@ public abstract class MainFrameMenu implements MenuBuilder {
         boolean swfLoaded = mainPanel != null ? !mainPanel.getSwfs().isEmpty() : false;
         boolean swfIsNew = swfSelected && swf.swfList != null && swf.swfList.sourceInfo.isEmpty();
 
+        boolean allSameSwf = true;
+        if (mainPanel != null) {
+            List<TreeItem> items = mainPanel.getCurrentTree().getSelected();
+            SWF firstSwf = null;
+            for (TreeItem item : items) {
+                if (firstSwf == null) {
+                    firstSwf = item.getSwf();
+                } else {
+                    if (item.getSwf() != firstSwf) {
+                        allSameSwf = false;
+                        break;
+                    }
+                }
+            }
+        }
+
         setMenuEnabled("_/open", !isWorking);
         setMenuEnabled("/file/open", !isWorking);
         setMenuEnabled("_/save", swfSelected && !isWorking);
@@ -757,16 +774,16 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("_/exportAll", swfSelected && !isWorking);
         setMenuEnabled("/file/export/exportAll", swfSelected && !isWorking);
         setMenuEnabled("_/exportFla", swfSelected && !isWorking);
-        setMenuEnabled("/file/export/exportFla", swfSelected && !isWorking);
+        setMenuEnabled("/file/export/exportFla", allSameSwf && swfSelected && !isWorking);
         setMenuEnabled("_/exportSelected", swfSelected && !isWorking);
         setMenuEnabled("/file/export/exportSelected", swfSelected && !isWorking);
         setMenuEnabled("/file/export/exportXml", swfSelected && !isWorking);
 
         setMenuEnabled("/file/import", swfSelected);
-        setMenuEnabled("/file/import/importText", swfSelected && !isWorking);
-        setMenuEnabled("/file/import/importScript", swfSelected && !isWorking);
-        setMenuEnabled("/file/import/importOther", swfSelected && !isWorking);        
-        setMenuEnabled("/file/import/importXml", swfSelected && !isWorking);
+        setMenuEnabled("/file/import/importText", allSameSwf && swfSelected && !isWorking);
+        setMenuEnabled("/file/import/importScript", allSameSwf && swfSelected && !isWorking);
+        setMenuEnabled("/file/import/importOther", allSameSwf && swfSelected && !isWorking);
+        setMenuEnabled("/file/import/importXml", allSameSwf && swfSelected && !isWorking);
 
         setMenuEnabled("/tools/deobfuscation", swfSelected);
         setMenuEnabled("/tools/deobfuscation/renameOneIdentifier", swfSelected && !isWorking);
@@ -819,9 +836,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
             titleBuilder.append(swf.getFileTitle());
         }
         mainFrame.setTitle(titleBuilder.toString());
-        
+
         if (mainPanel != null) {
-            switch(mainPanel.getCurrentView()){
+            switch (mainPanel.getCurrentView()) {
                 case MainPanel.VIEW_RESOURCES:
                     setGroupSelection("view", "/file/view/viewResources");
                     break;
@@ -878,7 +895,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/file/reload", translate("menu.file.reload"), "reload16", this::reloadActionPerformed, PRIORITY_MEDIUM, null, true, new HotKey("CTRL+SHIFT+R"), false);
         addMenuItem("/file/reloadAll", translate("menu.file.reloadAll"), "reload16", this::reloadAllActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/new", translate("menu.file.new"), "newswf32", this::newActionPerformed, PRIORITY_TOP, null, true, null, false);
-        
+
         addSeparator("/file");
 
         addMenuItem("/file/export", translate("menu.export"), null, null, 0, null, false, null, false);
@@ -892,8 +909,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/file/import/importXml", translate("menu.file.import.xml"), "importxml32", this::importXmlActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/file/import/importText", translate("menu.file.import.text"), "importtext32", this::importTextActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/import/importScript", translate("menu.file.import.script"), "importscript32", this::importScriptActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/file/import/importOther", translate("menu.file.import.other"), "importother32", null, PRIORITY_MEDIUM, null, false, null, false);        
-        addMenuItem("/file/import/importOther/importImages", translate("menu.file.import.images"), "importimage32", this::importImagesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/file/import/importOther", translate("menu.file.import.other"), "importother32", null, PRIORITY_MEDIUM, null, false, null, false);
+        addMenuItem("/file/import/importOther/importImages", translate("menu.file.import.image"), "importimage32", this::importImagesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/import/importOther/importSymbolClass", translate("menu.file.import.symbolClass"), "importsymbolclass32", this::importSymbolClassActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         finishMenu("/file/import/importOther");
         finishMenu("/file/import");
@@ -920,7 +937,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             addMenuItem("/file/exit", translate("menu.file.exit"), "exit32", this::exitActionPerformed, PRIORITY_TOP, null, true, null, false);
         }
 
-        finishMenu("/file");       
+        finishMenu("/file");
 
         /*
          menu.file.start = Start
@@ -1165,7 +1182,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     public void showTagListView() {
         viewTagListActionPerformed(null);
     }
-    
+
     private void viewResourcesActionPerformed(ActionEvent evt) {
         Configuration.dumpView.set(false);
         mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
@@ -1184,13 +1201,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setGroupSelection("view", "/file/view/viewHex");
         setMenuChecked("/tools/timeline", false);
     }
-    
+
     private void viewTagListActionPerformed(ActionEvent evt) {
-        Configuration.dumpView.set(false);    
+        Configuration.dumpView.set(false);
         MainPanel mainPanel = mainFrame.getPanel();
         mainPanel.showView(MainPanel.VIEW_TAGLIST);
         setGroupSelection("view", "/file/view/viewTagList");
-        setMenuChecked("/tools/timeline", false);        
+        setMenuChecked("/tools/timeline", false);
     }
 
     private void debuggerSwitchActionPerformed(ActionEvent evt) {

@@ -1375,9 +1375,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private List<TreeItem> getSelection(SWF swf) {
         if (currentView == MainPanel.VIEW_RESOURCES) {
-            return tagTree.getSelection(getCurrentSwf());
+            return tagTree.getSelection(swf);
         } else if (currentView == MainPanel.VIEW_TAGLIST) {
-            return tagListTree.getSelection(getCurrentSwf());
+            return tagListTree.getSelection(swf);
         }
         return new ArrayList<>();
     }
@@ -1385,7 +1385,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException, InterruptedException {
 
         List<File> ret = new ArrayList<>();
-        List<TreeItem> sel = getSelection(getCurrentSwf());
+        List<TreeItem> sel = getSelection(null);
 
         Set<SWF> usedSwfs = new HashSet<>();
         for (TreeItem d : sel) {
@@ -4708,6 +4708,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         this.missingNeededCharacters = missingNeededCharacters;
         tagTree.setMissingNeededCharacters(missingNeededCharacters);
         tagListTree.setMissingNeededCharacters(missingNeededCharacters);
-    }
+    }       
 
 }

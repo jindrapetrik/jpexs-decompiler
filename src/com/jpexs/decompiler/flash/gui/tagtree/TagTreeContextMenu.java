@@ -145,6 +145,15 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem exportSwfXmlMenuItem;
 
     private JMenuItem importSwfXmlMenuItem;
+    
+    private JMenuItem importScriptsMenuItem;
+    
+    private JMenuItem importTextsMenuItem;
+    
+    private JMenuItem importImagesMenuItem;
+    
+    private JMenuItem importSymbolClassMenuItem;
+
 
     private JMenuItem closeMenuItem;
 
@@ -276,6 +285,26 @@ public class TagTreeContextMenu extends JPopupMenu {
         importSwfXmlMenuItem.addActionListener(mainPanel::importSwfXmlActionPerformed);
         importSwfXmlMenuItem.setIcon(View.getIcon("importxml16"));
         add(importSwfXmlMenuItem);
+        
+        importScriptsMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.script"));
+        importScriptsMenuItem.addActionListener(this::importScriptsActionPerformed);
+        importScriptsMenuItem.setIcon(View.getIcon("importscript16"));
+        add(importScriptsMenuItem);
+        
+        importTextsMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.text"));
+        importTextsMenuItem.addActionListener(this::importTextsActionPerformed);
+        importTextsMenuItem.setIcon(View.getIcon("importtext16"));
+        add(importTextsMenuItem);
+        
+        importImagesMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.image"));
+        importImagesMenuItem.addActionListener(this::importImagesActionPerformed);
+        importImagesMenuItem.setIcon(View.getIcon("importimage16"));
+        add(importImagesMenuItem);
+        
+        importSymbolClassMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.symbolClass"));
+        importSymbolClassMenuItem.addActionListener(this::importSymbolClassActionPerformed);
+        importSymbolClassMenuItem.setIcon(View.getIcon("importsymbolclass16"));
+        add(importSymbolClassMenuItem);
 
         showInResourcesViewTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.showInResources"));
         showInResourcesViewTagMenuItem.addActionListener(this::showInResourcesViewActionPerformed);
@@ -623,7 +652,13 @@ public class TagTreeContextMenu extends JPopupMenu {
         jumpToCharacterMenuItem.setVisible(false);
         exportJavaSourceMenuItem.setVisible(allSelectedIsSwf);
         exportSwfXmlMenuItem.setVisible(allSelectedIsSwf);
-        importSwfXmlMenuItem.setVisible(allSelectedIsSwf);
+        
+        importImagesMenuItem.setVisible(false);
+        importScriptsMenuItem.setVisible(false);
+        importSymbolClassMenuItem.setVisible(false);
+        importTextsMenuItem.setVisible(false);
+        importSwfXmlMenuItem.setVisible(false);
+        
         closeMenuItem.setVisible(allSelectedIsSwf);
         addTagInsideMenu.setVisible(false);
         attachTagMenu.setVisible(false);
@@ -793,6 +828,14 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (firstItem instanceof Tag) {
                 showInHexDumpViewTagMenuItem.setVisible(true);
             }
+            
+            if (firstItem instanceof SWF) {
+                importImagesMenuItem.setVisible(true);
+                importScriptsMenuItem.setVisible(true);
+                importSymbolClassMenuItem.setVisible(true);
+                importTextsMenuItem.setVisible(true);
+                importSwfXmlMenuItem.setVisible(true);
+            }                        
 
             if (!mainPanel.clipboardEmpty()) {
                 if ((firstItem instanceof SWF) || (firstItem instanceof DefineSpriteTag) || (firstItem instanceof Frame)) {
@@ -861,7 +904,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             openSWFInsideTagMenuItem.setVisible(anyInnerSwf);
         }
-
+               
         for (TreeItem item : items) {
             if (item instanceof Tag) {
                 if (((Tag) item).isReadOnly()) {
@@ -2809,4 +2852,25 @@ public class TagTreeContextMenu extends JPopupMenu {
             Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
         }        
     }
+    
+    public void importScriptsActionPerformed(ActionEvent evt) {
+        SWF swf = getTree().getCurrentTreeItem().getSwf();
+        mainPanel.importScript(swf);
+    }
+    
+    public void importTextsActionPerformed(ActionEvent evt) {
+        SWF swf = getTree().getCurrentTreeItem().getSwf();
+        mainPanel.importText(swf);
+    }
+    
+    public void importImagesActionPerformed(ActionEvent evt) {
+        SWF swf = getTree().getCurrentTreeItem().getSwf();
+        mainPanel.importImage(swf);
+    }
+    
+    public void importSymbolClassActionPerformed(ActionEvent evt) {
+        SWF swf = getTree().getCurrentTreeItem().getSwf();
+        mainPanel.importSymbolClass(swf);
+    }
+    
 }
