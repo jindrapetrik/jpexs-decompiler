@@ -729,22 +729,22 @@ public class AddScriptDialog extends AppDialog {
             int f = ((MyFrame) ((MyTreeNode) tnode.getParent()).getData()).frame;
             Object parent = ((MyTreeNode) tnode.getParent().getParent()).getData();
             if (parent instanceof DefineSpriteTag) {
-                instancePreviewPanel.showImagePanel((DefineSpriteTag) parent, swf, f - 1, true);
+                instancePreviewPanel.showImagePanel((DefineSpriteTag) parent, swf, f - 1, true, true);
             } else {
-                instancePreviewPanel.showImagePanel(swf, swf, f - 1, true);
+                instancePreviewPanel.showImagePanel(swf, swf, f - 1, true, true);
             }
 
         } else if (tnode.getData() instanceof DefineSpriteTag) {
             instancePreviewPanel.selectImageDepth(-1);
-            instancePreviewPanel.showImagePanel((DefineSpriteTag) tnode.getData(), swf, -1, true);
+            instancePreviewPanel.showImagePanel((DefineSpriteTag) tnode.getData(), swf, -1, true, true);
         } else if (tnode.getData() instanceof MyFrame) {
             instancePreviewPanel.selectImageDepth(-1);
             int f = ((MyFrame) tnode.getData()).frame;
             Object parent = ((MyTreeNode) tnode.getParent()).getData();
             if (parent instanceof DefineSpriteTag) {
-                instancePreviewPanel.showImagePanel((DefineSpriteTag) parent, swf, f - 1, true);
+                instancePreviewPanel.showImagePanel((DefineSpriteTag) parent, swf, f - 1, true, true);
             } else {
-                instancePreviewPanel.showImagePanel(swf, swf, f - 1, true);
+                instancePreviewPanel.showImagePanel(swf, swf, f - 1, true, true);
             }
         }
         checkEnabled();
@@ -758,7 +758,7 @@ public class AddScriptDialog extends AppDialog {
             checkEnabled();
             return;
         }
-        spriteInitPreviewPanel.showImagePanel(spriteInitList.getSelectedValue(), swf, -1, true);
+        spriteInitPreviewPanel.showImagePanel(spriteInitList.getSelectedValue(), swf, -1, true, true);
         checkEnabled();
     }
 
@@ -770,7 +770,7 @@ public class AddScriptDialog extends AppDialog {
             checkEnabled();
             return;
         }
-        framePreviewPanel.showImagePanel(swf, swf, selectedIndex, true);
+        framePreviewPanel.showImagePanel(swf, swf, selectedIndex, true, true);
         int f = selectedIndex + 1;
 
         if (!frameTextField.getText().equals("" + f)) {
@@ -782,7 +782,7 @@ public class AddScriptDialog extends AppDialog {
     private void buttonValueChanged(ListSelectionEvent e) {
         buttonPreviewPanel.showEmpty();
         if (buttonList.getSelectedIndex() >= 0) {
-            buttonPreviewPanel.showImagePanel(MainPanel.makeTimelined(buttonList.getSelectedValue()), swf, -1, true);
+            buttonPreviewPanel.showImagePanel(MainPanel.makeTimelined(buttonList.getSelectedValue()), swf, -1, true, true);
         }
 
         checkEnabled();
@@ -798,14 +798,14 @@ public class AddScriptDialog extends AppDialog {
         }
         MyTreeNode tnode = (MyTreeNode) selection.getLastPathComponent();
         if (tnode.getData() instanceof DefineSpriteTag) {
-            spriteFramePreviewPanel.showImagePanel((DefineSpriteTag) tnode.getData(), swf, -1, true);
+            spriteFramePreviewPanel.showImagePanel((DefineSpriteTag) tnode.getData(), swf, -1, true, true);
         } else if (tnode.getData() instanceof MyFrame) {
             int f = ((MyFrame) tnode.getData()).frame;
             Object parent = ((MyTreeNode) tnode.getParent()).getData();
             if (parent instanceof DefineSpriteTag) {
-                spriteFramePreviewPanel.showImagePanel((DefineSpriteTag) parent, swf, f - 1, true);
+                spriteFramePreviewPanel.showImagePanel((DefineSpriteTag) parent, swf, f - 1, true, true);
             } else {
-                spriteFramePreviewPanel.showImagePanel(swf, swf, f - 1, true);
+                spriteFramePreviewPanel.showImagePanel(swf, swf, f - 1, true, true);
             }
             if (!spriteFrameTextField.getText().equals("" + f)) {
                 spriteFrameTextField.setText("" + f);

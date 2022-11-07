@@ -68,6 +68,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.SystemColor;
 import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.event.ComponentAdapter;
@@ -82,6 +83,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -89,8 +91,10 @@ import java.awt.image.VolatileImage;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -101,6 +105,14 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputAdapter;
+import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
+import org.pushingpixels.substance.api.ComponentState;
+import org.pushingpixels.substance.api.DecorationAreaType;
+import org.pushingpixels.substance.api.SubstanceConstants;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
+import org.pushingpixels.substance.api.SubstanceSkin;
+import org.pushingpixels.substance.api.painter.border.StandardBorderPainter;
+import org.pushingpixels.substance.internal.utils.SubstanceOutlineUtilities;
 
 /**
  *
@@ -222,15 +234,59 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private ExportRectangle _viewRect = new ExportRectangle(0, 0, 1, 1);
 
-    private boolean playing = false;
+    private boolean playing = false;     
+    
+    private boolean autoPlayed = false;
 
     private static Cursor loadCursor(String name, int x, int y) throws IOException {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Image image = ImageIO.read(MainPanel.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/cursors/" + name + ".png"));
         return toolkit.createCustomCursor(image, new Point(x, y), name);
     }
+    
+    private SerializableImage imgPlay = null;
+    
+    
+    private SerializableImage getImagePlay() {
+        if (imgPlay != null) {
+            return imgPlay;
+        }
+        
+        Color bgColor;
+        if (Configuration.useRibbonInterface.get()) {
+            SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
+            bgColor = (skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getBackgroundFillColor());
+        } else {
+            bgColor = SystemColor.control;
+        }
+        Color fgColor;
+        if (Configuration.useRibbonInterface.get()) {            
+            SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
+            fgColor = (skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getForegroundColor());
+        } else {
+            fgColor = SystemColor.controlText;
+        }                
+        
+        int size = 200;
+        imgPlay = new SerializableImage(size,size,BufferedImage.TYPE_INT_ARGB_PRE);
+        imgPlay.fillTransparent();
+        Graphics2D g2d = (Graphics2D) imgPlay.getGraphics();
+        g2d.setStroke(new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        GeneralPath path = new GeneralPath();
+        path.moveTo(0, 0);
+        path.lineTo(size, size/2);
+        path.lineTo(0, size);
+        path.closePath();    
+        g2d.setComposite(AlphaComposite.SrcOver);
+        g2d.setPaint(new Color(fgColor.getRed(), fgColor.getGreen(), fgColor.getBlue(), fgColor.getAlpha() / 2));
+        g2d.fill(path);
+        g2d.setPaint(fgColor);        
+        g2d.draw(path);
+        
+        return imgPlay;
+    }
 
-    static {
+    static {        
         try {
             moveCursor = loadCursor("move", 0, 0);
             moveRegPointCursor = loadCursor("move_regpoint", 0, 0);
@@ -474,6 +530,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (e.getButton() == MouseEvent.BUTTON1) {
                         mouseMoved(e); //to correctly calculate mode, because moseMoved event is not called during dragging
                         setDragStart(e.getPoint());
+                        
+                        if (!autoPlayed) {
+                            autoPlayed = true;
+                            play();
+                        }
                     }
                     requestFocusInWindow();
                 }
@@ -1536,7 +1597,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return zoomAvailable;
     }
 
-    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor) {
+    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay) {
         Stage stage = new Stage(drawable) {
             @Override
             public void callFrame(int frame) {
@@ -1623,8 +1684,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             time = 0;
             drawReady = false;
+            autoPlayed = autoPlay;
             redraw();
-            play();
+            if (autoPlay) {                
+                play();
+            }            
         }
 
         synchronized (delayObject) {
@@ -2098,13 +2162,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         int mouseButton;
         int selectedDepth;
         Zoom zoom;
-        SWF swf;
+        SWF swf;        
 
         synchronized (ImagePanel.this) {
             timelined = this.timelined;
             lastMouseEvent = this.lastMouseEvent;
         }
-
+        
         boolean shownAgain = false;
 
         synchronized (ImagePanel.this) {
@@ -2170,7 +2234,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         Reference<Rectangle2D> boundsRef = new Reference<>(bounds);
 
                         _viewRect = getViewRect();
-                        if (_viewRect.getHeight() < 0 || _viewRect.getWidth() < 0) {
+                        if (!autoPlayed) {                            
+                            img = new SerializableImage(
+                                    (int) (_viewRect.getWidth() / SWF.unitDivisor),
+                                    (int) (_viewRect.getHeight() / SWF.unitDivisor),
+                                    BufferedImage.TYPE_4BYTE_ABGR);
+                            SerializableImage imgPlay = getImagePlay();
+                            Graphics g = img.getGraphics();
+                            int x = (int) (_viewRect.getWidth() / SWF.unitDivisor / 2 - imgPlay.getWidth() / 2);
+                            int y = (int) (_viewRect.getHeight() / SWF.unitDivisor / 2 - imgPlay.getHeight() / 2);
+                            g.drawImage(imgPlay.getBufferedImage(), 
+                                    x, 
+                                    y,
+                                    null);
+                        } else if (_viewRect.getHeight() < 0 || _viewRect.getWidth() < 0) {
                             img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
                         } else {
                             img = getFrame(_viewRect, swf, frame, time, timelined, renderContext, selectedDepth, freeTransformDepth, zoomDouble, registrationPointRef, boundsRef, transform, transformUpdated == null ? null : new Matrix(transformUpdated));
@@ -2192,7 +2269,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
 
-            if (!shownAgain) {
+            if (!shownAgain && !autoPlayed) {
                 List<Integer> sounds = new ArrayList<>();
                 List<String> soundClasses = new ArrayList<>();
                 List<SOUNDINFO> soundInfos = new ArrayList<>();
@@ -2232,16 +2309,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             StringBuilder ret = new StringBuilder();
 
-            if (cursorPosition != null) {
+            if (cursorPosition != null && !autoPlayed) {
                 ret.append(" [").append(cursorPosition.x).append(",").append(cursorPosition.y).append("]");
                 if (showObjectsUnderCursor) {
                     ret.append(" : ");
                 }
             }
 
-            boolean handCursor = renderContext.mouseOverButton != null;
+            boolean handCursor = renderContext.mouseOverButton != null || !autoPlayed;
 
-            if (showObjectsUnderCursor) {
+            if (showObjectsUnderCursor && !autoPlayed) {
 
                 boolean first = true;
                 for (int i = renderContext.stateUnderCursor.size() - 1; i >= 0; i--) {
@@ -2376,6 +2453,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     @Override
     public synchronized void play() {
+        this.autoPlayed = true;
         stopInternal();
         if (timelined != null) {
             Timeline timeline = timelined.getTimeline();
@@ -2601,6 +2679,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return;
         }
 
+        this.autoPlayed = true;
         this.frame = frame - 1;
         this.prevFrame = -1;
         stopInternal();
