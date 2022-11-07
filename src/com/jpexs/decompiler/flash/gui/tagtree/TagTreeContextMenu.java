@@ -26,7 +26,6 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
-import com.jpexs.decompiler.flash.amf.amf3.ListSet;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
@@ -48,24 +47,15 @@ import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
-import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.ExportAssetsTag;
-import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
-import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
-import com.jpexs.decompiler.flash.tags.RemoveObjectTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
-import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
-import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
-import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagTypeInfo;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
-import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -169,9 +159,9 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenu moveTagToMenu;
 
-    private JMenu copyTagMenu;
+    private JMenu copyTagToMenu;
 
-    private JMenu copyTagWithDependenciesMenu;
+    private JMenu copyTagToWithDependenciesMenu;
 
     private JMenuItem openSWFInsideTagMenuItem;
 
@@ -321,13 +311,13 @@ public class TagTreeContextMenu extends JPopupMenu {
         moveTagToMenu.setIcon(View.getIcon("move16"));
         add(moveTagToMenu);
 
-        copyTagMenu = new JMenu(mainPanel.translate("contextmenu.copyTag"));
-        copyTagMenu.setIcon(View.getIcon("copy16"));
-        add(copyTagMenu);
+        copyTagToMenu = new JMenu(mainPanel.translate("contextmenu.copyTag"));
+        copyTagToMenu.setIcon(View.getIcon("copy16"));
+        add(copyTagToMenu);
 
-        copyTagWithDependenciesMenu = new JMenu(mainPanel.translate("contextmenu.copyTagWithDependencies"));
-        copyTagWithDependenciesMenu.setIcon(View.getIcon("copy16"));
-        add(copyTagWithDependenciesMenu);
+        copyTagToWithDependenciesMenu = new JMenu(mainPanel.translate("contextmenu.copyTagWithDependencies"));
+        copyTagToWithDependenciesMenu.setIcon(View.getIcon("copy16"));
+        add(copyTagToWithDependenciesMenu);
 
         openSWFInsideTagMenuItem = new JMenuItem(mainPanel.translate("contextmenu.openswfinside"));
         openSWFInsideTagMenuItem.setIcon(View.getIcon("openinside16"));
@@ -604,8 +594,8 @@ public class TagTreeContextMenu extends JPopupMenu {
         addTagBeforeMenu.setVisible(false);
         addTagAfterMenu.setVisible(false);
         moveTagToMenu.setVisible(false);
-        copyTagMenu.setVisible(false);
-        copyTagWithDependenciesMenu.setVisible(false);
+        copyTagToMenu.setVisible(false);
+        copyTagToWithDependenciesMenu.setVisible(false);
         openSWFInsideTagMenuItem.setVisible(false);
         addAs12ScriptMenuItem.setVisible(false);
         addAs3ClassMenuItem.setVisible(false);
@@ -766,19 +756,19 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         if (allSelectedIsInTheSameSwf && allSelectedIsTag && swfs.size() > 1) {
             moveTagToMenu.removeAll();
-            copyTagMenu.removeAll();
-            copyTagWithDependenciesMenu.removeAll();
+            copyTagToMenu.removeAll();
+            copyTagToWithDependenciesMenu.removeAll();
             for (SWFList targetSwfList : swfs) {
                 if ((targetSwfList.size() == 1) && (targetSwfList.get(0) == singleSwf)) {
                     continue;
                 }
                 addCopyMoveToMenusSwfList(KIND_MOVETO, singleSwf, targetSwfList, moveTagToMenu, items);
-                addCopyMoveToMenusSwfList(KIND_COPYTO, singleSwf, targetSwfList, copyTagMenu, items);
-                addCopyMoveToMenusSwfList(KIND_COPYTODEPS, singleSwf, targetSwfList, copyTagWithDependenciesMenu, items);
+                addCopyMoveToMenusSwfList(KIND_COPYTO, singleSwf, targetSwfList, copyTagToMenu, items);
+                addCopyMoveToMenusSwfList(KIND_COPYTODEPS, singleSwf, targetSwfList, copyTagToWithDependenciesMenu, items);
             }
             moveTagToMenu.setVisible(true);
-            copyTagMenu.setVisible(true);
-            copyTagWithDependenciesMenu.setVisible(true);
+            copyTagToMenu.setVisible(true);
+            copyTagToWithDependenciesMenu.setVisible(true);
         }
 
         if (allSelectedIsBinaryData) {
@@ -1212,7 +1202,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             targetSwf.assignExportNamesToSymbols();
             targetSwf.assignClassesToSymbols();
             targetSwf.clearImageCache();
-            targetSwf.updateCharacters();
+            targetSwf.updateCharacters();            
             mainPanel.refreshTree(targetSwf);
         } catch (IOException | InterruptedException ex) {
             logger.log(Level.SEVERE, null, ex);
@@ -1292,6 +1282,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             targetSwf.assignClassesToSymbols();
             targetSwf.clearImageCache();
             targetSwf.updateCharacters();
+            targetSwf.resetTimelines(targetSwf);
             mainPanel.refreshTree(targetSwf);
         } catch (IOException | InterruptedException ex) {
             logger.log(Level.SEVERE, null, ex);
