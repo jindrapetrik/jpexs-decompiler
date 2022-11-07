@@ -25,9 +25,12 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +49,8 @@ public class TagListTreeCellRenderer extends DefaultTreeCellRenderer {
     private Font plainFont;
 
     private Font boldFont;
+    
+    private boolean semiTransparent = false;
 
     public TagListTreeCellRenderer() {
         if (View.isOceanic()) {
@@ -54,6 +59,23 @@ public class TagListTreeCellRenderer extends DefaultTreeCellRenderer {
             setBackgroundNonSelectionColor(Color.white);
         }
     }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        
+        if (semiTransparent) { 
+            if (getIcon() != null) {
+                Color color = getBackground();
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha() / 2));
+                g2d.setComposite(AlphaComposite.SrcOver);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
+        }
+    }
+    
+    
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
@@ -117,8 +139,13 @@ public class TagListTreeCellRenderer extends DefaultTreeCellRenderer {
                         } else {
                             lab.setToolTipText(AppStrings.translate("error.missing.characterTag.multi").replace("%tags%",String.join(", ", missingAsStr)));
                         }
-                        lab.setForeground(Color.red);                       
+                        lab.setForeground(Color.red);                               
                     }
+                }
+                
+                semiTransparent = false;
+                if (aTree.getMainPanel().isClipboardCut() && aTree.getMainPanel().clipboardContains(val)) {                    
+                    semiTransparent = true;
                 }
             }
         }

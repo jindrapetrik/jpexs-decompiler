@@ -132,9 +132,13 @@ public abstract class AbstractTagTree extends JTree {
                 String tagTypeStr = treeNodeType.toString().toLowerCase(Locale.ENGLISH).replace("_", "");
                 ICONS.put(treeNodeType, View.getIcon(tagTypeStr + "16"));
             }
-        }
+        }        
     }
 
+    public MainPanel getMainPanel() {
+        return mainPanel;
+    }
+        
     public Map<TreeItem, Set<Integer>> getMissingNeededCharacters() {
         return missingNeededCharacters;
     }  
