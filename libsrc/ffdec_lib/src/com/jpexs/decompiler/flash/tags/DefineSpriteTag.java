@@ -441,6 +441,14 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
         removeTag(index);
         addTag(index, newTag);
     }
+    
+    @Override
+    public void replaceTag(Tag oldTag, Tag newTag) {        
+        int index = indexOfTag(oldTag);
+        if (index != -1) {
+            replaceTag(index, newTag);
+        }
+    }
 
     @Override
     public RECT getRectWithStrokes() {

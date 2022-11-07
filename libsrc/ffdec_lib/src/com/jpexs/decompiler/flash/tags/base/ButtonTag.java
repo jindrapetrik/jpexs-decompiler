@@ -183,4 +183,13 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
         removeTag(index);
         addTag(index, newTag);
     }
+    
+    @Override
+    public void replaceTag(Tag oldTag, Tag newTag) {
+        setModified(true);
+        int index = indexOfTag(oldTag);
+        if (index != -1) {
+            replaceTag(index, newTag);
+        }
+    }
 }

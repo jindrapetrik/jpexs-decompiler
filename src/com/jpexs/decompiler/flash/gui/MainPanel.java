@@ -377,16 +377,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private TagTreeContextMenu contextPopupMenu;
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
-    
+
     private Map<TreeItem, Set<Integer>> missingNeededCharacters = new WeakHashMap<>();
-    
+
     private Thread calculateMissingNeededThread;
 
     private List<WeakReference<TreeItem>> orderedClipboard = new ArrayList<>();
     private Map<TreeItem, Boolean> clipboard = new WeakHashMap<>();
-    
+
     private boolean clipboardCut = false;
-    
+
     public void gcClipboard() {
         for (int i = orderedClipboard.size() - 1; i >= 0; i--) {
             WeakReference<TreeItem> ref = orderedClipboard.get(i);
@@ -399,11 +399,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
     }
-    
+
     public void emptyClipboard() {
         copyToClipboard(new ArrayList<>());
     }
-    
+
     public void copyToClipboard(Collection<TreeItem> items) {
         orderedClipboard.clear();
         clipboard.clear();
@@ -413,20 +413,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         clipboardCut = false;
     }
-    
+
     public void cutToClipboard(Collection<TreeItem> items) {
         copyToClipboard(items);
-        clipboardCut = true;        
+        clipboardCut = true;
     }
-    
+
     public boolean clipboardContains(TreeItem item) {
         return clipboard.containsKey(item);
     }
-    
+
     public boolean clipboardEmpty() {
         return clipboard.isEmpty();
     }
-    
+
     public Set<TreeItem> getClipboardContents() {
         Set<TreeItem> ret = new LinkedHashSet<>();
         for (WeakReference<TreeItem> ref : orderedClipboard) {
@@ -440,9 +440,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public boolean isClipboardCut() {
         return clipboardCut;
-    }    
-    
-    
+    }
+
     private class MyTreeSelectionModel extends DefaultTreeSelectionModel {
 
         private boolean isModified() {
@@ -593,7 +592,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         statusPanel.setWorkStatus(s, worker);
         mainMenu.updateComponents();
     }
-    
+
     public CancellableWorker getCurrentWorker() {
         return statusPanel.getCurrentWorker();
     }
@@ -778,9 +777,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         dumpTree = new DumpTree(null, this);
         dumpTree.addTreeSelectionListener(this);
         dumpTree.createContextMenu();
-        
+
         currentView = Configuration.lastView.get();
-        
+
         statusPanel = new MainFrameStatusPanel(this);
         add(statusPanel, BorderLayout.SOUTH);
 
@@ -958,7 +957,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         calculateMissingNeededThread = new Thread("calculateMissingNeededThread") {
             @Override
             public void run() {
-                while(true) {
+                while (true) {
                     calculateMissingNeededCharacters();
                     try {
                         Thread.sleep(1000);
@@ -966,7 +965,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         return;
                     }
                 }
-            }            
+            }
         };
         calculateMissingNeededThread.start();
     }
@@ -1020,7 +1019,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (swf != null) {
             updateUi(swf);
         }
-        
+
         gcClipboard();
 
         doFilter();
@@ -1221,7 +1220,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         refreshTree();
 
         gcClipboard();
-        
+
         mainMenu.updateComponents(null);
         previewPanel.clear();
         dumpPreviewPanel.clear();
@@ -2510,7 +2509,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         fc.setCurrentDirectory(new File(selDir));
         if (!selDir.endsWith(File.separator)) {
             selDir += File.separator;
-        }        
+        }
         String swfShortName = swf.getShortFileName();
         if ("".equals(swfShortName)) {
             swfShortName = "untitled.swf";
@@ -2522,7 +2521,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             fileName = swfShortName + ".fla";
         }
         final String fSwfShortName = swfShortName;
-        
+
         fc.setSelectedFile(new File(selDir + fileName));
         List<FileFilter> flaFilters = new ArrayList<>();
         List<FileFilter> xflFilters = new ArrayList<>();
@@ -2616,6 +2615,96 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
 
                     Main.stopWork();
+                }
+            }.execute();
+        }
+    }
+
+    public void importImage(final SWF swf) {
+        ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importImages"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportImageInfo);
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
+        chooser.setDialogTitle(translate("import.select.directory"));
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
+            File imagesDir = new File(Path.combine(selFile, ImageExportSettings.EXPORT_FOLDER_NAME));
+            ImageImporter imageImporter = new ImageImporter();
+
+            final long timeBefore = System.currentTimeMillis();
+            new CancellableWorker<Void>() {
+                
+                private int count = 0;
+                
+                @Override
+                public Void doInBackground() throws Exception {
+                    try {
+                        Map<Integer, CharacterTag> characters = swf.getCharacters();
+                        List<String> extensions = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp");
+                        for (int characterId : characters.keySet()) {
+                            CharacterTag tag = characters.get(characterId);
+                            if (tag instanceof ImageTag) {
+                                ImageTag imageTag = (ImageTag) tag;
+                                if (!imageTag.importSupported()) {
+                                    continue;
+                                }
+                                List<File> existingFilesForImageTag = new ArrayList<>();
+                                for (String ext : extensions) {
+                                    File sourceFile = new File(Path.combine(imagesDir.getPath(), "" + characterId + "." + ext));
+                                    if (sourceFile.exists()) {
+                                        existingFilesForImageTag.add(sourceFile);
+                                    }
+                                }
+
+                                if (existingFilesForImageTag.isEmpty()) {
+                                    continue;
+                                }
+
+                                if (existingFilesForImageTag.size() > 1) {
+                                    Logger.getLogger(MainPanel.class.getName()).log(Level.WARNING, "Multiple matching files for image tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForImageTag.get(0).getName()});
+                                }
+                                File sourceFile = existingFilesForImageTag.get(0);
+                                try {
+                                    imageImporter.importImage(imageTag, Helper.readFile(sourceFile.getPath()));
+                                    count++;
+                                } catch (IOException ex) {
+                                    Logger.getLogger(MainPanel.class.getName()).log(Level.WARNING, "Cannot import image " + characterId + " from file " + sourceFile.getName(), ex);
+                                }
+                                if (Thread.currentThread().isInterrupted()) {
+                                    break;
+                                }
+                            }
+                        }
+                        swf.clearImageCache();
+                    } catch (Exception ex) {
+                        logger.log(Level.SEVERE, "Error during import", ex);
+                        ViewMessages.showMessageDialog(null, translate("error.import") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage());
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onStart() {
+                    Main.startWork(translate("work.importing") + "...", this);
+                }
+
+                @Override
+                protected void done() {
+                    Main.stopWork();
+                    long timeAfter = System.currentTimeMillis();
+                    final long timeMs = timeAfter - timeBefore;
+                    
+
+                    View.execInEventDispatch(() -> {
+                        refreshTree(swf);
+                        setStatus(translate("import.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
+                        
+                        ViewMessages.showMessageDialog(MainPanel.this, translate("import.image.result").replace("%count%", Integer.toString(count)));
+                        if (count != 0) {
+                            reload(true);
+                        }
+                    });
                 }
             }.execute();
         }
@@ -2868,8 +2957,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 swfs.add(item.getSwf());
             }
         }
-        
-        
+
         for (SWF item : swfs) {
             SWF swf = (SWF) item;
             final String selFile = selectExportDir();
@@ -2883,7 +2971,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
-        }        
+        }
     }
 
     public void exportSwfXml() {
@@ -3257,7 +3345,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public boolean nextTag() {
         JTree tree = getCurrentTree();
-        
+
         if (tree != null) {
             if (tree.getSelectionRows().length > 0) {
                 int row = tree.getSelectionRows()[0];
@@ -3636,24 +3724,24 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (treeItem == null) {
             return -1;
         }
-        if (currentView == VIEW_DUMP){
+        if (currentView == VIEW_DUMP) {
             if (treeItem instanceof Tag) {
                 Tag t = (Tag) treeItem;
                 ReadOnlyTagList tags = t.getTimelined().getTags();
-                int frame = 0;                
+                int frame = 0;
                 for (int i = 0; i < tags.size(); i++) {
                     if (tags.get(i) == t) {
                         return frame;
                     }
                     if (tags.get(i) instanceof ShowFrameTag) {
                         frame++;
-                    }                    
-                }                
+                    }
+                }
             }
             return -1;
         }
-            
-        if(currentView == VIEW_TIMELINE) {               
+
+        if (currentView == VIEW_TIMELINE) {
             return -1;
         }
         TreePath path = getCurrentTree().getModel().getTreePath(treeItem);
@@ -3673,17 +3761,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (treeItem == null) {
             return null;
         }
-        
+
         if (currentView == VIEW_DUMP) {
             if (treeItem instanceof Tag) {
                 Tag t = (Tag) treeItem;
                 return t.getTimelined();
             }
-            return null;        
+            return null;
         }
         if (currentView == VIEW_TIMELINE) {
             return null;
-        }        
+        }
 
         TreePath path = getCurrentTree().getModel().getTreePath(treeItem);
         if (path == null) {
@@ -3763,14 +3851,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     dumpTree.expandFirstLevelNodes();
                 }
                 break;
-            case VIEW_RESOURCES:      
+            case VIEW_RESOURCES:
             case VIEW_TAGLIST:
                 if (tagTree.getModel() == null) {
                     TagTreeModel ttm = new TagTreeModel(swfs, Configuration.tagTreeShowEmptyFolders.get());
                     tagTree.setModel(ttm);
                     tagTree.expandFirstLevelNodes();
-                }        
-            
+                }
+
                 if (tagListTree.getModel() == null) {
                     TagListTreeModel ttm = new TagListTreeModel(swfs);
                     tagListTree.setModel(ttm);
@@ -3844,7 +3932,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 reload(true);
                 return true;
-            case VIEW_TIMELINE:      
+            case VIEW_TIMELINE:
                 currentView = view;
                 Configuration.lastView.set(currentView);
                 final SWF swf = getCurrentSwf();
@@ -3920,7 +4008,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         } catch (IOException ex) {
                             //ignore
                         }
-                    }                    
+                    }
                 } catch (InterruptedException ex) {
                     //ignore
                 }
@@ -4078,8 +4166,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 SwfSpecificCustomConfiguration swfCustomConf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortFileName());
                 //swfConf.lastSelectedPath = tagTree.getSelectionPathString();
                 swfCustomConf.setCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_RESOURCES, tagTree.getSelectionPathString());
-                swfCustomConf.setCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_TAGLIST, tagListTree.getSelectionPathString());                
-                
+                swfCustomConf.setCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_TAGLIST, tagListTree.getSelectionPathString());
+
             }
         }
 
@@ -4106,7 +4194,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         stopFlashPlayer();
 
         previewPanel.setImageReplaceButtonVisible(false, false, false, false);
-        
+
         boolean internalViewer = !isAdobeFlashPlayerEnabled();
 
         if (treeItem instanceof ScriptPack) {
@@ -4253,7 +4341,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 for (Tag tag : timelined.getTags()) {
                     if (tag instanceof DefineSpriteTag) {
                         folderPreviewItems.add(tag);
-                        addFolderPreviewItems(folderPreviewItems, folderName, (DefineSpriteTag) tag);                    
+                        addFolderPreviewItems(folderPreviewItems, folderName, (DefineSpriteTag) tag);
                     }
                 }
                 break;
@@ -4304,7 +4392,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 break;
         }
     }
-    
+
     private void showFolderPreview(FolderItem item) {
         List<TreeItem> folderPreviewItems = new ArrayList<>();
         String folderName = item.getName();
@@ -4561,6 +4649,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             @Override
+            public void replaceTag(Tag oldTag, Tag newTag) {
+            }                        
+
+            @Override
             public int indexOfTag(Tag tag) {
                 return -1;
             }
@@ -4593,18 +4685,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         setDropTarget(null);
         disposeInner(this);
-        Helper.emptyObject(this);        
+        Helper.emptyObject(this);
     }
-    
+
     private static void calculateMissingNeededCharacters(Map<TreeItem, Set<Integer>> missingNeededCharacters, Timelined tim) {
-        for (Tag t: tim.getTags()) {
+        for (Tag t : tim.getTags()) {
             missingNeededCharacters.put(t, t.getMissingNeededCharacters());
             if (t instanceof DefineSpriteTag) {
                 calculateMissingNeededCharacters(missingNeededCharacters, (DefineSpriteTag) t);
             }
-        }        
+        }
     }
-    
+
     public void calculateMissingNeededCharacters() {
         Map<TreeItem, Set<Integer>> missingNeededCharacters = new WeakHashMap<>();
         List<SWFList> swfsLists = new ArrayList<>(swfs);
@@ -4617,5 +4709,5 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         tagTree.setMissingNeededCharacters(missingNeededCharacters);
         tagListTree.setMissingNeededCharacters(missingNeededCharacters);
     }
-    
+
 }

@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#1414] Cancelling in-progress exportation
 - [#1755] Copy tags to tag clipboard and paste them elsewhere
+- [#1460] Bulk importing images
 
 ### Fixed
 - FLA export printing xxx string on exporting character with id 320
@@ -2514,6 +2515,7 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1414]: https://www.free-decompiler.com/flash/issues/1414
 [#1755]: https://www.free-decompiler.com/flash/issues/1755
+[#1460]: https://www.free-decompiler.com/flash/issues/1460
 [#1459]: https://www.free-decompiler.com/flash/issues/1459
 [#1832]: https://www.free-decompiler.com/flash/issues/1832
 [#1849]: https://www.free-decompiler.com/flash/issues/1849
