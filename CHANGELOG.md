@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - Double warning/error when copy to / move to and same character id already exists
 - [#1862] Exporting selection to subfolders by SWFname when multiple SWFs selected
 - Java code export indentation
+- Java code does not export tags
 
 ## [16.1.0] - 2022-11-06
 ### Added
