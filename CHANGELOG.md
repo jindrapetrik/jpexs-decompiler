@@ -14,7 +14,7 @@ All notable changes to this project will be documented in this file.
 - Copy to with dependencies does not refresh timeline
 - Copy to with dependencies does not set the timelined, that can result to missing dependencies (red tags in the tree)
 - Double warning/error when copy to / move to and same character id already exists
-- [#1862] Exporting selection to subfolders by SWFname when multiple SWFs selected
+- [#1862], [#1735] Exporting selection to subfolders by SWFname when multiple SWFs selected
 - Java code export indentation
 - Java code does not export tags
 
@@ -2523,6 +2523,7 @@ All notable changes to this project will be documented in this file.
 [#1460]: https://www.free-decompiler.com/flash/issues/1460
 [#1465]: https://www.free-decompiler.com/flash/issues/1465
 [#1862]: https://www.free-decompiler.com/flash/issues/1862
+[#1735]: https://www.free-decompiler.com/flash/issues/1735
 [#1459]: https://www.free-decompiler.com/flash/issues/1459
 [#1832]: https://www.free-decompiler.com/flash/issues/1832
 [#1849]: https://www.free-decompiler.com/flash/issues/1849
