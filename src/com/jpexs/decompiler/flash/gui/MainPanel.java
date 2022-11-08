@@ -296,17 +296,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private final JProgressBar progressBar = new JProgressBar(0, 100);
 
     public TagTree tagTree;
-    
+
     public FasterScrollPane tagTreeScrollPanel;
 
-    public DumpTree dumpTree;        
+    public DumpTree dumpTree;
 
     public TagListTree tagListTree;
-    
+
     private ClipboardPanel resourcesClipboardPanel;
     private ClipboardPanel tagListClipboardPanel;
-    
-    
 
     private final FlashPlayerPanel flashPanel;
 
@@ -429,7 +427,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         clipboardCut = false;
         resourcesClipboardPanel.update();
-        tagListClipboardPanel.update();        
+        tagListClipboardPanel.update();
     }
 
     public void cutToClipboard(Collection<TreeItem> items) {
@@ -444,11 +442,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public boolean clipboardEmpty() {
         return clipboard.isEmpty();
     }
-    
+
     public int getClipboardSize() {
         return clipboard.size();
     }
-       
+
     public Set<TreeItem> getClipboardContents() {
         Set<TreeItem> ret = new LinkedHashSet<>();
         for (WeakReference<TreeItem> ref : orderedClipboard) {
@@ -935,17 +933,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 ttm.updateSwfs(e);
                 tagTree.expandRoot();
-                if (e.getAction() == CollectionChangedAction.RESET) {
-                    tagTree.expandFirstLevelNodes();
-                } else if (e.getAction() == CollectionChangedAction.ADD) {
-                    SWFList list = e.getNewItem();
-                    if (!list.isBundle() && list.swfs.size() == 1) {
-                        tagTree.expandPath(tagTree.getModel().getTreePath(list.get(0)));
-                    } else {
-                        tagTree.expandPath(tagTree.getModel().getTreePath(e.getNewItem()));
+                if (Configuration.expandFirstLevelOfTreeOnLoad.get()) {
+                    if (e.getAction() == CollectionChangedAction.RESET) {
+                        tagTree.expandFirstLevelNodes();
+                    } else if (e.getAction() == CollectionChangedAction.ADD) {
+                        SWFList list = e.getNewItem();
+                        if (!list.isBundle() && list.swfs.size() == 1) {
+                            tagTree.expandPath(tagTree.getModel().getTreePath(list.get(0)));
+                        } else {
+                            tagTree.expandPath(tagTree.getModel().getTreePath(e.getNewItem()));
+                        }
                     }
                 }
-                
             }
             ttm = tagListTree.getModel();
             if (ttm != null) {
@@ -954,15 +953,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 ttm.updateSwfs(e);
                 tagListTree.expandRoot();
-                
-                if (e.getAction() == CollectionChangedAction.RESET) {
-                    tagListTree.expandFirstLevelNodes();
-                } else if (e.getAction() == CollectionChangedAction.ADD) {
-                    SWFList list = e.getNewItem();
-                    if (!list.isBundle() && list.swfs.size() == 1) {
-                        tagListTree.expandPath(tagListTree.getModel().getTreePath(list.get(0)));
-                    } else {
-                        tagListTree.expandPath(tagListTree.getModel().getTreePath(e.getNewItem()));
+
+                if (Configuration.expandFirstLevelOfTreeOnLoad.get()) {
+                    if (e.getAction() == CollectionChangedAction.RESET) {
+                        tagListTree.expandFirstLevelNodes();
+                    } else if (e.getAction() == CollectionChangedAction.ADD) {
+                        SWFList list = e.getNewItem();
+                        if (!list.isBundle() && list.swfs.size() == 1) {
+                            tagListTree.expandPath(tagListTree.getModel().getTreePath(list.get(0)));
+                        } else {
+                            tagListTree.expandPath(tagListTree.getModel().getTreePath(e.getNewItem()));
+                        }
                     }
                 }
             }
@@ -973,12 +974,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 dtm.updateSwfs();
                 View.expandTreeNodes(dumpTree, expandedNodes);
                 dumpTree.expandRoot();
-                if (e.getAction() == CollectionChangedAction.RESET) {
-                    dumpTree.expandFirstLevelNodes();
-                } else if (e.getAction() == CollectionChangedAction.ADD) {
-                    SWFList list = e.getNewItem();
-                    for (SWF dswf : list) {
-                        dumpTree.expandSwfNode(dswf);
+                if (Configuration.expandFirstLevelOfTreeOnLoad.get()) {
+                    if (e.getAction() == CollectionChangedAction.RESET) {
+                        dumpTree.expandFirstLevelNodes();
+                    } else if (e.getAction() == CollectionChangedAction.ADD) {
+                        SWFList list = e.getNewItem();
+                        for (SWF dswf : list) {
+                            dumpTree.expandSwfNode(dswf);
+                        }
                     }
                 }
             }
@@ -2684,9 +2687,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             final long timeBefore = System.currentTimeMillis();
             new CancellableWorker<Void>() {
-                
+
                 private int count = 0;
-                
+
                 @Override
                 public Void doInBackground() throws Exception {
                     try {
@@ -2744,12 +2747,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     Main.stopWork();
                     long timeAfter = System.currentTimeMillis();
                     final long timeMs = timeAfter - timeBefore;
-                    
 
                     View.execInEventDispatch(() -> {
                         refreshTree(swf);
                         setStatus(translate("import.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
-                        
+
                         ViewMessages.showMessageDialog(MainPanel.this, translate("import.image.result").replace("%count%", Integer.toString(count)));
                         if (count != 0) {
                             reload(true);
@@ -3925,17 +3927,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private JPanel createTagListViewCard() {
-        tagListClipboardPanel = new ClipboardPanel(this);                
-        
-        JPanel r = new JPanel(new BorderLayout());   
+        tagListClipboardPanel = new ClipboardPanel(this);
+
+        JPanel r = new JPanel(new BorderLayout());
         r.add(tagListClipboardPanel, BorderLayout.NORTH);
         r.add(new FasterScrollPane(tagListTree), BorderLayout.CENTER);
         return r;
     }
 
     private JPanel createResourcesViewCard() {
-        resourcesClipboardPanel = new ClipboardPanel(this);       
-        JPanel r = new JPanel(new BorderLayout());   
+        resourcesClipboardPanel = new ClipboardPanel(this);
+        JPanel r = new JPanel(new BorderLayout());
         r.add(resourcesClipboardPanel, BorderLayout.NORTH);
         r.add(tagTreeScrollPanel = new FasterScrollPane(tagTree), BorderLayout.CENTER);
         r.add(searchPanel, BorderLayout.SOUTH);
@@ -4705,7 +4707,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             @Override
             public void replaceTag(Tag oldTag, Tag newTag) {
-            }                        
+            }
 
             @Override
             public int indexOfTag(Tag tag) {
@@ -4763,6 +4765,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         this.missingNeededCharacters = missingNeededCharacters;
         tagTree.setMissingNeededCharacters(missingNeededCharacters);
         tagListTree.setMissingNeededCharacters(missingNeededCharacters);
-    }       
+    }
 
 }

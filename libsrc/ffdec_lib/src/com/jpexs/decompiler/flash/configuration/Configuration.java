@@ -763,6 +763,10 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> autoPlaySwfs = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> expandFirstLevelOfTreeOnLoad = null;
         
     private enum OSId {
         WINDOWS, OSX, UNIX

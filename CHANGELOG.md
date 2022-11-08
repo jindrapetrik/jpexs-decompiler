@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - [#1460] Bulk importing images
 - Bulk importing scripts/text/images added to SWF context menu
 - [#1465] Configuration option to disable SWF preview autoplay
+- Setting for disabling expanding first level of tree nodes on SWF load
 
 ### Fixed
 - FLA export printing xxx string on exporting character with id 320
