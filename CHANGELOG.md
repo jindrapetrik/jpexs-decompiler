@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [16.2.0] - 2022-11-08
 ### Added
 - [#1414] Cancelling in-progress exportation
