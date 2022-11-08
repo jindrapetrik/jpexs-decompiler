@@ -590,6 +590,20 @@ public class DumpTree extends JTree {
             expandPath(new TreePath(new Object[]{root, dtm.getChild(root, i)}));
         }
     }
+    
+    public void expandSwfNode(SWF swf) {
+        DumpTreeModel dtm = getModel();
+        DumpInfo root = dtm.getRoot();
+        int childCount = dtm.getChildCount(root);
+        expandPath(new TreePath(new Object[]{root}));
+        for (int i = 0; i < childCount; i++) {
+            DumpInfoSwfNode swfNode = (DumpInfoSwfNode) dtm.getChild(root, i);
+            if (swfNode.getSwf() == swf) {
+                expandPath(new TreePath(new Object[]{root, dtm.getChild(root, i)}));            
+                break;
+            }
+        }
+    }
 
     public void setSelectedTag(Tag tag) {
         ByteArrayRange range = tag.getOriginalRange();

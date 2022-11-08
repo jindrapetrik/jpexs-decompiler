@@ -90,6 +90,7 @@ import com.jpexs.decompiler.flash.gui.dumpview.DumpTree;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpTreeModel;
 import com.jpexs.decompiler.flash.gui.dumpview.DumpViewPanel;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
+import com.jpexs.decompiler.flash.gui.helpers.CollectionChangedAction;
 import com.jpexs.decompiler.flash.gui.helpers.ObservableList;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.taglistview.TagListTree;
@@ -934,7 +935,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 ttm.updateSwfs(e);
                 tagTree.expandRoot();
-                tagTree.expandFirstLevelNodes();
+                if (e.getAction() == CollectionChangedAction.RESET) {
+                    tagTree.expandFirstLevelNodes();
+                } else if (e.getAction() == CollectionChangedAction.ADD) {
+                    SWFList list = e.getNewItem();
+                    if (!list.isBundle() && list.swfs.size() == 1) {
+                        tagTree.expandPath(tagTree.getModel().getTreePath(list.get(0)));
+                    } else {
+                        tagTree.expandPath(tagTree.getModel().getTreePath(e.getNewItem()));
+                    }
+                }
+                
             }
             ttm = tagListTree.getModel();
             if (ttm != null) {
@@ -943,7 +954,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 ttm.updateSwfs(e);
                 tagListTree.expandRoot();
-                tagListTree.expandFirstLevelNodes();
+                
+                if (e.getAction() == CollectionChangedAction.RESET) {
+                    tagListTree.expandFirstLevelNodes();
+                } else if (e.getAction() == CollectionChangedAction.ADD) {
+                    SWFList list = e.getNewItem();
+                    if (!list.isBundle() && list.swfs.size() == 1) {
+                        tagListTree.expandPath(tagListTree.getModel().getTreePath(list.get(0)));
+                    } else {
+                        tagListTree.expandPath(tagListTree.getModel().getTreePath(e.getNewItem()));
+                    }
+                }
             }
 
             DumpTreeModel dtm = dumpTree.getModel();
@@ -952,7 +973,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 dtm.updateSwfs();
                 View.expandTreeNodes(dumpTree, expandedNodes);
                 dumpTree.expandRoot();
-                dumpTree.expandFirstLevelNodes();
+                if (e.getAction() == CollectionChangedAction.RESET) {
+                    dumpTree.expandFirstLevelNodes();
+                } else if (e.getAction() == CollectionChangedAction.ADD) {
+                    SWFList list = e.getNewItem();
+                    for (SWF dswf : list) {
+                        dumpTree.expandSwfNode(dswf);
+                    }
+                }
             }
 
             if (swfs.isEmpty()) {

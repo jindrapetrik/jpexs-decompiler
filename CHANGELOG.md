@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - [#1862], [#1735] Exporting selection to subfolders by SWFname when multiple SWFs selected
 - Java code export indentation
 - Java code does not export tags
+- On new SWF loading, do not expand all other SWFs nodes, only this one
 
 ## [16.1.0] - 2022-11-06
 ### Added
