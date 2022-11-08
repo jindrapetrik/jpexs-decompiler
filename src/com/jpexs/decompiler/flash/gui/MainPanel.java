@@ -845,7 +845,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 ttm.updateSwfs(e);
                 tagTree.expandRoot();
-                tagTree.expandFirstLevelNodes();
             }
             ttm = tagListTree.getModel();
             if (ttm != null) {
