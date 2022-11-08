@@ -188,10 +188,12 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -246,9 +248,12 @@ import javax.swing.Icon;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -260,6 +265,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.plaf.basic.BasicScrollPaneUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
@@ -289,10 +295,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private final JProgressBar progressBar = new JProgressBar(0, 100);
 
     public TagTree tagTree;
+    
+    public FasterScrollPane tagTreeScrollPanel;
 
-    public DumpTree dumpTree;
+    public DumpTree dumpTree;        
 
     public TagListTree tagListTree;
+    
+    private ClipboardPanel resourcesClipboardPanel;
+    private ClipboardPanel tagListClipboardPanel;
+    
+    
 
     private final FlashPlayerPanel flashPanel;
 
@@ -398,6 +411,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
             }
         }
+        resourcesClipboardPanel.update();
+        tagListClipboardPanel.update();
     }
 
     public void emptyClipboard() {
@@ -412,6 +427,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             clipboard.put(item, true);
         }
         clipboardCut = false;
+        resourcesClipboardPanel.update();
+        tagListClipboardPanel.update();        
     }
 
     public void cutToClipboard(Collection<TreeItem> items) {
@@ -426,7 +443,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public boolean clipboardEmpty() {
         return clipboard.isEmpty();
     }
-
+    
+    public int getClipboardSize() {
+        return clipboard.size();
+    }
+       
     public Set<TreeItem> getClipboardContents() {
         Set<TreeItem> ret = new LinkedHashSet<>();
         for (WeakReference<TreeItem> ref : orderedClipboard) {
@@ -812,6 +833,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 closeTagTreeSearch();
             }
         });
+        closeSearchButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         searchPanel.add(closeSearchButton, BorderLayout.EAST);
         searchPanel.setVisible(false);
 
@@ -3875,14 +3897,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private JPanel createTagListViewCard() {
-        JPanel r = new JPanel(new BorderLayout());
+        tagListClipboardPanel = new ClipboardPanel(this);                
+        
+        JPanel r = new JPanel(new BorderLayout());   
+        r.add(tagListClipboardPanel, BorderLayout.NORTH);
         r.add(new FasterScrollPane(tagListTree), BorderLayout.CENTER);
         return r;
     }
 
     private JPanel createResourcesViewCard() {
-        JPanel r = new JPanel(new BorderLayout());
-        r.add(new FasterScrollPane(tagTree), BorderLayout.CENTER);
+        resourcesClipboardPanel = new ClipboardPanel(this);       
+        JPanel r = new JPanel(new BorderLayout());   
+        r.add(resourcesClipboardPanel, BorderLayout.NORTH);
+        r.add(tagTreeScrollPanel = new FasterScrollPane(tagTree), BorderLayout.CENTER);
         r.add(searchPanel, BorderLayout.SOUTH);
         return r;
     }
