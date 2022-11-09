@@ -21,6 +21,7 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -32,6 +33,8 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.GeneralPath;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -63,6 +66,8 @@ public class ClipboardPanel extends JPanel {
     private JLabel label;
 
     private MainPanel mainPanel;
+    
+    private Timer timer = null;
 
     public ClipboardPanel(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
@@ -139,5 +144,21 @@ public class ClipboardPanel extends JPanel {
             label.setText(AppStrings.translate("clipboard.items").replace("%count%", "" + clipboardSize));
         }
         setVisible(clipboardSize > 0);
+    }
+    
+    public void flash() {
+        if (timer != null) {
+            timer.cancel();            
+        }
+        label.setFont(label.getFont().deriveFont(Font.BOLD));
+        repaint();
+        
+        timer = new Timer();        
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                label.setFont(label.getFont().deriveFont(Font.PLAIN));
+            }
+        }, 1000);
     }
 }
