@@ -124,6 +124,15 @@ class TreeTransferHandler extends TransferHandler {
             return false;
         }
         
+        //no insert before SWF header
+        if ((dl.getPath().getLastPathComponent() instanceof SWF) && dl.getChildIndex() == 0) {
+            return false;
+        }
+        
+        /*if (dl.getPath().getLastPathComponent() instanceof TagListTreeRoot) {
+            return false;
+        }*/
+        
         AbstractTagTree tree = (AbstractTagTree) support.getComponent();       
         
         List<TreeItem> selected = tree.getSelected();
@@ -205,10 +214,30 @@ class TreeTransferHandler extends TransferHandler {
                 Frame frame = (Frame) dest;
                 timelined = frame.timeline.timelined;
                 position = childIndex == frame.allInnerTags.size() ? null : frame.allInnerTags.get(childIndex);
-            } else {
+            } else if (dest instanceof SWF) {                
+                SWF swf = (SWF) dest;
+                timelined = swf;
+                Frame frame = swf.getTimeline().getFrame(childIndex - 1/*header*/);
+                position = frame.allInnerTags.get(0);                
+            } else if (dest instanceof Tag) {
                 timelined = ((Tag) dest).getTimelined();
                 position = (Tag) dest;
-            }
+            } else {
+                int childCount = tree.getModel().getChildCount(dest);
+                TreeItem child;
+                if (childIndex >= childCount) {
+                    child = tree.getModel().getChild(dest, childCount - 1);
+                } else {
+                    child = tree.getModel().getChild(dest, childIndex);                    
+                }
+                if (child instanceof SWF) {
+                    SWF swf = (SWF) child;
+                    timelined = swf;
+                    position = null;
+                } else {
+                    return;
+                }
+            } 
         }
         mainPanel.getContextPopupMenu().copyOrMoveTagsBeforeAfter(sourceItems, (action & MOVE) == MOVE, timelined, position);
     }
