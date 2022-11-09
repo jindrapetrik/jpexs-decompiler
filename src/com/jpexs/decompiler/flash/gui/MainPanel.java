@@ -399,65 +399,65 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private boolean clipboardCut = false;
 
-    
     private void handleTreeKeyPressed(KeyEvent e) {
-        AbstractTagTree tree = (AbstractTagTree)e.getSource();
+        AbstractTagTree tree = (AbstractTagTree) e.getSource();
         if ((e.getKeyCode() == 'C' || e.getKeyCode() == 'X') && (e.isControlDown())) {
-        TreePath[] paths = tree.getSelectionPaths();
-        if (paths == null || paths.length == 0) {
-            return;
-        }
+            TreePath[] paths = tree.getSelectionPaths();
+            if (paths == null || paths.length == 0) {
+                return;
+            }
 
-        List<TreeItem> tagItems = new ArrayList<>();
-        for (TreePath treePath : paths) {
-            TreeItem item = (TreeItem) treePath.getLastPathComponent();
-            if (item instanceof TagScript) {
-                tagItems.add(((TagScript) item).getTag());
-            } else if (item instanceof Tag) {
-                tagItems.add((Tag) item);
+            List<TreeItem> tagItems = new ArrayList<>();
+            for (TreePath treePath : paths) {
+                TreeItem item = (TreeItem) treePath.getLastPathComponent();
+                if (item instanceof TagScript) {
+                    tagItems.add(((TagScript) item).getTag());
+                } else if (item instanceof Tag) {
+                    tagItems.add((Tag) item);
+                }
             }
-        }
-        if (e.getKeyCode() == 'C') {
-            if (e.isShiftDown()) {
-                contextPopupMenu.copyTagToClipboardWithDependenciesActionPerformed(null, tagItems);
-            } else {
-                contextPopupMenu.copyTagToClipboardActionPerformed(null, tagItems);
+            if (e.getKeyCode() == 'C') {
+                if (e.isShiftDown()) {
+                    contextPopupMenu.copyTagToClipboardWithDependenciesActionPerformed(null, tagItems);
+                } else {
+                    contextPopupMenu.copyTagToClipboardActionPerformed(null, tagItems);
+                }
             }
-        }
-        if (e.getKeyCode() == 'X') {
-            if (e.isShiftDown()) {
-                contextPopupMenu.cutTagToClipboardWithDependenciesActionPerformed(null);
-            } else {
-                contextPopupMenu.cutTagToClipboardActionPerformed(null);
+            if (e.getKeyCode() == 'X') {
+                if (e.isShiftDown()) {
+                    contextPopupMenu.cutTagToClipboardWithDependenciesActionPerformed(null);
+                } else {
+                    contextPopupMenu.cutTagToClipboardActionPerformed(null);
+                }
             }
+            repaintTree();
         }
-        repaintTree();                    
-    }
-    if (e.getKeyCode() == 'V' && e.isControlDown()) {
-        TreePath[] paths = tree.getSelectionPaths();
-        if (paths == null || paths.length == 0) {
-            return;
-        }
+        if (e.getKeyCode() == 'V' && e.isControlDown()) {
+            TreePath[] paths = tree.getSelectionPaths();
+            if (paths == null || paths.length == 0) {
+                return;
+            }
 
-        List<TreeItem> items = new ArrayList<>();
-        for (TreePath treePath : paths) {
-            TreeItem item = (TreeItem) treePath.getLastPathComponent();
-            items.add(item);
+            List<TreeItem> items = new ArrayList<>();
+            for (TreePath treePath : paths) {
+                TreeItem item = (TreeItem) treePath.getLastPathComponent();
+                items.add(item);
+            }
+            if (items.size() > 1) {
+                return;
+            }
+            TreeItem firstItem = items.get(0);
+            if (!((firstItem instanceof Tag) || (firstItem instanceof Frame))) {
+                return;
+            }
+            if (e.isShiftDown()) {
+                contextPopupMenu.pasteAfterActionPerformed(null);
+            } else {
+                contextPopupMenu.pasteBeforeActionPerformed(null);
+            }
         }
-        if (items.size() > 1) {
-            return;
-        }
-        TreeItem firstItem = items.get(0);
-        if (!((firstItem instanceof Tag) || (firstItem instanceof Frame))) {
-            return;
-        }
-        if (e.isShiftDown()) {
-            contextPopupMenu.pasteAfterActionPerformed(null);
-        } else {
-            contextPopupMenu.pasteBeforeActionPerformed(null);
-        }                    
     }
-    }
+
     public void gcClipboard() {
         for (int i = orderedClipboard.size() - 1; i >= 0; i--) {
             WeakReference<TreeItem> ref = orderedClipboard.get(i);
@@ -4830,9 +4830,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 calculateMissingNeededCharacters(missingNeededCharacters, swf);
             }
         }
-        this.missingNeededCharacters = missingNeededCharacters;
-        tagTree.setMissingNeededCharacters(missingNeededCharacters);
-        tagListTree.setMissingNeededCharacters(missingNeededCharacters);
+        if (!missingNeededCharacters.equals(this.missingNeededCharacters)) {
+            this.missingNeededCharacters = missingNeededCharacters;
+            tagTree.setMissingNeededCharacters(missingNeededCharacters);
+            tagListTree.setMissingNeededCharacters(missingNeededCharacters);
+        }
     }
 
 }
