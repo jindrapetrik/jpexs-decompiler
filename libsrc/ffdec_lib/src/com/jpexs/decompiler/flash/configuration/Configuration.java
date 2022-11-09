@@ -767,6 +767,10 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> expandFirstLevelOfTreeOnLoad = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> allowPlacingDefinesIntoSprites = null;
         
     private enum OSId {
         WINDOWS, OSX, UNIX

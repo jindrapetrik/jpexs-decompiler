@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import static com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree.getSelection;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -115,7 +116,11 @@ class TreeTransferHandler extends TransferHandler {
         // Do not allow a drop on the drag source selections.
         JTree.DropLocation dl = (JTree.DropLocation) support.getDropLocation();
         
-        if ((dl.getPath().getLastPathComponent() instanceof Tag) && dl.getChildIndex() == -1) {
+        if (
+                ((dl.getPath().getLastPathComponent() instanceof Tag) && 
+                !(dl.getPath().getLastPathComponent() instanceof DefineSpriteTag)) &&
+                dl.getChildIndex() == -1
+                ) {
             return false;
         }
         
@@ -181,7 +186,10 @@ class TreeTransferHandler extends TransferHandler {
         Timelined timelined;
         Tag position;
         if (childIndex == -1) {
-            if (dest instanceof Tag) {
+            if (dest instanceof DefineSpriteTag) {
+                timelined = (Timelined) dest;
+                position = null;
+            } else if (dest instanceof Tag) {
                 timelined = ((Tag) dest).getTimelined();
                 position = (Tag) dest;
             } else if (dest instanceof Frame) {
