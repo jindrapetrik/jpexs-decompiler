@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.gui.taglistview;
 
 import com.jpexs.decompiler.flash.gui.AppStrings;
-import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
@@ -57,9 +56,9 @@ public class TagListTreeCellRenderer extends DefaultTreeCellRenderer {
             setUI(new BasicLabelUI());
             setOpaque(false);
             setBackgroundNonSelectionColor(Color.white);
-        }
-    }
-
+        }        
+    }      
+    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -73,8 +72,8 @@ public class TagListTreeCellRenderer extends DefaultTreeCellRenderer {
                 g2d.fillRect(0, 0, getWidth(), getHeight());
             }
         }
-    }
-    
+    }                
+
     
 
     @Override
