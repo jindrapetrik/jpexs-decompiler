@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - Keyboard shortcuts for tag clipboard operations
 - Hilight clipboard panel on copy/cut action for a few seconds
 - Drag and drop to move/copy tags in the tag list view
+- Setting for enabling placing Define tags into DefineSprite
 
 ## [16.2.0] - 2022-11-08
 ### Added

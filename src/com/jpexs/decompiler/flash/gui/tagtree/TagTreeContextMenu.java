@@ -359,7 +359,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         add(copyTagToWithDependenciesMenu);
 
         cutTagToClipboardMenuItem = new JMenuItem(mainPanel.translate("contextmenu.cutTag") + " (CTRL+X)");
-        cutTagToClipboardMenuItem.setIcon(View.getIcon("cut16"));        
+        cutTagToClipboardMenuItem.setIcon(View.getIcon("cut16"));
         cutTagToClipboardMenuItem.addActionListener(this::cutTagToClipboardActionPerformed);
         add(cutTagToClipboardMenuItem);
 
@@ -853,9 +853,9 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         if (allSelectedIsTag) {
             List<TreeItem> tagItems = new ArrayList<>();
-            for(TreeItem item:items) {
+            for (TreeItem item : items) {
                 if (item instanceof TagScript) {
-                    tagItems.add(((TagScript)item).getTag());
+                    tagItems.add(((TagScript) item).getTag());
                 } else {
                     tagItems.add((Tag) item);
                 }
@@ -882,7 +882,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             cutTagToClipboardMenuItem.setVisible(true);
             cutTagToClipboardWithDependenciesMenuItem.setVisible(true);
-            
+
             copyTagToMenu.setVisible(true);
             copyTagToWithDependenciesMenu.setVisible(true);
         }
@@ -2741,7 +2741,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         ReadOnlyTagList tags = timelined.getTags();
         position = positionInt < tags.size() ? tags.get(positionInt) : null;
         copyOrMoveTagsBeforeAfter(mainPanel.getClipboardContents(), mainPanel.isClipboardCut(), timelined, position);
-        
+
         if (mainPanel.isClipboardCut()) {
             mainPanel.emptyClipboard();
         }
@@ -2763,7 +2763,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         ReadOnlyTagList tags = timelined.getTags();
         position = positionInt < tags.size() ? tags.get(positionInt) : null;
         copyOrMoveTagsBeforeAfter(mainPanel.getClipboardContents(), mainPanel.isClipboardCut(), timelined, position);
-        
+
         if (mainPanel.isClipboardCut()) {
             mainPanel.emptyClipboard();
         }
@@ -2782,69 +2782,72 @@ public class TagTreeContextMenu extends JPopupMenu {
             position = null;
         }
         copyOrMoveTagsBeforeAfter(mainPanel.getClipboardContents(), mainPanel.isClipboardCut(), timelined, position);
-        
+
         if (mainPanel.isClipboardCut()) {
             mainPanel.emptyClipboard();
         }
     }
 
     public void copyOrMoveTagsBeforeAfter(Set<TreeItem> items, boolean move, Timelined targetTimelined, Tag position) {
-        //do not move to self
-        if (items.size() == 1 && move) {
-            Tag tag = (Tag) items.iterator().next();
-            if (targetTimelined == tag.getTimelined()) {
-                if (tag == position) {
-                    return;
-                }
-                int index = tag.getTimelined().indexOfTag(tag);
-                ReadOnlyTagList tags = tag.getTimelined().getTags();
-                Tag nextPosition;
-                if (index + 1 < tags.size()) {
-                    nextPosition = tags.get(index + 1);
-                    if (nextPosition == position) {
-                        return;
-                    }
-                }
-            }                               
-        }
         Set<SWF> sourceSwfs = new LinkedHashSet<>();
         SWF targetSwf = (targetTimelined instanceof SWF) ? (SWF) targetTimelined : ((DefineSpriteTag) targetTimelined).getSwf();
         try {
             List<Tag> newTags = new ArrayList<>();
             Map<Integer, Integer> changedCharacterIds = new HashMap<>();
             for (TreeItem item : items) {
-                Tag tag = (Tag) item;                
+                Tag tag = (Tag) item;
                 if (tag.getSwf() == null) {
                     continue;
                 }
                 SWF sourceSwf = tag.getSwf();
                 sourceSwfs.add(sourceSwf);
-                
+
+                Timelined realTargetTimelined = targetTimelined;
+                Tag realPosition = position;
+
+                if (!Configuration.allowPlacingDefinesIntoSprites.get()) {
+                    //do not place Define tags in DefineSprites
+                    if ((tag instanceof CharacterTag) && (targetTimelined instanceof DefineSpriteTag)) {
+                        Tag spriteTag = ((DefineSpriteTag) targetTimelined);
+                        //get to the topmost level DefineSprite
+                        while (spriteTag.getTimelined() instanceof DefineSpriteTag) {
+                            spriteTag = (DefineSpriteTag) spriteTag.getTimelined();
+                        }
+                        realTargetTimelined = spriteTag.getTimelined(); //should be SWF                        
+                        realPosition = spriteTag;
+                    }
+                }
+
+                //do not move to self
+                if (items.size() == 1 && move) {
+                    if (realTargetTimelined == tag.getTimelined()) {
+                        if (tag == position) {
+                            return;
+                        }
+                        int index = tag.getTimelined().indexOfTag(tag);
+                        ReadOnlyTagList tags = tag.getTimelined().getTags();
+                        Tag nextPosition;
+                        if (index + 1 < tags.size()) {
+                            nextPosition = tags.get(index + 1);
+                            if (nextPosition == realPosition) {
+                                return;
+                            }
+                        }
+                    }
+                }
+
                 if (move) {
-                    if (tag == position) {
+                    /*if (tag == position) {
                         int index = tag.getTimelined().indexOfTag(position);
                         if (tag.getTimelined().getTags().size() > index + 1) {
                             position = tag.getTimelined().getTags().get(index + 1);
                         } else {
                             position = null;
                         }
-                    }
+                    }*/
                     tag.getTimelined().removeTag(tag);
                 }
 
-                Timelined realTargetTimelined = targetTimelined;
-                Tag realPosition = position;
-
-                //do not place Define tags in DefineSprites
-                if ((tag instanceof CharacterTag) && (targetTimelined instanceof DefineSpriteTag)) {
-                    Tag spriteTag = ((DefineSpriteTag) targetTimelined);
-                    //get to the topmost level DefineSprite
-                    while (spriteTag.getTimelined() instanceof DefineSpriteTag) {
-                        spriteTag = (DefineSpriteTag) spriteTag.getTimelined();
-                    }
-                    realTargetTimelined = spriteTag.getTimelined(); //should be SWF                        
-                    realPosition = spriteTag;
-                }
                 if (sourceSwf != targetSwf || !move) {
                     ReadOnlyTagList tags = realTargetTimelined.getTags();
                     int positionInt = realPosition == null ? tags.size() : tags.indexOf(realPosition);
@@ -2894,7 +2897,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             targetSwf.clearImageCache();
             targetSwf.updateCharacters();
             targetSwf.resetTimelines(targetSwf);
-            
+
             mainPanel.refreshTree(targetSwf);
         } catch (InterruptedException | IOException ex) {
             Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
