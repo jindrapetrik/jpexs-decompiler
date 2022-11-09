@@ -1153,7 +1153,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             cursor = selectCursor;
                         }
 
-                        setCursor(cursor);
+                        if (getCursor() != cursor) {
+                            setCursor(cursor);
+                        }
                         mode = newMode;
                     }
                 }
@@ -2359,12 +2361,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 debugLabel.setText(ret.toString());
                             }
                             if (freeTransformDepth == -1) {
+                                Cursor newCursor;
                                 if (handCursor) {
-                                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                                    newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
                                 } else if (iconPanel.hasAllowMove()) {
-                                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+                                    newCursor = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
                                 } else {
-                                    iconPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                                    newCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+                                }
+                                if (iconPanel.getCursor() != newCursor) { //call setcursor only when needed to avoid cursor flickering when dragging in the tree
+                                    iconPanel.setCursor(newCursor);
                                 }
                             }
                         }
