@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Allowed copy/cut tags to clipboard across multiple SWFs
+- Keyboard shortcuts for tag clipboard operations
+- Hilight clipboard panel on copy/cut action for a few seconds
 
 ## [16.2.0] - 2022-11-08
 ### Added
