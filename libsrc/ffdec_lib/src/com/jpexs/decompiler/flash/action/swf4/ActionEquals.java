@@ -25,6 +25,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,8 +36,8 @@ import java.util.List;
 @SWFVersion(from = 4)
 public class ActionEquals extends Action {
 
-    public ActionEquals() {
-        super(0x0E, 0);
+    public ActionEquals(String charset) {
+        super(0x0E, 0, charset);
     }
 
     @Override

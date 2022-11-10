@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,12 +32,12 @@ import java.util.List;
  */
 public class ActionNop extends Action {
 
-    public ActionNop() {
-        super(-1, 0);
+    public ActionNop(String charset) {
+        super(-1, 0, charset);
     }
 
-    protected ActionNop(int actionCode) {
-        super(actionCode, 0);
+    protected ActionNop(int actionCode, String charset) {
+        super(actionCode, 0, charset);
     }
 
     @Override

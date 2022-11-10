@@ -80,6 +80,7 @@ import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -533,22 +534,22 @@ public class FlashPlayerTest {
                     Action opAction = getOpAction(i);
 
                     if (i >= 13 + 23) {
-                        newActions.add(new ActionPush("mystring_\u00E1rv\u00EDzt\u0171r\u0151_t\u00FCk\u00F6rf\u00FAr\u00F3g\u00E9p"));
+                        newActions.add(new ActionPush("mystring_\u00E1rv\u00EDzt\u0171r\u0151_t\u00FCk\u00F6rf\u00FAr\u00F3g\u00E9p", Utf8Helper.charsetName));
                     }
 
                     Object p1o = pushes[p1];
                     Object p2o = null;
                     if (i >= 13) {
                         p2o = pushes[p2];
-                        newActions.add(new ActionPush(p2o));
+                        newActions.add(new ActionPush(p2o, Utf8Helper.charsetName));
                     }
 
-                    newActions.add(new ActionPush(p1o));
+                    newActions.add(new ActionPush(p1o, Utf8Helper.charsetName));
 
                     newActions.add(opAction);
-                    newActions.add(new ActionPushDuplicate());
+                    newActions.add(new ActionPushDuplicate(Utf8Helper.charsetName));
                     newActions.add(new ActionTypeOf());
-                    newActions.add(new ActionStackSwap());
+                    newActions.add(new ActionStackSwap(Utf8Helper.charsetName));
                     newActions.add(new ActionStringAdd());
 
                     AS2ExecuteTask task = new AS2ExecuteTask();
@@ -739,7 +740,7 @@ public class FlashPlayerTest {
             case 9:
                 return new ActionDivide();
             case 10:
-                return new ActionEquals();
+                return new ActionEquals(Utf8Helper.charsetName);
             case 11:
                 return new ActionEquals2();
             case 12:

@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.flashlite.ActionFSCommand2;
+import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -27,6 +28,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -78,13 +80,18 @@ public class FSCommand2ActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        
+        ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
+        String charset = asGenerator.getCharset();  
+        
+        
         List<GraphSourceItem> ret = new ArrayList<>();
         for (GraphTargetItem a : arguments) {
             ret.addAll(a.toSource(localData, generator));
         }
         ret.addAll(command.toSource(localData, generator));
-        ret.add(new ActionPush((Long) (long) arguments.size()));
-        ret.add(new ActionFSCommand2());
+        ret.add(new ActionPush((Long) (long) arguments.size(), charset));
+        ret.add(new ActionFSCommand2(charset));
         return ret;
     }
 

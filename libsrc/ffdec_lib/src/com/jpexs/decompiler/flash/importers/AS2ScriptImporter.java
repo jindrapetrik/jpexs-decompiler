@@ -27,6 +27,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,7 +84,7 @@ public class AS2ScriptImporter {
 
                 ActionScript2Parser par = new ActionScript2Parser(asm.getSwf(), asm);
                 try {
-                    asm.setActions(par.actionsFromString(txt));
+                    asm.setActions(par.actionsFromString(txt, asm.getSwf().getCharset()));
                 } catch (ValueTooLargeException ex) {
                     logger.log(Level.SEVERE, "Script or some of its functions are too large, file: {0}", fileName);
                 } catch (ActionParseException ex) {
@@ -111,7 +112,7 @@ public class AS2ScriptImporter {
                 String txt = Helper.readTextFile(fileName);
 
                 try {
-                    asm.setActions(ASMParser.parse(0, true, txt, asm.getSwf().version, false));
+                    asm.setActions(ASMParser.parse(0, true, txt, asm.getSwf().version, false, asm.getSwf().getCharset()));
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, "error during script import, file: %file%".replace("%file%", fileName), ex);
                 } catch (ActionParseException ex) {

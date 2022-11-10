@@ -128,7 +128,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
         sos.writeUB(1, trackAsMenu ? 1 : 0);
 
         ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-        try (SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion())) {
+        try (SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion(), getCharset())) {
             sos2.writeBUTTONRECORDList(characters, true);
         }
         byte[] brdata = baos2.toByteArray();

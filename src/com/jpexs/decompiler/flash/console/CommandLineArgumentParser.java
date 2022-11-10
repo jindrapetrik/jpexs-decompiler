@@ -3627,7 +3627,7 @@ public class CommandLineArgumentParser {
             src.setActionBytes(Helper.getBytesFromHexaText(text));
         } else {
             try {
-                src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
+                src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false, src.getSwf().getCharset()));
             } catch (ActionParseException ex) {
                 System.err.println("%error% on line %line%".replace("%error%", ex.text).replace("%line%", Long.toString(ex.line)));
                 System.exit(1);
@@ -3641,7 +3641,7 @@ public class CommandLineArgumentParser {
         System.out.println("Warning: This feature is EXPERIMENTAL");
         ActionScript2Parser par = new ActionScript2Parser(src.getSwf(), src);
         try {
-            src.setActions(par.actionsFromString(as));
+            src.setActions(par.actionsFromString(as, src.getSwf().getCharset()));
         } catch (ValueTooLargeException ex) {
             System.err.println("Script or some of its functions are too large");
             System.exit(1);

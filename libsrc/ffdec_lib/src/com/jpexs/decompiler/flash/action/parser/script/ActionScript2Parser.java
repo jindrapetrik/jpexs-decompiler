@@ -165,6 +165,7 @@ import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Reference;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -229,9 +230,11 @@ public class ActionScript2Parser {
     private final int swfVersion;
     private List<String> swfClasses = new ArrayList<>();
     private final ASMSource targetSource;
+    private String charset;
 
     public ActionScript2Parser(SWF swf, ASMSource targetSource) {
         this.swfVersion = swf.version;
+        this.charset = swf.getCharset();
         parseSwfClasses(swf);
         this.targetSource = targetSource;
     }
@@ -2333,12 +2336,12 @@ public class ActionScript2Parser {
     }
 
     private List<GraphSourceItem> generateActionList(List<GraphTargetItem> tree, List<String> constantPool) throws CompilationException {
-        ActionSourceGenerator gen = new ActionSourceGenerator(swfVersion, constantPool);
+        ActionSourceGenerator gen = new ActionSourceGenerator(swfVersion, constantPool, charset);
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(new HashMap<>(), 0, Boolean.FALSE, 0);
         return gen.generate(localData, tree);
     }
 
-    private List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPool, boolean doOrder) throws CompilationException, NeedsGenerateAgainException {
+    private List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPool, boolean doOrder, String charset) throws CompilationException, NeedsGenerateAgainException {
         List<Action> ret = new ArrayList<>();
 
         List<GraphSourceItem> srcList = generateActionList(tree, constantPool);
@@ -2389,21 +2392,21 @@ public class ActionScript2Parser {
                 ret.add((Action) s);
             }
         }
-        ret.add(0, new ActionConstantPool(constantPool));
+        ret.add(0, new ActionConstantPool(constantPool, charset));
         return ret;
     }
 
-    public List<Action> actionsFromString(String s) throws ActionParseException, IOException, CompilationException, InterruptedException {
+    public List<Action> actionsFromString(String s, String charset) throws ActionParseException, IOException, CompilationException, InterruptedException {
         try {
             List<String> constantPool = new ArrayList<>();
             List<GraphTargetItem> tree = treeFromString(s, constantPool);
-            return actionsFromTree(tree, constantPool, true);
+            return actionsFromTree(tree, constantPool, true, charset);
         } catch (NeedsGenerateAgainException nga) {
             //Can happen when constantpool needs reordering and number of constants > 256
             try {
                 List<String> newConstantPool = nga.getNewConstantPool();
                 List<GraphTargetItem> tree = treeFromString(s, newConstantPool);
-                return actionsFromTree(tree, newConstantPool, false /*do not order again*/);
+                return actionsFromTree(tree, newConstantPool, false /*do not order again*/, charset);
             } catch (NeedsGenerateAgainException ex) {
                 //should not happen as doOrder parameter is set to false 
                 return new ArrayList<>();

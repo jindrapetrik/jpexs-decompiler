@@ -29,7 +29,8 @@ public class SwfSpecificCustomConfiguration implements Serializable {
     private Map<String, String> customData = new HashMap<>();
     
     public static final String KEY_LAST_SELECTED_PATH_RESOURCES = "lastSelectedPath.resources";
-    public static final String KEY_LAST_SELECTED_PATH_TAGLIST = "lastSelectedPath.taglist";    
+    public static final String KEY_LAST_SELECTED_PATH_TAGLIST = "lastSelectedPath.taglist";
+    public static final String KEY_CHARSET = "charset";
     
     public String getCustomData(String key, String defaultValue) {
         if (customData.containsKey(key)) {

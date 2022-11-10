@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -70,7 +71,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
 
     public void testRemoveActionNormal(String actionsString, String expectedResult, int[] actionsToRemove) {
         try {
-            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false);
+            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
 
             for (int i : actionsToRemove) {
                 actions.removeAction(i);
@@ -93,7 +94,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
 
     public void testRemoveActionFast(String actionsString, String expectedResult, int[] actionsToRemove) {
         try {
-            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false);
+            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
             FastActionList fastActions = new FastActionList(actions);
 
             for (int i : actionsToRemove) {
@@ -124,7 +125,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
 
     public void testAddActionNormal(String actionsString, String expectedResult, Action action, int index) {
         try {
-            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false);
+            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
 
             actions.addAction(index, action);
 
@@ -145,7 +146,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
 
     public void testAddActionFast(String actionsString, String expectedResult, Action action, int index) {
         try {
-            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false);
+            ActionList actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
             FastActionList fastActions = new FastActionList(actions);
 
             fastActions.insertItemBefore(fastActions.get(index), action);
@@ -437,7 +438,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
                 + "label_2:Jump label_3\n"
                 + "label_3:Jump label_4\n"
                 + "label_4:";
-        ActionJump jump = new ActionJump(0);
+        ActionJump jump = new ActionJump(0, Utf8Helper.charsetName );
         jump.setAddress(9);
         jump.setJumpOffset(24 - 9 - 5);
         testAddActionNormal(actionsString, expectedResult, jump, 3);

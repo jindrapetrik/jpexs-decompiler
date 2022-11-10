@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.model.operations.AddActionItem;
+import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.parser.script.VariableActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionPop;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
@@ -34,6 +35,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -101,6 +103,10 @@ public class PostIncrementActionItem extends ActionItem implements SetTypeAction
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        
+        ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
+        String charset = asGenerator.getCharset();  
+        
         List<GraphSourceItem> ret = new ArrayList<>();
 
         GraphTargetItem val = object;
@@ -124,9 +130,9 @@ public class PostIncrementActionItem extends ActionItem implements SetTypeAction
             ret.add(new ActionSetMember());
         } else if ((val instanceof DirectValueActionItem) && ((DirectValueActionItem) val).value instanceof RegisterNumber) {
             RegisterNumber rn = (RegisterNumber) ((DirectValueActionItem) val).value;
-            ret.add(new ActionPush(new RegisterNumber(rn.number)));
+            ret.add(new ActionPush(new RegisterNumber(rn.number), charset));
             ret.add(new ActionIncrement());
-            ret.add(new ActionStoreRegister(rn.number));
+            ret.add(new ActionStoreRegister(rn.number, charset));
             ret.add(new ActionPop());
         } else if (val instanceof GetPropertyActionItem) {
             GetPropertyActionItem gp = (GetPropertyActionItem) val;

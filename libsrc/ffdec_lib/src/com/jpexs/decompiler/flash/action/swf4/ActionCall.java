@@ -26,6 +26,8 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.helpers.utf8.Utf8Helper;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,11 +39,11 @@ import java.util.List;
 public class ActionCall extends Action {
 
     public ActionCall() {
-        super(0x9E, 0);
+        super(0x9E, 0, Utf8Helper.charsetName);
     }
 
-    public ActionCall(int actionLength) {
-        super(0x9E, actionLength);
+    public ActionCall(int actionLength, String charset) {
+        super(0x9E, actionLength, charset);
     }
 
     @Override

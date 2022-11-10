@@ -323,6 +323,13 @@ public class SWFInputStream implements AutoCloseable {
 
     private int limit;
 
+    public String getCharset() {
+        if (swf == null) {
+            return Utf8Helper.charsetName;
+        }
+        return swf.getCharset();
+    }
+    
     public void addPercentListener(ProgressListener listener) {
         listeners.add(listener);
     }
@@ -363,7 +370,7 @@ public class SWFInputStream implements AutoCloseable {
         this.swf = swf;
         this.startingPos = startingPos;
         this.data = data;
-        this.limit = limit;
+        this.limit = limit;       
         is = new MemoryInputStream(data, 0, limit);
     }
 
@@ -502,7 +509,7 @@ public class SWFInputStream implements AutoCloseable {
             r = readEx();
             if (r == 0) {
                 endDumpLevel();
-                return new String(baos.toByteArray(), Utf8Helper.charset);
+                return new String(baos.toByteArray(), swf == null ? Utf8Helper.charsetName : swf.getCharset());
             }
             baos.write(r);
         }
@@ -1680,7 +1687,7 @@ public class SWFInputStream implements AutoCloseable {
         try {
             actionCode = readUI8("actionCode");
             if (actionCode == 0) {
-                return new ActionEnd();
+                return new ActionEnd(getCharset());
             }
             if (actionCode == -1) {
                 return null;
@@ -1727,7 +1734,7 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x0D:
                     return new ActionDivide();
                 case 0x0E:
-                    return new ActionEquals();
+                    return new ActionEquals(getCharset());
                 case 0x0F:
                     return new ActionLess();
                 case 0x10:
@@ -1765,17 +1772,17 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x9D:
                     return new ActionIf(actionLength, this);
                 case 0x9E:
-                    return new ActionCall(actionLength);
+                    return new ActionCall(actionLength, getCharset());
                 case 0x1C:
                     return new ActionGetVariable();
                 case 0x1D:
                     return new ActionSetVariable();
                 case 0x9A:
-                    return new ActionGetURL2(actionLength, this);
+                    return new ActionGetURL2(actionLength, this, getCharset());
                 case 0x9F:
                     return new ActionGotoFrame2(actionLength, this);
                 case 0x20:
-                    return new ActionSetTarget2();
+                    return new ActionSetTarget2(getCharset());
                 case 0x22:
                     return new ActionGetProperty();
                 case 0x23:
@@ -1862,11 +1869,11 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x50:
                     return new ActionIncrement();
                 case 0x4C:
-                    return new ActionPushDuplicate();
+                    return new ActionPushDuplicate(getCharset());
                 case 0x3E:
                     return new ActionReturn();
                 case 0x4D:
-                    return new ActionStackSwap();
+                    return new ActionStackSwap(getCharset());
                 case 0x87:
                     return new ActionStoreRegister(actionLength, this);
                 // SWF6 Actions
@@ -1884,11 +1891,11 @@ public class SWFInputStream implements AutoCloseable {
                 case 0x8E:
                     return new ActionDefineFunction2(actionLength, this, swf.version);
                 case 0x69:
-                    return new ActionExtends();
+                    return new ActionExtends(getCharset());
                 case 0x2B:
                     return new ActionCastOp();
                 case 0x2C:
-                    return new ActionImplementsOp();
+                    return new ActionImplementsOp(getCharset());
                 case 0x8F:
                     return new ActionTry(actionLength, this, swf.version);
                 case 0x2A:
@@ -1898,7 +1905,7 @@ public class SWFInputStream implements AutoCloseable {
                      //skip(actionLength);
                      }*/
                     //throw new UnknownActionException(actionCode);
-                    Action r = new ActionUnknown(actionCode, actionLength);
+                    Action r = new ActionUnknown(actionCode, actionLength, getCharset());
                     if (Configuration.useDetailedLogging.get()) {
                         logger.log(Level.SEVERE, "Unknown action code: {0}", actionCode);
                     }

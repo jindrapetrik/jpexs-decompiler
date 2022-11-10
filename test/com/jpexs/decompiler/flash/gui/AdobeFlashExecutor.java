@@ -166,7 +166,7 @@ public class AdobeFlashExecutor {
                     codeSize += actionsToExecute.getBytesLength();
                 }
 
-                actions2.add(new ActionDefineFunction("testRun" + i, new ArrayList<>(), codeSize, swf.version));
+                actions2.add(new ActionDefineFunction("testRun" + i, new ArrayList<>(), codeSize, swf.version, swf.getCharset()));
                 actions2.addAll(task.actions);
                 actions2.add(new ActionReturn());
 
@@ -176,7 +176,7 @@ public class AdobeFlashExecutor {
                 i++;
             }
 
-            item = actions.insertItemAfter(item, new ActionPush(new Object[]{tasks.size(), 1, "runTests"}));
+            item = actions.insertItemAfter(item, new ActionPush(new Object[]{tasks.size(), 1, "runTests"}, swf.getCharset()));
             actions.insertItemAfter(item, new ActionCallFunction());
             asm.setActions(actions.toActionList());
             asm.setModified();

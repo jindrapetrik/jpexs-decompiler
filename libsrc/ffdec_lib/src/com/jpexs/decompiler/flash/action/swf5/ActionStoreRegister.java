@@ -43,6 +43,7 @@ import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -66,18 +67,18 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
         return true;
     }
 
-    public ActionStoreRegister(int registerNumber) {
-        super(0x87, 1);
+    public ActionStoreRegister(int registerNumber, String charset) {
+        super(0x87, 1, charset);
         this.registerNumber = registerNumber;
     }
 
     public ActionStoreRegister(int actionLength, SWFInputStream sis) throws IOException {
-        super(0x87, actionLength);
+        super(0x87, actionLength, sis.getCharset());
         registerNumber = sis.readUI8("registerNumber");
     }
 
-    public ActionStoreRegister(FlasmLexer lexer) throws IOException, ActionParseException {
-        super(0x87, 0);
+    public ActionStoreRegister(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
+        super(0x87, 0, charset);
         registerNumber = (int) lexLong(lexer);
     }
 

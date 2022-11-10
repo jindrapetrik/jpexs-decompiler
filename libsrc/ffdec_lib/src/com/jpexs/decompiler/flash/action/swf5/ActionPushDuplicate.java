@@ -26,6 +26,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -36,8 +37,8 @@ import java.util.List;
 @SWFVersion(from = 5)
 public class ActionPushDuplicate extends Action {
 
-    public ActionPushDuplicate() {
-        super(0x4C, 0);
+    public ActionPushDuplicate(String charset) {
+        super(0x4C, 0, charset);
     }
 
     @Override

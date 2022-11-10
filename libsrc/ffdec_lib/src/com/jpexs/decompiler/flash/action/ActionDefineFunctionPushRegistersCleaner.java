@@ -293,7 +293,7 @@ public class ActionDefineFunctionPushRegistersCleaner extends SWFDecompilerAdapt
             if (newPushedValues.size() != currentPushedValues.size()) {
                 code.removeAction(pos); //remove that push
                 if (!newPushedValues.isEmpty()) {
-                    ActionPush newPush = new ActionPush(newPushedValues.toArray());
+                    ActionPush newPush = new ActionPush(newPushedValues.toArray(), code.getCharset());
                     newPush.constantPool = currentPush.constantPool;
                     code.addAction(pos, newPush); //replace with different push
                 } else {

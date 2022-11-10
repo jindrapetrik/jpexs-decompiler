@@ -33,6 +33,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -52,15 +53,15 @@ public class ActionGotoFrame2 extends Action {
     @Reserved
     int reserved;
 
-    public ActionGotoFrame2(boolean playFlag, boolean sceneBiasFlag, int sceneBias) {
-        super(0x9F, 0);
+    public ActionGotoFrame2(boolean playFlag, boolean sceneBiasFlag, int sceneBias, String charset) {
+        super(0x9F, 0, charset);
         this.sceneBiasFlag = sceneBiasFlag;
         this.playFlag = playFlag;
         this.sceneBias = sceneBias;
     }
 
     public ActionGotoFrame2(int actionLength, SWFInputStream sis) throws IOException {
-        super(0x9F, actionLength);
+        super(0x9F, actionLength, sis.getCharset());
         reserved = (int) sis.readUB(6, "reserved");
         sceneBiasFlag = sis.readUB(1, "sceneBiasFlag") == 1;
         playFlag = sis.readUB(1, "playFlag") == 1;
@@ -99,8 +100,8 @@ public class ActionGotoFrame2 extends Action {
         return "GotoFrame2 " + sceneBiasFlag + " " + playFlag + " " + (sceneBiasFlag ? " " + sceneBias : "");
     }
 
-    public ActionGotoFrame2(FlasmLexer lexer) throws IOException, ActionParseException {
-        super(0x9F, -1);
+    public ActionGotoFrame2(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
+        super(0x9F, -1, charset);
         sceneBiasFlag = lexBoolean(lexer);
         playFlag = lexBoolean(lexer);
         if (sceneBiasFlag) {

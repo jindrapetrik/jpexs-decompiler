@@ -35,6 +35,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -51,9 +52,17 @@ public class ActionList extends ArrayList<Action> {
     public int deobfuscationMode;
 
     public byte[] fileData;
+    
+    private String charset;
 
-    public ActionList() {
+    public ActionList(String charset) {
+        this.charset = charset;
     }
+
+    public String getCharset() {
+        return charset;
+    }    
+    
 
     public ActionList(Collection<Action> actions) {
         super(actions);
@@ -501,7 +510,7 @@ public class ActionList extends ArrayList<Action> {
                     ActionPush push = (ActionPush) action;
                     ActionPush push2 = (ActionPush) action2;
                     if (!(push.constantPool != null && push2.constantPool != null && push.constantPool != push2.constantPool)) {
-                        ActionPush newPush = new ActionPush(0);
+                        ActionPush newPush = new ActionPush(0, charset);
                         newPush.constantPool = push.constantPool == null ? push2.constantPool : push.constantPool;
                         newPush.values.clear();
                         newPush.values.addAll(push.values);
@@ -525,7 +534,7 @@ public class ActionList extends ArrayList<Action> {
                     int j = 0;
                     for (Object value : push.values) {
                         j++;
-                        ActionPush newPush = new ActionPush(value);
+                        ActionPush newPush = new ActionPush(value, charset);
                         newPush.constantPool = push.constantPool;
                         addAction(i + j, newPush);
                     }
@@ -556,7 +565,7 @@ public class ActionList extends ArrayList<Action> {
     public String toSource() {
         try {
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            actionsToSource(null, this, "", writer);
+            actionsToSource(null, this, "", writer, charset);
             return writer.toString();
         } catch (InterruptedException ex) {
             Logger.getLogger(ActionList.class.getName()).log(Level.SEVERE, null, ex);

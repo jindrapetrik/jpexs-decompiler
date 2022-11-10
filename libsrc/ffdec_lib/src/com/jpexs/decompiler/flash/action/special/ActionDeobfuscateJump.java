@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  *
@@ -27,12 +28,12 @@ import java.io.IOException;
  */
 public class ActionDeobfuscateJump extends ActionJump {
 
-    public ActionDeobfuscateJump(int offset) {
-        super(2);
+    public ActionDeobfuscateJump(int offset, String charset) {
+        super(2, charset);
     }
 
-    public ActionDeobfuscateJump(FlasmLexer lexer) throws IOException, ActionParseException {
-        super(lexer);
+    public ActionDeobfuscateJump(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
+        super(lexer, charset);
     }
 
     @Override

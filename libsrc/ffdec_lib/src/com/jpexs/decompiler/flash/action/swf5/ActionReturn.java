@@ -25,6 +25,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.util.HashMap;
 import java.util.List;
 
@@ -36,7 +37,7 @@ import java.util.List;
 public class ActionReturn extends Action {
 
     public ActionReturn() {
-        super(0x3E, 0);
+        super(0x3E, 0, Utf8Helper.charsetName);
     }
 
     @Override

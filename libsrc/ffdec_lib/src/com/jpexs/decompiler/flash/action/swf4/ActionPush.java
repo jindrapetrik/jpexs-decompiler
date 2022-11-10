@@ -46,6 +46,7 @@ import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -72,7 +73,7 @@ public class ActionPush extends Action {
     public static final int MAX_CONSTANT_INDEX_TYPE8 = 255;
 
     public ActionPush(int actionLength, SWFInputStream sis, int version) throws IOException {
-        super(0x96, actionLength);
+        super(0x96, actionLength, sis.getCharset());
         int type;
         values = new ArrayList<>();
         DumpInfo di = sis.dumpInfo;
@@ -234,22 +235,22 @@ public class ActionPush extends Action {
         return true;
     }
 
-    public ActionPush(Object value) {
-        super(0x96, 0);
+    public ActionPush(Object value, String charset) {
+        super(0x96, 0, charset);
         this.values = new ArrayList<>();
         this.values.add(value);
         updateLength();
     }
 
-    public ActionPush(Object[] values) {
-        super(0x96, 0);
+    public ActionPush(Object[] values, String charset) {
+        super(0x96, 0, charset);
         this.values = new ArrayList<>();
         this.values.addAll(Arrays.asList(values));
         updateLength();
     }
 
-    public ActionPush(FlasmLexer lexer, List<String> constantPool) throws IOException, ActionParseException {
-        super(0x96, 0);
+    public ActionPush(FlasmLexer lexer, List<String> constantPool, String charset) throws IOException, ActionParseException {
+        super(0x96, 0, charset);
         this.constantPool = constantPool;
         values = new ArrayList<>();
         int count = 0;

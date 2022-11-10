@@ -202,7 +202,7 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
             actions = getActions();
         }
 
-        return Action.actionsToSource(this, actions, getScriptName(), writer);
+        return Action.actionsToSource(this, actions, getScriptName(), writer, actions.getCharset());
     }
 
     /**

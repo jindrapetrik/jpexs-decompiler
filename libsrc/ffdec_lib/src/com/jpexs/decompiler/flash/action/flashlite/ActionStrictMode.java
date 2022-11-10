@@ -28,6 +28,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,12 +41,12 @@ public class ActionStrictMode extends Action {
     public int mode;
 
     public ActionStrictMode(SWFInputStream sis) throws IOException {
-        super(0x89, 1);
+        super(0x89, 1, sis.getCharset());
         mode = sis.readUI8("mode");
     }
 
-    public ActionStrictMode(FlasmLexer lexer) throws IOException, ActionParseException {
-        super(0x89, 1);
+    public ActionStrictMode(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
+        super(0x89, 1, charset);
         mode = (int) lexLong(lexer);
     }
 

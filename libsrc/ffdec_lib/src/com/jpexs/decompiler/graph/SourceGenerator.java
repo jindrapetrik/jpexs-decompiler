@@ -34,6 +34,7 @@ import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
+import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -41,7 +42,7 @@ import java.util.List;
  * @author JPEXS
  */
 public interface SourceGenerator {
-
+    
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, PushItem item) throws CompilationException;
 
     public List<GraphSourceItem> generate(SourceGeneratorLocalData localData, PopItem item) throws CompilationException;

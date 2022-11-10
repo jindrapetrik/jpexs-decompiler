@@ -36,6 +36,7 @@ import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.SecondPassException;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -62,7 +63,7 @@ public class ActionWaitForFrame extends Action implements ActionStore {
     }
 
     public ActionWaitForFrame(int actionLength, SWFInputStream sis) throws IOException {
-        super(0x8A, actionLength);
+        super(0x8A, actionLength, sis.getCharset());
         frame = sis.readUI16("frame");
         skipCount = sis.readUI8("skipCount");
         skipped = new ArrayList<>();
@@ -95,8 +96,8 @@ public class ActionWaitForFrame extends Action implements ActionStore {
         return 3;
     }
 
-    public ActionWaitForFrame(FlasmLexer lexer) throws IOException, ActionParseException {
-        super(0x8A, -1);
+    public ActionWaitForFrame(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
+        super(0x8A, -1, charset);
         frame = (int) lexLong(lexer);
         skipCount = (int) lexLong(lexer);
         skipped = new ArrayList<>();
@@ -110,13 +111,13 @@ public class ActionWaitForFrame extends Action implements ActionStore {
         HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
 
         try {
-            body = ActionGraph.translateViaGraph(null, insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path);
+            body = ActionGraph.translateViaGraph(null, insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path, getCharset());
         } catch (SecondPassException spe) {
             variables.clear();
             variables.putAll(variablesBackup);
             functions.clear();
             functions.putAll(functionsBackup);
-            body = ActionGraph.translateViaGraph(spe.getData(), insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path);
+            body = ActionGraph.translateViaGraph(spe.getData(), insideDoInitAction, true, regNames, variables, functions, skipped, SWF.DEFAULT_VERSION, staticOperation, path, getCharset());
         }
         output.add(new IfFrameLoadedActionItem(frameTi, body, this, lineStartAction));
     }

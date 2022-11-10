@@ -37,8 +37,10 @@ import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.graphs.graphviz.dot.parser.DotId;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -80,7 +82,7 @@ public class PcodeGraphVizExporter {
 
     public void exportAs12(ASMSource src, GraphTextWriter writer) throws InterruptedException {
         ActionList alist = src.getActions();
-        ActionGraph gr = new ActionGraph("", false, false, alist, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION);
+        ActionGraph gr = new ActionGraph("", false, false, alist, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, Utf8Helper.charsetName);
         export(gr, writer);
     }
 

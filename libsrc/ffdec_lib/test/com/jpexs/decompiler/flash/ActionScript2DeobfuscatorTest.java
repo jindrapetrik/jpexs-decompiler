@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -57,10 +58,10 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
         swf.version = SWF.DEFAULT_VERSION;
         ActionScript2Parser par = new ActionScript2Parser(swf, new DoActionTag(swf));
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-        List<Action> actions = par.actionsFromString(str);
+        List<Action> actions = par.actionsFromString(str, Utf8Helper.charsetName);
         byte[] hex = Action.actionsToBytes(actions, true, SWF.DEFAULT_VERSION);
         ActionList list = ActionListReader.readActionListTimeout(new ArrayList<>(), new SWFInputStream(swf, hex), SWF.DEFAULT_VERSION, 0, hex.length, "", 1);
-        Action.actionsToSource(null, list, "", writer);
+        Action.actionsToSource(null, list, "", writer, Utf8Helper.charsetName);
         return writer.toString();
     }
 
@@ -249,12 +250,12 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
                 + "Jump loc0084\n"
                 + "loc0084:";
         try {
-            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false);
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            Action.actionsToSource(doa, doa.getActions(), "", writer);
+            Action.actionsToSource(doa, doa.getActions(), "", writer, swf.getCharset());
             String actualResult = writer.toString();
 
             assertTrue(actualResult.contains("case \"c\":"));
@@ -274,12 +275,12 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
                 + "Trace\n"
                 + "loc2:";
         try {
-            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false);
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            Action.actionsToSource(doa, doa.getActions(), "", writer);
+            Action.actionsToSource(doa, doa.getActions(), "", writer, swf.getCharset());
             String actualResult = writer.toString();
 
             assertTrue(!actualResult.contains("FAIL"));
@@ -301,12 +302,12 @@ public class ActionScript2DeobfuscatorTest extends ActionScript2TestBase {
                 + "Trace\n"
                 + "loc2:";
         try {
-            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false);
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            Action.actionsToSource(doa, doa.getActions(), "", writer);
+            Action.actionsToSource(doa, doa.getActions(), "", writer, swf.getCharset());
             String actualResult = writer.toString();
 
             assertTrue(!actualResult.contains("FAIL"));

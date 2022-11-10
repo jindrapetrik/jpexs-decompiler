@@ -226,6 +226,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -1146,7 +1147,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             @Override
             public void run() {
                 while (true) {
-                    calculateMissingNeededCharacters();
+                    try {
+                        calculateMissingNeededCharacters();
+                    } catch (ConcurrentModificationException cme) {
+                        //ignore
+                    }
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException ex) {

@@ -298,7 +298,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
                     }
 
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+                    SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, getCharset());
                     sos.writeSI16(0); //Latency - how to calculate it?
                     sos.write(mp3data);
                     newSoundData = baos.toByteArray();

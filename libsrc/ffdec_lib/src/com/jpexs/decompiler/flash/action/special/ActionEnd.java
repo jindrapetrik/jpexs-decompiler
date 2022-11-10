@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,8 +33,8 @@ import java.util.List;
  */
 public class ActionEnd extends Action {
 
-    public ActionEnd() {
-        super(0, 0);
+    public ActionEnd(String charset) {
+        super(0, 0, charset);
         setIgnored(true, 0);
     }
 

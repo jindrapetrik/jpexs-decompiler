@@ -35,6 +35,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.UnaryOpItem;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +57,7 @@ public class PreDecrementActionItem extends UnaryOpItem {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
+        String charset = asGenerator.getCharset();
         List<GraphSourceItem> ret = new ArrayList<>();
         GraphTargetItem val = value;
         if (val instanceof VariableActionItem) {
@@ -68,9 +70,9 @@ public class PreDecrementActionItem extends UnaryOpItem {
             ret.addAll(gv.toSource(localData, generator));
             ret.add(new ActionDecrement());
             int tmpReg = asGenerator.getTempRegister(localData);
-            ret.add(new ActionStoreRegister(tmpReg));
+            ret.add(new ActionStoreRegister(tmpReg, charset));
             ret.add(new ActionSetVariable());
-            ret.add(new ActionPush(new RegisterNumber(tmpReg)));
+            ret.add(new ActionPush(new RegisterNumber(tmpReg), charset));
             asGenerator.releaseTempRegister(localData, tmpReg);
         } else if (val instanceof GetMemberActionItem) {
             GetMemberActionItem mem = (GetMemberActionItem) val;
@@ -79,15 +81,15 @@ public class PreDecrementActionItem extends UnaryOpItem {
             ret.addAll(mem.toSource(localData, generator));
             ret.add(new ActionDecrement());
             int tmpReg = asGenerator.getTempRegister(localData);
-            ret.add(new ActionStoreRegister(tmpReg));
+            ret.add(new ActionStoreRegister(tmpReg, charset));
             ret.add(new ActionSetMember());
-            ret.add(new ActionPush(new RegisterNumber(tmpReg)));
+            ret.add(new ActionPush(new RegisterNumber(tmpReg), charset));
             asGenerator.releaseTempRegister(localData, tmpReg);
         } else if ((val instanceof DirectValueActionItem) && ((DirectValueActionItem) val).value instanceof RegisterNumber) {
             RegisterNumber rn = (RegisterNumber) ((DirectValueActionItem) val).value;
-            ret.add(new ActionPush(new RegisterNumber(rn.number)));
+            ret.add(new ActionPush(new RegisterNumber(rn.number), charset));
             ret.add(new ActionDecrement());
-            ret.add(new ActionStoreRegister(rn.number));
+            ret.add(new ActionStoreRegister(rn.number, charset));
         } else if (val instanceof GetPropertyActionItem) {
             GetPropertyActionItem gp = (GetPropertyActionItem) val;
             ret.addAll(gp.toSource(localData, generator)); // old value

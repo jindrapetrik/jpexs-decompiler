@@ -42,11 +42,13 @@ import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -375,7 +377,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
 
-            SWFOutputStream sos = new SWFOutputStream(baos, swf.version);
+            SWFOutputStream sos = new SWFOutputStream(baos, swf.version, swf.getCharset());
             int tagLength = dataLength;
             int tagID = getId();
             int tagIDLength = (tagID << 6);
@@ -397,7 +399,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
 
-            SWFOutputStream sos = new SWFOutputStream(baos, version);
+            SWFOutputStream sos = new SWFOutputStream(baos, version, Utf8Helper.charsetName);
             sos.writeUI16(tagIDTagLength);
             if (writeLong) {
                 sos.writeSI32(tagLength);
@@ -488,7 +490,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             }
         }
 
-        try (SWFOutputStream sos = new SWFOutputStream(os, getVersion())) {
+        try (SWFOutputStream sos = new SWFOutputStream(os, getVersion(), getCharset())) {
             getData(sos);
             if (remainingData != null) {
                 sos.write(remainingData);
@@ -732,5 +734,12 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                 tagInfo.addInfo("general", "dependentFrames", Helper.joinStrings(dependent2, ", "));
             }
         }
+    }
+    
+    public String getCharset() {
+        if (swf == null) {
+            return Utf8Helper.charsetName;
+        }
+        return swf.getCharset();
     }
 }

@@ -45,6 +45,7 @@ import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -159,6 +160,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
+        String charset = asGenerator.getCharset();
         HashMap<String, Integer> registerVars = asGenerator.getRegisterVars(localData);
         ret.addAll(enumVariable.toSource(localData, generator));
         ret.add(new ActionEnumerate2());
@@ -166,10 +168,10 @@ public class ForInActionItem extends LoopActionItem implements Block {
         List<Action> loopExpr = new ArrayList<>();
         int exprReg = asGenerator.getTempRegister(localData);
 
-        loopExpr.add(new ActionStoreRegister(exprReg));
-        loopExpr.add(new ActionPush(Null.INSTANCE));
+        loopExpr.add(new ActionStoreRegister(exprReg, charset));
+        loopExpr.add(new ActionPush(Null.INSTANCE, charset));
         loopExpr.add(new ActionEquals2());
-        ActionIf forInEndIf = new ActionIf(0);
+        ActionIf forInEndIf = new ActionIf(0, charset);
         loopExpr.add(forInEndIf);
         List<Action> loopBody = new ArrayList<>();
 
@@ -184,7 +186,7 @@ public class ForInActionItem extends LoopActionItem implements Block {
         asGenerator.setForInLevel(localData, oldForIn + 1);
         loopBody.addAll(asGenerator.toActionList(asGenerator.generate(localData, commands)));
         asGenerator.setForInLevel(localData, oldForIn);
-        ActionJump forinJmpBack = new ActionJump(0);
+        ActionJump forinJmpBack = new ActionJump(0, charset);
         loopBody.add(forinJmpBack);
         int bodyLen = Action.actionsToBytes(loopBody, false, SWF.DEFAULT_VERSION).length;
         int exprLen = Action.actionsToBytes(loopExpr, false, SWF.DEFAULT_VERSION).length;
