@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - Hilight clipboard panel on copy/cut action for a few seconds
 - Drag and drop to move/copy tags in the tag list view
 - Setting for enabling placing Define tags into DefineSprite
+- Icons for tags in replace character dialog
 
 ## [16.2.0] - 2022-11-08
 ### Added
