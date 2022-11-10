@@ -464,4 +464,14 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
         }
         return ret;
     }
+    
+    @Override
+    public int getFrameCount() {
+        return frameCount;
+    }
+
+    @Override
+    public void setFrameCount(int frameCount) {
+        this.frameCount = frameCount;
+    }  
 }

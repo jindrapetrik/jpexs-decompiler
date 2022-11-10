@@ -1438,6 +1438,38 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
         return new File(title).getName();
     }
+    
+    /**
+     * Gets title of this SWF incuding parent nodes like SwfList and DefineBinaryData
+     * @return 
+     */
+    public String getShortPathTitle() {
+        if (binaryData != null) {
+            return binaryData.getSwf().getShortPathTitle()+ "/DefineBinaryData (" + binaryData.getCharacterId() + ")";
+        }
+        if (swfList != null) {
+            if (swfList.isBundle()) {
+                return swfList.name + "/" + getShortFileName();
+            }
+        }
+        return getShortFileName();
+    }
+    
+    /**
+     * Gets full path title of this SWF incuding parent nodes like SwfList and DefineBinaryData
+     * @return 
+     */
+    public String getFullPathTitle() {
+        if (binaryData != null) {
+            return binaryData.getSwf().getFullPathTitle()+ "/DefineBinaryData (" + binaryData.getCharacterId() + ")";
+        }
+        if (swfList != null) {
+            if (swfList.isBundle()) {
+                return swfList.sourceInfo.getFileTitleOrName() + "/" + getFileTitle();
+            }
+        }
+        return getFileTitle();
+    }
 
     public void setFile(String file) {
         this.file = file;
@@ -3920,5 +3952,15 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public void setFileTitle(String fileTitle) {
         this.fileTitle = fileTitle;
-    }        
+    }
+    
+    @Override
+    public int getFrameCount() {
+        return frameCount;
+    }
+
+    @Override
+    public void setFrameCount(int frameCount) {
+        this.frameCount = frameCount;
+    }
 }

@@ -239,7 +239,7 @@ class TreeTransferHandler extends TransferHandler {
                 }
             } 
         }
-        mainPanel.getContextPopupMenu().copyOrMoveTagsBeforeAfter(sourceItems, (action & MOVE) == MOVE, timelined, position);
+        mainPanel.getContextPopupMenu().copyOrMoveTags(sourceItems, (action & MOVE) == MOVE, timelined, position);
     }
 
     @Override

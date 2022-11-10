@@ -9,6 +9,13 @@ All notable changes to this project will be documented in this file.
 - Drag and drop to move/copy tags in the tag list view
 - Setting for enabling placing Define tags into DefineSprite
 - Icons for tags in replace character dialog
+- Move tag with dependencies
+- Copy/Move tag operation has select position dialog
+- Select position dialog has target file in its title
+
+### Fixed
+- Exception when bundle selected
+- File path in window title for SWFs inside DefineBinaryData
 
 ## [16.2.0] - 2022-11-08
 ### Added
