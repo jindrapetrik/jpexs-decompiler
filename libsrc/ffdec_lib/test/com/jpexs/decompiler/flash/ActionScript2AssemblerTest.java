@@ -50,7 +50,7 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
 
     private String recompilePcode(String pcode) {
         try {
-            List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false);
+            List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset());
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
@@ -66,14 +66,14 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
 
     private String decompilePcode(String pcode) {
         try {
-            List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false);
+            List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset());
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
 
             try {
-                Action.actionsToSource(doa, doa.getActions(), "", writer);
+                Action.actionsToSource(doa, doa.getActions(), "", writer, swf.getCharset());
             } catch (InterruptedException ex) {
                 fail();
             }
@@ -88,14 +88,14 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
 
     private String decompileClassPcode(String pcode) {
         try {
-            List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false);
+            List<Action> actions = ASMParser.parse(0, true, pcode, swf.version, false, swf.getCharset());
 
             DoInitActionTag doi = getFirstInitActionTag();
             doi.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
 
             try {
-                Action.actionsToSource(doi, doi.getActions(), "", writer);
+                Action.actionsToSource(doi, doi.getActions(), "", writer, swf.getCharset());
             } catch (InterruptedException ex) {
                 fail();
             }
@@ -119,12 +119,12 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "Jump loc000d\n"
                 + "loc002f:";
         try {
-            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false);
+            List<Action> actions = ASMParser.parse(0, true, actionsString, swf.version, false, swf.getCharset());
 
             DoActionTag doa = getFirstActionTag();
             doa.setActionBytes(Action.actionsToBytes(actions, true, swf.version));
             HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            Action.actionsToSource(doa, doa.getActions(), "", writer);
+            Action.actionsToSource(doa, doa.getActions(), "", writer, swf.getCharset());
             String actualResult = writer.toString();
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
             doa.getASMSource(ScriptExportMode.PCODE, writer, null);

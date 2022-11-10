@@ -26,6 +26,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,12 +53,14 @@ public class ActionGraphSource extends GraphSource {
     private final boolean insideDoInitAction;
 
     private final String path;
+    
+    private String charset;
 
     public List<Action> getActions() {
         return actions;
     }
 
-    public ActionGraphSource(String path, boolean insideDoInitAction, List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions) {
+    public ActionGraphSource(String path, boolean insideDoInitAction, List<Action> actions, int version, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, String charset) {
         this.actions = actions instanceof ActionList ? (ActionList) actions : new ActionList(actions);
         this.version = version;
         this.registerNames = registerNames;
@@ -65,8 +68,15 @@ public class ActionGraphSource extends GraphSource {
         this.functions = functions;
         this.insideDoInitAction = insideDoInitAction;
         this.path = path;
+        this.charset = charset;
     }
 
+    public String getCharset() {
+        return charset;
+    }
+
+    
+    
     @Override
     public Set<Long> getImportantAddresses() {
         return Action.getActionsAllRefs(actions);
@@ -103,7 +113,7 @@ public class ActionGraphSource extends GraphSource {
     public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
         Reference<GraphSourceItem> fi = new Reference<>(localData.lineStartInstruction);
 
-        List<GraphTargetItem> r = Action.actionsPartToTree(localData.secondPassData, this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path);
+        List<GraphTargetItem> r = Action.actionsPartToTree(localData.secondPassData, this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path, charset);
         localData.lineStartInstruction = fi.getVal();
         return r;
     }

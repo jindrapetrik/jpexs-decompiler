@@ -40,6 +40,8 @@ import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.helpers.utf8.Utf8Helper;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -51,7 +53,7 @@ import java.util.List;
 public class ActionSetVariable extends Action implements StoreTypeAction {
 
     public ActionSetVariable() {
-        super(0x1D, 0);
+        super(0x1D, 0, Utf8Helper.charsetName);
     }
 
     @Override

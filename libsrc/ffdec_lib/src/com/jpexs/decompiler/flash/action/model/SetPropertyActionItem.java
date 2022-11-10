@@ -31,6 +31,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
 
@@ -117,9 +118,10 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
+        String charset = asGenerator.getCharset();  
         int tmpReg = asGenerator.getTempRegister(localData);
         try {
-            return toSourceMerge(localData, generator, target, new ActionPush((Long) (long) propertyIndex), value, new ActionStoreRegister(tmpReg), new ActionSetProperty(), new ActionPush(new RegisterNumber(tmpReg)));
+            return toSourceMerge(localData, generator, target, new ActionPush((Long) (long) propertyIndex, charset), value, new ActionStoreRegister(tmpReg, charset), new ActionSetProperty(), new ActionPush(new RegisterNumber(tmpReg), charset));
         } finally {
             asGenerator.releaseTempRegister(localData, tmpReg);
         }
@@ -127,7 +129,9 @@ public class SetPropertyActionItem extends ActionItem implements SetTypeActionIt
 
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        return toSourceMerge(localData, generator, target, new ActionPush((Long) (long) propertyIndex), value, new ActionSetProperty());
+        ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
+        String charset = asGenerator.getCharset();  
+        return toSourceMerge(localData, generator, target, new ActionPush((Long) (long) propertyIndex, charset), value, new ActionSetProperty());
     }
 
     @Override

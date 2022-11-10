@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -57,13 +58,13 @@ public class ActionIf extends Action {
         this.offset = offset;
     }
 
-    public ActionIf(int offset) {
-        super(0x9D, 2);
+    public ActionIf(int offset, String charset) {
+        super(0x9D, 2, charset);
         setJumpOffset(offset);
     }
 
     public ActionIf(int actionLength, SWFInputStream sis) throws IOException {
-        super(0x9D, actionLength);
+        super(0x9D, actionLength, sis.getCharset());
         setJumpOffset(sis.readSI16("offset"));
     }
 
@@ -98,8 +99,8 @@ public class ActionIf extends Action {
         return "If loc" + ofsStr + (!jumpUsed ? " ;compileTimeIgnore" : (!ignoreUsed ? " ;compileTimeJump" : ""));
     }
 
-    public ActionIf(FlasmLexer lexer) throws IOException, ActionParseException {
-        super(0x9D, 2);
+    public ActionIf(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
+        super(0x9D, 2, charset);
         identifier = lexIdentifier(lexer);
     }
 

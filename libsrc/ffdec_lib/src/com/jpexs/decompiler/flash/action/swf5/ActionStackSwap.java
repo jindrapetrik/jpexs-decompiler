@@ -25,6 +25,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,8 +36,8 @@ import java.util.List;
 @SWFVersion(from = 5)
 public class ActionStackSwap extends Action {
 
-    public ActionStackSwap() {
-        super(0x4D, 0);
+    public ActionStackSwap(String charset) {
+        super(0x4D, 0, charset);
     }
 
     @Override

@@ -46,6 +46,7 @@ import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -85,8 +86,8 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         return false;
     }
 
-    public ActionTry(boolean catchInRegisterFlag, boolean finallyBlockFlag, boolean catchBlockFlag, String catchName, int catchRegister, long trySize, long catchSize, long finallySize, int version) {
-        super(0x8F, 0);
+    public ActionTry(boolean catchInRegisterFlag, boolean finallyBlockFlag, boolean catchBlockFlag, String catchName, int catchRegister, long trySize, long catchSize, long finallySize, int version, String charset) {
+        super(0x8F, 0, charset);
         this.catchInRegisterFlag = catchInRegisterFlag;
         this.finallyBlockFlag = finallyBlockFlag;
         this.catchBlockFlag = catchBlockFlag;
@@ -99,7 +100,7 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
     }
 
     public ActionTry(int actionLength, SWFInputStream sis, int version) throws IOException {
-        super(0x8F, actionLength);
+        super(0x8F, actionLength, sis.getCharset());
         long startPos = sis.getPos();
         this.version = version;
         reserved = (int) sis.readUB(5, "reserved");
@@ -147,8 +148,8 @@ public class ActionTry extends Action implements GraphSourceItemContainer {
         return res;
     }
 
-    public ActionTry(FlasmLexer lexer, int version) throws IOException, ActionParseException {
-        super(0x8F, 0);
+    public ActionTry(FlasmLexer lexer, int version, String charset) throws IOException, ActionParseException {
+        super(0x8F, 0, charset);
         this.version = version;
 
         ASMParsedSymbol symb = lexer.yylex();

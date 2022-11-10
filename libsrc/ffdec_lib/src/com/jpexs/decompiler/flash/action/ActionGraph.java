@@ -70,6 +70,7 @@ import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -88,8 +89,8 @@ public class ActionGraph extends Graph {
 
     private boolean insideFunction;
 
-    public ActionGraph(String path, boolean insideDoInitAction, boolean insideFunction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version) {
-        super(new ActionGraphSource(path, insideDoInitAction, code, version, registerNames, variables, functions), new ArrayList<>());
+    public ActionGraph(String path, boolean insideDoInitAction, boolean insideFunction, List<Action> code, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, int version, String charset) {
+        super(new ActionGraphSource(path, insideDoInitAction, code, version, registerNames, variables, functions, charset), new ArrayList<>());
         this.insideDoInitAction = insideDoInitAction;
         this.insideFunction = insideFunction;
     }
@@ -107,7 +108,7 @@ public class ActionGraph extends Graph {
                 List<ActionList> outs = new ArrayList<>();
                 for (long size : cnt.getContainerSizes()) {
                     if (size == 0) {
-                        outs.add(new ActionList());
+                        outs.add(new ActionList(((ActionGraphSource) code).getCharset()));
                         continue;
                     }
                     outs.add(new ActionList(alist.subList(adr2ip(alist, endAddr), adr2ip(alist, endAddr + size))));
@@ -116,7 +117,7 @@ public class ActionGraph extends Graph {
 
                 for (ActionList al : outs) {
                     subgraphs.put("loc" + Helper.formatAddress(code.pos2adr(ip)) + ": function " + functionName,
-                            new ActionGraph("", false, false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION)
+                            new ActionGraph("", false, false, al, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, ((ActionGraphSource)getGraphCode()).getCharset())
                     );
                 }
             }
@@ -134,8 +135,8 @@ public class ActionGraph extends Graph {
 
     }
 
-    public static List<GraphTargetItem> translateViaGraph(SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path) throws InterruptedException {
-        ActionGraph g = new ActionGraph(path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version);
+    public static List<GraphTargetItem> translateViaGraph(SecondPassData secondPassData, boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> code, int version, int staticOperation, String path, String charset) throws InterruptedException {
+        ActionGraph g = new ActionGraph(path, insideDoInitAction, insideFunction, code, registerNames, variables, functions, version, charset);
         ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames);
         g.init(localData);
         return g.translate(localData, staticOperation, path);

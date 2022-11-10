@@ -25,6 +25,8 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.helpers.utf8.Utf8Helper;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -36,7 +38,7 @@ import java.util.List;
 public class ActionLess2 extends Action {
 
     public ActionLess2() {
-        super(0x48, 0);
+        super(0x48, 0, Utf8Helper.charsetName);
     }
 
     @Override

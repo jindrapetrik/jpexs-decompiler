@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf5.ActionInitObject;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -29,6 +30,7 @@ import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -90,12 +92,14 @@ public class InitObjectActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
+        String charset = asGenerator.getCharset();  
         List<GraphSourceItem> ret = new ArrayList<>();
         for (int i = values.size() - 1; i >= 0; i--) {
             ret.addAll(names.get(i).toSource(localData, generator));
             ret.addAll(values.get(i).toSource(localData, generator));
         }
-        ret.add(new ActionPush((Long) (long) values.size()));
+        ret.add(new ActionPush((Long) (long) values.size(), charset));
         ret.add(new ActionInitObject());
         return ret;
     }

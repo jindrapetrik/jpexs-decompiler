@@ -183,6 +183,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -366,6 +367,8 @@ public final class SWF implements SWFContainerItem, Timelined {
     private Set<Integer> cyclicCharacters = null;
     
     private boolean headerModified = false;
+    
+    private String charset = "UTF-8";
 
     private static final DecompilerPool decompilerPool = new DecompilerPool();
 
@@ -385,6 +388,14 @@ public final class SWF implements SWFContainerItem, Timelined {
      */
     public static final Color ERROR_COLOR = Color.red;
 
+    public String getCharset() {
+        return charset;
+    }
+
+    public void setCharset(String charset) {
+        this.charset = charset;
+    }      
+    
     public void setHeaderModified(boolean headerModified) {
         this.headerModified = headerModified;
     }   
@@ -973,7 +984,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     private byte[] saveToByteArray(boolean gfx) throws IOException {        
         byte[] data;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                SWFOutputStream sos = new SWFOutputStream(baos, version)) {
+                SWFOutputStream sos = new SWFOutputStream(baos, version, charset)) {
             sos.write(getHeaderBytes(SWFCompression.NONE, gfx));
             sos.writeUI8(version);
             sos.writeUI32(0); // placeholder for file length
@@ -991,7 +1002,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         // update file size
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                SWFOutputStream sos = new SWFOutputStream(baos, version)) {
+                SWFOutputStream sos = new SWFOutputStream(baos, version, charset)) {
             sos.writeUI32(data.length);
             byte[] lengthData = baos.toByteArray();
             System.arraycopy(lengthData, 0, data, 4, lengthData.length);
@@ -1037,7 +1048,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             fileSize = sis.readUI32("fileSize");
         }
 
-        SWFOutputStream sos = new SWFOutputStream(os, version);
+        SWFOutputStream sos = new SWFOutputStream(os, version, Utf8Helper.charsetName);
         sos.write(getHeaderBytes(compression, gfx));
         sos.writeUI8(version);
         sos.writeUI32(fileSize);
@@ -1152,6 +1163,11 @@ public final class SWF implements SWFContainerItem, Timelined {
         displayRect = new RECT(0, 1, 0, 1);
         dumpInfo = new DumpInfoSwfNode(this, "rootswf", "", null, 0, 0);        
     }
+    
+    public SWF(String charset) {
+        this();
+        this.charset = charset;
+    }
 
     /**
      * Construct SWF from stream
@@ -1163,6 +1179,10 @@ public final class SWF implements SWFContainerItem, Timelined {
      */
     public SWF(InputStream is, boolean parallelRead) throws IOException, InterruptedException {
         this(is, null, null, null, parallelRead, false, true);
+    }
+    
+    public SWF(InputStream is, boolean parallelRead, String charset) throws IOException, InterruptedException {
+        this(is, null, null, null, parallelRead, false, true, charset);
     }
 
     /**
@@ -1176,6 +1196,10 @@ public final class SWF implements SWFContainerItem, Timelined {
      */
     public SWF(InputStream is, boolean parallelRead, boolean lazy) throws IOException, InterruptedException {
         this(is, null, null, null, parallelRead, false, lazy);
+    }
+    
+    public SWF(InputStream is, boolean parallelRead, boolean lazy, String charset) throws IOException, InterruptedException {
+        this(is, null, null, null, parallelRead, false, lazy, charset);
     }
 
     /**
@@ -1191,6 +1215,10 @@ public final class SWF implements SWFContainerItem, Timelined {
     public SWF(InputStream is, String file, String fileTitle, boolean parallelRead) throws IOException, InterruptedException {
         this(is, file, fileTitle, null, parallelRead, false, true);
     }
+    
+    public SWF(InputStream is, String file, String fileTitle, boolean parallelRead, String charset) throws IOException, InterruptedException {
+        this(is, file, fileTitle, null, parallelRead, false, true, charset);
+    }
 
     /**
      * Construct SWF from stream
@@ -1205,6 +1233,11 @@ public final class SWF implements SWFContainerItem, Timelined {
         this(is, null, null, listener, parallelRead, false, true);
     }
 
+    public SWF(InputStream is, ProgressListener listener, boolean parallelRead, String charset) throws IOException, InterruptedException {
+        this(is, null, null, listener, parallelRead, false, true, charset);
+    }
+
+    
     /**
      * Construct SWF from stream
      *
@@ -1219,6 +1252,10 @@ public final class SWF implements SWFContainerItem, Timelined {
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead) throws IOException, InterruptedException {
         this(is, file, fileTitle, listener, parallelRead, false, true);
     }
+    
+    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, String charset) throws IOException, InterruptedException {
+        this(is, file, fileTitle, listener, parallelRead, false, true, charset);
+    }
 
     /**
      * Faster constructor to check SWF only
@@ -1230,8 +1267,16 @@ public final class SWF implements SWFContainerItem, Timelined {
         decompress(is, new NulStream(), true);
     }
 
+    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, String charset) throws IOException, InterruptedException {
+        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, null, charset);
+    }
+    
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy) throws IOException, InterruptedException {
-        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, null);
+        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, null, Utf8Helper.charsetName);
+    }
+    
+    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver) throws IOException, InterruptedException {
+        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, resolver, Utf8Helper.charsetName);
     }
 
     /**
@@ -1248,9 +1293,10 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver) throws IOException, InterruptedException {
+    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver, String charset) throws IOException, InterruptedException {
         this.file = file;
         this.fileTitle = fileTitle;
+        this.charset = charset;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFHeader header = decompress(is, baos, true);
         gfx = header.gfx;
@@ -1264,6 +1310,11 @@ public final class SWF implements SWFContainerItem, Timelined {
         sis.dumpInfo = dumpInfo;
         sis.skipBytesEx(3, "signature"); // skip siganture
         version = sis.readUI8("version");
+        
+        if (version > 5) {
+            this.charset = Utf8Helper.charsetName;
+        }
+        
         fileSize = sis.readUI32("fileSize");
         dumpInfo.lengthBytes = fileSize;
         if (listener != null) {
@@ -1617,7 +1668,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         SWFHeader header = decodeHeader(hdr);
         long fileSize = header.fileSize;
 
-        try (SWFOutputStream sos = new SWFOutputStream(os, header.version)) {
+        try (SWFOutputStream sos = new SWFOutputStream(os, header.version, Utf8Helper.charsetName)) {
             sos.write(getHeaderBytes(SWFCompression.NONE, header.gfx));
             sos.writeUI8(header.version);
             sos.writeUI32(fileSize);
@@ -2113,7 +2164,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             GraphSourceItem ins = code.get(ip);
 
             if (debugMode) {
-                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ActionList(), new HashSet<>(), ScriptExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool())));
+                System.err.println("Visit " + ip + ": ofs" + Helper.formatAddress(((Action) ins).getAddress()) + ":" + ((Action) ins).getASMSource(new ActionList(code.getCharset()), new HashSet<>(), ScriptExportMode.PCODE) + " stack:" + Helper.stackToString(stack, LocalData.create(new ConstantPool())));
             }
             if (ins.isExit()) {
                 break;
@@ -2171,7 +2222,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                     ip = code.adr2pos(addr);
                     addr += size;
                     int nextip = code.adr2pos(addr);
-                    getVariables(aLocalData.insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(path, aLocalData.insideDoInitAction, code.getActions().subList(ip, nextip), code.version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path + (cntName == null ? "" : "/" + cntName));
+                    getVariables(aLocalData.insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(path, aLocalData.insideDoInitAction, code.getActions().subList(ip, nextip), code.version, new HashMap<>(), new HashMap<>(), new HashMap<>(), code.getCharset()), 0, path + (cntName == null ? "" : "/" + cntName));
                     ip = nextip;
                 }
                 List<List<GraphTargetItem>> r = new ArrayList<>();
@@ -2272,7 +2323,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         ActionList actions = src.getActions();
         actionsMap.put(src, actions);
         boolean insideDoInitAction = src instanceof DoInitActionTag;
-        getVariables(insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(path, insideDoInitAction, actions, version, new HashMap<>(), new HashMap<>(), new HashMap<>()), 0, path);
+        getVariables(insideDoInitAction, variables, functions, strings, usageTypes, new ActionGraphSource(path, insideDoInitAction, actions, version, new HashMap<>(), new HashMap<>(), new HashMap<>(), src.getSwf().getCharset()), 0, path);
         return ret;
     }
 
@@ -2428,7 +2479,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
                 List<GraphTargetItem> dec;
                 try {
-                    dec = Action.actionsToTree(true /*Yes, inside doInitAction*/, false, dia.getActions(), version, staticOperation, ""/*FIXME*/);
+                    dec = Action.actionsToTree(true /*Yes, inside doInitAction*/, false, dia.getActions(), version, staticOperation, ""/*FIXME*/, getCharset());
                 } catch (EmptyStackException ex) {
                     continue;
                 }
@@ -2851,7 +2902,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 throw ex;
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, null, ex);
-                return new ActionList();
+                return new ActionList(src.getSwf().getCharset());
             }
         }
     }

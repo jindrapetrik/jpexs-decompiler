@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
+import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf5.ActionWith;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -27,6 +28,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +70,8 @@ public class WithActionItem extends ActionItem {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+        ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
+        String charset = asGenerator.getCharset();        
         List<GraphSourceItem> data = generator.generate(localData, items);
         List<Action> dataA = new ArrayList<>();
         for (GraphSourceItem s : data) {
@@ -76,7 +80,7 @@ public class WithActionItem extends ActionItem {
             }
         }
         int codeLen = Action.actionsToBytes(dataA, false, SWF.DEFAULT_VERSION).length;
-        return toSourceMerge(localData, generator, scope, new ActionWith(codeLen), data);
+        return toSourceMerge(localData, generator, scope, new ActionWith(codeLen, charset), data);
     }
 
     @Override

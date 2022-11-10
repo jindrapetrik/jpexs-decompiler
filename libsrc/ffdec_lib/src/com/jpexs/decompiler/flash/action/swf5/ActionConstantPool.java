@@ -31,6 +31,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,13 +45,13 @@ public class ActionConstantPool extends Action {
 
     public List<String> constantPool = new ArrayList<>();
 
-    public ActionConstantPool(List<String> constantPool) {
-        super(0x88, 0);
+    public ActionConstantPool(List<String> constantPool, String charset) {
+        super(0x88, 0, charset);
         this.constantPool = constantPool;
     }
 
     public ActionConstantPool(int actionLength, SWFInputStream sis, int version) throws IOException {
-        super(0x88, actionLength);
+        super(0x88, actionLength, sis.getCharset());
         //sis = new SWFInputStream(new ByteArrayInputStream(sis.readBytes(actionLength)), version);
         int count = sis.readUI16("count");
         for (int i = 0; i < count; i++) {
@@ -58,8 +59,8 @@ public class ActionConstantPool extends Action {
         }
     }
 
-    public ActionConstantPool(FlasmLexer lexer) throws IOException, ActionParseException {
-        super(0x88, 0);
+    public ActionConstantPool(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
+        super(0x88, 0, charset);
         while (true) {
             ASMParsedSymbol symb = lexer.yylex();
             if (symb.type == ASMParsedSymbol.TYPE_STRING) {

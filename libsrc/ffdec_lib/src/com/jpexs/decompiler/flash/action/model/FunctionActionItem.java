@@ -38,6 +38,7 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.BranchStackResistant;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Helper;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -282,13 +283,15 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
 
+        ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
+        String charset = asGenerator.getCharset();  
+        
         Set<String> usedNames = new HashSet<>();
         for (VariableActionItem v : variables) {
             usedNames.add(v.getVariableName());
         }
 
         List<GraphSourceItem> ret = new ArrayList<>();
-        ActionSourceGenerator asGenerator = (ActionSourceGenerator) generator;
         List<Integer> paramRegs = new ArrayList<>();
         SourceGeneratorLocalData localDataCopy = Helper.deepCopy(localData);
         localDataCopy.inFunction++;
@@ -437,7 +440,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
         }
         int len = Action.actionsToBytes(asGenerator.toActionList(ret), false, SWF.DEFAULT_VERSION).length;
         if (!needsFun2 && paramNames.isEmpty()) {
-            ret.add(0, new ActionDefineFunction(functionName, paramNames, len, SWF.DEFAULT_VERSION));
+            ret.add(0, new ActionDefineFunction(functionName, paramNames, len, SWF.DEFAULT_VERSION, charset));
         } else {
             ret.add(0, new ActionDefineFunction2(functionName,
                     preloadParentFlag,
@@ -449,7 +452,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
                     suppressThisFlag,
                     preloadThisFlag,
                     preloadGlobalFlag,
-                    regCount, len, SWF.DEFAULT_VERSION, paramNames, paramRegs));
+                    regCount, len, SWF.DEFAULT_VERSION, paramNames, paramRegs, charset));
         }
 
         return ret;

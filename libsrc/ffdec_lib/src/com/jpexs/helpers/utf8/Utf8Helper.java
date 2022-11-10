@@ -27,6 +27,8 @@ import java.nio.charset.Charset;
  */
 public class Utf8Helper {
 
+    public static String charsetName = "UTF-8";
+    
     public static Charset charset = Charset.forName("UTF-8");
 
     public static String urlDecode(String s) {

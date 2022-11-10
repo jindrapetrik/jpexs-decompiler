@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.TranslateException;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -113,7 +114,7 @@ public class DirectEditingTest extends FileTestBase {
 
                         ActionScript2Parser par = new ActionScript2Parser(swf, asm);
                         try {
-                            asm.setActions(par.actionsFromString(as));
+                            asm.setActions(par.actionsFromString(as, Utf8Helper.charsetName));
                         } catch (ActionParseException | CompilationException ex) {
                             fail("Unable to parse: " + as + "/" + asm.toString(), ex);
                         }
@@ -122,7 +123,7 @@ public class DirectEditingTest extends FileTestBase {
                         String as2 = writer.toString();
                         //as2 = asm.removePrefixAndSuffix(as2);
                         try {
-                            asm.setActions(par.actionsFromString(as2));
+                            asm.setActions(par.actionsFromString(as2, Utf8Helper.charsetName));
                         } catch (ActionParseException | CompilationException ex) {
                             fail("Unable to parse: " + asm.getSwf().getShortFileName() + "/" + asm.toString(), ex);
                         }

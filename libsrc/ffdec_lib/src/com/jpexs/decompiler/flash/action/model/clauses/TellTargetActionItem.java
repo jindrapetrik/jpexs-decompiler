@@ -34,6 +34,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,22 +83,23 @@ public class TellTargetActionItem extends ActionItem implements Block {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         List<GraphSourceItem> ret = new ArrayList<>();
         ActionSourceGenerator actionGenerator = (ActionSourceGenerator) generator;
+        String charset = actionGenerator.getCharset();
         if (nested) {
-            ret.add(new ActionPush(""));
-            ret.add(new ActionPush(11)); //_target
+            ret.add(new ActionPush("", charset));
+            ret.add(new ActionPush(11, charset)); //_target
             ret.add(new ActionGetProperty());
         }
         if ((target instanceof DirectValueActionItem) && ((((DirectValueActionItem) target).value instanceof String) || (((DirectValueActionItem) target).value instanceof ConstantIndex))) {
-            ret.add(new ActionSetTarget((String) target.getResult()));
+            ret.add(new ActionSetTarget((String) target.getResult(), charset));
         } else {
             ret.addAll(target.toSource(localData, generator));
-            ret.add(new ActionSetTarget2());
+            ret.add(new ActionSetTarget2(charset));
         }
         ret.addAll(generator.generate(localData, commands));
-        ret.add(new ActionSetTarget(""));
+        ret.add(new ActionSetTarget("", charset));
 
         if (nested) {
-            ret.add(new ActionSetTarget2());
+            ret.add(new ActionSetTarget2(charset));
         }
         return ret;
     }

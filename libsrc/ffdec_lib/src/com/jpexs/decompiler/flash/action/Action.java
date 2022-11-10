@@ -81,6 +81,7 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -122,11 +123,19 @@ public abstract class Action implements GraphSourceItem {
     private long address;
 
     private long virtualAddress = -1;
+    
+    private String charset;
 
     @Override
     public long getLineOffset() {
         return fileOffset;
     }
+
+    public String getCharset() {
+        return charset;
+    }
+    
+    
 
     /**
      * Names of ActionScript properties
@@ -174,12 +183,13 @@ public abstract class Action implements GraphSourceItem {
      * @param actionCode Action type identifier
      * @param actionLength Length of action data
      */
-    public Action(int actionCode, int actionLength) {
+    public Action(int actionCode, int actionLength, String charset) {
         this.actionCode = actionCode;
         this.actionLength = actionLength;
+        this.charset = charset;
     }
 
-    public Action() {
+    public Action() {        
     }
 
     /**
@@ -333,7 +343,7 @@ public abstract class Action implements GraphSourceItem {
      */
     public final byte[] getBytes(int version) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, version);
+        SWFOutputStream sos = new SWFOutputStream(baos, version, charset);
         try {
             getContentBytes(sos);
             sos.close();
@@ -377,7 +387,7 @@ public abstract class Action implements GraphSourceItem {
      */
     private byte[] surroundWithAction(byte[] data, int version) {
         ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-        SWFOutputStream sos2 = new SWFOutputStream(baos2, version);
+        SWFOutputStream sos2 = new SWFOutputStream(baos2, version, charset);
         try {
             sos2.writeUI8(actionCode);
             if (actionCode >= 0x80) {
@@ -843,8 +853,8 @@ public abstract class Action implements GraphSourceItem {
         return -1;
     }
 
-    public static List<GraphTargetItem> actionsToTree(boolean insideDoInitAction, boolean insideFunction, List<Action> actions, int version, int staticOperation, String path) throws InterruptedException {
-        return actionsToTree(insideDoInitAction, insideFunction, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path);
+    public static List<GraphTargetItem> actionsToTree(boolean insideDoInitAction, boolean insideFunction, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
+        return actionsToTree(insideDoInitAction, insideFunction, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
     }
 
     /**
@@ -857,7 +867,7 @@ public abstract class Action implements GraphSourceItem {
      * @return
      * @throws java.lang.InterruptedException
      */
-    public static GraphTextWriter actionsToSource(final ASMSource asm, final List<Action> actions, final String path, GraphTextWriter writer) throws InterruptedException {
+    public static GraphTextWriter actionsToSource(final ASMSource asm, final List<Action> actions, final String path, GraphTextWriter writer, String charset) throws InterruptedException {
         writer.suspendMeasure();
         List<GraphTargetItem> tree = null;
         Throwable convertException = null;
@@ -870,7 +880,7 @@ public abstract class Action implements GraphSourceItem {
                 public List<GraphTargetItem> call() throws Exception {
                     int staticOperation = Graph.SOP_USE_STATIC; //(Boolean) Configuration.getConfig("autoDeobfuscate", true) ? Graph.SOP_SKIP_STATIC : Graph.SOP_USE_STATIC;
                     boolean insideDoInitAction = (asm instanceof DoInitActionTag);
-                    List<GraphTargetItem> tree = actionsToTree(insideDoInitAction, false, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path);
+                    List<GraphTargetItem> tree = actionsToTree(insideDoInitAction, false, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
                     SWFDecompilerPlugin.fireActionTreeCreated(tree, swf);
                     if (Configuration.autoDeobfuscate.get()) {
                         new ActionDeobfuscator().actionTreeCreated(tree, swf);
@@ -929,17 +939,17 @@ public abstract class Action implements GraphSourceItem {
      * @return List of treeItems
      * @throws java.lang.InterruptedException
      */
-    public static List<GraphTargetItem> actionsToTree(boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path) throws InterruptedException {
+    public static List<GraphTargetItem> actionsToTree(boolean insideDoInitAction, boolean insideFunction, HashMap<Integer, String> regNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, List<Action> actions, int version, int staticOperation, String path, String charset) throws InterruptedException {
         HashMap<String, GraphTargetItem> variablesBackup = new LinkedHashMap<>(variables);
         HashMap<String, GraphTargetItem> functionsBackup = new LinkedHashMap<>(functions);
         try {
-            return ActionGraph.translateViaGraph(null, insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path);
+            return ActionGraph.translateViaGraph(null, insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path, charset);
         } catch (SecondPassException spe) {
             variables.clear();
             variables.putAll(variablesBackup);
             functions.clear();
             functions.putAll(functionsBackup);
-            return ActionGraph.translateViaGraph(spe.getData(), insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path);
+            return ActionGraph.translateViaGraph(spe.getData(), insideDoInitAction, insideFunction, regNames, variables, functions, actions, version, staticOperation, path, charset);
         }
     }
 
@@ -1000,7 +1010,7 @@ public abstract class Action implements GraphSourceItem {
         return variables2;
     }
 
-    public static List<GraphTargetItem> actionsPartToTree(SecondPassData secondPassData, boolean insideDoInitAction, Reference<GraphSourceItem> fi, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, TranslateStack stack, List<Action> actions, int start, int end, int version, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
+    public static List<GraphTargetItem> actionsPartToTree(SecondPassData secondPassData, boolean insideDoInitAction, Reference<GraphSourceItem> fi, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, TranslateStack stack, List<Action> actions, int start, int end, int version, int staticOperation, String path, String charset) throws InterruptedException, GraphPartChangeException {
         if (start < actions.size() && (end > 0) && (start > 0)) {
             logger.log(Level.FINE, "Entering {0}-{1}{2}", new Object[]{start, end, actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""});
         }
@@ -1068,10 +1078,10 @@ public abstract class Action implements GraphSourceItem {
                             }
                         }
                         try {
-                            out = ActionGraph.translateViaGraph(null, insideDoInitAction, true, regNames, variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
+                            out = ActionGraph.translateViaGraph(null, insideDoInitAction, true, regNames, variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset);
                         } catch (SecondPassException spe) {
                             variables2 = prepareVariables(cnt, variables);
-                            out = ActionGraph.translateViaGraph(spe.getData(), insideDoInitAction, true, regNames, variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName));
+                            out = ActionGraph.translateViaGraph(spe.getData(), insideDoInitAction, true, regNames, variables2, functions, actions.subList(adr2ip(actions, endAddr), adr2ip(actions, endAddr + size)), version, staticOperation, path + (cntName == null ? "" : "/" + cntName), charset);
                         }
                     } catch (OutOfMemoryError | TranslateException | StackOverflowError ex) {
                         logger.log(Level.SEVERE, "Decompilation error in: " + path, ex);

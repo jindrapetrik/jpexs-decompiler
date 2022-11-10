@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash;
 
 //import com.jpexs.decompiler.flash.gui.Main;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import static org.testng.Assert.assertEquals;
@@ -53,7 +54,7 @@ public class SWFStreamTest {
     public void testFB() throws IOException {
         double f = 5.25;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION)) {
+        try (SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName)) {
             sos.writeFB(20, f);
         }
         try (SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
@@ -64,7 +65,7 @@ public class SWFStreamTest {
     @Test
     public void testUB() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION)) {
+        try (SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName)) {
             sos.writeUB(5, 1);
             sos.writeUB(6, 2);
             sos.writeUB(7, 3);
@@ -83,7 +84,7 @@ public class SWFStreamTest {
     @Test
     public void testSB() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION)) {
+        try (SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName)) {
             sos.writeSB(5, -1);
             sos.writeSB(6, 2);
             sos.writeSB(7, -3);
@@ -102,7 +103,7 @@ public class SWFStreamTest {
     @Test
     public void testFLOATAndDouble() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+        SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName);
         float f = 5.25f;
         sos.writeFLOAT(f);
         sos.close();
@@ -111,7 +112,7 @@ public class SWFStreamTest {
         sis.close();
 
         baos = new ByteArrayOutputStream();
-        sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+        sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName);
         f = 5.25f;
         sos.writeFLOAT16(f);
         sos.close();
@@ -120,7 +121,7 @@ public class SWFStreamTest {
         sis.close();
 
         baos = new ByteArrayOutputStream();
-        sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+        sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName);
         double d = 5.25;
         sos.writeDOUBLE(d);
         sos.close();
@@ -140,7 +141,7 @@ public class SWFStreamTest {
         double[] dds = new double[]{5.25, 65535.25};
         for (double dd : dds) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+            SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName);
             sos.writeFIXED(dd);
             sos.close();
             sis = new SWFInputStream(null, baos.toByteArray());
@@ -152,7 +153,7 @@ public class SWFStreamTest {
         float[] ffs = new float[]{5.25f, -5.25f, 127.75f, -128f};
         for (float ff : ffs) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+            SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName);
             sos.writeFIXED8(ff);
             sos.close();
             sis = new SWFInputStream(null, baos.toByteArray());
@@ -171,7 +172,7 @@ public class SWFStreamTest {
             sis.close();
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+            SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName);
             sos.writeFIXED8(d);
             sos.close();
             byte[] data2 = baos.toByteArray();
@@ -184,7 +185,7 @@ public class SWFStreamTest {
     public void testRECT() throws IOException {
         RECT rect;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION)) {
+        try (SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName)) {
             rect = new RECT(-0x80000000, 0x7FFFFFFF, -0x80000000, 0x7FFFFFFF);
             sos.writeRECT(rect);
         }

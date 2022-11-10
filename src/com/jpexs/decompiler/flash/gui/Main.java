@@ -65,6 +65,7 @@ import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.Stopwatch;
 import com.jpexs.helpers.streams.SeekableInputStream;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Kernel32;
@@ -98,6 +99,7 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
@@ -777,11 +779,11 @@ public class Main {
     public static void startWork(String name, CancellableWorker worker) {
         startWork(name, -1, worker);
     }
-    
+
     public static void continueWork(String name) {
         continueWork(name, -1);
     }
-    
+
     public static void continueWork(String name, final int percent) {
         startWork(name, percent, mainFrame.getPanel().getCurrentWorker());
     }
@@ -870,12 +872,15 @@ public class Main {
                     @Override
                     public SWF doInBackground() throws Exception {
                         final CancellableWorker worker = this;
+                        String fileKey = new File(streamEntry.getKey()).getName();
+                        SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
+                        String charset = conf == null ? Utf8Helper.charsetName : conf.getCustomData(SwfSpecificCustomConfiguration.KEY_CHARSET, Utf8Helper.charsetName);
                         SWF swf = new SWF(stream, null, streamEntry.getKey(), new ProgressListener() {
                             @Override
                             public void progress(int p) {
                                 startWork(AppStrings.translate("work.reading.swf"), p, worker);
                             }
-                        }, Configuration.parallelSpeedUp.get());
+                        }, Configuration.parallelSpeedUp.get(), charset);
                         return swf;
                     }
                 };
@@ -900,6 +905,10 @@ public class Main {
 
                 private SWF open(InputStream is, String file, String fileTitle) throws IOException, InterruptedException {
                     final CancellableWorker worker = this;
+                    String shortName = fileTitle != null ? fileTitle : file;
+                    String fileKey = shortName == null ? "" : new File(shortName).getName();
+                    SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
+                    String charset = conf == null ? Utf8Helper.charsetName : conf.getCustomData(SwfSpecificCustomConfiguration.KEY_CHARSET, Utf8Helper.charsetName);
 
                     SWF swf = new SWF(is, file, fileTitle, new ProgressListener() {
                         @Override
@@ -1033,7 +1042,7 @@ public class Main {
                             });
                             return ret.getVal();
                         }
-                    });
+                    }, charset);
                     return swf;
                 }
 
@@ -1128,7 +1137,7 @@ public class Main {
     }
 
     public static void saveFileToExe(SWF swf, ExeExportMode exeExportMode, File tmpFile) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream(tmpFile);  BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+        try ( FileOutputStream fos = new FileOutputStream(tmpFile);  BufferedOutputStream bos = new BufferedOutputStream(fos)) {
             switch (exeExportMode) {
                 case WRAPPER:
                     InputStream exeStream = View.class.getClassLoader().getResourceAsStream("com/jpexs/helpers/resource/Swf2Exe.bin");
@@ -1158,7 +1167,7 @@ public class Main {
                     bos.flush();
                     break;
             }
-            
+
             long pos = fos.getChannel().position();
             swf.saveTo(bos);
 
@@ -1179,7 +1188,7 @@ public class Main {
                     bos.write((swfSize >> 8) & 0xff);
                     bos.write((swfSize >> 16) & 0xff);
                     bos.write((swfSize >> 24) & 0xff);
-            }            
+            }
         }
     }
 
@@ -1197,7 +1206,7 @@ public class Main {
             if (mode == SaveFileMode.EXE) {
                 saveFileToExe(swf, exeExportMode, tmpFile);
             } else {
-                try (FileOutputStream fos = new FileOutputStream(tmpFile);  BufferedOutputStream bos = new BufferedOutputStream(fos)) {
+                try ( FileOutputStream fos = new FileOutputStream(tmpFile);  BufferedOutputStream bos = new BufferedOutputStream(fos)) {
                     swf.saveTo(bos);
                 }
             }

@@ -171,7 +171,7 @@ public class PreviewExporter {
         try {
             bca.setActions(ap.actionsFromString("on(press){"
                     + "stopped = !stopped; if(stopped) {stop();}else{play();}"
-                    + "}"));
+                    + "}", swf.getCharset()));
         } catch (CompilationException ex) {
             Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ActionParseException ex) {
@@ -199,7 +199,7 @@ public class PreviewExporter {
                     + "}else{"
                     + "gotoAndPlay(f);"
                     + "}"
-                    + "}"));
+                    + "}", swf.getCharset()));
         } catch (CompilationException ex) {
             Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ActionParseException ex) {
@@ -234,7 +234,7 @@ public class PreviewExporter {
         doAction = new DoActionTag(swf);
         ap = new ActionScript2Parser(swf, doAction);
         try {
-            doAction.setActions(ap.actionsFromString("var stopped = false;"));
+            doAction.setActions(ap.actionsFromString("var stopped = false;", swf.getCharset()));
         } catch (CompilationException ex) {
             Logger.getLogger(PreviewExporter.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ActionParseException ex) {
@@ -279,7 +279,7 @@ public class PreviewExporter {
 
         byte[] data;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            SWFOutputStream sos2 = new SWFOutputStream(baos, SWF.DEFAULT_VERSION);
+            SWFOutputStream sos2 = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, swf.getCharset());
             RECT outrect = new RECT(swf.displayRect);
 
             RECT treeItemBounds = null;
@@ -571,7 +571,7 @@ public class PreviewExporter {
                             + "Push \"attachSound\"\n"
                             + "CallMethod\n"
                             + "Pop\n"
-                            + "Stop", swf.version, false);
+                            + "Stop", swf.version, false, swf.getCharset());
                     doa.setActions(actions);
                     doa.writeTag(sos2);
                     new ShowFrameTag(swf).writeTag(sos2);
@@ -598,7 +598,7 @@ public class PreviewExporter {
                             + "Push \"start\"\n"
                             + "CallMethod\n"
                             + "Pop\n"
-                            + "Stop", swf.version, false);
+                            + "Stop", swf.version, false, swf.getCharset());
                     doa.setActions(actions);
                     doa.writeTag(sos2);
                     new ShowFrameTag(swf).writeTag(sos2);
@@ -642,14 +642,14 @@ public class PreviewExporter {
                             + "Push \"start\"\n"
                             + "CallMethod\n"
                             + "Pop\n"
-                            + "Stop", swf.version, false);
+                            + "Stop", swf.version, false, swf.getCharset());
                     doa.setActions(actions);
                     doa.writeTag(sos2);
                     new ShowFrameTag(swf).writeTag(sos2);
 
                     actions = ASMParser.parse(0, false,
                             "StopSounds\n"
-                            + "Stop", swf.version, false);
+                            + "Stop", swf.version, false, swf.getCharset());
                     doa.setActions(actions);
                     doa.writeTag(sos2);
                     new ShowFrameTag(swf).writeTag(sos2);
@@ -716,7 +716,7 @@ public class PreviewExporter {
         result.version = Math.max(10, swf.version);
         result.frameRate = frameRate;
 
-        SWFOutputStream sos = new SWFOutputStream(os, result.version);
+        SWFOutputStream sos = new SWFOutputStream(os, result.version, swf.getCharset());
         sos.write("FWS".getBytes());
         sos.write(swf.version);
         result.fileSize = sos.getPos() + data.length + 4;

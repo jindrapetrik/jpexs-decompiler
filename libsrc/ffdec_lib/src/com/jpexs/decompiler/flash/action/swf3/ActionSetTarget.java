@@ -31,6 +31,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,8 +44,8 @@ public class ActionSetTarget extends Action {
 
     public String targetName;
 
-    public ActionSetTarget(String targetName) {
-        super(0x8B, 0);
+    public ActionSetTarget(String targetName, String charset) {
+        super(0x8B, 0, charset);
         this.targetName = targetName;
     }
 
@@ -60,7 +61,7 @@ public class ActionSetTarget extends Action {
     }
 
     public ActionSetTarget(int actionLength, SWFInputStream sis, int version) throws IOException {
-        super(0x8B, actionLength);
+        super(0x8B, actionLength, sis.getCharset());
         //byte[] data = sis.readBytes(actionLength);
         //sis = new SWFInputStream(new ByteArrayInputStream(data), version);
         targetName = sis.readString("targetName");
@@ -86,8 +87,8 @@ public class ActionSetTarget extends Action {
         return Utf8Helper.getBytesLength(targetName) + 1;
     }
 
-    public ActionSetTarget(FlasmLexer lexer) throws IOException, ActionParseException {
-        super(0x8B, -1);
+    public ActionSetTarget(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
+        super(0x8B, -1, charset);
         targetName = lexString(lexer);
     }
 

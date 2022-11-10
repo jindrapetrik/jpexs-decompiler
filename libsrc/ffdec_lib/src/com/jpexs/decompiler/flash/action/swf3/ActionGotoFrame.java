@@ -30,6 +30,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,8 +43,8 @@ public class ActionGotoFrame extends Action {
 
     public int frame;
 
-    public ActionGotoFrame(int frame) {
-        super(0x81, 2);
+    public ActionGotoFrame(int frame, String charset) {
+        super(0x81, 2, charset);
         this.frame = frame;
     }
 
@@ -54,7 +55,7 @@ public class ActionGotoFrame extends Action {
     }
 
     public ActionGotoFrame(int actionLength, SWFInputStream sis) throws IOException {
-        super(0x81, actionLength);
+        super(0x81, actionLength, sis.getCharset());
         frame = sis.readUI16("frame");
     }
 
@@ -78,8 +79,8 @@ public class ActionGotoFrame extends Action {
         return 2;
     }
 
-    public ActionGotoFrame(FlasmLexer lexer) throws IOException, ActionParseException {
-        super(0x81, 0);
+    public ActionGotoFrame(FlasmLexer lexer, String charset) throws IOException, ActionParseException {
+        super(0x81, 0, charset);
         frame = (int) lexLong(lexer);
     }
 

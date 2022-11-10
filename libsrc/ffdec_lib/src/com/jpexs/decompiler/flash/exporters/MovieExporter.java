@@ -157,7 +157,7 @@ public class MovieExporter {
 
                 }
 
-                SWFOutputStream sos = new SWFOutputStream(baos, swf.version);
+                SWFOutputStream sos = new SWFOutputStream(baos, swf.version, swf.getCharset());
                 sos.writeUB(4, horizontalAdjustment);
                 sos.writeUB(4, verticalAdjustment);
             }

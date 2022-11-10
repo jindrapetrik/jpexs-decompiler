@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model.clauses;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.model.ActionItem;
+import com.jpexs.decompiler.flash.action.parser.script.ActionSourceGenerator;
 import com.jpexs.decompiler.flash.action.swf4.ActionWaitForFrame2;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.Block;
@@ -29,6 +30,7 @@ import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,7 +96,9 @@ public class IfFrameLoadedActionItem extends ActionItem implements Block {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         List<GraphSourceItem> body = generator.generate(localData, actions);
-        return toSourceMerge(localData, generator, frame, new ActionWaitForFrame2(body.size()), body);
+        ActionSourceGenerator actionGenerator = (ActionSourceGenerator) generator;
+        String charset = actionGenerator.getCharset();
+        return toSourceMerge(localData, generator, frame, new ActionWaitForFrame2(body.size(), charset), body);
     }
 
     @Override

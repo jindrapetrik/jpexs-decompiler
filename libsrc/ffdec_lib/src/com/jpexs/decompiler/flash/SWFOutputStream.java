@@ -109,6 +109,8 @@ public class SWFOutputStream extends OutputStream {
     private int bitPos = 0;
 
     private int tempByte = 0;
+    
+    private String charset;
 
     public long getPos() {
         return pos;
@@ -120,9 +122,10 @@ public class SWFOutputStream extends OutputStream {
      * @param os OutputStream for writing data
      * @param version Version of SWF
      */
-    public SWFOutputStream(OutputStream os, int version) {
+    public SWFOutputStream(OutputStream os, int version, String charset) {
         this.version = version;
         this.os = os;
+        this.charset = charset;
     }
 
     /**
@@ -180,7 +183,7 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeString(String value) throws IOException {
-        byte[] data = Utf8Helper.getBytes(value);
+        byte[] data = value.getBytes(charset);
         for (int i = 0; i < data.length; i++) {
             if (data[i] == 0) {
                 throw new IOException("String should not contain null character.");
@@ -806,7 +809,7 @@ public class SWFOutputStream extends OutputStream {
     public void writeCLIPACTIONRECORD(CLIPACTIONRECORD value) throws IOException {
         writeCLIPEVENTFLAGS(value.eventFlags);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (SWFOutputStream sos = new SWFOutputStream(baos, version)) {
+        try (SWFOutputStream sos = new SWFOutputStream(baos, version, charset)) {
             if (value.eventFlags.clipEventKeyPress) {
                 sos.writeUI8(value.keyCode);
             }
@@ -1154,7 +1157,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeBUTTONCONDACTION(BUTTONCONDACTION value, boolean isLast) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (SWFOutputStream sos = new SWFOutputStream(baos, version)) {
+        try (SWFOutputStream sos = new SWFOutputStream(baos, version, charset)) {
             sos.writeUB(1, value.condIdleToOverDown ? 1 : 0);
             sos.writeUB(1, value.condOutDownToIdle ? 1 : 0);
             sos.writeUB(1, value.condOutDownToOverDown ? 1 : 0);

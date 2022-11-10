@@ -141,7 +141,7 @@ public class DoActionTag extends Tag implements ASMSource {
             actions = getActions();
         }
 
-        return Action.actionsToSource(this, actions, getScriptName(), writer);
+        return Action.actionsToSource(this, actions, getScriptName(), writer, getCharset());
     }
 
     /**

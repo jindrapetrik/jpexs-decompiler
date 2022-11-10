@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.graph.GraphSourceItemContainer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,6 +46,8 @@ public class FastActionList implements Collection<ActionItem> {
     private final Map<Action, ActionItem> actionItemMap;
 
     private final Set<ActionItem> actionItemSet;
+    
+    private String charset;
 
     public FastActionList(ActionList actions) {
         actionItemMap = new HashMap<>(actions.size());
@@ -56,8 +59,15 @@ public class FastActionList implements Collection<ActionItem> {
         size = actions.size();
         getContainerLastActions(actions, actionItemMap);
         getJumps(actions, actionItemMap);
+        charset = actions.getCharset();
     }
 
+    public String getCharset() {
+        return charset;
+    }
+
+    
+    
     public final ActionItem insertItemBefore(ActionItem item, Action action) {
         ActionItem newItem = new ActionItem(action);
         return insertItemBefore(item, newItem);
@@ -387,7 +397,7 @@ public class FastActionList implements Collection<ActionItem> {
                 if (push.values.size() > 1) {
                     for (int i = 1; i < push.values.size(); i++) {
                         Object value = push.values.get(i);
-                        ActionPush newPush = new ActionPush(value);
+                        ActionPush newPush = new ActionPush(value, charset);
                         newPush.constantPool = push.constantPool;
                         insertItemAfter(item, newPush);
                         item = item.next;

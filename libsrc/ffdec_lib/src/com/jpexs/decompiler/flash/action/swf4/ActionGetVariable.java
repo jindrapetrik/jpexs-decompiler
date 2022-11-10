@@ -31,6 +31,8 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.helpers.utf8.Utf8Helper;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,7 +44,7 @@ import java.util.List;
 public class ActionGetVariable extends Action {
 
     public ActionGetVariable() {
-        super(0x1C, 0);
+        super(0x1C, 0, Utf8Helper.charsetName);
     }
 
     @Override

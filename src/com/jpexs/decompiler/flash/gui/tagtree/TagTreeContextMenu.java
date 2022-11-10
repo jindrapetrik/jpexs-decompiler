@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.SelectTagPositionDialog;
@@ -88,6 +89,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -96,6 +98,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -209,6 +212,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem addFramesBeforeMenuItem;
 
     private JMenuItem addFramesAfterMenuItem;
+    
+    private JMenu changeCharsetMenu;
 
     private static final int KIND_MOVETO = 0;
     private static final int KIND_MOVETODEPS = 1;
@@ -222,6 +227,23 @@ public class TagTreeContextMenu extends JPopupMenu {
         expandRecursiveMenuItem.addActionListener(this::expandRecursiveActionPerformed);
         expandRecursiveMenuItem.setIcon(View.getIcon("expand16"));
         add(expandRecursiveMenuItem);
+        
+        changeCharsetMenu = new JMenu();
+        JMenu currentCharsetMenu = changeCharsetMenu;
+        int charsetCnt = 0;        
+        for (String charsetStr : Charset.availableCharsets().keySet()) {
+            if (charsetCnt == 30) {
+                JMenu moreMenu = new JMenu(mainPanel.translate("contextmenu.more"));
+                currentCharsetMenu.add(moreMenu);
+                currentCharsetMenu = moreMenu;
+                charsetCnt = 0;
+            }
+            JMenuItem charsetMenuItem = new JMenuItem(charsetStr);
+            charsetMenuItem.addActionListener(this::changeCharsetActionPerformed);
+            currentCharsetMenu.add(charsetMenuItem);
+            charsetCnt++;                                    
+        }
+        add(changeCharsetMenu);
 
         removeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.remove"));
         removeMenuItem.addActionListener((ActionEvent e) -> {
@@ -706,6 +728,8 @@ public class TagTreeContextMenu extends JPopupMenu {
         addFramesMenuItem.setVisible(false);
         addFramesBeforeMenuItem.setVisible(false);
         addFramesAfterMenuItem.setVisible(false);
+        
+        changeCharsetMenu.setVisible(false);
 
         if (allSelectedIsTag) {
             boolean canUndo = false;
@@ -884,6 +908,14 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (firstItem instanceof SWFList) {
                 moveUpMenuItem.setVisible(true);
                 moveDownMenuItem.setVisible(true);
+            }
+            
+            if (firstItem instanceof SWF) {
+                SWF firstSwf = (SWF) firstItem;
+                if (firstSwf.version <= 5) {
+                    changeCharsetMenu.setText(mainPanel.translate("contextmenu.changeCharset").replace("%charset%", firstSwf.getCharset()));
+                    changeCharsetMenu.setVisible(true);
+                }
             }
         }
 
@@ -1891,7 +1923,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                             DottedChain dc = new DottedChain(parts, "");
 
                             try {
-                                List<Action> actions = parser.actionsFromString("class " + dc.toPrintableString(false) + "{}");
+                                List<Action> actions = parser.actionsFromString("class " + dc.toPrintableString(false) + "{}", swf.getCharset());
                                 doInit.setActions(actions);
                             } catch (ActionParseException | IOException | CompilationException | InterruptedException ex) {
                                 //ignore
@@ -2958,5 +2990,20 @@ public class TagTreeContextMenu extends JPopupMenu {
         getTree().setSelectionPath(path);
         getTree().scrollPathToVisible(path);
         mainPanel.repaintTree();
+    }
+    
+    public void changeCharsetActionPerformed(ActionEvent evt) {
+        SWF item = (SWF) getTree().getCurrentTreeItem();
+        String newCharset = ((JMenuItem)evt.getSource()).getText();
+        if (Objects.equals(item.getCharset(), newCharset)) {
+            return;
+        }
+        
+        SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(item.getShortFileName());
+        conf.setCustomData(SwfSpecificCustomConfiguration.KEY_CHARSET, newCharset);
+        while (item.binaryData != null) {
+            item = item.binaryData.getSwf();
+        }
+        Main.reloadFile(item.swfList);
     }
 }

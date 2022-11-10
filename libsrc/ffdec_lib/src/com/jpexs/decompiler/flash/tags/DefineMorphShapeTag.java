@@ -96,7 +96,7 @@ public class DefineMorphShapeTag extends MorphShapeTag {
         sos.writeRECT(startBounds);
         sos.writeRECT(endBounds);
         ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-        SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion());
+        SWFOutputStream sos2 = new SWFOutputStream(baos2, getVersion(), getCharset());
         sos2.writeMORPHFILLSTYLEARRAY(morphFillStyles, 1);
         sos2.writeMORPHLINESTYLEARRAY(morphLineStyles, 1);
         sos2.writeSHAPE(startEdges, 1);

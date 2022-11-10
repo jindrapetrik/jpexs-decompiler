@@ -129,6 +129,7 @@ import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -145,11 +146,11 @@ public class ASMParser {
 
     private static final Logger logger = Logger.getLogger(ASMParser.class.getName());
 
-    public static ActionList parse(boolean ignoreNops, List<Label> labels, Map<Action, Integer> lineMap, long address, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ActionParseException {
-        ActionList list = new ActionList();
+    public static ActionList parse(boolean ignoreNops, List<Label> labels, Map<Action, Integer> lineMap, long address, FlasmLexer lexer, List<String> constantPool, int version, String charset) throws IOException, ActionParseException {
+        ActionList list = new ActionList(charset);
         Stack<GraphSourceItemContainer> containers = new Stack<>();
 
-        ActionConstantPool cpool = new ActionConstantPool(constantPool);
+        ActionConstantPool cpool = new ActionConstantPool(constantPool, charset);
         cpool.setAddress(address);
         address += cpool.getTotalActionLength();
         list.add(cpool);
@@ -183,7 +184,7 @@ public class ASMParser {
                 }
             } else if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
                 String instructionName = (String) symb.value;
-                Action a = parseAction(instructionName, lexer, constantPool, version);
+                Action a = parseAction(instructionName, lexer, constantPool, version, charset);
                 if (ignoreNops && a instanceof ActionNop) {
                     a = null;
                 }
@@ -213,14 +214,14 @@ public class ASMParser {
         }
     }
 
-    private static Action parseAction(String instructionName, FlasmLexer lexer, List<String> constantPool, int version) throws IOException, ActionParseException {
+    private static Action parseAction(String instructionName, FlasmLexer lexer, List<String> constantPool, int version, String charset) throws IOException, ActionParseException {
         Action a = null;
         if (instructionName.compareToIgnoreCase("GetURL") == 0) {
-            a = new ActionGetURL(lexer);
+            a = new ActionGetURL(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("GoToLabel") == 0) {
-            a = new ActionGoToLabel(lexer);
+            a = new ActionGoToLabel(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("GotoFrame") == 0) {
-            a = new ActionGotoFrame(lexer);
+            a = new ActionGotoFrame(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("NextFrame") == 0) {
             a = new ActionNextFrame();
         } else if (instructionName.compareToIgnoreCase("Play") == 0) {
@@ -228,7 +229,7 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("PrevFrame") == 0) {
             a = new ActionPrevFrame();
         } else if (instructionName.compareToIgnoreCase("SetTarget") == 0) {
-            a = new ActionSetTarget(lexer);
+            a = new ActionSetTarget(lexer,charset);
         } else if (instructionName.compareToIgnoreCase("Stop") == 0) {
             a = new ActionStop();
         } else if (instructionName.compareToIgnoreCase("StopSounds") == 0) {
@@ -236,7 +237,7 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("ToggleQuality") == 0) {
             a = new ActionToggleQuality();
         } else if (instructionName.compareToIgnoreCase("WaitForFrame") == 0) {
-            a = new ActionWaitForFrame(lexer);
+            a = new ActionWaitForFrame(lexer,charset);
         } else if (instructionName.compareToIgnoreCase("Add") == 0) {
             a = new ActionAdd();
         } else if (instructionName.compareToIgnoreCase("And") == 0) {
@@ -254,21 +255,21 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("EndDrag") == 0) {
             a = new ActionEndDrag();
         } else if (instructionName.compareToIgnoreCase("Equals") == 0) {
-            a = new ActionEquals();
+            a = new ActionEquals(charset);
         } else if (instructionName.compareToIgnoreCase("GetProperty") == 0) {
             a = new ActionGetProperty();
         } else if (instructionName.compareToIgnoreCase("GetTime") == 0) {
             a = new ActionGetTime();
         } else if (instructionName.compareToIgnoreCase("GetURL2") == 0) {
-            a = new ActionGetURL2(lexer);
+            a = new ActionGetURL2(lexer,charset);
         } else if (instructionName.compareToIgnoreCase("GetVariable") == 0) {
             a = new ActionGetVariable();
         } else if (instructionName.compareToIgnoreCase("GotoFrame2") == 0) {
-            a = new ActionGotoFrame2(lexer);
+            a = new ActionGotoFrame2(lexer,charset);
         } else if (instructionName.compareToIgnoreCase("If") == 0) {
-            a = new ActionIf(lexer);
+            a = new ActionIf(lexer,charset);
         } else if (instructionName.compareToIgnoreCase("Jump") == 0) {
-            a = new ActionJump(lexer);
+            a = new ActionJump(lexer,charset);
         } else if (instructionName.compareToIgnoreCase("Less") == 0) {
             a = new ActionLess();
         } else if (instructionName.compareToIgnoreCase("MBAsciiToChar") == 0) {
@@ -288,7 +289,7 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("Pop") == 0) {
             a = new ActionPop();
         } else if (instructionName.compareToIgnoreCase("Push") == 0) {
-            a = new ActionPush(lexer, constantPool);
+            a = new ActionPush(lexer, constantPool, charset);
         } else if (instructionName.compareToIgnoreCase("RandomNumber") == 0) {
             a = new ActionRandomNumber();
         } else if (instructionName.compareToIgnoreCase("RemoveSprite") == 0) {
@@ -296,7 +297,7 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("SetProperty") == 0) {
             a = new ActionSetProperty();
         } else if (instructionName.compareToIgnoreCase("SetTarget2") == 0) {
-            a = new ActionSetTarget2();
+            a = new ActionSetTarget2(charset);
         } else if (instructionName.compareToIgnoreCase("SetVariable") == 0) {
             a = new ActionSetVariable();
         } else if (instructionName.compareToIgnoreCase("StartDrag") == 0) {
@@ -318,7 +319,7 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("Trace") == 0) {
             a = new ActionTrace();
         } else if (instructionName.compareToIgnoreCase("WaitForFrame2") == 0) {
-            a = new ActionWaitForFrame2(lexer);
+            a = new ActionWaitForFrame2(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("Add2") == 0) {
             a = new ActionAdd2();
         } else if (instructionName.compareToIgnoreCase("BitAnd") == 0) {
@@ -338,11 +339,11 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("CallMethod") == 0) {
             a = new ActionCallMethod();
         } else if (instructionName.compareToIgnoreCase("ConstantPool") == 0) {
-            a = new ActionConstantPool(lexer);
+            a = new ActionConstantPool(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("Decrement") == 0) {
             a = new ActionDecrement();
         } else if (instructionName.compareToIgnoreCase("DefineFunction") == 0) {
-            a = new ActionDefineFunction(lexer);
+            a = new ActionDefineFunction(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("DefineLocal") == 0) {
             a = new ActionDefineLocal();
         } else if (instructionName.compareToIgnoreCase("DefineLocal2") == 0) {
@@ -372,15 +373,15 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("NewObject") == 0) {
             a = new ActionNewObject();
         } else if (instructionName.compareToIgnoreCase("PushDuplicate") == 0) {
-            a = new ActionPushDuplicate();
+            a = new ActionPushDuplicate(charset);
         } else if (instructionName.compareToIgnoreCase("Return") == 0) {
             a = new ActionReturn();
         } else if (instructionName.compareToIgnoreCase("SetMember") == 0) {
             a = new ActionSetMember();
         } else if (instructionName.compareToIgnoreCase("StackSwap") == 0) {
-            a = new ActionStackSwap();
+            a = new ActionStackSwap(charset);
         } else if (instructionName.compareToIgnoreCase("StoreRegister") == 0) {
-            a = new ActionStoreRegister(lexer);
+            a = new ActionStoreRegister(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("TargetPath") == 0) {
             a = new ActionTargetPath();
         } else if (instructionName.compareToIgnoreCase("ToNumber") == 0) {
@@ -390,7 +391,7 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("TypeOf") == 0) {
             a = new ActionTypeOf();
         } else if (instructionName.compareToIgnoreCase("With") == 0) {
-            a = new ActionWith(lexer);
+            a = new ActionWith(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("Enumerate2") == 0) {
             a = new ActionEnumerate2();
         } else if (instructionName.compareToIgnoreCase("Greater") == 0) {
@@ -404,30 +405,30 @@ public class ASMParser {
         } else if (instructionName.compareToIgnoreCase("CastOp") == 0) {
             a = new ActionCastOp();
         } else if (instructionName.compareToIgnoreCase("DefineFunction2") == 0) {
-            a = new ActionDefineFunction2(lexer);
+            a = new ActionDefineFunction2(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("Extends") == 0) {
-            a = new ActionExtends();
+            a = new ActionExtends(charset);
         } else if (instructionName.compareToIgnoreCase("ImplementsOp") == 0) {
-            a = new ActionImplementsOp();
+            a = new ActionImplementsOp(charset);
         } else if (instructionName.compareToIgnoreCase("Throw") == 0) {
             a = new ActionThrow();
         } else if (instructionName.compareToIgnoreCase("Try") == 0) {
-            a = new ActionTry(lexer, version);
+            a = new ActionTry(lexer, version, charset);
         } else if (instructionName.compareToIgnoreCase("FSCommand2") == 0) {
-            a = new ActionFSCommand2();
+            a = new ActionFSCommand2(charset);
         } else if (instructionName.compareToIgnoreCase("StrictMode") == 0) {
-            a = new ActionStrictMode(lexer);
+            a = new ActionStrictMode(lexer, charset);
         } else if (instructionName.compareToIgnoreCase("Nop") == 0) {
-            a = new ActionNop();
+            a = new ActionNop(charset);
         } else if (instructionName.compareToIgnoreCase("End") == 0) {
-            a = new ActionEnd();
+            a = new ActionEnd(charset);
         } else if (instructionName.compareToIgnoreCase("FFDec_DeobfuscatePop") == 0) {
             a = new ActionDeobfuscatePop();
         } else if (instructionName.compareToIgnoreCase("FFDec_DeobfuscateJump") == 0) {
-            a = new ActionDeobfuscateJump(lexer);
+            a = new ActionDeobfuscateJump(lexer, charset);
         } else if (instructionName.length() == 10 && instructionName.substring(0, 8).compareToIgnoreCase("Unknown_") == 0) {
             int actionCode = Integer.parseInt(instructionName.substring(8), 16);
-            a = new ActionUnknown(actionCode, 0);
+            a = new ActionUnknown(actionCode, 0, charset);
         } else {
             throw new ActionParseException("Unknown instruction name :" + instructionName, lexer.yyline());
         }
@@ -436,7 +437,7 @@ public class ASMParser {
         return a;
     }
 
-    private static List<Action> parseAllActions(FlasmLexer lexer, int version) throws IOException, ActionParseException {
+    private static List<Action> parseAllActions(FlasmLexer lexer, int version, String charset) throws IOException, ActionParseException {
         List<Action> list = new ArrayList<>();
         Stack<GraphSourceItemContainer> containers = new Stack<>();
         List<String> emptyList = new ArrayList<>();
@@ -452,7 +453,7 @@ public class ASMParser {
                 }
             } else if (symb.type == ASMParsedSymbol.TYPE_INSTRUCTION_NAME) {
                 String instructionName = (String) symb.value;
-                Action a = parseAction(instructionName, lexer, emptyList, version);
+                Action a = parseAction(instructionName, lexer, emptyList, version, charset);
                 if (a instanceof GraphSourceItemContainer) {
                     containers.push((GraphSourceItemContainer) a);
                 }
@@ -465,9 +466,9 @@ public class ASMParser {
         }
     }
 
-    public static ActionList parse(long address, boolean ignoreNops, String source, int version, boolean throwOnError) throws IOException, ActionParseException {
+    public static ActionList parse(long address, boolean ignoreNops, String source, int version, boolean throwOnError, String charset) throws IOException, ActionParseException {
         FlasmLexer lexer = new FlasmLexer(new StringReader(source));
-        List<Action> list = parseAllActions(lexer, version);
+        List<Action> list = parseAllActions(lexer, version, charset);
 
         List<String> constantPool = new ArrayList<>();
         for (Action a : list) {
@@ -479,7 +480,7 @@ public class ASMParser {
         lexer = new FlasmLexer(new StringReader(source));
         List<Label> labels = new ArrayList<>();
         Map<Action, Integer> lineMap = new HashMap<>();
-        ActionList ret = parse(ignoreNops, labels, lineMap, address, lexer, constantPool, version);
+        ActionList ret = parse(ignoreNops, labels, lineMap, address, lexer, constantPool, version, charset);
         //Action.setActionsAddresses(ret, address, version);
         for (Action link : ret) {
             if (!(link instanceof ActionIf || link instanceof ActionJump)) {
@@ -559,7 +560,7 @@ public class ASMParser {
         }
 
         if (ret.size() == 0 || !(ret.get(ret.size() - 1) instanceof ActionEnd)) {
-            ret.add(new ActionEnd());
+            ret.add(new ActionEnd(charset));
         }
 
         return ret;

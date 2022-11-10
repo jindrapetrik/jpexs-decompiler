@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -60,7 +61,7 @@ public class ActionScript2CompilerTest extends ActionScript2TestBase {
 
             ActionScript2Parser par = new ActionScript2Parser(swf, asm);
             try {
-                asm.setActions(par.actionsFromString(sourceAsToCompile));
+                asm.setActions(par.actionsFromString(sourceAsToCompile, Utf8Helper.charsetName));
             } catch (ActionParseException | CompilationException ex) {
                 fail("Unable to parse: " + sourceAsToCompile + "/" + asm.toString(), ex);
             }

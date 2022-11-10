@@ -204,7 +204,7 @@ public class DefineFont2Tag extends FontTag {
 
         if (!fontFlagsWideOffsets) {
             ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
-            SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion());
+            SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion(), getCharset());
             for (int i = 0; i < numGlyphs; i++) {
                 long offset = ((glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + sos3.getPos());
                 if (offset > 0xffff) {
@@ -271,7 +271,7 @@ public class DefineFont2Tag extends FontTag {
         List<Long> offsetTable = new ArrayList<>();
         ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
 
-        SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion());
+        SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion(), getCharset());
         for (int i = 0; i < numGlyphs; i++) {
             offsetTable.add((glyphShapeTable.size() + 1/*CodeTableOffset*/) * (fontFlagsWideOffsets ? 4 : 2) + sos3.getPos());
             sos3.writeSHAPE(glyphShapeTable.get(i), 1);

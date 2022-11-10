@@ -144,10 +144,10 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
             ALPHABITMAPDATA bitmapData = new ALPHABITMAPDATA();
             bitmapData.bitmapPixelData = new int[]{0xff000000};
             ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
-            SWFOutputStream sos = new SWFOutputStream(bitmapDataOS, getVersion());
+            SWFOutputStream sos = new SWFOutputStream(bitmapDataOS, getVersion(), getCharset());
             sos.writeALPHABITMAPDATA(bitmapData, FORMAT_32BIT_ARGB, 1, 1);
             ByteArrayOutputStream zlibOS = new ByteArrayOutputStream();
-            SWFOutputStream sos2 = new SWFOutputStream(zlibOS, getVersion());
+            SWFOutputStream sos2 = new SWFOutputStream(zlibOS, getVersion(), getCharset());
             sos2.writeBytesZlib(bitmapDataOS.toByteArray());
             return zlibOS.toByteArray();
         } catch (IOException ex) {
@@ -180,10 +180,10 @@ public class DefineBitsLossless2Tag extends ImageTag implements AloneTag {
 
         int format = FORMAT_32BIT_ARGB;
         ByteArrayOutputStream bitmapDataOS = new ByteArrayOutputStream();
-        SWFOutputStream sos = new SWFOutputStream(bitmapDataOS, getVersion());
+        SWFOutputStream sos = new SWFOutputStream(bitmapDataOS, getVersion(), getCharset());
         sos.writeALPHABITMAPDATA(bitmapData, format, width, height);
         ByteArrayOutputStream zlibOS = new ByteArrayOutputStream();
-        SWFOutputStream sos2 = new SWFOutputStream(zlibOS, getVersion());
+        SWFOutputStream sos2 = new SWFOutputStream(zlibOS, getVersion(), getCharset());
         sos2.writeBytesZlib(bitmapDataOS.toByteArray());
         zlibBitmapData = new ByteArrayRange(zlibOS.toByteArray());
         bitmapFormat = format;

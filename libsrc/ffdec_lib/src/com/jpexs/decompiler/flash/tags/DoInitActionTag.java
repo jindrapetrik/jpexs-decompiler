@@ -149,7 +149,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
             actions = getActions();
         }
 
-        return Action.actionsToSource(this, actions, getScriptName(), writer);
+        return Action.actionsToSource(this, actions, getScriptName(), writer, getCharset());
     }
 
     @Override

@@ -29,6 +29,8 @@ import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
+import com.jpexs.helpers.utf8.Utf8Helper;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,7 +42,7 @@ import java.util.List;
 public class ActionStartDrag extends Action {
 
     public ActionStartDrag() {
-        super(0x27, 0);
+        super(0x27, 0, Utf8Helper.charsetName);
     }
 
     @Override

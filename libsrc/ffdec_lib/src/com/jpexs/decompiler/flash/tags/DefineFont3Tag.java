@@ -192,7 +192,7 @@ public class DefineFont3Tag extends FontTag {
 
         if (!fontFlagsWideOffsets) {
             ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
-            SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion());
+            SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion(), getCharset());
             for (int i = 0; i < numGlyphs; i++) {
                 long offset = (glyphShapeTable.size()) * 2 + sos3.getPos();
                 if (offset > 0xffff) {
@@ -240,7 +240,7 @@ public class DefineFont3Tag extends FontTag {
         checkWideParameters();
         List<Long> offsetTable = new ArrayList<>();
         ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
-        SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion());
+        SWFOutputStream sos3 = new SWFOutputStream(baosGlyphShapes, getVersion(), getCharset());
         int numGlyphs = glyphShapeTable.size();
         for (int i = 0; i < numGlyphs; i++) {
             offsetTable.add(sos3.getPos());

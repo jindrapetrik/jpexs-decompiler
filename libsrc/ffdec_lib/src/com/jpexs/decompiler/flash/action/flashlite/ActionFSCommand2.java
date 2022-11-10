@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,8 +35,8 @@ import java.util.List;
  */
 public class ActionFSCommand2 extends Action {
 
-    public ActionFSCommand2() {
-        super(0x2D, 0);
+    public ActionFSCommand2(String charset) {
+        super(0x2D, 0, charset);
     }
 
     @Override

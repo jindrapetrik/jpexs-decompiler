@@ -66,6 +66,7 @@ import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -978,7 +979,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         if (lastCode != null) {
             try {
                 boolean insideDoInitAction = (this.src instanceof DoInitActionTag);
-                GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(), new ActionGraph(this.src.getScriptName(), insideDoInitAction, false, lastCode, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION), "");
+                GraphDialog gf = new GraphDialog(mainPanel.getMainFrame().getWindow(), new ActionGraph(this.src.getScriptName(), insideDoInitAction, false, lastCode, new HashMap<>(), new HashMap<>(), new HashMap<>(), SWF.DEFAULT_VERSION, Utf8Helper.charsetName), "");
                 gf.setVisible(true);
             } catch (InterruptedException ex) {
                 logger.log(Level.SEVERE, null, ex);
@@ -1047,7 +1048,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
                     ViewMessages.showMessageDialog(this, AppStrings.translate("error.constantPoolTooBig").replace("%index%", Integer.toString(ex.index)).replace("%size%", Integer.toString(ex.size)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
             } else {
-                src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false));
+                src.setActions(ASMParser.parse(0, true, text, src.getSwf().version, false, src.getSwf().getCharset()));
             }
 
             SWF.uncache(src);
@@ -1081,7 +1082,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
     private void saveDecompiledButtonActionPerformed(ActionEvent evt) {
         try {
             ActionScript2Parser par = new ActionScript2Parser(mainPanel.getCurrentSwf(), src);
-            src.setActions(par.actionsFromString(decompiledEditor.getText()));
+            src.setActions(par.actionsFromString(decompiledEditor.getText(), src.getSwf().getCharset()));
             SWF.uncache(src);
             src.setModified();
             setSource(src, false);

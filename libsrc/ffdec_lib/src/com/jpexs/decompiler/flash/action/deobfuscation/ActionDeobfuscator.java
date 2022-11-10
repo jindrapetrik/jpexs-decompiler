@@ -146,7 +146,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                 }
 
                 if (isGetTime && a2 instanceof ActionIf) {
-                    ActionJump jump = new ActionJump(0);
+                    ActionJump jump = new ActionJump(0, actions.getCharset());
                     ActionItem jumpItem = new ActionItem(jump);
                     jumpItem.setJumpTarget(a2Item.getJumpTarget());
                     iterator.remove(); // GetTime
@@ -168,7 +168,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                     ActionItem a2Item = iterator.peek(1);
                     Action a2 = a2Item.action;
                     if (a instanceof ActionGetTime && a1 instanceof ActionIncrement && a2 instanceof ActionIf) {
-                        ActionJump jump = new ActionJump(0);
+                        ActionJump jump = new ActionJump(0, actions.getCharset());
                         ActionItem jumpItem = new ActionItem(jump);
                         jumpItem.setJumpTarget(a2Item.getJumpTarget());
                         iterator.remove(); // GetTime
@@ -259,17 +259,17 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                         } else {
                             ActionItem prevActionItem = actionItem.prev;
                             if (result.constantPool != null) {
-                                ActionConstantPool constantPool2 = new ActionConstantPool(new ArrayList<>(result.constantPool.constantPool));
+                                ActionConstantPool constantPool2 = new ActionConstantPool(new ArrayList<>(result.constantPool.constantPool), actions.getCharset());
                                 ActionItem constantPoolItem = new ActionItem(constantPool2);
                                 iterator.addBefore(constantPoolItem);
                             }
 
                             for (String variableName : result.variables.keySet()) {
                                 Object value = result.variables.get(variableName);
-                                ActionPush push = new ActionPush(variableName);
+                                ActionPush push = new ActionPush(variableName, actions.getCharset());
                                 ActionItem pushItem = new ActionItem(push);
                                 iterator.addBefore(pushItem);
-                                push = new ActionPush(value);
+                                push = new ActionPush(value, actions.getCharset());
                                 pushItem = new ActionItem(push);
                                 iterator.addBefore(pushItem);
 
@@ -286,13 +286,13 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
 
                             if (!result.stack.isEmpty()) {
                                 for (Object obj : result.stack) {
-                                    ActionPush push = new ActionPush(obj);
+                                    ActionPush push = new ActionPush(obj, actions.getCharset());
                                     ActionItem pushItem = new ActionItem(push);
                                     iterator.addBefore(pushItem);
                                 }
                             }
 
-                            ActionJump jump = new ActionJump(0);
+                            ActionJump jump = new ActionJump(0, actions.getCharset());
                             ActionItem jumpItem = new ActionItem(jump);
                             jumpItem.setJumpTarget(result.item);
                             iterator.addBefore(jumpItem);
