@@ -53,7 +53,7 @@ public class ReplaceCharacterDialog extends AppDialog {
         setSize(400, 150);
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         setLayout(new BorderLayout());
-        add(new JLabel(translate("replace.width")), BorderLayout.NORTH);
+        add(new JLabel(translate("replace.with")), BorderLayout.NORTH);
 
         charactersComboBox.setPreferredSize(new Dimension(400, charactersComboBox.getPreferredSize().height));
         add(charactersComboBox, BorderLayout.CENTER);
