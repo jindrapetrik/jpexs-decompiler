@@ -79,6 +79,55 @@ public class ObservableList<E> implements List<E> {
 
         return false;
     }
+    
+    /** *  Move item to desired position.0 A
+           1 B
+           2 C
+           3 D
+           4 E
+
+
+           move(1, 3)
+
+           0 A
+           1 C
+           2 B
+           3 D
+           4 E
+
+           move(3, 1)
+           0 A
+           1 D
+           2 B
+           3 C
+           4 E
+     * @param oldIndex
+     * @param newIndex 
+     * @return  
+     */
+    public boolean move(int oldIndex, int newIndex) {
+        if (oldIndex == newIndex) {
+            return true;
+        }
+        if (oldIndex < 0 || oldIndex >= size()) {
+            throw new ArrayIndexOutOfBoundsException(oldIndex);
+        }
+        if (newIndex < 0 || newIndex > size()) {
+            throw new ArrayIndexOutOfBoundsException(newIndex);
+        }
+        E item = list.remove(oldIndex);
+        if (newIndex > oldIndex) {
+            list.add(newIndex - 1, item);
+        } else {
+            list.add(newIndex, item);
+        }             
+        fireCollectionChanged(new CollectionChangedEvent<>(CollectionChangedAction.MOVE, item, item, oldIndex, newIndex));
+        return true;
+    }
+    
+    public boolean move(E item, int newIndex) {
+        return move(indexOf(item), newIndex);
+    }
 
     @Override
     public boolean containsAll(Collection<?> c) {

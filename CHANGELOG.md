@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 - Move tag with dependencies
 - Copy/Move tag operation has select position dialog
 - Select position dialog has target file in its title
+- [#1649] Moving SWF files (and bundles) up and down (comtext menuitem + ALT up/down shortcut)
+- Moving tags up and down (context menuitem + ALT up/down shortcut)
 
 ### Fixed
 - Exception when bundle selected
@@ -2538,6 +2540,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1649]: https://www.free-decompiler.com/flash/issues/1649
 [#1863]: https://www.free-decompiler.com/flash/issues/1863
 [#1414]: https://www.free-decompiler.com/flash/issues/1414
 [#1755]: https://www.free-decompiler.com/flash/issues/1755

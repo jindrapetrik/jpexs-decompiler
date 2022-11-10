@@ -399,6 +399,63 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private boolean clipboardCut = false;
 
+    private void handleTreeKeyReleased(KeyEvent e) {
+        AbstractTagTree tree = (AbstractTagTree) e.getSource();
+        if ((e.getKeyCode() == KeyEvent.VK_UP
+                || e.getKeyCode() == KeyEvent.VK_DOWN)
+                && e.isAltDown() && !e.isControlDown() && !e.isShiftDown()) {
+            TreePath paths[] = tree.getSelectionPaths();
+            if (paths == null || paths.length != 1) {
+                return;
+            }
+            TreeItem item = (TreeItem) paths[0].getLastPathComponent();
+            if (e.getKeyCode() == KeyEvent.VK_UP) {
+                contextPopupMenu.moveUpDown(item, true);
+            }
+            if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                contextPopupMenu.moveUpDown(item, false);
+            }
+        }
+    }
+
+    public void moveSwfListUpDown(TreeItem item, boolean up) {
+        SWFList swfList = null;
+        if (item instanceof SWF) {
+            SWF swf = (SWF) item;
+            if (swf.swfList != null && !swf.swfList.isBundle() && swf.swfList.size() == 1) {
+                swfList = swf.swfList;
+            } else {
+                return;
+            }
+        } else if (item instanceof SWFList) {
+            swfList = (SWFList) item;
+        } else {
+            return;
+        }
+        int index = swfs.indexOf(swfList);
+
+        List<List<String>> expandedTagTree = View.getExpandedNodes(tagTree);
+        List<List<String>> expandedTagListTree = View.getExpandedNodes(tagListTree);
+
+        if (up) {
+            if (index <= 0) {
+                return;
+            }
+            swfs.move(index, index - 1);
+        } else {
+            if (index < 0 || index >= swfs.size() - 1) {
+                return;
+            }
+            swfs.move(index, index + 2);
+        }
+        View.expandTreeNodes(tagTree, expandedTagTree);
+        View.expandTreeNodes(tagListTree, expandedTagListTree);
+        TreePath path = getCurrentTree().getModel().getTreePath(item);
+        getCurrentTree().setSelectionPath(path);
+        getCurrentTree().scrollPathToVisible(path);
+        repaintTree();
+    }
+
     private void handleTreeKeyPressed(KeyEvent e) {
         AbstractTagTree tree = (AbstractTagTree) e.getSource();
         if ((e.getKeyCode() == 'C' || e.getKeyCode() == 'X') && (e.isControlDown())) {
@@ -944,6 +1001,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         tagTree.addKeyListener(new KeyAdapter() {
             @Override
+            public void keyReleased(KeyEvent e) {
+                handleTreeKeyReleased(e);
+            }
+
+            @Override
             public void keyPressed(KeyEvent e) {
                 if ((e.getKeyCode() == 'F') && (e.isControlDown())) {
                     searchPanel.setVisible(true);
@@ -984,6 +1046,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         });
         tagListTree.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                handleTreeKeyReleased(e);
+            }
+
             @Override
             public void keyPressed(KeyEvent e) {
                 handleTreeKeyPressed(e);
