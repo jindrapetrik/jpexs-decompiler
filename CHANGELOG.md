@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
 - Copy/Move tag operation has select position dialog
 - Select position dialog has target file in its title
 - [#1649] Moving SWF files (and bundles) up and down (comtext menuitem + ALT up/down shortcut)
-- Moving tags up and down (context menuitem + ALT up/down shortcut)
+- Moving tags up and down in taglist view (context menuitem + ALT up/down shortcut)
 
 ### Fixed
 - Exception when bundle selected
