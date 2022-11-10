@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
@@ -746,6 +747,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
             List<TreeItem> items = mainPanel.getCurrentTree().getSelected();
             SWF firstSwf = null;
             for (TreeItem item : items) {
+                if (item instanceof SWFList) {
+                    allSameSwf = false;
+                    break;
+                }
                 if (firstSwf == null) {
                     firstSwf = item.getSwf();
                 } else {
@@ -830,10 +835,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         if (Configuration.displayFileName.get() && swf != null) {
             titleBuilder.append(" - ");
-            if (swf.swfList != null && swf.swfList.isBundle()) {
-                titleBuilder.append(swf.swfList.name).append("/");
-            }
-            titleBuilder.append(swf.getFileTitle());
+            titleBuilder.append(swf.getFullPathTitle());
         }
         mainFrame.setTitle(titleBuilder.toString());
 

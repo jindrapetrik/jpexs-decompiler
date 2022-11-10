@@ -288,4 +288,14 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
 
         timeline.addFrame(frameHit);
     }
+    
+     @Override
+    public int getFrameCount() {
+        return 4;
+    }
+
+    @Override
+    public void setFrameCount(int frameCount) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }  
 }

@@ -321,7 +321,7 @@ public class SelectTagPositionDialog extends AppDialog {
         this.selectedTimelined = selectedTimelined;
         this.allowInsideSprites = allowInsideSprites;
         this.selectNext = selectNext;
-        setTitle(translate("dialog.title"));
+        setTitle(translate("dialog.title").replace("%filetitle%", swf.getShortPathTitle()));
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         Container cnt = getContentPane();
         cnt.setLayout(new BorderLayout());

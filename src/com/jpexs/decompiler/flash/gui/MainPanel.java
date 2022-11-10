@@ -4786,6 +4786,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             public RECT getRectWithStrokes() {
                 return getRect();
             }
+
+            @Override
+            public void setFrameCount(int frameCount) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public int getFrameCount() {
+                return getTimeline().getFrameCount();
+            }
         };
     }
 
