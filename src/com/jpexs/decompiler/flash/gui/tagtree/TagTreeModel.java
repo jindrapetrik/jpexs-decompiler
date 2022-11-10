@@ -109,7 +109,8 @@ public class TagTreeModel extends AbstractTagTreeModel {
     }
 
     public void updateSwfs(CollectionChangedEvent e) {
-        if (e.getAction() != CollectionChangedAction.ADD) {
+        if (e.getAction() != CollectionChangedAction.ADD &&
+                e.getAction() != CollectionChangedAction.MOVE) {
             List<SWF> toRemove = new ArrayList<>();
             for (SWF swf : swfInfos.keySet()) {
                 SWF swf2 = swf.getRootSwf();
@@ -134,6 +135,12 @@ public class TagTreeModel extends AbstractTagTreeModel {
                 fireTreeNodesRemoved(new TreeModelEvent(this, rootPath, new int[]{e.getOldIndex()}, new Object[]{e.getOldItem()}));
                 break;
             }
+            /*case MOVE: {
+                TreePath rootPath = new TreePath(new Object[]{root});
+                fireTreeNodesRemoved(new TreeModelEvent(this, rootPath, new int[]{e.getOldIndex()}, new Object[]{e.getOldItem()}));
+                fireTreeNodesInserted(new TreeModelEvent(this, rootPath, new int[]{e.getNewIndex()}, new Object[]{e.getNewItem()}));
+                break;
+            }*/
             default:
                 fireTreeStructureChanged(new TreeModelEvent(this, new TreePath(root)));
         }

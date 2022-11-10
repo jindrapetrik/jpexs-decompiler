@@ -22,5 +22,5 @@ package com.jpexs.decompiler.flash.gui.helpers;
  */
 public enum CollectionChangedAction {
 
-    ADD, REMOVE, RESET
+    ADD, REMOVE, RESET, MOVE
 }

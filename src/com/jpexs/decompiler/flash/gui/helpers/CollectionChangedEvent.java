@@ -49,6 +49,14 @@ public class CollectionChangedEvent<E> {
                 break;
         }
     }
+    
+    public CollectionChangedEvent(CollectionChangedAction action, E oldItem, E newItem, int oldIndex, int newIndex) {
+        this.action = action;
+        this.oldItem = oldItem;
+        this.newItem = newItem;
+        this.oldIndex = oldIndex;
+        this.newIndex = newIndex;
+    }
 
     public CollectionChangedAction getAction() {
         return action;
