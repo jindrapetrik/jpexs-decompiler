@@ -1322,7 +1322,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     public void hilightScript(SWF swf, String name) {
         View.checkAccess();
 
-        TagTreeModel ttm = (TagTreeModel) mainPanel.getCurrentTree().getModel();
+        TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
         TreeItem scriptsNode = ttm.getScriptsNode(swf);
         if (scriptsNode instanceof ClassesListTreeModel) {
             ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
@@ -1342,8 +1342,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
 
             if (pack != null) {
+                if (mainPanel.getCurrentView() != MainPanel.VIEW_RESOURCES) {
+                    mainPanel.showView(MainPanel.VIEW_RESOURCES);
+                }
                 hilightScript(pack);
-            }
+            }                
         }
     }
 
