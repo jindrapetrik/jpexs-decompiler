@@ -306,15 +306,9 @@ public class TtfParser {
                         int idRangeOffset = readUnsignedShort(input);
                         idRangeOffsets.add(idRangeOffset);
                     }
-
-                    List<Integer> glyphIndices = new ArrayList<>();
-                    long startA = input.getFilePointer();
-                    long a = startA;
-                    for (; a < tableOffsets.get("cmap") + offset + length; a += 2) {
-                        int glyphIndex = readUnsignedShort(input);
-                        glyphIndices.add(glyphIndex);
-                    }
-
+                    
+                    long glyphIdArrayOffset = input.getFilePointer();                    
+                    
                     for (int j = 0; j < segCount; j++) {
                         for (int k = startCodes.get(j); k <= endCodes.get(j); k++) {
                             if (k == 65535) {
@@ -326,7 +320,8 @@ public class TtfParser {
 
                             } else {
                                 int glyphIndex = (idRangeOffsets.get(j) - 2 * (segCount - j)) / 2 + (k - startCodes.get(j));
-                                int glyph = glyphIndices.get(glyphIndex);
+                                input.seek(glyphIdArrayOffset + 2 * glyphIndex);
+                                int glyph = readUnsignedShort(input);                                
                                 ctg.put(k, glyph);
                             }
                         }
