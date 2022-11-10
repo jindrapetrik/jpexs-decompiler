@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.taglistview;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import static com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree.getSelection;
@@ -162,6 +163,10 @@ class TreeTransferHandler extends TransferHandler {
     protected Transferable createTransferable(JComponent c) {
         AbstractTagTree tree = (AbstractTagTree) c;
         dropLocation = null;
+        
+        if (!Configuration.allowDragAndDropInTagListTree.get()) {
+            return null;
+        }
         TreePath[] paths = tree.getSelectionPaths();
         if (paths == null) {
             return null;

@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 - Allowed copy/cut tags to clipboard across multiple SWFs
 - Keyboard shortcuts for tag clipboard operations
 - Hilight clipboard panel on copy/cut action for a few seconds
-- Drag and drop to move/copy tags in the tag list view
+- Drag and drop to move/copy tags in the tag list view (Can be disabled in settings)
 - Setting for enabling placing Define tags into DefineSprite
 - Icons for tags in replace character dialog
 - Move tag with dependencies

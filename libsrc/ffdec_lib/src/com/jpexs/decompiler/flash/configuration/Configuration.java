@@ -771,6 +771,10 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> allowPlacingDefinesIntoSprites = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> allowDragAndDropInTagListTree = null;
         
     private enum OSId {
         WINDOWS, OSX, UNIX
