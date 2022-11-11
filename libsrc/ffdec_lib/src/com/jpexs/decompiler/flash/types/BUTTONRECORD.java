@@ -16,8 +16,13 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -30,7 +35,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class BUTTONRECORD implements Serializable {
+public class BUTTONRECORD implements Serializable, TreeItem {
 
     @Reserved
     @SWFType(value = BasicType.UB, count = 2)
@@ -104,8 +109,47 @@ public class BUTTONRECORD implements Serializable {
     @Conditional(value = {"buttonHasBlendMode"}, tags = {DefineButton2Tag.ID})
     public int blendMode;
 
+    @Internal
+    private SWF swf;
+
+    @Internal
+    private ButtonTag tag;
+
+    public BUTTONRECORD(SWF swf, ButtonTag tag) {
+        this.swf = swf;
+        this.tag = tag;
+    }
+
+    public BUTTONRECORD() {
+        swf = null;
+        tag = null;
+    }                
+    
     @Override
     public String toString() {
-        return "[BUTTONRECORD character:" + characterId + ", depth:" + placeDepth + ", state:" + ((buttonStateDown ? "down " : "") + (buttonStateHitTest ? "hit " : "") + (buttonStateOver ? "over " : "") + (buttonStateUp ? "up " : "")) + "]";
+        return "BUTTONRECORD (" + characterId + ") Depth:" + placeDepth + " State:" + ((buttonStateDown ? "down " : "") + (buttonStateHitTest ? "hit " : "") + (buttonStateOver ? "over " : "") + (buttonStateUp ? "up " : ""));
     }
+
+    @Override
+    public SWF getSwf() {
+        return swf;
+    }
+
+    public void setModified() {
+        if (tag != null) {
+            tag.setModified(true);
+        }
+    }
+    
+    @Override
+    public boolean isModified() {
+        if (tag != null) {
+            return tag.isModified();
+        }
+        return false;
+    }
+
+    public ButtonTag getTag() {
+        return tag;
+    }        
 }

@@ -95,6 +95,7 @@ import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
+import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -216,6 +217,10 @@ public abstract class AbstractTagTree extends JTree {
         // DefineButton, DefineButton2
         if (t instanceof ButtonTag) {
             return TreeNodeType.BUTTON;
+        }
+        
+        if (t instanceof BUTTONRECORD) {
+            return TreeNodeType.BUTTON_RECORD;
         }
 
         if (t instanceof DefineVideoStreamTag) {

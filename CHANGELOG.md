@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - Moving tags up and down in the taglist view (context menuitem + ALT up/down shortcut)
 - [#1701] Setting charset for SWF files with version 5 or lower (GUI, commandline)
 - [#1864] Commandline: Allow to set special value "/dev/stdin" for input files to read from stdin (even on Windows)
+- Show button records in the tree, preview them
 
 ### Fixed
 - Exception when bundle selected
