@@ -108,6 +108,9 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
     }
 
     public DefineButtonSoundTag getSounds() {
+        if (swf == null) {
+            return null;
+        }
         return (DefineButtonSoundTag) swf.getCharacterIdTag(getCharacterId(), DefineButtonSoundTag.ID);
     }
 

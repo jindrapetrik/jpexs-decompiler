@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - [#1863] Export to PDF - cannot read fonts with long CMAP
 - Go to document class when switched to tag list view
 - Copy/Move with dependencies order of tags
+- [#1865] ConcurrentModificationException on SWF close
 
 ## [16.2.0] - 2022-11-08
 ### Added
@@ -2549,6 +2550,7 @@ All notable changes to this project will be documented in this file.
 [#1701]: https://www.free-decompiler.com/flash/issues/1701
 [#1864]: https://www.free-decompiler.com/flash/issues/1864
 [#1863]: https://www.free-decompiler.com/flash/issues/1863
+[#1865]: https://www.free-decompiler.com/flash/issues/1865
 [#1414]: https://www.free-decompiler.com/flash/issues/1414
 [#1755]: https://www.free-decompiler.com/flash/issues/1755
 [#1460]: https://www.free-decompiler.com/flash/issues/1460
