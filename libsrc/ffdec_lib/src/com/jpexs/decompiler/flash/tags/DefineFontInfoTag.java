@@ -88,11 +88,7 @@ public class DefineFontInfoTag extends FontInfoTag {
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         fontID = sis.readUI16("fontId");
-        if (swf.version >= 6) {
-            fontName = sis.readNetString("fontName", Utf8Helper.charset);
-        } else {
-            fontName = sis.readNetString("fontName");
-        }
+        fontName = sis.readNetString("fontName");
         reserved = (int) sis.readUB(2, "reserved");
         fontFlagsSmallText = sis.readUB(1, "fontFlagsSmallText") == 1;
         fontFlagsShiftJIS = sis.readUB(1, "fontFlagsShiftJIS") == 1;

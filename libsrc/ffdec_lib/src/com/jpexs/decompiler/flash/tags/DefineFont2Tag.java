@@ -138,11 +138,7 @@ public class DefineFont2Tag extends FontTag {
         fontFlagsItalic = sis.readUB(1, "fontFlagsItalic") == 1;
         fontFlagsBold = sis.readUB(1, "fontFlagsBold") == 1;
         languageCode = sis.readLANGCODE("languageCode");
-        if (swf.version >= 6) {
-            fontName = sis.readNetString("fontName", Utf8Helper.charset);
-        } else {
-            fontName = sis.readNetString("fontName");
-        }
+        fontName = sis.readNetString("fontName");
         int numGlyphs = sis.readUI16("numGlyphs");
         long[] offsetTable = new long[numGlyphs];
         long pos = sis.getPos();
