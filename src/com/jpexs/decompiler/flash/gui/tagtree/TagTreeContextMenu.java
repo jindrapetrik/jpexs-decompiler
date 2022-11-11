@@ -2689,9 +2689,19 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (tag instanceof CharacterTag) {
                 needed.add(((CharacterTag) tag).getCharacterId());
             }
-            for (Integer characterId : needed) {
+            for (Integer characterId : needed) {                
                 CharacterTag neededTag = sourceSwf.getCharacter(characterId);
                 newItems.add(neededTag);
+                List<Integer> mappedClasses = AbstractTagTree.getMappedTagIdsForClass(neededTag.getClass());
+                ReadOnlyTagList tags = neededTag.getTimelined().getTags();
+                for (int i = tags.indexOf(neededTag) + 1; i < tags.size(); i++) {
+                    if (tags.get(i) instanceof CharacterIdTag) {
+                        CharacterIdTag characterIdTag = (CharacterIdTag) tags.get(i);
+                        if (mappedClasses.contains(((Tag) characterIdTag).getId()) && characterIdTag.getCharacterId() == characterId) {
+                            newItems.add((Tag) characterIdTag);
+                        }
+                    }
+                }                
             }
         }
         return newItems;
@@ -2868,6 +2878,12 @@ public class TagTreeContextMenu extends JPopupMenu {
                 for (Tag newTag : newTags) {
                     // todo: avoid double replaces
                     newTag.replaceCharacter(oldCharacterId, newCharacterId);
+                    if ((newTag instanceof CharacterIdTag) && !(newTag instanceof CharacterTag)) {
+                        CharacterIdTag characterIdTag = (CharacterIdTag) newTag;
+                        if (characterIdTag.getCharacterId() == oldCharacterId) {
+                            characterIdTag.setCharacterId(newCharacterId);
+                        }
+                    }
                 }
             }
 
