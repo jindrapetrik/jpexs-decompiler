@@ -4942,7 +4942,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private static void calculateMissingNeededCharacters(Map<TreeItem, Set<Integer>> missingNeededCharacters, Timelined tim) {
-        for (Tag t : tim.getTags()) {
+        List<Tag> tags = tim.getTags().toArrayList();
+        for (Tag t : tags) {
             missingNeededCharacters.put(t, t.getMissingNeededCharacters());
             if (t instanceof DefineSpriteTag) {
                 calculateMissingNeededCharacters(missingNeededCharacters, (DefineSpriteTag) t);
