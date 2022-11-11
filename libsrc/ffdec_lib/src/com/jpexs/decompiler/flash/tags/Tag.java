@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -643,23 +644,34 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     }
 
     public void getNeededCharactersDeep(Set<Integer> needed) {
-        Set<Integer> visited = new HashSet<>();
         Set<Integer> needed2 = new LinkedHashSet<>();
         getNeededCharacters(needed2);
+        List<Integer> needed3 = new ArrayList<>(needed2);
 
-        while (visited.size() != needed2.size()) {
-            for (int characterId : needed2) {
-                if (!visited.contains(characterId)) {
-                    visited.add(characterId);
-                    if (swf.getCharacters().containsKey(characterId)) {
-                        swf.getCharacter(characterId).getNeededCharacters(needed2);
-                        break;
+        for (int i = 0; i < needed3.size(); i++) {
+            int characterId = needed3.get(i);
+            if (swf.getCharacters().containsKey(characterId)) {
+                Set<Integer> needed4 = new LinkedHashSet<>();
+                CharacterTag character = swf.getCharacter(characterId);                
+                character.getNeededCharacters(needed4);
+                List<Integer> newItems = new ArrayList<>();
+                for(int n : needed4) {
+                    int index = needed3.indexOf((Integer) n);
+                    if (index > i) {
+                        needed3.remove(index);
+                    }
+                    if (!needed3.contains(n) && !newItems.contains(n)) {
+                        newItems.add(n);
                     }
                 }
-            }
+                if (!newItems.isEmpty()) {
+                    needed3.addAll(i, newItems);                
+                    i--;
+                }
+            }            
         }
 
-        for (Integer characterId : needed2) {
+        for (Integer characterId : needed3) {
             if (swf.getCharacters().containsKey(characterId)) {
                 needed.add(characterId);
             }

@@ -2686,20 +2686,13 @@ public class TagTreeContextMenu extends JPopupMenu {
             Set<Integer> needed = new LinkedHashSet<>();
             Tag tag = (Tag) item;
             tag.getNeededCharactersDeep(needed);
-            List<Integer> neededList = new ArrayList<>();
+            if (tag instanceof CharacterTag) {
+                needed.add(((CharacterTag) tag).getCharacterId());
+            }
             for (Integer characterId : needed) {
-                neededList.add(characterId);
-            }
-
-            // first add dependencies in reverse order
-            for (int n = neededList.size() - 1; n >= 0; n--) {
-                int characterId = neededList.get(n);
                 CharacterTag neededTag = sourceSwf.getCharacter(characterId);
-                if (!newItems.contains(neededTag)) {
-                    newItems.add(neededTag);
-                }
+                newItems.add(neededTag);
             }
-            newItems.add(item);
         }
         return newItems;
     }

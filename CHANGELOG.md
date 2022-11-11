@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - File path in window title for SWFs inside DefineBinaryData
 - [#1863] Export to PDF - cannot read fonts with long CMAP
 - Go to document class when switched to tag list view
+- Copy/Move with dependencies order of tags
 
 ## [16.2.0] - 2022-11-08
 ### Added

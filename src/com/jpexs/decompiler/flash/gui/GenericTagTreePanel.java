@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.types.ARGB;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
+import com.jpexs.decompiler.flash.types.HasSwfAndTag;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
@@ -1228,6 +1229,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         ASMSource asv = (ASMSource) v;
                         asv.setSourceTag(editedTag);
                     }
+                    if (v instanceof HasSwfAndTag) {
+                        ((HasSwfAndTag) obj).setSwfAndTag(editedTag.getSwf(), editedTag);
+                    }
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
                     //ignore
                 }
@@ -1258,6 +1262,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 //Hack to set CLIPACTIONRECORD parent
                 if ((obj instanceof CLIPACTIONS) && (v instanceof CLIPACTIONRECORD)) {
                     ((CLIPACTIONRECORD) v).setParentClipActions((CLIPACTIONS) obj);
+                }
+                
+                if (obj instanceof HasSwfAndTag) {
+                    ((HasSwfAndTag) obj).setSwfAndTag(editedTag.getSwf(), editedTag);
                 }
 
             } catch (IllegalArgumentException | IllegalAccessException ex) {
