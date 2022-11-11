@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - [#1649] Moving SWF files (and bundles) up and down (comtext menuitem + ALT up/down shortcut)
 - Moving tags up and down in the taglist view (context menuitem + ALT up/down shortcut)
 - [#1701] Setting charset for SWF files with version 5 or lower
+- [#1864] Commandline: Allow to set special value "/dev/stdin" for input files to read from stdin (even on Windows)
 
 ### Fixed
 - Exception when bundle selected
@@ -2544,6 +2545,7 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1649]: https://www.free-decompiler.com/flash/issues/1649
 [#1701]: https://www.free-decompiler.com/flash/issues/1701
+[#1864]: https://www.free-decompiler.com/flash/issues/1864
 [#1863]: https://www.free-decompiler.com/flash/issues/1863
 [#1414]: https://www.free-decompiler.com/flash/issues/1414
 [#1755]: https://www.free-decompiler.com/flash/issues/1755
