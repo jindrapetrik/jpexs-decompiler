@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - Go to document class when switched to tag list view
 - Copy/Move with dependencies order of tags
 - [#1865] ConcurrentModificationException on SWF close
+- NullPointerException on expanding needed/dependent characters on basic tag info
 
 ## [16.2.0] - 2022-11-08
 ### Added

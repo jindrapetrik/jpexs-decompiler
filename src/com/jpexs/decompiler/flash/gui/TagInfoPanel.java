@@ -86,7 +86,9 @@ public class TagInfoPanel extends JPanel {
                     } else if ("frame".equals(scheme)) {
                         item = swf.getTimeline().getFrame(id);
                     }
-                    mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), item);
+                    if (item != null) {
+                        mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), item);
+                    }
                 }
             }
 
