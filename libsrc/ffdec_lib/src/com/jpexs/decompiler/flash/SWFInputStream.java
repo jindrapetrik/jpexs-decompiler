@@ -515,7 +515,7 @@ public class SWFInputStream implements AutoCloseable {
             baos.write(r);
         }
     }
-
+    
     /**
      * Reads one netstring (length + string) value from the stream
      *
@@ -526,23 +526,7 @@ public class SWFInputStream implements AutoCloseable {
     public String readNetString(String name) throws IOException {
         newDumpLevel(name, "string");
         int length = readEx();
-        String ret = new String(readBytesInternalEx(length));
-        endDumpLevel();
-        return ret;
-    }
-
-    /**
-     * Reads one netstring (length + string) value from the stream
-     *
-     * @param name
-     * @param charset
-     * @return String value
-     * @throws IOException
-     */
-    public String readNetString(String name, Charset charset) throws IOException {
-        newDumpLevel(name, "string");
-        int length = readEx();
-        String ret = new String(readBytesInternalEx(length), charset);
+        String ret = new String(readBytesInternalEx(length), swf.getCharset());
         endDumpLevel();
         return ret;
     }
