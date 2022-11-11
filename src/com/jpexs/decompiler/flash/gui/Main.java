@@ -874,7 +874,8 @@ public class Main {
                         final CancellableWorker worker = this;
                         String fileKey = new File(streamEntry.getKey()).getName();
                         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
-                        String charset = conf == null ? Utf8Helper.charsetName : conf.getCustomData(SwfSpecificCustomConfiguration.KEY_CHARSET, Utf8Helper.charsetName);
+                        
+                        String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(SwfSpecificCustomConfiguration.KEY_CHARSET, Charset.defaultCharset().name());
                         SWF swf = new SWF(stream, null, streamEntry.getKey(), new ProgressListener() {
                             @Override
                             public void progress(int p) {
@@ -908,7 +909,7 @@ public class Main {
                     String shortName = fileTitle != null ? fileTitle : file;
                     String fileKey = shortName == null ? "" : new File(shortName).getName();
                     SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
-                    String charset = conf == null ? Utf8Helper.charsetName : conf.getCustomData(SwfSpecificCustomConfiguration.KEY_CHARSET, Utf8Helper.charsetName);
+                    String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(SwfSpecificCustomConfiguration.KEY_CHARSET, Charset.defaultCharset().name());
 
                     SWF swf = new SWF(is, file, fileTitle, new ProgressListener() {
                         @Override

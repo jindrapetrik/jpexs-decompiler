@@ -210,6 +210,9 @@ public class SwfXmlExporter {
 
             if (obj instanceof UnknownTag) {
                 writer.writeAttribute("tagId", String.valueOf(((Tag) obj).getId()));
+            }    
+            if (obj instanceof SWF) {
+                writer.writeAttribute("charset", ((SWF) obj).getCharset());
             }
 
             for (Field f : fields) {
@@ -222,6 +225,7 @@ public class SwfXmlExporter {
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
+           
             writer.writeEndElement();
         } else if (isListItem) {
             writer.writeStartElement(name);

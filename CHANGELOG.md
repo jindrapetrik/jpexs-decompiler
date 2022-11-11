@@ -14,7 +14,7 @@ All notable changes to this project will be documented in this file.
 - Select position dialog has target file in its title
 - [#1649] Moving SWF files (and bundles) up and down (comtext menuitem + ALT up/down shortcut)
 - Moving tags up and down in the taglist view (context menuitem + ALT up/down shortcut)
-- [#1701] Setting charset for SWF files with version 5 or lower
+- [#1701] Setting charset for SWF files with version 5 or lower (GUI, commandline)
 - [#1864] Commandline: Allow to set special value "/dev/stdin" for input files to read from stdin (even on Windows)
 
 ### Fixed

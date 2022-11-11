@@ -311,6 +311,10 @@ public class SwfXmlImporter {
             if (name.equals("tagId") && "UnknownTag".equals(attributes.get("type"))) {
                 continue;
             }
+            if (name.equals("charset") && "SWF".equals(attributes.get("type"))) {
+                ((SWF) obj).setCharset(val);
+                continue;
+            }
             if (!name.equals("type")) {
                 try {
                     Field field = getField(cls, name);
