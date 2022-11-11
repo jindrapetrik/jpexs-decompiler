@@ -936,11 +936,13 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @throws IOException
      */
     public void saveTo(OutputStream os) throws IOException {
+        checkCharset();
         byte[] uncompressedData = saveToByteArray();
         compress(new ByteArrayInputStream(uncompressedData), os, compression, lzmaProperties);
     }
 
     public void saveTo(OutputStream os, boolean gfx) throws IOException {
+        checkCharset();
         byte[] uncompressedData = saveToByteArray(gfx);
         compress(new ByteArrayInputStream(uncompressedData), os, compression, lzmaProperties);
     }
@@ -979,6 +981,12 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     private byte[] saveToByteArray() throws IOException {
         return saveToByteArray(gfx);
+    }
+    
+    private void checkCharset() {
+        if (version > 5) {
+            charset = Utf8Helper.charsetName;
+        }
     }
 
     private byte[] saveToByteArray(boolean gfx) throws IOException {        
