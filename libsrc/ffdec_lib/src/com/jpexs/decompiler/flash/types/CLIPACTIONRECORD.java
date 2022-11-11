@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class CLIPACTIONRECORD implements ASMSource, Serializable {
+public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
 
     private String scriptName = "-";
     private CLIPACTIONS parentClipActions;
@@ -143,6 +143,18 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable {
     public void setParentClipActions(CLIPACTIONS parentClipActions) {
         this.parentClipActions = parentClipActions;
     }
+    
+    @Override
+    public void setSwfAndTag(SWF swf, Tag tag) {
+        this.swf = swf;
+        this.tag = tag;
+    }
+
+    @Override
+    public Tag getTag() {
+        return tag;
+    }            
+    
 
     public CLIPACTIONRECORD(SWF swf, SWFInputStream sis, Tag tag, CLIPACTIONS parentClipActions) throws IOException {
         this.swf = swf;

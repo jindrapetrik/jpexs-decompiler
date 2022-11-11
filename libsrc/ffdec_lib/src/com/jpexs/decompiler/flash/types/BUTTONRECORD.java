@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class BUTTONRECORD implements Serializable, TreeItem {
+public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag {
 
     @Reserved
     @SWFType(value = BasicType.UB, count = 2)
@@ -149,7 +149,14 @@ public class BUTTONRECORD implements Serializable, TreeItem {
         return false;
     }
 
+    @Override
     public ButtonTag getTag() {
         return tag;
     }        
+
+    @Override
+    public void setSwfAndTag(SWF swf, Tag tag) {
+        this.swf = swf;
+        this.tag = (ButtonTag) tag;
+    }
 }
