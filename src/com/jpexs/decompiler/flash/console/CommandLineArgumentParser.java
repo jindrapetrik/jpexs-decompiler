@@ -667,6 +667,8 @@ public class CommandLineArgumentParser {
         }        
 
         printCmdLineUsageExamples(out, filter);
+        
+        System.out.println("You can use special value \"/dev/stdin\" for input files to read data from standard input (even on Windows)");
     }
 
     private static void printCmdLineUsageExamples(PrintStream out, String filter) {
@@ -760,13 +762,13 @@ public class CommandLineArgumentParser {
         if (filter == null || filter.equals("swf2exe")) {
             out.println(PREFIX + "-swf2exe wrapper result.exe myfile.swf");
         }
-
+        
         if (!exampleFound) {
             out.println("Sorry, no example found for command " + filter + ", Let us know in issue tracker when you need it.");
         }
 
         out.println();
-        out.println("Instead of \"java -jar ffdec.jar\" you can use ffdec.bat on Windows, ffdec.sh on Linux/MacOs");
+        out.println("Instead of \"java -jar ffdec.jar\" you can use ffdec.bat on Windows, ffdec.sh on Linux/MacOs");        
     }
 
     /**
@@ -2155,8 +2157,9 @@ public class CommandLineArgumentParser {
         long startTime = System.currentTimeMillis();
 
         File outDirBase = new File(args.pop());
-        File inFileOrFolder = new File(args.pop());
-        if (!inFileOrFolder.exists()) {
+        String inFileOrFolderStr = args.pop();
+        File inFileOrFolder = new File(inFileOrFolderStr);
+        if (!StdInAwareFileInputStream.STDIN_PATH.equals(inFileOrFolderStr) && !inFileOrFolder.exists()) {
             System.err.println("Input SWF file does not exist!");
             badArguments("export");
         }
@@ -2210,7 +2213,7 @@ public class CommandLineArgumentParser {
                 SWFSourceInfo sourceInfo = new SWFSourceInfo(null, inFile.getAbsolutePath(), inFile.getName());
                 SWF swf;
                 try {
-                    swf = new SWF(new FileInputStream(inFile), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get());
+                    swf = new SWF(new StdInAwareFileInputStream(inFile), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get());
                 } catch (FileNotFoundException | SwfOpenException ex) {
                     // FileNotFoundException when anti virus software blocks to open the file
                     logger.log(Level.SEVERE, "Failed to open swf: " + inFile.getName(), ex);
@@ -2506,7 +2509,7 @@ public class CommandLineArgumentParser {
                 System.exit(1);
             }
         }
-        try (FileInputStream is = new FileInputStream(inFile);
+        try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile);
                 FileOutputStream fos = new FileOutputStream(outFile)) {
             SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
             if (!swf.isAS3()) {
@@ -2562,7 +2565,7 @@ public class CommandLineArgumentParser {
                 }
             }
 
-            try (InputStream fis = new BufferedInputStream(new FileInputStream(args.pop()));
+            try (InputStream fis = new BufferedInputStream(new StdInAwareFileInputStream(args.pop()));
                     OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.pop()))) {
                 result = SWF.compress(fis, fos, compression);
                 System.out.println(result ? "OK" : "FAIL");
@@ -2584,7 +2587,7 @@ public class CommandLineArgumentParser {
 
         boolean result = false;
         try {
-            try (InputStream fis = new BufferedInputStream(new FileInputStream(args.pop()));
+            try (InputStream fis = new BufferedInputStream(new StdInAwareFileInputStream(args.pop()));
                     OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.pop()))) {
                 result = SWF.decompress(fis, fos);
                 System.out.println(result ? "OK" : "FAIL");
@@ -2605,7 +2608,7 @@ public class CommandLineArgumentParser {
         }
 
         try {
-            try (FileInputStream is = new FileInputStream(args.pop())) {
+            try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(args.pop())) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 new SwfXmlExporter().exportXml(swf, new File(args.pop()));
             } catch (FileNotFoundException ex) {
@@ -2627,9 +2630,10 @@ public class CommandLineArgumentParser {
         }
 
         try {
-            File inFile = new File(args.pop());
             SWF swf = new SWF();
-            new SwfXmlImporter().importSwf(swf, inFile);
+            try (StdInAwareFileInputStream in = new StdInAwareFileInputStream(args.pop())) {
+                new SwfXmlImporter().importSwf(swf, in);
+            }
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(args.pop())))) {
                 swf.saveTo(fos);
             }
@@ -2834,7 +2838,7 @@ public class CommandLineArgumentParser {
 
         boolean result = false;
         try {
-            try (InputStream fis = new BufferedInputStream(new FileInputStream(args.pop()));
+            try (InputStream fis = new BufferedInputStream(new StdInAwareFileInputStream(args.pop()));
                     OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.pop()))) {
                 result = SWF.renameInvalidIdentifiers(renameType, fis, fos);
                 System.out.println(result ? "OK" : "FAIL");
@@ -2879,7 +2883,7 @@ public class CommandLineArgumentParser {
         File outFile = new File(args.pop());
         printHeader();
 
-        try (FileInputStream is = new FileInputStream(inFile)) {
+        try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
 
             PDFJob job = null;
 
@@ -2976,7 +2980,7 @@ public class CommandLineArgumentParser {
         }
 
         try {
-            try (FileInputStream is = new FileInputStream(inFile)) {
+            try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 while (true) {
                     String objectToReplace = args.pop();
@@ -3149,7 +3153,7 @@ public class CommandLineArgumentParser {
         File inFile = new File(args.pop());
         File outFile = new File(args.pop());
         try {
-            try (FileInputStream is = new FileInputStream(inFile)) {
+            try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 while (true) {
                     String objectToReplace = args.pop();
@@ -3205,7 +3209,7 @@ public class CommandLineArgumentParser {
         File inFile = new File(args.pop());
         File outFile = new File(args.pop());
         try {
-            try (FileInputStream is = new FileInputStream(inFile)) {
+            try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 while (true) {
                     String objectToReplace = args.pop();
@@ -3267,7 +3271,7 @@ public class CommandLineArgumentParser {
         File inFile = new File(args.pop());
         File outFile = new File(args.pop());
         try {
-            try (FileInputStream is = new FileInputStream(inFile)) {
+            try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 String arg = args.pop().toLowerCase(Locale.ENGLISH);
                 if (arg.equals("pack")) {
@@ -3323,7 +3327,7 @@ public class CommandLineArgumentParser {
         File inFile = new File(args.pop());
         File outFile = new File(args.pop());
         try {
-            try (FileInputStream is = new FileInputStream(inFile)) {
+            try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
 
                 String objectToConvert = args.pop();
@@ -3390,7 +3394,7 @@ public class CommandLineArgumentParser {
         File inFile = new File(args.pop());
         File outFile = new File(args.pop());
         try {
-            try (FileInputStream is = new FileInputStream(inFile)) {
+            try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 List<Integer> tagNumbersToRemove = new ArrayList<>();
                 while (true) {
@@ -3521,7 +3525,7 @@ public class CommandLineArgumentParser {
         File inFile = new File(args.pop());
         File outFile = new File(args.pop());
         try {
-            try (FileInputStream is = new FileInputStream(inFile)) {
+            try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 while (true) {
                     String objectToRemove = args.pop();
@@ -3576,7 +3580,7 @@ public class CommandLineArgumentParser {
         File inFile = new File(args.pop());
         File outFile = new File(args.pop());
         try {
-            try (FileInputStream is = new FileInputStream(inFile)) {
+            try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 String scriptsFolder = Path.combine(args.pop(), ScriptExportSettings.EXPORT_FOLDER_NAME);
                 new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
@@ -3817,7 +3821,7 @@ public class CommandLineArgumentParser {
                                 System.err.println("No SWFs found in \"" + file + "\"");
                             }
                         } else {
-                            FileInputStream fis = new FileInputStream(file);
+                            StdInAwareFileInputStream fis = new StdInAwareFileInputStream(file);
                             BufferedInputStream inputStream = new BufferedInputStream(fis);
 
                             InputStream fInputStream = inputStream;
@@ -3950,7 +3954,7 @@ public class CommandLineArgumentParser {
         }
         File file = new File(args.pop());
         try {
-            try (FileInputStream is = new FileInputStream(file)) {
+            try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(file)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 Map<String, ASMSource> asms = swf.getASMs(false);
                 for (String as2 : asms.keySet()) {
@@ -3996,7 +4000,7 @@ public class CommandLineArgumentParser {
         String outfile = args.pop();
         try {
             System.out.print("Working...");
-            FileInputStream fis = new FileInputStream(file);
+            StdInAwareFileInputStream fis = new StdInAwareFileInputStream(file);
             SWF swf = new SWF(fis, Configuration.parallelSpeedUp.get());
             fis.close();
             if (swf.isAS3()) {
@@ -4009,7 +4013,7 @@ public class CommandLineArgumentParser {
             fos.close();
             if (!swf.isAS3()) {
                 if (generateSwd) {
-                    fis = new FileInputStream(outfile);
+                    fis = new StdInAwareFileInputStream(outfile);
                     swf = new SWF(fis, Configuration.parallelSpeedUp.get());
                     fis.close();
                     String outSwd = outfile;
@@ -4051,7 +4055,7 @@ public class CommandLineArgumentParser {
         }
         File file = new File(args.pop());
         try {
-            try (FileInputStream is = new FileInputStream(file)) {
+            try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(file)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 List<ScriptPack> packs = swf.getAS3Packs();
                 for (ScriptPack entry : packs) {
@@ -4101,7 +4105,7 @@ public class CommandLineArgumentParser {
                 stdout = System.out;
             }
 
-            try (FileInputStream is = new FileInputStream(inFile)) {
+            try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 action.swfAction(swf, stdout);
             } catch (FileNotFoundException ex) {
@@ -4153,7 +4157,7 @@ public class CommandLineArgumentParser {
                     System.exit(1);
                 }
             }
-            try (FileInputStream is = new FileInputStream(inFile);
+            try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile);
                     FileOutputStream fos = new FileOutputStream(outFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get());
                 action.swfAction(swf, stdout);

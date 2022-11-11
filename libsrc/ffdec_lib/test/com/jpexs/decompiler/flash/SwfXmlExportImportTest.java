@@ -97,7 +97,9 @@ public class SwfXmlExportImportTest extends FileTestBase {
             new SwfXmlExporter().exportXml(swf, outFile);
 
             SWF swf2 = new SWF();
-            new SwfXmlImporter().importSwf(swf2, outFile);
+            try (FileInputStream fis = new FileInputStream(outFile)) {
+                new SwfXmlImporter().importSwf(swf2, fis);
+            }
 
             if (swf.getTags().size() != swf2.getTags().size()) {
                 throw new NotSameException(0);

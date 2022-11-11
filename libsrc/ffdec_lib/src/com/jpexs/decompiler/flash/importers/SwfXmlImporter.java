@@ -116,6 +116,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Array;
@@ -208,11 +209,11 @@ public class SwfXmlImporter {
         return cls != null && (cls.isArray() || List.class.isAssignableFrom(cls));
     }
 
-    public void importSwf(SWF swf, File inFile) throws IOException {
+    public void importSwf(SWF swf, InputStream in) throws IOException {
         XMLInputFactory xmlFactory = XMLInputFactory.newInstance();
         
         try {
-            try(Reader reader = new Utf8InputStreamReader(new BufferedInputStream(new FileInputStream(inFile)))) {
+            try(Reader reader = new Utf8InputStreamReader(new BufferedInputStream(in))) {
                 XMLStreamReader xmlReader = xmlFactory.createXMLStreamReader(reader);
 
                 xmlReader.nextTag();
