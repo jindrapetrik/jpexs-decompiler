@@ -133,7 +133,9 @@ import com.jpexs.decompiler.flash.tags.EndTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagInfo;
@@ -164,6 +166,7 @@ import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import static com.jpexs.decompiler.flash.types.FILLSTYLE.CLIPPED_BITMAP;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
@@ -4324,6 +4327,44 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             } else {
                 previewPanel.setParametersPanelVisible(false);
             }
+        } else if (treeItem instanceof BUTTONRECORD) {
+            BUTTONRECORD buttonRecord = (BUTTONRECORD) treeItem;
+            previewPanel.setParametersPanelVisible(false);
+            SWF swf = new SWF(buttonRecord.getSwf().getCharset());
+            swf.frameCount = 1;
+            swf.frameRate = buttonRecord.getSwf().frameRate;
+            swf.displayRect = buttonRecord.getTag().getRect();
+            if (swf.getBackgroundColor() != null) {
+                SetBackgroundColorTag setBackgroundColorTag = new SetBackgroundColorTag(swf, swf.getBackgroundColor().backgroundColor);
+                swf.addTag(setBackgroundColorTag);
+                setBackgroundColorTag.setTimelined(swf);
+            }
+            CharacterTag character = buttonRecord.getSwf().getCharacter(buttonRecord.characterId);
+            Set<Integer> needed = new LinkedHashSet<>();
+            character.getNeededCharactersDeep(needed);
+            needed.remove(buttonRecord.characterId);
+            needed.add(buttonRecord.characterId);
+            
+            for (int n : needed) {
+                CharacterTag neededCharacter;
+                try {
+                    neededCharacter = (CharacterTag) buttonRecord.getSwf().getCharacter(n).cloneTag();
+                } catch (InterruptedException | IOException ex) {
+                    Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    return;
+                }
+                neededCharacter.setSwf(swf);
+                neededCharacter.setTimelined(swf);    
+                swf.addTag(neededCharacter);
+            }
+            
+            PlaceObject2Tag placeTag = new PlaceObject2Tag(swf, false, 1, buttonRecord.characterId, buttonRecord.placeMatrix, buttonRecord.colorTransform, 0, null, -1, null);
+            swf.addTag(placeTag);
+            placeTag.setTimelined(swf);
+            ShowFrameTag showFrameTag = new ShowFrameTag(swf);
+            swf.addTag(showFrameTag);
+            showFrameTag.setTimelined(swf);
+            previewPanel.showImagePanel(swf, swf, 0, true, true);
         } else {
             previewPanel.showEmpty();
         }
@@ -4493,6 +4534,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof Tag) {
             showGenericTag((Tag) treeItem);
+        } else if (treeItem instanceof BUTTONRECORD) {
+            showPreview(treeItem, previewPanel, -1, null);
+            showCard(CARDPREVIEWPANEL);
         } else {
             showCard(CARDEMPTYPANEL);
         }

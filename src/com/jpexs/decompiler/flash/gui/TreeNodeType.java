@@ -31,6 +31,7 @@ public enum TreeNodeType {
     MORPH_SHAPE,
     SPRITE,
     BUTTON,
+    BUTTON_RECORD,
     AS,
     AS_CLASS,
     AS_INTERFACE,

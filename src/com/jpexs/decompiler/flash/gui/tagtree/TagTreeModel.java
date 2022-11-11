@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
@@ -44,6 +45,7 @@ import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -541,6 +543,8 @@ public class TagTreeModel extends AbstractTagTreeModel {
             } else {
                 return new ArrayList<>();
             }
+        } else if (parentNode instanceof ButtonTag) {
+            return ((ButtonTag) parentNode).getRecords();
         }
 
         return result;
@@ -614,6 +618,8 @@ public class TagTreeModel extends AbstractTagTreeModel {
             return clt.getChild(clt.getRoot(), index);
         } else if (parentNode instanceof AS3ClassTreeItem) {
             return ((AS3Package) parentNode).getChild(index);
+        } else if (parentNode instanceof ButtonTag) {
+            return ((ButtonTag) parentNode).getRecords().get(index);
         }
 
         throw new Error("Unsupported parent type: " + parentNode.getClass().getName());
@@ -654,6 +660,8 @@ public class TagTreeModel extends AbstractTagTreeModel {
             return mappedSize + clt.getChildCount(clt.getRoot());
         } else if (parentNode instanceof AS3Package) {
             return mappedSize + ((AS3Package) parentNode).getChildCount();
+        } else if (parentNode instanceof ButtonTag) {
+            return mappedSize + ((ButtonTag) parentNode).getRecords().size();
         } else if (parentNode instanceof CharacterTag) {
             return mappedSize;
         }
@@ -723,6 +731,8 @@ public class TagTreeModel extends AbstractTagTreeModel {
             return indexOfAdd(baseIndex, clt.getIndexOfChild(clt.getRoot(), childNode));
         } else if (parentNode instanceof AS3ClassTreeItem) {
             return indexOfAdd(baseIndex, ((AS3Package) parentNode).getIndexOfChild((AS3ClassTreeItem) childNode));
+        } else if (parentNode instanceof ButtonTag) {
+            return indexOfAdd(baseIndex, ((ButtonTag) parentNode).getRecords().indexOf(childNode));
         } else if (parentNode instanceof CharacterTag) {
             return indexOfAdd(baseIndex, getMappedCharacters(((CharacterTag) parentNode).getSwf(), (CharacterTag) parentNode).indexOf(childNode));
         }

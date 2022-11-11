@@ -202,6 +202,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalGradient;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage;
@@ -2457,17 +2458,17 @@ public class SWFInputStream implements AutoCloseable {
     /**
      * Reads list of BUTTONRECORD values from the stream
      *
-     * @param inDefineButton2 Whether read from inside of DefineButton2Tag or
-     * not
+     * @param swf
+     * @param buttonTag
      * @param name
      * @return List of BUTTONRECORD values
      * @throws IOException
      */
-    public List<BUTTONRECORD> readBUTTONRECORDList(boolean inDefineButton2, String name) throws IOException {
+    public List<BUTTONRECORD> readBUTTONRECORDList(SWF swf, ButtonTag buttonTag, String name) throws IOException {
         List<BUTTONRECORD> ret = new ArrayList<>();
         newDumpLevel(name, "BUTTONRECORDList");
         BUTTONRECORD br;
-        while ((br = readBUTTONRECORD(inDefineButton2, "record")) != null) {
+        while ((br = readBUTTONRECORD(swf, buttonTag, "record")) != null) {
             ret.add(br);
         }
         endDumpLevel();
@@ -2477,13 +2478,14 @@ public class SWFInputStream implements AutoCloseable {
     /**
      * Reads one BUTTONRECORD value from the stream
      *
-     * @param inDefineButton2 True when in DefineButton2
+     * @param swf
+     * @param tag
      * @param name
      * @return BUTTONRECORD value
      * @throws IOException
      */
-    public BUTTONRECORD readBUTTONRECORD(boolean inDefineButton2, String name) throws IOException {
-        BUTTONRECORD ret = new BUTTONRECORD();
+    public BUTTONRECORD readBUTTONRECORD(SWF swf, ButtonTag tag, String name) throws IOException {
+        BUTTONRECORD ret = new BUTTONRECORD(swf, tag);
         newDumpLevel(name, "BUTTONRECORD");
         ret.reserved = (int) readUB(2, "reserved");
         ret.buttonHasBlendMode = readUB(1, "buttonHasBlendMode") == 1;
@@ -2503,7 +2505,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.characterId = readUI16("characterId");
         ret.placeDepth = readUI16("placeDepth");
         ret.placeMatrix = readMatrix("placeMatrix");
-        if (inDefineButton2) {
+        if (tag instanceof DefineButton2Tag) {
             ret.colorTransform = readCXFORMWITHALPHA("colorTransform");
             if (ret.buttonHasFilterList) {
                 ret.filterList = readFILTERLIST("filterList");

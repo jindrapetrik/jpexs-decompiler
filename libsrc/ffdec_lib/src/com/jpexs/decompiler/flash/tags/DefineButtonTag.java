@@ -101,7 +101,7 @@ public class DefineButtonTag extends ButtonTag implements ASMSourceContainer {
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         buttonId = sis.readUI16("buttonId");
-        characters = sis.readBUTTONRECORDList(false, "characters");
+        characters = sis.readBUTTONRECORDList(swf, this, "characters");
         actionBytes = sis.readByteRangeEx(sis.available(), "actionBytes", DumpInfoSpecialType.ACTION_BYTES, sis.getPos());
     }
 

@@ -109,7 +109,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
         reserved = (int) sis.readUB(7, "reserved");
         trackAsMenu = sis.readUB(1, "trackAsMenu") == 1;
         int actionOffset = sis.readUI16("actionOffset");
-        characters = sis.readBUTTONRECORDList(true, "characters");
+        characters = sis.readBUTTONRECORDList(swf, this, "characters");
         if (actionOffset > 0) {
             actions = sis.readBUTTONCONDACTIONList(swf, this, "actions");
         }
