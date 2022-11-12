@@ -880,7 +880,12 @@ public class TagTreeContextMenu extends JPopupMenu {
                 showInTagListViewTagMenuItem.setVisible(true);
             }
 
-            if (firstItem instanceof Tag) {
+            if (
+                    (firstItem instanceof Tag) ||
+                    (firstItem instanceof CLIPACTIONRECORD) ||
+                    (firstItem instanceof BUTTONRECORD) || 
+                    (firstItem instanceof BUTTONCONDACTION)
+               ) {
                 showInHexDumpViewTagMenuItem.setVisible(true);
             }
 
@@ -2469,7 +2474,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         TreeItem item = getTree().getCurrentTreeItem();
         mainPanel.showView(MainPanel.VIEW_DUMP);
-        mainPanel.dumpTree.setSelectedTag((Tag) item);
+        mainPanel.dumpTree.setSelectedItem(item);
         mainPanel.updateMenu();
     }
 

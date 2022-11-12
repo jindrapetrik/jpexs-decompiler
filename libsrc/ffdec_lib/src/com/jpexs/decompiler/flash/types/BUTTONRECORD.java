@@ -153,8 +153,8 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
     }        
 
     @Override
-    public void setSwfAndTag(SWF swf, Tag tag) {
-        this.swf = swf;
+    public void setSourceTag(Tag tag) {
+        this.swf = tag.getSwf();
         this.tag = (ButtonTag) tag;
     }
 

@@ -8,7 +8,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
  * @author JPEXS
  */
 public interface HasSwfAndTag {
-    public void setSwfAndTag(SWF swf, Tag tag);
+    public void setSourceTag(Tag tag);
     
     public SWF getSwf();
     

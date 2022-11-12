@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.types.HasSwfAndTag;
 import com.jpexs.helpers.ByteArrayRange;
 import java.util.List;
 
@@ -31,7 +32,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public interface ASMSource extends Exportable {
+public interface ASMSource extends Exportable, HasSwfAndTag {
 
     /**
      * Converts actions to ASM source

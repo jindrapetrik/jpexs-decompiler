@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - [#1701] Setting charset for SWF files with version 5 or lower (GUI, commandline)
 - [#1864] Commandline: Allow to set special value "/dev/stdin" for input files to read from stdin (even on Windows)
 - Show button records in the tree, preview them
+- Show in Hex dump for BUTTONCONDACTION, BUTTONRECORD, CLIPACTIONRECORD
 
 ### Fixed
 - Exception when bundle selected

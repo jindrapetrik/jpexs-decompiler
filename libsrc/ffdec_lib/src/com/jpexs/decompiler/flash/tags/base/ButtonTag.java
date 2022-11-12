@@ -200,7 +200,7 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
     public void setSwf(SWF swf, boolean deep) {
         this.swf = swf;
         for(BUTTONRECORD record:getRecords()) {
-            record.setSwfAndTag(swf, this);
+            record.setSourceTag(this);
         }
     }        
 

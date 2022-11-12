@@ -1230,7 +1230,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                         asv.setSourceTag(editedTag);
                     }
                     if (v instanceof HasSwfAndTag) {
-                        ((HasSwfAndTag) obj).setSwfAndTag(editedTag.getSwf(), editedTag);
+                        ((HasSwfAndTag) obj).setSourceTag(editedTag);
                     }
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
                     //ignore
@@ -1265,7 +1265,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 }
                 
                 if (obj instanceof HasSwfAndTag) {
-                    ((HasSwfAndTag) obj).setSwfAndTag(editedTag.getSwf(), editedTag);
+                    ((HasSwfAndTag) obj).setSourceTag(editedTag);
                 }
 
             } catch (IllegalArgumentException | IllegalAccessException ex) {
