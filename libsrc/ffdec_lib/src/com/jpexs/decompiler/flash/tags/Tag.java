@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.CopyOutputStream;
+import com.jpexs.decompiler.flash.amf.amf3.ListSet;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
@@ -599,15 +600,14 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     public void getNeededCharacters(Set<Integer> needed) {
     }
     
-    public Set<Integer> getMissingNeededCharacters() {
-        Set<Integer> needed = new LinkedHashSet<>();
-        getNeededCharacters(needed);
-        if (needed.isEmpty()) {
-            return needed;
+    public Set<Integer> getMissingNeededCharacters(Set<Integer> needed) {
+        Set<Integer> needed2 = new ListSet<>(needed);
+        if (needed2.isEmpty()) {
+            return new LinkedHashSet<>();
         }
         Timelined tim = getTimelined();
         if (tim == null) {
-            return needed;
+            return needed2;
         }
         ReadOnlyTagList tags = tim.getTags();
         for (int i = tags.indexOf(this) - 1; i >= -1; i--) {
@@ -624,13 +624,13 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             }
             if (tags.get(i) instanceof CharacterTag) {
                 int charId = ((CharacterTag) tags.get(i)).getCharacterId();
-                needed.remove(charId);
-                if (needed.isEmpty()) {
-                    return needed;
+                needed2.remove(charId);
+                if (needed2.isEmpty()) {
+                    return needed2;
                 }
             }
         }        
-        return needed;
+        return needed2;
     }
 
     @Override
@@ -725,7 +725,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
                             bounds.getHeight() / SWF.unitDivisor));
         }
 
-        Set<Integer> needed = new LinkedHashSet<>();
+        /*Set<Integer> needed = new LinkedHashSet<>();
         getNeededCharactersDeep(needed);
 
         if (needed.size() > 0) {
@@ -745,7 +745,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             if(dependent2 != null && dependent2.size() > 0) {
                 tagInfo.addInfo("general", "dependentFrames", Helper.joinStrings(dependent2, ", "));
             }
-        }
+        }*/
     }
     
     public String getCharset() {

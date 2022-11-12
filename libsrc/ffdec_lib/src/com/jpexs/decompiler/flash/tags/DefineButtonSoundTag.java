@@ -155,6 +155,7 @@ public class DefineButtonSoundTag extends Tag implements CharacterIdTag {
         if (buttonSoundChar3 != 0) {
             needed.add(buttonSoundChar3);
         }
+        needed.add(buttonId);
     }
     
     @Override

@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -263,4 +264,6 @@ public class SoundStreamHead2Tag extends Tag implements SoundStreamHeadTypeTag {
     public String toString() {
         return getName() + (virtualCharacterId > 0 ? " (" + virtualCharacterId + ")" : "");
     }
+    
+    //getNeededCharacters intentionally not defined
 }

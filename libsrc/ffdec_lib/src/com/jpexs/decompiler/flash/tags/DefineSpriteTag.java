@@ -456,10 +456,12 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     }
     
     @Override
-    public Set<Integer> getMissingNeededCharacters() {
+    public Set<Integer> getMissingNeededCharacters(Set<Integer> needed) {
         Set<Integer> ret = new LinkedHashSet<>();
         for (Tag tag : getTags()) {
-            Set<Integer> sub = tag.getMissingNeededCharacters();
+            Set<Integer> subNeeded = new HashSet<>();
+            tag.getNeededCharactersDeep(subNeeded);
+            Set<Integer> sub = tag.getMissingNeededCharacters(subNeeded);
             ret.addAll(sub);
         }
         return ret;

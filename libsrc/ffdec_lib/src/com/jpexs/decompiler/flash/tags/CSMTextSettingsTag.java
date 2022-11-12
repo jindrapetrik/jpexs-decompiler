@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.Set;
 
 /**
  *
@@ -124,4 +125,9 @@ public class CSMTextSettingsTag extends Tag implements CharacterIdTag {
     public String toString() {
         return super.toString() + " (" + textID + ")";
     }
+
+    @Override
+    public void getNeededCharacters(Set<Integer> needed) {
+        needed.add(textID);
+    }   
 }

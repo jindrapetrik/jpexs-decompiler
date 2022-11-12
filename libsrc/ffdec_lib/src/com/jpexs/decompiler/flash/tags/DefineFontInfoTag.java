@@ -29,6 +29,7 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -190,5 +191,10 @@ public class DefineFontInfoTag extends FontInfoTag {
     @Override
     public boolean isAnsi() {
         return fontFlagsANSI;
+    }
+    
+    @Override
+    public void getNeededCharacters(Set<Integer> needed) {
+        needed.add(fontID);
     }
 }

@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
+import java.util.Set;
 
 /**
  * Removes the specified character
@@ -104,5 +105,10 @@ public class RemoveObjectTag extends RemoveTag implements CharacterIdTag {
     @Override
     public void setCharacterId(int characterId) {
         this.characterId = characterId;
+    }
+    
+    @Override
+    public void getNeededCharacters(Set<Integer> needed) {
+        needed.add(characterId);
     }
 }

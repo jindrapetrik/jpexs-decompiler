@@ -28,6 +28,8 @@ All notable changes to this project will be documented in this file.
 - [#1865] ConcurrentModificationException on SWF close
 - NullPointerException on expanding needed/dependent characters on basic tag info
 - Copy/Move with dependencies should copy mapped tags too
+- Recalculating dependencies in the loop (now only on change)
+- Dependencies handling
 
 ## [16.2.0] - 2022-11-08
 ### Added

@@ -31,6 +31,7 @@ import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -115,5 +116,10 @@ public class DefineFontAlignZonesTag extends Tag implements CharacterIdTag {
     @Override
     public String toString() {
         return super.toString() + " (" + fontID + ")";
+    }
+    
+    @Override
+    public void getNeededCharacters(Set<Integer> needed) {
+        needed.add(fontID);
     }
 }
