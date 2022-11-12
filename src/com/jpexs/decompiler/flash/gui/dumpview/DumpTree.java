@@ -77,9 +77,16 @@ import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHead2Tag;
 import com.jpexs.decompiler.flash.tags.SoundStreamHeadTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
+import com.jpexs.decompiler.flash.types.BUTTONRECORD;
+import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
+import com.jpexs.decompiler.flash.types.CLIPACTIONS;
+import com.jpexs.decompiler.flash.types.HasSwfAndTag;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
@@ -604,8 +611,16 @@ public class DumpTree extends JTree {
             }
         }
     }
-
-    public void setSelectedTag(Tag tag) {
+       
+    public void setSelectedItem(TreeItem item) {
+        Tag tag;
+        if (item instanceof Tag) {
+            tag = (Tag) item;
+        } else if (item instanceof HasSwfAndTag) {
+            tag = ((HasSwfAndTag) item).getTag();
+        } else {
+            return;
+        }
         ByteArrayRange range = tag.getOriginalRange();
         if (range == null) {
             return;
@@ -616,7 +631,7 @@ public class DumpTree extends JTree {
         for (DumpInfo sd : d.getChildInfos()) {
             if (sd instanceof DumpInfoSwfNode) {
                 DumpInfoSwfNode si = (DumpInfoSwfNode) sd;
-                if (si.getSwf() == tag.getSwf()) {                    
+                if (si.getSwf() == item.getSwf()) {                    
                     DumpInfo di = si;
                     while (model.getChildCount(di) > 0) {
                         boolean found = false;
@@ -635,6 +650,66 @@ public class DumpTree extends JTree {
                     }
                     di = di.parent; // tagId is selected, lets select the tag instead
                     TreePath selPath = model.getDumpInfoPath(di);
+                    
+                    if (item instanceof CLIPACTIONRECORD) {
+                        CLIPACTIONS clipActions = ((PlaceObjectTypeTag) tag).getClipActions();
+                        int index = clipActions.clipActionRecords.indexOf(item);
+                        for (DumpInfo sdi : di.getChildInfos()) {
+                            if ("clipActions".equals(sdi.name)) {
+                                int i = 0;
+                                for (DumpInfo sdi2 : sdi.getChildInfos()) {
+                                    if (sdi2.name.equals("record")) {
+                                        if (i == index) {
+                                            selPath = model.getDumpInfoPath(sdi2);
+                                            break;
+                                        }
+                                        i++;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    if (item instanceof BUTTONCONDACTION) {
+                        DefineButton2Tag button = (DefineButton2Tag) tag;
+                        int index = button.actions.indexOf(item);
+                        for (DumpInfo sdi : di.getChildInfos()) {
+                            if ("actions".equals(sdi.name)) {
+                                int i = 0;
+                                for (DumpInfo sdi2 : sdi.getChildInfos()) {
+                                    if (sdi2.name.equals("action")) {
+                                        if (i == index) {
+                                            selPath = model.getDumpInfoPath(sdi2);
+                                            break;
+                                        }
+                                        i++;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (item instanceof BUTTONRECORD) {
+                        ButtonTag button = (ButtonTag) tag;
+                        int index = button.getRecords().indexOf(item);
+                        for (DumpInfo sdi : di.getChildInfos()) {
+                            if ("characters".equals(sdi.name)) {
+                                int i = 0;
+                                for (DumpInfo sdi2 : sdi.getChildInfos()) {
+                                    if (sdi2.name.equals("record")) {
+                                        if (i == index) {
+                                            selPath = model.getDumpInfoPath(sdi2);
+                                            break;
+                                        }
+                                        i++;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    
                     if (selPath != null) {
                         setSelectionPath(selPath);
                         scrollPathToVisible(selPath);

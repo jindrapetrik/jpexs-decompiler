@@ -43,7 +43,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class BUTTONCONDACTION implements ASMSource, Serializable {
+public class BUTTONCONDACTION implements ASMSource, Serializable, HasSwfAndTag {
 
     private SWF swf;
 
@@ -356,5 +356,10 @@ public class BUTTONCONDACTION implements ASMSource, Serializable {
     public void setSourceTag(Tag t) {
         this.tag = t;
         this.swf = t.getSwf();
+    }
+
+    @Override
+    public Tag getTag() {
+        return tag;
     }
 }

@@ -145,8 +145,8 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
     }
     
     @Override
-    public void setSwfAndTag(SWF swf, Tag tag) {
-        this.swf = swf;
+    public void setSourceTag(Tag tag) {
+        this.swf = tag.getSwf();
         this.tag = tag;
     }
 
@@ -343,11 +343,5 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
     @Override
     public Tag getSourceTag() {
         return tag;
-    }
-
-    @Override
-    public void setSourceTag(Tag t) {
-        this.tag = t;
-        this.swf = t.getSwf();
     }
 }
