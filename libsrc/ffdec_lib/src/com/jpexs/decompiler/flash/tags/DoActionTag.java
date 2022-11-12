@@ -231,4 +231,9 @@ public class DoActionTag extends Tag implements ASMSource {
     public void setSourceTag(Tag t) {
         //nothing
     }
+
+    @Override
+    public Tag getTag() {
+        return null; //?
+    }        
 }

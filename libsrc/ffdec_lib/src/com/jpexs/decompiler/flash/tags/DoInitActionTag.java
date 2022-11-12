@@ -259,4 +259,9 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     public void setSourceTag(Tag t) {
         //nothing
     }
+
+    @Override
+    public Tag getTag() {
+        return null; //?
+    }
 }

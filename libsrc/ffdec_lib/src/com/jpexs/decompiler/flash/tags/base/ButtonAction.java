@@ -194,4 +194,11 @@ public class ButtonAction implements ASMSource {
     public String toString() {
         return buttonTag.toString();
     }
+
+    @Override
+    public Tag getTag() {
+        return buttonTag;
+    }
+    
+    
 }
