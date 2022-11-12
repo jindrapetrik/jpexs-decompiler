@@ -124,6 +124,8 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsTag;
+import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
+import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
 import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
@@ -135,6 +137,7 @@ import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
@@ -168,6 +171,7 @@ import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
+import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import static com.jpexs.decompiler.flash.types.FILLSTYLE.CLIPPED_BITMAP;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
@@ -4349,7 +4353,38 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 swf.addTag(neededCharacter);
             }
 
-            PlaceObject2Tag placeTag = new PlaceObject2Tag(swf, false, 1, buttonRecord.characterId, buttonRecord.placeMatrix, buttonRecord.colorTransform, 0, null, -1, null);
+            
+            
+            
+            PlaceObject3Tag placeTag = new PlaceObject3Tag(swf);
+            placeTag.depth = 1;
+            placeTag.characterId = buttonRecord.characterId;
+            placeTag.placeFlagHasCharacter = true;
+            if (buttonRecord.colorTransform != null) {
+                placeTag.colorTransform = buttonRecord.colorTransform;
+                placeTag.placeFlagHasColorTransform = true;
+            }
+            
+            ButtonTag buttonTag = buttonRecord.getTag();
+            if (buttonTag instanceof DefineButtonTag) {
+                DefineButtonTag button1Tag = (DefineButtonTag) buttonTag;
+                DefineButtonCxformTag cxformTag = (DefineButtonCxformTag) button1Tag.getSwf().getCharacterIdTag(button1Tag.getCharacterId(), DefineButtonCxformTag.ID);
+                if (cxformTag != null) {
+                    placeTag.colorTransform = new CXFORMWITHALPHA(cxformTag.buttonColorTransform);
+                    placeTag.placeFlagHasColorTransform = true;
+                }
+            }
+            
+            placeTag.matrix = buttonRecord.placeMatrix;
+            if (buttonRecord.buttonHasBlendMode) {
+                placeTag.blendMode = buttonRecord.blendMode;
+                placeTag.placeFlagHasBlendMode = true;
+            }
+            if (buttonRecord.buttonHasFilterList) {
+                placeTag.surfaceFilterList = buttonRecord.filterList;
+                placeTag.placeFlagHasFilterList = true;
+            }
+            
             swf.addTag(placeTag);
             placeTag.setTimelined(swf);
             ShowFrameTag showFrameTag = new ShowFrameTag(swf);
