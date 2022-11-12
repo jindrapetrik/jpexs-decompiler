@@ -37,6 +37,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.PathIterator;
 import java.io.IOException;
+import java.util.Set;
 
 /**
  *
@@ -213,6 +214,11 @@ public class DefineScalingGridTag extends Tag implements CharacterIdTag {
     @Override
     public String toString() {
         return super.toString() + " (" + characterId + ")";
+    }
+    
+    @Override
+    public void getNeededCharacters(Set<Integer> needed) {
+        needed.add(characterId);
     }
 
 }

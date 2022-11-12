@@ -38,6 +38,7 @@ import com.jpexs.helpers.Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -263,5 +264,10 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     @Override
     public Tag getTag() {
         return null; //?
+    }
+    
+    @Override
+    public void getNeededCharacters(Set<Integer> needed) {
+        needed.add(spriteId);
     }
 }

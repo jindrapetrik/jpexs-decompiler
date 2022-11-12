@@ -70,11 +70,6 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
         for (BUTTONRECORD r : getRecords()) {
             needed.add(r.characterId);
         }
-
-        DefineButtonSoundTag sounds = getSounds();
-        if (sounds != null) {
-            sounds.getNeededCharacters(needed);
-        }
     }
 
     @Override

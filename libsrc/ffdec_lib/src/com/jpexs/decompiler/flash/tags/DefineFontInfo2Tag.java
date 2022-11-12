@@ -30,6 +30,7 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -189,4 +190,9 @@ public class DefineFontInfo2Tag extends FontInfoTag {
     public boolean isShiftJIS() {
         return fontFlagsShiftJIS;
     }                
+    
+    @Override
+    public void getNeededCharacters(Set<Integer> needed) {
+        needed.add(fontID);
+    }
 }

@@ -1369,6 +1369,7 @@ public class Main {
                         mainFrame.getPanel().tagTree.setExpandPathString(resourcesPathStr);
                         mainFrame.getPanel().tagListTree.setExpandPathString(tagListPathStr);
                     }
+                    mainFrame.getPanel().updateMissingNeededCharacters();
                 }
 
                 if (executeAfterOpen != null) {

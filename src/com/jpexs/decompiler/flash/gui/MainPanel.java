@@ -31,9 +31,9 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AbcMultiNameCollisionFixer;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.amf.amf3.ListSet;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
-import com.jpexs.decompiler.flash.configuration.SwfSpecificConfiguration;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
@@ -124,6 +124,7 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsTag;
+import com.jpexs.decompiler.flash.tags.DefineFontNameTag;
 import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
@@ -197,7 +198,6 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -228,7 +228,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -238,6 +237,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -253,12 +253,9 @@ import javax.swing.Icon;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -270,11 +267,9 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.plaf.basic.BasicScrollPaneUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
 import jsyntaxpane.DefaultSyntaxKit;
 
 /**
@@ -394,9 +389,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private static final Logger logger = Logger.getLogger(MainPanel.class.getName());
 
+    private Map<TreeItem, Set<Integer>> neededCharacters = new WeakHashMap<>();
     private Map<TreeItem, Set<Integer>> missingNeededCharacters = new WeakHashMap<>();
 
-    private Thread calculateMissingNeededThread;
+    private CalculateMissingNeededThread calculateMissingNeededThread;
 
     private List<WeakReference<TreeItem>> orderedClipboard = new ArrayList<>();
     private Map<TreeItem, Boolean> clipboard = new WeakHashMap<>();
@@ -1146,23 +1142,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         //Opening files with drag&drop to main window
         enableDrop(true);
-        calculateMissingNeededThread = new Thread("calculateMissingNeededThread") {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        calculateMissingNeededCharacters();
-                    } catch (ConcurrentModificationException cme) {
-                        //ignore
-                    }
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        return;
-                    }
-                }
-            }
-        };
+        calculateMissingNeededThread = new CalculateMissingNeededThread();
         calculateMissingNeededThread.start();
     }
 
@@ -2960,6 +2940,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             swf.clearImageCache();
             reload(true);
+            updateMissingNeededCharacters();
         }
     }
 
@@ -3045,6 +3026,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         ViewMessages.showMessageDialog(MainPanel.this, translate("import.script.result").replace("%count%", Integer.toString(countAs2 + countAs3)));
                         if (countAs2 != 0 || countAs3 != 0) {
                             reload(true);
+                            updateMissingNeededCharacters();
                         }
                     });
                 }
@@ -3457,6 +3439,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         reload(true);
+        updateMissingNeededCharacters();
     }
 
     public void refreshDecompiled() {
@@ -4344,7 +4327,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             character.getNeededCharactersDeep(needed);
             needed.remove(buttonRecord.characterId);
             needed.add(buttonRecord.characterId);
-            
+
             for (int n : needed) {
                 CharacterTag neededCharacter;
                 try {
@@ -4354,10 +4337,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     return;
                 }
                 neededCharacter.setSwf(swf);
-                neededCharacter.setTimelined(swf);    
+                neededCharacter.setTimelined(swf);
                 swf.addTag(neededCharacter);
             }
-            
+
             PlaceObject2Tag placeTag = new PlaceObject2Tag(swf, false, 1, buttonRecord.characterId, buttonRecord.placeMatrix, buttonRecord.colorTransform, 0, null, -1, null);
             swf.addTag(placeTag);
             placeTag.setTimelined(swf);
@@ -4460,6 +4443,36 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             Tag tag = (Tag) treeItem;
             TagInfo tagInfo = new TagInfo(treeItem.getSwf());
             tag.getTagInfo(tagInfo);
+            
+            Set<Integer> needed;
+            if (neededCharacters.containsKey(treeItem)) {
+                needed = neededCharacters.get(treeItem);
+            } else {
+                needed = new LinkedHashSet<>();
+                tag.getNeededCharactersDeep(needed);
+                neededCharacters.put(treeItem, needed);
+            }
+
+            if (needed.size() > 0) {
+                tagInfo.addInfo("general", "neededCharacters", Helper.joinStrings(needed, ", "));
+            }
+
+            if (tag instanceof CharacterTag) {
+                int characterId = ((CharacterTag) tag).getCharacterId();
+                Set<Integer> dependent = tag.getSwf().getDependentCharacters(characterId);
+                if (dependent != null) {
+                    if (dependent.size() > 0) {
+                        tagInfo.addInfo("general", "dependentCharacters", Helper.joinStrings(dependent, ", "));
+                    }
+                }
+
+                Set<Integer> dependent2 = tag.getSwf().getDependentFrames(characterId);
+                if(dependent2 != null && dependent2.size() > 0) {
+                    tagInfo.addInfo("general", "dependentFrames", Helper.joinStrings(dependent2, ", "));
+                }
+            }
+            
+            
             if (!tagInfo.isEmpty()) {
                 tagInfoPanel.setTagInfos(tagInfo);
                 showDetail(DETAILCARDTAGINFO);
@@ -4941,29 +4954,78 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         Helper.emptyObject(this);
     }
 
-    private static void calculateMissingNeededCharacters(Map<TreeItem, Set<Integer>> missingNeededCharacters, Timelined tim) {
+    private static void calculateMissingNeededCharacters(Map<TreeItem, Set<Integer>> neededMap, Map<TreeItem, Set<Integer>> missingNeededCharacters, Timelined tim) {
         List<Tag> tags = tim.getTags().toArrayList();
         for (Tag t : tags) {
-            missingNeededCharacters.put(t, t.getMissingNeededCharacters());
+            Set<Integer> needed = new LinkedHashSet<>();
+            t.getNeededCharactersDeep(needed);
+            neededMap.put(t, needed);
+            missingNeededCharacters.put(t, t.getMissingNeededCharacters(needed));
             if (t instanceof DefineSpriteTag) {
-                calculateMissingNeededCharacters(missingNeededCharacters, (DefineSpriteTag) t);
+                calculateMissingNeededCharacters(neededMap, missingNeededCharacters, (DefineSpriteTag) t);
             }
         }
     }
 
-    public void calculateMissingNeededCharacters() {
+    public void updateMissingNeededCharacters() {
+        if (calculateMissingNeededThread != null) {
+            calculateMissingNeededThread.recalculate();
+        }
+    }
+
+    private void calculateMissingNeededCharacters() {
         Map<TreeItem, Set<Integer>> missingNeededCharacters = new WeakHashMap<>();
+        Map<TreeItem, Set<Integer>> neededCharacters = new WeakHashMap<>();
+        
         List<SWFList> swfsLists = new ArrayList<>(swfs);
         for (SWFList swfList : swfsLists) {
             for (SWF swf : swfList) {
-                calculateMissingNeededCharacters(missingNeededCharacters, swf);
+                calculateMissingNeededCharacters(neededCharacters, missingNeededCharacters, swf);
             }
         }
-        if (!missingNeededCharacters.equals(this.missingNeededCharacters)) {
-            this.missingNeededCharacters = missingNeededCharacters;
-            tagTree.setMissingNeededCharacters(missingNeededCharacters);
-            tagListTree.setMissingNeededCharacters(missingNeededCharacters);
-        }
+        this.neededCharacters = neededCharacters;
+        this.missingNeededCharacters = missingNeededCharacters; 
+        tagTree.setMissingNeededCharacters(missingNeededCharacters);
+        tagListTree.setMissingNeededCharacters(missingNeededCharacters);
     }
 
+    class CalculateMissingNeededThread extends Thread {
+
+        public CalculateMissingNeededThread() {
+            super("calculateMissingNeededThread");
+        }
+
+        private boolean recalculate = false;
+
+        public synchronized void recalculate() {
+            this.recalculate = true;
+            this.notify();
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                synchronized (this) {
+                    recalculate = false;
+                }
+                try {
+                    calculateMissingNeededCharacters();
+                } catch (ConcurrentModificationException cme) {
+                    //ignore
+                }
+                synchronized (this) {
+
+                    if (recalculate) {
+                        continue;
+                    }
+
+                    try {
+                        wait();
+                    } catch (InterruptedException ex) {
+                        return;
+                    }
+                }
+            }
+        }
+    }
 }
