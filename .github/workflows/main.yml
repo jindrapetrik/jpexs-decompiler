@@ -1,4 +1,4 @@
-name: Build and deploy JPEXS FFDec
+name: Build
 
 on:
   push:
