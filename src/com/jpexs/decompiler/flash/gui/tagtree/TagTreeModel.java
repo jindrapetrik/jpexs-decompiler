@@ -457,6 +457,9 @@ public class TagTreeModel extends AbstractTagTreeModel {
     }
 
     private List<TreeItem> getMappedCharacters(SWF swf, CharacterTag tag) {
+        if (swf == null) {
+            return new ArrayList<>();
+        }
         TagTreeSwfInfo swfInfo = getSwfInfo(swf);
         List<TreeItem> mapped = swfInfo.mappedTags.get(tag.getCharacterId());
         if (mapped == null) {

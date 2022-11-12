@@ -67,6 +67,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -133,6 +134,119 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         }
     }
+    
+    private static SWFType evalSwfType(MyTreeModel mod, String parentPath, SWFType swfType) {
+        if (swfType == null) {
+            return null;
+        }
+        if ("".equals(swfType.alternateCondition())) {
+            return swfType;
+        }
+        Conditional cond = new Conditional() {
+            @Override
+            public String[] value() {
+                return new String[] {swfType.alternateCondition()};
+            }
+
+            @Override
+            public int[] tags() {
+                return new int[0];
+            }
+
+            @Override
+            public int minSwfVersion() {
+                return 1;
+            }
+
+            @Override
+            public int maxSwfVersion() {
+                return Integer.MAX_VALUE;
+            }
+
+            @Override
+            public int[] options() {
+                return new int[0];
+            }
+
+            @Override
+            public boolean revert() {
+                return false;
+            }
+
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return Conditional.class;
+            }
+        };                
+        ConditionEvaluator ev = new ConditionEvaluator(cond);
+        try {
+            Map<String, Boolean> fieldMap = new HashMap<>();
+            for (String sf : ev.getFields()) {
+                String fulldf = parentPath + "." + sf;
+                FieldNode condnode = (FieldNode) (mod).getNodeByPath(fulldf);
+
+                if (condnode != null) {
+                    Object value = ReflectionTools.getValue(condnode.obj, condnode.fieldSet.get(FIELD_INDEX), condnode.index);
+                    if (value instanceof Boolean) {
+                        fieldMap.put(sf, (Boolean) value);
+                    } else if (value instanceof Integer) {
+                        int intValue = (Integer) value;
+                        boolean found = false;
+                        for (int i : cond.options()) {
+                            if (i == intValue) {
+                                found = true;
+                            }
+                        }
+                        fieldMap.put(sf, found);
+                    }
+                } else {
+                    fieldMap.put(sf, true);
+                }
+            }
+            if (!ev.eval(fieldMap, 0)) {
+                return swfType;
+            }
+            return new SWFType() {
+                    @Override
+                    public BasicType value() {
+                        return swfType.alternateValue();
+                    }
+
+                    @Override
+                    public BasicType alternateValue() {
+                        return BasicType.NONE;
+                    }
+
+                    @Override
+                    public String alternateCondition() {
+                        return "";
+                    }
+
+                    @Override
+                    public int count() {
+                        return swfType.count();
+                    }
+
+                    @Override
+                    public String countField() {
+                        return swfType.countField();
+                    }
+
+                    @Override
+                    public int countAdd() {
+                        return swfType.countAdd();
+                    }
+
+                    @Override
+                    public Class<? extends Annotation> annotationType() {
+                        return SWFType.class;
+                    }
+                };
+        } catch (AnnotationParseException | IllegalArgumentException | IllegalAccessException ex) {
+            logger.log(Level.SEVERE, null, ex);
+            return swfType;
+        }
+    }
 
     private class MyTreeCellEditor extends AbstractCellEditor implements TreeCellEditor {
 
@@ -172,6 +286,9 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     }
                     GenericTagEditor editor = null;
                     SWFType swfType = field.getAnnotation(SWFType.class);
+                    MyTreeModel mod = (MyTreeModel)tree.getModel();
+                    swfType = evalSwfType(mod, mod.getNodePathName(value), swfType);
+                    
                     Multiline multiline = field.getAnnotation(Multiline.class);
                     EnumValues enumValues = field.getAnnotation(EnumValues.class);
                     if (enumValues != null && (type.equals(int.class) || type.equals(Integer.class))) {
@@ -553,12 +670,15 @@ public class GenericTagTreePanel extends GenericTagPanel {
         private FieldSet fieldSet;
 
         private int index;
+        
+        private MyTreeModel model;
 
-        public FieldNode(Tag tag, Object obj, FieldSet fieldSet, int index) {
+        public FieldNode(MyTreeModel model, Tag tag, Object obj, FieldSet fieldSet, int index) {
             this.tag = tag;
             this.obj = obj;
             this.fieldSet = fieldSet;
             this.index = index;
+            this.model = model;
 
             for (int i = 0; i < fieldSet.size(); i++) {
                 if (getValue(i) == null) {
@@ -654,11 +774,19 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
 
         public String getType(int fieldIndex) {
-            SWFType swfType = fieldSet.get(fieldIndex).getAnnotation(SWFType.class);
             SWFArray swfArray = fieldSet.get(fieldIndex).getAnnotation(SWFArray.class);
             Class<?> declaredType = fieldSet.get(fieldIndex).getType();
             boolean isArray = ReflectionTools.needsIndex(fieldSet.get(fieldIndex)) || swfArray != null;
             boolean isArrayParent = isArray && index == -1;
+            
+            SWFType swfType = fieldSet.get(fieldIndex).getAnnotation(SWFType.class);            
+            String thisPath = model.getNodePathName(this);
+            String parentPath = thisPath.substring(0, thisPath.lastIndexOf("."));
+            if (isArray && !isArrayParent) {
+                parentPath = parentPath.substring(0, parentPath.lastIndexOf("."));
+            }
+            swfType = evalSwfType(model, parentPath, swfType);
+            
 
             Class<?> declaredSubType = isArray ? ReflectionTools.getFieldSubType(obj, fieldSet.get(fieldIndex)) : null;
 
@@ -905,15 +1033,15 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         private Object getChild(Object parent, int index, boolean limited) {
             if (parent == mtroot) {
-                return new FieldNode(mtroot, mtroot, filterFields(this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited, mtroot.getId()).get(index), -1);
+                return new FieldNode(this, mtroot, mtroot, filterFields(this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited, mtroot.getId()).get(index), -1);
             }
             FieldNode fnode = (FieldNode) parent;
             Field field = fnode.fieldSet.get(FIELD_INDEX);
             if (ReflectionTools.needsIndex(field) && (fnode.index == -1)) { //Arrays ot Lists
-                return new FieldNode(mtroot, fnode.obj, fnode.fieldSet, index);
+                return new FieldNode(this, mtroot, fnode.obj, fnode.fieldSet, index);
             }
             parent = fnode.getValue(FIELD_INDEX);
-            return new FieldNode(mtroot, parent, filterFields(this, getNodePathName(fnode), parent.getClass(), limited, mtroot.getId()).get(index), -1);
+            return new FieldNode(this, mtroot, parent, filterFields(this, getNodePathName(fnode), parent.getClass(), limited, mtroot.getId()).get(index), -1);
         }
 
         @Override
@@ -1068,10 +1196,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
             type = val.getClass();
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             return false;
-        }
-        SWFType swfType = field.getAnnotation(SWFType.class);
-        Multiline multiline = field.getAnnotation(Multiline.class);
-
+        }        
         if (type.equals(int.class) || type.equals(Integer.class)
                 || type.equals(short.class) || type.equals(Short.class)
                 || type.equals(long.class) || type.equals(Long.class)
