@@ -116,11 +116,7 @@ public class DefineFontInfoTag extends FontInfoTag {
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI16(fontID);
-        if (swf.version >= 6) {
-            sos.writeNetString(fontName, Utf8Helper.charset);
-        } else {
-            sos.writeNetString(fontName);
-        }
+        sos.writeNetString(fontName);
         sos.writeUB(2, reserved);
         sos.writeUB(1, fontFlagsSmallText ? 1 : 0);
         sos.writeUB(1, fontFlagsShiftJIS ? 1 : 0);

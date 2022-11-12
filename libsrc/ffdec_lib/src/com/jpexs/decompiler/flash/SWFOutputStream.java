@@ -198,23 +198,10 @@ public class SWFOutputStream extends OutputStream {
      * @throws IOException
      */
     public void writeNetString(String value) throws IOException {
-        byte[] data = value.getBytes();
-        writeUI8(data.length);
-        write(data);
-    }
-
-    /**
-     * Writes netstring (length + string) value to the stream
-     *
-     * @param value String value
-     * @param charset
-     * @throws IOException
-     */
-    public void writeNetString(String value, Charset charset) throws IOException {
         byte[] data = value.getBytes(charset);
         writeUI8(data.length);
         write(data);
-    }
+    }   
 
     /**
      * Writes UI32 (Unsigned 32bit integer) value to the stream
