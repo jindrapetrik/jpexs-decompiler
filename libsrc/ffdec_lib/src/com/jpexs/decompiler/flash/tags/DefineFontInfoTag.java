@@ -60,8 +60,7 @@ public class DefineFontInfoTag extends FontInfoTag {
 
     public boolean fontFlagsWideCodes;
 
-    //@SWFType(value = BasicType.UI8, alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
-    @SWFType(value = BasicType.UI16)
+    @SWFType(value = BasicType.UI8, alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
     public List<Integer> codeTable;
 
     /**

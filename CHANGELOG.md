@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 - Copy/Move with dependencies should copy mapped tags too
 - Recalculating dependencies in the loop (now only on change)
 - Dependencies handling
+- Raw editing of DefineFontInfo/DefineFont2-3, KERNINGRECORD - proper switching wide codes
 
 ## [16.2.0] - 2022-11-08
 ### Added
