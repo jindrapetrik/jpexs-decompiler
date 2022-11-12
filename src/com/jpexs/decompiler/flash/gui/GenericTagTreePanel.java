@@ -286,8 +286,19 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     }
                     GenericTagEditor editor = null;
                     SWFType swfType = field.getAnnotation(SWFType.class);
-                    MyTreeModel mod = (MyTreeModel)tree.getModel();
-                    swfType = evalSwfType(mod, mod.getNodePathName(value), swfType);
+                    MyTreeModel model = (MyTreeModel)tree.getModel();
+                    
+                    SWFArray swfArray = field.getAnnotation(SWFArray.class);
+                    boolean isArray = ReflectionTools.needsIndex(field) || swfArray != null;
+                    boolean isArrayParent = isArray && index == -1;
+
+                    String thisPath = model.getNodePathName(value);
+                    String parentPath = thisPath.substring(0, thisPath.lastIndexOf("."));
+                    if (isArray && !isArrayParent) {
+                        parentPath = parentPath.substring(0, parentPath.lastIndexOf("."));
+                    }
+                                
+                    swfType = evalSwfType(model, parentPath, swfType);
                     
                     Multiline multiline = field.getAnnotation(Multiline.class);
                     EnumValues enumValues = field.getAnnotation(EnumValues.class);
