@@ -41,7 +41,6 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.utf8.Utf8Helper;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 

@@ -28,7 +28,6 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.model.LocalData;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;

@@ -35,7 +35,6 @@ import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
