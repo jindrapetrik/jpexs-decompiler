@@ -16,13 +16,13 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.types.HasCharacterId;
+
 /**
  *
  * @author JPEXS
  */
-public interface CharacterIdTag {
+public interface CharacterIdTag extends HasCharacterId {
 
-    public int getCharacterId();
-
-    public void setCharacterId(int characterId);
+    
 }
