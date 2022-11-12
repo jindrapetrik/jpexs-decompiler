@@ -59,7 +59,8 @@ public class DefineFontInfoTag extends FontInfoTag {
 
     public boolean fontFlagsWideCodes;
 
-    @SWFType(value = BasicType.UI8, alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
+    //@SWFType(value = BasicType.UI8, alternateValue = BasicType.UI16, alternateCondition = "fontFlagsWideCodes")
+    @SWFType(value = BasicType.UI16)
     public List<Integer> codeTable;
 
     /**
@@ -179,5 +180,15 @@ public class DefineFontInfoTag extends FontInfoTag {
     @Override
     public void setFontFlagsItalic(boolean value) {
         fontFlagsItalic = value;
+    }       
+
+    @Override
+    public boolean isShiftJIS() {
+        return fontFlagsShiftJIS;
+    }
+
+    @Override
+    public boolean isAnsi() {
+        return fontFlagsANSI;
     }
 }

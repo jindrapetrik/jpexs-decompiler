@@ -534,4 +534,9 @@ public final class DefineCompactedFont extends FontTag {
     public RECT getRectWithStrokes() {
         return getRect();
     }
+
+    @Override
+    public String getCodesCharset() {
+        return getCharset();
+    }
 }

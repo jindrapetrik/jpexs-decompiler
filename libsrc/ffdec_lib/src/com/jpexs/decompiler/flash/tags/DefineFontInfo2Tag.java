@@ -179,4 +179,14 @@ public class DefineFontInfo2Tag extends FontInfoTag {
     public void setFontFlagsItalic(boolean value) {
         fontFlagsItalic = value;
     }
+
+    @Override
+    public boolean isAnsi() {
+        return fontFlagsANSI;
+    }
+
+    @Override
+    public boolean isShiftJIS() {
+        return fontFlagsShiftJIS;
+    }                
 }

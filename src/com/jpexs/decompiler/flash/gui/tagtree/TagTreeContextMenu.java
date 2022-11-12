@@ -83,6 +83,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -231,7 +232,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         changeCharsetMenu = new JMenu();
         JMenu currentCharsetMenu = changeCharsetMenu;
         int charsetCnt = 0;        
-        for (String charsetStr : Charset.availableCharsets().keySet()) {
+        for (String charsetStr : Utf8Helper.allowedCharsets) {
             if (charsetCnt == 30) {
                 JMenu moreMenu = new JMenu(mainPanel.translate("contextmenu.more"));
                 currentCharsetMenu.add(moreMenu);
