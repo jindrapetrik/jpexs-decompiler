@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag {
+public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCharacterId {
 
     @Reserved
     @SWFType(value = BasicType.UB, count = 2)
@@ -114,6 +114,9 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag {
 
     @Internal
     private ButtonTag tag;
+    
+    @Internal
+    private boolean modified;
 
     public BUTTONRECORD(SWF swf, ButtonTag tag) {
         this.swf = swf;
@@ -135,18 +138,13 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag {
         return swf;
     }
 
-    public void setModified() {
-        if (tag != null) {
-            tag.setModified(true);
-        }
+    public void setModified(boolean value) {
+        modified = value;
     }
     
     @Override
     public boolean isModified() {
-        if (tag != null) {
-            return tag.isModified();
-        }
-        return false;
+        return modified;
     }
 
     @Override
@@ -158,5 +156,15 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag {
     public void setSwfAndTag(SWF swf, Tag tag) {
         this.swf = swf;
         this.tag = (ButtonTag) tag;
+    }
+
+    @Override
+    public int getCharacterId() {
+        return characterId;
+    }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterId = characterId;
     }
 }

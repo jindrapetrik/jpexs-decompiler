@@ -370,6 +370,9 @@ public class DefineEditTextTag extends TextTag {
     }
 
     private List<CharacterWithStyle> getTextWithStyle() {
+        if (swf == null) {
+            return new ArrayList<>();
+        }
         String str = "";
         TextStyle style = new TextStyle();
         if (fontClass != null) {
@@ -1029,7 +1032,7 @@ public class DefineEditTextTag extends TextTag {
         }
     }
 
-    public List<TEXTRECORD> getTextRecords() {
+    public List<TEXTRECORD> getTextRecords() {        
         DynamicTextModel textModel = new DynamicTextModel();
         List<CharacterWithStyle> txt = getTextWithStyle();
         TextStyle lastStyle = null;

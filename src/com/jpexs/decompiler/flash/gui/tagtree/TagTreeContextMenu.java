@@ -58,6 +58,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagTypeInfo;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
@@ -76,9 +77,11 @@ import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
+import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
+import com.jpexs.decompiler.flash.types.HasCharacterId;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
@@ -547,6 +550,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                 if (item instanceof FrameScript) {
                     continue;
                 }
+                
+                if (item instanceof BUTTONRECORD) {
+                    continue;
+                }
 
                 canRemove = false;
                 break;
@@ -848,7 +855,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 expandRecursiveMenuItem.setVisible(true);
             }
 
-            if (firstItem instanceof CharacterIdTag && !(firstItem instanceof CharacterTag)) {
+            if (firstItem instanceof HasCharacterId && !(firstItem instanceof CharacterTag)) {
                 jumpToCharacterMenuItem.setVisible(true);
             }
 
@@ -1503,12 +1510,12 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void jumpToCharacterActionPerformed(ActionEvent evt) {
         TreeItem itemj = getTree().getCurrentTreeItem();
-        if (itemj == null || !(itemj instanceof CharacterIdTag)) {
+        if (itemj == null || !(itemj instanceof HasCharacterId)) {
             return;
         }
 
-        CharacterIdTag characterIdTag = (CharacterIdTag) itemj;
-        mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), itemj.getSwf().getCharacter(characterIdTag.getCharacterId()));
+        HasCharacterId hasCharacterId = (HasCharacterId) itemj;
+        mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), itemj.getSwf().getCharacter(hasCharacterId.getCharacterId()));
     }
 
     private void expandRecursiveActionPerformed(ActionEvent evt) {
@@ -2158,6 +2165,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                     itemsToRemoveParents.add(new Object());
                     itemsToRemoveSprites.add(new Object());
                 }
+            } else if (item instanceof BUTTONRECORD) {
+                itemsToRemove.add(item);
+                itemsToRemoveParents.add(((BUTTONRECORD) item).getTag());
+                itemsToRemoveSprites.add(new Object());
             }
         }
 
@@ -2215,6 +2226,22 @@ public class TagTreeContextMenu extends JPopupMenu {
                         for (int i = 0; i < itemsToRemove.size(); i++) {
                             Object item = itemsToRemove.get(i);
                             Object parent = itemsToRemoveParents.get(i);
+                            
+                            if (item instanceof BUTTONRECORD) {
+                                ButtonTag button = (ButtonTag) parent;
+                                button.getRecords().remove((BUTTONRECORD) item);
+                                List<BUTTONRECORD> unmodifiedRecords = new ArrayList<>();                                
+                                for (BUTTONRECORD rec : button.getRecords()) {
+                                    if (!rec.isModified()) {
+                                        unmodifiedRecords.add(rec);
+                                    }
+                                }
+                                button.setModified(true);
+                                for (BUTTONRECORD rec : unmodifiedRecords) {
+                                    rec.setModified(false);
+                                }
+                            }
+                            
                             if (item instanceof BUTTONCONDACTION) {
                                 DefineButton2Tag button = (DefineButton2Tag) parent;
                                 BUTTONCONDACTION buttonCondAction = (BUTTONCONDACTION) item;
@@ -2225,7 +2252,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                     }
                                 }
                                 button.setModified(true);
-                            }
+                            }                            
                             if (item instanceof CLIPACTIONRECORD) {
                                 PlaceObjectTypeTag place = (PlaceObjectTypeTag) parent;
                                 Timelined tim = (itemsToRemoveSprites.get(i) instanceof DefineSpriteTag) ? (DefineSpriteTag) itemsToRemoveSprites.get(i) : place.getSwf();
@@ -2240,7 +2267,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                 clipActions.calculateAllEventFlags();
                                 place.setModified(true);
                                 tim.resetTimeline();
-                            }
+                            }                            
                             if (item instanceof ScriptPack) {
                                 ScriptPack sp = (ScriptPack) item;
                                 sp.delete(sp.abc, true);
