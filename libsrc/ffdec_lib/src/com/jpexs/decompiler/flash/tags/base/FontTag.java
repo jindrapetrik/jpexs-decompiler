@@ -233,7 +233,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         int fontId = getFontId();
         String selectedFont = swf.sourceFontNamesMap.get(fontId);
         if (selectedFont == null) {
-            SwfSpecificConfiguration swfConf = Configuration.getSwfSpecificConfiguration(swf.getShortFileName());
+            SwfSpecificConfiguration swfConf = Configuration.getSwfSpecificConfiguration(swf.getShortPathTitle());
             String key = fontId + "_" + getFontNameIntag();
             if (swfConf != null) {
                 selectedFont = swfConf.fontPairingMap.get(key);
@@ -494,6 +494,9 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     public DefineFontNameTag getFontNameTag() {
+        if (swf == null) {
+            return null;
+        }
         for (Tag t : swf.getTags()) {
             if (t instanceof DefineFontNameTag) {
                 DefineFontNameTag dfn = (DefineFontNameTag) t;

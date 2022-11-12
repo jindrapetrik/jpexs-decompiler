@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
@@ -31,6 +32,7 @@ import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  *
@@ -78,9 +80,13 @@ public class DefineBinaryDataTag extends CharacterTag {
         binaryData = sis.readByteRangeEx(sis.available(), "binaryData");
 
         if (Configuration.autoLoadEmbeddedSwfs.get()) {
+            String path = getSwf().getShortPathTitle()+"/DefineBinaryData (" + getCharacterId() + ")";
+            SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(path);
+            String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(SwfSpecificCustomConfiguration.KEY_CHARSET, Charset.defaultCharset().name());
+                            
             try {
                 InputStream is = new ByteArrayInputStream(binaryData.getArray(), binaryData.getPos(), binaryData.getLength());
-                SWF bswf = new SWF(is, null, "(SWF Data)", Configuration.parallelSpeedUp.get());
+                SWF bswf = new SWF(is, null, "(SWF Data)", Configuration.parallelSpeedUp.get(), charset);
                 innerSwf = bswf;
                 bswf.binaryData = this;
             } catch (IOException | InterruptedException ex) {

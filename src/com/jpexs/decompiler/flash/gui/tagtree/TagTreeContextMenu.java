@@ -3040,7 +3040,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             return;
         }
         
-        SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(item.getShortFileName());
+        SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(item.getShortPathTitle());
         conf.setCustomData(SwfSpecificCustomConfiguration.KEY_CHARSET, newCharset);
         while (item.binaryData != null) {
             item = item.binaryData.getSwf();

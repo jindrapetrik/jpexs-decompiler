@@ -183,6 +183,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1279,11 +1280,11 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
     
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy) throws IOException, InterruptedException {
-        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, null, Utf8Helper.charsetName);
+        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, null, Charset.defaultCharset().name());
     }
     
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver) throws IOException, InterruptedException {
-        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, resolver, Utf8Helper.charsetName);
+        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, resolver, Charset.defaultCharset().name());
     }
 
     /**
@@ -1489,12 +1490,15 @@ public final class SWF implements SWFContainerItem, Timelined {
         return file;
     }
 
+    public String getTitleOrShortFileName() {
+        if (fileTitle != null) {
+            return fileTitle;
+        }        
+        return new File(file).getName();
+    }
+    
     public String getShortFileName() {
-        String title = getFileTitle();
-        if (title == null) {
-            return "";
-        }
-        return new File(title).getName();
+        return new File(getTitleOrShortFileName()).getName();
     }
     
     /**
@@ -1507,10 +1511,10 @@ public final class SWF implements SWFContainerItem, Timelined {
         }
         if (swfList != null) {
             if (swfList.isBundle()) {
-                return swfList.name + "/" + getShortFileName();
+                return swfList.name + "/" + getTitleOrShortFileName();
             }
         }
-        return getShortFileName();
+        return getTitleOrShortFileName();
     }
     
     /**
@@ -3379,7 +3383,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     @Override
     public String toString() {
-        return getShortFileName();
+        return getTitleOrShortFileName();
     }
 
     public void deobfuscate(DeobfuscationLevel level) throws InterruptedException {
