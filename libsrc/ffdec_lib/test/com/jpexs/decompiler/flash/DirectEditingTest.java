@@ -125,14 +125,14 @@ public class DirectEditingTest extends FileTestBase {
                         try {
                             asm.setActions(par.actionsFromString(as2, Utf8Helper.charsetName));
                         } catch (ActionParseException | CompilationException ex) {
-                            fail("Unable to parse: " + asm.getSwf().getShortFileName() + "/" + asm.toString(), ex);
+                            fail("Unable to parse: " + asm.getSwf().getTitleOrShortFileName()+ "/" + asm.toString(), ex);
                         }
                         writer = new HighlightedTextWriter(new CodeFormatting(), false);
                         asm.getActionScriptSource(writer, null);
                         String as3 = writer.toString();
                         //as3 = asm.removePrefixAndSuffix(as3);
                         if (!as3.equals(as2)) {
-                            fail("ActionScript is different: " + asm.getSwf().getShortFileName() + "/" + asm.toString());
+                            fail("ActionScript is different: " + asm.getSwf().getTitleOrShortFileName()+ "/" + asm.toString());
                         }
                         asm.setModified();
                     } catch (InterruptedException | IOException | OutOfMemoryError | TranslateException | StackOverflowError ex) {

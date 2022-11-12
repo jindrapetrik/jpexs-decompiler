@@ -862,6 +862,7 @@ public class Main {
             }
             result.bundle = bundle;
             result.name = new File(sourceInfo.getFileTitleOrName()).getName();
+            final String fname = result.name;
             for (Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
                 InputStream stream = streamEntry.getValue();
                 stream.reset();
@@ -869,7 +870,7 @@ public class Main {
                     @Override
                     public SWF doInBackground() throws Exception {
                         final CancellableWorker worker = this;
-                        String fileKey = new File(streamEntry.getKey()).getName();
+                        String fileKey = fname + "/" + streamEntry.getKey();
                         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
                         
                         String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(SwfSpecificCustomConfiguration.KEY_CHARSET, Charset.defaultCharset().name());
@@ -1347,13 +1348,13 @@ public class Main {
                 }
 
                 if (mainFrame != null && fswf != null) {
-                    SwfSpecificConfiguration swfConf = Configuration.getSwfSpecificConfiguration(fswf.getShortFileName());
+                    SwfSpecificConfiguration swfConf = Configuration.getSwfSpecificConfiguration(fswf.getShortPathTitle());
                     String resourcesPathStr = null;
                     String tagListPathStr = null;
                     if (swfConf != null) {
                         resourcesPathStr = swfConf.lastSelectedPath;
                     }
-                    SwfSpecificCustomConfiguration swfCustomConf = Configuration.getSwfSpecificCustomConfiguration(fswf.getShortFileName());
+                    SwfSpecificCustomConfiguration swfCustomConf = Configuration.getSwfSpecificCustomConfiguration(fswf.getShortPathTitle());
                     if (swfCustomConf != null) {
                         resourcesPathStr = swfCustomConf.getCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_RESOURCES, resourcesPathStr);
                         tagListPathStr = swfCustomConf.getCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_TAGLIST, null);

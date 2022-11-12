@@ -225,6 +225,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1674,7 +1675,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             String selFile2;
             if (usedSwfs.size() > 1) {
-                selFile2 = selFile + File.separator + Helper.getNextId(swf.getShortFileName(), usedSwfsIds);
+                selFile2 = selFile + File.separator + Helper.getNextId(swf.getTitleOrShortFileName(), usedSwfsIds);
             } else {
                 selFile2 = selFile;
             }
@@ -4187,14 +4188,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             protected Void doInBackground() throws Exception {
                 try {
                     for (DefineBinaryDataTag binaryDataTag : binaryDataTags) {
+                        String path = binaryDataTag.getSwf().getShortPathTitle()+"/DefineBinaryData (" + binaryDataTag.getCharacterId() + ")";
                         try {
+                            SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(path);
+                            String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(SwfSpecificCustomConfiguration.KEY_CHARSET, Charset.defaultCharset().name());
                             InputStream is = new ByteArrayInputStream(binaryDataTag.binaryData.getRangeData());
                             SWF bswf = new SWF(is, null, "(SWF Data)", new ProgressListener() {
                                 @Override
                                 public void progress(int p) {
                                     Main.loadingDialog.setPercent(p);
                                 }
-                            }, Configuration.parallelSpeedUp.get());
+                            }, Configuration.parallelSpeedUp.get(), charset);
                             binaryDataTag.innerSwf = bswf;
                             bswf.binaryData = binaryDataTag;
                         } catch (IOException ex) {
@@ -4424,7 +4428,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             if (swf != null) {
-                SwfSpecificCustomConfiguration swfCustomConf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortFileName());
+                SwfSpecificCustomConfiguration swfCustomConf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
                 //swfConf.lastSelectedPath = tagTree.getSelectionPathString();
                 swfCustomConf.setCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_RESOURCES, tagTree.getSelectionPathString());
                 swfCustomConf.setCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_TAGLIST, tagListTree.getSelectionPathString());
