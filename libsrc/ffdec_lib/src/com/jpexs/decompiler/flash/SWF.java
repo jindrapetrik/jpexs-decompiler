@@ -593,7 +593,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         for (int i = 0; i < tim.getFrameCount(); i++) {
             Frame frame = tim.getFrame(i);
             Set<Integer> needed = new HashSet<>();
-            frame.getNeededCharacters(needed);
+            frame.getNeededCharactersDeep(needed);
             for (Integer needed1 : needed) {
                 Set<Integer> s = dep.get(needed1);
                 if (s == null) {

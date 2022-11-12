@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
@@ -150,9 +151,28 @@ public class Frame implements TreeItem, Exportable {
     public void getNeededCharacters(Set<Integer> needed) {
         for (Tag t : innerTags) {
             if(t instanceof PlaceObjectTypeTag) {
-                needed.add(((PlaceObjectTypeTag)t).getCharacterId());
+                PlaceObjectTypeTag place = (PlaceObjectTypeTag)t;                
+                int characterId = place.getCharacterId();
+                if (characterId != -1) {
+                    needed.add(characterId);
+                }
             }
         }
-        needed.remove(-1);
+    }
+    
+    public void getNeededCharactersDeep(Set<Integer> needed) {
+        for (Tag t : innerTags) {
+            if(t instanceof PlaceObjectTypeTag) {  
+                PlaceObjectTypeTag place = (PlaceObjectTypeTag)t;                
+                int characterId = ((PlaceObjectTypeTag)t).getCharacterId();
+                if (characterId != -1) {
+                    CharacterTag character = place.getSwf().getCharacter(characterId);
+                    if (character != null) {
+                        character.getNeededCharactersDeep(needed);
+                    }
+                    needed.add(characterId);
+                }
+            }
+        }
     }
 }
