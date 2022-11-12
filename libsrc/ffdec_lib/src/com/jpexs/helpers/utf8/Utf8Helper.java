@@ -16,14 +16,12 @@
  */
 package com.jpexs.helpers.utf8;
 
-import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.charset.Gb2312;
 import com.jpexs.helpers.utf8.charset.ShiftJis;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;

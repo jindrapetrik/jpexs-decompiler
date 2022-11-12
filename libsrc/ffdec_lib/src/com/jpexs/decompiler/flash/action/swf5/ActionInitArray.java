@@ -27,7 +27,6 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.helpers.utf8.Utf8Helper;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

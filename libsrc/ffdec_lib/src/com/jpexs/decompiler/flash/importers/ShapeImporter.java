@@ -31,7 +31,6 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
-import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPEWITHSTYLE;
 import java.awt.Dimension;

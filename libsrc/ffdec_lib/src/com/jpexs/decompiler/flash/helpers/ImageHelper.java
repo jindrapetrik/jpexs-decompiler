@@ -22,7 +22,6 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.helpers.Helper;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;

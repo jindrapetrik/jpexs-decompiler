@@ -27,7 +27,6 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

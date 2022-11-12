@@ -80,7 +80,6 @@ import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
-import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -88,8 +87,6 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 

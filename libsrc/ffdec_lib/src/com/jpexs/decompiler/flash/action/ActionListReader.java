@@ -34,7 +34,6 @@ import com.jpexs.decompiler.graph.GraphSourceItemContainer;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.stat.Statistics;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;

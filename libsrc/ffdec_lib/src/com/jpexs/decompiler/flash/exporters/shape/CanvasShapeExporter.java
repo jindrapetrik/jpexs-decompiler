@@ -31,7 +31,6 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Color;
 
 /**
  *

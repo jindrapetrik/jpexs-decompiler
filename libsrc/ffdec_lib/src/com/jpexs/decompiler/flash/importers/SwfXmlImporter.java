@@ -113,8 +113,6 @@ import com.jpexs.helpers.HashArrayList;
 import com.jpexs.helpers.ReflectionTools;
 import com.jpexs.helpers.utf8.Utf8InputStreamReader;
 import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;

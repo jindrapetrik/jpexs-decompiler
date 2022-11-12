@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
-import com.jpexs.decompiler.flash.tags.base.ButtonAction;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timelined;

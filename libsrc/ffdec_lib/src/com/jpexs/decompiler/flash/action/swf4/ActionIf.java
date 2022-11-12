@@ -29,7 +29,6 @@ import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.helpers.Helper;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;

@@ -36,7 +36,6 @@ import com.jpexs.decompiler.graph.SecondPassData;
 import com.jpexs.decompiler.graph.SecondPassException;
 import com.jpexs.decompiler.graph.TranslateStack;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;

@@ -18,7 +18,6 @@ package com.jpexs.decompiler.flash.gui.taglistview;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import java.util.List;
 
 /**
  *

@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.action.swf4.ActionJump;
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 /**
  *

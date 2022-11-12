@@ -20,7 +20,6 @@ import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.ConditionalType;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Arrays;
 import java.util.EmptyStackException;
 import java.util.HashSet;
 import java.util.Map;

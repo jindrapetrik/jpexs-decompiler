@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.exporters.commonshape;
 
 import com.jpexs.decompiler.flash.types.ILINESTYLE;
-import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.RGB;
 

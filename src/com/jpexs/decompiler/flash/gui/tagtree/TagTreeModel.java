@@ -45,14 +45,12 @@ import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
-import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 /**

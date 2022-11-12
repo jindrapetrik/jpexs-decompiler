@@ -34,7 +34,6 @@ import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
-import java.nio.charset.Charset;
 import java.util.List;
 
 /**

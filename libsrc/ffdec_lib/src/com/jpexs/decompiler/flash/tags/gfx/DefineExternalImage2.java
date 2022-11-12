@@ -25,7 +25,6 @@ import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.SerializableImage;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
