@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -165,6 +166,12 @@ public class FontPanel extends JPanel {
             if (oldchars.indexOf((int) c) == -1) {
                 if (font.getSize() != 1024) { //Do not resize if not required so we can have single instance of custom fonts
                     font = font.deriveFont(f.getFontStyle(), 1024);
+                }
+                if (Utf8Helper.charToCodePoint(c, ft.getCodesCharset()) == -1) {
+                    String msg = translate("error.charset.nocharacter").replace("%char%", "" + c);
+                    Logger.getLogger(FontPanel.class.getName()).log(Level.SEVERE, msg);
+                    ViewMessages.showMessageDialog(FontPanel.this, msg, translate("error"), JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
                 if (!font.canDisplay(c)) {
                     String msg = translate("error.font.nocharacter").replace("%char%", "" + c);

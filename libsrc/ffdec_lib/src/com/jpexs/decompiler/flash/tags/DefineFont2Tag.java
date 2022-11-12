@@ -361,12 +361,12 @@ public class DefineFont2Tag extends FontTag {
 
     @Override
     public char glyphToChar(int glyphIndex) {
-        return (char) (int) codeTable.get(glyphIndex);
+        return Utf8Helper.codePointToChar(codeTable.get(glyphIndex), getCodesCharset());
     }
 
     @Override
     public int charToGlyph(char c) {
-        return codeTable.indexOf((int) c);
+        return codeTable.indexOf(Utf8Helper.charToCodePoint(c, getCodesCharset()));
     }
 
     @Override
@@ -452,8 +452,13 @@ public class DefineFont2Tag extends FontTag {
         int fontStyle = getFontStyle();
 
         SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, (int) Math.round(getDivider() * 1024), character);
-
-        int code = (int) character;
+        
+        int code = (int) Utf8Helper.charToCodePoint(character, getCodesCharset());
+        
+        if (code == -1) { //Fixme - throw exception, etc.
+            code = 0;
+        }
+        
         int pos = -1;
         boolean exists = false;
         for (int i = 0; i < codeTable.size(); i++) {
@@ -472,7 +477,7 @@ public class DefineFont2Tag extends FontTag {
         if (!exists) {
             shiftGlyphIndices(fontID, pos, true);
             glyphShapeTable.add(pos, shp);
-            codeTable.add(pos, (int) character);
+            codeTable.add(pos, code);
         } else {
             glyphShapeTable.set(pos, shp);
         }
@@ -488,25 +493,25 @@ public class DefineFont2Tag extends FontTag {
             }
 
             for (int k = 0; k < fontKerningTable.size(); k++) {
-                if (fontKerningTable.get(k).fontKerningCode1 == character
-                        || fontKerningTable.get(k).fontKerningCode2 == character) {
+                if (fontKerningTable.get(k).fontKerningCode1 == code
+                        || fontKerningTable.get(k).fontKerningCode2 == code) {
                     fontKerningTable.remove(k);
                     k--;
                 }
             }
             List<FontHelper.KerningPair> kerning = getFontKerningPairs(font, (int) (getDivider() * 1024));
             for (FontHelper.KerningPair pair : kerning) {
-                if (pair.char1 != character && pair.char2 != character) {
+                if (pair.char1 != code && pair.char2 != code) {
                     continue;
                 }
                 int glyph1 = charToGlyph(pair.char1);
-                if (pair.char1 == character) {
+                if (pair.char1 == code) {
 
                 } else if (glyph1 == -1) {
                     continue;
                 }
                 int glyph2 = charToGlyph(pair.char2);
-                if (pair.char2 == character) {
+                if (pair.char2 == code) {
 
                 } else if (glyph2 == -1) {
                     continue;
@@ -596,7 +601,8 @@ public class DefineFont2Tag extends FontTag {
     public String getCharacters() {
         StringBuilder ret = new StringBuilder(codeTable.size());
         for (int i : codeTable) {
-            ret.append((char) i);
+            Character c = Utf8Helper.codePointToChar(i, getCodesCharset());
+            ret.append(c == null ? "?" : c);
         }
         return ret.toString();
     }
@@ -616,8 +622,10 @@ public class DefineFont2Tag extends FontTag {
     @Override
     public int getCharKerningAdjustment(char c1, char c2) {
         int kerningAdjustment = 0;
+        int c1Code = Utf8Helper.charToCodePoint(c1, getCodesCharset());
+        int c2Code = Utf8Helper.charToCodePoint(c2, getCodesCharset());
         for (KERNINGRECORD ker : fontKerningTable) {
-            if (ker.fontKerningCode1 == c1 && ker.fontKerningCode2 == c2) {
+            if (ker.fontKerningCode1 == c1Code && ker.fontKerningCode2 == c2Code) {
                 kerningAdjustment = ker.fontKerningAdjustment;
                 break;
             }
@@ -687,4 +695,12 @@ public class DefineFont2Tag extends FontTag {
         return hasLayout();
     }
 
+    @Override
+    public String getCodesCharset() {
+        if (fontFlagsShiftJIS) {
+            return "Shift_JIS";
+        }
+        return getCharset();
+    }
+    
 }

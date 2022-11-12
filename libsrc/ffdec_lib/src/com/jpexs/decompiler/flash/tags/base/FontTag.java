@@ -531,4 +531,6 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         return installedFontsByName;
     }
 
+    public abstract String getCodesCharset();
+    
 }
