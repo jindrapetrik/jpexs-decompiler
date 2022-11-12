@@ -3885,11 +3885,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         reload(false);
 
         if (source == dumpTree) {
-            Tag t = null;
+            TreeItem t = null;
             if (treeItem instanceof DumpInfo) {
                 DumpInfo di = (DumpInfo) treeItem;
                 t = di.getTag();
-            }
+                if ("BUTTONRECORD".equals(di.type)) {
+                    DumpInfo recList = di.parent;
+                    int index = recList.getChildInfos().indexOf(di);
+                    ButtonTag buttonTag = (ButtonTag) di.parent.parent.getTag();
+                    if (index < buttonTag.getRecords().size()) { //last is empty, not displayed in resource/taglist views
+                        t = buttonTag.getRecords().get(index);      
+                    }
+                }                
+            }            
             showPreview(t, dumpPreviewPanel, getFrameForTreeItem(t), getTimelinedForTreeItem(t));
         }
     }
