@@ -1744,10 +1744,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         image.fillTransparent();
         Matrix m = Matrix.getTranslateInstance(-rect.Xmin * zoomDouble, -rect.Ymin * zoomDouble);
         m.scale(zoomDouble);
-        textTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFFC0C0C0), zoomDouble, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL);
+        textTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFFC0C0C0), zoomDouble, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0);
 
         if (newTextTag != null) {
-            newTextTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFF000000), zoomDouble, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL);
+            newTextTag.toImage(0, 0, 0, new RenderContext(), image, image, false, m, m, m, m, new ConstantColorColorTransform(0xFF000000), zoomDouble, false, new ExportRectangle(rect), true, Timeline.DRAW_MODE_ALL, 0);
         }
 
         iconPanel.setImg(image);
@@ -1894,7 +1894,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             timeline.getFrame(frame).layers.get(freeTransformDepth).matrix = newMatrix;
         }
 
-        timeline.toImage(frame, time, renderContext, image, image, false, m, new Matrix(), m, null, zoom, false, viewRect, fullM, true, Timeline.DRAW_MODE_ALL);
+        timeline.toImage(frame, time, renderContext, image, image, false, m, new Matrix(), m, null, zoom, false, viewRect, fullM, true, Timeline.DRAW_MODE_ALL, 0);
 
         Graphics2D gg = (Graphics2D) image.getGraphics();
         gg.setStroke(new BasicStroke(3));

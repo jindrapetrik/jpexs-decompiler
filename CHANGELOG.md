@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - [#1864] Commandline: Allow to set special value "/dev/stdin" for input files to read from stdin (even on Windows)
 - Show button records in the tree, preview them
 - Show in Hex dump for BUTTONCONDACTION, BUTTONRECORD, CLIPACTIONRECORD
+- Alpha and Erase blend modes support
 
 ### Fixed
 - Exception when bundle selected
