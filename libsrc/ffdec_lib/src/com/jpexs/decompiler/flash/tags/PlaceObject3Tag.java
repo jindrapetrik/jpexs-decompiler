@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.BlendMode;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
@@ -31,6 +32,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
+import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
@@ -196,6 +198,21 @@ public class PlaceObject3Tag extends PlaceObjectTypeTag implements ASMSourceCont
      */
     @SWFType(BasicType.UI8)
     @Conditional("placeFlagHasBlendMode")
+    @EnumValue(value = 0, text = "normal")
+    @EnumValue(value = BlendMode.NORMAL, text = "normal")
+    @EnumValue(value = BlendMode.LAYER, text = "layer")
+    @EnumValue(value = BlendMode.MULTIPLY, text = "multiply")
+    @EnumValue(value = BlendMode.SCREEN, text = "screen")
+    @EnumValue(value = BlendMode.LIGHTEN, text = "lighten")
+    @EnumValue(value = BlendMode.DARKEN, text = "darken")
+    @EnumValue(value = BlendMode.DIFFERENCE, text = "difference")
+    @EnumValue(value = BlendMode.ADD, text = "add")
+    @EnumValue(value = BlendMode.SUBTRACT, text = "subtract")
+    @EnumValue(value = BlendMode.INVERT, text = "invert")
+    @EnumValue(value = BlendMode.ALPHA, text = "alpha")
+    @EnumValue(value = BlendMode.ERASE, text = "erase")
+    @EnumValue(value = BlendMode.OVERLAY, text = "overlay")
+    @EnumValue(value = BlendMode.HARDLIGHT, text = "hardlight")    
     public int blendMode;
 
     /**

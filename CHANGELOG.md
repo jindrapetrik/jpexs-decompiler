@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - Show button records in the tree, preview them
 - Show in Hex dump for BUTTONCONDACTION, BUTTONRECORD, CLIPACTIONRECORD
 - Alpha and Erase blend modes support
+- Raw editor - Edit blend modes as enum
 
 ### Fixed
 - Exception when bundle selected
