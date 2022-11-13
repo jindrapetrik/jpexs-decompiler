@@ -49,6 +49,7 @@ import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.types.BlendMode;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.ColorTransform;
@@ -839,46 +840,46 @@ public class Timeline {
         } else {
             switch (blendMode) {
                 case 0:
-                case 1:
+                case BlendMode.NORMAL:
                     g.setComposite(AlphaComposite.SrcOver);
                     break;
-                case 2: // Layer
+                case BlendMode.LAYER:
                     g.setComposite(AlphaComposite.SrcOver);
                     break;
-                case 3:
+                case BlendMode.MULTIPLY:
                     g.setComposite(BlendComposite.Multiply);
                     break;
-                case 4:
+                case BlendMode.SCREEN:
                     g.setComposite(BlendComposite.Screen);
                     break;
-                case 5:
+                case BlendMode.LIGHTEN:
                     g.setComposite(BlendComposite.Lighten);
                     break;
-                case 6:
+                case BlendMode.DARKEN:
                     g.setComposite(BlendComposite.Darken);
                     break;
-                case 7:
+                case BlendMode.DIFFERENCE:
                     g.setComposite(BlendComposite.Difference);
                     break;
-                case 8:
+                case BlendMode.ADD:
                     g.setComposite(BlendComposite.Add);
                     break;
-                case 9:
+                case BlendMode.SUBTRACT:
                     g.setComposite(BlendComposite.Subtract);
                     break;
-                case 10:
+                case BlendMode.INVERT:
                     g.setComposite(BlendComposite.Invert);
                     break;
-                case 11:
+                case BlendMode.ALPHA:
                     g.setComposite(BlendComposite.Alpha);
                     break;
-                case 12:
+                case BlendMode.ERASE:
                     g.setComposite(BlendComposite.Erase);
                     break;
-                case 13:
+                case BlendMode.OVERLAY:
                     g.setComposite(BlendComposite.Overlay);
                     break;
-                case 14:
+                case BlendMode.HARDLIGHT:
                     g.setComposite(BlendComposite.HardLight);
                     break;
                 default: // Not implemented
