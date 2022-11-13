@@ -90,7 +90,13 @@ public class EnumEditor extends JComboBox<ComboBoxItem<Integer>> implements Gene
     public void reset() {
         try {
             int value = (int) (Integer) ReflectionTools.getValue(obj, field, index);
-            setSelectedItem(values.get(value));
+            for (int i = 0; i < getItemCount(); i++) {
+                ComboBoxItem<Integer> item = getItemAt(i);
+                if (item.getValue() == value) {
+                    setSelectedItem(item);
+                    break;
+                }                   
+            }
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
