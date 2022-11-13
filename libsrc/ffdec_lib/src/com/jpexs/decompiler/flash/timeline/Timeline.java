@@ -792,6 +792,11 @@ public class Timeline {
             }
 
             ColorTransform clrTrans2 = clrTrans;
+            
+            if (blendMode > 1) {
+                clrTrans2 = null;
+            }
+            
             if (clipDepth > -1) {
                 //Make transparent colors opaque, mask should be only made by shapes
                 CXFORMWITHALPHA clrMask = new CXFORMWITHALPHA();
@@ -926,6 +931,11 @@ public class Timeline {
             }*/
             if (!(sameImage && canUseSameImage)) {
                 g.setTransform(drawMatrix.toTransform());
+                
+                if (blendMode > 1 && clrTrans != null) {
+                    img = clrTrans.apply(img);
+                }
+                
                 g.drawImage(img.getBufferedImage(), 0, 0, null);
                 //g.setColor(Color.red);
                 //g.drawRect(0, 0, img.getWidth(), img.getHeight());
@@ -1020,7 +1030,7 @@ public class Timeline {
             Matrix absMat = absoluteTransformation.concatenate(layerMatrix);
 
             ColorTransform clrTrans = colorTransform;
-            if (layer.colorTransForm != null && layer.blendMode <= 1) { // Normal blend mode
+            if (layer.colorTransForm != null) {
                 clrTrans = clrTrans == null ? layer.colorTransForm : colorTransform.merge(layer.colorTransForm);
             }
 
