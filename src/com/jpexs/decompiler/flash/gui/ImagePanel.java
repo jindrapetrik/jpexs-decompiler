@@ -2266,7 +2266,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
             }
 
-            if (!shownAgain && !autoPlayed) {
+            if (!shownAgain && autoPlayed) {
                 List<Integer> sounds = new ArrayList<>();
                 List<String> soundClasses = new ArrayList<>();
                 List<SOUNDINFO> soundInfos = new ArrayList<>();
