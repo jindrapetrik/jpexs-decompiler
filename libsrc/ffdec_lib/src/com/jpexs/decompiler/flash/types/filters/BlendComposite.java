@@ -190,34 +190,59 @@ public final class BlendComposite implements Composite {
                     srcPixel[1] = (pixel >> 8) & 0xFF;
                     srcPixel[2] = (pixel) & 0xFF;
                     srcPixel[3] = (pixel >> 24) & 0xFF;
-                    
-                    
+
                     if (srcPixel[3] != 1 && srcPixel[3] != 0) {
                         srcPixel[0] = srcPixel[0] * 255 / srcPixel[3];
                         srcPixel[1] = srcPixel[1] * 255 / srcPixel[3];
                         srcPixel[2] = srcPixel[2] * 255 / srcPixel[3];
                     }
-                    
+
                     pixel = dstPixels[x];
                     dstPixel[0] = (pixel >> 16) & 0xFF;
                     dstPixel[1] = (pixel >> 8) & 0xFF;
                     dstPixel[2] = (pixel) & 0xFF;
                     dstPixel[3] = (pixel >> 24) & 0xFF;
 
-                    blender.blend(srcPixel, dstPixel, result);
-                    
-                    result[3] = 255;
+                    if (composite.mode == BlendingMode.ALPHA) {
+                        retPixel[0] = dstPixel[0];
+                        retPixel[1] = dstPixel[1];
+                        retPixel[2] = dstPixel[2];
+                        if (srcPixel[3] != 0) {
+                            retPixel[0] = retPixel[0] * srcPixel[3] / 255;
+                            retPixel[1] = retPixel[1] * srcPixel[3] / 255;
+                            retPixel[2] = retPixel[2] * srcPixel[3] / 255;
+                            retPixel[3] = srcPixel[3];
+                        } else {
+                            retPixel[3] = 255;
+                        }
+                    } else if (composite.mode == BlendingMode.ERASE) {
+                        retPixel[0] = dstPixel[0];
+                        retPixel[1] = dstPixel[1];
+                        retPixel[2] = dstPixel[2];
+                        if (srcPixel[3] != 0) {
+                            int a = 255 - srcPixel[3];
+                            retPixel[0] = retPixel[0] * a / 255;
+                            retPixel[1] = retPixel[1] * a / 255;
+                            retPixel[2] = retPixel[2] * a / 255;
+                            retPixel[3] = a;
+                        } else {
+                            retPixel[3] = 255;
+                        }
+                    } else {
+                        blender.blend(srcPixel, dstPixel, result);
 
-                    retPixel[0] = ((int) (dstPixel[0] + (result[0] - dstPixel[0]) * alpha) & 0xFF);
-                    retPixel[1] = ((int) (dstPixel[1] + (result[1] - dstPixel[1]) * alpha) & 0xFF);
-                    retPixel[2] = (int) (dstPixel[2] + (result[2] - dstPixel[2]) * alpha) & 0xFF;
-                    retPixel[3] = ((int) (dstPixel[3] + (result[3] - dstPixel[3]) * alpha) & 0xFF);
-                    
-                    float af = ((float) srcPixel[3]) / 255f;
-                    retPixel[0] = (int) ((1f - af) * dstPixel[0] + af * retPixel[0]);
-                    retPixel[1] = (int) ((1f - af) * dstPixel[1] + af * retPixel[1]);
-                    retPixel[2] = (int) ((1f - af) * dstPixel[2] + af * retPixel[2]);
-                    retPixel[3] = (int) ((1f - af) * dstPixel[3] + af * retPixel[3]);
+                        result[3] = 255;
+                        retPixel[0] = ((int) (dstPixel[0] + (result[0] - dstPixel[0]) * alpha) & 0xFF);
+                        retPixel[1] = ((int) (dstPixel[1] + (result[1] - dstPixel[1]) * alpha) & 0xFF);
+                        retPixel[2] = (int) (dstPixel[2] + (result[2] - dstPixel[2]) * alpha) & 0xFF;
+                        retPixel[3] = ((int) (dstPixel[3] + (result[3] - dstPixel[3]) * alpha) & 0xFF);
+
+                        float af = ((float) srcPixel[3]) / 255f;
+                        retPixel[0] = (int) ((1f - af) * dstPixel[0] + af * retPixel[0]);
+                        retPixel[1] = (int) ((1f - af) * dstPixel[1] + af * retPixel[1]);
+                        retPixel[2] = (int) ((1f - af) * dstPixel[2] + af * retPixel[2]);
+                        retPixel[3] = (int) ((1f - af) * dstPixel[3] + af * retPixel[3]);
+                    }
 
                     dstPixels[x] = (retPixel[3] << 24)
                             | retPixel[0] << 16

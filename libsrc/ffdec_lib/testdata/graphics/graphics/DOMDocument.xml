@@ -1,7 +1,7 @@
 <DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" viewAngle3D="50.6510299754819" nextSceneIdentifier="83" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveEnabled="true" autoSaveHasPrompted="true">
      <fonts>
-          <DOMFontItem name="Font 2" itemID="604e7a9e-00000444" font="TimesNewRomanPS-BoldMT" size="30" id="2" sourceLastImported="1615755934" embedRanges="1|2"/>
           <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
+          <DOMFontItem name="Font 2" itemID="604e7a9e-00000444" font="TimesNewRomanPS-BoldMT" size="30" id="2" sourceLastImported="1615755934" embedRanges="1|2"/>
      </fonts>
      <media>
           <DOMBitmapItem name="bitmapfill.png" itemID="604dcb84-00000229" sourceLastImported="1615711005" externalFileSize="1931" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill.png" bitmapDataHRef="M 2 1615711026.dat" frameRight="640" frameBottom="1280"/>
@@ -25,7 +25,7 @@
           <Include href="OrangeCircle3.xml" loadImmediate="false" itemID="604e14bd-00000374" lastModified="1615729952"/>
           <Include href="PinkCircle.xml" loadImmediate="false" itemID="60617e82-000001f9" lastModified="1617002239"/>
           <Include href="pinkSquare.xml" loadImmediate="false" itemID="606495f2-0000026b" lastModified="1617204862"/>
-          <Include href="RedRect.xml" itemIcon="1" loadImmediate="false" itemID="604e0e4c-0000033d" lastModified="1615730227"/>
+          <Include href="RedRect.xml" itemIcon="1" loadImmediate="false" itemID="604e0e4c-0000033d" lastModified="1668349855"/>
           <Include href="ScaledRect.xml" loadImmediate="false" itemID="604df0ee-0000024d" lastModified="1617210430"/>
           <Include href="Sprite1.xml" loadImmediate="false" itemID="604dbfb7-00000201" lastModified="1615732383"/>
           <Include href="Stroke 1.xml" itemIcon="1" loadImmediate="false" itemID="604dd9d9-0000026d" lastModified="1615749975"/>
@@ -39,7 +39,7 @@
           <Include href="VideoSprite.xml" loadImmediate="false" itemID="60672f60-00000201" lastModified="1617375202"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="65">
+          <DOMTimeline name="Scene 1" currentFrame="49">
                <layers>
                     <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
@@ -175,7 +175,7 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Graphics layer" color="#4FFF4F" autoNamed="false">
+                    <DOMLayer name="Graphics layer" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" keyMode="9728">
                                    <elements>
@@ -787,10 +787,10 @@
 !3980 1990|2980 1990!2980 1990|2980 990!2980 990|3980 990!3980 990|3980 1990"/>
                                                   <Edge strokeStyle="5" edges="
 !1960 990|1960 1990!1960 1990|960 1990!960 1990|960 990!960 990|1960 990"/>
-                                                  <Edge strokeStyle="6" edges="
-!2980 3990|3980 3990!3980 3990|3980 4990!3980 4990|2980 4990!2980 4990|2980 3990"/>
                                                   <Edge strokeStyle="7" edges="
 !1980 4990|980 4990!980 4990|980 3990!980 3990|1980 3990!1980 3990|1980 4990"/>
+                                                  <Edge strokeStyle="6" edges="
+!2980 3990|3980 3990!3980 3990|3980 4990!3980 4990|2980 4990!2980 4990|2980 3990"/>
                                                   <Edge strokeStyle="8" edges="
 !5980 3990|5980 4990!5980 4990|4980 4990!4980 4990|4980 3990!4980 3990|5980 3990"/>
                                                   <Edge cubics="!1960 990(;1960,990 1960,1990 1960,1990q1960 990 1960 1990);"/>
@@ -1389,18 +1389,18 @@
                                                   </StrokeStyle>
                                              </strokes>
                                              <edges>
-                                                  <Edge strokeStyle="5" edges="
-!5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
                                                   <Edge strokeStyle="2" edges="
 !3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
+                                                  <Edge strokeStyle="5" edges="
+!5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
                                                   <Edge strokeStyle="1" edges="
 !2000 1000|2000 2000!2000 2000|1000 2000!1000 2000|1000 1000"/>
-                                                  <Edge strokeStyle="4" edges="
-!1000 3660/1295 4670!1295 4670/1372 3660"/>
-                                                  <Edge strokeStyle="3" edges="
-!2553 3660/2848 4670!2848 4670/2925 3660"/>
                                                   <Edge strokeStyle="6" edges="
 !4647 3660/4942 4670!4942 4670/5019 3660"/>
+                                                  <Edge strokeStyle="3" edges="
+!2553 3660/2848 4670!2848 4670/2925 3660"/>
+                                                  <Edge strokeStyle="4" edges="
+!1000 3660/1295 4670!1295 4670/1372 3660"/>
                                                   <Edge cubics="!5000 2000(;5000,2000 4000,2000 4000,2000q5000 2000 4000 2000);"/>
                                                   <Edge cubics="!4000 2000(4000,2000;4000,2000 4000,1000 4000,1000q4000 2000 4000 1000);"/>
                                                   <Edge cubics="!5000 1000(;5000,1000 5000,2000 5000,2000q5000 1000 5000 2000);"/>
@@ -1635,6 +1635,9 @@
                                              <transformationPoint>
                                                   <Point x="23.55" y="23.55"/>
                                              </transformationPoint>
+                                             <color>
+                                                  <Color alphaMultiplier="0.75"/>
+                                             </color>
                                         </DOMSymbolInstance>
                                         <DOMSymbolInstance libraryItemName="OrangeCircle" blendMode="multiply" centerPoint3DX="215" centerPoint3DY="65">
                                              <matrix>
@@ -1643,6 +1646,9 @@
                                              <transformationPoint>
                                                   <Point x="23.55" y="23.55"/>
                                              </transformationPoint>
+                                             <color>
+                                                  <Color alphaMultiplier="0.75"/>
+                                             </color>
                                         </DOMSymbolInstance>
                                         <DOMSymbolInstance libraryItemName="OrangeCircle" blendMode="darken" centerPoint3DX="140" centerPoint3DY="65">
                                              <matrix>
@@ -1651,6 +1657,9 @@
                                              <transformationPoint>
                                                   <Point x="23.55" y="23.55"/>
                                              </transformationPoint>
+                                             <color>
+                                                  <Color alphaMultiplier="0.75"/>
+                                             </color>
                                         </DOMSymbolInstance>
                                         <DOMSymbolInstance libraryItemName="OrangeCircle" blendMode="lighten" centerPoint3DX="290" centerPoint3DY="65">
                                              <matrix>
@@ -1659,6 +1668,9 @@
                                              <transformationPoint>
                                                   <Point x="23.55" y="23.55"/>
                                              </transformationPoint>
+                                             <color>
+                                                  <Color alphaMultiplier="0.75"/>
+                                             </color>
                                         </DOMSymbolInstance>
                                         <DOMSymbolInstance libraryItemName="OrangeCircle" blendMode="screen" centerPoint3DX="365" centerPoint3DY="65">
                                              <matrix>
@@ -1667,6 +1679,9 @@
                                              <transformationPoint>
                                                   <Point x="23.55" y="23.55"/>
                                              </transformationPoint>
+                                             <color>
+                                                  <Color alphaMultiplier="0.75"/>
+                                             </color>
                                         </DOMSymbolInstance>
                                         <DOMSymbolInstance libraryItemName="OrangeCircle" blendMode="overlay" centerPoint3DX="65" centerPoint3DY="190">
                                              <matrix>
@@ -1675,6 +1690,9 @@
                                              <transformationPoint>
                                                   <Point x="23.55" y="23.55"/>
                                              </transformationPoint>
+                                             <color>
+                                                  <Color alphaMultiplier="0.75"/>
+                                             </color>
                                         </DOMSymbolInstance>
                                         <DOMSymbolInstance libraryItemName="OrangeCircle" blendMode="hardlight" centerPoint3DX="140" centerPoint3DY="190">
                                              <matrix>
@@ -1683,6 +1701,9 @@
                                              <transformationPoint>
                                                   <Point x="23.55" y="23.55"/>
                                              </transformationPoint>
+                                             <color>
+                                                  <Color alphaMultiplier="0.75"/>
+                                             </color>
                                         </DOMSymbolInstance>
                                         <DOMSymbolInstance libraryItemName="OrangeCircle" blendMode="add" centerPoint3DX="215" centerPoint3DY="190">
                                              <matrix>
@@ -1691,6 +1712,9 @@
                                              <transformationPoint>
                                                   <Point x="23.55" y="23.55"/>
                                              </transformationPoint>
+                                             <color>
+                                                  <Color alphaMultiplier="0.75"/>
+                                             </color>
                                         </DOMSymbolInstance>
                                         <DOMSymbolInstance libraryItemName="OrangeCircle" blendMode="subtract" centerPoint3DX="290" centerPoint3DY="190">
                                              <matrix>
@@ -1699,6 +1723,9 @@
                                              <transformationPoint>
                                                   <Point x="23.55" y="23.55"/>
                                              </transformationPoint>
+                                             <color>
+                                                  <Color alphaMultiplier="0.75"/>
+                                             </color>
                                         </DOMSymbolInstance>
                                         <DOMSymbolInstance libraryItemName="OrangeCircle" blendMode="difference" centerPoint3DX="365" centerPoint3DY="190">
                                              <matrix>
@@ -1707,6 +1734,9 @@
                                              <transformationPoint>
                                                   <Point x="23.55" y="23.55"/>
                                              </transformationPoint>
+                                             <color>
+                                                  <Color alphaMultiplier="0.75"/>
+                                             </color>
                                         </DOMSymbolInstance>
                                         <DOMSymbolInstance libraryItemName="BlueSquare" symbolType="graphic" loop="loop">
                                              <matrix>
@@ -1723,6 +1753,9 @@
                                              <transformationPoint>
                                                   <Point x="23.55" y="23.55"/>
                                              </transformationPoint>
+                                             <color>
+                                                  <Color alphaMultiplier="0.75"/>
+                                             </color>
                                         </DOMSymbolInstance>
                                         <DOMSymbolInstance libraryItemName="BlueSquare" symbolType="graphic" loop="loop">
                                              <matrix>
@@ -1747,6 +1780,9 @@
                                              <transformationPoint>
                                                   <Point x="23.55" y="23.55"/>
                                              </transformationPoint>
+                                             <color>
+                                                  <Color alphaMultiplier="0.75"/>
+                                             </color>
                                         </DOMSymbolInstance>
                                         <DOMSymbolInstance libraryItemName="OrangeCircle3" blendMode="layer" centerPoint3DX="215" centerPoint3DY="290">
                                              <matrix>
@@ -1755,6 +1791,9 @@
                                              <transformationPoint>
                                                   <Point x="23.55" y="23.55"/>
                                              </transformationPoint>
+                                             <color>
+                                                  <Color alphaMultiplier="0.75"/>
+                                             </color>
                                         </DOMSymbolInstance>
                                    </elements>
                               </DOMFrame>
@@ -2990,7 +3029,7 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Frame description layer" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+                    <DOMLayer name="Frame description layer" color="#9933CC" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" keyMode="9728">
                                    <elements>
@@ -3815,6 +3854,7 @@
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="3657857" publishTime="1668349897"/>
           <PublishItem publishSize="3657883" publishTime="1666634735"/>
           <PublishItem publishSize="3657878" publishTime="1666634687"/>
           <PublishItem publishSize="3657743" publishTime="1666596760" publishDebug="true"/>
@@ -3834,6 +3874,5 @@
           <PublishItem publishSize="1586" publishTime="1637176556"/>
           <PublishItem publishSize="3655062" publishTime="1617375217"/>
           <PublishItem publishSize="2351995" publishTime="1617369003"/>
-          <PublishItem publishSize="1611" publishTime="1617210496"/>
      </publishHistory>
 </DOMDocument>
