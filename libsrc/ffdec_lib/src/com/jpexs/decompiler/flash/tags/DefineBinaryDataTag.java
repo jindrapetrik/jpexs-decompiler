@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -82,7 +83,7 @@ public class DefineBinaryDataTag extends CharacterTag {
         if (Configuration.autoLoadEmbeddedSwfs.get()) {
             String path = getSwf().getShortPathTitle()+"/DefineBinaryData (" + getCharacterId() + ")";
             SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(path);
-            String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(SwfSpecificCustomConfiguration.KEY_CHARSET, Charset.defaultCharset().name());
+            String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
                             
             try {
                 InputStream is = new ByteArrayInputStream(binaryData.getArray(), binaryData.getPos(), binaryData.getLength());
