@@ -111,6 +111,7 @@ public class MiterClipBasicStroke implements Stroke {
 
         List<Vector> vectors = new ArrayList<>();
         List<Boolean> offPath = new ArrayList<>();
+        List<Boolean> moveTo = new ArrayList<>();
         float x = 0;
         float y = 0;
         while (!pi.isDone()) {
@@ -119,30 +120,37 @@ public class MiterClipBasicStroke implements Stroke {
                 case PathIterator.SEG_MOVETO:
                     vectors.add(new Vector(x, y, points[0], points[1]));
                     offPath.add(true);
+                    moveTo.add(true);
                     x = points[0];
                     y = points[1];
                     break;
                 case PathIterator.SEG_LINETO:
                     vectors.add(new Vector(x, y, points[0], points[1]));
                     offPath.add(false);
+                    moveTo.add(false);                    
                     x = points[0];
                     y = points[1];
                     break;
                 case PathIterator.SEG_CUBICTO:
                     vectors.add(new Vector(x, y, points[0], points[1]));
                     offPath.add(true);
+                    moveTo.add(false);
                     vectors.add(new Vector(points[0], points[1], points[2], points[3]));
                     offPath.add(true);
+                    moveTo.add(false);
                     vectors.add(new Vector(points[2], points[3], points[4], points[5]));
                     offPath.add(false);
+                    moveTo.add(false);
                     x = points[4];
                     y = points[5];
                     break;
                 case PathIterator.SEG_QUADTO:
                     vectors.add(new Vector(x, y, points[0], points[1]));
                     offPath.add(true);
+                    moveTo.add(false);
                     vectors.add(new Vector(points[0], points[1], points[2], points[3]));
                     offPath.add(false);
+                    moveTo.add(false);
                     x = points[2];
                     y = points[3];
                     break;
@@ -151,7 +159,7 @@ public class MiterClipBasicStroke implements Stroke {
         }
 
         for (int i = 0; i < vectors.size() - 1; i++) {
-            if (offPath.get(i) || offPath.get(i + 1)) {
+            if (offPath.get(i) || moveTo.get(i + 1)) {
                 continue;
             }
             Vector u = vectors.get(i).transform(t);
