@@ -37,7 +37,6 @@ All notable changes to this project will be documented in this file.
 - [#1846] blend modes with alpha
 - Raw editor does not select item in enum list
 - Sound not played on frames
-- [#1678] Miter join
 
 ### Changed
 - Full path inside bundle is displayed as SWF name instead simple name
