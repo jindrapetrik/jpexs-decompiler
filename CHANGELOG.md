@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - Dependencies handling
 - Raw editing of DefineFontInfo/DefineFont2-3, KERNINGRECORD - proper switching wide codes
 - Storing SWF configuration for files inside bundles and/or binarydata
+- [#1846] blend modes with alpha
 
 ### Changed
 - Full path inside bundle is displayed as SWF name instead simple name
@@ -2561,6 +2562,7 @@ All notable changes to this project will be documented in this file.
 [#1864]: https://www.free-decompiler.com/flash/issues/1864
 [#1863]: https://www.free-decompiler.com/flash/issues/1863
 [#1865]: https://www.free-decompiler.com/flash/issues/1865
+[#1846]: https://www.free-decompiler.com/flash/issues/1846
 [#1414]: https://www.free-decompiler.com/flash/issues/1414
 [#1755]: https://www.free-decompiler.com/flash/issues/1755
 [#1460]: https://www.free-decompiler.com/flash/issues/1460
