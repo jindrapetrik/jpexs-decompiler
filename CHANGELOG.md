@@ -37,6 +37,7 @@ All notable changes to this project will be documented in this file.
 - [#1846] blend modes with alpha
 - Raw editor does not select item in enum list
 - Sound not played on frames
+- [#1678] Miter join
 
 ### Changed
 - Full path inside bundle is displayed as SWF name instead simple name
@@ -2567,6 +2568,7 @@ All notable changes to this project will be documented in this file.
 [#1863]: https://www.free-decompiler.com/flash/issues/1863
 [#1865]: https://www.free-decompiler.com/flash/issues/1865
 [#1846]: https://www.free-decompiler.com/flash/issues/1846
+[#1678]: https://www.free-decompiler.com/flash/issues/1678
 [#1414]: https://www.free-decompiler.com/flash/issues/1414
 [#1755]: https://www.free-decompiler.com/flash/issues/1755
 [#1460]: https://www.free-decompiler.com/flash/issues/1460
@@ -2643,7 +2645,6 @@ All notable changes to this project will be documented in this file.
 [#1671]: https://www.free-decompiler.com/flash/issues/1671
 [#1672]: https://www.free-decompiler.com/flash/issues/1672
 [#1677]: https://www.free-decompiler.com/flash/issues/1677
-[#1678]: https://www.free-decompiler.com/flash/issues/1678
 [#1665]: https://www.free-decompiler.com/flash/issues/1665
 [#1661]: https://www.free-decompiler.com/flash/issues/1661
 [#1435]: https://www.free-decompiler.com/flash/issues/1435

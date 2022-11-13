@@ -151,12 +151,12 @@ public class MiterClipBasicStroke implements Stroke {
         }
 
         for (int i = 0; i < vectors.size() - 1; i++) {
-            if (offPath.get(i)) {
+            if (offPath.get(i) || offPath.get(i + 1)) {
                 continue;
             }
             Vector u = vectors.get(i).transform(t);
             Vector v = vectors.get(i + 1).transform(t);
-
+            
             float parallelSign = 1;
             float dx = u.x2 - u.x1;
             float dy = u.y2 - u.y1;
@@ -194,23 +194,15 @@ public class MiterClipBasicStroke implements Stroke {
                 intersectX = perp2.x1;
                 float line_a = (perp1.y2 - perp1.y1) / (perp1.x2 - perp1.x1);
                 float line_c = perp1.y1 - line_a * perp1.x1;
-                intersectY = line_a * intersectX + line_c;
-            } else if (perp1.y1 == perp1.y2) {
-                intersectY = perp1.y1;
-                float line_b = (perp2.y2 - perp2.y1) / (perp2.x2 - perp2.x1);
-                float line_d = perp2.y1 - line_b * perp2.x1;
-                intersectX = (intersectY - line_d) / line_b;
-            } else if (perp2.y1 == perp2.y2) {
-                intersectY = perp2.y1;
+                intersectY = line_a * intersectX + line_c;                                
+            } else {                
+                //y = a x + c                
                 float line_a = (perp1.y2 - perp1.y1) / (perp1.x2 - perp1.x1);
                 float line_c = perp1.y1 - line_a * perp1.x1;
-                intersectX = intersectY - line_c / line_a;
-            } else {
-                float line_a = (perp1.y2 - perp1.y1) / (perp1.x2 - perp1.x1);
-                float line_c = perp1.y1 - line_a * perp1.x1;
+                //y = b x + d
                 float line_b = (perp2.y2 - perp2.y1) / (perp2.x2 - perp2.x1);
-                float line_d = perp2.y1 - line_b * perp2.x1;
-
+                float line_d = perp2.y1 - line_b * perp2.x1;               
+                               
                 intersectX = (line_d - line_c) / (line_a - line_b);
                 intersectY = line_a * intersectX + line_c;
             }
