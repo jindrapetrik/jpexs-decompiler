@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
+import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
@@ -4191,7 +4192,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         String path = binaryDataTag.getSwf().getShortPathTitle()+"/DefineBinaryData (" + binaryDataTag.getCharacterId() + ")";
                         try {
                             SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(path);
-                            String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(SwfSpecificCustomConfiguration.KEY_CHARSET, Charset.defaultCharset().name());
+                            String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
                             InputStream is = new ByteArrayInputStream(binaryDataTag.binaryData.getRangeData());
                             SWF bswf = new SWF(is, null, "(SWF Data)", new ProgressListener() {
                                 @Override
@@ -4429,10 +4430,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             if (swf != null) {
                 SwfSpecificCustomConfiguration swfCustomConf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
-                //swfConf.lastSelectedPath = tagTree.getSelectionPathString();
-                swfCustomConf.setCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_RESOURCES, tagTree.getSelectionPathString());
-                swfCustomConf.setCustomData(SwfSpecificCustomConfiguration.KEY_LAST_SELECTED_PATH_TAGLIST, tagListTree.getSelectionPathString());
-
+                swfCustomConf.setCustomData(CustomConfigurationKeys.KEY_LAST_SELECTED_PATH_RESOURCES, tagTree.getSelectionPathString());
+                swfCustomConf.setCustomData(CustomConfigurationKeys.KEY_LAST_SELECTED_PATH_TAGLIST, tagListTree.getSelectionPathString());
             }
         }
 

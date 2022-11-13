@@ -26,17 +26,15 @@ import java.util.Map;
  */
 public class SwfSpecificCustomConfiguration implements Serializable {
     
-    private Map<String, String> customData = new HashMap<>();
+    private static final long serialVersionUID = 0x2acb421da57f5eb4L;
     
-    public static final String KEY_LAST_SELECTED_PATH_RESOURCES = "lastSelectedPath.resources";
-    public static final String KEY_LAST_SELECTED_PATH_TAGLIST = "lastSelectedPath.taglist";
-    public static final String KEY_CHARSET = "charset";
+    private Map<String, String> customData = new HashMap<>();       
     
     public String getCustomData(String key, String defaultValue) {
         if (customData.containsKey(key)) {
             return customData.get(key);
         }
-        
+                
         return defaultValue;
     }
     

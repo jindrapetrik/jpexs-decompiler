@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.script.ActionScript2Parser;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
@@ -3041,7 +3042,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         
         SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(item.getShortPathTitle());
-        conf.setCustomData(SwfSpecificCustomConfiguration.KEY_CHARSET, newCharset);
+        conf.setCustomData(CustomConfigurationKeys.KEY_CHARSET, newCharset);
         while (item.binaryData != null) {
             item = item.binaryData.getSwf();
         }
