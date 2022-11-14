@@ -35,6 +35,8 @@ import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -48,12 +50,14 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -66,6 +70,7 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
@@ -83,13 +88,26 @@ import org.pushingpixels.substance.api.skin.SkinInfo;
  */
 public class AdvancedSettingsDialog extends AppDialog {
 
+    private final Map<String, JLabel> labelsMap = new HashMap<>();
     private final Map<String, Component> componentsMap = new HashMap<>();
+    private final Map<String, String> titleToNameMap = new HashMap<>();
+    private final Map<String, Integer> categoryCounts = new HashMap<>();
+    private final JTextField searchTextField = new JTextField(30);
+
+    private final Map<String, Component> allComponentsMap = new HashMap<>();
+
+    private Map<String, Component> tabs = new HashMap<>();
 
     private JButton cancelButton;
 
     private JButton okButton;
 
     private JButton resetButton;
+
+    private JTabbedPane tabPane = new JTabbedPane();
+    
+    private String hilightBackgroundColorHex;
+    private String hilightForegroundColorHex;
 
     public AdvancedSettingsDialog(Window owner, String selectedCategory) {
         super(owner);
@@ -99,6 +117,13 @@ public class AdvancedSettingsDialog extends AppDialog {
 
         //configurationTable.setCellEditor(configurationTable.getDefaultEditor(null));
         pack();
+        
+        Color c;
+        c = UIManager.getColor("List.selectionBackground");
+        hilightBackgroundColorHex = String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
+        
+        c = UIManager.getColor("List.selectionForeground");
+        hilightForegroundColorHex = String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
     }
 
     private DefaultTableModel getModel() {
@@ -151,45 +176,8 @@ public class AdvancedSettingsDialog extends AppDialog {
         }
     }
 
-    private void initComponents(String selectedCategory) {
-        okButton = new JButton();
-        cancelButton = new JButton();
-        resetButton = new JButton();
-
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle(translate("advancedSettings.dialog.title"));
-        setModal(true);
-        setPreferredSize(new Dimension(800, 500));
-
-        okButton.setText(AppStrings.translate("button.ok"));
-        okButton.addActionListener(this::okButtonActionPerformed);
-
-        cancelButton.setText(AppStrings.translate("button.cancel"));
-        cancelButton.addActionListener(this::cancelButtonActionPerformed);
-
-        resetButton.setText(AppStrings.translate("button.reset"));
-        resetButton.addActionListener(this::resetButtonActionPerformed);
-
-        Container cnt = getContentPane();
-        cnt.setLayout(new BorderLayout());
-        //cnt.add(new FasterScrollPane(configurationTable),BorderLayout.CENTER);
-
-        JPanel buttonsPanel = new JPanel(new BorderLayout());
-
-        JPanel buttonsLeftPanel = new JPanel(new FlowLayout());
-        buttonsLeftPanel.add(resetButton, BorderLayout.WEST);
-
-        buttonsPanel.add(buttonsLeftPanel, BorderLayout.WEST);
-
-        JPanel buttonsRightPanel = new JPanel(new FlowLayout());
-        buttonsRightPanel.add(okButton);
-        buttonsRightPanel.add(cancelButton);
-        buttonsPanel.add(buttonsRightPanel, BorderLayout.EAST);
-
-        cnt.add(buttonsPanel, BorderLayout.SOUTH);
-
-        JTabbedPane tabPane = new JTabbedPane();
-
+    private void initTabPane(String filter, String selectedCategory) {
+        tabPane.removeAll();
         JComboBox<SkinSelect> skinComboBox = new JComboBox<>();
         skinComboBox.setRenderer(new SubstanceDefaultListCellRenderer() {
             @Override
@@ -245,8 +233,9 @@ public class AdvancedSettingsDialog extends AppDialog {
             }
         }
 
-        Map<String, Component> tabs = new HashMap<>();
-        getCategories(componentsMap, tabs, skinComboBox, getResourceBundle());
+        tabs = new LinkedHashMap<>();
+
+        getCategories(hilightBackgroundColorHex, hilightForegroundColorHex, allComponentsMap, categoryCounts, filter, titleToNameMap, labelsMap, componentsMap, tabs, skinComboBox, getResourceBundle());
 
         String[] catOrder = new String[]{"ui", "display", "decompilation", "script", "format", "export", "import", "paths", "limit", "update", "debug", "other"};
 
@@ -255,50 +244,92 @@ public class AdvancedSettingsDialog extends AppDialog {
                 continue;
             }
 
-            tabPane.add(translate("config.group.name." + cat), tabs.get(cat));
-            tabPane.setToolTipTextAt(tabPane.getTabCount() - 1, translate("config.group.description." + cat));
+            int count = categoryCounts.get(cat);
+            String countAdd = "";
+            if (!filter.trim().equals("")) {
+                countAdd = " (" + count + ")";
+            }
+
+            if (count > 0) {
+                tabPane.add(translate("config.group.name." + cat) + countAdd, tabs.get(cat));
+                tabPane.setToolTipTextAt(tabPane.getTabCount() - 1, translate("config.group.description." + cat));
+            } else {
+                if (cat.equals(selectedCategory)) {
+                    selectedCategory = null;
+                }
+            }
         }
         if (selectedCategory != null && tabs.containsKey(selectedCategory)) {
             tabPane.setSelectedComponent(tabs.get(selectedCategory));
         }
+    }
 
+    private void initComponents(String selectedCategory) {
+        okButton = new JButton();
+        cancelButton = new JButton();
+        resetButton = new JButton();
+
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle(translate("advancedSettings.dialog.title"));
+        setModal(true);
+        setPreferredSize(new Dimension(800, 500));
+
+        okButton.setText(AppStrings.translate("button.ok"));
+        okButton.addActionListener(this::okButtonActionPerformed);
+
+        cancelButton.setText(AppStrings.translate("button.cancel"));
+        cancelButton.addActionListener(this::cancelButtonActionPerformed);
+
+        resetButton.setText(AppStrings.translate("button.reset"));
+        resetButton.addActionListener(this::resetButtonActionPerformed);
+
+        Container cnt = getContentPane();
+        cnt.setLayout(new BorderLayout());
+        //cnt.add(new FasterScrollPane(configurationTable),BorderLayout.CENTER);
+
+        JPanel buttonsPanel = new JPanel(new BorderLayout());
+
+        JPanel buttonsLeftPanel = new JPanel(new FlowLayout());
+        buttonsLeftPanel.add(resetButton, BorderLayout.WEST);
+
+        buttonsPanel.add(buttonsLeftPanel, BorderLayout.WEST);
+
+        JPanel buttonsRightPanel = new JPanel(new FlowLayout());
+        buttonsRightPanel.add(okButton);
+        buttonsRightPanel.add(cancelButton);
+        buttonsPanel.add(buttonsRightPanel, BorderLayout.EAST);
+
+        searchTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                String val = searchTextField.getText();
+                Component selComponent = tabPane.getSelectedComponent();
+                String selCategory = null;
+                for (String cat : tabs.keySet()) {
+                    if (tabs.get(cat) == selComponent) {
+                        selCategory = cat;
+                        break;
+                    }
+                }
+
+                initTabPane(val, selCategory);
+            }                          
+        });
+
+        JPanel searchPanel = new JPanel(new FlowLayout());
+        searchPanel.add(new JLabel(translate("advancedSettings.search")));
+        searchPanel.add(searchTextField);
+
+        buttonsPanel.add(searchPanel, BorderLayout.CENTER);
+
+        cnt.add(buttonsPanel, BorderLayout.SOUTH);
+        initTabPane("", selectedCategory);
         cnt.add(tabPane, BorderLayout.CENTER);
         pack();
+        searchTextField.requestFocusInWindow();
     }
 
-    public static String selectConfigFile(ConfigurationItem config, String current, String pattern) {
-        JFileChooser fc = new JFileChooser();
-        fc.setSelectedFile(new File(current));
-        fc.setMultiSelectionEnabled(false);
-        fc.setCurrentDirectory(new File((String) config.get()));
-        FileFilter allSupportedFilter = new FileFilter() {
-            private final String[] supportedExtensions = new String[]{".swf", ".gfx", ".swc", ".zip", ".iggy"};
-
-            @Override
-            public boolean accept(File f) {
-                if (f.isDirectory()) {
-                    return true;
-                }
-                return f.getName().matches(pattern);
-            }
-
-            @Override
-            public String getDescription() {
-                return "";
-            }
-        };
-        fc.setFileFilter(allSupportedFilter);
-
-        fc.setAcceptAllFileFilterUsed(false);
-        int returnVal = fc.showOpenDialog(Main.getDefaultMessagesComponent());
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            return Helper.fixDialogFile(fc.getSelectedFile()).getAbsolutePath();
-        } else {
-            return (String) config.get();
-        }
-    }
-
-    public static void getCategories(Map<String, Component> componentsMap, Map<String, Component> tabs, JComboBox<?> skinComboBox, ResourceBundle resourceBundle) {
+    public static void getCategories(String hilightBackgroundColorHex, String hilightForegroundColorHex, Map<String, Component> allComponentsMap, Map<String, Integer> categoryCounts, String filter, Map<String, String> titleToNameMap, Map<String, JLabel> labelsMap, Map<String, Component> componentsMap, Map<String, Component> tabs, JComboBox<?> skinComboBox, ResourceBundle resourceBundle) {
         Map<String, Map<String, Field>> categorized = new HashMap<>();
 
         Map<String, Field> fields = Configuration.getConfigurationFields();
@@ -351,6 +382,17 @@ public class AdvancedSettingsDialog extends AppDialog {
 
                 String locName = locNames.get(name);
 
+                String description = "";
+                if (resourceBundle.containsKey("config.description." + name)) {
+                    description = resourceBundle.getString("config.description." + name);
+                }
+
+                if (!"".equals(filter.trim())
+                        && !(locName.toLowerCase().contains(filter.toLowerCase())
+                        || description.toLowerCase().contains(filter.toLowerCase()))) {
+                    continue;
+                }
+
                 try {
                     field.setAccessible(true);
                     ConfigurationItem item = (ConfigurationItem) field.get(null);
@@ -363,11 +405,6 @@ public class AdvancedSettingsDialog extends AppDialog {
 
                     Class itemType = (Class<?>) itemType2;
 
-                    String description = "";
-                    if (resourceBundle.containsKey("config.description." + name)) {
-                        description = resourceBundle.getString("config.description." + name);
-                    }
-
                     Object defaultValue = Configuration.getDefaultValue(field);
                     if (name.equals("gui.skin")) {
                         Class c;
@@ -378,85 +415,91 @@ public class AdvancedSettingsDialog extends AppDialog {
                             Logger.getLogger(AdvancedSettingsDialog.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
-
+                    String locNameHtml = locName;
+                    if (!filter.trim().equals("")) {
+                        locNameHtml = locNameHtml.replaceAll("(?i)" + Pattern.quote(filter), "{bold}$0{/bold}");                                             
+                    }
+                    locNameHtml = "<html>" + locNameHtml.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")+ "</html>";
+                    locNameHtml = locNameHtml.replace("{bold}", "<span style=\"background-color:"+hilightBackgroundColorHex+"; color: " + hilightForegroundColorHex + "\">").replace("{/bold}", "</span>");
+                    
                     if (defaultValue != null) {
                         description += " (" + resourceBundle.getString("default") + ": " + defaultValue + ")";
                     }
 
-                    JLabel l = new JLabel(locName, JLabel.TRAILING);
+                    JLabel l = new JLabel(locNameHtml, JLabel.TRAILING);
+                    titleToNameMap.put(locName, name);
                     l.setToolTipText(description);
                     configPanel.add(l);
+
                     Component c = null;
-                    Component addComponent = null;
-                    if (name.equals("gui.skin")) {
-                        skinComboBox.setToolTipText(description);
-                        skinComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, skinComboBox.getPreferredSize().height));
-                        c = skinComboBox;
-                    } else if ((itemType == String.class) || (itemType == Integer.class) || (itemType == Long.class) || (itemType == Double.class) || (itemType == Float.class) || (itemType == Calendar.class)) {
-                        ConfigurationFile confFile = field.getAnnotation(ConfigurationFile.class);
-                        ConfigurationDirectory confDirectory = field.getAnnotation(ConfigurationDirectory.class);
-
-                        JTextField tf = new JTextField();
-                        Object val = item.get();
-                        if (val == null) {
-                            val = "";
-                        }
-                        if (itemType == Calendar.class) {
-                            tf.setText(new SimpleDateFormat().format(((Calendar) val).getTime()));
-                        } else {
-                            tf.setText(val.toString());
-                        }
-                        tf.setToolTipText(description);
-                        tf.setMaximumSize(new Dimension(Integer.MAX_VALUE, tf.getPreferredSize().height));
-
-                        c = tf;
-                        if (confFile != null) { //|| confDirectory != null) {
-                            JPanel p = new JPanel(new BorderLayout());
-                            p.setMaximumSize(new Dimension(Integer.MAX_VALUE, tf.getPreferredSize().height));
-                            p.add(tf, BorderLayout.CENTER);
-                            JButton butSelect = new JButton(View.getIcon("folderopen16"));
-                            butSelect.setToolTipText(ResourceBundle.getBundle(AppStrings.getResourcePath(MainFrame.class)).getString("FileChooser.openButtonText"));
-                            butSelect.setMargin(new Insets(2, 2, 2, 2));
-                            butSelect.addActionListener((ActionEvent e) -> {
-                                tf.setText(selectConfigFile(item, tf.getText(), confFile.value()));
-                            });
-                            p.add(butSelect, BorderLayout.EAST);
-                            addComponent = p;
-                        }
-                    } else if (itemType == Boolean.class) {
-                        JCheckBox cb = new JCheckBox();
-                        cb.setSelected((Boolean) item.get());
-                        cb.setToolTipText(description);
-                        c = cb;
-                    } else if (itemType.isEnum()) {
-                        JComboBox<String> cb = new JComboBox<>();
-                        @SuppressWarnings("unchecked")
-                        EnumSet enumValues = EnumSet.allOf(itemType);
-                        String stringValue = null;
-                        for (Object enumValue : enumValues) {
-                            String enumValueStr = enumValue.toString();
-                            if (stringValue == null) {
-                                stringValue = enumValueStr;
-                            }
-                            cb.addItem(enumValueStr);
-                        }
-                        if (item.get() != null) {
-                            stringValue = item.get().toString();
-                        }
-                        cb.setToolTipText(description);
-                        cb.setSelectedItem(stringValue);
-                        cb.setMaximumSize(new Dimension(Integer.MAX_VALUE, cb.getPreferredSize().height));
-                        c = cb;
+                    
+                    if (allComponentsMap.containsKey(name)) {
+                        c = allComponentsMap.get(name);
                     } else {
-                        throw new UnsupportedOperationException("Configuration ttem type '" + itemType.getName() + "' is not supported");
-                    }
 
-                    componentsMap.put(name, c);
-                    if (addComponent == null) {
-                        addComponent = c;
+                        if (name.equals("gui.skin")) {
+                            skinComboBox.setToolTipText(description);
+                            skinComboBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, skinComboBox.getPreferredSize().height));
+                            c = skinComboBox;
+                        } else if ((itemType == String.class) || (itemType == Integer.class) || (itemType == Long.class) || (itemType == Double.class) || (itemType == Float.class) || (itemType == Calendar.class)) {
+                            ConfigurationFile confFile = field.getAnnotation(ConfigurationFile.class);
+                            ConfigurationDirectory confDirectory = field.getAnnotation(ConfigurationDirectory.class);
+
+                            JTextField tf = new JTextField();
+                            Object val = item.get();
+                            if (val == null) {
+                                val = "";
+                            }
+                            if (itemType == Calendar.class) {
+                                tf.setText(new SimpleDateFormat().format(((Calendar) val).getTime()));
+                            } else {
+                                tf.setText(val.toString());
+                            }
+                            tf.setToolTipText(description);
+                            tf.setMaximumSize(new Dimension(Integer.MAX_VALUE, tf.getPreferredSize().height));
+
+                            c = tf;
+                            if (confFile != null) { //|| confDirectory != null) {                            
+                                c = new ConfigurationFileSelection(item, confFile, val.toString(), description);
+                            }
+                        } else if (itemType == Boolean.class) {
+                            JCheckBox cb = new JCheckBox();
+                            cb.setSelected((Boolean) item.get());
+                            cb.setToolTipText(description);
+                            c = cb;
+                        } else if (itemType.isEnum()) {
+                            JComboBox<String> cb = new JComboBox<>();
+                            @SuppressWarnings("unchecked")
+                            EnumSet enumValues = EnumSet.allOf(itemType);
+                            String stringValue = null;
+                            for (Object enumValue : enumValues) {
+                                String enumValueStr = enumValue.toString();
+                                if (stringValue == null) {
+                                    stringValue = enumValueStr;
+                                }
+                                cb.addItem(enumValueStr);
+                            }
+                            if (item.get() != null) {
+                                stringValue = item.get().toString();
+                            }
+                            cb.setToolTipText(description);
+                            cb.setSelectedItem(stringValue);
+                            cb.setMaximumSize(new Dimension(Integer.MAX_VALUE, cb.getPreferredSize().height));
+                            c = cb;
+                        } else {
+                            throw new UnsupportedOperationException("Configuration ttem type '" + itemType.getName() + "' is not supported");
+                        }
+
+                        labelsMap.put(name, l);
+                        componentsMap.put(name, c);
+                        allComponentsMap.put(name, c);
                     }
-                    l.setLabelFor(c);
-                    configPanel.add(addComponent);
+                    Component toLabelComponent = c;
+                    if (toLabelComponent instanceof ConfigurationFileSelection) {
+                        toLabelComponent = ((ConfigurationFileSelection) toLabelComponent).getTextField();
+                    }
+                    l.setLabelFor(toLabelComponent);
+                    configPanel.add(c);
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
                     // Reflection exceptions. This should never happen
                     throw new Error(ex.getMessage());
@@ -464,6 +507,8 @@ public class AdvancedSettingsDialog extends AppDialog {
 
                 itemCount++;
             }
+
+            categoryCounts.put(cat, itemCount);
 
             SpringUtilities.makeCompactGrid(configPanel,
                     itemCount, 2, //rows, cols
@@ -508,7 +553,7 @@ public class AdvancedSettingsDialog extends AppDialog {
         Map<String, Field> fields = Configuration.getConfigurationFields();
         Map<String, Object> values = new HashMap<>();
         for (String name : fields.keySet()) {
-            Component c = componentsMap.get(name);
+            Component c = allComponentsMap.get(name);
             Object value = null;
 
             ParameterizedType listType = (ParameterizedType) fields.get(name).getGenericType();
@@ -518,7 +563,9 @@ public class AdvancedSettingsDialog extends AppDialog {
             }
 
             Class itemType = (Class<?>) itemType2;
-            if (name.equals("gui.skin")) {
+            if (c instanceof ConfigurationFileSelection) {
+                value = ((ConfigurationFileSelection) c).getValue();
+            } else if (name.equals("gui.skin")) {
                 value = ((SkinSelect) ((JComboBox<SkinSelect>) c).getSelectedItem()).className;
             } else if (itemType == String.class) {
                 value = ((JTextField) c).getText();
