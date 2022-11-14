@@ -928,7 +928,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         @Override
         public int hashCode() {
             int hash = 7;
-            hash = 11 * hash + Objects.hashCode(this.obj);
+            hash = 11 * hash + System.identityHashCode(this.obj);
             hash = 11 * hash + Objects.hashCode(this.fieldSet.get(FIELD_INDEX));
             hash = 11 * hash + this.index;
             return hash;
@@ -943,9 +943,12 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 return false;
             }
             final FieldNode other = (FieldNode) obj;
-            if (!Objects.equals(this.obj, other.obj)) {
+            if (this.obj != other.obj) {
                 return false;
             }
+            /*if (!Objects.equals(this.obj, other.obj)) {
+                return false;
+            }*/
             if (!Objects.equals(this.fieldSet.get(FIELD_INDEX), other.fieldSet.get(FIELD_INDEX))) {
                 return false;
             }
@@ -973,7 +976,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
 
         public String getNodePathName(Object find) {
-
+            
             if (nodeCacheReverse.containsKey(find)) {
                 return nodeCacheReverse.get(find);
             }
@@ -1255,6 +1258,36 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         public int size() {
             return fields.size();
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 67 * hash + Objects.hashCode(this.fields);
+            hash = 67 * hash + Objects.hashCode(this.name);
+            hash = 67 * hash + Objects.hashCode(this.itemName);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final FieldSet other = (FieldSet) obj;
+            if (!Objects.equals(this.name, other.name)) {
+                return false;
+            }
+            if (!Objects.equals(this.itemName, other.itemName)) {
+                return false;
+            }
+            return Objects.equals(this.fields, other.fields);
         }
     }
 

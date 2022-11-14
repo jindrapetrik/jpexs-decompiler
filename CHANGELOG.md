@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#1867] AS3 - §§hasnext, §§nextvalue, §§nextname in some nonstandard compiled SWFs
+- Raw editation NullPointerException
 
 ## [16.3.0] - 2022-11-14
 ### Added
