@@ -25,7 +25,7 @@ import javax.swing.text.html.HTMLDocument;
 
 public class HtmlLabel extends JEditorPane {
 
-    private JLabel label = new JLabel();
+    private final JLabel label = new JLabel();
     private String rawText;
 
     public HtmlLabel() {
@@ -56,7 +56,16 @@ public class HtmlLabel extends JEditorPane {
         this.rawText = t;
         super.setText(modText);
 
-        String aRule = "a {color: " + getUIColorToHex("List.selectionBackground") + "}";
+        Color bgColor = UIManager.getColor("Panel.background");
+        int light = (bgColor.getRed() + bgColor.getGreen() + bgColor.getBlue()) / 3;
+        boolean nightMode = light <= 128;
+
+        Color linkColor = Color.blue;
+        if (nightMode) {
+            linkColor = new Color(0x88, 0x88, 0xff);
+        }
+        
+        String aRule = "a {color: " + String.format("#%02x%02x%02x", linkColor.getRed(), linkColor.getGreen(), linkColor.getBlue()) + "}";
 
         ((HTMLDocument) getDocument()).getStyleSheet().addRule(aRule);
     }
@@ -65,10 +74,4 @@ public class HtmlLabel extends JEditorPane {
     public String getText() {
         return rawText;
     }
-
-    private static String getUIColorToHex(String name) {
-        Color c = UIManager.getColor(name);
-        return String.format("#%02x%02x%02x", c.getRed(), c.getGreen(), c.getBlue());
-    }
-
 }

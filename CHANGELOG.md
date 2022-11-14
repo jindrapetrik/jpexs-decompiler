@@ -39,6 +39,7 @@ All notable changes to this project will be documented in this file.
 - Raw editor does not select item in enum list
 - Sound not played on frames
 - [#1678] Miter clip join - can be enabled in Settings
+- Html label links visibility
 
 ### Changed
 - Full path inside bundle is displayed as SWF name instead simple name
