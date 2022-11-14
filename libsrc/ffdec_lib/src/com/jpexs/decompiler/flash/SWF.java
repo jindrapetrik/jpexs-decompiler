@@ -2748,6 +2748,10 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
         }
     }
+    
+    public void clearShapeCache() {
+        shapeExportDataCache.clear();
+    }
 
     public void clearSoundCache() {
         soundCache.clear();
@@ -2792,6 +2796,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         cyclicCharacters = null;
         clearReadOnlyListCache();
         clearImageCache();
+        clearShapeCache();
         clearScriptCache();
         clearAbcListCache();
         clearAllStaticCache();
@@ -3171,6 +3176,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
         updateCharacters();
         clearImageCache();
+        clearShapeCache();
     }
 
     @Override
@@ -3193,6 +3199,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         resetTimelines(timelined);
         updateCharacters();
         clearImageCache();
+        clearShapeCache();
     }
 
     private void removeTagInternal(Timelined timelined, Tag tag, boolean removeDependencies) {
@@ -3376,6 +3383,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         assignExportNamesToSymbols();
         assignClassesToSymbols();
         clearImageCache();
+        clearShapeCache();
         updateCharacters();
         computeDependentCharacters();
         computeDependentFrames();

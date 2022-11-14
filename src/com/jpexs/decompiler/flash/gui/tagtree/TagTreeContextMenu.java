@@ -1384,6 +1384,8 @@ public class TagTreeContextMenu extends JPopupMenu {
         targetSwf.assignClassesToSymbols();
         sourceSwf.clearImageCache();
         targetSwf.clearImageCache();
+        sourceSwf.clearShapeCache();
+        targetSwf.clearShapeCache();
         sourceSwf.updateCharacters();
         targetSwf.updateCharacters();
         sourceSwf.resetTimelines(sourceSwf);
@@ -1476,6 +1478,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             swf.assignExportNamesToSymbols();
             swf.assignClassesToSymbols();
             swf.clearImageCache();
+            swf.clearShapeCache();
             swf.updateCharacters();
             swf.computeDependentCharacters();
             swf.computeDependentFrames();
@@ -2446,6 +2449,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 swf.assignExportNamesToSymbols();
                 swf.assignClassesToSymbols();
                 swf.clearImageCache();
+                swf.clearShapeCache();
                 swf.updateCharacters();
                 mainPanel.refreshTree(swf);
             }
@@ -2926,6 +2930,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     sourceSwf.assignExportNamesToSymbols();
                     sourceSwf.assignClassesToSymbols();
                     sourceSwf.clearImageCache();
+                    sourceSwf.clearShapeCache();
                     sourceSwf.updateCharacters();
                     sourceSwf.resetTimelines(sourceSwf);
                 }
@@ -2933,6 +2938,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             targetSwf.assignExportNamesToSymbols();
             targetSwf.assignClassesToSymbols();
             targetSwf.clearImageCache();
+            targetSwf.clearShapeCache();
             targetSwf.updateCharacters();
             targetSwf.resetTimelines(targetSwf);
 

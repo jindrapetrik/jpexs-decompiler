@@ -943,6 +943,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             Tag tag = genericTagPanel.getTag();
             SWF swf = tag.getSwf();
             swf.clearImageCache();
+            swf.clearShapeCache();
             swf.updateCharacters();
             tag.getTimelined().resetTimeline();
             swf.assignClassesToSymbols();
