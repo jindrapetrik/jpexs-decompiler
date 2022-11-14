@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.exporters.shape;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.ImageTagBufferedImage;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -440,8 +441,9 @@ public class BitmapExporter extends ShapeExporterBase {
 
         if (joinStyle == BasicStroke.JOIN_MITER) {
             lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle, miterLimit);
-            //This seems to be correct, but ridiculously slow :-(
-            //lineStroke = new MiterClipBasicStroke((BasicStroke) lineStroke);
+            if (Configuration.allowMiterClipLinestyle.get()) {
+                lineStroke = new MiterClipBasicStroke((BasicStroke) lineStroke);
+            }
         } else {
             lineStroke = new BasicStroke((float) thickness, capStyle, joinStyle);
         }
