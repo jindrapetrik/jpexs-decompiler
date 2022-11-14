@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -31,7 +32,7 @@ import java.io.IOException;
  * @author JPEXS
  */
 @SWFVersion(from = 1)
-public class StartSoundTag extends Tag {
+public class StartSoundTag extends Tag implements CharacterIdTag {
 
     public static final int ID = 15;
 
@@ -80,5 +81,15 @@ public class StartSoundTag extends Tag {
     public void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI16(soundId);
         sos.writeSOUNDINFO(soundInfo);
+    }   
+
+    @Override
+    public int getCharacterId() {
+        return soundId;
     }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        soundId = characterId;
+    }        
 }

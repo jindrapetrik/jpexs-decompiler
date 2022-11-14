@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- [#1869] Replace references now replaces all references, not just PlaceObject
+- Handle StartSound tag as CharacterIdTag
 
 ## [16.3.1] - 2022-11-14
 ### Fixed
@@ -2443,7 +2446,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.3.0...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.3.1...dev
+[16.3.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.3.0...version16.3.1
 [16.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.2.0...version16.3.0
 [16.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.1.0...version16.2.0
 [16.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.4...version16.1.0
@@ -2572,6 +2576,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1869]: https://www.free-decompiler.com/flash/issues/1869
 [#1867]: https://www.free-decompiler.com/flash/issues/1867
 [#1868]: https://www.free-decompiler.com/flash/issues/1868
 [#1649]: https://www.free-decompiler.com/flash/issues/1649

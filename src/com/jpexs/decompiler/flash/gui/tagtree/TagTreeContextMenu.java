@@ -1472,13 +1472,14 @@ public class TagTreeContextMenu extends JPopupMenu {
             for (Tag tag : swf.getTags()) {
                 replaceRef(tag, characterId, newCharacterId);
             }
-
+            
             swf.assignExportNamesToSymbols();
             swf.assignClassesToSymbols();
             swf.clearImageCache();
             swf.updateCharacters();
             swf.computeDependentCharacters();
             swf.computeDependentFrames();
+            swf.resetTimeline();
             mainPanel.refreshTree(swf);
         }
     }
@@ -1489,19 +1490,19 @@ public class TagTreeContextMenu extends JPopupMenu {
             for (Tag subTag : sprite.getTags()) {
                 replaceRef(subTag, characterId, newCharacterId);
             }
+            sprite.resetTimeline();
             sprite.clearReadOnlyListCache();
+            return;
         }
-        if (tag instanceof PlaceObjectTypeTag) {
-            PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag) tag;
-            if (placeTag.getCharacterId() == characterId) {
-                placeTag.setCharacterId(newCharacterId);
-                placeTag.setModified(true);
-                Timelined tim = placeTag.getTimelined();
-                if (tim != null) {
-                    tim.resetTimeline();
-                }
-            }
+        
+        if ((tag instanceof CharacterIdTag) && !(tag instanceof CharacterTag)) {
+            CharacterIdTag charIdTag = (CharacterIdTag) tag;
+            if (charIdTag.getCharacterId() == characterId) {
+                charIdTag.setCharacterId(newCharacterId);
+                tag.setModified(true);
+            } 
         }
+        tag.replaceCharacter(characterId, newCharacterId);
     }
 
     private void rawEditActionPerformed(ActionEvent evt) {

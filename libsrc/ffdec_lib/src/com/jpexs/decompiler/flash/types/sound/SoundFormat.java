@@ -227,10 +227,16 @@ public class SoundFormat {
             int inPointBytes = inPoint * 2 /*16bit*/ * (stereo ? 2 : 1);
             int outPointBytes = soundInfo.hasOutPoint ? outPoint * 2 /*16bit*/ * (stereo ? 2 : 1) : data.length;
             for (int i = inPointBytes; i < outPointBytes; i += (stereo ? 4 : 2)) {
+                if (i + 1 >= data.length) {
+                    break;
+                }
                 int left = ((data[i] & 0xff) + ((data[i + 1] & 0xff) << 8)) << 16 >> 16;
                 int right = left;
                 if (stereo) {
-                    right = ((data[i + 2] & 0xff) + ((data[i + 3] & 0xff) << 8)) << 16 >> 16;
+                    if (i + 3 >= data.length) {
+                        break;
+                    }  
+                    right = ((data[i + 2] & 0xff) + ((data[i + 3] & 0xff) << 8)) << 16 >> 16;                                  
                 }
 
                 if (soundInfo.hasEnvelope) {
