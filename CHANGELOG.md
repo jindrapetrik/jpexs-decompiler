@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#1867] AS3 - §§hasnext, §§nextvalue, §§nextname in some nonstandard compiled SWFs
-- Raw editation NullPointerException
+- [#1868] Raw editation NullPointerException
 
 ## [16.3.0] - 2022-11-14
 ### Added
@@ -2571,6 +2571,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1867]: https://www.free-decompiler.com/flash/issues/1867
+[#1868]: https://www.free-decompiler.com/flash/issues/1868
 [#1649]: https://www.free-decompiler.com/flash/issues/1649
 [#1701]: https://www.free-decompiler.com/flash/issues/1701
 [#1864]: https://www.free-decompiler.com/flash/issues/1864
