@@ -417,7 +417,7 @@ public class AdvancedSettingsDialog extends AppDialog {
                     }
                     String locNameHtml = locName;
                     if (!filter.trim().equals("")) {
-                        locNameHtml = locNameHtml.replaceAll("(?i)" + Pattern.quote(filter), "{bold}$0{/bold}");                                             
+                        locNameHtml = Pattern.compile(Pattern.quote(filter), Pattern.UNICODE_CASE + Pattern.CASE_INSENSITIVE).matcher(locNameHtml).replaceAll("{bold}$0{/bold}");
                     }
                     locNameHtml = "<html>" + locNameHtml.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")+ "</html>";
                     locNameHtml = locNameHtml.replace("{bold}", "<span style=\"background-color:"+hilightBackgroundColorHex+"; color: " + hilightForegroundColorHex + "\">").replace("{/bold}", "</span>");
