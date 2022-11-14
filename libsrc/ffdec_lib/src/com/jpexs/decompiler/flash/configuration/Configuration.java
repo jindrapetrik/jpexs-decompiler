@@ -775,6 +775,10 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> allowDragAndDropInTagListTree = null;
+    
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> allowMiterClipLinestyle = null;
         
     private enum OSId {
         WINDOWS, OSX, UNIX
