@@ -3616,6 +3616,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         setTagTreeSelectedNode(getCurrentTree(), newTag);
                     }
                     swf.clearImageCache();
+                    swf.clearShapeCache();
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, "Invalid image", ex);
                     ViewMessages.showMessageDialog(this, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -3644,6 +3645,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
 
                 swf.clearImageCache();
+                swf.clearShapeCache();
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, "Invalid image", ex);
                 ViewMessages.showMessageDialog(MainPanel.this, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -3699,6 +3701,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
 
                     swf.clearImageCache();
+                    swf.clearShapeCache();
                 } catch (IOException ex) {
                     logger.log(Level.SEVERE, "Invalid image", ex);
                     ViewMessages.showMessageDialog(this, translate("error.image.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
@@ -3729,6 +3732,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         new ImageImporter().importImageAlpha(it, data);
                         SWF swf = it.getSwf();
                         swf.clearImageCache();
+                        swf.clearShapeCache();
                     } catch (IOException ex) {
                         logger.log(Level.SEVERE, "Invalid alpha channel data", ex);
                         ViewMessages.showMessageDialog(this, translate("error.image.alpha.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
