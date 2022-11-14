@@ -80,6 +80,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.clauses.TryAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.StrictEqAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
+import com.jpexs.decompiler.graph.AbstractGraphTargetVisitor;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphException;
@@ -88,6 +89,7 @@ import com.jpexs.decompiler.graph.GraphPartChangeException;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.Loop;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.decompiler.graph.StopPartKind;
@@ -1906,7 +1908,40 @@ public class AVM2Graph extends Graph {
                             } else if (gti instanceof NextNameAVM2Item) {
                                 return new ForInAVM2Item(w.getSrc(), w.getLineStartItem(), w.loop, new InAVM2Item(hn.getInstruction(), hn.getLineStartIns(), varName, collection), w.commands);
                             }
+                        } else {
+                            GraphTargetItem first = w.commands.get(0);
+                            Reference<Integer> kindRef = new Reference<>(0);
+                            first.visitRecursively(new AbstractGraphTargetVisitor() {
+                                private boolean handled = false;
+                                @Override
+                                public void visit(GraphTargetItem item) {
+                                    if (handled) {
+                                        return;
+                                    }
+                                    if ((item instanceof NextNameAVM2Item) || (item instanceof NextValueAVM2Item)) {
+                                        handled = true;
+                                        if (item instanceof NextValueAVM2Item){
+                                            NextValueAVM2Item nv = (NextValueAVM2Item) item;
+                                            nv.localReg = hn.index;                                                                       
+                                            kindRef.setVal(1);
+                                        }
+                                        if (item instanceof NextNameAVM2Item){
+                                            NextNameAVM2Item nn = (NextNameAVM2Item) item;
+                                            nn.localReg = hn.index;
+                                            kindRef.setVal(2);
+                                        }                                        
+                                    }                                
+                                }
+                            });
+                            
+                            if (kindRef.getVal() == 1) {
+                                return new ForEachInAVM2Item(w.getSrc(), w.getLineStartItem(), w.loop, new InAVM2Item(hn.getInstruction(), hn.getLineStartIns(), hn.index, hn.obj), w.commands);                            
+                            }
+                            if (kindRef.getVal() == 2) {
+                                return new ForInAVM2Item(w.getSrc(), w.getLineStartItem(), w.loop, new InAVM2Item(hn.getInstruction(), hn.getLineStartIns(),hn.index , hn.obj), w.commands);                            
+                            }                            
                         }
+                            
                     }
                 }
             }

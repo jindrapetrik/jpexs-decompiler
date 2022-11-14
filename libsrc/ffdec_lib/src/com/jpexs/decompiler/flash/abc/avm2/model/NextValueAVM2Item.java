@@ -38,6 +38,8 @@ public class NextValueAVM2Item extends AVM2Item {
     public GraphTargetItem index;
 
     public GraphTargetItem obj;
+    
+    public GraphTargetItem localReg;
 
     public NextValueAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem index, GraphTargetItem obj) {
         super(instruction, lineStartIns, NOPRECEDENCE);
@@ -58,6 +60,10 @@ public class NextValueAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        if (localReg != null) {
+            localReg.appendTo(writer, localData);
+            return writer;
+        }
         writer.append("§§nextvalue");
         writer.spaceBeforeCallParenthesies(2);
         writer.append("(");
