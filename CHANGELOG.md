@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- [#1867] AS3 - §§hasnext, §§nextvalue, §§nextname in some nonstandard compiled SWFs
 
 ## [16.3.0] - 2022-11-14
 ### Added
@@ -2438,7 +2440,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.2.0...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.3.0...dev
+[16.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.2.0...version16.3.0
 [16.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.1.0...version16.2.0
 [16.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.4...version16.1.0
 [16.0.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.0.3...version16.0.4
@@ -2566,6 +2569,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1867]: https://www.free-decompiler.com/flash/issues/1867
 [#1649]: https://www.free-decompiler.com/flash/issues/1649
 [#1701]: https://www.free-decompiler.com/flash/issues/1701
 [#1864]: https://www.free-decompiler.com/flash/issues/1864

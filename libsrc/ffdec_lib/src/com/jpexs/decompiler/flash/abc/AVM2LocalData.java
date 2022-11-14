@@ -119,7 +119,7 @@ public class AVM2LocalData extends BaseLocalData {
     public boolean inGetLoops = false;
 
     public Set<Integer> seenMethods = new HashSet<>();
-
+        
     public AVM2LocalData() {
 
     }
