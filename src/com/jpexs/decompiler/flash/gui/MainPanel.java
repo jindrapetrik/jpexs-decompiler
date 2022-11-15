@@ -3903,6 +3903,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
                 }                
             }            
+            if (t instanceof Tag) {
+                t = dumpTree.getOriginalTag(t);
+            }
             showPreview(t, dumpPreviewPanel, getFrameForTreeItem(t), getTimelinedForTreeItem(t));
         }
     }
@@ -3919,17 +3922,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         if (currentView == VIEW_DUMP) {
             if (treeItem instanceof Tag) {
-                Tag t = (Tag) treeItem;
-                ReadOnlyTagList tags = t.getTimelined().getTags();
-                int frame = 0;
-                for (int i = 0; i < tags.size(); i++) {
-                    if (tags.get(i) == t) {
-                        return frame;
-                    }
-                    if (tags.get(i) instanceof ShowFrameTag) {
-                        frame++;
-                    }
-                }
+                return dumpTree.getFrameForItem(treeItem);
             }
             return -1;
         }
@@ -3957,8 +3950,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (currentView == VIEW_DUMP) {
             if (treeItem instanceof Tag) {
-                Tag t = (Tag) treeItem;
-                return t.getTimelined();
+                return dumpTree.getTimelinedForItem(treeItem);
             }
             return null;
         }
