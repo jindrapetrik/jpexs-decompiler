@@ -611,7 +611,50 @@ public class DumpTree extends JTree {
             }
         }
     }
-       
+    
+    public Tag getOriginalTag(TreeItem item) {
+        Tag tag;
+        if (item instanceof Tag) {
+            tag = (Tag) item;
+        } else if (item instanceof HasSwfAndTag) {
+            tag = ((HasSwfAndTag) item).getTag();
+        } else {
+            return null;
+        }
+        ByteArrayRange range = tag.getOriginalRange();
+        if (range == null) {
+            return null;
+        }
+        long address = range.getPos();
+        return searchTimelinedForTag(item.getSwf(), address);
+    }
+    
+    public Timelined getTimelinedForItem(TreeItem item) {
+        Tag original = getOriginalTag(item);
+        if (original == null) {
+            return null;
+        }
+        return original.getTimelined();
+    }
+    
+    public int getFrameForItem(TreeItem item) {
+        
+        Tag originalTag = getOriginalTag(item);
+        if (originalTag == null) {
+            return -1;
+        }
+        int frame = 0;
+        for (Tag t : originalTag.getTimelined().getTags()) {
+            if (t == originalTag) {
+                return frame;
+            }
+            if (t instanceof ShowFrameTag) {
+                frame++;
+            }
+        }
+        return -1;
+    }
+    
     public void setSelectedItem(TreeItem item) {
         Tag tag;
         if (item instanceof Tag) {

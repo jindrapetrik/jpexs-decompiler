@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#1869] Replace references now replaces all references, not just PlaceObject
 - Handle StartSound tag as CharacterIdTag
 - Clearing shape export cache on changes
+- Preview of PlaceObject and frames on hex dump view
 
 ## [16.3.1] - 2022-11-14
 ### Fixed
