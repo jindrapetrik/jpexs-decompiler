@@ -20,7 +20,11 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.SelectTagPositionDialog;
 import com.jpexs.decompiler.flash.gui.View;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -29,12 +33,17 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.plaf.basic.BasicMenuUI;
 
 /**
  *
@@ -42,32 +51,80 @@ import javax.swing.event.DocumentListener;
  */
 public class AddClassDialog extends AppDialog {
 
-    private final JButton okButton = new JButton(translate("button.ok"));
+    private final JButton proceedButton = new JButton(translate("button.proceed"));
     private final JButton cancelButton = new JButton(translate("button.cancel"));
 
     private final JTextField classNameTextField = new JTextField(30);
-    private String result = null;
+    private String selectedClass = null;
+    private ABCContainerTag selectedAbcContainer;
+    private Tag selectedPosition;
+    private Timelined selectedTimelined;
+    private int result = ERROR_OPTION;
+    
+    private SWF swf;
+    
+    private int abcCount = 0;
+    
+    private JRadioButton existingAbcTagRadioButton = new JRadioButton(translate("abc.where.existing"));
+    private JRadioButton newAbcTagRadioButton = new JRadioButton(translate("abc.where.new"));
 
-    public AddClassDialog(Window owner) {
+    public AddClassDialog(Window owner, SWF swf) {
         super(owner);
+        this.swf = swf;
+        abcCount = 0;
+        for(Tag t : swf.getTags()) {
+            if (t instanceof ABCContainerTag) {               
+               abcCount++;
+            }
+        }
+        
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setTitle(translate("dialog.title"));
 
         Container cnt = getContentPane();
         cnt.setLayout(new BoxLayout(cnt, BoxLayout.Y_AXIS));
 
-        JPanel panButtons = new JPanel(new FlowLayout());
-        okButton.addActionListener(this::okButtonActionPerformed);
+        JPanel abcTargetPanel = new JPanel();
+        abcTargetPanel.setLayout(new BoxLayout(abcTargetPanel, BoxLayout.Y_AXIS));
+        abcTargetPanel.add(new JLabel(translate("abc.where")));
+        existingAbcTagRadioButton.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                checkEnabled();
+            }
+        });
+        newAbcTagRadioButton.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                checkEnabled();
+            }
+        });
+        ButtonGroup abcTargetButtonGroup = new ButtonGroup();
+        abcTargetButtonGroup.add(existingAbcTagRadioButton);
+        abcTargetButtonGroup.add(newAbcTagRadioButton);        
+        existingAbcTagRadioButton.setSelected(true);
+        abcTargetPanel.add(existingAbcTagRadioButton);
+        abcTargetPanel.add(newAbcTagRadioButton);
+        
+        if (abcCount == 0) {
+            newAbcTagRadioButton.setSelected(true);
+            abcTargetPanel.setVisible(false);
+        }
+        
+        JPanel buttonsPanel = new JPanel(new FlowLayout());
+        proceedButton.addActionListener(this::okButtonActionPerformed);                
         cancelButton.addActionListener(this::cancelButtonActionPerformed);
-        panButtons.add(okButton);
-        panButtons.add(cancelButton);
+        buttonsPanel.add(proceedButton);
+        buttonsPanel.add(cancelButton);
 
         JLabel classNameLabel = new JLabel(translate("classname"));
-        classNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        classNameLabel.setAlignmentX(JLabel.CENTER);
         cnt.add(classNameLabel);
         cnt.add(classNameTextField);
+        
+        cnt.add(abcTargetPanel);
 
-        cnt.add(panButtons);
+        cnt.add(buttonsPanel);
 
         classNameTextField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -97,7 +154,14 @@ public class AddClassDialog extends AppDialog {
     }
 
     private void checkEnabled() {
-
+        
+        if (existingAbcTagRadioButton.isSelected() && abcCount == 1) {
+            proceedButton.setText(translate("button.ok"));
+        } else {
+            proceedButton.setText(translate("button.proceed"));
+        }
+        
+        
         boolean ok = true;
 
         if (classNameTextField.getText().isEmpty()) {
@@ -122,29 +186,72 @@ public class AddClassDialog extends AppDialog {
             }
         }
 
-        okButton.setEnabled(ok);
+        proceedButton.setEnabled(ok);
     }
 
     private void okButtonActionPerformed(ActionEvent evt) {
-        if (!okButton.isEnabled()) {
+        if (!proceedButton.isEnabled()) {
             return;
         }
-        result = classNameTextField.getText();
         setVisible(false);
+        if (existingAbcTagRadioButton.isSelected()) {
+            SelectDoABCDialog selectDoABCDialog = new SelectDoABCDialog(owner, swf);
+            selectedAbcContainer = selectDoABCDialog.showDialog();
+            if (selectedAbcContainer == null) {
+                cancelButtonActionPerformed(evt);
+                return;
+            }
+        }
+        if (newAbcTagRadioButton.isSelected()) {
+            SelectTagPositionDialog selectTagPositionDialog = new SelectTagPositionDialog(owner, swf, true);
+            if (selectTagPositionDialog.showDialog() != OK_OPTION) {
+                cancelButtonActionPerformed(evt);
+                return;
+            }
+            selectedPosition = selectTagPositionDialog.getSelectedTag();
+            selectedTimelined = selectTagPositionDialog.getSelectedTimelined();
+        }
+        
+        result = OK_OPTION;
+        selectedClass = classNameTextField.getText();
+        setVisible(false);        
     }
 
     private void cancelButtonActionPerformed(ActionEvent evt) {
-        result = null;
+        selectedClass = null;
+        selectedAbcContainer = null;
+        selectedPosition = null;
+        selectedTimelined = null;
+        result = CANCEL_OPTION;
         setVisible(false);
     }
 
-    public String showDialog() {
+    public int showDialog() {
         return showDialog("");
     }
-    public String showDialog(String pkg) {
+    public int showDialog(String pkg) {
         classNameTextField.setText(pkg);
-        result = null;
+        selectedClass = null;
+        selectedAbcContainer = null;
+        selectedPosition = null;
+        selectedTimelined = null;
         setVisible(true);
         return result;
     }
+
+    public Tag getSelectedPosition() {
+        return selectedPosition;
+    }
+
+    public String getSelectedClass() {
+        return selectedClass;
+    }
+
+    public Timelined getSelectedTimelined() {
+        return selectedTimelined;
+    }
+
+    public ABCContainerTag getSelectedAbcContainer() {
+        return selectedAbcContainer;
+    }               
 }

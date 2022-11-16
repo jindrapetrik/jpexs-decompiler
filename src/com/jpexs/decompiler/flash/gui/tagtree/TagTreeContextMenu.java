@@ -1570,35 +1570,35 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             {
-                AddClassDialog acd = new AddClassDialog(Main.getDefaultDialogsOwner());
-                String className = acd.showDialog(preselected);
-                if (className == null) {
+                AddClassDialog acd = new AddClassDialog(Main.getDefaultDialogsOwner(), swf);
+                if (acd.showDialog(preselected) != AppDialog.OK_OPTION) {
                     return;
                 }
+                String className = acd.getSelectedClass();
                 String[] parts = className.contains(".") ? className.split("\\.") : new String[]{className};
 
-                DoABC2Tag doAbc = new DoABC2Tag(swf);
-                doAbc.setTimelined(swf);
-                doAbc.name = className;
+                ABCContainerTag doAbc = acd.getSelectedAbcContainer();
+                
+                if (doAbc == null) {
+                    DoABC2Tag doAbc2 = new DoABC2Tag(swf);
+                    
+                    Timelined timelined = acd.getSelectedTimelined();
+                    Tag position = acd.getSelectedPosition();
+                    if (position == null) {
+                        timelined.addTag(doAbc2);
+                    } else {
+                        timelined.addTag(timelined.indexOfTag(position), doAbc2);
+                    }                    
+                    doAbc2.setTimelined(acd.getSelectedTimelined());
+                    doAbc2.name = className;
+                    doAbc = doAbc2;
+                }
 
                 List<ABC> abcs = new ArrayList<>();
                 for (ABCContainerTag ct : swf.getAbcList()) {
                     abcs.add(ct.getABC());
                 }
-
-                ReadOnlyTagList tags = swf.getTags();
-                int insertPos = -1;
-                for (int i = 0; i < tags.size(); i++) {
-                    if (tags.get(i) instanceof ShowFrameTag) {
-                        insertPos = i;
-                        break;
-                    }
-                }
-                if (insertPos == -1) {
-                    insertPos = tags.size();
-                }
-                swf.addTag(insertPos, doAbc);
-
+                                
                 String pkg = className.contains(".") ? className.substring(0, className.lastIndexOf(".")) : "";
                 String classSimpleName = className.contains(".") ? className.substring(className.lastIndexOf(".") + 1) : className;
                 String fileName = className.replace(".", "/");
@@ -1623,7 +1623,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, "Error during script compilation", ex);
                 }
 
-                doAbc.setModified(true);
+                ((Tag)doAbc).setModified(true);
                 swf.clearAllCache();
                 swf.setModified(true);
                 mainPanel.refreshTree(swf);
