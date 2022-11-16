@@ -1357,7 +1357,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 List<List<NamespaceItem>> allopns = new ArrayList<>();
                 allopns.add(openedNamespaces);
 
-                GetterAVM2Item getter = new GetterAVM2Item(allopns, false, false, new ArrayList<>(), new NamespaceItem(pkg.toRawString() + ":" + name, Namespace.KIND_PROTECTED), isInterface, null, false, false, 0,
+                GetterAVM2Item getter = new GetterAVM2Item(allopns, false, false, new ArrayList<>(), new NamespaceItem(pkg.isEmpty() ? name : pkg.toRawString() + ":" + name, Namespace.KIND_PROTECTED), isInterface, null, false, false, 0,
                         true, false, false, "skinParts", new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
                         getterBody, subvars, new TypeItem("Object"));
 
@@ -1373,7 +1373,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 NewObjectAVM2Item sltVal = new NewObjectAVM2Item(null, null, pairs);
 
                 SlotAVM2Item slt = new SlotAVM2Item(
-                        new ArrayList<>(), new NamespaceItem(pkg.toRawString() + ":" + name, Namespace.KIND_PRIVATE),
+                        new ArrayList<>(), new NamespaceItem(pkg.isEmpty() ? name : pkg.toRawString() + ":" + name, Namespace.KIND_PRIVATE),
                         null, true, "_skinParts", new TypeItem("Object"), sltVal, 0);
 
                 traitItems.add(0, slt);
@@ -1394,7 +1394,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             instanceInfo.iinit_index = init = method(false, 0, false, isInterface, new ArrayList<>(), pkg, false, new ArrayList<>(), initScope + 1, false, 0, isInterface ? null : name, extendsVal != null ? extendsVal.toString() : null, true, localData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), TypeItem.UNBOUNDED/*?? FIXME*/);
         } else {
             MethodAVM2Item m = (MethodAVM2Item) iinit;
-            instanceInfo.iinit_index = init = method(false, str(pkg.toRawString() + ":" + name + "/" + name), false, false, new ArrayList<>(), pkg, m.needsActivation, m.subvariables, initScope + 1, m.hasRest, m.line, name, extendsVal != null ? extendsVal.toString() : null, true, localData, m.paramTypes, m.paramNames, m.paramValues, m.body, TypeItem.UNBOUNDED/*?? FIXME*/);
+            instanceInfo.iinit_index = init = method(false, pkg.toRawString().isEmpty() ? str(name + "/" + name) : str(pkg.toRawString() + ":" + name + "/" + name), false, false, new ArrayList<>(), pkg, m.needsActivation, m.subvariables, initScope + 1, m.hasRest, m.line, name, extendsVal != null ? extendsVal.toString() : null, true, localData, m.paramTypes, m.paramNames, m.paramValues, m.body, TypeItem.UNBOUNDED/*?? FIXME*/);
         }
 
         //Class initializer
@@ -1503,7 +1503,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 ii.flags |= InstanceInfo.CLASS_FINAL;
             }
             ii.flags |= InstanceInfo.CLASS_PROTECTEDNS;
-            ii.protectedNS = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PROTECTED, pkg.toRawString() + ":" + cai.className, 0, true);
+            ii.protectedNS = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PROTECTED, pkg.toRawString().isEmpty() ? cai.className : pkg.toRawString() + ":" + cai.className, 0, true);
         }
         if (cls instanceof InterfaceAVM2Item) {
             InterfaceAVM2Item iai = (InterfaceAVM2Item) cls;
@@ -2289,7 +2289,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     break;
             }
         }
-        sb.append(":");
+        sb.append("/");
         sb.append(methodName);
         if (typeSuffix != null && !typeSuffix.isEmpty()) {
             sb.append("/");
@@ -2465,7 +2465,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         mbCode.add(ins(AVM2Instructions.GetLocal0));
         mbCode.add(ins(AVM2Instructions.PushScope));
 
-        int traitScope = 2;
+        int traitScope = 1;
 
         Map<Trait, Integer> initScopes = new HashMap<>();
 
@@ -2475,13 +2475,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 DottedChain className = tc.getName(abc).getNameWithNamespace(abc.constants, true);
 
                 List<Integer> parents = new ArrayList<>();
-                if (className.size() == 1) {
-                    mbCode.add(ins(AVM2Instructions.GetScopeObject, 0));
-                    traitScope++;
-                } else {
-                    int[] nsset = new int[]{constants.getMultiname(tc.name_index).namespace_index};
-                    mbCode.add(ins(AVM2Instructions.FindPropertyStrict, constants.getMultinameId(Multiname.createMultiname(false, constants.getMultiname(tc.name_index).name_index, constants.getNamespaceSetId(nsset, true)), true)));
-                }
+                int[] nsset = new int[]{constants.getMultiname(tc.name_index).namespace_index};
+                mbCode.add(ins(AVM2Instructions.FindPropertyStrict, constants.getMultinameId(Multiname.createMultiname(false, constants.getMultiname(tc.name_index).name_index, constants.getNamespaceSetId(nsset, true)), true)));
+                traitScope++;
                 if (abc.instance_info.get(tc.class_info).isInterface()) {
                     mbCode.add(ins(AVM2Instructions.PushNull));
                 } else {
