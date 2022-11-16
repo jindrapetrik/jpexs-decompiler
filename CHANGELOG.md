@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - AS3 Direct editation - Top level classes do not use ":" in their namespace names
 - AS3 Direct editation - Using "/" separator for method names
 - Folder preview resizing (scrollbar too long)
+- [#1872] Removing PlaceObject/RemoveObject with no characterid with Remove character action
 
 ## [16.3.1] - 2022-11-14
 ### Fixed
@@ -2586,6 +2587,7 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1870]: https://www.free-decompiler.com/flash/issues/1870
 [#1869]: https://www.free-decompiler.com/flash/issues/1869
+[#1872]: https://www.free-decompiler.com/flash/issues/1872
 [#1867]: https://www.free-decompiler.com/flash/issues/1867
 [#1868]: https://www.free-decompiler.com/flash/issues/1868
 [#1649]: https://www.free-decompiler.com/flash/issues/1649
