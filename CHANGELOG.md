@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Preview of PlaceObject and frames on hex dump view
 - AS3 Direct editation - Top level classes do not use ":" in their namespace names
 - AS3 Direct editation - Using "/" separator for method names
+- Folder preview resizing (scrollbar too long)
 
 ## [16.3.1] - 2022-11-14
 ### Fixed
