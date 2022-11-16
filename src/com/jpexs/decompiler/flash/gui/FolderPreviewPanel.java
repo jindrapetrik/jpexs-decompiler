@@ -51,6 +51,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
@@ -178,11 +179,12 @@ public class FolderPreviewPanel extends JPanel {
 
     @Override
     public Dimension getPreferredSize() {
-        int width = getParent().getSize().width - 20;
+        int width = getParent().getSize().width - 1;
         int cols = width / CELL_WIDTH;
         int rows = (int) Math.ceil(items.size() / (float) cols);
         int height = rows * CELL_HEIGHT;
-        return new Dimension(width, height);
+        int prefWidth = cols * CELL_WIDTH;
+        return new Dimension(prefWidth, height);
     }
 
     @Override
@@ -191,11 +193,7 @@ public class FolderPreviewPanel extends JPanel {
         repaintQueued = false;
         Rectangle r = getVisibleRect();
         int width = getWidth();
-
         int cols = width / CELL_WIDTH;
-        int rows = (int) Math.ceil(items.size() / (float) cols);
-        int height = rows * CELL_HEIGHT;
-
         int start_y = r.y / CELL_HEIGHT;
         JLabel l = new JLabel();
         Font f = l.getFont().deriveFont(AffineTransform.getScaleInstance(0.8, 0.8));
@@ -263,12 +261,6 @@ public class FolderPreviewPanel extends JPanel {
 
                 }
             }
-        }
-
-        if (lastWidth != width || lastHeight != height) {
-            lastWidth = width;
-            lastHeight = height;
-            setSize(new Dimension(width, height));
         }
     }
 
