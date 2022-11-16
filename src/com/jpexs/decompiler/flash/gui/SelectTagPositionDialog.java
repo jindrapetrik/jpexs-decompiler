@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import static com.jpexs.decompiler.flash.gui.AppDialog.CANCEL_OPTION;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
@@ -477,9 +478,9 @@ public class SelectTagPositionDialog extends AppDialog {
             int f = ((MyFrame) tnode.getData()).frame;
             Object parent = ((MyTreeNode) tnode.getParent()).getData();
             if (parent instanceof DefineSpriteTag) {
-                previewPanel.showImagePanel((DefineSpriteTag) parent, swf, f - 1, true, true);
+                previewPanel.showImagePanel((DefineSpriteTag) parent, swf, f - 1, true, true, !Configuration.animateSubsprites.get(), false);
             } else {
-                previewPanel.showImagePanel(swf, swf, f - 1, true, true);
+                previewPanel.showImagePanel(swf, swf, f - 1, true, true, !Configuration.animateSubsprites.get(), false);
             }
         } else {
             previewPanel.showEmpty();

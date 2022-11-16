@@ -232,6 +232,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private boolean playing = false;     
     
     private boolean autoPlayed = false;
+    
+    private boolean frozen = false;
+    
+    private boolean alwaysDisplay = false;
 
     private static Cursor loadCursor(String name, int x, int y) throws IOException {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -406,6 +410,29 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return Color.white;
     }
 
+    @Override
+    public void setDisplayed(boolean value) {
+        autoPlayed = value;
+        Configuration.autoPlayPreviews.set(value);
+    }
+
+    @Override
+    public void setFrozen(boolean value) {
+        this.frozen = value;
+    }
+    
+    @Override
+    public boolean isDisplayed() {
+        return autoPlayed;
+    }
+
+    @Override
+    public boolean alwaysDisplay() {
+        return alwaysDisplay;
+    }
+    
+    
+
     private class IconPanel extends JPanel {
 
         private SerializableImage _img;
@@ -527,6 +554,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         setDragStart(e.getPoint());
                         
                         if (!autoPlayed) {
+                            Configuration.autoPlayPreviews.set(true);
                             autoPlayed = true;
                             play();
                         }
@@ -1223,21 +1251,21 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
         }
 
-        private Rectangle calcRect(Zoom z) {
+        private Rectangle calcRect(Zoom z) {           
             synchronized (ImagePanel.this) {
-                if (_img != null || timelined != null) {
+                if (_img != null || timelined != null) {                    
                     //int w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
                     //int h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
                     double zoomDouble = z.fit ? getZoomToFit() : z.value;
                     int w1;
                     int h1;
-                    if (timelined != null) {
+                    if (timelined == null || (!autoPlayed && _img != null)) {                        
+                        w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
+                        h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));                    
+                    } else {
                         w1 = (int) (timelined.getRectWithStrokes().getWidth() * zoomDouble / SWF.unitDivisor);
                         h1 = (int) (timelined.getRectWithStrokes().getHeight() * zoomDouble / SWF.unitDivisor);
-                    } else {
-                        w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
-                        h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
-                    }
+                    } 
 
                     int w2 = getWidth();
                     int h2 = getHeight();
@@ -1594,7 +1622,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return zoomAvailable;
     }
 
-    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay) {
+    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay) {
         Stage stage = new Stage(drawable) {
             @Override
             public void callFrame(int frame) {
@@ -1682,6 +1710,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             time = 0;
             drawReady = false;
             autoPlayed = autoPlay;
+            this.alwaysDisplay = alwaysDisplay;
+            this.frozen = frozen;
             redraw();
             if (autoPlay) {                
                 play();
@@ -1853,15 +1883,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         fireMediaDisplayStateChanged();
     }
 
-    private static SerializableImage getFrame(ExportRectangle viewRect, SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, int selectedDepth, int freeTransformDepth, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix) {
+    private static SerializableImage getFrame(ExportRectangle viewRect, SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, int selectedDepth, int freeTransformDepth, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix) {        
         Timeline timeline = drawable.getTimeline();
-        //int mouseButton = renderContext.mouseButton;
-        //Point cursorPosition = renderContext.cursorPosition;
-        //String key = "drawable_" + frame + "_" + drawable.hashCode() + "_" + mouseButton + "_depth" + selectedDepth + "_" + (cursorPosition == null ? "out" : cursorPosition.hashCode()) + "_" + zoom + "_" + timeline.fontFrameNum;
         SerializableImage img;
-        //SerializableImage img = swf.getFromCache(key);
-        //if (img == null) {
-        //boolean shouldCache = timeline.isSingleFrame(frame);
         RECT rect = drawable.getRect();
 
         int width = (int) (viewRect.getWidth() * zoom); //int) (rect.getWidth() * zoom);
@@ -1874,7 +1898,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         SerializableImage image = new SerializableImage((int) Math.ceil(width / SWF.unitDivisor),
                 (int) Math.ceil(height / SWF.unitDivisor), SerializableImage.TYPE_INT_ARGB);
-        //renderContext.borderImage = new SerializableImage(image.getWidth(), image.getHeight(), SerializableImage.TYPE_INT_ARGB);
         image.fillTransparent();
 
         Matrix m = new Matrix();
@@ -2232,7 +2255,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         _viewRect = getViewRect();
                         if (!autoPlayed) {                            
-                            img = new SerializableImage(
+                            img = getImagePlay(); /*new SerializableImage(
                                     (int) (_viewRect.getWidth() / SWF.unitDivisor),
                                     (int) (_viewRect.getHeight() / SWF.unitDivisor),
                                     BufferedImage.TYPE_4BYTE_ABGR);
@@ -2243,11 +2266,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             g.drawImage(imgPlay.getBufferedImage(), 
                                     x, 
                                     y,
-                                    null);
+                                    null);*/
                         } else if (_viewRect.getHeight() < 0 || _viewRect.getWidth() < 0) {
                             img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
                         } else {
-                            img = getFrame(_viewRect, swf, frame, time, timelined, renderContext, selectedDepth, freeTransformDepth, zoomDouble, registrationPointRef, boundsRef, transform, transformUpdated == null ? null : new Matrix(transformUpdated));
+                            img = getFrame(_viewRect, swf, frame, frozen ? 0 : time, timelined, renderContext, selectedDepth, freeTransformDepth, zoomDouble, registrationPointRef, boundsRef, transform, transformUpdated == null ? null : new Matrix(transformUpdated));
                         }
                         bounds = boundsRef.getVal();
                         registrationPoint = registrationPointRef.getVal();

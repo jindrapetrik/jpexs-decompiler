@@ -445,4 +445,24 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
         }
         return bgColor;
     }
+
+    @Override
+    public void setDisplayed(boolean value) {
+        
+    }
+
+    @Override
+    public boolean isDisplayed() {
+        return true;
+    }
+
+    @Override
+    public void setFrozen(boolean value) {
+
+    }
+
+    @Override
+    public boolean alwaysDisplay() {
+        return true;
+    }
 }
