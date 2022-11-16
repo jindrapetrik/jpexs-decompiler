@@ -4241,7 +4241,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (treeItem instanceof SWF) {
             SWF swf = (SWF) treeItem;
             if (internalViewer) {
-                previewPanel.showImagePanel(swf, swf, -1, true, Configuration.autoPlaySwfs.get(), !Configuration.animateSubsprites.get(), false);
+                previewPanel.showImagePanel(swf, swf, -1, true, Configuration.autoPlaySwfs.get() && Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false);
             } else {
                 previewPanel.setParametersPanelVisible(false);
                 //if (flashPanel != null) { //same for flashPanel2
