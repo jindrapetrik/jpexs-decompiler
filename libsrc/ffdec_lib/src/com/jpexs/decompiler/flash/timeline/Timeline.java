@@ -559,16 +559,7 @@ public class Timeline {
     }
 
     public boolean removeCharacter(int characterId) {
-        boolean modified = false;
-        for (int i = 0; i < timelined.getTags().size(); i++) {
-            Tag t = timelined.getTags().get(i);
-            if (t instanceof CharacterIdTag && ((CharacterIdTag) t).getCharacterId() == characterId) {
-                timelined.removeTag(i);
-                i--;
-                modified = true;
-            }
-        }
-        return modified;
+        return swf.removeCharacterFromTimeline(characterId, this);        
     }
 
     public double roundToPixel(double val) {
