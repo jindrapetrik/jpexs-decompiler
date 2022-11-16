@@ -69,4 +69,12 @@ public interface MediaDisplay extends Closeable {
     public void removeEventListener(MediaDisplayListener listener);
 
     public Color getBackgroundColor();
+    
+    public void setDisplayed(boolean value);
+    
+    public boolean isDisplayed();
+    
+    public void setFrozen(boolean value);   
+    
+    public boolean alwaysDisplay();
 }

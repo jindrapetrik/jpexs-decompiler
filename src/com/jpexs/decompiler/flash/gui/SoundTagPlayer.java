@@ -494,4 +494,26 @@ public class SoundTagPlayer implements MediaDisplay {
     public Color getBackgroundColor() {
         return Color.white;
     }
+
+    @Override
+    public void setDisplayed(boolean value) {
+        
+    }
+    
+    @Override
+    public void setFrozen(boolean value) {
+        
+    }
+    
+    @Override
+    public boolean isDisplayed() {
+        return true;
+    }
+
+    @Override
+    public boolean alwaysDisplay() {
+        return true;
+    }
+    
+    
 }

@@ -779,6 +779,14 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(false)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> allowMiterClipLinestyle = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> animateSubsprites = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> autoPlayPreviews = null;
         
     private enum OSId {
         WINDOWS, OSX, UNIX

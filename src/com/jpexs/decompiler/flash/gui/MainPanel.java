@@ -4241,7 +4241,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (treeItem instanceof SWF) {
             SWF swf = (SWF) treeItem;
             if (internalViewer) {
-                previewPanel.showImagePanel(swf, swf, -1, true, Configuration.autoPlaySwfs.get());
+                previewPanel.showImagePanel(swf, swf, -1, true, Configuration.autoPlaySwfs.get(), !Configuration.animateSubsprites.get(), false);
             } else {
                 previewPanel.setParametersPanelVisible(false);
                 //if (flashPanel != null) { //same for flashPanel2
@@ -4265,7 +4265,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             ImageTag imageTag = (ImageTag) treeItem;
             previewPanel.setImageReplaceButtonVisible(!((Tag) imageTag).isReadOnly() && imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag, false, false);
             SWF imageSWF = makeTimelinedImage(imageTag);
-            previewPanel.showImagePanel(imageSWF, imageSWF, 0, false, true);
+            previewPanel.showImagePanel(imageSWF, imageSWF, 0, false, true, true, true);
 
         } else if ((treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag)) && internalViewer) {
             final Tag tag = (Tag) treeItem;
@@ -4281,11 +4281,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (treeItem instanceof ShapeTag) {
                 previewPanel.setImageReplaceButtonVisible(false, false, !((Tag) treeItem).isReadOnly(), false);
             }
-            previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, true);
+            previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), treeItem instanceof ShapeTag);
         } else if (treeItem instanceof Frame && internalViewer) {
             Frame fn = (Frame) treeItem;
             SWF swf = fn.getSwf();
-            previewPanel.showImagePanel(fn.timeline.timelined, swf, fn.frame, true, true);
+            previewPanel.showImagePanel(fn.timeline.timelined, swf, fn.frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false);
         } else if (treeItem instanceof ShowFrameTag) {
             SWF swf;
             if (timelinedContainer instanceof DefineSpriteTag) {
@@ -4293,7 +4293,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             } else {
                 swf = (SWF) timelinedContainer;
             }
-            previewPanel.showImagePanel(timelinedContainer, swf, frame, true, true);
+            previewPanel.showImagePanel(timelinedContainer, swf, frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false);
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
             previewPanel.setImageReplaceButtonVisible(false, false, false, !((Tag) treeItem).isReadOnly() && (treeItem instanceof DefineSoundTag));
@@ -4386,7 +4386,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             ShowFrameTag showFrameTag = new ShowFrameTag(swf);
             swf.addTag(showFrameTag);
             showFrameTag.setTimelined(swf);
-            previewPanel.showImagePanel(swf, swf, 0, true, true);
+            previewPanel.showImagePanel(swf, swf, 0, true, true, !Configuration.animateSubsprites.get(), false);
         } else {
             previewPanel.showEmpty();
         }
