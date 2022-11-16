@@ -36,6 +36,8 @@ public abstract class AppDialog extends JDialog {
 
     private ResourceBundle resourceBundle = ResourceBundle.getBundle(AppStrings.getResourcePath(getClass()));
 
+    protected Window owner;
+    
     /*public AppDialog() {
         View.installEscapeCloseOperation(this);
         if (Configuration.useRibbonInterface.get()) {
@@ -45,6 +47,7 @@ public abstract class AppDialog extends JDialog {
 
     public AppDialog(Window owner) {
         super(owner);
+        this.owner = owner;
         View.installEscapeCloseOperation(this);
         if (Configuration.useRibbonInterface.get()) {
             getRootPane().setWindowDecorationStyle(JRootPane.FRAME);

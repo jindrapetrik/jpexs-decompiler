@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#1870] AS3 Adding new class - Target DoABC tag or position can be selected to prevent Error 1014
+
 ### Fixed
 - [#1869] Replace references now replaces all references, not just PlaceObject
 - Handle StartSound tag as CharacterIdTag
@@ -2581,6 +2584,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1870]: https://www.free-decompiler.com/flash/issues/1870
 [#1869]: https://www.free-decompiler.com/flash/issues/1869
 [#1867]: https://www.free-decompiler.com/flash/issues/1867
 [#1868]: https://www.free-decompiler.com/flash/issues/1868
