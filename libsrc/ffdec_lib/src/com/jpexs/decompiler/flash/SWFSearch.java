@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,7 +45,7 @@ public class SWFSearch {
 
     private final Set<ProgressListener> listeners = new HashSet<>();
 
-    private final Map<Long, MemoryInputStream> swfStreams = new HashMap<>();
+    private final Map<Long, MemoryInputStream> swfStreams = new LinkedHashMap<>();
 
     public SWFSearch(Searchable s, boolean noCheck, SearchMode searchMode) {
         this.s = s;

@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - [#1872] Removing PlaceObject/RemoveObject with no characterid with Remove character action
 - [#1692] Resolving use namespace
 - [#1692] Properly distinguish obfuscated names vs namespace suffixes and attributes
+- [#1757] Binary search - SWF files need to be sorted by file position
 
 ### Changed
 - GFX - DefineExternalImage2 no longer handled as character
@@ -2602,6 +2603,7 @@ All notable changes to this project will be documented in this file.
 [#1869]: https://www.free-decompiler.com/flash/issues/1869
 [#1872]: https://www.free-decompiler.com/flash/issues/1872
 [#1692]: https://www.free-decompiler.com/flash/issues/1692
+[#1757]: https://www.free-decompiler.com/flash/issues/1757
 [#1867]: https://www.free-decompiler.com/flash/issues/1867
 [#1868]: https://www.free-decompiler.com/flash/issues/1868
 [#1649]: https://www.free-decompiler.com/flash/issues/1649
