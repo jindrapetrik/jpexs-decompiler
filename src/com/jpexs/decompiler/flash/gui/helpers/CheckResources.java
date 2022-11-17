@@ -124,7 +124,7 @@ public class CheckResources {
                             }
 
                             if (firstMissing2) {
-                                stream.println(clazz.getSimpleName());
+                                stream.println(clazz.getSimpleName() + ":");                                
                                 firstMissing2 = false;
                             }
 
