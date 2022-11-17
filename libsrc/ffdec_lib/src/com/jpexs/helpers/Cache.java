@@ -16,6 +16,7 @@
  */
 package com.jpexs.helpers;
 
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.Freed;
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -37,6 +40,7 @@ import java.util.WeakHashMap;
 public class Cache<K, V> implements Freed {
 
     private Map<K, V> cache;
+    private Map<K, Long> lastAccessed;
 
     private static final List<WeakReference<Cache>> instances = new ArrayList<>();
 
@@ -49,6 +53,12 @@ public class Cache<K, V> implements Freed {
     private final boolean memoryOnly;
 
     private final String name;
+    
+    private final boolean temporary;
+            
+    private static final long CLEAN_INTERVAL = 5 * 1000; //5 seconds
+    
+    private static Thread oldCleaner = null;
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -67,8 +77,24 @@ public class Cache<K, V> implements Freed {
         });
     }
 
-    public static <K, V> Cache<K, V> getInstance(boolean weak, boolean memoryOnly, String name) {
-        Cache<K, V> instance = new Cache<>(weak, memoryOnly, name);
+    public static <K, V> Cache<K, V> getInstance(boolean weak, boolean memoryOnly, String name, boolean temporary) {
+        if (oldCleaner == null) {
+            oldCleaner = new Thread("Old cache cleaner") {
+                @Override
+                public void run() {
+                    while(!Thread.interrupted()) {
+                        try {
+                            Thread.sleep(CLEAN_INTERVAL);
+                        } catch (InterruptedException ex) {
+                            return;
+                        }
+                        clearAllOld();                        
+                    }
+                }                
+            };
+            oldCleaner.start();
+        }
+        Cache<K, V> instance = new Cache<>(weak, memoryOnly, name, temporary);
         instances.add(new WeakReference<>(instance));
         return instance;
     }
@@ -129,36 +155,48 @@ public class Cache<K, V> implements Freed {
         if (this.cache instanceof Freed) {
             ((Freed) this.cache).free();
         }
+        this.lastAccessed = new WeakHashMap<>();
         this.cache = newCache;
     }
 
-    private Cache(boolean weak, boolean memoryOnly, String name) {
+    private Cache(boolean weak, boolean memoryOnly, String name, boolean temporary) {
         this.weak = weak;
         this.name = name;
         this.memoryOnly = memoryOnly;
+        this.temporary = temporary;
         initCache();
     }
 
-    public synchronized boolean contains(K key) {
-        return cache.containsKey(key);
+    public synchronized boolean contains(K key) {        
+        boolean ret = cache.containsKey(key);
+        if (ret) {
+            lastAccessed.put(key, System.currentTimeMillis());
+        }
+        return ret;
     }
 
     public synchronized void clear() {
         cache.clear();
+        lastAccessed.clear();
     }
 
     public synchronized void remove(K key) {
         if (cache.containsKey(key)) {
             cache.remove(key);
         }
+        if (lastAccessed.containsKey(key)) {
+            lastAccessed.remove(key);
+        }
     }
 
     public synchronized V get(K key) {
+        lastAccessed.put(key, System.currentTimeMillis());
         return cache.get(key);
     }
 
     public synchronized void put(K key, V value) {
         cache.put(key, value);
+        lastAccessed.put(key, System.currentTimeMillis());
     }
 
     @Override
@@ -177,5 +215,38 @@ public class Cache<K, V> implements Freed {
         Set<K> ret = new HashSet<>();
         ret.addAll(cache.keySet());
         return ret;
+    }
+    
+    private synchronized int clearOld() {
+        long currentTime = System.currentTimeMillis();
+        Set<K> keys = new HashSet<>(lastAccessed.keySet());
+        int temporaryThreshold = Configuration.maxCachedTime.get();
+        if (temporaryThreshold == 0) {
+            return 0;
+        }
+        int num = 0;
+        for(K key:keys) {
+            long time = lastAccessed.get(key);
+            if (time < currentTime - temporaryThreshold) {
+                remove(key);
+                num++;
+            }
+        }        
+        return num;
+    }
+    
+    private static void clearAllOld() {
+        int num = 0;
+        for (WeakReference<Cache> cw : instances) {
+            Cache c = cw.get();
+            if (c != null) {
+                if (c.temporary) {
+                    num += c.clearOld();
+                }
+            }
+        }        
+        if (num > 0) {
+            System.gc();
+        }
     }
 }

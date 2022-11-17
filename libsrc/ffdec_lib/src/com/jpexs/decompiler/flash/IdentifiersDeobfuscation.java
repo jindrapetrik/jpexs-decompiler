@@ -47,9 +47,9 @@ public class IdentifiersDeobfuscation {
 
     private final HashMap<String, Integer> typeCounts = new HashMap<>();
 
-    private static final Cache<String, String> as2NameCache = Cache.getInstance(false, true, "as2_ident");
+    private static final Cache<String, String> as2NameCache = Cache.getInstance(false, true, "as2_ident", true);
 
-    private static final Cache<String, String> as3NameCache = Cache.getInstance(false, true, "as3_ident");
+    private static final Cache<String, String> as3NameCache = Cache.getInstance(false, true, "as3_ident", true);
 
     public static final String VALID_FIRST_CHARACTERS = "\\p{Lu}\\p{Ll}\\p{Lt}\\p{Lm}\\p{Lo}_$";
 

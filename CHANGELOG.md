@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#1870] AS3 Adding new class - Target DoABC tag or position can be selected to prevent Error 1014
 - [#1871] Toogle buttons for disabling subsprite animation, display preview of sprites/frames
+- [#1875] Remove no longer accessed items from cache after certain amount of time
 
 ### Fixed
 - [#1869] Replace references now replaces all references, not just PlaceObject
@@ -2588,6 +2589,7 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1870]: https://www.free-decompiler.com/flash/issues/1870
 [#1871]: https://www.free-decompiler.com/flash/issues/1871
+[#1875]: https://www.free-decompiler.com/flash/issues/1875
 [#1869]: https://www.free-decompiler.com/flash/issues/1869
 [#1872]: https://www.free-decompiler.com/flash/issues/1872
 [#1867]: https://www.free-decompiler.com/flash/issues/1867
