@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - AS3 Direct editation - Using "/" separator for method names
 - Folder preview resizing (scrollbar too long)
 - [#1872] Removing PlaceObject/RemoveObject with no characterid with Remove character action
+- [#1692] Resolving use namespace
 
 ## [16.3.1] - 2022-11-14
 ### Fixed
@@ -2592,6 +2593,7 @@ All notable changes to this project will be documented in this file.
 [#1875]: https://www.free-decompiler.com/flash/issues/1875
 [#1869]: https://www.free-decompiler.com/flash/issues/1869
 [#1872]: https://www.free-decompiler.com/flash/issues/1872
+[#1692]: https://www.free-decompiler.com/flash/issues/1692
 [#1867]: https://www.free-decompiler.com/flash/issues/1867
 [#1868]: https://www.free-decompiler.com/flash/issues/1868
 [#1649]: https://www.free-decompiler.com/flash/issues/1649

@@ -433,8 +433,12 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 }
             }
 
+            DottedChain classChain = DottedChain.parseWithSuffix(currentClass);
+            DottedChain pkg = classChain.getWithoutLast();
+
             //Search for types in opened namespaces
             for (NamespaceItem n : openedNamespaces) {
+                n.resolveCustomNs(abcIndex, importedClasses, pkg, openedNamespaces, localData);
                 Namespace ons = abc.getSelectedAbc().constants.getNamespace(n.getCpoolIndex(abc));
                 TypeItem ti = new TypeItem(ons.getName(abc.getSelectedAbc().constants).addWithSuffix(name.get(0)));
                 AbcIndexing.ClassIndex ci = abc.findClass(ti);
