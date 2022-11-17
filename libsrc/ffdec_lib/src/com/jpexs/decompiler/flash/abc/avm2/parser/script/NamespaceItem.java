@@ -53,6 +53,10 @@ public class NamespaceItem {
         this.name = DottedChain.parseWithSuffix(name);
         this.kind = kind;
     }
+    
+    public NamespaceItem(int nsIndex) {        
+        this.nsIndex = nsIndex;
+    }
 
     @Override
     public String toString() {
@@ -86,7 +90,7 @@ public class NamespaceItem {
         }
         if (kind == Namespace.KIND_NAMESPACE) {
             String custom = name.toRawString();
-            PropertyAVM2Item prop = new PropertyAVM2Item(null, false, custom, abcIndex, openedNamespaces, new ArrayList<>());
+            PropertyAVM2Item prop = new PropertyAVM2Item(null, false, custom, "", abcIndex, openedNamespaces, new ArrayList<>());
             Reference<ValueKind> value = new Reference<>(null);
             Reference<ABC> outAbc = new Reference<>(null);
             Reference<Boolean> isType = new Reference<>(false);

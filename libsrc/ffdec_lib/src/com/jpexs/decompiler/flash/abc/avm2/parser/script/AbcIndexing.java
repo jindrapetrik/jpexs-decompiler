@@ -453,7 +453,7 @@ public final class AbcIndexing {
                 propValue = new ValueKind(tsc.value_index, tsc.value_kind);
             }
             if (map != null) {
-                PropertyDef dp = new PropertyDef(t.getName(abc).getName(abc.constants, new ArrayList<>() /*?*/, true, true /*FIXME ???*/), multinameToType(name_index, abc.constants), abc, abc.constants.getMultiname(t.name_index).namespace_index);
+                PropertyDef dp = new PropertyDef(t.getName(abc).getName(abc.constants, new ArrayList<>() /*?*/, true, false), multinameToType(name_index, abc.constants), abc, abc.constants.getMultiname(t.name_index).namespace_index);
                 map.put(dp, new TraitIndex(t, abc, getTraitReturnType(abc, t), propValue, multinameToType(name_index, abc.constants)));
             }
             if (mapNs != null) {
