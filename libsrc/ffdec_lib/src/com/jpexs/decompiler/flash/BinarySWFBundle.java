@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,7 +47,7 @@ public class BinarySWFBundle implements SWFBundle {
 
     @Override
     public Set<String> getKeys() {
-        Set<String> ret = new HashSet<>();
+        Set<String> ret = new LinkedHashSet<>();
         for (Long address : search.getAddresses()) {
             ret.add("[" + address + "]");
         }
@@ -71,7 +73,7 @@ public class BinarySWFBundle implements SWFBundle {
 
     @Override
     public Map<String, SeekableInputStream> getAll() {
-        Map<String, SeekableInputStream> ret = new HashMap<>();
+        Map<String, SeekableInputStream> ret = new LinkedHashMap<>();
         for (String key : getKeys()) {
             ret.put(key, getSWF(key));
         }
