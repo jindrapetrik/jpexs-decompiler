@@ -93,7 +93,7 @@ public abstract class ActionScript3DecompileTestBase extends ActionScriptTestBas
         abc = scriptPack.abc;
         scriptIndex = scriptPack.scriptIndex;
 
-        clsIndex = abc.findClassByName(new DottedChain(new String[]{"tests", className}, ""));
+        clsIndex = abc.findClassByName(new DottedChain(new String[]{"tests", className}));
 
         assertTrue(clsIndex > -1);
         assertTrue(scriptIndex > -1);

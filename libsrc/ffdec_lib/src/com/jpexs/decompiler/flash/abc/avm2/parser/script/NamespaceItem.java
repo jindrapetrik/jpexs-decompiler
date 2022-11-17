@@ -86,7 +86,7 @@ public class NamespaceItem {
         }
         if (kind == Namespace.KIND_NAMESPACE) {
             String custom = name.toRawString();
-            PropertyAVM2Item prop = new PropertyAVM2Item(null, custom, abcIndex, openedNamespaces, new ArrayList<>());
+            PropertyAVM2Item prop = new PropertyAVM2Item(null, false, custom, abcIndex, openedNamespaces, new ArrayList<>());
             Reference<ValueKind> value = new Reference<>(null);
             Reference<ABC> outAbc = new Reference<>(null);
             Reference<Boolean> isType = new Reference<>(false);

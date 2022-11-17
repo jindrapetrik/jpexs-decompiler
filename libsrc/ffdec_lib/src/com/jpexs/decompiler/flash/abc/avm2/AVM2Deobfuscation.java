@@ -48,9 +48,9 @@ public class AVM2Deobfuscation {
 
     private final Map<String, Integer> usageTypesCount = new HashMap<>();
 
-    public static final DottedChain FLASH_PROXY = new DottedChain(new String[]{"flash", "utils", "flash_proxy"}, "");
+    public static final DottedChain FLASH_PROXY = new DottedChain(new String[]{"flash", "utils", "flash_proxy"});
 
-    public static final DottedChain BUILTIN = new DottedChain(new String[]{"-"}, "");
+    public static final DottedChain BUILTIN = new DottedChain(new String[]{"-"});
 
     public AVM2Deobfuscation(SWF swf, AVM2ConstantPool constants) {
         this.swf = swf;

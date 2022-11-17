@@ -418,7 +418,7 @@ public class Multiname {
         if (ns != null) {
             return ns.getName(constants).add(name, withSuffix ? getNamespaceSuffix() : "");
         }
-        return new DottedChain(new String[]{name}, withSuffix ? getNamespaceSuffix() : "");
+        return new DottedChain(new String[]{name}, new String[]{withSuffix ? getNamespaceSuffix() : ""});
     }
 
     public Namespace getNamespace(AVM2ConstantPool constants) {

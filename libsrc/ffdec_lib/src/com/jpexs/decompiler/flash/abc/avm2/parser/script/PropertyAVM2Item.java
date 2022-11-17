@@ -57,6 +57,8 @@ import java.util.logging.Logger;
  */
 public class PropertyAVM2Item extends AssignableAVM2Item {
 
+    public boolean attribute;
+    
     public String propertyName;
 
     public GraphTargetItem object;
@@ -71,11 +73,12 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
 
     @Override
     public AssignableAVM2Item copy() {
-        PropertyAVM2Item p = new PropertyAVM2Item(object, propertyName, abcIndex, openedNamespaces, callStack);
+        PropertyAVM2Item p = new PropertyAVM2Item(object, attribute, propertyName, abcIndex, openedNamespaces, callStack);
         return p;
     }
 
-    public PropertyAVM2Item(GraphTargetItem object, String propertyName, AbcIndexing abcIndex, List<NamespaceItem> openedNamespaces, List<MethodBody> callStack) {
+    public PropertyAVM2Item(GraphTargetItem object, boolean attribute, String propertyName, AbcIndexing abcIndex, List<NamespaceItem> openedNamespaces, List<MethodBody> callStack) {
+        this.attribute = attribute;
         this.propertyName = propertyName;
         this.object = object;
         this.abcIndex = abcIndex;
@@ -160,7 +163,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         int propIndex = 0;
         ABC abc = abcIndex.getSelectedAbc();
         AVM2ConstantPool constants = abc.constants;
-        if (!propertyName.startsWith("@")) {
+        if (!attribute) {
 
             if (scopeStack.isEmpty()) { //Everything is multiname when with command
                 if (objType == null) {
@@ -417,17 +420,16 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
 
         if (propIndex == 0 && !mustExist) {
             String pname = propertyName;
-            boolean attr = pname.startsWith("@");
-            if (attr) {
+            if (attribute) {
                 pname = pname.substring(1);
             }
             Multiname multiname;
-            if (attr && pname.isEmpty()) {
+            if (attribute && pname.isEmpty()) {
                 multiname = Multiname.createMultinameL(true,
                         constants.getNamespaceSetId(new int[]{constants.getNamespaceId(Namespace.KIND_PACKAGE_INTERNAL, localData.pkg, 0, true)}, true));
             } else {
                 int name_index = constants.getStringId("*".equals(pname) ? null : pname, true); //Note: name = * is for .@* attribute
-                multiname = Multiname.createMultiname(attr, name_index, allNsSet(abcIndex));
+                multiname = Multiname.createMultiname(attribute, name_index, allNsSet(abcIndex));
             }
             propIndex = constants.getMultinameId(multiname, true);
             propType = TypeItem.UNBOUNDED;
@@ -557,7 +559,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 }
             }
             if (!localData.subMethod && cname != null && AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, true, abcIndex, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType) && (localData.getFullClass().equals(outNs.getVal().addWithSuffix(outName.getVal()).toRawString()))) {
-                NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, "this", null, false, openedNamespaces, abcIndex);
+                NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, false, "this", null, false, openedNamespaces, abcIndex);
                 nobj.setRegNumber(0);
                 obj = nobj;
             } else {

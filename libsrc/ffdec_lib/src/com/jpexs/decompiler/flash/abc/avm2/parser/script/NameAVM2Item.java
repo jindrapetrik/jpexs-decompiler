@@ -49,6 +49,8 @@ import java.util.Objects;
  */
 public class NameAVM2Item extends AssignableAVM2Item {
 
+    private boolean attribute;
+    
     private String variableName;
 
     private boolean definition;
@@ -77,13 +79,19 @@ public class NameAVM2Item extends AssignableAVM2Item {
 
     @Override
     public AssignableAVM2Item copy() {
-        NameAVM2Item c = new NameAVM2Item(type, line, variableName, assignedValue, definition, openedNamespaces, abcIndex);
+        NameAVM2Item c = new NameAVM2Item(type, line, attribute, variableName, assignedValue, definition, openedNamespaces, abcIndex);
         c.setNs(ns);
         c.regNumber = regNumber;
         c.unresolved = unresolved;
         c.nsKind = nsKind;
         return c;
     }
+
+    public boolean isAttribute() {
+        return attribute;
+    }
+    
+    
 
     public void setSlotScope(int slotScope) {
         this.slotScope = slotScope;
@@ -137,8 +145,9 @@ public class NameAVM2Item extends AssignableAVM2Item {
         return variableName;
     }
 
-    public NameAVM2Item(GraphTargetItem type, int line, String variableName, GraphTargetItem storeValue, boolean definition, List<NamespaceItem> openedNamespaces, AbcIndexing abcIndex) {
+    public NameAVM2Item(GraphTargetItem type, int line, boolean attribute, String variableName, GraphTargetItem storeValue, boolean definition, List<NamespaceItem> openedNamespaces, AbcIndexing abcIndex) {
         super(storeValue);
+        this.attribute = attribute;
         this.variableName = variableName;
         this.assignedValue = storeValue;
         this.definition = definition;

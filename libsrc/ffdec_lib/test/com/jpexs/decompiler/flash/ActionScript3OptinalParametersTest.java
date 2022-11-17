@@ -52,7 +52,7 @@ public class ActionScript3OptinalParametersTest extends ActionScript3DecompileTe
             if (t instanceof DoABC2Tag) {
                 tag = (DoABC2Tag) t;
                 abc = tag.getABC();
-                clsIndex = abc.findClassByName(new DottedChain(new String[]{"tests", className}, ""));
+                clsIndex = abc.findClassByName(new DottedChain(new String[]{"tests", className}));
                 if (clsIndex > -1) {
                     break;
                 }

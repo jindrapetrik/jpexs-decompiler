@@ -43,7 +43,7 @@ public class TypeItem extends GraphTargetItem {
     public final DottedChain fullTypeName;
 
     public TypeItem(String s) {
-        this(s == null ? new DottedChain(new String[]{}, "") : DottedChain.parseWithSuffix(s));
+        this(s == null ? new DottedChain(new String[]{}, new String[]{""}) : DottedChain.parseWithSuffix(s));
     }
 
     public TypeItem(DottedChain fullTypeName) {
