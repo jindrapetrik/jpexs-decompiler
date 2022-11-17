@@ -7,5 +7,5 @@ package com.jpexs.decompiler.flash.types;
 public interface HasCharacterId {
     public int getCharacterId();
 
-    public void setCharacterId(int characterId);
+    public void setCharacterId(int characterId);        
 }

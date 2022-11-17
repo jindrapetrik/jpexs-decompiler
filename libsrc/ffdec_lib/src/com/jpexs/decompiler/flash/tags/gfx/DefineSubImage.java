@@ -47,7 +47,7 @@ public class DefineSubImage extends ImageTag {
 
     public static final String NAME = "DefineSubImage";
 
-    public int imageCharacterId;
+    public int imageId;
 
     public int x1;
 
@@ -81,7 +81,7 @@ public class DefineSubImage extends ImageTag {
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI16(characterID);
-        sos.writeUI16(imageCharacterId);
+        sos.writeUI16(imageId);
         sos.writeUI16(x1);
         sos.writeUI16(y1);
         sos.writeUI16(x2);
@@ -113,7 +113,7 @@ public class DefineSubImage extends ImageTag {
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
         characterID = sis.readUI16("characterID");
-        imageCharacterId = sis.readUI16("imageCharacterId");
+        imageId = sis.readUI16("imageId");
         x1 = sis.readUI16("x1");
         y1 = sis.readUI16("y1");
         x2 = sis.readUI16("x2");
@@ -172,14 +172,9 @@ public class DefineSubImage extends ImageTag {
     public Dimension getImageDimension() {
         return new Dimension(x2 - x1, y2 - y1);
     }
-
-    @Override
-    public void getNeededCharacters(Set<Integer> needed) {
-        needed.add(imageCharacterId | 0x8000);
-    }
-
+   
     private void initImage() {
-        DefineExternalImage2 image = (DefineExternalImage2) swf.getImage(imageCharacterId | 0x8000);
+        DefineExternalImage2 image = swf.getExternalImage2(imageId);
 
         if (image == null) {
             createFailedImage();

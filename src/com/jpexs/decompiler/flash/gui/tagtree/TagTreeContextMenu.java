@@ -803,8 +803,11 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             if (firstItem instanceof CharacterTag) {
-                replaceWithTagMenuItem.setVisible(true);
-                replaceRefsWithTagMenuItem.setVisible(true);
+                CharacterTag ct = (CharacterTag) firstItem;
+                if (ct.getCharacterId() != -1) {
+                    replaceWithTagMenuItem.setVisible(true);
+                    replaceRefsWithTagMenuItem.setVisible(true);
+                }
             }
 
             TreeItem parent = (TreeItem) tree.getModel().getTreePath(firstItem).getParentPath().getLastPathComponent();

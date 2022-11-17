@@ -47,6 +47,8 @@ public class DefineExternalImage2 extends ImageTag {
 
     public static final String NAME = "DefineExternalImage2";
 
+    public int imageID;
+    
     public int unknownID;
 
     public int bitmapFormat;
@@ -81,7 +83,7 @@ public class DefineExternalImage2 extends ImageTag {
      */
     @Override
     public void getData(SWFOutputStream sos) throws IOException {
-        sos.writeUI16(characterID - 0x8000);
+        sos.writeUI16(imageID);
         sos.writeUI16(unknownID);
         sos.writeUI16(bitmapFormat);
         sos.writeUI16(targetWidth);
@@ -103,6 +105,7 @@ public class DefineExternalImage2 extends ImageTag {
     public DefineExternalImage2(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
+        characterID = -1;
     }
 
     public DefineExternalImage2(SWF swf) {
@@ -111,12 +114,15 @@ public class DefineExternalImage2 extends ImageTag {
         fileName = "";
         targetWidth = 1;
         targetHeight = 1;
+        unknownID = 9; //?
+        bitmapFormat = BITMAP_FORMAT_DDS;
+        characterID = -1;
         createFailedImage();
     }
 
     @Override
     public final void readData(SWFInputStream sis, ByteArrayRange data, int level, boolean parallel, boolean skipUnusualTags, boolean lazy) throws IOException {
-        characterID = sis.readUI16("characterID") | 0x8000;
+        imageID = sis.readUI16("imageID");
         unknownID = sis.readUI16("unknownID"); // always 9
         bitmapFormat = sis.readUI16("bitmapFormat");
         targetWidth = sis.readUI16("targetWidth");
@@ -214,4 +220,14 @@ public class DefineExternalImage2 extends ImageTag {
     public boolean importSupported() {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return tagName + " (i" + imageID + ")";
+    }   
+
+    @Override
+    public void setCharacterId(int characterId) {
+    
+    }            
 }
