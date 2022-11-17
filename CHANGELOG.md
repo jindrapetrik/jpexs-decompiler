@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#1870] AS3 Adding new class - Target DoABC tag or position can be selected to prevent Error 1014
 - [#1871] Toogle buttons for disabling subsprite animation, display preview of sprites/frames
 - [#1875] Remove no longer accessed items from cache after certain amount of time
+- [#1280] AS3 Direct editation of traits with the same name
 
 ### Fixed
 - [#1869] Replace references now replaces all references, not just PlaceObject

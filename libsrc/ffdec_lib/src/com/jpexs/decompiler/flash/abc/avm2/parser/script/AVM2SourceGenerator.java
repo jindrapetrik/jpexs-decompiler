@@ -746,7 +746,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             ret.add(ins(AVM2Instructions.NewObject, 0));
             ret.add(ins(AVM2Instructions.PushWith));
             scope = localData.scopeStack.size();
-            localData.scopeStack.add(new PropertyAVM2Item(null, false, item.functionName, abcIndex, new ArrayList<>(), localData.callStack));
+            localData.scopeStack.add(new PropertyAVM2Item(null, false, item.functionName, "" /*??*/, abcIndex, new ArrayList<>(), localData.callStack));
         }
         AVM2ConstantPool constants = abcIndex.getSelectedAbc().constants;
         ret.add(ins(AVM2Instructions.NewFunction, method(false, constants.getStringId(item.functionName, true), true, false, localData.callStack, localData.pkg, item.needsActivation, item.subvariables, 0 /*Set later*/, item.hasRest, item.line, localData.currentClass, null, false, localData, item.paramTypes, item.paramNames, item.paramValues, item.body, item.retType)));
@@ -1850,7 +1850,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     continue;
                 }
 
-                NameAVM2Item d = new NameAVM2Item(n.type, n.line, n.isAttribute(), n.getVariableName(), NameAVM2Item.getDefaultValue("" + n.type), true, n.openedNamespaces, abcIndex);
+                NameAVM2Item d = new NameAVM2Item(n.type, n.line, n.isAttribute(), n.getVariableName(), n.getNamespaceSuffix(), NameAVM2Item.getDefaultValue("" + n.type), true, n.openedNamespaces, abcIndex);
                 //no index
                 if (needsActivation) {
                     if (d.getSlotNumber() <= 0) {
@@ -1909,9 +1909,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     mbody.traits.traits.add(tsc);
                 }
                 for (int i = 1; i < paramRegCount; i++) {
-                    NameAVM2Item param = new NameAVM2Item(registerTypes.get(i), 0, false, registerNames.get(i), null, false, new ArrayList<>(), abcIndex);
+                    NameAVM2Item param = new NameAVM2Item(registerTypes.get(i), 0, false, registerNames.get(i), "", null, false, new ArrayList<>(), abcIndex);
                     param.setRegNumber(i);
-                    NameAVM2Item d = new NameAVM2Item(registerTypes.get(i), 0, false, registerNames.get(i), param, true, new ArrayList<>(), abcIndex);
+                    NameAVM2Item d = new NameAVM2Item(registerTypes.get(i), 0, false, registerNames.get(i), "", param, true, new ArrayList<>(), abcIndex);
                     d.setSlotScope(slotScope);
                     d.setSlotNumber(slotNames.indexOf(registerNames.get(i)));
                     declarations.add(d);
@@ -2609,8 +2609,13 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return TypeItem.UNBOUNDED;
     }
 
-    public static boolean searchPrototypeChain(List<Integer> otherNs, int privateNs, int protectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType) {
+    public static boolean searchPrototypeChain(Integer namespaceSuffix, List<Integer> otherNs, int privateNs, int protectedNs, boolean instanceOnly, AbcIndexing abc, DottedChain pkg, String obj, String propertyName, Reference<String> outName, Reference<DottedChain> outNs, Reference<DottedChain> outPropNs, Reference<Integer> outPropNsKind, Reference<Integer> outPropNsIndex, Reference<GraphTargetItem> outPropType, Reference<ValueKind> outPropValue, Reference<ABC> outPropValueAbc, Reference<Boolean> isType) {
         // private and protected namespaces first so we find overriding functions before overridden functions
+        if (namespaceSuffix != null) {
+            if (searchPrototypeChain(namespaceSuffix, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType)) {
+                return true;
+            }            
+        }
         if (searchPrototypeChain(privateNs, instanceOnly, abc, pkg, obj, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType)) {
             return true;
         }

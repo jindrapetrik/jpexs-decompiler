@@ -76,10 +76,12 @@ public class NameAVM2Item extends AssignableAVM2Item {
     public GraphTargetItem redirect;
 
     private AbcIndexing abcIndex;
+    
+    private String namespaceSuffix;
 
     @Override
     public AssignableAVM2Item copy() {
-        NameAVM2Item c = new NameAVM2Item(type, line, attribute, variableName, assignedValue, definition, openedNamespaces, abcIndex);
+        NameAVM2Item c = new NameAVM2Item(type, line, attribute, variableName, namespaceSuffix, assignedValue, definition, openedNamespaces, abcIndex);
         c.setNs(ns);
         c.regNumber = regNumber;
         c.unresolved = unresolved;
@@ -145,10 +147,17 @@ public class NameAVM2Item extends AssignableAVM2Item {
         return variableName;
     }
 
-    public NameAVM2Item(GraphTargetItem type, int line, boolean attribute, String variableName, GraphTargetItem storeValue, boolean definition, List<NamespaceItem> openedNamespaces, AbcIndexing abcIndex) {
+    public String getNamespaceSuffix() {
+        return namespaceSuffix;
+    }
+    
+    
+
+    public NameAVM2Item(GraphTargetItem type, int line, boolean attribute, String variableName, String namespaceSuffix, GraphTargetItem storeValue, boolean definition, List<NamespaceItem> openedNamespaces, AbcIndexing abcIndex) {
         super(storeValue);
         this.attribute = attribute;
         this.variableName = variableName;
+        this.namespaceSuffix = namespaceSuffix;
         this.assignedValue = storeValue;
         this.definition = definition;
         this.line = line;

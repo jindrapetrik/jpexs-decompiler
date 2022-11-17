@@ -64,6 +64,8 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     public GraphTargetItem object;
 
     public AbcIndexing abcIndex;
+    
+    public String namespaceSuffix;
 
     private final List<NamespaceItem> openedNamespaces;
 
@@ -73,13 +75,14 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
 
     @Override
     public AssignableAVM2Item copy() {
-        PropertyAVM2Item p = new PropertyAVM2Item(object, attribute, propertyName, abcIndex, openedNamespaces, callStack);
+        PropertyAVM2Item p = new PropertyAVM2Item(object, attribute, propertyName, namespaceSuffix, abcIndex, openedNamespaces, callStack);
         return p;
     }
 
-    public PropertyAVM2Item(GraphTargetItem object, boolean attribute, String propertyName, AbcIndexing abcIndex, List<NamespaceItem> openedNamespaces, List<MethodBody> callStack) {
-        this.attribute = attribute;
+    public PropertyAVM2Item(GraphTargetItem object, boolean attribute, String propertyName, String namespaceSuffix, AbcIndexing abcIndex, List<NamespaceItem> openedNamespaces, List<MethodBody> callStack) {
+        this.attribute = attribute;        
         this.propertyName = propertyName;
+        this.namespaceSuffix = namespaceSuffix;
         this.object = object;
         this.abcIndex = abcIndex;
         this.openedNamespaces = openedNamespaces;
@@ -137,6 +140,11 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     }
 
     public void resolve(boolean mustExist, SourceGeneratorLocalData localData, Reference<Boolean> isType, Reference<GraphTargetItem> objectType, Reference<GraphTargetItem> propertyType, Reference<Integer> propertyIndex, Reference<ValueKind> propertyValue, Reference<ABC> propertyValueABC) throws CompilationException {
+        
+        Integer namespaceSuffixInt = null;
+        if (!"".equals(namespaceSuffix)) {
+            namespaceSuffixInt = Integer.parseInt(namespaceSuffix.substring(1));
+        }
         isType.setVal(false);
         GraphTargetItem thisType = new TypeItem(localData.getFullClass());
         GraphTargetItem objType = null;
@@ -274,12 +282,12 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                 propValueAbc = sp.abc;
                             }
                         }
-                        if (propType == null && AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, false, abcIndex, ftn.getWithoutLast(), ftn.getLast(), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType)) {
+                        if (propType == null && AVM2SourceGenerator.searchPrototypeChain(namespaceSuffixInt, otherNs, localData.privateNs, localData.protectedNs, false, abcIndex, ftn.getWithoutLast(), ftn.getLast(), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType)) {
                             objType = new TypeItem(outNs.getVal().addWithSuffix(outName.getVal()));
                             propType = outPropType.getVal();
                             propIndex = constants.getMultinameId(Multiname.createQName(false,
                                     constants.getStringId(propertyName, true),
-                                    constants.getNamespaceId(outPropNsKind.getVal(), outPropNs.getVal(), outPropNsIndex.getVal(), true)), true
+                                    namespaceSuffixInt != null ? namespaceSuffixInt : constants.getNamespaceId(outPropNsKind.getVal(), outPropNs.getVal(), outPropNsIndex.getVal(), true)), true
                             );
                             propValue = outPropValue.getVal();
                             propValueAbc = outPropValueAbc.getVal();
@@ -393,12 +401,12 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                                 otherns.add(n.getCpoolIndex(abcIndex));
                                             }
                                         }
-                                        if (AVM2SourceGenerator.searchPrototypeChain(otherns, localData.privateNs, localData.protectedNs, false, abcIndex, nsname, (((TypeItem) p.objType).fullTypeName.getLast()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType)) {
+                                        if (AVM2SourceGenerator.searchPrototypeChain(namespaceSuffixInt, otherns, localData.privateNs, localData.protectedNs, false, abcIndex, nsname, (((TypeItem) p.objType).fullTypeName.getLast()), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType)) {
                                             objType = new TypeItem(outNs.getVal().addWithSuffix(outName.getVal()));
                                             propType = p.returnType;
                                             propIndex = constants.getMultinameId(Multiname.createQName(false,
                                                     constants.getStringId(propertyName, true),
-                                                    constants.getNamespaceId(outPropNsKind.getVal(), outPropNs.getVal(), outPropNsIndex.getVal(), true)), true
+                                                    namespaceSuffixInt != null ? namespaceSuffixInt : constants.getNamespaceId(outPropNsKind.getVal(), outPropNs.getVal(), outPropNsIndex.getVal(), true)), true
                                             );
                                             propValue = p.value;
                                             propValueAbc = outPropValueAbc.getVal();
@@ -558,8 +566,14 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                     otherNs.add(n.getCpoolIndex(abcIndex));
                 }
             }
-            if (!localData.subMethod && cname != null && AVM2SourceGenerator.searchPrototypeChain(otherNs, localData.privateNs, localData.protectedNs, true, abcIndex, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType) && (localData.getFullClass().equals(outNs.getVal().addWithSuffix(outName.getVal()).toRawString()))) {
-                NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, false, "this", null, false, openedNamespaces, abcIndex);
+            
+            Integer namespaceSuffixInt = null;
+            if (!"".equals(namespaceSuffix)) {
+                namespaceSuffixInt = Integer.parseInt(namespaceSuffix.substring(1));
+            }
+            
+            if (!localData.subMethod && cname != null && AVM2SourceGenerator.searchPrototypeChain(namespaceSuffixInt, otherNs, localData.privateNs, localData.protectedNs, true, abcIndex, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType) && (localData.getFullClass().equals(outNs.getVal().addWithSuffix(outName.getVal()).toRawString()))) {
+                NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, false, "this", "", null, false, openedNamespaces, abcIndex);
                 nobj.setRegNumber(0);
                 obj = nobj;
             } else {
