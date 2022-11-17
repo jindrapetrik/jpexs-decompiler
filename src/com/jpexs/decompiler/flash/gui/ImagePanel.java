@@ -150,7 +150,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private final List<SoundTagPlayer> soundPlayers = new ArrayList<>();
 
-    private final Cache<DisplayObjectCacheKey, SerializableImage> displayObjectCache = Cache.getInstance(false, false, "displayObject");
+    private final Cache<DisplayObjectCacheKey, SerializableImage> displayObjectCache = Cache.getInstance(false, false, "displayObject", true);
 
     private final IconPanel iconPanel;
 

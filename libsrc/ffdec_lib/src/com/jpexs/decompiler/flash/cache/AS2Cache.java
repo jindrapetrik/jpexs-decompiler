@@ -27,9 +27,9 @@ import com.jpexs.helpers.Cache;
  */
 public class AS2Cache {
 
-    private final Cache<ASMSource, HighlightedText> cache = Cache.getInstance(true, false, "as2");
+    private final Cache<ASMSource, HighlightedText> cache = Cache.getInstance(true, false, "as2", false);
 
-    private final Cache<ASMSource, ActionList> pcodeCache = Cache.getInstance(true, true, "as2pcode");
+    private final Cache<ASMSource, ActionList> pcodeCache = Cache.getInstance(true, true, "as2pcode", false);
 
     public void clear() {
         pcodeCache.clear();

@@ -26,7 +26,7 @@ import com.jpexs.helpers.Cache;
  */
 public class AS3Cache {
 
-    private final Cache<ScriptPack, HighlightedText> cache = Cache.getInstance(true, false, "as3");
+    private final Cache<ScriptPack, HighlightedText> cache = Cache.getInstance(true, false, "as3", false);
 
     public void clear() {
         cache.clear();

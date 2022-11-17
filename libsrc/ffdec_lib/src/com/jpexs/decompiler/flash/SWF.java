@@ -341,16 +341,16 @@ public final class SWF implements SWFContainerItem, Timelined {
     private final IdentifiersDeobfuscation deobfuscation = new IdentifiersDeobfuscation();
 
     @Internal
-    private final Cache<String, SerializableImage> frameCache = Cache.getInstance(false, false, "frame");
+    private final Cache<String, SerializableImage> frameCache = Cache.getInstance(false, false, "frame", true);
 
     @Internal
-    private final Cache<CharacterTag, RECT> rectCache = Cache.getInstance(true, true, "rect");
+    private final Cache<CharacterTag, RECT> rectCache = Cache.getInstance(true, true, "rect", true);
 
     @Internal
-    private final Cache<SHAPE, ShapeExportData> shapeExportDataCache = Cache.getInstance(true, true, "shapeExportData");
+    private final Cache<SHAPE, ShapeExportData> shapeExportDataCache = Cache.getInstance(true, true, "shapeExportData", true);
 
     @Internal
-    private final Cache<SoundInfoSoundCacheEntry, byte[]> soundCache = Cache.getInstance(false, false, "sound");
+    private final Cache<SoundInfoSoundCacheEntry, byte[]> soundCache = Cache.getInstance(false, false, "sound", true);
 
     @Internal
     public final AS2Cache as2Cache = new AS2Cache();

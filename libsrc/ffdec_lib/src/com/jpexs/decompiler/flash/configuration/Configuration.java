@@ -787,6 +787,10 @@ public final class Configuration {
     @ConfigurationDefaultBoolean(true)
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> autoPlayPreviews = null;
+    
+    @ConfigurationDefaultInt(5 * 60 * 1000)
+    @ConfigurationCategory("limit")
+    public static ConfigurationItem<Integer> maxCachedTime = null;
         
     private enum OSId {
         WINDOWS, OSX, UNIX

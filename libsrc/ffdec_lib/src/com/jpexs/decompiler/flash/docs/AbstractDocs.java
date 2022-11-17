@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 
 public class AbstractDocs {
 
-    protected static Cache<String, String> docsCache = Cache.getInstance(false, true, "abstractDocsCache");
+    protected static Cache<String, String> docsCache = Cache.getInstance(false, true, "abstractDocsCache", false);
 
     protected static String htmlFooter() {
         StringBuilder sb = new StringBuilder();
