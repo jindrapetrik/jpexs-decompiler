@@ -30,41 +30,41 @@ import java.util.List;
  */
 public class DottedChain implements Serializable, Comparable<DottedChain> {
 
-    public static final String NO_SUFFIX = "";
-
     public static final DottedChain EMPTY = new DottedChain(true);
 
-    public static final DottedChain TOPLEVEL = new DottedChain(new String[]{}, NO_SUFFIX);
+    public static final DottedChain TOPLEVEL = new DottedChain(new String[]{});
 
-    public static final DottedChain BOOLEAN = new DottedChain(new String[]{"Boolean"}, NO_SUFFIX);
+    public static final DottedChain BOOLEAN = new DottedChain(new String[]{"Boolean"});
 
-    public static final DottedChain STRING = new DottedChain(new String[]{"String"}, NO_SUFFIX);
+    public static final DottedChain STRING = new DottedChain(new String[]{"String"});
 
-    public static final DottedChain ARRAY = new DottedChain(new String[]{"Array"}, NO_SUFFIX);
+    public static final DottedChain ARRAY = new DottedChain(new String[]{"Array"});
 
-    public static final DottedChain NUMBER = new DottedChain(new String[]{"Number"}, NO_SUFFIX);
+    public static final DottedChain NUMBER = new DottedChain(new String[]{"Number"});
 
-    public static final DottedChain OBJECT = new DottedChain(new String[]{"Object"}, NO_SUFFIX);
+    public static final DottedChain OBJECT = new DottedChain(new String[]{"Object"});
 
-    public static final DottedChain INT = new DottedChain(new String[]{"int"}, NO_SUFFIX);
+    public static final DottedChain INT = new DottedChain(new String[]{"int"});
 
-    public static final DottedChain UINT = new DottedChain(new String[]{"uint"}, NO_SUFFIX);
+    public static final DottedChain UINT = new DottedChain(new String[]{"uint"});
 
-    public static final DottedChain UNDEFINED = new DottedChain(new String[]{"Undefined"}, NO_SUFFIX);
+    public static final DottedChain UNDEFINED = new DottedChain(new String[]{"Undefined"});
 
-    public static final DottedChain XML = new DottedChain(new String[]{"XML"}, NO_SUFFIX);
+    public static final DottedChain XML = new DottedChain(new String[]{"XML"});
 
-    public static final DottedChain NULL = new DottedChain(new String[]{"null"}, NO_SUFFIX);
+    public static final DottedChain NULL = new DottedChain(new String[]{"null"});
 
-    public static final DottedChain FUNCTION = new DottedChain(new String[]{"Function"}, NO_SUFFIX);
+    public static final DottedChain FUNCTION = new DottedChain(new String[]{"Function"});
 
-    public static final DottedChain VOID = new DottedChain(new String[]{"void"}, NO_SUFFIX);
+    public static final DottedChain VOID = new DottedChain(new String[]{"void"});
 
-    public static final DottedChain NAMESPACE = new DottedChain(new String[]{"Namespace"}, NO_SUFFIX);
+    public static final DottedChain NAMESPACE = new DottedChain(new String[]{"Namespace"});
 
-    public static final DottedChain ALL = new DottedChain(new String[]{"*"}, NO_SUFFIX);
+    public static final DottedChain ALL = new DottedChain(new String[]{"*"});
 
     private final String[] parts;
+    
+    private final boolean[] attributes;
 
     private final int length;
 
@@ -72,25 +72,42 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     private boolean isNull = false;
 
-    private String namespaceSuffix = "";
+    private String[] namespaceSuffixes;
 
-    public String getNamespaceSuffix() {
-        return namespaceSuffix;
+    public String getNamespaceSuffix(int index) {
+        return namespaceSuffixes[index];
     }
 
+    public String getLastNamespaceSuffix() {
+        if (length == 0) {
+            return "";
+        }
+        return namespaceSuffixes[length - 1];
+    }
+
+    
     public static final DottedChain parseWithSuffix(String name) {
         if (name == null) {
             return DottedChain.EMPTY;
         } else if (name.isEmpty()) {
             return DottedChain.TOPLEVEL;
         } else {
-            String nameNoSuffix = name;
-            String namespaceSuffix = "";
-            if (name.matches(".*#[0-9]+$")) {
-                nameNoSuffix = name.substring(0, name.lastIndexOf("#"));
-                namespaceSuffix = name.substring(name.lastIndexOf("#"));
+            String parts[] = name.split("\\.");
+            String nsSuffixes[] = new String[parts.length];
+            int i = 0;
+            for (String part : parts) {
+                String nameNoSuffix = part;
+                String namespaceSuffix = "";
+                if (part.matches(".*#[0-9]+$")) {
+                    nameNoSuffix = part.substring(0, part.lastIndexOf("#"));
+                    namespaceSuffix = part.substring(part.lastIndexOf("#"));
+                }             
+                parts[i] = nameNoSuffix;
+                nsSuffixes[i] = namespaceSuffix;
+                i++;
             }
-            return new DottedChain(nameNoSuffix.split("\\."), namespaceSuffix);
+            
+            return new DottedChain(parts, nsSuffixes);
         }
     }
 
@@ -99,37 +116,58 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         this.parts = new String[0];
         this.length = 0;
         this.hash = 0;
+        this.attributes = new boolean[0];
+        this.namespaceSuffixes = new String[0];
     }
 
     public DottedChain(DottedChain src) {
-        this(src.parts, src.namespaceSuffix);
+        this(src.parts, src.namespaceSuffixes);
         this.isNull = src.isNull;
     }
 
+    public DottedChain(String[] parts) {
+        this(Arrays.asList(parts));
+    }
+    
     public DottedChain(List<String> parts) {
         length = parts.size();
         this.parts = parts.toArray(new String[length]);
+        attributes = new boolean[length];
         hash = calcHash();
+        this.namespaceSuffixes = new String[length];
+        for(int i = 0; i < length; i++) {
+            namespaceSuffixes[i] = "";
+        }
     }
 
     /*public DottedChain(String onePart, String namespaceSuffix) {
         this(new String[]{onePart}, namespaceSuffix);
     }*/
-    public DottedChain(String[] parts, String namespaceSuffix) {
+    public DottedChain(String[] parts, String[] namespaceSuffixes) {
+        this(new boolean[parts.length], parts, namespaceSuffixes);
+    }
+    
+    public DottedChain(boolean attributes[], String[] parts, String[] namespaceSuffixes) {
         if (parts.length == 1 && parts[0].isEmpty()) {
             length = 0;
-            this.parts = new String[0];
+            this.parts = new String[0];        
         } else {
             length = parts.length;
-            this.parts = parts;
+            this.parts = parts;            
         }
+        this.attributes = attributes;
         hash = calcHash();
-        this.namespaceSuffix = namespaceSuffix;
+        this.namespaceSuffixes = namespaceSuffixes;
     }
 
     private DottedChain(String[] parts, int length) {
         this.length = length;
         this.parts = parts;
+        attributes = new boolean[length];
+        this.namespaceSuffixes = new String[length];
+        for(int i = 0; i < length; i++) {
+            namespaceSuffixes[i] = "";
+        }
         hash = calcHash();
     }
 
@@ -152,6 +190,13 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
 
         return parts[index];
     }
+    
+    public boolean isAttribute(int index) {
+        if (index >= length) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+        return attributes[index];
+    }
 
     public DottedChain subChain(int count) {
         if (count > length) {
@@ -169,6 +214,17 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
             return "";
         } else {
             return parts[length - 1];
+        }
+    }
+    
+    public boolean isLastAttribute() {
+        if (isNull) {
+            return false;
+        }
+        if (length == 0) {
+            return false;
+        } else {
+            return attributes[length - 1];
         }
     }
 
@@ -194,16 +250,25 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
     }
 
     public DottedChain add(String name, String namespaceSuffix) {
+        return add(false, name, namespaceSuffix);
+    }
+    public DottedChain add(boolean attribute, String name, String namespaceSuffix) {
         if (name == null) {
             return new DottedChain(this);
         }
         String[] nparts = new String[length + 1];
+        boolean[] nattributes = new boolean[length + 1];
+        String[] nnamespaceSuffixes = new String[length + 1];
         if (length > 0) {
             System.arraycopy(parts, 0, nparts, 0, length);
+            System.arraycopy(attributes, 0, nattributes, 0, length);
+            System.arraycopy(namespaceSuffixes, 0, nnamespaceSuffixes, 0, length);            
         }
-
+       
+        nattributes[nattributes.length - 1] = attribute;
         nparts[nparts.length - 1] = name;
-        return new DottedChain(nparts, namespaceSuffix);
+        nnamespaceSuffixes[nparts.length - 1] = namespaceSuffix;
+        return new DottedChain(nparts, nnamespaceSuffixes);
     }
 
     protected String toString(boolean as3, boolean raw, boolean withSuffix) {
@@ -223,10 +288,11 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
             String part = parts[i];
             boolean lastStar = i == length - 1 && "*".equals(part);
             ret.append((raw || lastStar) ? part : IdentifiersDeobfuscation.printIdentifier(as3, part));
+            if (withSuffix) {
+                ret.append(namespaceSuffixes[i]);
+            }
         }
-        if (withSuffix) {
-            ret.append(namespaceSuffix);
-        }
+        
         return ret.toString();
     }
 
@@ -303,6 +369,12 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
             String s1 = parts[i];
             String s2 = other.parts[i];
             if (!s1.equals(s2)) {
+                return false;
+            }
+            if (attributes[i] != other.attributes[i]) {
+                return false;
+            }
+            if (!namespaceSuffixes[i].equals(other.namespaceSuffixes[i])) {
                 return false;
             }
         }

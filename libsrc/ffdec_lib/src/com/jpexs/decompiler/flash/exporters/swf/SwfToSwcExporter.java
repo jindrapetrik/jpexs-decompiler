@@ -144,12 +144,12 @@ public class SwfToSwcExporter {
                 sb.append("        <def id=\"").append(defId).append("\" />\n");
 
                 Set<DottedChain> allDeps = new HashSet<>();
-                allDeps.add(new DottedChain(new String[]{"AS3"}, ""));
+                allDeps.add(new DottedChain(new String[]{"AS3"}, new String[]{""}));
                 sb.append("        <dep id=\"AS3\" type=\"").append(DEPENDENCY_NAMESPACE).append("\" />\n");
                 if (!skipDependencies) {
                     List<Dependency> dependencies = new ArrayList<>();
                     List<String> uses = new ArrayList<>();
-                    pack.abc.script_info.get(pack.scriptIndex).traits.getDependencies(pack.scriptIndex, -1, false, null, pack.abc, dependencies, uses, new DottedChain(new String[]{"NO:PACKAGE"}, ""), new ArrayList<>());
+                    pack.abc.script_info.get(pack.scriptIndex).traits.getDependencies(pack.scriptIndex, -1, false, null, pack.abc, dependencies, uses, new DottedChain(new String[]{"NO:PACKAGE"}), new ArrayList<>());
 
                     for (Dependency d : dependencies) {
                         if ("*".equals(d.getId().getLast())) {

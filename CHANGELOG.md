@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - Folder preview resizing (scrollbar too long)
 - [#1872] Removing PlaceObject/RemoveObject with no characterid with Remove character action
 - [#1692] Resolving use namespace
+- [#1692] Properly distinguish obfuscated names vs namespace suffixes and attributes
 
 ## [16.3.1] - 2022-11-14
 ### Fixed

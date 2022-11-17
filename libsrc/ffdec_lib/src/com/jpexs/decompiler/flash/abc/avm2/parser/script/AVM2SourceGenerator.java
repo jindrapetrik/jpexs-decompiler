@@ -746,7 +746,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             ret.add(ins(AVM2Instructions.NewObject, 0));
             ret.add(ins(AVM2Instructions.PushWith));
             scope = localData.scopeStack.size();
-            localData.scopeStack.add(new PropertyAVM2Item(null, item.functionName, abcIndex, new ArrayList<>(), localData.callStack));
+            localData.scopeStack.add(new PropertyAVM2Item(null, false, item.functionName, abcIndex, new ArrayList<>(), localData.callStack));
         }
         AVM2ConstantPool constants = abcIndex.getSelectedAbc().constants;
         ret.add(ins(AVM2Instructions.NewFunction, method(false, constants.getStringId(item.functionName, true), true, false, localData.callStack, localData.pkg, item.needsActivation, item.subvariables, 0 /*Set later*/, item.hasRest, item.line, localData.currentClass, null, false, localData, item.paramTypes, item.paramNames, item.paramValues, item.body, item.retType)));
@@ -1349,7 +1349,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
                  */
                 List<GraphTargetItem> getterBody = new ArrayList<>();
-                UnresolvedAVM2Item sp = new UnresolvedAVM2Item(new ArrayList<>(), importedClasses, false, TypeItem.UNBOUNDED, 0, new DottedChain(new String[]{"_skinParts"}, ""),
+                UnresolvedAVM2Item sp = new UnresolvedAVM2Item(new ArrayList<>(), importedClasses, false, TypeItem.UNBOUNDED, 0, new DottedChain(new String[]{"_skinParts"}),
                         null, openedNamespaces, abcIndex);
                 getterBody.add(new ReturnValueAVM2Item(null, null, sp));
                 List<AssignableAVM2Item> subvars = new ArrayList<>();
@@ -1850,7 +1850,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     continue;
                 }
 
-                NameAVM2Item d = new NameAVM2Item(n.type, n.line, n.getVariableName(), NameAVM2Item.getDefaultValue("" + n.type), true, n.openedNamespaces, abcIndex);
+                NameAVM2Item d = new NameAVM2Item(n.type, n.line, n.isAttribute(), n.getVariableName(), NameAVM2Item.getDefaultValue("" + n.type), true, n.openedNamespaces, abcIndex);
                 //no index
                 if (needsActivation) {
                     if (d.getSlotNumber() <= 0) {
@@ -1909,9 +1909,9 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     mbody.traits.traits.add(tsc);
                 }
                 for (int i = 1; i < paramRegCount; i++) {
-                    NameAVM2Item param = new NameAVM2Item(registerTypes.get(i), 0, registerNames.get(i), null, false, new ArrayList<>(), abcIndex);
+                    NameAVM2Item param = new NameAVM2Item(registerTypes.get(i), 0, false, registerNames.get(i), null, false, new ArrayList<>(), abcIndex);
                     param.setRegNumber(i);
-                    NameAVM2Item d = new NameAVM2Item(registerTypes.get(i), 0, registerNames.get(i), param, true, new ArrayList<>(), abcIndex);
+                    NameAVM2Item d = new NameAVM2Item(registerTypes.get(i), 0, false, registerNames.get(i), param, true, new ArrayList<>(), abcIndex);
                     d.setSlotScope(slotScope);
                     d.setSlotNumber(slotNames.indexOf(registerNames.get(i)));
                     declarations.add(d);

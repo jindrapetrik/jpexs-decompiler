@@ -1613,7 +1613,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 try {
                     ActionScript3Parser parser = new ActionScript3Parser(doAbc.getABC(), abcs);
 
-                    DottedChain dc = new DottedChain(pkgParts, "");
+                    DottedChain dc = new DottedChain(pkgParts);
                     String script = "package " + dc.toPrintableString(true) + " {"
                             + "public class " + IdentifiersDeobfuscation.printIdentifier(true, classSimpleName) + " {"
                             + " }"
@@ -1937,7 +1937,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                             ActionScript2Parser parser = new ActionScript2Parser(swf, doInit);
 
                             String[] parts = className.contains(".") ? className.split("\\.") : new String[]{className};
-                            DottedChain dc = new DottedChain(parts, "");
+                            DottedChain dc = new DottedChain(parts);
 
                             try {
                                 List<Action> actions = parser.actionsFromString("class " + dc.toPrintableString(false) + "{}", swf.getCharset());
