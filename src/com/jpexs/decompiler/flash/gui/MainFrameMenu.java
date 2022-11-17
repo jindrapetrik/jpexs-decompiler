@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.treeitems.SWFList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import com.sun.jna.Platform;
@@ -1128,6 +1129,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
                     nswf.clearAllCache();
                 }
             }, PRIORITY_MEDIUM, null, true, null, false);
+            addMenuItem("/debug/emptyAllCache", "Empty all caches", "continue16", e -> {
+                Cache.clearAll();
+            }, PRIORITY_MEDIUM, null, true, null, false);
             addMenuItem("/debug/memoryInformation", "Memory information", "continue16", e -> {
                 String architecture = System.getProperty("sun.arch.data.model");
                 Runtime runtime = Runtime.getRuntime();
@@ -1135,7 +1139,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
                         + "Jre 64bit: " + Helper.is64BitJre() + Helper.newLine
                         + "Os 64bit: " + Helper.is64BitOs() + Helper.newLine
                         + "Max: " + (runtime.maxMemory() / 1024 / 1024) + "MB" + Helper.newLine
-                        + "Used: " + (runtime.totalMemory() / 1024 / 1024) + "MB" + Helper.newLine
+                        + "Total: " + (runtime.totalMemory()/ 1024 / 1024) + "MB" + Helper.newLine
+                        + "Used: " + ((runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024) + "MB" + Helper.newLine
                         + "Free: " + (runtime.freeMemory() / 1024 / 1024) + "MB";
                 ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), info);
                 SWF nswf = mainFrame.getPanel().getCurrentSwf();
