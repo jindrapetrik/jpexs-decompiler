@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - [#1871] Toogle buttons for disabling subsprite animation, display preview of sprites/frames
 - [#1875] Remove no longer accessed items from cache after certain amount of time
 - [#1280] AS3 Direct editation of traits with the same name
+- [#1743] GFX - Adding DefineExternalImage2 and DefineSubImage tags
 
 ### Fixed
 - [#1869] Replace references now replaces all references, not just PlaceObject
@@ -19,6 +20,9 @@ All notable changes to this project will be documented in this file.
 - [#1872] Removing PlaceObject/RemoveObject with no characterid with Remove character action
 - [#1692] Resolving use namespace
 - [#1692] Properly distinguish obfuscated names vs namespace suffixes and attributes
+
+### Changed
+- GFX - DefineExternalImage2 no longer handled as character
 
 ## [16.3.1] - 2022-11-14
 ### Fixed
@@ -2593,6 +2597,8 @@ All notable changes to this project will be documented in this file.
 [#1870]: https://www.free-decompiler.com/flash/issues/1870
 [#1871]: https://www.free-decompiler.com/flash/issues/1871
 [#1875]: https://www.free-decompiler.com/flash/issues/1875
+[#1280]: https://www.free-decompiler.com/flash/issues/1280
+[#1743]: https://www.free-decompiler.com/flash/issues/1743
 [#1869]: https://www.free-decompiler.com/flash/issues/1869
 [#1872]: https://www.free-decompiler.com/flash/issues/1872
 [#1692]: https://www.free-decompiler.com/flash/issues/1692

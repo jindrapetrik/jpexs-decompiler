@@ -158,6 +158,8 @@ import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
+import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -4737,9 +4739,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             List<CharacterTag> neededCopies = new ArrayList<>();
             for (int n : needed) {
-                CharacterTag ct = (CharacterTag) imageTag.getSwf().getCharacter(n).cloneTag();
-                ct.setSwf(swf);
-                neededCopies.add(ct);
+                CharacterTag ct = imageTag.getSwf().getCharacter(n);
+                if (ct != null) {
+                    ct = (CharacterTag) ct.cloneTag();
+                    ct.setSwf(swf);
+                    neededCopies.add(ct);
+                }
+            }
+            if (imageTag instanceof DefineSubImage) {
+                DefineExternalImage2 dei2 = (DefineExternalImage2) imageTag.getSwf().getExternalImage2(((DefineSubImage) imageTag).imageId);
+                if (dei2 != null) {
+                    dei2 = (DefineExternalImage2) dei2.cloneTag();
+                    dei2.setSwf(swf);
+                    neededCopies.add(dei2);
+                }
             }
 
             ImageTag imageTagCopy = (ImageTag) imageTag.cloneTag();

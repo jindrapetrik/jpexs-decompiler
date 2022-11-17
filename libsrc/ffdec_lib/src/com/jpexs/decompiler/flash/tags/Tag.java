@@ -679,12 +679,14 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     private void getDependentCharactersOnTimelined(Timelined timelined, Set<Integer> dependent) {
         for (Tag tag : timelined.getTags()) {
             if (tag instanceof CharacterTag) {
-                Set<Integer> needed = new HashSet<>();
-                tag.getNeededCharactersDeep(needed);
-                for (int dep : dependent) {
-                    if (needed.contains(dep)) {
-                        dependent.add(((CharacterTag) tag).getCharacterId());
-                        break;
+                if (((CharacterTag) tag).getCharacterId() != -1) {
+                    Set<Integer> needed = new HashSet<>();
+                    tag.getNeededCharactersDeep(needed);
+                    for (int dep : dependent) {
+                        if (needed.contains(dep)) {
+                            dependent.add(((CharacterTag) tag).getCharacterId());
+                            break;
+                        }
                     }
                 }
             }

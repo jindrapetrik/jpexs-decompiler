@@ -367,8 +367,10 @@ public class PreviewExporter {
                     //}
                     if (t instanceof CharacterTag) {
                         int characterId = ((CharacterTag) t).getCharacterId();
-                        doneCharacters.add(characterId);
-                        writeTag(t, sos2);
+                        if (characterId != -1) {
+                            doneCharacters.add(characterId);
+                            writeTag(t, sos2);
+                        }
                     }
                 }
 

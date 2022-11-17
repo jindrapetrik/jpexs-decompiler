@@ -103,6 +103,7 @@ public class DefineExternalImage extends ImageTag {
         fileName = "";
         targetWidth = 1;
         targetHeight = 1;
+        bitmapFormat = BITMAP_FORMAT_DDS;
         createFailedImage();
     }
 
