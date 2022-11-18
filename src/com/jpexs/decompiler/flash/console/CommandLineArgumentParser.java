@@ -672,6 +672,12 @@ public class CommandLineArgumentParser {
             out.println(" ...sets desired character set for reading/writing SWF files with SWF version <= 5");
             out.println("   (use in combination with other commands)");
         }
+        
+        if (filter == null || filter.equals("air")) {
+            out.println(" " + (cnt++) + ") -air");
+            out.println(" ...use AIR (airglobal.swc) for AS3 compilation instead of playerglobal.swc");
+            out.println("   (use in combination with other commands)");
+        }
 
         printCmdLineUsageExamples(out, filter);
 
@@ -800,10 +806,11 @@ public class CommandLineArgumentParser {
         double zoom = 1;
         String charset = Charset.defaultCharset().name();
         boolean cliMode = false;
+        boolean air = false;
         Selection selection = new Selection();
         Selection selectionIds = new Selection();
         List<String> selectionClasses = null;
-        String nextParam = null, nextParamOriginal = null;
+        String nextParam = null, nextParamOriginal = null;        
         OUTER:
         while (true) {
             nextParamOriginal = args.pop();
@@ -814,6 +821,9 @@ public class CommandLineArgumentParser {
                 nextParam = "";
             }
             switch (nextParam) {
+                case "-air":
+                    air = true;
+                    break;
                 case "-cli":
                     cliMode = true;
                     break;
@@ -955,7 +965,7 @@ public class CommandLineArgumentParser {
         } else if (command.equals("flashpaper2pdf")) {
             parseFlashPaperToPdf(selection, zoom, args, charset);
         } else if (command.equals("replace")) {
-            parseReplace(args, charset);
+            parseReplace(args, charset, air);
         } else if (command.equals("replacealpha")) {
             parseReplaceAlpha(args, charset);
         } else if (command.equals("replacecharacter")) {
@@ -973,9 +983,9 @@ public class CommandLineArgumentParser {
         } else if (command.equals("doc")) {
             parseDoc(args);
         } else if (command.equals("importscript")) {
-            parseImportScript(args, charset);
+            parseImportScript(args, charset, air);
         } else if (command.equals("as3compiler")) {
-            ActionScript3Parser.compile(null /*?*/, args.pop(), args.pop(), 0, 0);
+            ActionScript3Parser.compile(null /*?*/, args.pop(), args.pop(), 0, 0, air);
         } else if (nextParam.equals("--debugtool")) {
             parseDebugTool(args, charset);
         } else if (nextParam.equals("--compareresources")) {
@@ -2979,7 +2989,7 @@ public class CommandLineArgumentParser {
         System.exit(0);
     }
 
-    private static void parseReplace(Stack<String> args, String charset) {
+    private static void parseReplace(Stack<String> args, String charset, boolean air) {
         if (args.size() < 3) {
             badArguments("replace");
         }
@@ -3110,7 +3120,7 @@ public class CommandLineArgumentParser {
                                     String repText = Helper.readTextFile(repFile);
                                     ScriptPack pack = entry;
                                     if (Path.getExtension(repFile).equals(".as")) {
-                                        replaceAS3(repFile, repText, pack);
+                                        replaceAS3(repFile, repText, pack, air);
                                     } else {
                                         // todo: get traits
                                         if (args.isEmpty()) {
@@ -3593,7 +3603,7 @@ public class CommandLineArgumentParser {
         }
     }
 
-    private static void parseImportScript(Stack<String> args, String charset) {
+    private static void parseImportScript(Stack<String> args, String charset, boolean air) {
 
         String flexLocation = Configuration.flexSdkLocation.get();
         if (Configuration.useFlexAs3Compiler.get() && (flexLocation.isEmpty() || (!new File(flexLocation).exists()))) {
@@ -3612,7 +3622,7 @@ public class CommandLineArgumentParser {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
                 String scriptsFolder = Path.combine(args.pop(), ScriptExportSettings.EXPORT_FOLDER_NAME);
                 new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
-                new AS3ScriptImporter().importScripts(As3ScriptReplacerFactory.createByConfig(), scriptsFolder, swf.getAS3Packs());
+                new AS3ScriptImporter().importScripts(As3ScriptReplacerFactory.createByConfig(air), scriptsFolder, swf.getAS3Packs());
 
                 try {
                     try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
@@ -3742,10 +3752,10 @@ public class CommandLineArgumentParser {
         ((Tag) abc.parentTag).setModified(true);
     }
 
-    private static void replaceAS3(String asp, String as, ScriptPack pack) throws IOException, InterruptedException {
+    private static void replaceAS3(String asp, String as, ScriptPack pack, boolean air) throws IOException, InterruptedException {
         System.out.println("Replacing: " + asp);
         System.out.println("Warning: This feature is EXPERIMENTAL");
-        As3ScriptReplacerInterface scriptReplacer = As3ScriptReplacerFactory.createByConfig();
+        As3ScriptReplacerInterface scriptReplacer = As3ScriptReplacerFactory.createByConfig(air);
         if (!scriptReplacer.isAvailable()) {
             System.err.println("Current script replacer is not available.");
             if (scriptReplacer instanceof FFDecAs3ScriptReplacer) {

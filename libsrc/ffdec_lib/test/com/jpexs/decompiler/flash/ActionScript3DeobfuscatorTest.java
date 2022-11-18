@@ -119,7 +119,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
                 return 0;
             }
         });
-        ActionScript3Parser par = new ActionScript3Parser(abc, new ArrayList<>());
+        ActionScript3Parser par = new ActionScript3Parser(abc, new ArrayList<>(), false);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         par.addScript(str, "Test.as", 0, 0);
 
