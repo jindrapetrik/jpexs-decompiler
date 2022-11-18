@@ -5050,6 +5050,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         public CalculateMissingNeededThread() {
             super("calculateMissingNeededThread");
+            setPriority(Thread.MIN_PRIORITY);
         }
 
         private boolean recalculate = false;
