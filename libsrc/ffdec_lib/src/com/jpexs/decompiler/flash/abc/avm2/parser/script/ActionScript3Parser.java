@@ -1771,7 +1771,7 @@ public class ActionScript3Parser {
                         expectedType(SymbolType.COLON);
                         GraphTargetItem etype = type(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, variables);
                         NameAVM2Item e = new NameAVM2Item(etype, lexer.yyline(), false, enamestr, "", new ExceptionAVM2Item(null)/*?*/, true/*?*/, openedNamespaces, abcIndex);
-                        variables.add(e);
+                        //variables.add(e);
                         catchExceptions.add(e);
                         e.setSlotNumber(1);
                         e.setSlotScope(Integer.MAX_VALUE); //will be changed later
@@ -1787,24 +1787,27 @@ public class ActionScript3Parser {
                             if (a instanceof UnresolvedAVM2Item) {
                                 UnresolvedAVM2Item ui = (UnresolvedAVM2Item) a;
                                 if (ui.getVariableName().equals(DottedChain.parseWithSuffix(e.getVariableName()))) {
+                                    List<AssignableAVM2Item> catchedVarAsList = new ArrayList<>();
+                                    catchedVarAsList.add(e);
                                     try {
-                                        ui.resolve(null, null, null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), variables);
+                                        ui.resolve(null, null, null, new ArrayList<>(), new ArrayList<>(), abcIndex, new ArrayList<>(), catchedVarAsList);
                                     } catch (CompilationException ex) {
                                         // ignore
                                     }
                                     ui.setSlotNumber(e.getSlotNumber());
                                     ui.setSlotScope(e.getSlotScope());
+                                    variables.remove(a);
                                 }
 
                             }
-                        }
+                        }                                                
 
                         catchCommands.add(cc);
                         s = lex();
                         found = true;
                     }
                     //TODO:
-                    for (int i = varCnt; i < variables.size(); i++) {
+                    /*for (int i = varCnt; i < variables.size(); i++) {
                         AssignableAVM2Item av = variables.get(i);
                         if (av instanceof UnresolvedAVM2Item) {
                             UnresolvedAVM2Item ui = (UnresolvedAVM2Item) av;
@@ -1820,7 +1823,7 @@ public class ActionScript3Parser {
                                 }
                             }
                         }
-                    }
+                    }*/
 
                     List<GraphTargetItem> finallyCommands = null;
                     if (s.type == SymbolType.FINALLY) {
