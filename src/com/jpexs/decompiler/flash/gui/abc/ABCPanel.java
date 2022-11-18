@@ -934,7 +934,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         decompiledScrollPane = new FasterScrollPane(decompiledTextArea);
 
         JPanel iconDecPanel = new JPanel();
-        iconDecPanel.setLayout(new BoxLayout(iconDecPanel, BoxLayout.Y_AXIS));
+        iconDecPanel.setLayout(new BorderLayout());
         JPanel iconsPanel = new JPanel(new FlowLayout());
         //iconsPanel.setLayout(new BoxLayout(iconsPanel, BoxLayout.X_AXIS));
 
@@ -951,10 +951,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         iconsPanel.add(removeTraitButton);
 
         scriptNameLabel = new JLabel("-");
-        scriptNameLabel.setAlignmentX(0);
+        
+        JPanel topPanel = new JPanel(new BorderLayout());        
         //iconsPanel.setAlignmentX(0);
-        decompiledScrollPane.setAlignmentX(0);
-        iconDecPanel.add(scriptNameLabel);
+        topPanel.add(scriptNameLabel, BorderLayout.NORTH);
         
         toolbarPanel = new JPanel(new BorderLayout());
         toolbarPanel.add(iconsPanel, BorderLayout.WEST);
@@ -981,18 +981,18 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         librarySelectPanel.add(libraryComboBox);        
         toolbarPanel.add(librarySelectPanel, BorderLayout.EAST);
         
-        toolbarPanel.setAlignmentX(0);
+        topPanel.add(toolbarPanel, BorderLayout.CENTER);
         
-        iconDecPanel.add(toolbarPanel);
+        iconDecPanel.add(topPanel, BorderLayout.NORTH);
 
         JPanel panelWithHint = new JPanel(new BorderLayout());
-        panelWithHint.setAlignmentX(0);
+        panelWithHint.setAlignmentX(CENTER_ALIGNMENT);
         panelWithHint.add(brokenHintPanel, BorderLayout.NORTH);
         panelWithHint.add(decompiledScrollPane, BorderLayout.CENTER);
 
         brokenHintPanel.setVisible(false);
 
-        iconDecPanel.add(panelWithHint);
+        iconDecPanel.add(panelWithHint, BorderLayout.CENTER);
         final JPanel decButtonsPan = new JPanel(new FlowLayout());
         decButtonsPan.setBorder(new BevelBorder(BevelBorder.RAISED));
         decButtonsPan.add(editDecompiledButton);
