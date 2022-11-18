@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
+import com.jpexs.helpers.Profiler;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
@@ -140,7 +141,6 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
     }
 
     public void resolve(boolean mustExist, SourceGeneratorLocalData localData, Reference<Boolean> isType, Reference<GraphTargetItem> objectType, Reference<GraphTargetItem> propertyType, Reference<Integer> propertyIndex, Reference<ValueKind> propertyValue, Reference<ABC> propertyValueABC) throws CompilationException {
-        
         Integer namespaceSuffixInt = null;
         if (!"".equals(namespaceSuffix)) {
             namespaceSuffixInt = Integer.parseInt(namespaceSuffix.substring(1));
@@ -173,48 +173,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         AVM2ConstantPool constants = abc.constants;
         if (!attribute) {
 
-            if (scopeStack.isEmpty()) { //Everything is multiname when with command
-                if (objType == null) {
-
-                    /*for (GraphTargetItem s : scopeStack) {
-                     String oType = s.returnType().toString();
-                     String name = oType;
-                     String nsname = "";
-                     if(name.contains(".")){
-                     nsname = name.substring(0,name.lastIndexOf("."));
-                     name = name.substring(name.lastIndexOf(".")+1);
-                     }
-
-                     List<ABC> abcs = new ArrayList<>();
-                     abcs.add(abc);
-                     abcs.addAll(otherABCs);
-                     loopabc:
-                     for (ABC a : abcs) {
-                     for (int h = 0; h < a.instance_info.size(); h++) {
-                     InstanceInfo ii = a.instance_info.get(h);
-                     Multiname n = a.constants.constant_multiname.get(ii.name_index);
-                     if (name.equals(n.getName(a.constants, new ArrayList<>())) && n.getNamespace(a.constants).hasName(nsname,a.constants)) {
-                     Reference<String> outName = new Reference<>("");
-                     Reference<String> outNs = new Reference<>("");
-                     Reference<String> outPropNs = new Reference<>("");
-                     Reference<Integer> outPropNsKind = new Reference<>(1);
-                     Reference<String> outPropType = new Reference<>("");
-                     if (AVM2SourceGenerator.searchPrototypeChain(false, abcs, nsname, name, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropType)) {
-                     objType = "".equals(outNs.getVal()) ? outName.getVal() : outNs.getVal() + "." + outName.getVal();
-                     propType = outPropType.getVal();
-                     propIndex = abc.constants.getMultinameId(new Multiname(Multiname.QNAME,
-                     abc.constants.getStringId(propertyName, true),
-                     abc.constants.getNamespaceId(new Namespace(outPropNsKind.getVal(), abc.constants.getStringId(outPropNs.getVal(), true)), 0, true), 0, 0, new ArrayList<Integer>()), true
-                     );
-
-                     break loopabc;
-                     }
-                     }
-                     }
-                     }
-                     }*/
-                }
-
+            if (scopeStack.isEmpty()) { //Everything is multiname when with command                  
                 GraphTargetItem ttype = objType;
                 if (ttype == null) {
                     ttype = thisType;
@@ -236,16 +195,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                 ttype = new TypeItem(InitVectorAVM2Item.VECTOR_OBJECT);
                         }
                     }
-                    /*                    AbcIndexing.TraitIndex p = abc.findProperty(new AbcIndexing.PropertyDef(propertyName, ttype), false, true);
-                     if(p!=null){
-                     objType = new TypeItem(outNs.getVal().isEmpty() ? outName.getVal() : outNs.getVal().toRawString() + "." + outName.getVal());
-                     propType = p.type;
-                     propIndex = abc.getLastAbc().constants.getMultinameId(new Multiname(Multiname.QNAME,
-                     abc.getLastAbc().getStringId(propertyName, true),
-                     abc.getLastAbc().getNamespaceId(new Namespace(outPropNsKind.getVal(), abc.constants.getStringId(outPropNs.getVal(), true)), outPropNsIndex.getVal(), true), 0, 0, new ArrayList<>()), true
-                     );
-                     propValue = outPropValue.getVal();
-                     }*/
+                  
                     if (ttype instanceof TypeItem) {
                         DottedChain ftn = ((TypeItem) ttype).fullTypeName;
                         Reference<String> outName = new Reference<>("");
@@ -322,12 +272,17 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
 
                                 int nsKind = openedNamespaces.get(i).kind;
                                 DottedChain nsname = openedNamespaces.get(i).name;
-                                int name_index = 0;
-                                for (int m = 1; m < constants.getMultinameCount(); m++) {
-                                    Multiname mname = constants.getMultiname(m);
-                                    if (mname.kind == Multiname.QNAME && mname.getName(constants, null, true, true).equals(propertyName) && mname.namespace_index == nsindex) {
-                                        name_index = m;
-                                        break;
+                                int name_index = 0;               
+                                int string_property_index = constants.getStringId(propertyName, false);
+                                if (string_property_index > -1) {
+                                    for (int m = 1; m < constants.getMultinameCount(); m++) {
+                                        Multiname mname = constants.getMultiname(m);                                        
+                                        if (mname.kind == Multiname.QNAME && 
+                                                mname.name_index == string_property_index &&                                                
+                                                mname.namespace_index == nsindex) {
+                                            name_index = m;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (name_index > 0) {
@@ -362,7 +317,8 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                             }
                                         }
                                     }
-
+                                    
+                                    
                                     for (ScriptInfo si : abc.script_info) {
                                         if (si.deleted) {
                                             continue;
@@ -381,9 +337,9 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                                 break loopobjType;
                                             }
                                         }
-                                    }
+                                    }                                                                    
                                 }
-                                if (nsKind == Namespace.KIND_PACKAGE && propertyName != null) {
+                                if (nsKind == Namespace.KIND_PACKAGE && propertyName != null) {                                    
                                     AbcIndexing.TraitIndex p = abcIndex.findNsProperty(new AbcIndexing.PropertyNsDef(propertyName, nsname, abc, openedNamespaces.get(i).getCpoolIndex(abcIndex)), true, true);
 
                                     Reference<String> outName = new Reference<>("");
@@ -412,17 +368,12 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                             propValueAbc = outPropValueAbc.getVal();
                                             break loopobjType;
                                         }
-                                    }
-
-                                    //if (propertyName != null && AVM2SourceGenerator.searchPrototypeChain(false, abcs, nsname, n.getName(a.constants, null, true), propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue)) {
-                                    //
-                                    //}
+                                    }                                    
                                 }
                             }
                         }
                     }
-                }
-
+                }                
             }
         }
 
