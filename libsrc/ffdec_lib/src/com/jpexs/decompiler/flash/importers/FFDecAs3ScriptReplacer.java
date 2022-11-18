@@ -33,6 +33,14 @@ import java.util.List;
 
 public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
 
+    private boolean air;
+    
+    public FFDecAs3ScriptReplacer(boolean air) {
+        this.air = air;                 
+    }
+
+    
+    
     @Override
     public void replaceScript(ScriptPack pack, String text) throws As3ScriptReplaceException, IOException, InterruptedException {
         ABC abc = pack.abc;
@@ -63,7 +71,7 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
             otherAbcs.remove(abc);
             abc.script_info.get(oldIndex).delete(abc, true);
 
-            ActionScript3Parser.compile(text, abc, otherAbcs, scriptName, newClassIndex, oldIndex);
+            ActionScript3Parser.compile(text, abc, otherAbcs, scriptName, newClassIndex, oldIndex, air);
             if (pack.isSimple) {
                 // Move newly added script to its position
                 abc.script_info.set(oldIndex, abc.script_info.get(newIndex));
@@ -84,10 +92,16 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
     }
 
     @Override
-    public boolean isAvailable() {
-        File swc = Configuration.getPlayerSWC();
+    public boolean isAvailable() {                
+        File swc = air ? Configuration.getAirSWC() : Configuration.getPlayerSWC();
         return !(swc == null || !swc.exists());
     }
+
+    public boolean isAir() {
+        return air;
+    }
+    
+    
 
     @Override
     public void initReplacement(ScriptPack pack) {

@@ -21,8 +21,10 @@ import com.jpexs.decompiler.flash.flexsdk.MxmlcAs3ScriptReplacer;
 
 public class As3ScriptReplacerFactory {
 
-    public static As3ScriptReplacerInterface createByConfig() {
-        if (Configuration.useFlexAs3Compiler.get()) {
+    public static As3ScriptReplacerInterface createByConfig(boolean air) {
+        if (air) {
+            return createFFDecAir();
+        } else if (Configuration.useFlexAs3Compiler.get()) {
             return createFlex();
         } else {
             return createFFDec();
@@ -34,6 +36,10 @@ public class As3ScriptReplacerFactory {
     }
 
     public static As3ScriptReplacerInterface createFFDec() {
-        return new FFDecAs3ScriptReplacer();
+        return new FFDecAs3ScriptReplacer(false);
+    }
+    
+    public static As3ScriptReplacerInterface createFFDecAir() {
+        return new FFDecAs3ScriptReplacer(true);
     }
 }

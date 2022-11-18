@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.helpers.CodeFormatting;
 import com.jpexs.decompiler.flash.helpers.FontHelper;
 import com.jpexs.decompiler.flash.importers.TextImportResizeTextBoundsMode;
 import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.Path;
 import java.awt.Font;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -791,6 +792,11 @@ public final class Configuration {
     @ConfigurationDefaultInt(5 * 60 * 1000)
     @ConfigurationCategory("limit")
     public static ConfigurationItem<Integer> maxCachedTime = null;
+    
+    @ConfigurationDefaultString("")
+    @ConfigurationCategory("paths")
+    @ConfigurationFile(".*\\.swc$")
+    public static ConfigurationItem<String> airLibLocation = null;
         
     private enum OSId {
         WINDOWS, OSX, UNIX
@@ -1071,6 +1077,12 @@ public final class Configuration {
                 playerLibLocation.set(swcFile.getAbsolutePath());
             }
         }
+        if (airLibLocation.get("").isEmpty()) {
+            File swcFile = getAirSwcOld();
+            if (swcFile != null) {
+                airLibLocation.set(swcFile.getAbsolutePath());
+            }
+        }
     }
 
     public static Object getDefaultValue(Field field) {
@@ -1211,7 +1223,33 @@ public final class Configuration {
         }
         return ret;
     }
+    
+    public static File getAirSWC() {
+        String libLocation = airLibLocation.get("");
+        File ret = null;
+        if (!libLocation.isEmpty()) {
+            ret = new File(libLocation);
+        }
+        if (ret == null || !ret.exists()) {
+            ret = getAirSwcOld();
+            if (ret != null) {
+                airLibLocation.set(ret.getAbsolutePath());
+            }
+        }
+        return ret;
+    }
 
+    private static File getAirSwcOld() {
+        File libsDir = getFlashLibPath();
+        if (libsDir != null && libsDir.exists()) {
+            File airFile = new File(Path.combine(libsDir.getAbsolutePath(), "airglobal.swc"));
+            if (airFile.exists()) {
+                return airFile;
+            }
+        }
+        return null;
+    }
+    
     private static File getPlayerSwcOld() {
         File libsDir = getFlashLibPath();
         if (libsDir != null && libsDir.exists()) {

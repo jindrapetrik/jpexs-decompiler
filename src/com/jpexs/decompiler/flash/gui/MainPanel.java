@@ -2947,16 +2947,23 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public As3ScriptReplacerInterface getAs3ScriptReplacer() {
-        As3ScriptReplacerInterface r = As3ScriptReplacerFactory.createByConfig();
+    public As3ScriptReplacerInterface getAs3ScriptReplacer(boolean air) {
+        As3ScriptReplacerInterface r = As3ScriptReplacerFactory.createByConfig(air);
         if (!r.isAvailable()) {
             if (r instanceof MxmlcAs3ScriptReplacer) {
                 if (ViewMessages.showConfirmDialog(this, AppStrings.translate("message.flexpath.notset"), AppStrings.translate("error"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
                     Main.advancedSettings("paths");
                 }
             } else if (r instanceof FFDecAs3ScriptReplacer) {
-                if (ViewMessages.showConfirmDialog(this, AppStrings.translate("message.playerpath.lib.notset"), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
-                    Main.advancedSettings("paths");
+                FFDecAs3ScriptReplacer fr = (FFDecAs3ScriptReplacer) r;
+                if (fr.isAir()) {
+                    if (ViewMessages.showConfirmDialog(this, AppStrings.translate("message.airpath.lib.notset"), AppStrings.translate("message.action.airglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+                        Main.advancedSettings("paths");
+                    }
+                } else {
+                    if (ViewMessages.showConfirmDialog(this, AppStrings.translate("message.playerpath.lib.notset"), AppStrings.translate("message.action.playerglobal.title"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
+                        Main.advancedSettings("paths");
+                    }
                 }
             } else {
                 //Not translated yet - just in case there are more Script replacers in the future. Unused now.
@@ -2968,7 +2975,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void importScript(final SWF swf) {
-        As3ScriptReplacerInterface as3ScriptReplacer = getAs3ScriptReplacer();
+        As3ScriptReplacerInterface as3ScriptReplacer = getAs3ScriptReplacer(Main.isSwfAir(swf));
         if (as3ScriptReplacer == null) {
             return;
         }

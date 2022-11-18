@@ -45,6 +45,8 @@ import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
+import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.AppStrings;
@@ -156,6 +158,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
     public ABC abc;
 
+    private final JPanel toolbarPanel;
+    
+    private final JComboBox<String> libraryComboBox;
+    
     public final DecompiledEditorPane decompiledTextArea;
 
     public final JScrollPane decompiledScrollPane;
@@ -225,12 +231,17 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     }
 
     public void setAbc(ABC abc) {
-        View.checkAccess();
+        View.checkAccess();               
 
         if (abc == this.abc) {
             return;
         }
 
+        if (Main.isSwfAir(abc.getSwf())) {
+            libraryComboBox.setSelectedIndex(Main.LIBRARY_AIR);
+        } else {
+            libraryComboBox.setSelectedIndex(Main.LIBRARY_FLASH);
+        }       
         this.abc = abc;
         setDecompiledEditMode(false);
         navigator.setAbc(abc);
@@ -924,8 +935,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         JPanel iconDecPanel = new JPanel();
         iconDecPanel.setLayout(new BoxLayout(iconDecPanel, BoxLayout.Y_AXIS));
-        JPanel iconsPanel = new JPanel();
-        iconsPanel.setLayout(new BoxLayout(iconsPanel, BoxLayout.X_AXIS));
+        JPanel iconsPanel = new JPanel(new FlowLayout());
+        //iconsPanel.setLayout(new BoxLayout(iconsPanel, BoxLayout.X_AXIS));
 
         JButton newTraitButton = new JButton(View.getIcon("traitadd16"));
         newTraitButton.setMargin(new Insets(5, 5, 5, 5));
@@ -941,10 +952,38 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         scriptNameLabel = new JLabel("-");
         scriptNameLabel.setAlignmentX(0);
-        iconsPanel.setAlignmentX(0);
+        //iconsPanel.setAlignmentX(0);
         decompiledScrollPane.setAlignmentX(0);
         iconDecPanel.add(scriptNameLabel);
-        iconDecPanel.add(iconsPanel);
+        
+        toolbarPanel = new JPanel(new BorderLayout());
+        toolbarPanel.add(iconsPanel, BorderLayout.WEST);
+        
+        
+        JPanel librarySelectPanel = new JPanel(new FlowLayout());
+        libraryComboBox = new JComboBox<>();
+        libraryComboBox.addItem("AIR (airglobal.swc)");
+        libraryComboBox.addItem("Flash (playerglobal.swc)");
+        libraryComboBox.setSelectedIndex(Main.LIBRARY_FLASH);       
+        libraryComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                SWF swf = getSwf();
+                if (swf == null) {
+                    return;
+                }
+                SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
+                conf.setCustomData(CustomConfigurationKeys.KEY_LIBRARY, "" + libraryComboBox.getSelectedIndex());
+            }
+        });
+        
+        librarySelectPanel.add(new JLabel(AppStrings.translate("library")));
+        librarySelectPanel.add(libraryComboBox);        
+        toolbarPanel.add(librarySelectPanel, BorderLayout.EAST);
+        
+        toolbarPanel.setAlignmentX(0);
+        
+        iconDecPanel.add(toolbarPanel);
 
         JPanel panelWithHint = new JPanel(new BorderLayout());
         panelWithHint.setAlignmentX(0);
@@ -1436,13 +1475,14 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         if (val) {
             decompiledTextArea.requestFocusInWindow();
         }
+        toolbarPanel.setVisible(!val);
     }
 
-    private void editDecompiledButtonActionPerformed(ActionEvent evt) {
-        scriptReplacer = mainPanel.getAs3ScriptReplacer();
+    private void editDecompiledButtonActionPerformed(ActionEvent evt) {        
+        scriptReplacer = mainPanel.getAs3ScriptReplacer(Main.isSwfAir(getSwf()));
         if (scriptReplacer == null) {
             return;
-        }
+        }        
 
         if (ViewMessages.showConfirmDialog(this, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS3Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
             pack = decompiledTextArea.getScriptLeaf();
