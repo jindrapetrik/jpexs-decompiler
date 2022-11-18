@@ -1618,7 +1618,7 @@ public class Main {
         View.checkAccess();
 
         sourceInfos.remove(swf.sourceInfo);
-        mainFrame.getPanel().close(swf);
+        mainFrame.getPanel().close(swf);               
     }
 
     public static void reloadFile(SWFList swf) {
@@ -1645,6 +1645,7 @@ public class Main {
         boolean closeResult = mainFrame.getPanel().closeAll(true);
         if (closeResult) {
             sourceInfos.clear();
+            System.gc();
         }
 
         if (filesChangedDialog != null) {
