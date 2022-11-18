@@ -92,6 +92,7 @@ public class Cache<K, V> implements Freed {
                     }
                 }                
             };
+            oldCleaner.setPriority(Thread.MIN_PRIORITY);
             oldCleaner.start();
         }
         Cache<K, V> instance = new Cache<>(weak, memoryOnly, name, temporary);
