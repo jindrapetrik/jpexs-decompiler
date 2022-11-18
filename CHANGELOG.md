@@ -23,7 +23,7 @@ All notable changes to this project will be documented in this file.
 - [#1692] Properly distinguish obfuscated names vs namespace suffixes and attributes
 - [#1757] Binary search - SWF files need to be sorted by file position
 - [#1803] AS3 Direct editation - Colliding catch name with other variable names / arguments
-- AS3 Direct editation - slow property resolving
+- AS3 Direct editation - slow property resolving (Now up to 10 times faster compilation)
 
 ### Changed
 - GFX - DefineExternalImage2 no longer handled as character
