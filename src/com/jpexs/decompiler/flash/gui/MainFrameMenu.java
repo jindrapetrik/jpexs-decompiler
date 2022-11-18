@@ -238,8 +238,15 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (swf == null) {
             return;
         }
-
         Main.closeFile(swf.swfList);
+        swf = null;
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                System.gc();
+            }
+        }, 1000);
     }
 
     protected boolean closeAllActionPerformed(ActionEvent evt) {
@@ -248,7 +255,18 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
 
         if (swf != null) {
-            return Main.closeAll();
+            boolean result = Main.closeAll();
+            if (result) {
+                swf = null;
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        System.gc();
+                    }
+                }, 1000);
+            }
+            return result;
         }
 
         return false;
@@ -508,7 +526,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                         lang = null;
                     }
                     ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    try (PrintStream stream = new PrintStream(os, false, "UTF-8")) {
+                    try ( PrintStream stream = new PrintStream(os, false, "UTF-8")) {
                         CheckResources.checkResources(stream, lang);
                         String str = new String(os.toByteArray(), Utf8Helper.charset);
                         editor.setText(str);
@@ -1139,7 +1157,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                         + "Jre 64bit: " + Helper.is64BitJre() + Helper.newLine
                         + "Os 64bit: " + Helper.is64BitOs() + Helper.newLine
                         + "Max: " + (runtime.maxMemory() / 1024 / 1024) + "MB" + Helper.newLine
-                        + "Total: " + (runtime.totalMemory()/ 1024 / 1024) + "MB" + Helper.newLine
+                        + "Total: " + (runtime.totalMemory() / 1024 / 1024) + "MB" + Helper.newLine
                         + "Used: " + ((runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024) + "MB" + Helper.newLine
                         + "Free: " + (runtime.freeMemory() / 1024 / 1024) + "MB";
                 ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), info);

@@ -459,7 +459,15 @@ public final class SWF implements SWFContainerItem, Timelined {
         clearScriptCache();
         frameCache.clear();
         soundCache.clear();
-
+        
+        clearImageCache();
+        clearShapeCache();
+        clearAbcListCache();
+        
+        characters = null;
+        characterIdTags = null;
+        externalImages2 = null;
+        
         timeline = null;
         if (dumpInfo != null) {
             clearDumpInfo(dumpInfo);
@@ -2827,6 +2835,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     public void clearAllCache() {
         characters = null;
         characterIdTags = null;
+        externalImages2 = null;
         timeline = null;
         cyclicCharacters = null;
         clearReadOnlyListCache();
