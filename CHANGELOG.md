@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - AS3 Direct editation - slow property resolving (Now up to 10 times faster compilation)
 - [#1875] Garbage collect SWF and its caches after closing it
 - [#1807] Proper parenthesis around call inside another call
+- [#1840] AS3 - Allow to compile object literal keys with nonstring/numbers in obfuscated code
 
 ### Changed
 - GFX - DefineExternalImage2 no longer handled as character
@@ -2612,6 +2613,7 @@ All notable changes to this project will be documented in this file.
 [#1692]: https://www.free-decompiler.com/flash/issues/1692
 [#1757]: https://www.free-decompiler.com/flash/issues/1757
 [#1807]: https://www.free-decompiler.com/flash/issues/1807
+[#1840]: https://www.free-decompiler.com/flash/issues/1840
 [#1867]: https://www.free-decompiler.com/flash/issues/1867
 [#1868]: https://www.free-decompiler.com/flash/issues/1868
 [#1649]: https://www.free-decompiler.com/flash/issues/1649

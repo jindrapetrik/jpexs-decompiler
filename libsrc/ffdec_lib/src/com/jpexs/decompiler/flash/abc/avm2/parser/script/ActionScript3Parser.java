@@ -2351,10 +2351,15 @@ public class ActionScript3Parser {
                         lexer.pushback(s);
                     }
                     s = lex();
-                    expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.STRING, SymbolType.INTEGER, SymbolType.DOUBLE);
+                    expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.STRING, SymbolType.INTEGER, SymbolType.DOUBLE, SymbolType.PARENT_OPEN);
 
-                    GraphTargetItem n = new StringAVM2Item(null, null, s.value.toString());
-//expression(allOpenedNamespaces, thisType,pkg,needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables);
+                    GraphTargetItem n;                    
+                    if (s.type == SymbolType.PARENT_OPEN) { //special for obfuscated SWFs
+                        n = expression(allOpenedNamespaces, thisType,pkg,needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables, false);
+                        expectedType(SymbolType.PARENT_CLOSE);
+                    } else {
+                        n = new StringAVM2Item(null, null, s.value.toString());
+                    }                    
                     expectedType(SymbolType.COLON);
                     GraphTargetItem v = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables, false);
 
