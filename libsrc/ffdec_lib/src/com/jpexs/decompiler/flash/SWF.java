@@ -368,6 +368,9 @@ public final class SWF implements SWFContainerItem, Timelined {
     @Internal
     private Map<String, ASMSource> asmsCache;
 
+    @Internal
+    private boolean destroyed = false;
+    
     private Set<Integer> cyclicCharacters = null;
 
     private boolean headerModified = false;
@@ -415,6 +418,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public void clearTagSwfs() {
+        destroyed = true;
         decompilerPool.destroySwf(this);
         resetTimelines(this);
         updateCharacters();
@@ -485,10 +489,13 @@ public final class SWF implements SWFContainerItem, Timelined {
         di.getChildInfos().clear();
     }
 
-    public Map<Integer, CharacterTag> getCharacters() {
+    public Map<Integer, CharacterTag> getCharacters() {        
         if (characters == null) {
             synchronized (this) {
                 if (characters == null) {
+                    if (destroyed) {
+                        return new HashMap<>();
+                    }
                     Map<Integer, CharacterTag> chars = new HashMap<>();
                     Map<Integer, List<CharacterIdTag>> charIdtags = new HashMap<>();
                     Map<Integer, DefineExternalImage2> eimages = new HashMap<>();
