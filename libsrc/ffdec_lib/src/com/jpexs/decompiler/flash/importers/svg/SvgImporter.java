@@ -365,7 +365,9 @@ public class SvgImporter {
         LINESTYLE2 lineStyle2Obj = null;
         if (shapeNum == 4) {
             lineStyle2Obj = scrStyle.lineStyles.lineStyles2.length < 1 ? null : scrStyle.lineStyles.lineStyles2[0];
-            lineStyle2Obj.noClose = true;
+            if (lineStyle2Obj != null) {
+                lineStyle2Obj.noClose = true;
+            }
         }
 
         for (PathCommand command : commands) {
