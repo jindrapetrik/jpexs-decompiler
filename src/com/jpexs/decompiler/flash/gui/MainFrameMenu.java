@@ -294,7 +294,21 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
         mainFrame.getPanel().importImage(swf);
     }
+    
+    protected void importShapesActionPerformed(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+        mainFrame.getPanel().importShape(swf, false);
+    }
 
+    protected void importShapesNoFillActionPerformed(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+        mainFrame.getPanel().importShape(swf, true);
+    }
+    
     protected void importSymbolClassActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
@@ -932,6 +946,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/file/import/importScript", translate("menu.file.import.script"), "importscript32", this::importScriptActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/import/importOther", translate("menu.file.import.other"), "importother32", null, PRIORITY_MEDIUM, null, false, null, false);
         addMenuItem("/file/import/importOther/importImages", translate("menu.file.import.image"), "importimage32", this::importImagesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/file/import/importOther/importShapes", translate("menu.file.import.shape"), "importshape32", this::importShapesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/file/import/importOther/importShapesNoFill", translate("menu.file.import.shapeNoFill"), "importshape32", this::importShapesNoFillActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/import/importOther/importSymbolClass", translate("menu.file.import.symbolClass"), "importsymbolclass32", this::importSymbolClassActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         finishMenu("/file/import/importOther");
         finishMenu("/file/import");
