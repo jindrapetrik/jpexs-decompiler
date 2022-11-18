@@ -1113,6 +1113,53 @@ public class Graph {
 
                 }
 
+                /*
+                if (xx) {
+                    A;
+                    continue
+                } else {
+                    B;
+                    break/exit/continue;
+                }
+                
+                =>
+                
+                if (xx) {
+                    A;
+                } else {
+                    B;
+                    break/exit/continue;
+                }
+                continue;
+                
+                */
+                
+                if ((!onTrue.isEmpty()) && (!onFalse.isEmpty())) {
+                    if ((onFalse.get(onFalse.size() - 1) instanceof ExitItem) || (onFalse.get(onFalse.size() - 1) instanceof BreakItem)) {
+                        if (onTrue.get(onTrue.size() - 1) instanceof ContinueItem) {
+                            list.add(i + 1, onTrue.remove(onTrue.size() - 1));
+                        }
+                    }
+                }
+                
+                
+                /*
+                if (xx) {
+                    A;
+                    break/exit/continue;
+                } else {
+                    B;                    
+                }
+                
+                =>
+                
+                if (xx) {
+                    A;
+                    break/exit/continue;
+                }
+                B;
+                
+                */
                 if ((!onTrue.isEmpty()) && (!onFalse.isEmpty())) {
                     GraphTargetItem last = onTrue.get(onTrue.size() - 1);
                     if ((last instanceof ExitItem) || (last instanceof ContinueItem) || (last instanceof BreakItem)) {
@@ -1121,13 +1168,7 @@ public class Graph {
                     }
                 }
 
-                if ((!onTrue.isEmpty()) && (!onFalse.isEmpty())) {
-                    if ((onFalse.get(onFalse.size() - 1) instanceof ExitItem) || (onFalse.get(onFalse.size() - 1) instanceof BreakItem)) {
-                        if (onTrue.get(onTrue.size() - 1) instanceof ContinueItem) {
-                            list.add(i + 1, onTrue.remove(onTrue.size() - 1));
-                        }
-                    }
-                }
+                
 
                 //Prefer continue/return/throw/break in onTrue rather than onFalse
                 if (!onFalse.isEmpty()
