@@ -33,6 +33,7 @@ All notable changes to this project will be documented in this file.
 - [#1877] Recalculate dependent characters and frames on removing / editing item
 - DefineShape4 SVG import NullPointerException
 - List of objects under cursor and coordinates not showing
+- ConcurrentModificationException in getCharacters on exit
 
 ### Changed
 - GFX - DefineExternalImage2 no longer handled as character
