@@ -1712,6 +1712,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             autoPlayed = autoPlay;
             this.alwaysDisplay = alwaysDisplay;
             this.frozen = frozen;
+            this.showObjectsUnderCursor = showObjectsUnderCursor;
             redraw();
             if (autoPlay) {                
                 play();
@@ -1731,8 +1732,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 clearImagePanel();
             }
         }
-
-        this.showObjectsUnderCursor = showObjectsUnderCursor;
+        
         fireMediaDisplayStateChanged();
     }
 
@@ -1842,7 +1842,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             fireMediaDisplayStateChanged();
         }
 
-        showObjectsUnderCursor = false;
         textTag = null;
         newTextTag = null;
         displayObjectCache.clear();
@@ -2329,7 +2328,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             StringBuilder ret = new StringBuilder();
 
-            if (cursorPosition != null && !autoPlayed) {
+            if (cursorPosition != null && autoPlayed) {
                 ret.append(" [").append(cursorPosition.x).append(",").append(cursorPosition.y).append("]");
                 if (showObjectsUnderCursor) {
                     ret.append(" : ");
@@ -2338,7 +2337,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             boolean handCursor = renderContext.mouseOverButton != null || !autoPlayed;
 
-            if (showObjectsUnderCursor && !autoPlayed) {
+            if (showObjectsUnderCursor && autoPlayed) {
 
                 boolean first = true;
                 for (int i = renderContext.stateUnderCursor.size() - 1; i >= 0; i--) {
@@ -2466,7 +2465,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         timelined = null;
         swf = null;
         lda = null;
-
+        showObjectsUnderCursor = false;        
         fireMediaDisplayStateChanged();
     }
 
