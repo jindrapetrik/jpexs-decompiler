@@ -718,6 +718,8 @@ public class TagTreeContextMenu extends JPopupMenu {
         exportSwfXmlMenuItem.setVisible(allSelectedIsSwf);
 
         importImagesMenuItem.setVisible(false);
+        importShapesMenuItem.setVisible(false);
+        importShapesNoFillMenuItem.setVisible(false);
         importScriptsMenuItem.setVisible(false);
         importSymbolClassMenuItem.setVisible(false);
         importTextsMenuItem.setVisible(false);
@@ -908,6 +910,8 @@ public class TagTreeContextMenu extends JPopupMenu {
 
             if (firstItem instanceof SWF) {
                 importImagesMenuItem.setVisible(true);
+                importShapesMenuItem.setVisible(true);
+                importShapesNoFillMenuItem.setVisible(true);
                 importScriptsMenuItem.setVisible(true);
                 importSymbolClassMenuItem.setVisible(true);
                 importTextsMenuItem.setVisible(true);
