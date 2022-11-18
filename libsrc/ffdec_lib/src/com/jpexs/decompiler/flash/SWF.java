@@ -2838,12 +2838,13 @@ public final class SWF implements SWFContainerItem, Timelined {
         externalImages2 = null;
         timeline = null;
         cyclicCharacters = null;
+        dependentCharacters = null;
+        dependentFrames = null;
         clearReadOnlyListCache();
         clearImageCache();
         clearShapeCache();
         clearScriptCache();
         clearAbcListCache();
-        clearAllStaticCache();
     }
 
     public static void uncache(ASMSource src) {

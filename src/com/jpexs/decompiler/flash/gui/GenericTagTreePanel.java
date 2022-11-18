@@ -1172,6 +1172,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 ((Timelined)parentCharacter).resetTimeline();
             }
         }
+        swf.computeDependentCharacters();
+        swf.computeDependentFrames();
         return true;
     }
 
