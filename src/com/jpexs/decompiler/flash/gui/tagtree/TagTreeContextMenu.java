@@ -159,6 +159,10 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private JMenuItem importImagesMenuItem;
 
+    private JMenuItem importShapesMenuItem;
+
+    private JMenuItem importShapesNoFillMenuItem;
+
     private JMenuItem importSymbolClassMenuItem;
 
     private JMenuItem closeMenuItem;
@@ -332,6 +336,16 @@ public class TagTreeContextMenu extends JPopupMenu {
         importImagesMenuItem.addActionListener(this::importImagesActionPerformed);
         importImagesMenuItem.setIcon(View.getIcon("importimage16"));
         add(importImagesMenuItem);
+        
+        importShapesMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.shape"));
+        importShapesMenuItem.addActionListener(this::importShapesActionPerformed);
+        importShapesMenuItem.setIcon(View.getIcon("importshape16"));
+        add(importShapesMenuItem);
+
+        importShapesNoFillMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.shapeNoFill"));
+        importShapesNoFillMenuItem.addActionListener(this::importShapesNoFillActionPerformed);
+        importShapesNoFillMenuItem.setIcon(View.getIcon("importshape16"));
+        add(importShapesNoFillMenuItem);
 
         importSymbolClassMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.symbolClass"));
         importSymbolClassMenuItem.addActionListener(this::importSymbolClassActionPerformed);
@@ -2974,6 +2988,16 @@ public class TagTreeContextMenu extends JPopupMenu {
     public void importImagesActionPerformed(ActionEvent evt) {
         SWF swf = getTree().getCurrentTreeItem().getSwf();
         mainPanel.importImage(swf);
+    }
+    
+    public void importShapesActionPerformed(ActionEvent evt) {
+        SWF swf = getTree().getCurrentTreeItem().getSwf();
+        mainPanel.importShape(swf, false);
+    }
+    
+    public void importShapesNoFillActionPerformed(ActionEvent evt) {
+        SWF swf = getTree().getCurrentTreeItem().getSwf();
+        mainPanel.importShape(swf, true);
     }
 
     public void importSymbolClassActionPerformed(ActionEvent evt) {

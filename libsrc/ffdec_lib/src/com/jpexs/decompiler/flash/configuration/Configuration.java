@@ -798,6 +798,10 @@ public final class Configuration {
     @ConfigurationFile(".*\\.swc$")
     public static ConfigurationItem<String> airLibLocation = null;
         
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> showImportShapeInfo = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

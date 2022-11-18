@@ -2799,6 +2799,99 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
+    public void importShape(final SWF swf, boolean noFill) {
+        ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importShapes"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportShapeInfo);
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
+        chooser.setDialogTitle(translate("import.select.directory"));
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
+            File shapesDir = new File(Path.combine(selFile, ShapeExportSettings.EXPORT_FOLDER_NAME));
+            ShapeImporter shapeImporter = new ShapeImporter();
+            SvgImporter svgImporter = new SvgImporter();
+            
+            final long timeBefore = System.currentTimeMillis();
+            new CancellableWorker<Void>() {
+
+                private int count = 0;
+
+                @Override
+                public Void doInBackground() throws Exception {
+                    try {
+                        Map<Integer, CharacterTag> characters = swf.getCharacters();
+                        List<String> extensions = Arrays.asList("svg", "png", "jpg", "jpeg", "gif", "bmp");
+                        for (int characterId : characters.keySet()) {
+                            CharacterTag tag = characters.get(characterId);
+                            if (tag instanceof ShapeTag) {
+                                ShapeTag shapeTag = (ShapeTag) tag;
+                                List<File> existingFilesForImageTag = new ArrayList<>();
+                                for (String ext : extensions) {
+                                    File sourceFile = new File(Path.combine(shapesDir.getPath(), "" + characterId + "." + ext));
+                                    if (sourceFile.exists()) {
+                                        existingFilesForImageTag.add(sourceFile);
+                                    }
+                                }
+
+                                if (existingFilesForImageTag.isEmpty()) {
+                                    continue;
+                                }
+
+                                if (existingFilesForImageTag.size() > 1) {
+                                    Logger.getLogger(MainPanel.class.getName()).log(Level.WARNING, "Multiple matching files for shape tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForImageTag.get(0).getName()});
+                                }
+                                File sourceFile = existingFilesForImageTag.get(0);
+                                
+                                try {
+                                    if (sourceFile.getAbsolutePath().toLowerCase().endsWith(".svg")) {
+                                        svgImporter.importSvg(shapeTag, Helper.readTextFile(sourceFile.getAbsolutePath()), !noFill);
+                                    } else {
+                                        shapeImporter.importImage(shapeTag, Helper.readFile(sourceFile.getAbsolutePath()), 0, !noFill);
+                                    }
+                                    count++;
+                                } catch (IOException ex) {
+                                    Logger.getLogger(MainPanel.class.getName()).log(Level.WARNING, "Cannot import shape " + characterId + " from file " + sourceFile.getName(), ex);
+                                }
+                                if (Thread.currentThread().isInterrupted()) {
+                                    break;
+                                }
+                            }
+                        }
+                        swf.clearImageCache();
+                        swf.clearShapeCache();
+                    } catch (Exception ex) {
+                        logger.log(Level.SEVERE, "Error during import", ex);
+                        ViewMessages.showMessageDialog(null, translate("error.import") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage());
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onStart() {
+                    Main.startWork(translate("work.importing") + "...", this);
+                }
+
+                @Override
+                protected void done() {
+                    Main.stopWork();
+                    long timeAfter = System.currentTimeMillis();
+                    final long timeMs = timeAfter - timeBefore;
+
+                    View.execInEventDispatch(() -> {
+                        refreshTree(swf);
+                        setStatus(translate("import.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
+
+                        ViewMessages.showMessageDialog(MainPanel.this, translate("import.shape.result").replace("%count%", Integer.toString(count)));
+                        if (count != 0) {
+                            reload(true);
+                        }
+                    });
+                }
+            }.execute();
+        }
+    }
+    
     public void importImage(final SWF swf) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importImages"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportImageInfo);
         JFileChooser chooser = new JFileChooser();
