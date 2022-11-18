@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - [#1840] AS3 - Allow to compile object literal keys with nonstring/numbers in obfuscated code
 - [#1840] AS3 Direct editation - Type mismatched for a trait
 - [#1840] Proper if..continue..break handling
+- [#1877] Recalculate dependent characters and frames on removing / editing item
 
 ### Changed
 - GFX - DefineExternalImage2 no longer handled as character
@@ -2616,6 +2617,7 @@ All notable changes to this project will be documented in this file.
 [#1757]: https://www.free-decompiler.com/flash/issues/1757
 [#1807]: https://www.free-decompiler.com/flash/issues/1807
 [#1840]: https://www.free-decompiler.com/flash/issues/1840
+[#1877]: https://www.free-decompiler.com/flash/issues/1877
 [#1867]: https://www.free-decompiler.com/flash/issues/1867
 [#1868]: https://www.free-decompiler.com/flash/issues/1868
 [#1649]: https://www.free-decompiler.com/flash/issues/1649

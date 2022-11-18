@@ -1393,6 +1393,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         targetSwf.updateCharacters();
         sourceSwf.resetTimelines(sourceSwf);
         targetSwf.resetTimelines(targetSwf);
+        sourceSwf.computeDependentCharacters();
+        targetSwf.computeDependentCharacters();
+        sourceSwf.computeDependentFrames();
+        targetSwf.computeDependentFrames();
 
         timelined.setFrameCount(timelined.getTimeline().getFrameCount());
 
@@ -2321,9 +2325,11 @@ public class TagTreeContextMenu extends JPopupMenu {
 
                             tagsToRemoveBySwf.get(swf).add(tag);
                         }
-
+                                                
                         for (SWF swf : tagsToRemoveBySwf.keySet()) {
                             swf.removeTags(tagsToRemoveBySwf.get(swf), removeDependencies);
+                            swf.computeDependentCharacters();
+                            swf.computeDependentFrames();
                         }
 
                         for (SWF swf : swfsToClearCache) {
@@ -2935,6 +2941,8 @@ public class TagTreeContextMenu extends JPopupMenu {
                     sourceSwf.clearImageCache();
                     sourceSwf.clearShapeCache();
                     sourceSwf.updateCharacters();
+                    sourceSwf.computeDependentCharacters();
+                    sourceSwf.computeDependentFrames();
                     sourceSwf.resetTimelines(sourceSwf);
                 }
             }
@@ -2943,6 +2951,8 @@ public class TagTreeContextMenu extends JPopupMenu {
             targetSwf.clearImageCache();
             targetSwf.clearShapeCache();
             targetSwf.updateCharacters();
+            targetSwf.computeDependentCharacters();
+            targetSwf.computeDependentFrames();
             targetSwf.resetTimelines(targetSwf);
 
             mainPanel.refreshTree(targetSwf);
