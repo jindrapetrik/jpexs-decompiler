@@ -374,8 +374,13 @@ public class NameAVM2Item extends AssignableAVM2Item {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 13 * hash + Objects.hashCode(this.variableName);
+        int hash = 3;
+        hash = 29 * hash + (this.attribute ? 1 : 0);
+        hash = 29 * hash + Objects.hashCode(this.variableName);
+        hash = 29 * hash + (this.definition ? 1 : 0);
+        hash = 29 * hash + this.regNumber;
+        hash = 29 * hash + this.slotNumber;
+        hash = 29 * hash + this.slotScope;
         return hash;
     }
 
@@ -391,10 +396,24 @@ public class NameAVM2Item extends AssignableAVM2Item {
             return false;
         }
         final NameAVM2Item other = (NameAVM2Item) obj;
-        if (!Objects.equals(this.variableName, other.variableName)) {
+        if (this.attribute != other.attribute) {
             return false;
         }
-        return true;
+        if (this.definition != other.definition) {
+            return false;
+        }
+        if (this.regNumber != other.regNumber) {
+            return false;
+        }
+        if (this.slotNumber != other.slotNumber) {
+            return false;
+        }
+        if (this.slotScope != other.slotScope) {
+            return false;
+        }
+        return Objects.equals(this.variableName, other.variableName);
     }
+
+    
 
 }

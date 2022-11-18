@@ -228,7 +228,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         if (resolved == null) {
-            throw new RuntimeException("Unresolved");
+            throw new RuntimeException("Unresolved: " + toString());
         }
         return resolved.toSource(localData, generator);
     }
