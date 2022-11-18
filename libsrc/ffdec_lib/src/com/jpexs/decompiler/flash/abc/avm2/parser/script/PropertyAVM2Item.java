@@ -272,7 +272,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
 
                                 int nsKind = openedNamespaces.get(i).kind;
                                 DottedChain nsname = openedNamespaces.get(i).name;
-                                int name_index = 0;               
+                                int name_index = 0;
                                 int string_property_index = constants.getStringId(propertyName, false);
                                 if (string_property_index > -1) {
                                     for (int m = 1; m < constants.getMultinameCount(); m++) {
@@ -286,7 +286,8 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                     }
                                 }
                                 if (name_index > 0) {
-                                    for (int c = 0; c < abc.instance_info.size(); c++) {
+                                    //I believe these can be commented out... as it breaks #1840
+                                    /*for (int c = 0; c < abc.instance_info.size(); c++) {
                                         if (abc.instance_info.get(c).deleted) {
                                             continue;
                                         }
@@ -316,8 +317,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                                 break loopobjType;
                                             }
                                         }
-                                    }
-                                    
+                                    }*/
                                     
                                     for (ScriptInfo si : abc.script_info) {
                                         if (si.deleted) {

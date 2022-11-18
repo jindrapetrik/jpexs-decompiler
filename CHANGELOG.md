@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - [#1875] Garbage collect SWF and its caches after closing it
 - [#1807] Proper parenthesis around call inside another call
 - [#1840] AS3 - Allow to compile object literal keys with nonstring/numbers in obfuscated code
+- [#1840] AS3 Direct editation - Type mismatched for a trait
 
 ### Changed
 - GFX - DefineExternalImage2 no longer handled as character
