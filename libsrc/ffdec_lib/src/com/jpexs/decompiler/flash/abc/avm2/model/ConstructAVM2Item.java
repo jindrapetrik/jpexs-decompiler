@@ -53,11 +53,18 @@ public class ConstructAVM2Item extends AVM2Item {
             return object.toString(writer, localData);
         }
         writer.append("new ");
-        if (object.getPrecedence() > getPrecedence()) {
+        
+        boolean objectIsCall = (object instanceof CallAVM2Item) ||
+                (object instanceof CallPropertyAVM2Item) ||
+                (object instanceof CallMethodAVM2Item) || 
+                (object instanceof CallStaticAVM2Item) || 
+                (object instanceof CallSuperAVM2Item);
+        
+        if (object.getPrecedence() > getPrecedence() || objectIsCall) {
             writer.append("(");
         }
         object.toString(writer, localData);
-        if (object.getPrecedence() > getPrecedence()) {
+        if (object.getPrecedence() > getPrecedence() || objectIsCall) {
             writer.append(")");
         }
         writer.spaceBeforeCallParenthesies(args.size());

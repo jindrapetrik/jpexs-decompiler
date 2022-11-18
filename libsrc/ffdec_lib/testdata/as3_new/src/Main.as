@@ -17,6 +17,7 @@ package
 	{
 		TestActivationArguments;
 		TestArguments;
+        TestCallCall;
 		TestCallLocal;
 		TestCatchFinally;
 		TestChain2;
