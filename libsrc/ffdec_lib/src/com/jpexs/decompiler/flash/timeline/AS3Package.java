@@ -43,9 +43,12 @@ public class AS3Package extends AS3ClassTreeItem {
     private List<AS3Package> sortedPackages;
 
     private List<ScriptPack> sortedScripts;
+    
+    private boolean flat;
 
-    public AS3Package(String packageName, SWF swf) {
+    public AS3Package(String packageName, SWF swf, boolean flat) {
         super(packageName, "", null);
+        this.flat = flat;
         this.swf = swf;
         this.packageName = packageName;
     }
@@ -148,6 +151,9 @@ public class AS3Package extends AS3ClassTreeItem {
 
     @Override
     public String toString() {
+        if (flat) {
+            return packageName;
+        }
         return IdentifiersDeobfuscation.printIdentifier(true, packageName);
     }
 

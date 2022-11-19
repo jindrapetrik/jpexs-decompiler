@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
+import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
@@ -1191,6 +1192,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         calculateMissingNeededThread = new CalculateMissingNeededThread();
         calculateMissingNeededThread.start();
         pinsPanel.load();
+        
+        Configuration.flattenASPackages.addListener(new ConfigurationItemChangeListener<Boolean>() {
+            @Override
+            public void configurationItemChanged(Boolean newValue) {
+                resetAllTimelines();
+                refreshTree();
+            }
+        });
     }
 
     public void closeTagTreeSearch() {
@@ -1201,6 +1210,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         searchPanel.setVisible(false);
     }
 
+    public void resetAllTimelines() {
+        List<SWFList> swfsLists = new ArrayList<>(swfs);
+        List<SWF> allSwfs = new ArrayList<>();
+        for (SWFList swfList : swfsLists) {
+            allSwfs.addAll(swfList);
+            for (SWF swf : swfList) {
+                Main.populateSwfs(swf, allSwfs);
+            }
+        }
+        for (SWF swf : allSwfs) {
+            swf.resetTimeline();
+        }
+    }
+    
     public void loadSwfAtPos(SWFList newSwfs, int index) {
         View.checkAccess();
 

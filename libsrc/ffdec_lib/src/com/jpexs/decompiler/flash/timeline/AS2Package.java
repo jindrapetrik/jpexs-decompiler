@@ -39,11 +39,14 @@ public class AS2Package implements TreeItem {
     public Map<String, AS2Package> subPackages = new TreeMap<>();
 
     public Map<String, ASMSource> scripts = new TreeMap<>();
+    
+    private boolean flat;
 
-    public AS2Package(String name, AS2Package parent, SWF swf) {
+    public AS2Package(String name, AS2Package parent, SWF swf, boolean flat) {
         this.name = name;
         this.parent = parent;
         this.swf = swf;
+        this.flat = flat;
     }
 
     @Override
@@ -133,4 +136,8 @@ public class AS2Package implements TreeItem {
         }
         return false;
     }
+
+    public boolean isFlat() {
+        return flat;
+    }        
 }

@@ -46,14 +46,17 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     private final AS3Package root;
 
     private final List<TreeModelListener> listeners = new ArrayList<>();
+    
+    private boolean flat = true;
 
     public List<ScriptPack> getList() {
         return list;
     }
 
-    public ClassesListTreeModel(SWF swf) {
+    public ClassesListTreeModel(SWF swf, boolean flat) {
         super(null, null, null);
-        root = new AS3Package(null, swf);
+        this.flat = flat;
+        root = new AS3Package(null, swf, flat);
         this.swf = swf;
         this.list = swf.getAS3Packs();
         setFilter(null);
@@ -111,12 +114,24 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     }
 
     private AS3Package ensurePackage(DottedChain packageStr) {
+        if (flat) {
+            String fullName = packageStr.toPrintableString(true);
+            if (fullName.length() == 0) {
+                return root;
+            }
+            AS3Package pkg = root.getSubPackage(fullName);
+            if (pkg == null) {
+                pkg = new AS3Package(fullName, swf, true);
+                root.addSubPackage(pkg);
+            }
+            return pkg;
+        }
         AS3Package parent = root;
         for (int i = 0; i < packageStr.size(); i++) {
             String pathElement = packageStr.get(i);
             AS3Package pkg = parent.getSubPackage(pathElement);
             if (pkg == null) {
-                pkg = new AS3Package(pathElement, swf);
+                pkg = new AS3Package(pathElement, swf, false);
                 parent.addSubPackage(pkg);
             }
 

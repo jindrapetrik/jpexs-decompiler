@@ -808,6 +808,10 @@ public final class Configuration {
     @ConfigurationDefaultString("")    
     public static ConfigurationItem<String> pinnedItemsTagListPaths = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> flattenASPackages = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

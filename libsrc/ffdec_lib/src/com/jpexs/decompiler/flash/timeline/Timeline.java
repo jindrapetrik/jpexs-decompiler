@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.TagRemoveListener;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.BlendModeSetable;
 import com.jpexs.decompiler.flash.exporters.FrameExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
@@ -191,7 +192,7 @@ public class Timeline {
         this.displayRect = displayRect;
         this.frameRate = swf.frameRate;
         this.timelined = timelined;
-        as2RootPackage = new AS2Package(null, null, swf);
+        as2RootPackage = new AS2Package(null, null, swf, false);
     }
 
     public final int getMaxDepth() {
@@ -256,7 +257,7 @@ public class Timeline {
         this.displayRect = displayRect;
         this.frameRate = swf.frameRate;
         this.timelined = timelined;
-        as2RootPackage = new AS2Package(null, null, swf);
+        as2RootPackage = new AS2Package(null, null, swf, false);
     }
 
     public int getFrameWithLabel(String label) {
@@ -479,10 +480,31 @@ public class Timeline {
                 String[] pathParts = path.contains(".") ? path.split("\\.") : new String[]{path};
                 AS2Package pkg = as2RootPackage;
                 for (int pos = 0; pos < pathParts.length - 1; pos++) {
+                    if (Configuration.flattenASPackages.get()) {
+                        boolean isNamedPackages = "__Packages".equals(pathParts[0]);
+                        
+                        if (isNamedPackages && pos == 0) {
+                            //nothing
+                        } else {                        
+                            String fullPath;                        
+                            if (isNamedPackages) {
+                                fullPath = path.substring(pathParts[0].length() + 1, path.length() - pathParts[pathParts.length - 1].length() - 1);
+                            } else {
+                                fullPath = path.substring(0, path.length() - pathParts[pathParts.length - 1].length() - 1);
+                            }
+                            AS2Package subPkg = pkg.subPackages.get(fullPath);
+                            if (subPkg == null) {
+                                subPkg = new AS2Package(fullPath, pkg, swf, true);
+                                pkg.subPackages.put(fullPath, subPkg);
+                            }
+                            pkg = subPkg;
+                            break;
+                        }
+                    }
                     String pathPart = pathParts[pos];
                     AS2Package subPkg = pkg.subPackages.get(pathPart);
                     if (subPkg == null) {
-                        subPkg = new AS2Package(pathPart, pkg, swf);
+                        subPkg = new AS2Package(pathPart, pkg, swf, false);
                         pkg.subPackages.put(pathPart, subPkg);
                     }
 
