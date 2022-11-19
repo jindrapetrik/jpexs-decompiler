@@ -61,6 +61,19 @@ public class PinsPanel extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
     }
 
+    /**
+     * Totally destroy and save empty
+     */
+    public void destroy() {
+        items.clear();
+        rebuild();
+        save();
+    }
+   
+    /**
+     * Removes all items reference, saves them as paths.
+     * 
+     */
     public void clear() {
         for (TreeItem item : items) {
             String tagTreePath = mainPanel.tagTree.getItemPathString(item);

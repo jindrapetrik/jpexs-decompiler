@@ -490,6 +490,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
     protected void clearRecentSearchesActionPerformed(ActionEvent evt) {
         Main.searchResultsStorage.clear();
     }
+    
+    protected void clearPinnedItemsActionPerformed(ActionEvent evt) {
+        mainFrame.getPanel().destroyPins();
+    }
 
     protected void removeNonScripts() {
         mainFrame.getPanel().removeNonScripts(swf);
@@ -1073,6 +1077,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/settings/advancedSettings/advancedSettings", translate("menu.advancedsettings.advancedsettings"), "settings32", this::advancedSettingsActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/settings/advancedSettings/clearRecentFiles", translate("menu.tools.otherTools.clearRecentFiles"), "clearrecent16", this::clearRecentFilesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/settings/advancedSettings/clearRecentSearches", translate("menu.tools.otherTools.clearRecentSearches"), "clearrecent16", this::clearRecentSearchesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/settings/advancedSettings/clearPinnedItems", translate("menu.tools.otherTools.clearPinnedItems"), "clearrecent16", this::clearPinnedItemsActionPerformed, PRIORITY_MEDIUM, null, true, null, false);                
         finishMenu("/settings/advancedSettings");
 
         finishMenu("/settings");
