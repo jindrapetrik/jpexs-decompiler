@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 - [#1743] GFX - Adding DefineExternalImage2 and DefineSubImage tags
 - [#1822], [#1803] AS3 direct editation - optional using AIR (airglobal.swc) to compile
 - [#1501] Bulk import shapes
-- [#1680] Pinning objects
+- [#1680] Pinning items
 
 ### Fixed
 - [#1869] Replace references now replaces all references, not just PlaceObject
