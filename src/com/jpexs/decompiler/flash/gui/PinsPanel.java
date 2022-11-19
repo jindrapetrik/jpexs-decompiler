@@ -136,21 +136,7 @@ public class PinsPanel extends JPanel {
 
         rebuild();
     }
-
-    private String getTreeItemPath(TreeItem item) {
-        TreePath path = mainPanel.getCurrentTree().getModel().getTreePath(item);
-        if (path == null) {
-            return "";
-        }
-        StringBuilder pathString = new StringBuilder();
-        for (int i = 1; i < path.getPathCount(); i++) {
-            if (pathString.length() > 0) {
-                pathString.append(" / ");
-            }
-            pathString.append(mainPanel.itemToString((TreeItem) path.getPathComponent(i)));
-        }
-        return pathString.toString();
-    }
+    
 
     private void rebuild() {
         removeAll();
@@ -159,7 +145,6 @@ public class PinsPanel extends JPanel {
         boolean currentPinned = false;
         for (TreeItem item : items) {
             PinButton pinButton = new PinButton(mainPanel, item, true);
-            pinButton.setToolTipText(getTreeItemPath(item));
             pinButton.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -247,7 +232,6 @@ public class PinsPanel extends JPanel {
             currentUnpinnedButton = new PinButton(mainPanel, current, false);
             lastSelectedButton = currentUnpinnedButton;
             add(currentUnpinnedButton);
-            currentUnpinnedButton.setToolTipText(getTreeItemPath(current));
             currentUnpinnedButton.setSelected(true);
             currentUnpinnedButton.addChangeListener(new ChangeListener() {
                 @Override
@@ -395,8 +379,18 @@ public class PinsPanel extends JPanel {
     }
 
     public void replaceItem(TreeItem oldItem, TreeItem newItem) {
+        
+        TreeItem oldItemNoTs = oldItem;
+        if (oldItem instanceof TagScript) {
+            oldItemNoTs = ((TagScript) oldItem).getTag();
+        }
+        
         for (int i = 0; i < items.size(); i++) {
-            if (items.get(i) == oldItem) {
+            TreeItem item2NoTs = items.get(i);            
+            if (item2NoTs instanceof TagScript) {
+                item2NoTs = ((TagScript) item2NoTs).getTag();
+            }
+            if (item2NoTs == oldItemNoTs) {
                 items.set(i, newItem);
                 rebuild();
                 break;
