@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -117,7 +118,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
         if (flat) {
             String fullName = packageStr.toPrintableString(true);
             if (fullName.length() == 0) {
-                return root;
+                fullName = AppResources.translate("package.default");
             }
             AS3Package pkg = root.getSubPackage(fullName);
             if (pkg == null) {
