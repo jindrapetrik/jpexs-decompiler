@@ -39,6 +39,7 @@ All notable changes to this project will be documented in this file.
 - Header of display panel not visible on certain color schemes
 - Move tag to action did not remove original tag
 - Show in tag list from tag scripts
+- Move/Copy tag to action on tag scripts
 
 ### Changed
 - GFX - DefineExternalImage2 no longer handled as character

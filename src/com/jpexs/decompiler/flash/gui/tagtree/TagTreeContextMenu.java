@@ -959,15 +959,16 @@ public class TagTreeContextMenu extends JPopupMenu {
         copyTagToMenu.removeAll();
         copyTagToWithDependenciesMenu.removeAll();
 
-        if (allSelectedIsTag) {
-            List<TreeItem> tagItems = new ArrayList<>();
-            for (TreeItem item : items) {
-                if (item instanceof TagScript) {
-                    tagItems.add(((TagScript) item).getTag());
-                } else {
-                    tagItems.add((Tag) item);
-                }
+        List<TreeItem> tagItems = new ArrayList<>();
+        for (TreeItem item : items) {
+            if (item instanceof TagScript) {
+                tagItems.add(((TagScript) item).getTag());
+            } else {
+                tagItems.add((Tag) item);
             }
+        }
+        if (allSelectedIsTag) {
+            
             JMenuItem copyToClipboardMenuItem = new JMenuItem(AppStrings.translate("contextmenu.clipboard") + " (CTRL+C)", View.getIcon("clipboard16"));
             copyToClipboardMenuItem.addActionListener(new ActionListener() {
                 @Override
@@ -999,10 +1000,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                 if ((targetSwfList.size() == 1) && (targetSwfList.get(0) == singleSwf)) {
                     continue;
                 }
-                addCopyMoveToMenusSwfList(KIND_MOVETO, singleSwf, targetSwfList, moveTagToMenu, items);
-                addCopyMoveToMenusSwfList(KIND_MOVETODEPS, singleSwf, targetSwfList, moveTagToWithDependenciesMenu, items);
-                addCopyMoveToMenusSwfList(KIND_COPYTO, singleSwf, targetSwfList, copyTagToMenu, items);
-                addCopyMoveToMenusSwfList(KIND_COPYTODEPS, singleSwf, targetSwfList, copyTagToWithDependenciesMenu, items);
+                addCopyMoveToMenusSwfList(KIND_MOVETO, singleSwf, targetSwfList, moveTagToMenu, tagItems);
+                addCopyMoveToMenusSwfList(KIND_MOVETODEPS, singleSwf, targetSwfList, moveTagToWithDependenciesMenu, tagItems);
+                addCopyMoveToMenusSwfList(KIND_COPYTO, singleSwf, targetSwfList, copyTagToMenu, tagItems);
+                addCopyMoveToMenusSwfList(KIND_COPYTODEPS, singleSwf, targetSwfList, copyTagToWithDependenciesMenu, tagItems);
             }
             moveTagToMenu.setVisible(true);
             moveTagToWithDependenciesMenu.setVisible(true);

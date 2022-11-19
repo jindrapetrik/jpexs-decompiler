@@ -36,6 +36,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.tree.TreePath;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
@@ -113,9 +114,8 @@ public class PinButton extends JPanel {
         
              
         label = new JLabel();
-        label.setIcon(AbstractTagTree.getIconFor(item));
-        label.setText(mainPanel.itemToString(item));
-
+        label.setIcon(AbstractTagTree.getIconFor(item));        
+        refresh();        
         button = new JLabel();
         button.setMinimumSize(new Dimension(10 + 16, 16));
         button.setPreferredSize(new Dimension(10 + 16, 16));
@@ -175,6 +175,8 @@ public class PinButton extends JPanel {
         };
         addMouseListener(adapter);
         addMouseMotionListener(adapter);
+        label.addMouseListener(adapter);
+        label.addMouseMotionListener(adapter);
 
         button.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -233,7 +235,7 @@ public class PinButton extends JPanel {
 
         setLayout(new BorderLayout());
         add(label, BorderLayout.CENTER);
-        add(button, BorderLayout.EAST);
+        add(button, BorderLayout.EAST);       
     }
 
     private void updateIcon() {
@@ -318,8 +320,24 @@ public class PinButton extends JPanel {
             g.drawLine(0, 2, getWidth() - 1, 2);
         }
     }
+    
+    private String getTreeItemPath(TreeItem item) {
+        TreePath path = mainPanel.getCurrentTree().getModel().getTreePath(item);
+        if (path == null) {
+            return "";
+        }
+        StringBuilder pathString = new StringBuilder();
+        for (int i = 1; i < path.getPathCount(); i++) {
+            if (pathString.length() > 0) {
+                pathString.append(" / ");
+            }
+            pathString.append(mainPanel.itemToString((TreeItem) path.getPathComponent(i)));
+        }
+        return pathString.toString();
+    }
 
     public void refresh() {
         label.setText(mainPanel.itemToString(item));
+        label.setToolTipText(getTreeItemPath(item));
     }
 }
