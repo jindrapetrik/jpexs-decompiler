@@ -224,6 +224,10 @@ public class TagTree extends AbstractTagTree {
             if (aTree.getMainPanel().isClipboardCut() && aTree.getMainPanel().clipboardContains(val)) {
                 semiTransparent = true;
             }
+            int itemIndex = aTree.getModel().getItemIndex(val);
+            if (itemIndex > 1) {
+                setText(val.toString() + " [" + itemIndex + "]");
+            }
 
             return this;
         }

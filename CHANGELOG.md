@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - [#1822], [#1803] AS3 direct editation - optional using AIR (airglobal.swc) to compile
 - [#1501] Bulk import shapes
 - [#1680] Pinning items
+- Indices in brackets for items with same name (like two subsequent DoAction tags)
 
 ### Fixed
 - [#1869] Replace references now replaces all references, not just PlaceObject
@@ -42,6 +43,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - GFX - DefineExternalImage2 no longer handled as character
 - Raw editor does not show tag name in the tree (it's now in the new pinnable head)
+- DoInitAction is not shown in resources/sprites section, only in scripts
 
 ## [16.3.1] - 2022-11-14
 ### Fixed

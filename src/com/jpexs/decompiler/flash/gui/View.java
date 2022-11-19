@@ -17,6 +17,8 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
+import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
@@ -538,7 +540,16 @@ public class View {
             int childCount = model.getChildCount(node);
             for (int j = 0; j < childCount; j++) {
                 Object child = model.getChild(node, j);
-                if (child.toString().equals(name)) {
+                String childStr = child.toString();
+                int index = 1;                
+                if (model instanceof AbstractTagTreeModel) {
+                    AbstractTagTreeModel aModel = (AbstractTagTreeModel) model;
+                    index = aModel.getItemIndex((TreeItem) child);
+                    if (index > 1) {
+                        childStr += " [" + index + "]";
+                    }
+                }
+                if (childStr.equals(name)) {
                     node = child;
                     path.add(node);
                     break;

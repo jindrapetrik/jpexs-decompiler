@@ -1020,7 +1020,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         pinsPanel.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                setTagTreeSelectedNode(getCurrentTree(), pinsPanel.getCurrent());
+                TreeItem item = pinsPanel.getCurrent();
+                if ((getCurrentTree() == tagListTree) && (item instanceof TagScript)) {
+                    item = ((TagScript) item).getTag();
+                }
+                setTagTreeSelectedNode(getCurrentTree(), item);
             }
         });
         rightPanel.add(pinsPanel, BorderLayout.NORTH);
@@ -1225,6 +1229,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         doFilter();
         reload(false);
         View.expandTreeNodes(tagTree, expandedNodes);
+        pinsPanel.load();
     }
 
     public void load(SWFList newSwfs, boolean first) {
@@ -2596,7 +2601,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void setTagTreeSelectedNode(AbstractTagTree tree, TreeItem treeItem) {
-        AbstractTagTreeModel ttm = tree.getModel();
+        AbstractTagTreeModel ttm = tree.getModel();        
         TreePath tp = ttm.getTreePath(treeItem);
         if (tp != null) {
             tree.setSelectionPath(tp);
@@ -3558,6 +3563,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         reload(true);
+        pinsPanel.refresh();
     }
 
     public void refreshTree(SWF swf) {
@@ -3587,6 +3593,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         reload(true);
         updateMissingNeededCharacters();
+        pinsPanel.refresh();
     }
 
     public void refreshDecompiled() {
@@ -4737,10 +4744,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (!(treeItem instanceof ScriptPack)){
             showCard(CARDEMPTYPANEL);
         }
-        if (treeItem instanceof TreeRoot) {
+        if (oldItem instanceof TreeRoot) {
             pinsPanel.setCurrent(null);
         } else {
-            pinsPanel.setCurrent(treeItem);
+            pinsPanel.setCurrent(oldItem);
         }
     }
 
@@ -5228,5 +5235,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
             }
         }
+    }
+    
+    public String itemToString(TreeItem item) {
+        int index = getCurrentTree().getModel().getItemIndex(item);
+        String itemToStr = item.toString();
+        if (index > 1) {
+            return itemToStr + " [" + index + "]";
+        }
+        return itemToStr;
     }
 }

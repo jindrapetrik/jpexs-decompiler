@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.tagtree.TreeRoot;
+import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,13 +47,12 @@ public class PinsPanel extends JPanel {
     private MainPanel mainPanel;
     private PinButton lastSelectedButton;
     private PinButton currentUnpinnedButton;
-    private List<PinButton> buttons = new ArrayList<>();   
+    private List<PinButton> buttons = new ArrayList<>();
     private List<ChangeListener> changeListeners = new ArrayList<>();
-    
+
     private List<String> missingTagTreePaths = new ArrayList<>();
     private List<String> missingTagListPaths = new ArrayList<>();
-    
-    
+
     private static final String PATHS_SEPARATOR = "{#sep#}";
 
     public PinsPanel(MainPanel mainPanel) {
@@ -69,10 +69,10 @@ public class PinsPanel extends JPanel {
         rebuild();
         save();
     }
-   
+
     /**
      * Removes all items reference, saves them as paths.
-     * 
+     *
      */
     public void clear() {
         for (TreeItem item : items) {
@@ -98,9 +98,20 @@ public class PinsPanel extends JPanel {
         if (lastSelectedButton != null) {
             lastSelectedButton.setSelected(false);
         }
+        TreeItem itemNoTs = item;
+        if (item instanceof TagScript) {
+            itemNoTs = ((TagScript) item).getTag();
+        }
+        
+        
         for (int i = 0; i < items.size(); i++) {
-            if (items.get(i) == item) {            
-                this.current = item;        
+            TreeItem item2 = items.get(i);
+            TreeItem item2NoTs = item2;
+            if (item2 instanceof TagScript) {
+                item2NoTs = ((TagScript) item2).getTag();
+            }
+            if (item2NoTs == itemNoTs) {
+                this.current = items.get(i);
                 buttons.get(i).setSelected(true);
                 lastSelectedButton = buttons.get(i);
                 if (currentUnpinnedButton != null) {
@@ -111,12 +122,18 @@ public class PinsPanel extends JPanel {
                 return;
             }
         }
-        if (this.current == item) {
+
+        TreeItem currentNoTs = this.current;
+        if (currentNoTs instanceof TagScript) {
+            currentNoTs = ((TagScript) currentNoTs).getTag();
+        }
+
+        if (currentNoTs == itemNoTs) {
             return;
         }
-        
+
         this.current = item;
-        
+
         rebuild();
     }
 
@@ -130,7 +147,7 @@ public class PinsPanel extends JPanel {
             if (pathString.length() > 0) {
                 pathString.append(" / ");
             }
-            pathString.append(path.getPathComponent(i).toString());
+            pathString.append(mainPanel.itemToString((TreeItem) path.getPathComponent(i)));
         }
         return pathString.toString();
     }
@@ -141,7 +158,7 @@ public class PinsPanel extends JPanel {
         currentUnpinnedButton = null;
         boolean currentPinned = false;
         for (TreeItem item : items) {
-            PinButton pinButton = new PinButton(item, true);            
+            PinButton pinButton = new PinButton(mainPanel, item, true);
             pinButton.setToolTipText(getTreeItemPath(item));
             pinButton.addMouseListener(new MouseAdapter() {
                 @Override
@@ -155,10 +172,10 @@ public class PinsPanel extends JPanel {
                                 items.remove(item);
                                 rebuild();
                                 fireChange();
-                            }                            
+                            }
                         });
                         pinMenu.add(unpinMenuItem);
-                        
+
                         JMenuItem unpinAllMenuItem = new JMenuItem(AppStrings.translate("contextmenu.unpin.all"));
                         unpinAllMenuItem.addActionListener(new ActionListener() {
                             @Override
@@ -166,12 +183,12 @@ public class PinsPanel extends JPanel {
                                 items.clear();
                                 rebuild();
                                 fireChange();
-                            }                            
+                            }
                         });
                         if (items.size() > 1) {
                             pinMenu.add(unpinAllMenuItem);
                         }
-                        
+
                         JMenuItem unpinOthersMenuItem = new JMenuItem(AppStrings.translate("contextmenu.unpin.others"));
                         unpinOthersMenuItem.addActionListener(new ActionListener() {
                             @Override
@@ -180,7 +197,7 @@ public class PinsPanel extends JPanel {
                                 items.add(item);
                                 rebuild();
                                 fireChange();
-                            }                            
+                            }
                         });
                         if (items.size() > 1) {
                             pinMenu.add(unpinOthersMenuItem);
@@ -188,14 +205,14 @@ public class PinsPanel extends JPanel {
                         pinMenu.show(pinButton, e.getX(), e.getY());
                     }
                 }
-                
+
             });
             pinButton.addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
                     if (!pinButton.isPinned()) {
                         items.remove(item);
-                        rebuild();                        
+                        rebuild();
                     }
                     save();
                     fireChange();
@@ -204,7 +221,7 @@ public class PinsPanel extends JPanel {
             pinButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    current = pinButton.getItem();  
+                    current = pinButton.getItem();
                     if (lastSelectedButton != null) {
                         lastSelectedButton.setSelected(false);
                         if (!lastSelectedButton.isPinned()) {
@@ -227,7 +244,7 @@ public class PinsPanel extends JPanel {
             }
         }
         if (!currentPinned && current != null) {
-            currentUnpinnedButton = new PinButton(current, false);
+            currentUnpinnedButton = new PinButton(mainPanel, current, false);
             lastSelectedButton = currentUnpinnedButton;
             add(currentUnpinnedButton);
             currentUnpinnedButton.setToolTipText(getTreeItemPath(current));
@@ -273,14 +290,14 @@ public class PinsPanel extends JPanel {
         this.items = new ArrayList<>(items);
         rebuild();
     }
-    
+
     public void save() {
         StringBuilder tagTreePathsBuilder = new StringBuilder();
         StringBuilder tagListPathsBuilder = new StringBuilder();
         boolean first = true;
-        
+
         for (int i = 0; i < missingTagTreePaths.size(); i++) {
-            if (!first) {                
+            if (!first) {
                 tagTreePathsBuilder.append(PATHS_SEPARATOR);
                 tagListPathsBuilder.append(PATHS_SEPARATOR);
             }
@@ -288,18 +305,23 @@ public class PinsPanel extends JPanel {
             tagListPathsBuilder.append(missingTagListPaths.get(i));
             first = false;
         }
-        
+
         for (TreeItem item : items) {
             String tagTreePath = mainPanel.tagTree.getItemPathString(item);
             if (tagTreePath == null) {
                 tagTreePath = "";
             }
-            
-            String tagListPath = mainPanel.tagListTree.getItemPathString(item);
+
+            TreeItem tagListItem = item;
+            if (item instanceof TagScript) {
+                tagListItem = ((TagScript) item).getTag();
+            }
+
+            String tagListPath = mainPanel.tagListTree.getItemPathString(tagListItem);
             if (tagListPath == null) {
                 tagListPath = "";
             }
-            if (!first) {                
+            if (!first) {
                 tagTreePathsBuilder.append(PATHS_SEPARATOR);
                 tagListPathsBuilder.append(PATHS_SEPARATOR);
             }
@@ -307,19 +329,19 @@ public class PinsPanel extends JPanel {
             tagListPathsBuilder.append(tagListPath);
             first = false;
         }
-        
+
         Configuration.pinnedItemsTagTreePaths.set(tagTreePathsBuilder.toString());
         Configuration.pinnedItemsTagListPaths.set(tagListPathsBuilder.toString());
     }
-    
+
     public void load() {
-        
+
         final String PATHS_END = "{finish}";
-                
+
         List<String> missingTagTreePaths = new ArrayList<>();
         List<String> missingTagListPaths = new ArrayList<>();
         String tagTreePathsCombined = Configuration.pinnedItemsTagTreePaths.get() + PATHS_SEPARATOR + PATHS_END;
-        String tagListPathsCombined = Configuration.pinnedItemsTagListPaths.get() + PATHS_SEPARATOR + PATHS_END;        
+        String tagListPathsCombined = Configuration.pinnedItemsTagListPaths.get() + PATHS_SEPARATOR + PATHS_END;
         String[] tagTreePaths = tagTreePathsCombined.split(Pattern.quote(PATHS_SEPARATOR));
         String[] tagListPaths = tagListPathsCombined.split(Pattern.quote(PATHS_SEPARATOR));
         if (tagTreePaths.length != tagListPaths.length) {
@@ -328,7 +350,7 @@ public class PinsPanel extends JPanel {
         List<TreeItem> items = new ArrayList<>();
         for (int i = 0; i < tagTreePaths.length - 1; i++) {
             String tagTreePath = tagTreePaths[i];
-            String tagListPath = tagListPaths[i];            
+            String tagListPath = tagListPaths[i];
             TreeItem item = mainPanel.tagTree.getTreeItemFromPathString(tagTreePath);
             if (item == null || (item instanceof TreeRoot)) {
                 item = mainPanel.tagListTree.getTreeItemFromPathString(tagListPath);
@@ -344,14 +366,14 @@ public class PinsPanel extends JPanel {
         this.missingTagTreePaths = missingTagTreePaths;
         this.missingTagListPaths = missingTagListPaths;
         rebuild();
-    }        
-    
+    }
+
     public void removeSwf(SWF swf) {
         for (int i = 0; i < items.size(); i++) {
             TreeItem item = items.get(i);
             SWF itemSwf = item.getSwf();
             if (itemSwf == swf || itemSwf == null) {
-                
+
                 String tagTreePath = mainPanel.tagTree.getItemPathString(item);
                 if (tagTreePath == null) {
                     tagTreePath = "";
@@ -361,17 +383,17 @@ public class PinsPanel extends JPanel {
                 if (tagListPath == null) {
                     tagListPath = "";
                 }
-                
+
                 missingTagTreePaths.add(tagTreePath);
                 missingTagListPaths.add(tagListPath);
-                
+
                 items.remove(i);
                 i--;
             }
         }
         save();
     }
-    
+
     public void replaceItem(TreeItem oldItem, TreeItem newItem) {
         for (int i = 0; i < items.size(); i++) {
             if (items.get(i) == oldItem) {
@@ -381,14 +403,31 @@ public class PinsPanel extends JPanel {
             }
         }
     }
-    
+
     public void removeItem(TreeItem item) {
+        if (item instanceof TagScript) {
+            item = ((TagScript) item).getTag();
+        }
+
         for (int i = 0; i < items.size(); i++) {
-            if (items.get(i) == item) {
+            TreeItem item2 = items.get(i);
+            if (item2 instanceof TagScript) {
+                item2 = ((TagScript) item2).getTag();
+            }
+            if (item2 == item) {
                 items.remove(i);
-                rebuild();
+                rebuild();                
                 break;
             }
+        }
+    }
+
+    public void refresh() {
+        for (PinButton button : buttons) {
+            button.refresh();
+        }
+        if (currentUnpinnedButton != null) {
+            currentUnpinnedButton.refresh();
         }
     }
 }
