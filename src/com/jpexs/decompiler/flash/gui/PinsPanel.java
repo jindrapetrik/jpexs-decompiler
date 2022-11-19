@@ -129,6 +129,9 @@ public class PinsPanel extends JPanel {
         }
 
         if (currentNoTs == itemNoTs) {
+            if (currentUnpinnedButton != null) {
+                currentUnpinnedButton.setSelected(true);
+            }
             return;
         }
 
