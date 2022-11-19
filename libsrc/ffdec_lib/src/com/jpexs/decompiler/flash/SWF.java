@@ -1964,7 +1964,11 @@ public final class SWF implements SWFContainerItem, Timelined {
         } else if (treeItem instanceof AS2Package) {
             AS2Package as2Package = (AS2Package) treeItem;
             for (TreeItem subItem : as2Package.subPackages.values()) {
-                getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, path + File.separator + getASMPath(exportFileNames, subItem));
+                if ((subItem instanceof AS2Package) && ((AS2Package)subItem).isDefaultPackage()) {
+                    getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, path);
+                } else {
+                    getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, path + File.separator + getASMPath(exportFileNames, subItem));
+                }
             }
             for (TreeItem subItem : as2Package.scripts.values()) {
                 getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, path + File.separator + getASMPath(exportFileNames, subItem));

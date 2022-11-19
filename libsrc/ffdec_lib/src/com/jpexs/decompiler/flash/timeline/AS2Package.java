@@ -41,13 +41,22 @@ public class AS2Package implements TreeItem {
     public Map<String, ASMSource> scripts = new TreeMap<>();
     
     private boolean flat;
+    
+    private boolean defaultPackage;
 
-    public AS2Package(String name, AS2Package parent, SWF swf, boolean flat) {
+    public AS2Package(String name, AS2Package parent, SWF swf, boolean flat, boolean defaultPackage) {
         this.name = name;
         this.parent = parent;
         this.swf = swf;
         this.flat = flat;
+        this.defaultPackage = defaultPackage;
     }
+
+    public boolean isDefaultPackage() {
+        return defaultPackage;
+    }
+    
+    
 
     @Override
     public SWF getSwf() {

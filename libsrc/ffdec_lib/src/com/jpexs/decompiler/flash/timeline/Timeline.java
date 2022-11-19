@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.TagRemoveListener;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -192,7 +193,7 @@ public class Timeline {
         this.displayRect = displayRect;
         this.frameRate = swf.frameRate;
         this.timelined = timelined;
-        as2RootPackage = new AS2Package(null, null, swf, false);
+        as2RootPackage = new AS2Package(null, null, swf, false, false);
     }
 
     public final int getMaxDepth() {
@@ -257,7 +258,7 @@ public class Timeline {
         this.displayRect = displayRect;
         this.frameRate = swf.frameRate;
         this.timelined = timelined;
-        as2RootPackage = new AS2Package(null, null, swf, false);
+        as2RootPackage = new AS2Package(null, null, swf, false, false);
     }
 
     public int getFrameWithLabel(String label) {
@@ -478,37 +479,51 @@ public class Timeline {
                 }
 
                 String[] pathParts = path.contains(".") ? path.split("\\.") : new String[]{path};
-                AS2Package pkg = as2RootPackage;
+                AS2Package pkg = as2RootPackage;                
+                
+                boolean isNamedPackages = "__Packages".equals(pathParts[0]);
+                
                 for (int pos = 0; pos < pathParts.length - 1; pos++) {
-                    if (Configuration.flattenASPackages.get()) {
-                        boolean isNamedPackages = "__Packages".equals(pathParts[0]);
-                        
+                    if (Configuration.flattenASPackages.get()) {                                                
                         if (isNamedPackages && pos == 0) {
                             //nothing
-                        } else {                        
+                        } else {                                                                                
+                            
                             String fullPath;                        
                             if (isNamedPackages) {
                                 fullPath = path.substring(pathParts[0].length() + 1, path.length() - pathParts[pathParts.length - 1].length() - 1);
                             } else {
                                 fullPath = path.substring(0, path.length() - pathParts[pathParts.length - 1].length() - 1);
                             }
+                            
                             AS2Package subPkg = pkg.subPackages.get(fullPath);
                             if (subPkg == null) {
-                                subPkg = new AS2Package(fullPath, pkg, swf, true);
+                                subPkg = new AS2Package(fullPath, pkg, swf, true, false);
                                 pkg.subPackages.put(fullPath, subPkg);
                             }
                             pkg = subPkg;
                             break;
                         }
-                    }
+                    }                                        
+                    
                     String pathPart = pathParts[pos];
                     AS2Package subPkg = pkg.subPackages.get(pathPart);
                     if (subPkg == null) {
-                        subPkg = new AS2Package(pathPart, pkg, swf, false);
+                        subPkg = new AS2Package(pathPart, pkg, swf, false, false);
                         pkg.subPackages.put(pathPart, subPkg);
                     }
 
                     pkg = subPkg;
+                }
+                
+                if (Configuration.flattenASPackages.get() && ((pathParts.length == 2 && isNamedPackages) || pathParts.length == 1)) {
+                    String fullPath = AppResources.translate("package.default");                            
+                    AS2Package subPkg = pkg.subPackages.get(fullPath);
+                    if (subPkg == null) {
+                        subPkg = new AS2Package(fullPath, pkg, swf, true, true);
+                        pkg.subPackages.put(fullPath, subPkg);
+                    }
+                    pkg = subPkg;                    
                 }
 
                 pkg.scripts.put(pathParts[pathParts.length - 1], asm);
