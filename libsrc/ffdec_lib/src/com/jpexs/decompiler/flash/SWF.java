@@ -370,7 +370,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     @Internal
     private boolean destroyed = false;
-    
+
     private Set<Integer> cyclicCharacters = null;
 
     private boolean headerModified = false;
@@ -463,15 +463,15 @@ public final class SWF implements SWFContainerItem, Timelined {
         clearScriptCache();
         frameCache.clear();
         soundCache.clear();
-        
+
         clearImageCache();
         clearShapeCache();
         clearAbcListCache();
-        
+
         characters = null;
         characterIdTags = null;
         externalImages2 = null;
-        
+
         timeline = null;
         if (dumpInfo != null) {
             clearDumpInfo(dumpInfo);
@@ -489,7 +489,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         di.getChildInfos().clear();
     }
 
-    public Map<Integer, CharacterTag> getCharacters() {        
+    public Map<Integer, CharacterTag> getCharacters() {
         if (characters == null) {
             synchronized (this) {
                 if (characters == null) {
@@ -3110,7 +3110,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         return image;
     }
 
-    private void removeTagWithDependenciesFromTimeline(Tag toRemove, Timeline timeline) {
+    private void removeTagWithDependenciesFromTimeline(Tag toRemove, Timeline timeline, TagRemoveListener listener) {
         Set<Integer> dependingChars = new HashSet<>();
         if (toRemove instanceof CharacterTag) {
             int characterId = ((CharacterTag) toRemove).getCharacterId();
@@ -3119,16 +3119,16 @@ public final class SWF implements SWFContainerItem, Timelined {
                 dependingChars.add(characterId);
             }
         }
-        removeTagWithDependenciesFromTimeline(toRemove, timeline, dependingChars);
+        removeTagWithDependenciesFromTimeline(toRemove, timeline, dependingChars, listener);
     }
 
-    public boolean removeCharacterFromTimeline(int characterId, Timeline timeline) {
+    public boolean removeCharacterFromTimeline(int characterId, Timeline timeline, TagRemoveListener listener) {
         Set<Integer> chars = new HashSet<>();
         chars.add(characterId);
-        return removeTagWithDependenciesFromTimeline(null, timeline, chars);
+        return removeTagWithDependenciesFromTimeline(null, timeline, chars, listener);
     }
 
-    private boolean removeTagWithDependenciesFromTimeline(Tag toRemove, Timeline timeline, Set<Integer> dependingChars) {
+    private boolean removeTagWithDependenciesFromTimeline(Tag toRemove, Timeline timeline, Set<Integer> dependingChars, TagRemoveListener listener) {
         Map<Integer, Integer> stage = new HashMap<>();
         Timelined timelined = timeline.timelined;
         ReadOnlyTagList tags = timelined.getTags();
@@ -3142,6 +3142,9 @@ public final class SWF implements SWFContainerItem, Timelined {
                     int currentCharId = stage.get(depth);
                     stage.remove(depth);
                     if (dependingChars.contains(currentCharId)) {
+                        if (listener != null) {
+                            listener.tagRemoved(t);
+                        }
                         timelined.removeTag(i);
                         modified = true;
                         i--;
@@ -3161,6 +3164,9 @@ public final class SWF implements SWFContainerItem, Timelined {
                 }
 
                 if (placeCharId >= 0 && dependingChars.contains(placeCharId)) {
+                    if (listener != null) {
+                        listener.tagRemoved(t);
+                    }
                     timelined.removeTag(i);
                     modified = true;
                     i--;
@@ -3171,6 +3177,10 @@ public final class SWF implements SWFContainerItem, Timelined {
             if (t instanceof CharacterIdTag) {
                 CharacterIdTag c = (CharacterIdTag) t;
                 if (dependingChars.contains(c.getCharacterId())) {
+                    if (listener != null) {
+                        listener.tagRemoved(t);
+                    }
+
                     timelined.removeTag(i);
                     modified = true;
                     i--;
@@ -3179,6 +3189,10 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
 
             if (t == toRemove) {
+                if (listener != null) {
+                    listener.tagRemoved(t);
+                }
+
                 timelined.removeTag(i);
                 modified = true;
                 i--;
@@ -3186,19 +3200,19 @@ public final class SWF implements SWFContainerItem, Timelined {
             }
 
             if (t instanceof Timelined) {
-                modified |= removeTagWithDependenciesFromTimeline(toRemove, ((Timelined) t).getTimeline(), dependingChars);
+                modified |= removeTagWithDependenciesFromTimeline(toRemove, ((Timelined) t).getTimeline(), dependingChars, listener);
             }
         }
         return modified;
     }
 
-    private boolean removeTagFromTimeline(Tag toRemove, Timeline timeline) {
+    private boolean removeTagFromTimeline(Tag toRemove, Timeline timeline, TagRemoveListener listener) {
         boolean modified = false;
         int characterId = -1;
         if (toRemove instanceof CharacterTag) {
             characterId = ((CharacterTag) toRemove).getCharacterId();
             if (characterId != -1) {
-                modified = removeCharacterFromTimeline(characterId, timeline);
+                modified = removeCharacterFromTimeline(characterId, timeline, listener);
             }
         }
         Timelined timelined = timeline.timelined;
@@ -3206,6 +3220,9 @@ public final class SWF implements SWFContainerItem, Timelined {
         for (int i = 0; i < tags.size(); i++) {
             Tag t = tags.get(i);
             if (t == toRemove) {
+                if (listener != null) {
+                    listener.tagRemoved(t);
+                }
                 timelined.removeTag(t);
                 i--;
                 continue;
@@ -3221,7 +3238,7 @@ public final class SWF implements SWFContainerItem, Timelined {
 
             if (t instanceof DefineSpriteTag) {
                 DefineSpriteTag spr = (DefineSpriteTag) t;
-                boolean sprModified = removeTagFromTimeline(toRemove, spr.getTimeline());
+                boolean sprModified = removeTagFromTimeline(toRemove, spr.getTimeline(), listener);
                 if (sprModified) {
                     spr.setModified(true);
                 }
@@ -3231,12 +3248,12 @@ public final class SWF implements SWFContainerItem, Timelined {
         return modified;
     }
 
-    public void removeTags(Collection<Tag> tags, boolean removeDependencies) {
+    public void removeTags(Collection<Tag> tags, boolean removeDependencies, TagRemoveListener listener) {
         Set<Timelined> timelineds = new HashSet<>();
         for (Tag tag : tags) {
             Timelined timelined = tag.getTimelined();
             timelineds.add(timelined);
-            removeTagInternal(timelined, tag, removeDependencies);
+            removeTagInternal(timelined, tag, removeDependencies, listener);
         }
 
         for (Timelined timelined : timelineds) {
@@ -3262,29 +3279,32 @@ public final class SWF implements SWFContainerItem, Timelined {
         updateCharacters();
     }
 
-    public void removeTag(Tag tag, boolean removeDependencies) {
+    public void removeTag(Tag tag, boolean removeDependencies, TagRemoveListener listener) {
         Timelined timelined = tag.getTimelined();
-        removeTagInternal(timelined, tag, removeDependencies);
+        removeTagInternal(timelined, tag, removeDependencies, listener);
         resetTimelines(timelined);
         updateCharacters();
         clearImageCache();
         clearShapeCache();
     }
 
-    private void removeTagInternal(Timelined timelined, Tag tag, boolean removeDependencies) {
+    private void removeTagInternal(Timelined timelined, Tag tag, boolean removeDependencies, TagRemoveListener listener) {
         if ((tag instanceof DoABC2Tag) || (tag instanceof DoABCTag)) {
             clearAbcListCache();
         }
         if (tag instanceof ShowFrameTag || ShowFrameTag.isNestedTagType(tag.getId())) {
+            if (listener != null) {
+                listener.tagRemoved(tag);
+            }
             timelined.removeTag(tag);
             timelined.setModified(true);
             timelined.resetTimeline();
         } else // timeline should be always the swf here
         if (removeDependencies) {
-            removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline());
+            removeTagWithDependenciesFromTimeline(tag, timelined.getTimeline(), listener);
             timelined.setModified(true);
         } else {
-            boolean modified = removeTagFromTimeline(tag, timelined.getTimeline());
+            boolean modified = removeTagFromTimeline(tag, timelined.getTimeline(), listener);
             if (modified) {
                 timelined.setModified(true);
             }

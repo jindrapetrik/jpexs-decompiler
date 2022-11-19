@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.tagtree;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.TagRemoveListener;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
@@ -1385,40 +1386,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         Tag position = selectPositionDialog.getSelectedTag();
         Timelined timelined = selectPositionDialog.getSelectedTimelined();
-        ReadOnlyTagList tags = timelined.getTags();;
-        SWF sourceSwf = items.get(0).getSwf();
-        for (TreeItem item : items) {
-            Tag tag = (Tag) item;
-            timelined.removeTag(tag);
-            tag.setSwf(targetSwf, true);
-            tag.setTimelined(timelined);
-            checkUniqueCharacterId(tag);
-            int positionInt = position == null ? timelined.getTags().size() : timelined.indexOfTag(position);
-            timelined.addTag(positionInt, tag);
-            targetSwf.updateCharacters();
-            tag.setModified(true);
-        }
-
-        sourceSwf.assignExportNamesToSymbols();
-        targetSwf.assignExportNamesToSymbols();
-        sourceSwf.assignClassesToSymbols();
-        targetSwf.assignClassesToSymbols();
-        sourceSwf.clearImageCache();
-        targetSwf.clearImageCache();
-        sourceSwf.clearShapeCache();
-        targetSwf.clearShapeCache();
-        sourceSwf.updateCharacters();
-        targetSwf.updateCharacters();
-        sourceSwf.resetTimelines(sourceSwf);
-        targetSwf.resetTimelines(targetSwf);
-        sourceSwf.computeDependentCharacters();
-        targetSwf.computeDependentCharacters();
-        sourceSwf.computeDependentFrames();
-        targetSwf.computeDependentFrames();
-
-        timelined.setFrameCount(timelined.getTimeline().getFrameCount());
-
-        mainPanel.refreshTree(new SWF[]{sourceSwf, targetSwf});
+        copyOrMoveTags(new LinkedHashSet<TreeItem>(items), true, timelined, position);
     }
 
     private void copyTagToActionPerformed(ActionEvent evt, List<TreeItem> items, SWF targetSwf) {
@@ -2314,6 +2282,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                                     }
                                 }
                             }
+                            if (item instanceof TreeItem) {
+                                mainPanel.destroyItemPin((TreeItem) item);
+                            }
                         }
 
                         for (ABC abc : abcsToPack) {
@@ -2342,10 +2313,16 @@ public class TagTreeContextMenu extends JPopupMenu {
                             }
 
                             tagsToRemoveBySwf.get(swf).add(tag);
+                            mainPanel.destroyItemPin(tag);
                         }
                                                 
                         for (SWF swf : tagsToRemoveBySwf.keySet()) {
-                            swf.removeTags(tagsToRemoveBySwf.get(swf), removeDependencies);
+                            swf.removeTags(tagsToRemoveBySwf.get(swf), removeDependencies, new TagRemoveListener() {
+                                @Override
+                                public void tagRemoved(Tag tag) {
+                                    mainPanel.destroyItemPin(tag);
+                                }                                
+                            });
                             swf.computeDependentCharacters();
                             swf.computeDependentFrames();
                         }
@@ -2931,6 +2908,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                     targetSwf.getCharacters(); // force rebuild character id cache
                     copyTag.setModified(true);
                     newTags.add(copyTag);
+                    if (move) {
+                        mainPanel.replaceItemPin(tag, copyTag);
+                    }
                 } else if (sourceSwf == targetSwf && move) { //mainPanel.isClipboardCut()
                     ReadOnlyTagList tags = realTargetTimelined.getTags();
                     int positionInt = realPosition == null ? tags.size() : tags.indexOf(realPosition);

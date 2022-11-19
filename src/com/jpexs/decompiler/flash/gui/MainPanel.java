@@ -422,6 +422,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         pinsPanel.destroy();
     }
     
+    public void destroyItemPin(TreeItem item) {
+        pinsPanel.removeItem(item);
+    }
+    
+    public void replaceItemPin(TreeItem oldItem, TreeItem newItem) {
+        pinsPanel.replaceItem(oldItem, newItem);
+    }
+    
     private void handleTreeKeyReleased(KeyEvent e) {
         AbstractTagTree tree = (AbstractTagTree) e.getSource();
         if ((e.getKeyCode() == KeyEvent.VK_UP
@@ -3478,7 +3486,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
 
-        swf.removeTags(toRemove, true);
+        swf.removeTags(toRemove, true, null);
         refreshTree(swf);
     }
 
@@ -3507,7 +3515,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         }
 
-        swf.removeTags(tagsToRemove, true);
+        swf.removeTags(tagsToRemove, true, null);
         refreshTree(swf);
     }
 

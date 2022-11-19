@@ -361,7 +361,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
 
     @Override
     public boolean removeCharacter(int characterId) {
-        boolean modified = getTimeline().removeCharacter(characterId);
+        boolean modified = getTimeline().removeCharacter(characterId, null);
         if (modified) {
             setModified(true);
         }
