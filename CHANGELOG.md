@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - [#1743] GFX - Adding DefineExternalImage2 and DefineSubImage tags
 - [#1822], [#1803] AS3 direct editation - optional using AIR (airglobal.swc) to compile
 - [#1501] Bulk import shapes
+- [#1680] Pinning objects
 
 ### Fixed
 - [#1869] Replace references now replaces all references, not just PlaceObject
@@ -34,9 +35,11 @@ All notable changes to this project will be documented in this file.
 - DefineShape4 SVG import NullPointerException
 - List of objects under cursor and coordinates not showing
 - ConcurrentModificationException in getCharacters on exit
+- Header of display panel not visible on certain color schemes
 
 ### Changed
 - GFX - DefineExternalImage2 no longer handled as character
+- Raw editor does not show tag name in the tree (it's now in the new pinnable head)
 
 ## [16.3.1] - 2022-11-14
 ### Fixed
@@ -2616,6 +2619,7 @@ All notable changes to this project will be documented in this file.
 [#1822]: https://www.free-decompiler.com/flash/issues/1822
 [#1803]: https://www.free-decompiler.com/flash/issues/1803
 [#1501]: https://www.free-decompiler.com/flash/issues/1501
+[#1680]: https://www.free-decompiler.com/flash/issues/1680
 [#1869]: https://www.free-decompiler.com/flash/issues/1869
 [#1872]: https://www.free-decompiler.com/flash/issues/1872
 [#1692]: https://www.free-decompiler.com/flash/issues/1692

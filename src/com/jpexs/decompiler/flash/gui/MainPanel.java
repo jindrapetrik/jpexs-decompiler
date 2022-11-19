@@ -100,6 +100,7 @@ import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeContextMenu;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
+import com.jpexs.decompiler.flash.gui.tagtree.TreeRoot;
 import com.jpexs.decompiler.flash.gui.timeline.TimelineViewPanel;
 import com.jpexs.decompiler.flash.helpers.FileTextWriter;
 import com.jpexs.decompiler.flash.helpers.Freed;
@@ -250,6 +251,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.Icon;
@@ -265,6 +267,10 @@ import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -398,10 +404,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private CalculateMissingNeededThread calculateMissingNeededThread;
 
     private List<WeakReference<TreeItem>> orderedClipboard = new ArrayList<>();
-    private Map<TreeItem, Boolean> clipboard = new WeakHashMap<>();
+    private Map<TreeItem, Boolean> clipboard = new WeakHashMap<>();        
 
     private boolean clipboardCut = false;
+    
+    private PinsPanel pinsPanel;
 
+    public void savePins() {
+        pinsPanel.save();
+    }
+    
+    public void clearPins() {
+        pinsPanel.clear();
+    }
+    
     private void handleTreeKeyReleased(KeyEvent e) {
         AbstractTagTree tree = (AbstractTagTree) e.getSource();
         if ((e.getKeyCode() == KeyEvent.VK_UP
@@ -923,7 +939,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         statusPanel = new MainFrameStatusPanel(this);
         add(statusPanel, BorderLayout.SOUTH);
-
+                
         displayPanel = new JPanel(new CardLayout());
 
         DefaultSyntaxKit.initKit();
@@ -986,9 +1002,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
         });
 
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        rightPanel.add(displayPanel, BorderLayout.CENTER);
+        pinsPanel = new PinsPanel(this);
+        pinsPanel.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                setTagTreeSelectedNode(getCurrentTree(), pinsPanel.getCurrent());
+            }
+        });
+        rightPanel.add(pinsPanel, BorderLayout.NORTH);
+        
         //displayPanel.setBorder(BorderFactory.createLineBorder(Color.black));
         splitPane2 = new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, treePanel, detailPanel, Configuration.guiSplitPane2DividerLocationPercent);
-        splitPane1 = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane2, displayPanel, Configuration.guiSplitPane1DividerLocationPercent);
+        splitPane1 = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane2, rightPanel, Configuration.guiSplitPane1DividerLocationPercent);
 
         welcomePanel = createWelcomePanel();
         add(welcomePanel, BorderLayout.CENTER);
@@ -1147,6 +1174,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         enableDrop(true);
         calculateMissingNeededThread = new CalculateMissingNeededThread();
         calculateMissingNeededThread.start();
+        pinsPanel.load();
     }
 
     public void closeTagTreeSearch() {
@@ -1204,6 +1232,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         doFilter();
         reload(false);
         View.expandTreeNodes(getCurrentTree(), expandedNodes);
+        pinsPanel.load();
     }
 
     public ABCPanel getABCPanel() {
@@ -1315,6 +1344,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 return false;
             }
         }
+        
+        clearPins();
 
         List<SWFList> swfsLists = new ArrayList<>(swfs);
 
@@ -1337,7 +1368,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         for (SWF swf : swfsToClose) {
-            swf.clearTagSwfs();
+            swf.clearTagSwfs();            
         }
 
         refreshTree();
@@ -1385,6 +1416,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         for (SWF swf : swfsToClose) {
             Main.searchResultsStorage.destroySwf(swf);
+            pinsPanel.removeSwf(swf);
         }
 
         swfs.remove(swfList);
@@ -4195,6 +4227,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         setTreeModel(view);
         switch (view) {
             case VIEW_DUMP:
+                pinsPanel.setVisible(false);
                 currentView = view;
                 Configuration.lastView.set(currentView);
                 if (!isWelcomeScreen) {
@@ -4206,6 +4239,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 reload(true);
                 return true;
             case VIEW_RESOURCES:
+                pinsPanel.setVisible(true);                
                 currentView = view;
                 Configuration.lastView.set(currentView);
                 if (!isWelcomeScreen) {
@@ -4225,6 +4259,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 reload(true);
                 return true;
             case VIEW_TIMELINE:
+                pinsPanel.setVisible(false);                
                 currentView = view;
                 Configuration.lastView.set(currentView);
                 final SWF swf = getCurrentSwf();
@@ -4247,6 +4282,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 return false;
             case VIEW_TAGLIST:
+                pinsPanel.setVisible(true);
                 currentView = view;
                 Configuration.lastView.set(currentView);
                 if (!isWelcomeScreen) {
@@ -4574,11 +4610,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             } else {
                 showDetail(DETAILCARDEMPTYPANEL);
             }
-            showCard(CARDACTIONSCRIPT3PANEL);
-            return;
-        }
-
-        if (treeItem instanceof Tag) {
+            showCard(CARDACTIONSCRIPT3PANEL);            
+        } else if (treeItem instanceof Tag) {
             Tag tag = (Tag) treeItem;
             TagInfo tagInfo = new TagInfo(treeItem.getSwf());
             tag.getTagInfo(tagInfo);
@@ -4689,8 +4722,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof BUTTONRECORD) {
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
-        } else {
+        } else if (!(treeItem instanceof ScriptPack)){
             showCard(CARDEMPTYPANEL);
+        }
+        if (treeItem instanceof TreeRoot) {
+            pinsPanel.setCurrent(null);
+        } else {
+            pinsPanel.setCurrent(treeItem);
         }
     }
 

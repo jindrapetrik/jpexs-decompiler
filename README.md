@@ -157,7 +157,7 @@ And links also these libraries:
 * [flashdebugger library] (Debugging ActionScript) - LGPLv3
 * FFDec Library (LGPLv3) - see below
 
-Application uses also some icons of the [Silk icons pack], [Silk companion 1] and [FatCow icons pack].
+Application uses also some icons of the [Silk icons pack], [Silk companion 1], [FatCow icons pack] and [Aha-Soft icons pack].
 ### Library
 
 FFDec Library is licensed under GNU LGPL v3 (LGPL-3.0-or-later), see [license.txt](libsrc/ffdec_lib/license.txt) for details.
@@ -193,6 +193,7 @@ And also links to these libraries:
 [Silk icons pack]: http://www.famfamfam.com/lab/icons/silk/
 [Silk companion 1]: http://damieng.com/creative/icons/silk-companion-1-icons
 [FatCow icons pack]: http://www.fatcow.com/free-icons
+[Aha-Soft icons pack]: http://www.aha-soft.com
 [sfntly]: https://code.google.com/p/sfntly/
 [JLayer]: http://www.javazoom.net/javalayer/javalayer.html
 [Animated GIF Writer]: http://elliot.kroo.net/software/java/GifSequenceWriter/

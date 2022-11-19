@@ -17,13 +17,14 @@
 package com.jpexs.decompiler.flash.gui.taglistview;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.gui.tagtree.TreeRoot;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 
 /**
  *
  * @author JPEXS
  */
-public class TagListTreeRoot implements TreeItem {
+public class TagListTreeRoot implements TreeItem, TreeRoot{
        
     @Override
     public SWF getSwf() {

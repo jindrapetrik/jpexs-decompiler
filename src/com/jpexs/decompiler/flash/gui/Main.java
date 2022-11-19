@@ -2559,7 +2559,7 @@ public class Main {
             searchResultsStorage.save();
         } catch (IOException ex) {
             //ignore
-        }
+        }              
         Configuration.saveConfig();
         if (mainFrame != null && mainFrame.getPanel() != null) {
             mainFrame.getPanel().unloadFlashPlayer();

@@ -434,7 +434,8 @@ public class GenericTagTreePanel extends GenericTagPanel {
         super(mainPanel);
         setLayout(new BorderLayout());
         tree = new MyTree();
-
+        tree.setRootVisible(false);
+        tree.setShowsRootHandles(true);
         add(new FasterScrollPane(tree), BorderLayout.CENTER);
         tree.addMouseListener(new MouseAdapter() {
             @Override
@@ -643,9 +644,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
              if (component instanceof JLabel) {
                  JLabel lab = (JLabel) component;
                  if (value == tree.getModel().getRoot()) {
+                     //It still does not matter since root is hidden
                      if (editedTag != null) {
                          lab.setIcon(AbstractTagTree.getIconForType(AbstractTagTree.getTreeNodeType(editedTag)));
-                     }
+                     }                     
                  }
              }
              return component;
