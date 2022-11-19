@@ -255,8 +255,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
 
         if (swf != null) {
-            boolean result = Main.closeAll();
-            if (result) {
+            boolean result = Main.closeAll();            
+            if (result) {                
                 swf = null;
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {

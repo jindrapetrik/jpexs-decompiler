@@ -149,6 +149,28 @@ public abstract class AbstractTagTree extends JTree {
         return ICONS.get(t);
     }
     
+    public static Icon getIconFor(TreeItem val) {
+        return getIconFor(val, false);
+    }
+    public static Icon getIconFor(TreeItem val, boolean folderExpanded) {
+        TreeNodeType type = getTreeNodeType(val);
+
+        if (type == TreeNodeType.FOLDER && folderExpanded) {
+            type = TreeNodeType.FOLDER_OPEN;
+        }
+
+        if ((type == TreeNodeType.FOLDER || type == TreeNodeType.FOLDER_OPEN) && val instanceof FolderItem) {
+            FolderItem si = (FolderItem) val;
+            if (!TagTreeRoot.FOLDER_ROOT.equals(si.getName())) {
+                String itemName = "folder" + si.getName();
+                return View.getIcon(itemName.toLowerCase(Locale.ENGLISH) + "16");
+            }
+        } else {
+            return getIconForType(type);
+        }
+        return null;
+    }
+    
     public AbstractTagTree(AbstractTagTreeModel treeModel, MainPanel mainPanel) {
         super(treeModel);
         this.mainPanel = mainPanel;
@@ -401,15 +423,27 @@ public abstract class AbstractTagTree extends JTree {
         }
     }
 
+    public TreePath getTreePathFromString(String pathStr) {
+        if (pathStr == null || pathStr.length() == 0) {
+            return null;
+        }
+        String[] path = pathStr.split("\\|");
+        return View.getTreePathByPathStrings(this, Arrays.asList(path));
+    }
+    
+    public TreeItem getTreeItemFromPathString(String pathStr) {
+        TreePath path = getTreePathFromString(pathStr);
+        if (path == null) {
+            return null;
+        }
+        return (TreeItem) path.getLastPathComponent();
+    }
+    
     public void setSelectionPathString(String pathStr) {
-        if (pathStr != null && pathStr.length() > 0) {
-            String[] path = pathStr.split("\\|");
-
-            TreePath tp = View.getTreePathByPathStrings(this, Arrays.asList(path));
-            if (tp != null) {
-                // the current view is the Resources view, otherwise tp is null
-                mainPanel.setTagTreeSelectedNode(this, (TreeItem) tp.getLastPathComponent());
-            }
+        TreeItem item = getTreeItemFromPathString(pathStr);
+        if (item != null) {
+            // the current view is the Resources view, otherwise tp is null
+            mainPanel.setTagTreeSelectedNode(this, item);
         }
     }
     
@@ -563,9 +597,16 @@ public abstract class AbstractTagTree extends JTree {
         return item;
     }
     
-    public String getSelectionPathString() {
+    public String getItemPathString(TreeItem item) {
+        TreePath path = getModel().getTreePath(item);
+        if (path == null) {
+            return null;
+        }
+        return pathToString(path);                
+    }
+    
+    public String pathToString(TreePath path) {
         StringBuilder sb = new StringBuilder();
-        TreePath path = getSelectionPath();
         if (path != null) {
             boolean first = true;
             for (Object p : path.getPath()) {
@@ -577,8 +618,11 @@ public abstract class AbstractTagTree extends JTree {
                 sb.append(p.toString());
             }
         }
-
         return sb.toString();
+    }
+    
+    public String getSelectionPathString() {
+        return pathToString(getSelectionPath());
     }
     
     public static TreeNodeType getTagNodeTypeFromTagClass(Class<?> cl) {                     

@@ -22,7 +22,7 @@ import com.jpexs.decompiler.flash.treeitems.FolderItem;
  *
  * @author JPEXS
  */
-public class TagTreeRoot extends FolderItem {
+public class TagTreeRoot extends FolderItem implements TreeRoot {
 
     public static final String FOLDER_ROOT = "root";
 

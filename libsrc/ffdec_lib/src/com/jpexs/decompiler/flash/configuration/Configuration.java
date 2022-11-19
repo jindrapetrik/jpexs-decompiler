@@ -802,6 +802,12 @@ public final class Configuration {
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> showImportShapeInfo = null;
     
+    @ConfigurationDefaultString("")    
+    public static ConfigurationItem<String> pinnedItemsTagTreePaths = null;
+    
+    @ConfigurationDefaultString("")    
+    public static ConfigurationItem<String> pinnedItemsTagListPaths = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

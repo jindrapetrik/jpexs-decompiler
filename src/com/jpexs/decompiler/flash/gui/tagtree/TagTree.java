@@ -168,21 +168,7 @@ public class TagTree extends AbstractTagTree {
                 return this;
             }
 
-            TreeNodeType type = getTreeNodeType(val);
-
-            if (type == TreeNodeType.FOLDER && expanded) {
-                type = TreeNodeType.FOLDER_OPEN;
-            }
-
-            if ((type == TreeNodeType.FOLDER || type == TreeNodeType.FOLDER_OPEN) && val instanceof FolderItem) {
-                FolderItem si = (FolderItem) val;
-                if (!TagTreeRoot.FOLDER_ROOT.equals(si.getName())) {
-                    String itemName = "folder" + si.getName();
-                    setIcon(View.getIcon(itemName.toLowerCase(Locale.ENGLISH) + "16"));
-                }
-            } else {
-                setIcon(getIconForType(type));
-            }
+            setIcon(getIconFor(val, expanded));
 
             /* boolean isModified = val instanceof Tag && ((Tag) val).isModified();
              if(val instanceof ScriptPack){
