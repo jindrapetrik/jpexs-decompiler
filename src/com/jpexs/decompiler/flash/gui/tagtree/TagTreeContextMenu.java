@@ -2340,6 +2340,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     r.run();
                     mainPanel.refreshTree();
                 }
+                mainPanel.savePins();
             }
         }
     }

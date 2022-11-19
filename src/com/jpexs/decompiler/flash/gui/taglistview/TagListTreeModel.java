@@ -240,6 +240,7 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             default:
                 fireTreeStructureChanged(new TreeModelEvent(this, new TreePath(root)));
         }
+        calculateCollisions();
     }
     
     private Frame searchForFrame(Object parent, SWF swf, Timelined t, int frame) {
@@ -352,5 +353,6 @@ public class TagListTreeModel extends AbstractTagTreeModel {
         swfHeaders.clear();
         TreePath changedPath = getTreePath(swf == null ? root : swf);
         fireTreeStructureChanged(new TreeModelEvent(this, changedPath));
+        calculateCollisions();
     }  
 }

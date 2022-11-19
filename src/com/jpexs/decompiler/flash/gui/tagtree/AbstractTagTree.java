@@ -605,8 +605,13 @@ public abstract class AbstractTagTree extends JTree {
         return pathToString(path);                
     }
     
+    public final void calculateCollisions() {
+        getModel().calculateCollisions();
+    }
+    
     public String pathToString(TreePath path) {
         StringBuilder sb = new StringBuilder();
+        AbstractTagTreeModel model = getModel();
         if (path != null) {
             boolean first = true;
             for (Object p : path.getPath()) {
@@ -616,6 +621,10 @@ public abstract class AbstractTagTree extends JTree {
 
                 first = false;
                 sb.append(p.toString());
+                int index = model.getItemIndex((TreeItem) p);
+                if (index > 1) {
+                    sb.append(" [").append(index).append("]");
+                }
             }
         }
         return sb.toString();

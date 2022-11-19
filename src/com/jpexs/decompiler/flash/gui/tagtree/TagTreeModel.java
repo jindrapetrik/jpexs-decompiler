@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.gui.helpers.CollectionChangedAction;
 import com.jpexs.decompiler.flash.gui.helpers.CollectionChangedEvent;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -144,6 +145,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
             default:
                 fireTreeStructureChanged(new TreeModelEvent(this, new TreePath(root)));
         }
+        calculateCollisions();
     }
 
     @Override
@@ -151,6 +153,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
         swfInfos.clear();
         TreePath changedPath = getTreePath(swf == null ? root : swf);
         fireTreeStructureChanged(new TreeModelEvent(this, changedPath));
+        calculateCollisions();
     }
 
     private void walkTimelinedTagList(Timelined timelined,
@@ -397,7 +400,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
 
             if (n instanceof AS3ClassTreeItem) {
                 AS3ClassTreeItem te = (AS3ClassTreeItem) n;
-                if (obj.equals(te)) {
+                if (obj == te) {
                     return newPath;
                 }
             }
@@ -406,19 +409,26 @@ public class TagTreeModel extends AbstractTagTreeModel {
                 // FolderItems are always recreated, so compare them by name and swf
                 FolderItem nds = (FolderItem) n;
                 FolderItem objs = (FolderItem) obj;
-                if (objs.getName().equals(nds.getName()) && objs.swf.equals(nds.swf)) {
+                if (objs.getName().equals(nds.getName()) && objs.swf == nds.swf) {
                     return newPath;
                 }
             } else {
-                if (obj.equals(n)) {
-                    return newPath;
+                
+                
+                TreeItem objNoTs = obj;
+                if (obj instanceof TagScript) {
+                    objNoTs = ((TagScript) obj).getTag();
                 }
-
+                
+                TreeItem nNoTs = n;
                 if (n instanceof TagScript) {
-                    if (obj.equals(((TagScript) n).getTag())) {
-                        return newPath;
-                    }
+                    nNoTs = ((TagScript) n).getTag();
                 }
+                
+                
+                if (objNoTs == nNoTs) {
+                    return newPath;
+                }                                               
             }
 
             ret = searchTreeItem(obj, n, newPath);
@@ -462,6 +472,13 @@ public class TagTreeModel extends AbstractTagTreeModel {
         List<TreeItem> mapped = swfInfo.mappedTags.get(tag.getCharacterId());
         if (mapped == null) {
             mapped = new ArrayList<>();
+        }
+        mapped = new ArrayList<>(mapped);
+        for (int i = 0; i < mapped.size(); i++) {
+            if (mapped.get(i) instanceof DoInitActionTag) {
+                mapped.remove(i);
+                i--;
+            }
         }
 
         return mapped;

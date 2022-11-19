@@ -18,11 +18,16 @@ package com.jpexs.decompiler.flash.gui.tagtree;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.helpers.CollectionChangedEvent;
+import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.Frame;
+import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -37,6 +42,43 @@ public abstract class AbstractTagTreeModel implements TreeModel {
     protected final List<TreeModelListener> listeners = new ArrayList<>();   
     
     public abstract void updateSwfs(CollectionChangedEvent e);
+            
+    private Map<TreeItem, Integer> indices = new WeakHashMap<>();
+    
+    public final void calculateCollisions() {
+        Map<TreeItem, Integer> indices = new WeakHashMap<>();
+        calculateCollisions(getRoot(), indices);
+        this.indices = indices;
+    }
+    
+    private void calculateCollisions(Object parent, Map<TreeItem, Integer> indices) {
+        List<? extends TreeItem> items = getAllChildren(parent);
+        Map<String, Integer> counts = new HashMap<>();
+        for (TreeItem item: items) {
+            String str = item.toString();
+            int count = counts.containsKey(str) ? counts.get(str) : 0;
+            count++;
+            counts.put(str, count);
+            if (count > 1) {
+                indices.put(item, count);                
+                if (item instanceof TagScript) {
+                    Tag tag = ((TagScript) item).getTag();
+                    indices.put(tag, count);
+                }
+            }            
+            calculateCollisions(item, indices);
+        }
+    }
+    
+    public final int getItemIndex(TreeItem item) {
+        if (item instanceof TagScript) {
+            item = ((TagScript) item).getTag();
+        }
+        if (indices.containsKey(item)) {
+            return indices.get(item);
+        }
+        return 1;
+    }
     
     protected void fireTreeNodesRemoved(TreeModelEvent e) {
         for (TreeModelListener listener : listeners) {

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.taglistview;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
+import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -145,6 +146,12 @@ public class TagListTreeCellRenderer extends DefaultTreeCellRenderer {
                 semiTransparent = false;
                 if (aTree.getMainPanel().isClipboardCut() && aTree.getMainPanel().clipboardContains(val)) {                    
                     semiTransparent = true;
+                }
+                
+                AbstractTagTreeModel model = aTree.getModel();
+                int itemIndex = model.getItemIndex(val);
+                if (itemIndex > 1) {
+                    lab.setText(lab.getText() + " [" + itemIndex + "]");
                 }
             }
         }

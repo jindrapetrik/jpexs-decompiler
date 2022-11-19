@@ -73,8 +73,10 @@ public class PinButton extends JPanel {
     private Color textColor;
     
     private JLabel label;
+    private MainPanel mainPanel;
 
-    public PinButton(TreeItem item, boolean pinned) {
+    public PinButton(MainPanel mainPanel, TreeItem item, boolean pinned) {
+        this.mainPanel = mainPanel;
         //setBorder(raisedBorder);
         setBorder(BorderFactory.createEmptyBorder(5, 10, 0, 10));
         this.item = item;
@@ -112,7 +114,7 @@ public class PinButton extends JPanel {
              
         label = new JLabel();
         label.setIcon(AbstractTagTree.getIconFor(item));
-        label.setText(item.toString());
+        label.setText(mainPanel.itemToString(item));
 
         button = new JLabel();
         button.setMinimumSize(new Dimension(10 + 16, 16));
@@ -317,4 +319,7 @@ public class PinButton extends JPanel {
         }
     }
 
+    public void refresh() {
+        label.setText(mainPanel.itemToString(item));
+    }
 }
