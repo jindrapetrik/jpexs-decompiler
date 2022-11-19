@@ -1551,6 +1551,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                     if (path[p] instanceof ClassesListTreeModel) {
                         break;
                     }
+                    if (((AS3Package) path[p]).isDefaultPackage()) {
+                        break;
+                    }
                     preselected = ((AS3Package) path[p]).packageName + "." + preselected;
                 }
             }
