@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.TagRemoveListener;
 import com.jpexs.decompiler.flash.exporters.BlendModeSetable;
 import com.jpexs.decompiler.flash.exporters.FrameExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
@@ -558,8 +559,8 @@ public class Timeline {
         return modified;
     }
 
-    public boolean removeCharacter(int characterId) {
-        return swf.removeCharacterFromTimeline(characterId, this);        
+    public boolean removeCharacter(int characterId, TagRemoveListener listener) {
+        return swf.removeCharacterFromTimeline(characterId, this, listener);        
     }
 
     public double roundToPixel(double val) {

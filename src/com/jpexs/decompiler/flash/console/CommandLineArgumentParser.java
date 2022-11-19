@@ -3581,7 +3581,7 @@ public class CommandLineArgumentParser {
                     }
 
                     CharacterTag characterTag = swf.getCharacter(characterId);
-                    swf.removeTag(characterTag, removeDependencies);
+                    swf.removeTag(characterTag, removeDependencies, null);
 
                     if (args.isEmpty() || args.peek().startsWith("-")) {
                         break;

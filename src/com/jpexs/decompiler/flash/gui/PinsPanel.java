@@ -371,4 +371,24 @@ public class PinsPanel extends JPanel {
         }
         save();
     }
+    
+    public void replaceItem(TreeItem oldItem, TreeItem newItem) {
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i) == oldItem) {
+                items.set(i, newItem);
+                rebuild();
+                break;
+            }
+        }
+    }
+    
+    public void removeItem(TreeItem item) {
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i) == item) {
+                items.remove(i);
+                rebuild();
+                break;
+            }
+        }
+    }
 }
