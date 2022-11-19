@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.tagtree;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
 import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
@@ -287,7 +288,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
         Map<Tag, TagScript> currentTagScriptCache = new HashMap<>();
         if (swf.isAS3()) {
             if (!swf.getAbcList().isEmpty()) {
-                nodeList.add(new ClassesListTreeModel(swf));
+                nodeList.add(new ClassesListTreeModel(swf, Configuration.flattenASPackages.get()));
             }
         } else {
             List<TreeItem> subNodes = swf.getFirstLevelASMNodes(currentTagScriptCache);

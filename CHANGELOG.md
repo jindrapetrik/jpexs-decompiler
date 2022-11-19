@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - [#1501] Bulk import shapes
 - [#1680] Pinning items
 - Indices in brackets for items with same name (like two subsequent DoAction tags)
+- Flattened ActionScript packages (one row per package instead package tree), can be turned off in settings
 
 ### Fixed
 - [#1869] Replace references now replaces all references, not just PlaceObject
@@ -45,6 +46,7 @@ All notable changes to this project will be documented in this file.
 - GFX - DefineExternalImage2 no longer handled as character
 - Raw editor does not show tag name in the tree (it's now in the new pinnable head)
 - DoInitAction is not shown in resources/sprites section, only in scripts
+- ActionScript packages are by default flattened (can be turned off in settings)
 
 ## [16.3.1] - 2022-11-14
 ### Fixed

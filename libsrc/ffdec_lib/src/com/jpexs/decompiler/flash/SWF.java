@@ -1973,6 +1973,19 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     private String getASMPath(boolean exportFileName, TreeItem treeItem) {
+
+        if (treeItem instanceof AS2Package) {
+            AS2Package pkg = (AS2Package) treeItem;
+            if (pkg.isFlat()) {
+                String parts[] = pkg.toString().split("\\.");
+                for (int i = 0; i < parts.length; i++) {
+                    parts[i] = Helper.makeFileName(parts[i]);
+                }
+                return String.join(File.separator, parts);
+            }
+        }
+        
+        
         if (!exportFileName) {
             return treeItem.toString();
         }

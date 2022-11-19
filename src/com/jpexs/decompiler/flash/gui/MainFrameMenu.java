@@ -79,6 +79,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
     private SWF swf;
 
     private ConfigurationItemChangeListener<Boolean> configListenerAutoDeobfuscate;
+    
+    private ConfigurationItemChangeListener<Boolean> configListenerFlattenASPackages;
+
 
     private ConfigurationItemChangeListener<Boolean> configListenerSimplifyExpressions;
 
@@ -651,6 +654,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         Configuration.autoOpenLoadedSWFs.set(selected);
     }
+    
+    protected void flattenASPackagesActionPerformed(ActionEvent evt) {
+        AbstractButton button = (AbstractButton) evt.getSource();
+        boolean selected = button.isSelected();
+
+        Configuration.flattenASPackages.set(selected);
+    }
 
     protected void autoRenameIdentifiersActionPerformed(ActionEvent evt) {
         AbstractButton button = (AbstractButton) evt.getSource();
@@ -1056,6 +1066,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addToggleMenuItem("/settings/gotoMainClassOnStartup", translate("menu.settings.gotoMainClassOnStartup"), null, null, this::gotoDucumentClassOnStartupActionPerformed, 0, null);
         addToggleMenuItem("/settings/autoRenameIdentifiers", translate("menu.settings.autoRenameIdentifiers"), null, null, this::autoRenameIdentifiersActionPerformed, 0, null);
         addToggleMenuItem("/settings/autoOpenLoadedSWFs", translate("menu.settings.autoOpenLoadedSWFs"), null, null, this::autoOpenLoadedSWFsActionPerformed, 0, null);
+        addToggleMenuItem("/settings/flattenASPackages", translate("menu.settings.flattenASPackages"), null, null, this::flattenASPackagesActionPerformed, 0, null);
         if (Platform.isWindows()) {
             addToggleMenuItem("/settings/associate", translate("menu.settings.addtocontextmenu"), null, null, this::associateActionPerformed, 0, null);
         }
@@ -1124,6 +1135,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuChecked("/settings/autoOpenLoadedSWFs", Configuration.autoOpenLoadedSWFs.get());
         Configuration.autoOpenLoadedSWFs.addListener(configListenerAutoOpenLoadedSWFs = (Boolean newValue) -> {
             setMenuChecked("/settings/autoOpenLoadedSWFs", newValue);
+        });
+        
+        setMenuChecked("/settings/flattenASPackages", Configuration.flattenASPackages.get());
+        Configuration.flattenASPackages.addListener(configListenerFlattenASPackages = (Boolean newValue) -> {
+            setMenuChecked("/settings/flattenASPackages", newValue);
         });
 
         /*
