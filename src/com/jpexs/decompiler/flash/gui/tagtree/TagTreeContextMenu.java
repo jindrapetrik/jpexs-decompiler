@@ -2473,6 +2473,10 @@ public class TagTreeContextMenu extends JPopupMenu {
     private void showInTagListViewActionPerformed(ActionEvent evt) {
         TreeItem item = getTree().getCurrentTreeItem();
         mainPanel.showView(MainPanel.VIEW_TAGLIST);
+        
+        if (item instanceof TagScript) {
+            item = ((TagScript) item).getTag();
+        }
         mainPanel.setTagTreeSelectedNode(mainPanel.tagListTree, item);
         mainPanel.updateMenu();
     }
