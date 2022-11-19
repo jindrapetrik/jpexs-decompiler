@@ -45,13 +45,22 @@ public class AS3Package extends AS3ClassTreeItem {
     private List<ScriptPack> sortedScripts;
     
     private boolean flat;
+    
+    private boolean defaultPackage;
 
-    public AS3Package(String packageName, SWF swf, boolean flat) {
+    public AS3Package(String packageName, SWF swf, boolean flat, boolean defaultPackage) {
         super(packageName, "", null);
         this.flat = flat;
         this.swf = swf;
         this.packageName = packageName;
+        this.defaultPackage = defaultPackage;
     }
+
+    public boolean isDefaultPackage() {
+        return defaultPackage;
+    }
+    
+    
 
     @Override
     public SWF getSwf() {
