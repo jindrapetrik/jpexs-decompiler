@@ -418,6 +418,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         pinsPanel.clear();
     }
     
+    public void destroyPins() {
+        pinsPanel.destroy();
+    }
+    
     private void handleTreeKeyReleased(KeyEvent e) {
         AbstractTagTree tree = (AbstractTagTree) e.getSource();
         if ((e.getKeyCode() == KeyEvent.VK_UP
