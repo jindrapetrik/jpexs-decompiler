@@ -17,16 +17,21 @@
 package com.jpexs.decompiler.flash.gui.taglistview;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
+import com.jpexs.decompiler.flash.gui.abc.ClassesListTreeModel;
 import com.jpexs.decompiler.flash.gui.helpers.CollectionChangedAction;
 import com.jpexs.decompiler.flash.gui.helpers.CollectionChangedEvent;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
@@ -36,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.WeakHashMap;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.TreePath;
 
@@ -49,7 +55,9 @@ public class TagListTreeModel extends AbstractTagTreeModel {
 
     private List<OpenableList> swfs;
     
-    private Map<SWF, HeaderItem> swfHeaders = new HashMap<>();         
+    private Map<SWF, HeaderItem> swfHeaders = new HashMap<>();        
+    
+    private final Map<ABCContainerTag, ClassesListTreeModel> abcClassesTree = new WeakHashMap<>();
     
     public TagListTreeModel(List<OpenableList> swfs) {
         this.swfs = swfs;
@@ -58,6 +66,16 @@ public class TagListTreeModel extends AbstractTagTreeModel {
     @Override
     public TreeItem getRoot() {
         return root;
+    }
+    
+    private ClassesListTreeModel getClassesListTreeModel(ABCContainerTag abcContainer) {
+        if (abcClassesTree.containsKey(abcContainer)) {
+            return abcClassesTree.get(abcContainer);
+        }
+        
+        ClassesListTreeModel model = new ClassesListTreeModel(abcContainer.getSwf(), Configuration.flattenASPackages.get());
+        abcClassesTree.put(abcContainer, model);
+        return model;
     }
     
     private HeaderItem getSwfHeader(SWF swf) {
@@ -99,6 +117,11 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             return ((Frame) parentNode).allInnerTags.get(index);
         } else if (parentNode instanceof DefineBinaryDataTag) {
             return ((DefineBinaryDataTag) parentNode).innerSwf;
+        } else if (parentNode instanceof ABCContainerTag) {
+            ClassesListTreeModel classesListTreeModel = getClassesListTreeModel((ABCContainerTag) parentNode);
+            return classesListTreeModel.getChild(classesListTreeModel.getRoot(), index);
+        } else if (parentNode instanceof AS3ClassTreeItem) {
+            return ((AS3Package) parentNode).getChild(index);
         }
         
         if (parentNode instanceof ButtonTag) {
@@ -131,7 +154,12 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             return  ((DefineSpriteTag) parentNode).getTimeline().getFrameCount();
         } else if (parentNode instanceof DefineBinaryDataTag) {
             return  (((DefineBinaryDataTag) parentNode).innerSwf == null ? 0 : 1);
-        }
+        } else if (parentNode instanceof ABCContainerTag) {
+            ClassesListTreeModel classesListTreeModel = getClassesListTreeModel((ABCContainerTag) parentNode);
+            return classesListTreeModel.getChildCount(classesListTreeModel.getRoot());
+        } else if (parentNode instanceof AS3Package) {
+            return ((AS3Package) parentNode).getChildCount();
+        } 
         int size = 0;
         if (parentNode instanceof ButtonTag) {
             size += ((ButtonTag) parentNode).getRecords().size();
@@ -182,7 +210,12 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             return ((Frame) parentNode).allInnerTags.indexOf(child);
         } else if (parentNode instanceof DefineBinaryDataTag) {
             return ((DefineBinaryDataTag) parentNode).innerSwf == child ? 0 : -1;
-        }
+        } else if (parentNode instanceof ABCContainerTag) {
+            ClassesListTreeModel classesListTreeModel = getClassesListTreeModel((ABCContainerTag) parentNode);
+            return classesListTreeModel.getIndexOfChild(classesListTreeModel.getRoot(), child);
+        } else if (parentNode instanceof AS3Package) {
+            return ((AS3Package) parentNode).getIndexOfChild((AS3ClassTreeItem) child);
+        } 
         int base = 0;
         if (parentNode instanceof ButtonTag) {
             int index = ((ButtonTag) parentNode).getRecords().indexOf(child);
@@ -219,7 +252,7 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             for (SWF swf : toRemove) {
                 swfHeaders.remove(swf);
             }
-        }
+        }        
 
         switch (e.getAction()) {
             case ADD: {
@@ -240,7 +273,7 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             }*/
             default:
                 fireTreeStructureChanged(new TreeModelEvent(this, new TreePath(root)));
-        }
+        }        
         calculateCollisions();
     }
     
@@ -302,6 +335,15 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             } else {
                 return new ArrayList<>(0);
             }
+        } else if (parentNode instanceof ABCContainerTag) {
+            ClassesListTreeModel classesListTreeModel = getClassesListTreeModel((ABCContainerTag) parentNode);
+            return classesListTreeModel.getAllChildren(classesListTreeModel.getRoot());
+        } else if (parentNode instanceof AS3ClassTreeItem) {
+            if (parentNode instanceof AS3Package) {
+                return ((AS3Package) parentNode).getAllChildren();
+            } else {
+                return new ArrayList<>();
+            }
         }
         List<TreeItem> ret = new ArrayList<>();
         if (parentNode instanceof ButtonTag) {
@@ -352,6 +394,7 @@ public class TagListTreeModel extends AbstractTagTreeModel {
     @Override
     public void updateOpenable(Openable openable) {
         swfHeaders.clear();
+        abcClassesTree.clear();
         TreePath changedPath = getTreePath(openable == null ? root : openable);
         fireTreeStructureChanged(new TreeModelEvent(this, changedPath));
         calculateCollisions();
