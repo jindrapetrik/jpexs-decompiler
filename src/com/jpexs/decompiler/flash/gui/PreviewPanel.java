@@ -52,6 +52,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -262,22 +263,42 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private JPanel createImageButtonsPanel() {
         replaceShapeButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replaceshape16"));
         replaceShapeButton.setMargin(new Insets(3, 3, 3, 10));
-        replaceShapeButton.addActionListener(mainPanel::replaceButtonActionPerformed);
+        replaceShapeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainPanel.replaceButtonActionPerformed(mainPanel.getCurrentTree().getSelected());
+            }
+        });
         replaceShapeButton.setVisible(false);
         
         replaceShapeUpdateBoundsButton = new JButton(mainPanel.translate("button.replaceNoFill"), View.getIcon("replaceshape16"));
         replaceShapeUpdateBoundsButton.setMargin(new Insets(3, 3, 3, 10));
-        replaceShapeUpdateBoundsButton.addActionListener(mainPanel::replaceNoFillButtonActionPerformed);
+        replaceShapeUpdateBoundsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainPanel.replaceNoFillButtonActionPerformed(mainPanel.getCurrentTree().getCurrentTreeItem());
+            }
+        });
         replaceShapeUpdateBoundsButton.setVisible(false);
         
         replaceSoundButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replacesound16"));
         replaceSoundButton.setMargin(new Insets(3, 3, 3, 10));
-        replaceSoundButton.addActionListener(mainPanel::replaceButtonActionPerformed);
+        replaceSoundButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainPanel.replaceButtonActionPerformed(mainPanel.getCurrentTree().getSelected());
+            }
+        });
         replaceSoundButton.setVisible(false);
         
         replaceImageButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replaceimage16"));
         replaceImageButton.setMargin(new Insets(3, 3, 3, 10));
-        replaceImageButton.addActionListener(mainPanel::replaceButtonActionPerformed);
+        replaceImageButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainPanel.replaceButtonActionPerformed(mainPanel.getCurrentTree().getSelected());
+            }
+        });
         replaceImageButton.setVisible(false);
 
         replaceImageAlphaButton = new JButton(mainPanel.translate("button.replaceAlphaChannel"), View.getIcon("replacealpha16"));
@@ -309,7 +330,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private JPanel createBinaryButtonsPanel() {
         replaceBinaryButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("edit16"));
         replaceBinaryButton.setMargin(new Insets(3, 3, 3, 10));
-        replaceBinaryButton.addActionListener(mainPanel::replaceButtonActionPerformed);
+        replaceBinaryButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainPanel.replaceButtonActionPerformed(mainPanel.getCurrentTree().getSelected());
+            }
+        });
 
         ButtonsPanel binaryButtonsPanel = new ButtonsPanel();
         binaryButtonsPanel.add(replaceBinaryButton);
@@ -319,7 +345,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private JPanel createUnknownButtonsPanel() {
         replaceUnknownButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("edit16"));
         replaceUnknownButton.setMargin(new Insets(3, 3, 3, 10));
-        replaceUnknownButton.addActionListener(mainPanel::replaceButtonActionPerformed);
+        replaceUnknownButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainPanel.replaceButtonActionPerformed(mainPanel.getCurrentTree().getSelected());
+            }
+        });
 
         ButtonsPanel unknownButtonsPanel = new ButtonsPanel();
         unknownButtonsPanel.add(replaceBinaryButton);

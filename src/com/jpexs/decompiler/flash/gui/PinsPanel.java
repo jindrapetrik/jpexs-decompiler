@@ -149,53 +149,6 @@ public class PinsPanel extends JPanel {
         boolean currentPinned = false;
         for (TreeItem item : items) {
             PinButton pinButton = new PinButton(mainPanel, item, true);
-            pinButton.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    if (e.getButton() == MouseEvent.BUTTON3) {
-                        JPopupMenu pinMenu = new JPopupMenu();
-                        JMenuItem unpinMenuItem = new JMenuItem(AppStrings.translate("contextmenu.unpin"));
-                        unpinMenuItem.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                items.remove(item);
-                                rebuild();
-                                fireChange();
-                            }
-                        });
-                        pinMenu.add(unpinMenuItem);
-
-                        JMenuItem unpinAllMenuItem = new JMenuItem(AppStrings.translate("contextmenu.unpin.all"));
-                        unpinAllMenuItem.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                items.clear();
-                                rebuild();
-                                fireChange();
-                            }
-                        });
-                        if (items.size() > 1) {
-                            pinMenu.add(unpinAllMenuItem);
-                        }
-
-                        JMenuItem unpinOthersMenuItem = new JMenuItem(AppStrings.translate("contextmenu.unpin.others"));
-                        unpinOthersMenuItem.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                items.clear();
-                                items.add(item);
-                                rebuild();
-                                fireChange();
-                            }
-                        });
-                        if (items.size() > 1) {
-                            pinMenu.add(unpinOthersMenuItem);
-                        }
-                        pinMenu.show(pinButton, e.getX(), e.getY());
-                    }
-                }
-
-            });
             pinButton.addChangeListener(new ChangeListener() {
                 @Override
                 public void stateChanged(ChangeEvent e) {
@@ -402,6 +355,42 @@ public class PinsPanel extends JPanel {
         }
     }
 
+    public void removeOthers(TreeItem item) {
+        items.clear();
+        items.add(item);
+        rebuild();
+        save();
+    }
+    
+    public void pin(TreeItem item) {
+        if (!isPinned(item)) {
+            items.add(item);
+            rebuild();
+            save();
+        }
+    }
+    
+    public int getPinCount() {
+        return items.size();
+    }
+    
+    public boolean isPinned(TreeItem item) {
+        if (item instanceof TagScript) {
+            item = ((TagScript) item).getTag();
+        }
+
+        for (int i = 0; i < items.size(); i++) {
+            TreeItem item2 = items.get(i);
+            if (item2 instanceof TagScript) {
+                item2 = ((TagScript) item2).getTag();
+            }
+            if (item2 == item) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public void removeItem(TreeItem item) {
         if (item instanceof TagScript) {
             item = ((TagScript) item).getTag();
