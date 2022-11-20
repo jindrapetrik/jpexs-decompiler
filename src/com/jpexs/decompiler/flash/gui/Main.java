@@ -212,8 +212,8 @@ public class Main {
     public static final int LIBRARY_AIR = 0;
     public static final int LIBRARY_FLASH = 1;
 
-    public static boolean isSwfAir(SWF swf) {
-        SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(swf.getShortPathTitle());
+    public static boolean isSwfAir(Openable openable) {
+        SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(openable.getShortPathTitle());
         if (conf != null) {
             String libraryAsStr = conf.getCustomData(CustomConfigurationKeys.KEY_LIBRARY, "" + LIBRARY_FLASH);
             int libraryAsInt = Integer.parseInt(libraryAsStr);

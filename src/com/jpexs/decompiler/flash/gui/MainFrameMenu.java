@@ -290,7 +290,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        mainFrame.getPanel().importScript((SWF) openable);
+        mainFrame.getPanel().importScript(openable);
     }
 
     protected void importImagesActionPerformed(ActionEvent evt) {
@@ -803,16 +803,25 @@ public abstract class MainFrameMenu implements MenuBuilder {
         boolean swfIsNew = openableSelected && openable.getOpenableList() != null && openable.getOpenableList().sourceInfo.isEmpty();
 
         boolean allSameSwf = true;
+        boolean allSameOpenable = true;
         if (mainPanel != null) {
             List<TreeItem> items = mainPanel.getCurrentTree().getSelected();
             SWF firstSwf = null;
+            Openable firstOpenable = null;
             for (TreeItem item : items) {
                 if (item instanceof OpenableList) {
                     allSameSwf = false;
                     break;
                 }
-                if (firstSwf == null) {
-                    Openable fopenable = item.getOpenable();
+                Openable fopenable = item.getOpenable();
+                if (firstOpenable == null) {
+                    firstOpenable = fopenable;
+                } else {
+                    if (fopenable != firstOpenable) {
+                        allSameOpenable = false;
+                    }
+                }
+                if (firstSwf == null) {                                       
                     if (fopenable instanceof SWF) {
                         firstSwf = (SWF) fopenable;
                     } else {
@@ -852,7 +861,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         setMenuEnabled("/file/import", openableSelected);
         setMenuEnabled("/file/import/importText", allSameSwf && swfSelected && !isWorking);
-        setMenuEnabled("/file/import/importScript", allSameSwf && swfSelected && !isWorking);
+        setMenuEnabled("/file/import/importScript", allSameOpenable && openableSelected && !isWorking);
         setMenuEnabled("/file/import/importOther", allSameSwf && swfSelected && !isWorking);
         setMenuEnabled("/file/import/importXml", allSameSwf && swfSelected && !isWorking);
 

@@ -238,7 +238,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             return;
         }
 
-        if (Main.isSwfAir(abc.getSwf())) {
+        if (Main.isSwfAir(abc.getOpenable())) {
             libraryComboBox.setSelectedIndex(Main.LIBRARY_AIR);
         } else {
             libraryComboBox.setSelectedIndex(Main.LIBRARY_FLASH);
@@ -284,6 +284,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
     public SWF getSwf() {
         return abc == null ? null : abc.getSwf();
+    }
+    
+    public Openable getOpenable() {
+        return abc == null ? null : abc.getOpenable();
     }
 
     public List<ABCContainerTag> getAbcList() {
@@ -1480,7 +1484,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     }
 
     private void editDecompiledButtonActionPerformed(ActionEvent evt) {        
-        scriptReplacer = mainPanel.getAs3ScriptReplacer(Main.isSwfAir(getSwf()));
+        scriptReplacer = mainPanel.getAs3ScriptReplacer(Main.isSwfAir(getOpenable()));
         if (scriptReplacer == null) {
             return;
         }        
