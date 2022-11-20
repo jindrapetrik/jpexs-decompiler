@@ -1256,6 +1256,9 @@ public class Main {
         if (mode == SaveFileMode.SAVEAS && openable.getOpenableList() != null /*SWF in binarydata has null*/ && !openable.getOpenableList().isBundle()) {
             openable.setFile(outfile);
             openable.getOpenableList().sourceInfo.setFile(outfile);
+            if (mainFrame != null && mainFrame.getPanel() != null) {
+                mainFrame.getPanel().refreshPins();
+            }
         }
         File outfileF = new File(outfile);
         File tmpFile = new File(outfile + ".tmp");

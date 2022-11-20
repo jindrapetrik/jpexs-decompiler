@@ -420,6 +420,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         pinsPanel.clear();
     }
     
+    public void refreshPins() {
+        pinsPanel.refresh();
+    }
+    
     public void destroyPins() {
         pinsPanel.destroy();
     }
