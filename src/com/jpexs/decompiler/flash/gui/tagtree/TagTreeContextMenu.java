@@ -94,6 +94,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -109,12 +111,14 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.TreePath;
 
 /**
@@ -136,6 +140,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem undoTagMenuItem;
 
     private JMenuItem exportSelectionMenuItem;
+    
+    private JMenuItem exportABCMenuItem;
 
     private JMenuItem replaceMenuItem;
 
@@ -278,6 +284,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         exportSelectionMenuItem.addActionListener(mainPanel::exportSelectionActionPerformed);
         exportSelectionMenuItem.setIcon(View.getIcon("exportsel16"));
         add(exportSelectionMenuItem);
+        
+        exportABCMenuItem = new JMenuItem(mainPanel.translate("contextmenu.exportAbc"));
+        exportABCMenuItem.addActionListener(this::exportABCActionPerformed);
+        exportABCMenuItem.setIcon(View.getIcon("exportabc16"));
+        add(exportABCMenuItem);
 
         replaceMenuItem = new JMenuItem(mainPanel.translate("button.replace"));
         replaceMenuItem.addActionListener(mainPanel::replaceButtonActionPerformed);
@@ -716,6 +727,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         cloneMenuItem.setVisible(allSelectedIsTagOrFrame && allSelectedSameParent);
         undoTagMenuItem.setVisible(allSelectedIsTag);
         exportSelectionMenuItem.setEnabled(hasExportableNodes); //?
+        exportABCMenuItem.setVisible(false);
         replaceMenuItem.setVisible(false);
         replaceNoFillMenuItem.setVisible(false);
         replaceWithTagMenuItem.setVisible(false);
@@ -826,10 +838,11 @@ public class TagTreeContextMenu extends JPopupMenu {
                 addAs3ClassMenuItem.setVisible(true);
             }
             if (firstItem instanceof ABC) {
-                addAs3ClassMenuItem.setVisible(true);
+                addAs3ClassMenuItem.setVisible(true);                
             }
             if ((firstItem instanceof ABCContainerTag) && mainPanel.getCurrentView() == MainPanel.VIEW_TAGLIST) {
                 addAs3ClassMenuItem.setVisible(true);
+                exportABCMenuItem.setVisible(true);
             }
 
             if (firstItem instanceof CharacterTag) {
@@ -3159,5 +3172,45 @@ public class TagTreeContextMenu extends JPopupMenu {
             item = item.binaryData.getSwf();
         }
         Main.reloadFile(item.openableList);
+    }
+    
+    private void exportABCActionPerformed(ActionEvent evt) {
+        ABCContainerTag container = (ABCContainerTag) getTree().getCurrentTreeItem();
+        FileFilter abcFilter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(".abc")) || (f.isDirectory());
+            }
+
+            @Override
+            public String getDescription() {
+                return AppStrings.translate("filter.abc");
+            }
+        };
+        JFileChooser fc = new JFileChooser();
+        fc.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
+        fc.setFileFilter(abcFilter);
+        fc.setAcceptAllFileFilterUsed(false);
+        if (fc.showSaveDialog(Main.getDefaultMessagesComponent()) == JFileChooser.APPROVE_OPTION) {
+            File file = Helper.fixDialogFile(fc.getSelectedFile());
+            FileFilter selFilter = fc.getFileFilter();
+            try {
+                String fileName = file.getAbsolutePath();
+                if (selFilter == abcFilter) {
+                    if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(".abc")) {
+                        fileName += ".abc";
+                    }                    
+                }
+                
+                try (FileOutputStream fos = new FileOutputStream(fileName)) {
+                    container.getABC().saveTo(fos);
+                }
+                
+                Configuration.lastExportDir.set(file.getParentFile().getAbsolutePath());
+                
+            } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
+                Main.handleSaveError(ex);
+            }
+        }
     }
 }
