@@ -1823,6 +1823,12 @@ public class Main {
                     }
                     ((SWF)openable).gfx = true;
                 }
+                
+                if (selFilter == abcFilter) {
+                    if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(".abc")) {
+                        fileName += ".abc";
+                    }
+                }
                 Main.saveFile(openable, fileName, mode, exeExportMode);
                 Configuration.lastSaveDir.set(file.getParentFile().getAbsolutePath());
                 return true;
