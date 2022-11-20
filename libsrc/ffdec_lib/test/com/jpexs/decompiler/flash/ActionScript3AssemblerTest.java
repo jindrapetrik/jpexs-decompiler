@@ -77,6 +77,10 @@ public class ActionScript3AssemblerTest extends ActionScriptTestBase {
             public int compareTo(ABCContainerTag o) {
                 return 0;
             }
+
+            @Override
+            public void setABC(ABC abc) {
+            }                        
         });
     }
 

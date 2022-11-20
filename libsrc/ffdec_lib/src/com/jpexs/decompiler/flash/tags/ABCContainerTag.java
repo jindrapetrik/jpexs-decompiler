@@ -28,4 +28,6 @@ public interface ABCContainerTag extends Comparable<ABCContainerTag> {
     public ABC getABC();
 
     public SWF getSwf();
+    
+    public void setABC(ABC abc);
 }
