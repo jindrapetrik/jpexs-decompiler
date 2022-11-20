@@ -942,9 +942,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                 moveUpMenuItem.setVisible(true);
                 moveDownMenuItem.setVisible(true);
             }
-            if (firstItem instanceof SWF) {
-                SWF firstSwf = (SWF) firstItem;
-                if (firstSwf.openableList != null && !firstSwf.openableList.isBundle() && firstSwf.openableList.size() == 1) {
+            if (firstItem instanceof Openable) {
+                Openable firstOpenable = (Openable) firstItem;
+                if (firstOpenable.getOpenableList() != null && !firstOpenable.getOpenableList().isBundle() && firstOpenable.getOpenableList().size() == 1) {
                     moveUpMenuItem.setVisible(true);
                     moveDownMenuItem.setVisible(true);
                 }
@@ -3034,7 +3034,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     public void moveUpDown(TreeItem item, boolean up) {
-        if ((item instanceof SWF) || (item instanceof OpenableList)) {
+        if ((item instanceof Openable) || (item instanceof OpenableList)) {
             mainPanel.moveSwfListUpDown(item, up);
             return;
         }
