@@ -4445,6 +4445,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
                 });
 
+                refreshPins();                
                 reload(true);
                 return true;
             case VIEW_TIMELINE:
@@ -4479,6 +4480,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 showTreePanelCard(TAGLIST_VIEW);
                 treePanelMode = TreePanelMode.TAGLIST_TREE;
+                refreshPins();                
                 reload(true);
                 return true;
         }
