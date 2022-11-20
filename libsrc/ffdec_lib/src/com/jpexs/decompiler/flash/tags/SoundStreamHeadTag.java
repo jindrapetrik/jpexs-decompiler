@@ -274,13 +274,6 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
     public String toString() {
         return getName() + (virtualCharacterId > 0 ? " (" + virtualCharacterId + ")" : "");
     }
-    
-    @Override
-    public void getNeededCharacters(Set<Integer> needed) {
-        if (virtualCharacterId > 0) {
-            needed.add(virtualCharacterId);
-        }
-    }
-    
+        
     //getNeededCharacters intentionally not defined
 }

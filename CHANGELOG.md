@@ -42,6 +42,7 @@ All notable changes to this project will be documented in this file.
 - Move tag to action did not remove original tag
 - Show in tag list from tag scripts
 - Move/Copy tag to action on tag scripts
+- [#1879] False tag order error with SoundStreamHead
 
 ### Changed
 - GFX - DefineExternalImage2 no longer handled as character
@@ -2635,6 +2636,7 @@ All notable changes to this project will be documented in this file.
 [#1807]: https://www.free-decompiler.com/flash/issues/1807
 [#1840]: https://www.free-decompiler.com/flash/issues/1840
 [#1877]: https://www.free-decompiler.com/flash/issues/1877
+[#1879]: https://www.free-decompiler.com/flash/issues/1879
 [#1867]: https://www.free-decompiler.com/flash/issues/1867
 [#1868]: https://www.free-decompiler.com/flash/issues/1868
 [#1649]: https://www.free-decompiler.com/flash/issues/1649
