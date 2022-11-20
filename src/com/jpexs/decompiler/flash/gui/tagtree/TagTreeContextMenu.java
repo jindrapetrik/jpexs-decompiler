@@ -1576,6 +1576,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                     if (path[p] instanceof ABC) {
                         break;
                     }
+                    if (path[p] instanceof ABCContainerTag) {
+                        break;
+                    }
                     if (((AS3Package) path[p]).isDefaultPackage()) {
                         break;
                     }
@@ -1584,12 +1587,25 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             TreePath scriptsPath = tree.getSelectionPaths()[0];
-            while (!(scriptsPath.getLastPathComponent() instanceof ClassesListTreeModel) && !(scriptsPath.getLastPathComponent() instanceof ABC)) {
+            while (!(scriptsPath.getLastPathComponent() instanceof ClassesListTreeModel) &&
+                    !(scriptsPath.getLastPathComponent() instanceof ABC) &&
+                    !(scriptsPath.getLastPathComponent() instanceof ABCContainerTag)
+                    ) {
                 scriptsPath = scriptsPath.getParentPath();
             }
 
             {
-                AddClassDialog acd = new AddClassDialog(Main.getDefaultDialogsOwner(), openable);
+                ABCContainerTag preselectedContainer = null;
+                
+                TreeItem scriptsNode = (TreeItem) scriptsPath.getLastPathComponent();
+                
+                if (scriptsNode instanceof ABC) {
+                    preselectedContainer = ((ABC)scriptsNode).parentTag;
+                } else if (scriptsNode instanceof ABCContainerTag) {
+                    preselectedContainer = (ABCContainerTag) scriptsNode;
+                }
+                
+                AddClassDialog acd = new AddClassDialog(Main.getDefaultDialogsOwner(), openable, preselectedContainer);
                 if (acd.showDialog(preselected) != AppDialog.OK_OPTION) {
                     return;
                 }
@@ -1647,23 +1663,39 @@ public class TagTreeContextMenu extends JPopupMenu {
                 swf.setModified(true);
                 mainPanel.refreshTree(swf);
 
-                Object item = mainPanel.tagTree.getModel().getScriptsNode(swf);
+                Object item;
+                
+                if ((mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES) && (openable instanceof SWF)) {
+                    item  = mainPanel.tagTree.getModel().getScriptsNode((SWF) openable);
+                } else if (openable instanceof ABC) {
+                    item = openable;
+                } else { //SWF on taglist, should be DoABCContainer
+                    item = scriptsPath.getLastPathComponent();
+                }               
 
-                TreePath classPath = scriptsPath;
-
-                for (int i = 0; i < parts.length; i++) {
+                //Object item = scriptsPath.getLastPathComponent();                
+                loopparts: for (int i = 0; i < parts.length; i++) {
                     for (TreeItem ti : tree.getModel().getAllChildren(item)) {
+                        if ((ti instanceof AS3Package) && ((AS3Package)ti).isFlat()) {
+                            AS3Package pti = (AS3Package) ti;
+                            if ((pkg.isEmpty() && pti.isDefaultPackage()) || (!pti.isDefaultPackage() && pkg.equals(pti.packageName))) {
+                                item = pti;
+                                i = parts.length - 1 - 1;
+                                break;
+                            }
+                            continue;
+                        }
                         if (ti instanceof AS3ClassTreeItem) {
                             AS3ClassTreeItem cti = (AS3ClassTreeItem) ti;
+                            
                             if (parts[i].equals(cti.getNameWithNamespaceSuffix())) {
-                                classPath = classPath.pathByAddingChild(ti);
                                 item = ti;
                                 break;
                             }
                         }
                     }
                 }
-                mainPanel.tagTree.setSelectionPath(classPath);
+                mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), (TreeItem) item);
             }
         }
     }

@@ -66,15 +66,20 @@ public class AddClassDialog extends AppDialog {
     private Openable openable;
 
     private int abcCount = 0;
+    
+    private ABCContainerTag preselectedAbcContainer;
 
     private JRadioButton existingAbcTagRadioButton = new JRadioButton(translate("abc.where.existing"));
     private JRadioButton newAbcTagRadioButton = new JRadioButton(translate("abc.where.new"));
 
-    public AddClassDialog(Window owner, Openable openable) {
+    public AddClassDialog(Window owner, Openable openable, ABCContainerTag abcContainer) {
         super(owner);
         this.openable = openable;
         abcCount = 0;
-        if (openable instanceof SWF) {
+        this.preselectedAbcContainer = abcContainer;
+        if (abcContainer != null) {
+            abcCount = 1;
+        } else if (openable instanceof SWF) {
             SWF swf = (SWF) openable;
             for (Tag t : swf.getTags()) {
                 if (t instanceof ABCContainerTag) {
@@ -118,7 +123,7 @@ public class AddClassDialog extends AppDialog {
             abcTargetPanel.setVisible(false);
         }
 
-        if (openable instanceof ABC) {
+        if (preselectedAbcContainer != null) {
             existingAbcTagRadioButton.setSelected(true);
             abcTargetPanel.setVisible(false);
         }
@@ -221,8 +226,8 @@ public class AddClassDialog extends AppDialog {
             return;
         }
         setVisible(false);
-        if (openable instanceof ABC) {
-            selectedAbcContainer = ((ABC) openable).parentTag;
+        if (preselectedAbcContainer != null) {
+            selectedAbcContainer = preselectedAbcContainer;
         } else {
             if (existingAbcTagRadioButton.isSelected()) {
                 SelectDoABCDialog selectDoABCDialog = new SelectDoABCDialog(owner, (SWF) openable);

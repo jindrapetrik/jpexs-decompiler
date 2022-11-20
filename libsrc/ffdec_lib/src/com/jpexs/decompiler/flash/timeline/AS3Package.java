@@ -60,6 +60,10 @@ public class AS3Package extends AS3ClassTreeItem {
     public boolean isDefaultPackage() {
         return defaultPackage;
     }
+
+    public boolean isFlat() {
+        return flat;
+    }
     
     
 
