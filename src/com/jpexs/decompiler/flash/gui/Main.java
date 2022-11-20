@@ -25,6 +25,7 @@ import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.debugger.flash.Variable;
 import com.jpexs.debugger.flash.VariableType;
 import com.jpexs.debugger.flash.messages.in.InCallFunction;
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.SWF;
@@ -133,9 +134,11 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
 import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 import com.jpexs.decompiler.flash.Bundle;
+import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.OpenableSourceKind;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ABCInputStream;
+import com.jpexs.decompiler.flash.abc.ABCOpenException;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.helpers.MemoryInputStream;
@@ -1355,6 +1358,9 @@ public class Main {
                         if (cause instanceof SwfOpenException) {
                             throw (SwfOpenException) cause;
                         }
+                        if (cause instanceof ABCOpenException) {
+                            throw (ABCOpenException) cause;
+                        }
 
                         throw ex;
                     }
@@ -1362,13 +1368,13 @@ public class Main {
                     logger.log(Level.SEVERE, null, ex);
                     handleOutOfMemory("Cannot load SWF file.");
                     continue;
-                } catch (SwfOpenException ex) {
+                } catch (ABCOpenException | SwfOpenException ex) {
                     logger.log(Level.SEVERE, null, ex);
-                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), ex.getMessage());
+                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), ex.getMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     continue;
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, null, ex);
-                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), "Cannot load SWF file: " + ex.getLocalizedMessage());
+                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), "Cannot load SWF file: " + ex.getLocalizedMessage(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
                     continue;
                 }
 
