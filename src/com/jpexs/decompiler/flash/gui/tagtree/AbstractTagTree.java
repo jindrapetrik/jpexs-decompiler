@@ -476,6 +476,15 @@ public abstract class AbstractTagTree extends JTree {
         }
         return ret;
     }
+    
+    public List<TreeItem> getAllSubsForItems(List<TreeItem> items) {
+        List<TreeItem> ret = new ArrayList<>();        
+        for (TreeItem item:items) {
+            ret.add(item);
+            getAllSubs(item, ret);
+        }
+        return ret;
+    }
 
     public List<TreeItem> getSelected() {
         if (!mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {

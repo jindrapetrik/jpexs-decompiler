@@ -127,6 +127,12 @@ public class PinButton extends JPanel {
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     //setBorder(loweredBorder);
                 }
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    List<TreeItem> itemList = new ArrayList<>();
+                    itemList.add(item);
+                    mainPanel.getContextPopupMenu().update(itemList);
+                    mainPanel.getContextPopupMenu().show(PinButton.this, 0, PinButton.this.getHeight());
+                }
             }
 
             @Override

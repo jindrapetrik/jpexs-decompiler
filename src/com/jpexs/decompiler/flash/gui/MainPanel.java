@@ -428,8 +428,24 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         pinsPanel.destroy();
     }
 
-    public void destroyItemPin(TreeItem item) {
+    public void unpinItem(TreeItem item) {
         pinsPanel.removeItem(item);
+    }
+    
+    public void unpinOthers(TreeItem item) {
+        pinsPanel.removeOthers(item);
+    }
+    
+    public void pinItem(TreeItem item) {
+        pinsPanel.pin(item);
+    }
+    
+    public int getPinCount() {
+        return pinsPanel.getPinCount();
+    }
+    
+    public boolean isPinned(TreeItem item) {
+        return pinsPanel.isPinned(item);
     }
 
     public void replaceItemPin(TreeItem oldItem, TreeItem newItem) {
@@ -518,6 +534,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
             }
             if (e.getKeyCode() == 'X') {
+                contextPopupMenu.update(tagItems);
                 if (e.isShiftDown()) {
                     contextPopupMenu.cutTagToClipboardWithDependenciesActionPerformed(null);
                 } else {
@@ -544,6 +561,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (!((firstItem instanceof Tag) || (firstItem instanceof Frame))) {
                 return;
             }
+            contextPopupMenu.update(items);
             if (e.isShiftDown()) {
                 contextPopupMenu.pasteAfterActionPerformed(null);
             } else {
@@ -895,7 +913,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             File ftemp = new File(tempDir);
                             ExportDialog exd = new ExportDialog(Main.getDefaultDialogsOwner(), null);
                             try {
-                                files = exportSelection(new GuiAbortRetryIgnoreHandler(), tempDir, exd);
+                                files = exportSelection(null, new GuiAbortRetryIgnoreHandler(), tempDir, exd);
                             } catch (InterruptedException ex) {
                                 logger.log(Level.SEVERE, null, ex);
                                 return null;
@@ -1654,19 +1672,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return ViewMessages.showConfirmDialog(this, translate("message.confirm.experimental"), translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION;
     }
 
-    private List<TreeItem> getSelection(SWF swf) {
+    private List<TreeItem> getSelection(Openable openable, List<TreeItem> selection) {
         if (currentView == MainPanel.VIEW_RESOURCES) {
-            return tagTree.getSelection(swf);
+            return selection == null ? tagTree.getSelection(openable) : tagTree.getSelection(openable, selection);
         } else if (currentView == MainPanel.VIEW_TAGLIST) {
-            return tagListTree.getSelection(swf);
+            return selection == null ? tagListTree.getSelection(openable) : tagListTree.getSelection(openable, selection);
         }
         return new ArrayList<>();
     }
 
-    public List<File> exportSelection(AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException, InterruptedException {
+    public List<File> exportSelection(List<TreeItem> selection, AbortRetryIgnoreHandler handler, String selFile, ExportDialog export) throws IOException, InterruptedException {
 
         List<File> ret = new ArrayList<>();
-        List<TreeItem> sel = getSelection(null);
+        List<TreeItem> sel = getSelection(null, selection);
 
         Set<Openable> usedOpenables = new HashSet<>();
         for (TreeItem d : sel) {
@@ -3353,11 +3371,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return null;
     }
 
-    public void export(final boolean onlySel) {
+    public void export(final boolean onlySel, List<TreeItem> selected) {
         View.checkAccess();
 
         final SWF swf = getCurrentSwf();
-        List<TreeItem> sel = getAllSelected();
+        List<TreeItem> sel = getCurrentTree().getAllSubsForItems(selected);
         if (!onlySel) {
             sel = null;
         } else if (sel.isEmpty()) {
@@ -3375,7 +3393,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         try {
                             AbortRetryIgnoreHandler errorHandler = new GuiAbortRetryIgnoreHandler();
                             if (onlySel) {
-                                exportSelection(errorHandler, selFile, export);
+                                exportSelection(selected, errorHandler, selFile, export);
                             } else {
                                 exportAll(swf, errorHandler, selFile, export);
                             }
@@ -3407,11 +3425,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public void exportJavaSource() {
-        List<TreeItem> sel = getSelected();
+    public void exportJavaSource(List<TreeItem> items) {
         Set<SWF> swfs = new LinkedHashSet<>();
 
-        for (TreeItem item : sel) {
+        for (TreeItem item : items) {
             if (item instanceof OpenableList) {
                 OpenableList list = (OpenableList) item;
                 for (Openable openable : list) {
@@ -3443,13 +3460,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public void exportSwfXml() {
+    public void exportSwfXml(List<TreeItem> items) {
         View.checkAccess();
 
-        List<TreeItem> sel = getSelected();
         Set<SWF> swfs = new LinkedHashSet<>();
 
-        for (TreeItem item : sel) {
+        for (TreeItem item : items) {
             if (item instanceof OpenableList) {
                 OpenableList list = (OpenableList) item;
                 for (Openable openable : list) {
@@ -3481,15 +3497,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public void importSwfXml() {
+    public void importSwfXml(List<TreeItem> items) {
         View.checkAccess();
 
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importXml"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportXmlInfo);
 
-        List<TreeItem> sel = getSelected();
         Set<SWF> swfs = new LinkedHashSet<>();
 
-        for (TreeItem item : sel) {
+        for (TreeItem item : items) {
             if (item instanceof OpenableList) {
                 OpenableList list = (OpenableList) item;
                 for (Openable openable : list) {
@@ -3877,8 +3892,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public void replaceButtonActionPerformed(ActionEvent evt) {
-        List<TreeItem> items = getSelected();
+    public void replaceButtonActionPerformed(List<TreeItem> items) {
         if (items.size() == 0) {
             return;
         }
@@ -4000,8 +4014,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public void replaceNoFillButtonActionPerformed(ActionEvent evt) {
-        TreeItem item = getCurrentTree().getCurrentTreeItem();
+    public void replaceNoFillButtonActionPerformed(TreeItem item) {
         if (item == null) {
             return;
         }
@@ -4072,36 +4085,36 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public void exportJavaSourceActionPerformed(ActionEvent evt) {
+    public void exportJavaSourceActionPerformed(List<TreeItem> items) {
         if (Main.isWorking()) {
             return;
         }
 
-        exportJavaSource();
+        exportJavaSource(items);
     }
 
-    public void exportSwfXmlActionPerformed(ActionEvent evt) {
+    public void exportSwfXmlActionPerformed(List<TreeItem> items) {
         if (Main.isWorking()) {
             return;
         }
 
-        exportSwfXml();
+        exportSwfXml(items);
     }
 
-    public void importSwfXmlActionPerformed(ActionEvent evt) {
+    public void importSwfXmlActionPerformed(List<TreeItem> items) {
         if (Main.isWorking()) {
             return;
         }
 
-        importSwfXml();
+        importSwfXml(items);
     }
 
-    public void exportSelectionActionPerformed(ActionEvent evt) {
+    public void exportSelectionActionPerformed(List<TreeItem> selected) {
         if (Main.isWorking()) {
             return;
         }
 
-        export(true);
+        export(true, selected);
     }
 
     public File showImportFileChooser(String filter, boolean imagePreview) {

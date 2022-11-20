@@ -342,7 +342,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         View.checkAccess();
 
         if (openable != null) {
-            mainFrame.getPanel().export(onlySelected);
+            mainFrame.getPanel().export(onlySelected, mainFrame.getPanel().getCurrentTree().getSelected());
             return true;
         }
 
@@ -362,7 +362,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        mainFrame.getPanel().importSwfXml();
+        mainFrame.getPanel().importSwfXml(mainFrame.getPanel().getCurrentTree().getSelected());
     }
 
     protected void exportXmlActionPerformed(ActionEvent evt) {
@@ -370,7 +370,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        mainFrame.getPanel().exportSwfXml();
+        mainFrame.getPanel().exportSwfXml(mainFrame.getPanel().getCurrentTree().getSelected());
     }
 
     protected boolean searchActionPerformed(ActionEvent evt) {
