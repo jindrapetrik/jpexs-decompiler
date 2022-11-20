@@ -257,8 +257,8 @@ public class TagTree extends AbstractTagTree {
             case TagTreeModel.FOLDER_IMAGES:
                 if (gfx) {
                     ret = Arrays.asList(DefineBitsTag.ID, DefineBitsJPEG2Tag.ID, DefineBitsJPEG3Tag.ID, DefineBitsJPEG4Tag.ID, DefineBitsLosslessTag.ID, DefineBitsLossless2Tag.ID,
-                                DefineExternalImage.ID, DefineExternalImage2.ID, DefineSubImage.ID
-                            );                   
+                            DefineExternalImage.ID, DefineExternalImage2.ID, DefineSubImage.ID
+                    );
                 } else {
                     ret = Arrays.asList(DefineBitsTag.ID, DefineBitsJPEG2Tag.ID, DefineBitsJPEG3Tag.ID, DefineBitsJPEG4Tag.ID, DefineBitsLosslessTag.ID, DefineBitsLossless2Tag.ID);
                 }
