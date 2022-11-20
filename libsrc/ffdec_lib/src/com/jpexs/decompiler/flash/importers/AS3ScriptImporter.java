@@ -16,9 +16,12 @@
  */
 package com.jpexs.decompiler.flash.importers;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.helpers.Helper;
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +54,9 @@ public class AS3ScriptImporter {
             try {
                 File file = pack.getExportFile(scriptsFolder, new ScriptExportSettings(ScriptExportMode.AS, false, false));
                 if (file.exists()) {
-                    pack.getSwf().informListeners("importing_as", file.getAbsolutePath());
+                    Openable openable = pack.getOpenable();
+                    SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
+                    swf.informListeners("importing_as", file.getAbsolutePath());
                     String fileName = file.getAbsolutePath();
                     String txt = Helper.readTextFile(fileName);
 

@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -58,8 +59,8 @@ public class TagListTree extends AbstractTagTree {
     }      
         
     @Override
-    public List<TreeItem> getSelection(SWF swf) {
-        return getSelection(swf, getAllSelected());
+    public List<TreeItem> getSelection(Openable openable) {
+        return getSelection(openable, getAllSelected());
     }
 
     @Override

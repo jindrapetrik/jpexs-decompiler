@@ -44,6 +44,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.search.MethodId;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.CancellableWorker;
@@ -93,8 +94,8 @@ public class ScriptPack extends AS3ClassTreeItem {
     public boolean scriptInitializerIsEmpty = false;
 
     @Override
-    public SWF getSwf() {
-        return abc.getSwf();
+    public Openable getOpenable() {
+        return abc.getOpenable();
     }
 
     public ClassPath getClassPath() {
@@ -355,6 +356,13 @@ public class ScriptPack extends AS3ClassTreeItem {
             return false;
         }
         return abc.script_info.get(scriptIndex).isModified();
+    }
+    
+    public void clearModified() {
+        if (scriptIndex >= abc.script_info.size()) {
+            return;
+        }
+        abc.script_info.get(scriptIndex).setModified(false);
     }
 
     /**

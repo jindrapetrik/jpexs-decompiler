@@ -66,9 +66,12 @@ import com.jpexs.decompiler.flash.importers.As3ScriptReplaceException;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -85,7 +88,7 @@ import java.util.logging.Logger;
  *
  * @author JPEXS
  */
-public class ABC {
+public class ABC implements Openable {
 
     public ABCVersion version = new ABCVersion(46, 16);
 
@@ -118,18 +121,38 @@ public class ABC {
 
     /* Map from multiname index of namespace value to namespace name**/
     private Map<String, DottedChain> namespaceMap;
+    
+    private String file;
+    
+    private String fileTitle;
+    
+    private OpenableList openableList;
+    
+    private boolean isOpenable = false;
 
     public ABC(ABCContainerTag tag) {
         this.parentTag = tag;
         this.deobfuscation = null;
     }
 
-    public SWF getSwf() {
+    @Override
+    public Openable getOpenable() {
+        if (isOpenable) {
+            return this;
+        }
         return parentTag.getSwf();
     }
 
+    public SWF getSwf() {
+        return parentTag.getSwf();
+    }
+    
     public List<ABCContainerTag> getAbcTags() {
-        return getSwf().getAbcList();
+        Openable openable = getOpenable();
+        if (openable instanceof SWF) {
+            return ((SWF) openable).getAbcList();
+        }
+        return new ArrayList<>();
     }
 
     public int addMethodBody(MethodBody body) {
@@ -481,7 +504,15 @@ public class ABC {
     }
 
     public ABC(ABCInputStream ais, SWF swf, ABCContainerTag tag) throws IOException {
+        this(ais, swf, tag, null, null);
+    }
+    public ABC(ABCInputStream ais, SWF swf, ABCContainerTag tag, String file, String fileTitle) throws IOException {
         this.parentTag = tag;
+        this.file = file;
+        this.fileTitle = fileTitle;
+        if (file != null) {
+            isOpenable = true;
+        }
         int minor_version = ais.readU16("minor_version");
         int major_version = ais.readU16("major_version");
         version = new ABCVersion(major_version, minor_version);
@@ -2116,4 +2147,96 @@ public class ABC {
         deobfuscation = null;
         abcMethodIndexing = null;
     }
+
+    @Override
+    public String getFile() {
+        return file;
+    }    
+    
+    @Override
+    public String getFileTitle() {
+        if (fileTitle != null) {
+            return fileTitle;
+        }
+        return file;
+    }
+
+    @Override
+    public String getTitleOrShortFileName() {
+        if (fileTitle != null) {
+            return fileTitle;
+        }
+        return new File(file).getName();
+    }
+    
+    @Override
+    public String getShortPathTitle() {
+        if (openableList != null) {
+            if (openableList.isBundle()) {
+                return openableList.name + "/" + getTitleOrShortFileName();
+            }
+        }
+        return getTitleOrShortFileName();
+    }
+
+    @Override
+    public String getShortFileName() {
+        return new File(getTitleOrShortFileName()).getName();
+    }
+
+    @Override
+    public String getFullPathTitle() {
+        if (openableList != null) {
+            if (openableList.isBundle()) {
+                return openableList.sourceInfo.getFileTitleOrName() + "/" + getFileTitle();
+            }
+        }
+        return getFileTitle();
+    }
+    
+    @Override
+    public boolean isModified() {
+        return getSwf().isModified(); //??
+    }
+    
+    @Override
+    public void setOpenableList(OpenableList openableList) {
+        this.openableList = openableList;
+        getSwf().setOpenableList(openableList); //dummySwf
+    }
+
+    @Override
+    public OpenableList getOpenableList() {
+        return openableList;
+    }
+
+    @Override
+    public String toString() {
+        return getTitleOrShortFileName();
+    }
+
+    @Override
+    public void saveTo(OutputStream os) throws IOException {
+        saveToStream(os);
+    }            
+    
+    @Override
+    public void setFile(String file) {
+        this.file = file;
+        fileTitle = null;
+    }    
+    
+    @Override
+    public void clearModified() {
+        getSwf().clearModified();
+        List<ABC> allAbcs = new ArrayList<>();
+        allAbcs.add(this);
+        List<ScriptPack> packs = getScriptPacks(null, allAbcs);
+        for(ScriptPack pack : packs) {
+            if (pack.isModified()) {
+                pack.clearModified();
+            }
+        }
+    }
+
 }

@@ -28,7 +28,7 @@ import java.io.InputStream;
  *
  * @author JPEXS
  */
-public class SWFSourceInfo {
+public class OpenableSourceInfo {
 
     private final InputStream inputStream;
 
@@ -39,8 +39,10 @@ public class SWFSourceInfo {
     private final boolean detectBundle;
     
     private boolean empty = false;
+    
+    private OpenableSourceKind kind;
 
-    public SWFSourceInfo(String fileTitle) {
+    public OpenableSourceInfo(String fileTitle) {
         this(null, null, fileTitle, false);
         empty = true;
     }
@@ -49,16 +51,31 @@ public class SWFSourceInfo {
         return empty;
     }        
     
-    public SWFSourceInfo(InputStream inputStream, String file, String fileTitle) {
+    public OpenableSourceInfo(InputStream inputStream, String file, String fileTitle) {
         this(inputStream, file, fileTitle, true);
     }
-    public SWFSourceInfo(InputStream inputStream, String file, String fileTitle, boolean detectBundle) {
+    public OpenableSourceInfo(InputStream inputStream, String file, String fileTitle, boolean detectBundle) {
         this.inputStream = inputStream;
         this.file = file;
         this.fileTitle = fileTitle;
         this.detectBundle = detectBundle;
+        detectKind();
     }
 
+    public OpenableSourceKind getKind() {
+        return kind;
+    }            
+
+    private void detectKind() {
+        if (isBundle()) {
+            kind = OpenableSourceKind.BUNDLE;
+        } else if (this.file != null && this.file.endsWith(".abc")) {
+            kind = OpenableSourceKind.ABC;
+        } else {
+            kind = OpenableSourceKind.SWF;
+        }
+    }
+    
     public InputStream getInputStream() {
         return inputStream;
     }
@@ -69,6 +86,7 @@ public class SWFSourceInfo {
 
     public void setFile(String file) {
         this.file = file;
+        detectKind();
     }
 
     public String getFileTitle() {
@@ -95,12 +113,12 @@ public class SWFSourceInfo {
                 return false;
             }
             String extension = Path.getExtension(fileObj);
-            return (detectBundle) && (extension == null || !(extension.equals(".swf") || extension.equals(".gfx")));
+            return (detectBundle) && (extension == null || !(extension.equals(".swf") || extension.equals(".gfx") || extension.equals(".abc")));
         }
         return false;
     }
 
-    public SWFBundle getBundle(boolean noCheck, SearchMode searchMode) throws IOException {
+    public Bundle getBundle(boolean noCheck, SearchMode searchMode) throws IOException {
         if (!isBundle()) {
             return null;
         }
@@ -111,7 +129,7 @@ public class SWFSourceInfo {
                 case ".swc":
                     return new SWC(new File(file));
                 case ".zip":
-                    return new ZippedSWFBundle(new File(file));
+                    return new ZippedBundle(new File(file));
                 case ".iggy":
                     return new IggySwfBundle(new File(file));
             }

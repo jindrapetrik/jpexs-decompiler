@@ -266,7 +266,7 @@ public class FolderPreviewPanel extends JPanel {
 
     private synchronized void renderImageTask(final int index, final TreeItem treeItem) {
         executor.submit(() -> {
-            cachedPreviews.put(index, renderImage(treeItem.getSwf(), treeItem));
+            cachedPreviews.put(index, renderImage((SWF)treeItem.getOpenable(), treeItem));
             if (!repaintQueued) {
                 repaintQueued = true;
                 View.execInEventDispatchLater(() -> {

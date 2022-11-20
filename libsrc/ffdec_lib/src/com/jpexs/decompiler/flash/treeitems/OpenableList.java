@@ -17,35 +17,35 @@
 package com.jpexs.decompiler.flash.treeitems;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFContainerItem;
-import com.jpexs.decompiler.flash.SWFSourceInfo;
+import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import com.jpexs.decompiler.flash.Bundle;
 
 /**
  *
  * @author JPEXS
  */
-public class SWFList implements List<SWF>, SWFContainerItem {
+public class OpenableList implements List<Openable>, SWFContainerItem {
 
     public String name;
 
-    public SWFBundle bundle;
+    public Bundle bundle;
 
-    public SWFSourceInfo sourceInfo;
+    public OpenableSourceInfo sourceInfo;
 
-    public List<SWF> swfs = new ArrayList<>();
+    public List<Openable> items = new ArrayList<>();
 
     public boolean isBundle() {
         return bundle != null;
     }
 
     @Override
-    public SWF getSwf() {
+    public Openable getOpenable() {
         throw new UnsupportedOperationException("Not supported.");
     }
 
@@ -54,131 +54,131 @@ public class SWFList implements List<SWF>, SWFContainerItem {
         if (isBundle()) {
             return name;
         } else {
-            return swfs.get(0).getFileTitle();
+            return items.get(0).getFileTitle();
         }
     }
 
     @Override
-    public Iterator<SWF> iterator() {
-        return swfs.iterator();
+    public Iterator<Openable> iterator() {
+        return items.iterator();
     }
 
     @Override
     public int size() {
-        return swfs.size();
+        return items.size();
     }
 
     @Override
     public boolean isEmpty() {
-        return swfs.isEmpty();
+        return items.isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
-        return swfs.contains(o);
+        return items.contains(o);
     }
 
     @Override
     public Object[] toArray() {
-        return swfs.toArray();
+        return items.toArray();
     }
 
     @Override
     public <T> T[] toArray(T[] ts) {
-        return swfs.toArray(ts);
+        return items.toArray(ts);
     }
 
     @Override
-    public boolean add(SWF e) {
-        return swfs.add(e);
+    public boolean add(Openable e) {
+        return items.add(e);
     }
 
     @Override
     public boolean remove(Object o) {
-        return swfs.remove(o);
+        return items.remove(o);
     }
 
     @Override
     public boolean containsAll(Collection<?> clctn) {
-        return swfs.containsAll(clctn);
+        return items.containsAll(clctn);
     }
 
     @Override
-    public boolean addAll(Collection<? extends SWF> clctn) {
-        return swfs.addAll(clctn);
+    public boolean addAll(Collection<? extends Openable> clctn) {
+        return items.addAll(clctn);
     }
 
     @Override
     public boolean removeAll(Collection<?> clctn) {
-        return swfs.removeAll(clctn);
+        return items.removeAll(clctn);
     }
 
     @Override
     public boolean retainAll(Collection<?> clctn) {
-        return swfs.retainAll(clctn);
+        return items.retainAll(clctn);
     }
 
     @Override
     public void clear() {
-        swfs.clear();
+        items.clear();
     }
 
     @Override
-    public boolean addAll(int i, Collection<? extends SWF> clctn) {
-        return swfs.addAll(i, clctn);
+    public boolean addAll(int i, Collection<? extends Openable> clctn) {
+        return items.addAll(i, clctn);
     }
 
     @Override
-    public SWF get(int i) {
-        if (i < 0 || i >= swfs.size()) {
+    public Openable get(int i) {
+        if (i < 0 || i >= items.size()) {
             return null;
         }
-        return swfs.get(i);
+        return items.get(i);
     }
 
     @Override
-    public SWF set(int i, SWF e) {
-        return swfs.set(i, e);
+    public Openable set(int i, Openable e) {
+        return items.set(i, e);
     }
 
     @Override
-    public void add(int i, SWF e) {
-        swfs.add(i, e);
+    public void add(int i, Openable e) {
+        items.add(i, e);
     }
 
     @Override
-    public SWF remove(int i) {
-        return swfs.remove(i);
+    public Openable remove(int i) {
+        return items.remove(i);
     }
 
     @Override
     public int indexOf(Object o) {
-        return swfs.indexOf(0);
+        return items.indexOf(0);
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        return swfs.lastIndexOf(o);
+        return items.lastIndexOf(o);
     }
 
     @Override
-    public ListIterator<SWF> listIterator() {
-        return swfs.listIterator();
+    public ListIterator<Openable> listIterator() {
+        return items.listIterator();
     }
 
     @Override
-    public ListIterator<SWF> listIterator(int i) {
-        return swfs.listIterator(i);
+    public ListIterator<Openable> listIterator(int i) {
+        return items.listIterator(i);
     }
 
     @Override
-    public List<SWF> subList(int i, int i1) {
-        return swfs.subList(i, i1);
+    public List<Openable> subList(int i, int i1) {
+        return items.subList(i, i1);
     }
 
     @Override
     public boolean isModified() {
-        for (SWF s : swfs) {
+        for (Openable s : items) {
             if (s.isModified()) {
                 return true;
             }

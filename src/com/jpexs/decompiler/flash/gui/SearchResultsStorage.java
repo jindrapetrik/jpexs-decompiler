@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.search.ABCSearchResult;
 import com.jpexs.decompiler.flash.search.ActionSearchResult;
 import com.jpexs.decompiler.flash.search.ScriptNotFoundException;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -57,7 +58,7 @@ public class SearchResultsStorage {
         return Configuration.getFFDecHome() + SEARCH_RESULTS_FILE;
     }
 
-    List<String> swfIds = new ArrayList<>();
+    List<String> openableIds = new ArrayList<>();
     List<String> searchedValues = new ArrayList<>();
     List<Boolean> isRegExp = new ArrayList<>();
     List<Boolean> isIgnoreCase = new ArrayList<>();
@@ -71,28 +72,28 @@ public class SearchResultsStorage {
         currentGroupId++;
     }
 
-    public static String getSwfId(SWF swf) {
+    public static String getOpenableId(Openable swf) {
 
-        SWF s = swf;
+        Openable s = swf;
         String binaryDataSuffix = "";
 
-        while (s.binaryData != null) {
-            binaryDataSuffix += "|binaryData[" + s.binaryData.getCharacterId() + "]";
-            s = s.binaryData.getSwf();
+        while ((s instanceof SWF) && ((SWF)s).binaryData != null) {
+            binaryDataSuffix += "|binaryData[" + ((SWF)s).binaryData.getCharacterId() + "]";
+            s = ((SWF)s).binaryData.getSwf();
         }
 
-        if (s.swfList != null) {
+        if (s.getOpenableList() != null) {
             String fileInsideTitle = s.getFile() == null ? s.getFileTitle() : "";
             if (fileInsideTitle != null && !"".equals(fileInsideTitle)) {
                 fileInsideTitle = "|" + fileInsideTitle;
             }
-            return s.swfList.sourceInfo.getFile() + fileInsideTitle + binaryDataSuffix;
+            return s.getOpenableList().sourceInfo.getFile() + fileInsideTitle + binaryDataSuffix;
         }
         return "**NONE**";
     }
 
     public int getCount() {
-        return swfIds.size();
+        return openableIds.size();
     }
 
     public String getSearchedValueAt(int index) {
@@ -122,12 +123,12 @@ public class SearchResultsStorage {
         return false;
     }
 
-    public List<Integer> getIndicesForSwf(SWF swf) {
-        String swfId = getSwfId(swf);
+    public List<Integer> getIndicesForOpenable(Openable swf) {
+        String swfId = getOpenableId(swf);
         List<Integer> res = new ArrayList<>();
         Set<Integer> foundGroups = new LinkedHashSet<>();
-        for (int i = 0; i < swfIds.size(); i++) {
-            if (swfIds.get(i).equals(swfId)) {
+        for (int i = 0; i < openableIds.size(); i++) {
+            if (openableIds.get(i).equals(swfId)) {
                 foundGroups.add(groups.get(i));
             }
         }
@@ -135,29 +136,29 @@ public class SearchResultsStorage {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ScriptSearchResult> getSearchResultsAt(Set<SWF> allSwfs, int index) {
+    public List<ScriptSearchResult> getSearchResultsAt(Set<Openable> allOpenables, int index) {
         List<ScriptSearchResult> result = new ArrayList<>();
 
-        Map<String, SWF> swfIdToSwf = new HashMap<>();
-        for (SWF s : allSwfs) {
-            swfIdToSwf.put(getSwfId(s), s);
+        Map<String, Openable> openableIdToOpenable = new HashMap<>();
+        for (Openable o : allOpenables) {
+            openableIdToOpenable.put(getOpenableId(o), o);
         }
 
         for (int j = 0; j < data.size(); j++) {
             if (groups.get(j) == index) {
-                if (!swfIdToSwf.containsKey(swfIds.get(j))) {
+                if (!openableIdToOpenable.containsKey(openableIds.get(j))) {
                     continue;
                 }
                 if (unpackedData.get(j) != null) {
                     List<ScriptSearchResult> unpacked = unpackedData.get(j);
                     for (ScriptSearchResult sr : unpacked) {
-                        if (allSwfs.contains(sr.getSWF())) {
+                        if (allOpenables.contains(sr.getOpenable())) {
                             result.add(sr);
                         }
                     }
                     continue;
                 }
-                SWF swf = swfIdToSwf.get(swfIds.get(j));
+                Openable openable = openableIdToOpenable.get(openableIds.get(j));
                 byte[] itemData = data.get(j);
                 List<ScriptSearchResult> currentResults = new ArrayList<>();
                 try {
@@ -170,10 +171,10 @@ public class SearchResultsStorage {
                             ByteArrayInputStream bais = new ByteArrayInputStream(resultData.get(i));
 
                             if (kind == DATA_ABC) {
-                                currentResults.add(new ABCSearchResult(swf, bais));
+                                currentResults.add(new ABCSearchResult(openable, bais));
                             }
                             if (kind == DATA_ACTION) {
-                                currentResults.add(new ActionSearchResult(swf, bais));
+                                currentResults.add(new ActionSearchResult((SWF) openable, bais));
                             }
                         } catch (ScriptNotFoundException | IOException ex) {
                             ex.printStackTrace();
@@ -201,7 +202,7 @@ public class SearchResultsStorage {
                 if (major != SERIAL_VERSION_MAJOR) { //incompatible version
                     return;
                 }
-                swfIds = (List<String>) ois.readObject();
+                openableIds = (List<String>) ois.readObject();
                 searchedValues = (List<String>) ois.readObject();
                 isIgnoreCase = (List<Boolean>) ois.readObject();
                 isRegExp = (List<Boolean>) ois.readObject();
@@ -231,7 +232,7 @@ public class SearchResultsStorage {
                 ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.write(SERIAL_VERSION_MAJOR);
             oos.write(SERIAL_VERSION_MINOR);
-            oos.writeObject(swfIds);
+            oos.writeObject(openableIds);
             oos.writeObject(searchedValues);
             oos.writeObject(isIgnoreCase);
             oos.writeObject(isRegExp);
@@ -240,8 +241,8 @@ public class SearchResultsStorage {
         }
     }
 
-    public void addABCResults(SWF swf, String searchedString, boolean ignoreCase, boolean regExp, List<ABCSearchResult> results) {
-        swfIds.add(getSwfId(swf));
+    public void addABCResults(Openable openable, String searchedString, boolean ignoreCase, boolean regExp, List<ABCSearchResult> results) {
+        openableIds.add(getOpenableId(openable));
         searchedValues.add(searchedString);
         isIgnoreCase.add(ignoreCase);
         isRegExp.add(regExp);
@@ -268,7 +269,7 @@ public class SearchResultsStorage {
     }
 
     public void addActionResults(SWF swf, String searchedString, boolean ignoreCase, boolean regExp, List<ActionSearchResult> results) {
-        swfIds.add(getSwfId(swf));
+        openableIds.add(getOpenableId(swf));
         searchedValues.add(searchedString);
         isIgnoreCase.add(ignoreCase);
         isRegExp.add(regExp);
@@ -293,7 +294,7 @@ public class SearchResultsStorage {
     }
 
     public void clear() {
-        swfIds.clear();
+        openableIds.clear();
         searchedValues.clear();
         isIgnoreCase.clear();
         isRegExp.clear();
@@ -302,11 +303,11 @@ public class SearchResultsStorage {
         unpackedData.clear();
     }
 
-    public void clearForSwf(SWF swf) {
-        String swfId = getSwfId(swf);
-        for (int i = 0; i < swfIds.size(); i++) {
-            if (swfIds.get(i).equals(swfId)) {
-                swfIds.remove(i);
+    public void clearForOpenable(Openable openable) {
+        String swfId = getOpenableId(openable);
+        for (int i = 0; i < openableIds.size(); i++) {
+            if (openableIds.get(i).equals(swfId)) {
+                openableIds.remove(i);
                 searchedValues.remove(i);
                 isIgnoreCase.remove(i);
                 isRegExp.remove(i);
@@ -339,9 +340,9 @@ public class SearchResultsStorage {
     }
 
     public void destroySwf(SWF swf) {
-        String swfId = getSwfId(swf);
-        for (int i = 0; i < swfIds.size(); i++) {
-            if (swfIds.get(i).equals(swfId)) {
+        String swfId = getOpenableId(swf);
+        for (int i = 0; i < openableIds.size(); i++) {
+            if (openableIds.get(i).equals(swfId)) {
                 unpackedData.set(i, null);
             }
         }

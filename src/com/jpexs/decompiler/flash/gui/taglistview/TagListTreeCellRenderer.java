@@ -23,7 +23,7 @@ import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.Frame;
-import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -84,7 +84,7 @@ public class TagListTreeCellRenderer extends DefaultTreeCellRenderer {
             val = (TreeItem) value;
         }
 
-        if (val != null && !(val instanceof SWFList) && val.getSwf() == null) {
+        if (val != null && !(val instanceof OpenableList) && val.getOpenable()== null) {
             // SWF was closed
             value = null;
         }

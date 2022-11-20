@@ -39,6 +39,7 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
 import com.jpexs.decompiler.flash.tags.gfx.ExporterInfo;
 import com.jpexs.decompiler.flash.tags.gfx.FontTextureInfo;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.helpers.ByteArrayRange;
@@ -156,6 +157,10 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     }
 
     @Override
+    public Openable getOpenable() {
+        return swf;
+    }
+    
     public SWF getSwf() {
         return swf;
     }
@@ -648,6 +653,9 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
         for (int i = 0; i < needed3.size(); i++) {
             int characterId = needed3.get(i);
+            if (swf == null) {
+                return;
+            }
             if (swf.getCharacters().containsKey(characterId)) {
                 Set<Integer> needed4 = new LinkedHashSet<>();
                 CharacterTag character = swf.getCharacter(characterId);                
@@ -670,6 +678,9 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         }
 
         for (Integer characterId : needed3) {
+            if (swf == null) {
+                return;
+            }
             if (swf.getCharacters().containsKey(characterId)) {
                 needed.add(characterId);
             }

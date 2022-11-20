@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.tagtree;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.TreeNodeType;
@@ -45,12 +46,14 @@ import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
-import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreePath;
@@ -91,15 +94,17 @@ public class TagTreeModel extends AbstractTagTreeModel {
 
     private final TagTreeRoot root = new TagTreeRoot();
 
-    private final List<SWFList> swfs;
+    private final List<OpenableList> swfs;
 
     private final Map<SWF, TagTreeSwfInfo> swfInfos = new HashMap<>();
 
     private final boolean addAllFolders;
 
     private final Map<TreeItem, TreePath> pathCache = new HashMap<>();
+    
+    private final Map<ABC, ClassesListTreeModel> abcClassesTree = new WeakHashMap<>();
 
-    public TagTreeModel(List<SWFList> swfs, boolean addAllFolders) {
+    public TagTreeModel(List<OpenableList> swfs, boolean addAllFolders) {
         this.swfs = swfs;
         this.addAllFolders = addAllFolders;
         //Main.startWork(AppStrings.translate("work.buildingscripttree") + "...");
@@ -116,7 +121,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
             List<SWF> toRemove = new ArrayList<>();
             for (SWF swf : swfInfos.keySet()) {
                 SWF swf2 = swf.getRootSwf();
-                if (swf2 != null && !swfs.contains(swf2.swfList)) {
+                if (swf2 != null && !swfs.contains(swf2.openableList)) {
                     toRemove.add(swf);
                 }
             }
@@ -499,15 +504,15 @@ public class TagTreeModel extends AbstractTagTreeModel {
         }
 
         if (parentNode == root) {
-            for (SWFList swfList : swfs) {
+            for (OpenableList swfList : swfs) {
                 if (!swfList.isBundle()) {
                     result.add(swfList.get(0));
                 }
                 result.add(swfList);
             }
             return result;
-        } else if (parentNode instanceof SWFList) {
-            return ((SWFList) parentNode).swfs;
+        } else if (parentNode instanceof OpenableList) {
+            return ((OpenableList) parentNode).items;
         } else if (parentNode instanceof SWF) {
             return getSwfFolders((SWF) parentNode);
         } else if (parentNode instanceof FolderItem) {
@@ -535,7 +540,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
                 TreeItem item = result.get(i);
                 if (item instanceof Tag) {
                     Tag resultTag = (Tag) item;
-                    Map<Tag, TagScript> currentTagScriptCache = getTagScriptCache(item.getSwf());
+                    Map<Tag, TagScript> currentTagScriptCache = getTagScriptCache((SWF) item.getOpenable());
                     TagScript tagScript = currentTagScriptCache.get(resultTag);
                     if (tagScript == null) {
                         List<TreeItem> subNodes = new ArrayList<>();
@@ -544,7 +549,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
                                 subNodes.add(item2);
                             }
                         }
-                        tagScript = new TagScript(item.getSwf(), resultTag, subNodes);
+                        tagScript = new TagScript((SWF) item.getOpenable(), resultTag, subNodes);
                         currentTagScriptCache.put(resultTag, tagScript);
                     }
                     result.set(i, tagScript);
@@ -564,6 +569,9 @@ public class TagTreeModel extends AbstractTagTreeModel {
             }
         } else if (parentNode instanceof ButtonTag) {
             return ((ButtonTag) parentNode).getRecords();
+        } else if (parentNode instanceof ABC) {
+            ClassesListTreeModel classesTreeModel = getClassesListTreeModel((ABC) parentNode);
+            return classesTreeModel.getAllChildren(classesTreeModel.getRoot());
         }
 
         return result;
@@ -585,13 +593,13 @@ public class TagTreeModel extends AbstractTagTreeModel {
         }
 
         if (parentNode == root) {
-            SWFList swfList = swfs.get(index);
-            if (!swfList.isBundle()) {
-                return swfList.get(0);
+            OpenableList openableList = swfs.get(index);
+            if (!openableList.isBundle()) {
+                return openableList.get(0);
             }
-            return swfList;
-        } else if (parentNode instanceof SWFList) {
-            return ((SWFList) parentNode).swfs.get(index);
+            return openableList;
+        } else if (parentNode instanceof OpenableList) {
+            return ((OpenableList) parentNode).items.get(index);
         } else if (parentNode instanceof SWF) {
             return getSwfFolders((SWF) parentNode).get(index);
         } else if (parentNode instanceof FolderItem) {
@@ -615,7 +623,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
             }
             if (result instanceof Tag) {
                 Tag resultTag = (Tag) result;
-                Map<Tag, TagScript> currentTagScriptCache = getTagScriptCache(result.getSwf());
+                Map<Tag, TagScript> currentTagScriptCache = getTagScriptCache((SWF) result.getOpenable());
                 TagScript tagScript = currentTagScriptCache.get(resultTag);
                 if (tagScript == null) {
                     List<TreeItem> subNodes = new ArrayList<>();
@@ -624,7 +632,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
                             subNodes.add(item);
                         }
                     }
-                    tagScript = new TagScript(result.getSwf(), resultTag, subNodes);
+                    tagScript = new TagScript((SWF) result.getOpenable(), resultTag, subNodes);
                     currentTagScriptCache.put(resultTag, tagScript);
                 }
                 result = tagScript;
@@ -639,6 +647,9 @@ public class TagTreeModel extends AbstractTagTreeModel {
             return ((AS3Package) parentNode).getChild(index);
         } else if (parentNode instanceof ButtonTag) {
             return ((ButtonTag) parentNode).getRecords().get(index);
+        } else if (parentNode instanceof ABC) {
+            ClassesListTreeModel classesTreeModel = getClassesListTreeModel((ABC) parentNode);
+            return classesTreeModel.getChild(classesTreeModel.getRoot(), index);
         }
 
         throw new Error("Unsupported parent type: " + parentNode.getClass().getName());
@@ -653,8 +664,8 @@ public class TagTreeModel extends AbstractTagTreeModel {
         }
         if (parentNode == root) {
             return mappedSize + swfs.size();
-        } else if (parentNode instanceof SWFList) {
-            return mappedSize + ((SWFList) parentNode).swfs.size();
+        } else if (parentNode instanceof OpenableList) {
+            return mappedSize + ((OpenableList) parentNode).items.size();
         } else if (parentNode instanceof SWF) {
             return mappedSize + getSwfFolders((SWF) parentNode).size();
         } else if (parentNode instanceof HeaderItem) {
@@ -683,6 +694,9 @@ public class TagTreeModel extends AbstractTagTreeModel {
             return mappedSize + ((ButtonTag) parentNode).getRecords().size();
         } else if (parentNode instanceof CharacterTag) {
             return mappedSize;
+        } else if (parentNode instanceof ABC) {
+            ClassesListTreeModel classesTreeModel = getClassesListTreeModel((ABC) parentNode);
+            return classesTreeModel.getChildCount(classesTreeModel.getRoot());
         }
 
         return 0;
@@ -715,12 +729,12 @@ public class TagTreeModel extends AbstractTagTreeModel {
             baseIndex = mapped.size();
         }
         if (parentNode == root) {
-            SWFList swfList = child instanceof SWFList
-                    ? (SWFList) child
-                    : ((SWF) child).swfList;
-            return indexOfAdd(baseIndex, swfs.indexOf(swfList));
-        } else if (parentNode instanceof SWFList) {
-            return indexOfAdd(baseIndex, ((SWFList) parentNode).swfs.indexOf(childNode));
+            OpenableList openableList = child instanceof OpenableList
+                    ? (OpenableList) child
+                    : ((Openable) child).getOpenableList();
+            return indexOfAdd(baseIndex, swfs.indexOf(openableList));
+        } else if (parentNode instanceof OpenableList) {
+            return indexOfAdd(baseIndex, ((OpenableList) parentNode).items.indexOf(childNode));
         } else if (parentNode instanceof SWF) {
             return indexOfAdd(baseIndex, getSwfFolders((SWF) parentNode).indexOf(childNode));
         } else if (parentNode instanceof FolderItem) {
@@ -754,8 +768,21 @@ public class TagTreeModel extends AbstractTagTreeModel {
             return indexOfAdd(baseIndex, ((ButtonTag) parentNode).getRecords().indexOf(childNode));
         } else if (parentNode instanceof CharacterTag) {
             return indexOfAdd(baseIndex, getMappedCharacters(((CharacterTag) parentNode).getSwf(), (CharacterTag) parentNode).indexOf(childNode));
+        } else if (parentNode instanceof ABC) {
+            ClassesListTreeModel classesTreeModel = getClassesListTreeModel((ABC) parentNode);
+            return indexOfAdd(baseIndex, classesTreeModel.getIndexOfChild(classesTreeModel.getRoot(), childNode));
         }
 
         return -1;
+    }
+    
+    private ClassesListTreeModel getClassesListTreeModel(ABC abc) {
+        if (abcClassesTree.containsKey(abc)) {
+            return abcClassesTree.get(abc);
+        }
+        
+        ClassesListTreeModel model = new ClassesListTreeModel(abc, Configuration.flattenASPackages.get());
+        abcClassesTree.put(abc, model);
+        return model;
     }
 }

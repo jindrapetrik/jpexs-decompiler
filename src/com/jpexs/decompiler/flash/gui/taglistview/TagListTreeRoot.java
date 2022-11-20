@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.taglistview;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.gui.tagtree.TreeRoot;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 
 /**
@@ -27,7 +28,7 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 public class TagListTreeRoot implements TreeItem, TreeRoot{
        
     @Override
-    public SWF getSwf() {
+    public Openable getOpenable() {
         return null;
     }
 

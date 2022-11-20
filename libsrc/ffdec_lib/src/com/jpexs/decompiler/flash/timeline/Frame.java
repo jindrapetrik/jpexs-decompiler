@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.RGBA;
@@ -87,7 +88,7 @@ public class Frame implements TreeItem, Exportable {
     }
 
     @Override
-    public SWF getSwf() {
+    public Openable getOpenable() {
         return timeline.swf;
     }
 

@@ -31,7 +31,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class BinarySWFBundle implements SWFBundle {
+public class BinarySWFBundle implements Bundle {
 
     private final SWFSearch search;
 
@@ -55,7 +55,7 @@ public class BinarySWFBundle implements SWFBundle {
     }
 
     @Override
-    public SeekableInputStream getSWF(String key) {
+    public SeekableInputStream getOpenable(String key) {
         if (!key.startsWith("[")) {
             return null;
         }
@@ -75,7 +75,7 @@ public class BinarySWFBundle implements SWFBundle {
     public Map<String, SeekableInputStream> getAll() {
         Map<String, SeekableInputStream> ret = new LinkedHashMap<>();
         for (String key : getKeys()) {
-            ret.put(key, getSWF(key));
+            ret.put(key, getOpenable(key));
         }
         return ret;
     }
@@ -91,7 +91,7 @@ public class BinarySWFBundle implements SWFBundle {
     }
 
     @Override
-    public boolean putSWF(String key, InputStream is) {
+    public boolean putOpenable(String key, InputStream is) {
         throw new UnsupportedOperationException("Save not supported for this type of bundle");
     }
 }

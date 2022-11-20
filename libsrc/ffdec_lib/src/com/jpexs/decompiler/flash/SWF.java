@@ -140,7 +140,8 @@ import com.jpexs.decompiler.flash.timeline.FrameScript;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
-import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
@@ -212,7 +213,7 @@ import java.util.zip.InflaterInputStream;
  *
  * @author JPEXS
  */
-public final class SWF implements SWFContainerItem, Timelined {
+public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     /**
      * Default version of SWF file format
@@ -290,7 +291,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     public boolean gfx = false;
 
     @Internal
-    public SWFList swfList;
+    public OpenableList openableList;
 
     @Internal
     private String file;
@@ -456,8 +457,8 @@ public final class SWF implements SWFContainerItem, Timelined {
             abcList = null;
         }
 
-        if (swfList != null) {
-            swfList.swfs.clear();
+        if (openableList != null) {
+            openableList.items.clear();
         }
 
         clearScriptCache();
@@ -979,12 +980,13 @@ public final class SWF implements SWFContainerItem, Timelined {
      * @param os OutputStream to save SWF in
      * @throws IOException
      */
+    @Override
     public void saveTo(OutputStream os) throws IOException {
         checkCharset();
         byte[] uncompressedData = saveToByteArray();
         compress(new ByteArrayInputStream(uncompressedData), os, compression, lzmaProperties);
     }
-
+    
     public void saveTo(OutputStream os, boolean gfx) throws IOException {
         checkCharset();
         byte[] uncompressedData = saveToByteArray(gfx);
@@ -1186,6 +1188,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         isModified = value;
     }
 
+    @Override
     public void clearModified() {
         for (Tag tag : getTags()) {
             if (tag.isModified()) {
@@ -1501,7 +1504,7 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     @Override
-    public SWF getSwf() {
+    public SWF getOpenable() {
         return this;
     }
 
@@ -1514,6 +1517,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         return result;
     }
 
+    @Override
     public String getFile() {
         return file;
     }
@@ -1523,6 +1527,7 @@ public final class SWF implements SWFContainerItem, Timelined {
      *
      * @return file title
      */
+    @Override
     public String getFileTitle() {
         if (fileTitle != null) {
             return fileTitle;
@@ -1530,6 +1535,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         return file;
     }
 
+    @Override
     public String getTitleOrShortFileName() {
         if (fileTitle != null) {
             return fileTitle;
@@ -1537,6 +1543,7 @@ public final class SWF implements SWFContainerItem, Timelined {
         return new File(file).getName();
     }
 
+    @Override
     public String getShortFileName() {
         return new File(getTitleOrShortFileName()).getName();
     }
@@ -1547,13 +1554,14 @@ public final class SWF implements SWFContainerItem, Timelined {
      *
      * @return
      */
+    @Override
     public String getShortPathTitle() {
         if (binaryData != null) {
             return binaryData.getSwf().getShortPathTitle() + "/DefineBinaryData (" + binaryData.getCharacterId() + ")";
         }
-        if (swfList != null) {
-            if (swfList.isBundle()) {
-                return swfList.name + "/" + getTitleOrShortFileName();
+        if (openableList != null) {
+            if (openableList.isBundle()) {
+                return openableList.name + "/" + getTitleOrShortFileName();
             }
         }
         return getTitleOrShortFileName();
@@ -1565,18 +1573,20 @@ public final class SWF implements SWFContainerItem, Timelined {
      *
      * @return
      */
+    @Override
     public String getFullPathTitle() {
         if (binaryData != null) {
             return binaryData.getSwf().getFullPathTitle() + "/DefineBinaryData (" + binaryData.getCharacterId() + ")";
         }
-        if (swfList != null) {
-            if (swfList.isBundle()) {
-                return swfList.sourceInfo.getFileTitleOrName() + "/" + getFileTitle();
+        if (openableList != null) {
+            if (openableList.isBundle()) {
+                return openableList.sourceInfo.getFileTitleOrName() + "/" + getFileTitle();
             }
         }
         return getFileTitle();
     }
 
+    @Override
     public void setFile(String file) {
         this.file = file;
         fileTitle = null;
@@ -1584,8 +1594,8 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public Date getFileModificationDate() {
         try {
-            if (swfList != null && swfList.sourceInfo != null) {
-                String fileName = swfList.sourceInfo.getFile();
+            if (openableList != null && openableList.sourceInfo != null) {
+                String fileName = openableList.sourceInfo.getFile();
                 if (fileName != null) {
                     long lastModified = new File(fileName).lastModified();
                     if (lastModified > 0) {
@@ -2014,7 +2024,7 @@ public final class SWF implements SWFContainerItem, Timelined {
                 }
             }
 
-            TagScript tagScript = new TagScript(treeItem.getSwf(), resultTag, subNodes);
+            TagScript tagScript = new TagScript((SWF) treeItem.getOpenable(), resultTag, subNodes);
             return tagScript;
         }
 
@@ -2882,7 +2892,8 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public static void uncache(ScriptPack pack) {
         if (pack != null) {
-            SWF swf = pack.getSwf();
+            Openable openable = pack.getOpenable();
+            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
             if (swf != null) {
                 swf.as3Cache.remove(pack);
             }
@@ -2913,7 +2924,8 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public static boolean isCached(ScriptPack pack) {
         if (pack != null) {
-            SWF swf = pack.getSwf();
+            Openable openable = pack.getOpenable();
+            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
             if (swf != null) {
                 return swf.as3Cache.isCached(pack);
             }
@@ -2946,7 +2958,8 @@ public final class SWF implements SWFContainerItem, Timelined {
 
     public static HighlightedText getFromCache(ScriptPack pack) {
         if (pack != null) {
-            SWF swf = pack.getSwf();
+            Openable openable = pack.getOpenable();
+            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
             if (swf != null) {
                 return swf.as3Cache.get(pack);
             }
@@ -3006,7 +3019,8 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public static HighlightedText getCached(ScriptPack pack) throws InterruptedException {
-        SWF swf = pack.getSwf();
+        Openable openable = pack.getOpenable();
+        SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
         HighlightedText res;
         if (swf != null) {
             res = swf.as3Cache.get(pack);
@@ -3036,7 +3050,8 @@ public final class SWF implements SWFContainerItem, Timelined {
     }
 
     public static Future<HighlightedText> getCachedFuture(ScriptPack pack, ScriptDecompiledListener<HighlightedText> listener) throws InterruptedException {
-        SWF swf = pack.getSwf();
+        Openable openable = pack.getOpenable();
+        SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
         HighlightedText res;
         if (swf != null) {
             res = swf.as3Cache.get(pack);
@@ -3418,7 +3433,7 @@ public final class SWF implements SWFContainerItem, Timelined {
             return (DefineSpriteTag) treeItem;
         }
 
-        return treeItem.getSwf();
+        return (SWF) treeItem.getOpenable(); //??
     }
 
     public void packCharacterIds() {
@@ -4148,4 +4163,14 @@ public final class SWF implements SWFContainerItem, Timelined {
     public void setFrameCount(int frameCount) {
         this.frameCount = frameCount;
     }
+
+    @Override
+    public void setOpenableList(OpenableList openableList) {
+        this.openableList = openableList;
+    }
+
+    @Override
+    public OpenableList getOpenableList() {
+        return openableList;
+    }                        
 }

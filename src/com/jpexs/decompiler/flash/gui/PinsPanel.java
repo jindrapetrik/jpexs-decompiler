@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.tagtree.TreeRoot;
 import com.jpexs.decompiler.flash.timeline.TagScript;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -355,11 +356,11 @@ public class PinsPanel extends JPanel {
         rebuild();
     }
 
-    public void removeSwf(SWF swf) {
+    public void removeOpenable(Openable openable) {
         for (int i = 0; i < items.size(); i++) {
             TreeItem item = items.get(i);
-            SWF itemSwf = item.getSwf();
-            if (itemSwf == swf || itemSwf == null) {
+            Openable itemOpenable = item.getOpenable();
+            if (itemOpenable == openable || itemOpenable == null) {
 
                 String tagTreePath = mainPanel.tagTree.getItemPathString(item);
                 if (tagTreePath == null) {

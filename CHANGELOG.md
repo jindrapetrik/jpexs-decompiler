@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#1680] Pinning items
 - Indices in brackets for items with same name (like two subsequent DoAction tags)
 - Flattened ActionScript packages (one row per package instead package tree), can be turned off in settings
+- Opening ABC file format (*.abc)
 
 ### Fixed
 - [#1869] Replace references now replaces all references, not just PlaceObject

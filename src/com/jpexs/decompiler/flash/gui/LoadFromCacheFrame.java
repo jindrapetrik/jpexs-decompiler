@@ -19,7 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.browsers.cache.CacheEntry;
 import com.jpexs.browsers.cache.CacheImplementation;
 import com.jpexs.browsers.cache.CacheReader;
-import com.jpexs.decompiler.flash.SWFSourceInfo;
+import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReReadableInputStream;
@@ -226,7 +226,7 @@ public class LoadFromCacheFrame extends AppFrame {
         CacheEntry en = list.getSelectedValue();
         if (en != null) {
             ReReadableInputStream str = new ReReadableInputStream(en.getResponseDataStream());
-            SWFSourceInfo sourceInfo = new SWFSourceInfo(str, null, entryToFileName(en));
+            OpenableSourceInfo sourceInfo = new OpenableSourceInfo(str, null, entryToFileName(en));
             Main.openFile(sourceInfo);
         }
     }

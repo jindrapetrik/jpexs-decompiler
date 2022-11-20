@@ -247,7 +247,7 @@ public class PreviewExporter {
     }
 
     public SWFHeader exportSwf(OutputStream os, TreeItem treeItem, Color backgroundColor, int fontPageNum, boolean showControls) throws IOException, ActionParseException {
-        SWF swf = treeItem.getSwf();
+        SWF swf = (SWF) treeItem.getOpenable();
 
         int frameCount = 1;
         float frameRate = swf.frameRate;

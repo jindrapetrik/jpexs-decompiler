@@ -22,9 +22,8 @@ import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.SWFCompression;
-import com.jpexs.decompiler.flash.SWFSourceInfo;
+import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import com.jpexs.decompiler.flash.SearchMode;
 import com.jpexs.decompiler.flash.SwfOpenException;
 import com.jpexs.decompiler.flash.ValueTooLargeException;
@@ -147,7 +146,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
-import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
@@ -216,6 +215,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.jpexs.decompiler.flash.Bundle;
 
 /**
  *
@@ -2009,11 +2009,11 @@ public class CommandLineArgumentParser {
 
                 File[] files = new File(folder).listFiles(getSwfFilter());
                 for (File file : files) {
-                    SWFSourceInfo sourceInfo = new SWFSourceInfo(null, file.getAbsolutePath(), file.getName());
+                    OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, file.getAbsolutePath(), file.getName());
                     try {
                         SWF swf = new SWF(new FileInputStream(file), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get(), charset);
-                        swf.swfList = new SWFList();
-                        swf.swfList.sourceInfo = sourceInfo;
+                        swf.openableList = new OpenableList();
+                        swf.openableList.sourceInfo = sourceInfo;
                         boolean found = false;
                         for (Tag tag : swf.getTags()) {
                             if (tag.getId() == tagId) {
@@ -2051,11 +2051,11 @@ public class CommandLineArgumentParser {
 
                 File[] files = new File(folder).listFiles(getSwfFilter());
                 for (File file : files) {
-                    SWFSourceInfo sourceInfo = new SWFSourceInfo(null, file.getAbsolutePath(), file.getName());
+                    OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, file.getAbsolutePath(), file.getName());
                     try {
                         SWF swf = new SWF(new FileInputStream(file), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get(), charset);
-                        swf.swfList = new SWFList();
-                        swf.swfList.sourceInfo = sourceInfo;
+                        swf.openableList = new OpenableList();
+                        swf.openableList.sourceInfo = sourceInfo;
                         boolean found = false;
                         for (Tag tag : swf.getTags()) {
                             if (tag instanceof JPEGTablesTag) {
@@ -2231,7 +2231,7 @@ public class CommandLineArgumentParser {
                     System.out.println("Start exporting " + inFile.getName());
                 }
 
-                SWFSourceInfo sourceInfo = new SWFSourceInfo(null, inFile.getAbsolutePath(), inFile.getName());
+                OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, inFile.getAbsolutePath(), inFile.getName());
                 SWF swf;
                 try {
                     swf = new SWF(new StdInAwareFileInputStream(inFile), sourceInfo.getFile(), sourceInfo.getFileTitle(), Configuration.parallelSpeedUp.get(), charset);
@@ -2241,8 +2241,8 @@ public class CommandLineArgumentParser {
                     continue;
                 }
 
-                swf.swfList = new SWFList();
-                swf.swfList.sourceInfo = sourceInfo;
+                swf.openableList = new OpenableList();
+                swf.openableList.sourceInfo = sourceInfo;
                 String outDir = outDirBase.getAbsolutePath();
                 if (!singleFile) {
                     outDir = Path.combine(outDir, inFile.getName());
@@ -2705,12 +2705,12 @@ public class CommandLineArgumentParser {
         }
 
         try {
-            SWFSourceInfo sourceInfo = new SWFSourceInfo(null, fileName, null);
+            OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, fileName, null);
             if (!sourceInfo.isBundle()) {
                 System.err.println("Error: <infile> should be a bundle. (ZIP or non SWF binary file)");
                 System.exit(1);
             }
-            SWFBundle bundle = sourceInfo.getBundle(noCheck, mode);
+            Bundle bundle = sourceInfo.getBundle(noCheck, mode);
             List<Map.Entry<String, SeekableInputStream>> streamsToExtract = new ArrayList<>();
             for (Map.Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
                 InputStream stream = streamEntry.getValue();
@@ -3652,8 +3652,8 @@ public class CommandLineArgumentParser {
         boolean result = true;
         for (String fileName : fileNames) {
             try {
-                SWFSourceInfo sourceInfo = new SWFSourceInfo(null, fileName, null);
-                Main.parseSWF(sourceInfo);
+                OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, fileName, null);
+                Main.parseOpenable(sourceInfo);
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, null, ex);
                 result = false;
@@ -3816,12 +3816,12 @@ public class CommandLineArgumentParser {
                     detectBundle = false;
                     break;
                 default:
-                    SWFBundle bundle;
+                    Bundle bundle;
                     String sfile = a;
                     File file = new File(sfile);
                     try {
 
-                        SWFSourceInfo sourceInfo = new SWFSourceInfo(null, sfile, sfile, detectBundle);
+                        OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, sfile, sfile, detectBundle);
                         bundle = sourceInfo.getBundle(false, SearchMode.ALL);
                         logger.log(Level.INFO, "Load file: {0}", sourceInfo.getFile());
 
@@ -3977,8 +3977,8 @@ public class CommandLineArgumentParser {
         try {
             Configuration.dumpTags.set(true);
             Configuration.parallelSpeedUp.set(false);
-            SWFSourceInfo sourceInfo = new SWFSourceInfo(null, args.pop(), null);
-            Main.parseSWF(sourceInfo);
+            OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, args.pop(), null);
+            Main.parseOpenable(sourceInfo);
         } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
             System.exit(1);

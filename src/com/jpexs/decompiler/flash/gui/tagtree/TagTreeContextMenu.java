@@ -76,7 +76,8 @@ import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
-import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
@@ -529,7 +530,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         AbstractTagTree tree = getTree();
 
-        final List<SWFList> swfs = mainPanel.getSwfs();
+        final List<OpenableList> swfs = mainPanel.getSwfs();
 
         boolean canRemove = true;
         boolean allDoNotHaveDependencies = true;
@@ -659,13 +660,13 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         boolean allSelectedIsSwf = true;
         for (TreeItem item : items) {
-            if (!(item instanceof SWF) && !(item instanceof SWFList)) {
+            if (!(item instanceof SWF) && !(item instanceof OpenableList)) {
                 allSelectedIsSwf = false;
                 break;
             } else if (item instanceof SWF) {
                 SWF swf = (SWF) item;
                 // Do not allow to close SWF in bundle
-                if (swf.swfList != null && swf.swfList.isBundle()) {
+                if (swf.openableList != null && swf.openableList.isBundle()) {
                     allSelectedIsSwf = false;
                 }
             }
@@ -674,13 +675,19 @@ public class TagTreeContextMenu extends JPopupMenu {
         boolean allSelectedIsInTheSameSwf = true;
         SWF singleSwf = null;
         for (TreeItem item : items) {
-            if (item instanceof SWFList) {
+            if (item instanceof OpenableList) {
                 allSelectedIsInTheSameSwf = false;
                 break;
             }
             if (singleSwf == null) {
-                singleSwf = item.getSwf();
-            } else if (singleSwf != item.getSwf()) {
+                Openable singleOpenable = item.getOpenable();
+                if (singleOpenable instanceof SWF) {
+                    singleSwf = (SWF) singleOpenable;
+                } else {
+                    allSelectedIsInTheSameSwf = false;
+                    break;
+                }
+            } else if (singleSwf != item.getOpenable()) {
                 allSelectedIsInTheSameSwf = false;
                 break;
             }
@@ -933,12 +940,12 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
             if (firstItem instanceof SWF) {
                 SWF firstSwf = (SWF) firstItem;
-                if (firstSwf.swfList != null && !firstSwf.swfList.isBundle() && firstSwf.swfList.size() == 1) {
+                if (firstSwf.openableList != null && !firstSwf.openableList.isBundle() && firstSwf.openableList.size() == 1) {
                     moveUpMenuItem.setVisible(true);
                     moveDownMenuItem.setVisible(true);
                 }
             }
-            if (firstItem instanceof SWFList) {
+            if (firstItem instanceof OpenableList) {
                 moveUpMenuItem.setVisible(true);
                 moveDownMenuItem.setVisible(true);
             }
@@ -993,7 +1000,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             copyTagToWithDependenciesMenu.setVisible(true);
         }
         if (allSelectedIsInTheSameSwf && allSelectedIsTag && swfs.size() > 1) {
-            for (SWFList targetSwfList : swfs) {
+            for (OpenableList targetSwfList : swfs) {
                 if ((targetSwfList.size() == 1) && (targetSwfList.get(0) == singleSwf)) {
                     continue;
                 }
@@ -1238,7 +1245,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        SWF swf = item.getSwf();
+        SWF swf = (SWF) item.getOpenable();
         Timelined selectedTimelined = null;
         Tag selectedTag = null;
         boolean selectNext = false;
@@ -1251,7 +1258,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 selectedTag = frame.allInnerTags.get(frame.allInnerTags.size() - 1);
             }
         } else if (item instanceof FolderItem) {
-            selectedTimelined = item.getSwf();
+            selectedTimelined = (SWF) item.getOpenable();
         } else if (item instanceof SWF) {
             selectedTimelined = (SWF) item;
         }
@@ -1280,7 +1287,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void addTagBeforeActionPerformed(ActionEvent evt, TreeItem item, Class<?> cl) {
         try {
-            SWF swf = item.getSwf();
+            SWF swf = (SWF) item.getOpenable();
             Tag t = (Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf});
 
             Timelined timelined = null;
@@ -1319,7 +1326,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void addTagAfterActionPerformed(ActionEvent evt, TreeItem item, Class<?> cl) {
         try {
-            SWF swf = item.getSwf();
+            SWF swf = (SWF) item.getOpenable();
             Tag t = (Tag) cl.getDeclaredConstructor(SWF.class).newInstance(new Object[]{swf});
 
             Timelined timelined = null;
@@ -1438,7 +1445,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             return;
         }
 
-        SWF swf = itemr.getSwf();
+        SWF swf = (SWF) itemr.getOpenable();
         CharacterTag characterTag = (CharacterTag) itemr;
         int characterId = characterTag.getCharacterId();
         ReplaceCharacterDialog replaceCharacterDialog = new ReplaceCharacterDialog(Main.getDefaultDialogsOwner());
@@ -1455,7 +1462,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             return;
         }
 
-        SWF swf = itemr.getSwf();
+        SWF swf = (SWF) itemr.getOpenable();
         CharacterTag characterTag = (CharacterTag) itemr;
         int characterId = characterTag.getCharacterId();
         ReplaceCharacterDialog replaceCharacterDialog = new ReplaceCharacterDialog(Main.getDefaultDialogsOwner());
@@ -1515,7 +1522,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
 
         HasCharacterId hasCharacterId = (HasCharacterId) itemj;
-        mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), itemj.getSwf().getCharacter(hasCharacterId.getCharacterId()));
+        mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), ((SWF) itemj.getOpenable()).getCharacter(hasCharacterId.getCharacterId()));
     }
 
     private void expandRecursiveActionPerformed(ActionEvent evt) {
@@ -1540,11 +1547,21 @@ public class TagTreeContextMenu extends JPopupMenu {
             String preselected = "";
             if (sel.get(0) instanceof ClassesListTreeModel) {
                 ClassesListTreeModel cl = (ClassesListTreeModel) sel.get(0);
-                swf = cl.getSwf();
+                Openable openable = cl.getOpenable();
+                if (openable instanceof SWF) {
+                    swf = (SWF) openable;
+                } else {
+                    swf = ((ABC)openable).getSwf();
+                }
             }
             if (sel.get(0) instanceof AS3Package) {
                 AS3Package pkg = (AS3Package) sel.get(0);
-                swf = pkg.getSwf();
+                Openable openable = pkg.getOpenable();
+                if (openable instanceof SWF) {
+                    swf = (SWF) openable;
+                } else {
+                    swf = ((ABC)openable).getSwf();
+                }
                 TreePath tp = tree.getSelectionPaths()[0];
                 Object[] path = tp.getPath();
                 for (int p = path.length - 1; p >= 0; p--) {
@@ -1649,7 +1666,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (sel.get(0) instanceof FolderItem) {
 
                 FolderItem folder = (FolderItem) sel.get(0);
-                SWF swf = folder.getSwf();
+                SWF swf = (SWF) folder.getOpenable();
 
                 AddScriptDialog addScriptDialog = new AddScriptDialog(Main.getDefaultDialogsOwner(), swf);
                 if (addScriptDialog.showDialog() == JOptionPane.OK_OPTION) {
@@ -2275,8 +2292,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                                 ScriptPack sp = (ScriptPack) item;
                                 sp.delete(sp.abc, true);
                                 abcsToPack.add(sp.abc);
-                                swfsToClearCache.add(sp.getSwf());
-                                for (ABCContainerTag ct : sp.getSwf().getAbcList()) {
+                                Openable openable = sp.getOpenable();
+                                SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
+                                swfsToClearCache.add(swf);
+                                for (ABCContainerTag ct : swf.getAbcList()) {
                                     if (ct.getABC() == sp.abc) {
                                         ((Tag) ct).setModified(true);
                                         break;
@@ -2377,10 +2396,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                     swf.clearTagSwfs();
                     mainPanel.refreshTree();
                 } else {
-                    Main.closeFile(swf.swfList);
+                    Main.closeFile(swf.openableList);
                 }
-            } else if (item instanceof SWFList) {
-                Main.closeFile((SWFList) item);
+            } else if (item instanceof OpenableList) {
+                Main.closeFile((OpenableList) item);
             }
         }
     }
@@ -2394,7 +2413,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         try {
             for (TreeItem item : items) {
-                SWF swf = item.getSwf();
+                SWF swf = (SWF)item.getOpenable();
                 swfs.add(swf);
 
                 if (item instanceof Tag) {
@@ -2591,7 +2610,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             frame = (Frame) item;
             timelined = frame.timeline.timelined;
         } else if (item instanceof FolderItem) { //frames folder
-            timelined = item.getSwf();
+            timelined = (SWF) item.getOpenable();
         } else {
             timelined = (Timelined) item;
         }
@@ -2646,16 +2665,18 @@ public class TagTreeContextMenu extends JPopupMenu {
         addFrames(false); //this works because timeline is selected, no frame
     }
 
-    private void addCopyMoveToMenusSwfList(int kind, SWF singleSwf, SWFList targetSwfList, JMenuItem menu, List<TreeItem> items) {
+    private void addCopyMoveToMenusSwfList(int kind, SWF singleSwf, OpenableList targetSwfList, JMenuItem menu, List<TreeItem> items) {
         if (targetSwfList.isBundle()) {
             JMenu bundleMenu = new JMenu(targetSwfList.name);
             bundleMenu.setIcon(AbstractTagTree.getIconForType(AbstractTagTree.getTreeNodeType(targetSwfList)));
             menu.add(bundleMenu);
             menu = bundleMenu;
         }
-        for (final SWF targetSwf : targetSwfList) {
-            if (targetSwf != singleSwf) {
-                addCopyMoveToMenus(kind, menu, items, targetSwf.getShortFileName(), targetSwf);
+        for (final Openable targetOpenable : targetSwfList) {
+            if (targetOpenable instanceof SWF) {
+                if (targetOpenable != singleSwf) {
+                    addCopyMoveToMenus(kind, menu, items, targetOpenable.getShortFileName(), (SWF) targetOpenable);
+                }
             }
         }
     }
@@ -2728,7 +2749,11 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private Set<TreeItem> getDependenciesSet(List<TreeItem> items) {
-        SWF sourceSwf = items.get(0).getSwf();
+        Openable sourceOpenable = items.get(0).getOpenable();
+        if (sourceOpenable instanceof ABC) {
+            return new LinkedHashSet<>();
+        }
+        SWF sourceSwf = (SWF) items.get(0).getOpenable();
         Set<TreeItem> newItems = new LinkedHashSet<>();
         for (TreeItem item : items) {
             Set<Integer> needed = new LinkedHashSet<>();
@@ -2966,32 +2991,33 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     public void importScriptsActionPerformed(ActionEvent evt) {
-        SWF swf = getTree().getCurrentTreeItem().getSwf();
+        Openable openable = getTree().getCurrentTreeItem().getOpenable();
+        SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
         mainPanel.importScript(swf);
     }
 
     public void importTextsActionPerformed(ActionEvent evt) {
-        SWF swf = getTree().getCurrentTreeItem().getSwf();
+        SWF swf = (SWF) getTree().getCurrentTreeItem().getOpenable();
         mainPanel.importText(swf);
     }
 
     public void importImagesActionPerformed(ActionEvent evt) {
-        SWF swf = getTree().getCurrentTreeItem().getSwf();
+        SWF swf = (SWF) getTree().getCurrentTreeItem().getOpenable();
         mainPanel.importImage(swf);
     }
 
     public void importShapesActionPerformed(ActionEvent evt) {
-        SWF swf = getTree().getCurrentTreeItem().getSwf();
+        SWF swf = (SWF) getTree().getCurrentTreeItem().getOpenable();
         mainPanel.importShape(swf, false);
     }
 
     public void importShapesNoFillActionPerformed(ActionEvent evt) {
-        SWF swf = getTree().getCurrentTreeItem().getSwf();
+        SWF swf = (SWF) getTree().getCurrentTreeItem().getOpenable();
         mainPanel.importShape(swf, true);
     }
 
     public void importSymbolClassActionPerformed(ActionEvent evt) {
-        SWF swf = getTree().getCurrentTreeItem().getSwf();
+        SWF swf = (SWF) getTree().getCurrentTreeItem().getOpenable();
         mainPanel.importSymbolClass(swf);
     }
 
@@ -3004,7 +3030,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     public void moveUpDown(TreeItem item, boolean up) {
-        if ((item instanceof SWF) || (item instanceof SWFList)) {
+        if ((item instanceof SWF) || (item instanceof OpenableList)) {
             mainPanel.moveSwfListUpDown(item, up);
             return;
         }
@@ -3080,6 +3106,6 @@ public class TagTreeContextMenu extends JPopupMenu {
         while (item.binaryData != null) {
             item = item.binaryData.getSwf();
         }
-        Main.reloadFile(item.swfList);
+        Main.reloadFile(item.openableList);
     }
 }

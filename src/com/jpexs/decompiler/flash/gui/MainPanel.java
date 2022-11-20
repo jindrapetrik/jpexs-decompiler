@@ -22,8 +22,7 @@ import com.jpexs.decompiler.flash.DecompilerPool;
 import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFBundle;
-import com.jpexs.decompiler.flash.SWFSourceInfo;
+import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -170,7 +169,7 @@ import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
-import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
@@ -281,6 +280,8 @@ import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.DefaultTreeSelectionModel;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
+import com.jpexs.decompiler.flash.Bundle;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 
 /**
  *
@@ -290,7 +291,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private final MainFrame mainFrame;
 
-    private final ObservableList<SWFList> swfs;
+    private final ObservableList<OpenableList> openables;
 
     private final JPanel welcomePanel;
 
@@ -451,20 +452,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void moveSwfListUpDown(TreeItem item, boolean up) {
-        SWFList swfList = null;
+        OpenableList swfList = null;
         if (item instanceof SWF) {
             SWF swf = (SWF) item;
-            if (swf.swfList != null && !swf.swfList.isBundle() && swf.swfList.size() == 1) {
-                swfList = swf.swfList;
+            if (swf.openableList != null && !swf.openableList.isBundle() && swf.openableList.size() == 1) {
+                swfList = swf.openableList;
             } else {
                 return;
             }
-        } else if (item instanceof SWFList) {
-            swfList = (SWFList) item;
+        } else if (item instanceof OpenableList) {
+            swfList = (OpenableList) item;
         } else {
             return;
         }
-        int index = swfs.indexOf(swfList);
+        int index = openables.indexOf(swfList);
 
         List<List<String>> expandedTagTree = View.getExpandedNodes(tagTree);
         List<List<String>> expandedTagListTree = View.getExpandedNodes(tagListTree);
@@ -473,12 +474,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (index <= 0) {
                 return;
             }
-            swfs.move(index, index - 1);
+            openables.move(index, index - 1);
         } else {
-            if (index < 0 || index >= swfs.size() - 1) {
+            if (index < 0 || index >= openables.size() - 1) {
                 return;
             }
-            swfs.move(index, index + 2);
+            openables.move(index, index + 2);
         }
         View.expandTreeNodes(tagTree, expandedTagTree);
         View.expandTreeNodes(tagListTree, expandedTagListTree);
@@ -552,7 +553,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             WeakReference<TreeItem> ref = orderedClipboard.get(i);
             TreeItem item = ref.get();
             if (item != null) {
-                if (item.getSwf() == null) {
+                if (item.getOpenable() == null) {
                     orderedClipboard.remove(i);
                     clipboard.remove(item);
                 }
@@ -836,7 +837,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         mainFrame.setTitle(ApplicationInfo.applicationVerName);
 
         setLayout(new BorderLayout());
-        swfs = new ObservableList<>();
+        openables = new ObservableList<>();
 
         detailPanel = new JPanel();
         detailPanel.setLayout(new CardLayout());
@@ -1107,7 +1108,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         updateUi();
 
-        this.swfs.addCollectionChangedListener((e) -> {
+        this.openables.addCollectionChangedListener((e) -> {
             AbstractTagTreeModel ttm = tagTree.getModel();
             if (ttm != null) {
                 if (getCurrentSwf() == null) {
@@ -1119,8 +1120,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (e.getAction() == CollectionChangedAction.RESET) {
                         tagTree.expandFirstLevelNodes();
                     } else if (e.getAction() == CollectionChangedAction.ADD) {
-                        SWFList list = e.getNewItem();
-                        if (!list.isBundle() && list.swfs.size() == 1) {
+                        OpenableList list = e.getNewItem();
+                        if (!list.isBundle() && list.items.size() == 1) {
                             tagTree.expandPath(tagTree.getModel().getTreePath(list.get(0)));
                         } else {
                             tagTree.expandPath(tagTree.getModel().getTreePath(e.getNewItem()));
@@ -1140,8 +1141,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (e.getAction() == CollectionChangedAction.RESET) {
                         tagListTree.expandFirstLevelNodes();
                     } else if (e.getAction() == CollectionChangedAction.ADD) {
-                        SWFList list = e.getNewItem();
-                        if (!list.isBundle() && list.swfs.size() == 1) {
+                        OpenableList list = e.getNewItem();
+                        if (!list.isBundle() && list.items.size() == 1) {
                             tagListTree.expandPath(tagListTree.getModel().getTreePath(list.get(0)));
                         } else {
                             tagListTree.expandPath(tagListTree.getModel().getTreePath(e.getNewItem()));
@@ -1160,15 +1161,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (e.getAction() == CollectionChangedAction.RESET) {
                         dumpTree.expandFirstLevelNodes();
                     } else if (e.getAction() == CollectionChangedAction.ADD) {
-                        SWFList list = e.getNewItem();
-                        for (SWF dswf : list) {
-                            dumpTree.expandSwfNode(dswf);
+                        OpenableList list = e.getNewItem();
+                        for (Openable dopenable : list) {
+                            if (dopenable instanceof SWF) {
+                                dumpTree.expandSwfNode((SWF) dopenable);
+                            }
                         }
                     }
                 }
             }
 
-            if (swfs.isEmpty()) {
+            if (openables.isEmpty()) {
                 tagTree.setUI(new BasicTreeUI() {
                     {
                         setHashColor(Color.gray);
@@ -1211,12 +1214,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void resetAllTimelines() {
-        List<SWFList> swfsLists = new ArrayList<>(swfs);
+        List<OpenableList> openableLists = new ArrayList<>(openables);
         List<SWF> allSwfs = new ArrayList<>();
-        for (SWFList swfList : swfsLists) {
-            allSwfs.addAll(swfList);
-            for (SWF swf : swfList) {
-                Main.populateSwfs(swf, allSwfs);
+        for (OpenableList openableList : openableLists) {
+            for (Openable openable : openableList) {
+                if (openable instanceof SWF) {
+                    allSwfs.add((SWF) openable);
+                }
+            }
+            for (Openable openable : openableList) {
+                if (openable instanceof SWF) {
+                    Main.populateSwfs((SWF) openable, allSwfs);
+                }
             }
         }
         for (SWF swf : allSwfs) {
@@ -1224,28 +1233,30 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
     
-    public void loadSwfAtPos(SWFList newSwfs, int index) {
+    public void loadSwfAtPos(OpenableList newSwfs, int index) {
         View.checkAccess();
 
-        SWFList oldSwfList = swfs.get(index);
+        OpenableList oldSwfList = openables.get(index);
 
         List<SWF> allSwfs = new ArrayList<>();
-        for (SWF s : oldSwfList.swfs) {
-            allSwfs.add(s);
-            Main.populateSwfs(s, allSwfs);
+        for (Openable o : oldSwfList.items) {
+            if (o instanceof SWF) {
+                allSwfs.add((SWF) o);
+                Main.populateSwfs((SWF) o, allSwfs);
+            }            
         }
 
         List<List<String>> expandedNodes = View.getExpandedNodes(tagTree);
         previewPanel.clear();
-        swfs.set(index, newSwfs);
+        openables.set(index, newSwfs);
 
         for (SWF s : allSwfs) {
             s.clearTagSwfs();
             Main.searchResultsStorage.destroySwf(s);
         }
-        SWF swf = newSwfs.size() > 0 ? newSwfs.get(0) : null;
-        if (swf != null) {
-            updateUi(swf);
+        Openable openable = newSwfs.size() > 0 ? newSwfs.get(0) : null;
+        if (openable != null) {
+            updateUi(openable);
         }
 
         gcClipboard();
@@ -1255,16 +1266,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         pinsPanel.load();
     }
 
-    public void load(SWFList newSwfs, boolean first) {
+    public void load(OpenableList newOpenables, boolean first) {
         View.checkAccess();
 
         List<List<String>> expandedNodes = View.getExpandedNodes(getCurrentTree());
         previewPanel.clear();
 
-        swfs.add(newSwfs);
-        SWF swf = newSwfs.size() > 0 ? newSwfs.get(0) : null;
-        if (swf != null) {
-            updateUi(swf);
+        openables.add(newOpenables);
+        Openable openable = newOpenables.size() > 0 ? newOpenables.get(0) : null;
+        if (openable != null) {
+            updateUi(openable);
         }
 
         gcClipboard();
@@ -1294,35 +1305,38 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return actionPanel;
     }
 
-    private void updateUi(final SWF swf) {
+    private void updateUi(final Openable openable) {
         View.checkAccess();
-
-        List<ABCContainerTag> abcList = swf.getAbcList();
-
-        boolean hasAbc = !abcList.isEmpty();
-
-        if (hasAbc) {
-            getABCPanel().setAbc(abcList.get(0).getABC());
-        }
 
         if (isWelcomeScreen) {
             showContentPanelCard(SPLIT_PANE1);
             isWelcomeScreen = false;
         }
+        SWF swf = null;
+        if (openable instanceof SWF) {
+            swf = (SWF) openable;        
+            List<ABCContainerTag> abcList = swf.getAbcList();
 
-        mainMenu.updateComponents(swf);
+            boolean hasAbc = !abcList.isEmpty();
+
+            if (hasAbc) {
+                getABCPanel().setAbc(abcList.get(0).getABC());
+            }            
+        }    
+        mainMenu.updateComponents(openable);
 
         if (taskThread != null) {
             taskThread.interrupt();
         }
 
-        if (Configuration._debugMode.get()) {
+        if (Configuration._debugMode.get() && swf != null) {
+            final SWF fSwf = swf;
             Thread t = new Thread() {
                 @Override
                 public void run() {
                     while (!Thread.currentThread().isInterrupted()) {
-                        DecompilerPool d = swf.getDecompilerPool();
-                        statusPanel.setStatus(swf.getFileTitle() + " " + d.getStat());
+                        DecompilerPool d = fSwf.getDecompilerPool();
+                        statusPanel.setStatus(fSwf.getFileTitle() + " " + d.getStat());
 
                         try {
                             Thread.sleep(100);
@@ -1341,7 +1355,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private void updateUi() {
         View.checkAccess();
 
-        if (!isWelcomeScreen && swfs.isEmpty()) {
+        if (!isWelcomeScreen && openables.isEmpty()) {
             showContentPanelCard(WELCOME_PANEL);
             isWelcomeScreen = true;
             closeTagTreeSearch();
@@ -1353,7 +1367,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         showView(getCurrentView());
     }
 
-    private boolean closeConfirmation(SWFList swfList) {
+    private boolean closeConfirmation(OpenableList swfList) {
         View.checkAccess();
 
         String message = swfList == null
@@ -1364,9 +1378,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public boolean isModified() {
-        for (SWFList swfList : swfs) {
-            for (SWF swf : swfList) {
-                if (swf.isModified()) {
+        for (OpenableList openableList : openables) {
+            for (Openable openable : openableList) {
+                if (openable.isModified()) {
                     return true;
                 }
             }
@@ -1379,7 +1393,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         View.checkAccess();
 
         if (showCloseConfirmation && isModified()) {
-            boolean closeConfirmResult = closeConfirmation(swfs.size() == 1 ? swfs.get(0) : null);
+            boolean closeConfirmResult = closeConfirmation(openables.size() == 1 ? openables.get(0) : null);
             if (!closeConfirmResult) {
                 return false;
             }
@@ -1387,23 +1401,29 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         
         clearPins();
 
-        List<SWFList> swfsLists = new ArrayList<>(swfs);
+        List<OpenableList> swfsLists = new ArrayList<>(openables);
 
         for (SearchResultsDialog sr : searchResultsDialogs) {
             sr.setVisible(false);
         }
         searchResultsDialogs.clear();
 
-        swfs.clear();
+        openables.clear();
         oldItem = null;
         clear();
         updateUi();
 
         List<SWF> swfsToClose = new ArrayList<>();
-        for (SWFList swfList : swfsLists) {
-            swfsToClose.addAll(swfList);
-            for (SWF swf : swfList) {
-                Main.populateSwfs(swf, swfsToClose);
+        for (OpenableList openableList : swfsLists) {
+            for (Openable openable : openableList) {
+                if (openable instanceof SWF) {
+                    swfsToClose.add((SWF) openable);
+                }
+            }
+            for (Openable openable : openableList) {
+                if (openable instanceof SWF) {
+                    Main.populateSwfs((SWF) openable, swfsToClose);
+                }
             }
         }
 
@@ -1420,27 +1440,33 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return true;
     }
 
-    public boolean close(SWFList swfList) {
+    public boolean close(OpenableList openableList) {
         View.checkAccess();
 
         boolean modified = false;
-        for (SWF swf : swfList) {
-            if (swf.isModified()) {
+        for (Openable openable : openableList) {
+            if (openable.isModified()) {
                 modified = true;
             }
         }
 
         if (modified) {
-            boolean closeConfirmResult = closeConfirmation(swfList);
+            boolean closeConfirmResult = closeConfirmation(openableList);
             if (!closeConfirmResult) {
                 return false;
             }
         }
 
         List<SWF> swfsToClose = new ArrayList<>();
-        swfsToClose.addAll(swfList);
-        for (SWF swf : swfList) {
-            Main.populateSwfs(swf, swfsToClose);
+        for (Openable openable : openableList) {
+            if (openable instanceof SWF) {
+                swfsToClose.add((SWF) openable);
+            }
+        }
+        for (Openable openable : openableList) {
+            if (openable instanceof SWF) {
+                Main.populateSwfs((SWF) openable, swfsToClose);
+            }
         }
 
         for (int i = 0; i < searchResultsDialogs.size(); i++) {
@@ -1456,10 +1482,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         for (SWF swf : swfsToClose) {
             Main.searchResultsStorage.destroySwf(swf);
-            pinsPanel.removeSwf(swf);
+            pinsPanel.removeOpenable(swf);
         }
 
-        swfs.remove(swfList);
+        openables.remove(openableList);
         oldItem = null;
         clear();
         updateUi();
@@ -1488,9 +1514,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         @SuppressWarnings("unchecked")
                         List<File> droppedFiles = (List<File>) dtde.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
                         if (!droppedFiles.isEmpty()) {
-                            SWFSourceInfo[] sourceInfos = new SWFSourceInfo[droppedFiles.size()];
+                            OpenableSourceInfo[] sourceInfos = new OpenableSourceInfo[droppedFiles.size()];
                             for (int i = 0; i < droppedFiles.size(); i++) {
-                                sourceInfos[i] = new SWFSourceInfo(null, droppedFiles.get(i).getAbsolutePath(), null);
+                                sourceInfos[i] = new OpenableSourceInfo(null, droppedFiles.get(i).getAbsolutePath(), null);
                             }
                             Main.openFile(sourceInfos, null);
                         }
@@ -1604,7 +1630,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         for (int i = 0; i < tm.getChildCount(root); i++) {
             // first level node can be SWF and SWFBundle
             TreeItem node = tm.getChild(root, i);
-            if (node instanceof SWFBundle) {
+            if (node instanceof Bundle) {
                 for (int j = 0; j < tm.getChildCount(node); j++) {
                     // child of SWFBundle should be SWF
                     SWF swfNode = (SWF) tm.getChild(node, j);
@@ -1638,16 +1664,23 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         List<File> ret = new ArrayList<>();
         List<TreeItem> sel = getSelection(null);
 
-        Set<SWF> usedSwfs = new HashSet<>();
+        Set<Openable> usedOpenables = new HashSet<>();
         for (TreeItem d : sel) {
-            SWF selectedNodeSwf = d.getSwf();
-            if (!usedSwfs.contains(selectedNodeSwf)) {
-                usedSwfs.add(selectedNodeSwf);
+            Openable selectedNodeOpenable = d.getOpenable();
+            if (!usedOpenables.contains(selectedNodeOpenable)) {
+                usedOpenables.add(selectedNodeOpenable);
             }
         }
 
         Map<String, Integer> usedSwfsIds = new HashMap<>();
-        for (SWF swf : usedSwfs) {
+        for (Openable openable : usedOpenables) {
+            
+            SWF swf = null;
+            if (openable instanceof SWF) {
+                swf = (SWF) openable;
+            } else {
+                swf = ((ABC)openable).getSwf();
+            }
             List<ScriptPack> as3scripts = new ArrayList<>();
             List<Tag> images = new ArrayList<>();
             List<Tag> shapes = new ArrayList<>();
@@ -1664,9 +1697,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             List<Tag> symbolNames = new ArrayList<>();
 
             for (TreeItem d : sel) {
-                SWF selectedNodeSwf = d.getSwf();
+                Openable selectedNodeSwf = d.getOpenable();
 
-                if (selectedNodeSwf != swf) {
+                if (selectedNodeSwf != openable) {
                     continue;
                 }
 
@@ -1749,8 +1782,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             String selFile2;
-            if (usedSwfs.size() > 1) {
-                selFile2 = selFile + File.separator + Helper.getNextId(swf.getTitleOrShortFileName(), usedSwfsIds);
+            if (usedOpenables.size() > 1) {
+                selFile2 = selFile + File.separator + Helper.getNextId(openable.getTitleOrShortFileName(), usedSwfsIds);
             } else {
                 selFile2 = selFile;
             }
@@ -1844,7 +1877,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
 
                     ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), singleScriptFile, false);
-                    String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
+                    String singleFileName = Path.combine(scriptsFolder, openable.getShortFileName() + scriptExportSettings.getFileExtension());
                     try ( FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                         scriptExportSettings.singleFileWriter = writer;
                         if (swf.isAS3()) {
@@ -2077,31 +2110,31 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public List<SWFList> getSwfs() {
-        return swfs;
+    public List<OpenableList> getSwfs() {
+        return openables;
     }
 
-    public SWFList getCurrentSwfList() {
+    public OpenableList getCurrentSwfList() {
         SWF swf = getCurrentSwf();
         if (swf == null) {
             return null;
         }
 
-        return swf.swfList;
+        return swf.openableList;
     }
 
-    public SWF getCurrentSwf() {
-        if (swfs == null || swfs.isEmpty()) {
+    public Openable getCurrentOpenable() {
+        if (openables == null || openables.isEmpty()) {
             return null;
         }
 
         if (treePanelMode == TreePanelMode.TAG_TREE) {
             TreeItem treeNode = (TreeItem) tagTree.getLastSelectedPathComponent();
-            if (treeNode == null || treeNode instanceof SWFList) {
+            if (treeNode == null || treeNode instanceof OpenableList) {
                 return null;
             }
 
-            return treeNode.getSwf();
+            return treeNode.getOpenable();
         } else if (treePanelMode == TreePanelMode.DUMP_TREE) {
             DumpInfo dumpInfo = (DumpInfo) dumpTree.getLastSelectedPathComponent();
 
@@ -2109,16 +2142,24 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 return null;
             }
 
-            return DumpInfoSwfNode.getSwfNode(dumpInfo).getSwf();
+            return DumpInfoSwfNode.getSwfNode(dumpInfo).getOpenable();
         } else if (treePanelMode == TreePanelMode.TAGLIST_TREE) {
             TreeItem treeNode = (TreeItem) tagListTree.getLastSelectedPathComponent();
-            if (treeNode == null || treeNode instanceof SWFList) {
+            if (treeNode == null || treeNode instanceof OpenableList) {
                 return null;
             }
 
-            return treeNode.getSwf();
+            return treeNode.getOpenable();
         }
 
+        return null;
+    }
+    
+    public SWF getCurrentSwf() {
+        Openable openable = getCurrentOpenable();
+        if (openable instanceof SWF) {
+            return (SWF) openable;
+        }
         return null;
     }
 
@@ -2141,7 +2182,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         if (treeItem instanceof Timelined) {
             Timelined t = (Timelined) treeItem;
-            Frame f = tagTree.getModel().getFrame(treeItem.getSwf(), t, frame);
+            Frame f = tagTree.getModel().getFrame((SWF)treeItem.getOpenable(), t, frame);
             if (f != null) {
                 setTagTreeSelectedNode(getCurrentTree(), f);
             }
@@ -2270,24 +2311,45 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private void clearAllScriptCache() {
-        for (SWFList swfList : swfs) {
-            for (SWF swf : swfList) {
-                swf.clearScriptCache();
+        for (OpenableList openableList : openables) {
+            for (Openable openable : openableList) {
+                if (openable instanceof SWF) {
+                    ((SWF) openable).clearScriptCache();
+                }
             }
         }
     }
 
     public Set<SWF> getAllSwfs() {
         List<SWF> allSwfs = new ArrayList<>();
-        for (SWFList slist : getSwfs()) {
-            for (SWF s : slist.swfs) {
-                allSwfs.add(s);
-                Main.populateSwfs(s, allSwfs);
+        for (OpenableList slist : getSwfs()) {
+            for (Openable o : slist.items) {
+                if (o instanceof SWF) {
+                    allSwfs.add((SWF) o);
+                    Main.populateSwfs((SWF) o, allSwfs);
+                }
             }
         }
         return new LinkedHashSet<>(allSwfs);
     }
 
+    public Set<Openable> getAllOpenablesAndSwfs() {
+        List<Openable> allOpenables = new ArrayList<>();
+        for (OpenableList slist : getSwfs()) {
+            for (Openable o : slist.items) {
+                allOpenables.add((SWF) o);
+                if (o instanceof SWF) {            
+                    List<SWF> subSwfs = new ArrayList<>();
+                    Main.populateSwfs((SWF) o, subSwfs);
+                    for (SWF swf : subSwfs) {
+                        allOpenables.add(swf);
+                    }
+                }
+            }
+        }
+        return new LinkedHashSet<>(allOpenables);
+    }
+    
     private List<TreeItem> getAllSelected() {
         if (currentView == VIEW_RESOURCES) {
             return tagTree.getAllSelected();
@@ -2308,25 +2370,31 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return new ArrayList<>();
     }
 
-    public void searchInActionScriptOrText(Boolean searchInText, SWF swf, boolean useSelection) {
+    public void searchInActionScriptOrText(Boolean searchInText, Openable openable, boolean useSelection) {
         View.checkAccess();
-
-        Map<SWF, List<ScriptPack>> scopeAs3 = new LinkedHashMap<>();
+        
+        /*if (!(openable instanceof SWF)) { //FIXME for ABCs
+            return;
+        }*/
+        
+        SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
+        
+        Map<Openable, List<ScriptPack>> scopeAs3 = new LinkedHashMap<>();
         Map<SWF, Map<String, ASMSource>> swfToAllASMSourceMap = new HashMap<>();
         Map<SWF, Map<String, ASMSource>> scopeAs12 = new LinkedHashMap<>();
 
-        Set<SWF> swfsUsed = new LinkedHashSet<>();
+        Set<Openable> openablesUsed = new LinkedHashSet<>();
 
         List<TreeItem> allItems = getAllSelected();
         for (TreeItem t : allItems) {
             if (t instanceof ScriptPack) {
                 ScriptPack sp = (ScriptPack) t;
-                SWF s = sp.getSwf();
+                Openable s = sp.getOpenable(); //Fixme for ABCs                
                 if (!scopeAs3.containsKey(s)) {
                     scopeAs3.put(s, new ArrayList<>());
                 }
                 scopeAs3.get(s).add(sp);
-                swfsUsed.add(s);
+                openablesUsed.add(s);
             }
             ASMSource as = null;
             if (t instanceof ASMSource) {
@@ -2357,7 +2425,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     scopeAs12.put(s, new LinkedHashMap<>());
                 }
                 scopeAs12.get(s).put(asId, as);
-                swfsUsed.add(s);
+                openablesUsed.add(s);
             }
         }
 
@@ -2374,7 +2442,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             selected = AppDialog.translateForDialog("scope.selection.items", SearchDialog.class).replace("%count%", "" + items.size());
         }
 
-        SearchDialog searchDialog = new SearchDialog(getMainFrame().getWindow(), false, selected, useSelection);
+        SearchDialog searchDialog = new SearchDialog(getMainFrame().getWindow(), false, selected, useSelection, openable instanceof ABC);
         if (searchInText != null) {
             if (searchInText) {
                 searchDialog.searchInTextsRadioButton.setSelected(true);
@@ -2391,25 +2459,44 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     scopeAs3.clear();
                     scopeAs12.clear();
                     if (swf.isAS3()) {
-                        scopeAs3.put(swf, swf.getAS3Packs());
+                        List<ScriptPack> packs = new ArrayList<>();
+                        if (openable instanceof SWF) {
+                            packs = ((SWF)openable).getAS3Packs();
+                        } else {
+                            ABC abc = (ABC) openable;
+                            List<ABC> allAbcs = new ArrayList<>();
+                            allAbcs.add(abc);
+                            packs = abc.getScriptPacks(null, allAbcs);
+                        }
+                        scopeAs3.put(openable, packs);
                     } else {
-                        scopeAs12.put(swf, swf.getASMs(false));
+                        scopeAs12.put((SWF)openable, swf.getASMs(false));
                     }
-                    swfsUsed.clear();
-                    swfsUsed.add(swf);
+                    openablesUsed.clear();
+                    openablesUsed.add(openable);
                 }
                 if (searchDialog.getCurrentScope() == SearchDialog.SCOPE_ALL_FILES) {
-                    Set<SWF> allSwfs = getAllSwfs();
+                    Set<Openable> allOpenables = getAllOpenablesAndSwfs();
 
-                    for (SWF s : allSwfs) {
-                        if (s.isAS3()) {
-                            scopeAs3.put(s, s.getAS3Packs());
+                    for (Openable s : allOpenables) {
+                        SWF ss = (s instanceof SWF) ? (SWF) s : ((ABC)s).getSwf();                        
+                        if (ss.isAS3()) {
+                            List<ScriptPack> packs = new ArrayList<>();
+                            if (s instanceof SWF) {
+                                packs = ((SWF)s).getAS3Packs();
+                            } else {
+                                ABC abc = (ABC) s;
+                                List<ABC> allAbcs = new ArrayList<>();
+                                allAbcs.add(abc);
+                                packs = abc.getScriptPacks(null, allAbcs);
+                            }
+                            scopeAs3.put(s, packs);
                         } else {
-                            scopeAs12.put(s, s.getASMs(false));
+                            scopeAs12.put(ss, ss.getASMs(false));
                         }
                     }
-                    swfsUsed.clear();
-                    swfsUsed.addAll(allSwfs);
+                    openablesUsed.clear();
+                    openablesUsed.addAll(allOpenables);
                 }
 
                 if (!scopeAs3.isEmpty()) {
@@ -2431,7 +2518,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         protected Void doInBackground() throws Exception {
 
                             List<ScriptSearchResult> fResult = new ArrayList<>();
-                            for (SWF s : swfsUsed) {
+                            for (Openable s : openablesUsed) {
                                 if (scopeAs3.containsKey(s)) {
                                     List<ABCSearchResult> abcResult = getABCPanel().search(s, txt, ignoreCase, regexp, pCodeSearch, this, scopeAs3.get(s));
                                     fResult.addAll(abcResult);
@@ -2440,10 +2527,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                     }
                                 }
                                 if (scopeAs12.containsKey(s)) {
-                                    List<ActionSearchResult> actionResult = getActionPanel().search(s, txt, ignoreCase, regexp, pCodeSearch, this, scopeAs12.get(s));
+                                    List<ActionSearchResult> actionResult = getActionPanel().search((SWF) s, txt, ignoreCase, regexp, pCodeSearch, this, scopeAs12.get(s));
                                     fResult.addAll(actionResult);
                                     if (!actionResult.isEmpty()) {
-                                        Main.searchResultsStorage.addActionResults(s, txt, ignoreCase, regexp, actionResult);
+                                        Main.searchResultsStorage.addActionResults((SWF) s, txt, ignoreCase, regexp, actionResult);
                                     }
                                 }
                             }
@@ -2515,7 +2602,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void replaceText() {
-        SearchDialog replaceDialog = new SearchDialog(getMainFrame().getWindow(), true, null, false);
+        SearchDialog replaceDialog = new SearchDialog(getMainFrame().getWindow(), true, null, false, false);
         if (replaceDialog.showDialog() == AppDialog.OK_OPTION) {
             final String txt = replaceDialog.searchField.getText();
             if (!txt.isEmpty()) {
@@ -2644,18 +2731,25 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         updateClassesList();
     }
 
-    public void renameColliding(final SWF swf) {
+    public void renameColliding(final Openable openable) {
         View.checkAccess();
 
+        SWF swf = null;
+        if (openable instanceof SWF) {
+            swf = (SWF) openable;
+        }
+        //FIXME for ABCs
+        
         if (swf == null) {
             return;
         }
+        final SWF fswf = swf;
         if (confirmExperimental()) {
             new CancellableWorker<Integer>() {
                 @Override
                 protected Integer doInBackground() throws Exception {
                     AbcMultiNameCollisionFixer fixer = new AbcMultiNameCollisionFixer();
-                    return fixer.fixCollisions(swf);
+                    return fixer.fixCollisions(fswf);
                 }
 
                 @Override
@@ -2670,8 +2764,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             int cnt = get();
                             Main.stopWork();
                             ViewMessages.showMessageDialog(MainPanel.this, translate("message.rename.renamed").replace("%count%", Integer.toString(cnt)));
-                            swf.assignClassesToSymbols();
-                            swf.clearScriptCache();
+                            fswf.assignClassesToSymbols();
+                            fswf.clearScriptCache();
                             if (abcPanel != null) {
                                 abcPanel.reload();
                             }
@@ -3302,11 +3396,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         Set<SWF> swfs = new LinkedHashSet<>();
 
         for (TreeItem item : sel) {
-            if (item instanceof SWFList) {
-                SWFList list = (SWFList) item;
-                swfs.addAll(list);
+            if (item instanceof OpenableList) {
+                OpenableList list = (OpenableList) item;
+                for (Openable openable : list) {
+                    if (openable instanceof SWF) {
+                        swfs.add((SWF) openable);
+                    }
+                }                
             } else {
-                swfs.add(item.getSwf());
+                Openable openable = item.getOpenable();
+                if (openable instanceof SWF) {
+                    swfs.add((SWF) openable);
+                }
             }
         }
 
@@ -3333,11 +3434,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         Set<SWF> swfs = new LinkedHashSet<>();
 
         for (TreeItem item : sel) {
-            if (item instanceof SWFList) {
-                SWFList list = (SWFList) item;
-                swfs.addAll(list);
+            if (item instanceof OpenableList) {
+                OpenableList list = (OpenableList) item;
+                for (Openable openable : list) {
+                    if (openable instanceof SWF) {
+                        swfs.add((SWF) openable);
+                    }
+                }                
             } else {
-                swfs.add(item.getSwf());
+                Openable openable = item.getOpenable();
+                if (openable instanceof SWF) {
+                    swfs.add((SWF) openable);
+                }
             }
         }
 
@@ -3366,11 +3474,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         Set<SWF> swfs = new LinkedHashSet<>();
 
         for (TreeItem item : sel) {
-            if (item instanceof SWFList) {
-                SWFList list = (SWFList) item;
-                swfs.addAll(list);
+            if (item instanceof OpenableList) {
+                OpenableList list = (OpenableList) item;
+                for (Openable openable : list) {
+                    if (openable instanceof SWF) {
+                        swfs.add((SWF) openable);
+                    }
+                }                
             } else {
-                swfs.add(item.getSwf());
+                Openable openable = item.getOpenable();
+                if (openable instanceof SWF) {
+                    swfs.add((SWF) openable);
+                }
             }
         }
         if (swfs.size() > 1) {
@@ -3396,12 +3511,21 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
-    public void renameIdentifiers(final SWF swf) {
+    public void renameIdentifiers(final Openable openable) {
         View.checkAccess();
 
+        SWF swf = null;
+        
+        if (openable instanceof SWF) {
+            swf = (SWF) openable;
+        }
+        //FIXME for ABCs        
+        
         if (swf == null) {
             return;
         }
+        
+        final SWF fswf = swf;
         if (confirmExperimental()) {
             RenameDialog renameDialog = new RenameDialog(Main.getDefaultDialogsOwner());
             if (renameDialog.showRenameDialog() == AppDialog.OK_OPTION) {
@@ -3409,7 +3533,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 new CancellableWorker<Integer>() {
                     @Override
                     protected Integer doInBackground() throws Exception {
-                        int cnt = swf.deobfuscateIdentifiers(renameType);
+                        int cnt = fswf.deobfuscateIdentifiers(renameType);
                         return cnt;
                     }
 
@@ -3425,8 +3549,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 int cnt = get();
                                 Main.stopWork();
                                 ViewMessages.showMessageDialog(MainPanel.this, translate("message.rename.renamed").replace("%count%", Integer.toString(cnt)));
-                                swf.assignClassesToSymbols();
-                                swf.clearScriptCache();
+                                fswf.assignClassesToSymbols();
+                                fswf.clearScriptCache();
                                 if (abcPanel != null) {
                                     abcPanel.reload();
                                 }
@@ -3576,10 +3700,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         tagListTree.updateSwfs(new SWF[0]);
 
         if (treeItem != null) {
-            SWF swf = treeItem.getSwf();
+            SWF swf = (SWF)treeItem.getOpenable(); //should be SWF
             if (swf != null) {
                 SWF treeItemSwf = swf.getRootSwf();
-                if (this.swfs.contains(treeItemSwf.swfList)) {
+                if (this.openables.contains(treeItemSwf.openableList)) {
                     setTagTreeSelectedNode(getCurrentTree(), treeItem);
                 }
             }
@@ -3589,11 +3713,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         pinsPanel.refresh();
     }
 
-    public void refreshTree(SWF swf) {
-        refreshTree(new SWF[]{swf});
+    public void refreshTree(Openable openable) {
+        refreshTree(new Openable[]{openable});
     }
 
-    public void refreshTree(SWF[] swfs) {
+    public void refreshTree(Openable[] openables) {
         clear();
         showCard(CARDEMPTYPANEL);
         TreeItem treeItem = null;
@@ -3601,14 +3725,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             treeItem = getCurrentTree().getCurrentTreeItem();
         }
 
-        tagTree.updateSwfs(swfs);
-        tagListTree.updateSwfs(swfs);
+        tagTree.updateSwfs(openables);
+        tagListTree.updateSwfs(openables);
 
         if (treeItem != null) {
-            SWF swf = treeItem.getSwf();
-            if (swf != null) {
+            Openable openable = treeItem.getOpenable();
+            
+            if (openable instanceof SWF) {
+                SWF swf = (SWF) openable;
                 SWF treeItemSwf = swf.getRootSwf();
-                if (this.swfs.contains(treeItemSwf.swfList)) {
+                if (this.openables.contains(treeItemSwf.openableList)) {
+                    setTagTreeSelectedNode(getCurrentTree(), treeItem);
+                }
+            } else {
+                if (this.openables.contains(openable.getOpenableList())) {
                     setTagTreeSelectedNode(getCurrentTree(), treeItem);
                 }
             }
@@ -4045,18 +4175,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
 
-        if (!(treeItem instanceof SWFList)) {
-            SWF swf = treeItem.getSwf();
-            if (swfs.isEmpty()) {
+        if (!(treeItem instanceof OpenableList)) {
+            Openable openable = treeItem.getOpenable();
+            if (openables.isEmpty()) {
                 // show welcome panel after closing swfs
                 updateUi();
             } else {
-                if (swf == null && swfs.get(0) != null) {
-                    swf = swfs.get(0).get(0);
+                if (openable == null && openables.get(0) != null) {
+                    openable = openables.get(0).get(0);
                 }
 
-                if (swf != null) {
-                    updateUi(swf);
+                if (openable != null) {
+                    updateUi(openable);
                 }
             }
         } else {
@@ -4207,7 +4337,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         switch (view) {
             case VIEW_DUMP:
                 if (dumpTree.getModel() == null) {
-                    DumpTreeModel dtm = new DumpTreeModel(swfs);
+                    DumpTreeModel dtm = new DumpTreeModel(openables);
                     dumpTree.setModel(dtm);
                     dumpTree.expandFirstLevelNodes();
                 }
@@ -4215,13 +4345,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             case VIEW_RESOURCES:
             case VIEW_TAGLIST:
                 if (tagTree.getModel() == null) {
-                    TagTreeModel ttm = new TagTreeModel(swfs, Configuration.tagTreeShowEmptyFolders.get());
+                    TagTreeModel ttm = new TagTreeModel(openables, Configuration.tagTreeShowEmptyFolders.get());
                     tagTree.setModel(ttm);
                     tagTree.expandFirstLevelNodes();
                 }
 
                 if (tagListTree.getModel() == null) {
-                    TagListTreeModel ttm = new TagListTreeModel(swfs);
+                    TagListTreeModel ttm = new TagListTreeModel(openables);
                     tagListTree.setModel(ttm);
                     tagListTree.expandFirstLevelNodes();
                 }
@@ -4464,7 +4594,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), treeItem instanceof ShapeTag);
         } else if (treeItem instanceof Frame && internalViewer) {
             Frame fn = (Frame) treeItem;
-            SWF swf = fn.getSwf();
+            SWF swf = (SWF) fn.getOpenable();           
             previewPanel.showImagePanel(fn.timeline.timelined, swf, fn.frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false);
         } else if (treeItem instanceof ShowFrameTag) {
             SWF swf;
@@ -4598,14 +4728,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         // save last selected node to config
-        if (treeItem != null && !(treeItem instanceof SWFList)) {
-            SWF swf = treeItem.getSwf();
-            if (swf != null) {
-                swf = swf.getRootSwf();
+        if (treeItem != null && !(treeItem instanceof OpenableList)) {
+            Openable openable = treeItem.getOpenable();
+            if (openable != null && (openable instanceof SWF)) {
+                openable = ((SWF)openable).getRootSwf();
             }
 
-            if (swf != null) {
-                SwfSpecificCustomConfiguration swfCustomConf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
+            if (openable != null) {
+                SwfSpecificCustomConfiguration swfCustomConf = Configuration.getOrCreateSwfSpecificCustomConfiguration(openable.getShortPathTitle());
                 swfCustomConf.setCustomData(CustomConfigurationKeys.KEY_LAST_SELECTED_PATH_RESOURCES, tagTree.getSelectionPathString());
                 swfCustomConf.setCustomData(CustomConfigurationKeys.KEY_LAST_SELECTED_PATH_TAGLIST, tagListTree.getSelectionPathString());
             }
@@ -4655,7 +4785,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showCard(CARDACTIONSCRIPT3PANEL);            
         } else if (treeItem instanceof Tag) {
             Tag tag = (Tag) treeItem;
-            TagInfo tagInfo = new TagInfo(treeItem.getSwf());
+            TagInfo tagInfo = new TagInfo((SWF)treeItem.getOpenable());
             tag.getTagInfo(tagInfo);
             
             Set<Integer> needed;
@@ -4700,7 +4830,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             frame.getNeededCharacters(needed);
 
             if (!needed.isEmpty()) {
-                TagInfo tagInfo = new TagInfo(treeItem.getSwf());
+                TagInfo tagInfo = new TagInfo((SWF)treeItem.getOpenable());
                 tagInfo.addInfo("general", "neededCharacters", Helper.joinStrings(needed, ", "));
                 tagInfoPanel.setTagInfos(tagInfo);
                 showDetail(DETAILCARDTAGINFO);
@@ -4712,7 +4842,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         if (treeItem instanceof HeaderItem) {
-            headerPanel.load(((HeaderItem) treeItem).getSwf());
+            headerPanel.load((SWF)((HeaderItem) treeItem).getOpenable());
             showCard(CARDHEADER);
         } else if (treeItem instanceof FolderItem) {
             showFolderPreview((FolderItem) treeItem);
@@ -5207,11 +5337,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         Map<TreeItem, Set<Integer>> missingNeededCharacters = new WeakHashMap<>();
         Map<TreeItem, Set<Integer>> neededCharacters = new WeakHashMap<>();
         
-        List<SWFList> swfsLists = new ArrayList<>(swfs);
-        for (SWFList swfList : swfsLists) {
-            for (SWF swf : swfList) {
-                calculateMissingNeededCharacters(neededCharacters, missingNeededCharacters, swf);
-            }
+        List<OpenableList> swfsLists = new ArrayList<>(openables);
+        for (OpenableList swfList : swfsLists) {
+            for (Openable openable : swfList) {
+                if (openable instanceof SWF) {
+                    calculateMissingNeededCharacters(neededCharacters, missingNeededCharacters, (SWF) openable);
+                    //TODO: how about SubSWFs???
+                }
+            }            
         }
         this.neededCharacters = neededCharacters;
         this.missingNeededCharacters = missingNeededCharacters; 

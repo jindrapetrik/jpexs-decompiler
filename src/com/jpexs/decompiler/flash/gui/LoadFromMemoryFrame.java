@@ -16,7 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.SWFSourceInfo;
+import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReReadableInputStream;
@@ -164,7 +164,7 @@ public class LoadFromMemoryFrame extends AppFrame {
                 return;
             }
             str.mark(Integer.MAX_VALUE);
-            SWFSourceInfo sourceInfo = new SWFSourceInfo(str, null, swf.process + " [" + (index + 1) + "]");
+            OpenableSourceInfo sourceInfo = new OpenableSourceInfo(str, null, swf.process + " [" + (index + 1) + "]");
             Main.openFile(sourceInfo);
         }
     }

@@ -17,11 +17,12 @@
 package com.jpexs.decompiler.flash.search;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 
 /**
  *
  * @author JPEXS
  */
 public interface SearchResult {
-    public SWF getSWF();
+    public Openable getOpenable();
 }

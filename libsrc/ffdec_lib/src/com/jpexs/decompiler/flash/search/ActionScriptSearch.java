@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -121,20 +122,27 @@ public class ActionScriptSearch {
         return null;
     }
 
-    public List<ABCSearchResult> searchAs3(final SWF swf, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, ScriptSearchListener listener, List<ScriptPack> scope) {
+    public List<ABCSearchResult> searchAs3(final Openable openable, final String txt, boolean ignoreCase, boolean regexp, boolean pcode, ScriptSearchListener listener, List<ScriptPack> scope) {
         // todo: pcode seach
         if (txt != null && !txt.isEmpty()) {
             List<String> ignoredClasses = new ArrayList<>();
             List<String> ignoredNss = new ArrayList<>();
 
-            if (Configuration._ignoreAdditionalFlexClasses.get()) {
-                swf.getFlexMainClass(ignoredClasses, ignoredNss);
+            if (Configuration._ignoreAdditionalFlexClasses.get() && (openable instanceof SWF)) {
+                ((SWF)openable).getFlexMainClass(ignoredClasses, ignoredNss);
             }
 
             final List<ABCSearchResult> found = Collections.synchronizedList(new ArrayList<>());
             final List<ScriptPack> fscope;
             if (scope == null) {
-                fscope = swf.getAS3Packs();
+                if (openable instanceof SWF) {
+                    fscope = ((SWF)openable).getAS3Packs();
+                } else {
+                    ABC abc = (ABC)openable;
+                    List<ABC> allAbcs = new ArrayList<>();
+                    allAbcs.add(abc);
+                    fscope = abc.getScriptPacks(null, allAbcs);                    
+                }
             } else {
                 fscope = scope;
             }

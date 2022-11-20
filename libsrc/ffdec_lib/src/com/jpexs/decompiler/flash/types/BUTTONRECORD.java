@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.EnumValue;
@@ -151,6 +152,11 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
 
     @Override
     public SWF getSwf() {
+        return swf;
+    }
+    
+    @Override
+    public Openable getOpenable() {
         return swf;
     }
 

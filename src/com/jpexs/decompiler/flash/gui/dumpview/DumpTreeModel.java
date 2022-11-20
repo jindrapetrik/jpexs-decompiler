@@ -18,7 +18,8 @@ package com.jpexs.decompiler.flash.gui.dumpview;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
-import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.TreeModelEvent;
@@ -36,20 +37,23 @@ public final class DumpTreeModel implements TreeModel {
 
     private final List<TreeModelListener> listeners = new ArrayList<>();
 
-    private final List<SWFList> swfs;
+    private final List<OpenableList> openables;
 
-    public DumpTreeModel(List<SWFList> swfs) {
-        this.swfs = swfs;
+    public DumpTreeModel(List<OpenableList> openables) {
+        this.openables = openables;
         root = new DumpInfo("root", "", null, 0, 0);
         updateSwfs();
     }
 
     public void updateSwfs() {
         root.getChildInfos().clear();
-        for (SWFList swfList : swfs) {
-            for (SWF swf : swfList) {
-                swf.dumpInfo.name = swf.getFileTitle();
-                root.getChildInfos().add(swf.dumpInfo);
+        for (OpenableList openableList : openables) {
+            for (Openable openable : openableList) {
+                if (openable instanceof SWF) {
+                    SWF swf = (SWF) openable;
+                    swf.dumpInfo.name = swf.getFileTitle();
+                    root.getChildInfos().add(swf.dumpInfo);
+                }
             }
         }
 

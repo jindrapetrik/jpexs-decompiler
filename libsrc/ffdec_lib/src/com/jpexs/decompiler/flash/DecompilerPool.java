@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash;
 
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
@@ -26,6 +27,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.HighlightedText;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.helpers.ImmediateFuture;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +50,7 @@ public class DecompilerPool {
 
     private final ThreadPoolExecutor executor;
 
-    private Map<SWF, List<Future<HighlightedText>>> swfToFutures = new WeakHashMap<>();
+    private Map<Openable, List<Future<HighlightedText>>> openableToFutures = new WeakHashMap<>();
 
     public DecompilerPool() {
         int threadCount = Configuration.getParallelThreadCount();
@@ -105,7 +107,8 @@ public class DecompilerPool {
                 pack.toSource(writer, script == null ? null : script.traits.traits, new ConvertData(), ScriptExportMode.AS, parallel, false);
 
                 HighlightedText result = new HighlightedText(writer);
-                SWF swf = pack.getSwf();
+                Openable openable = pack.getOpenable();
+                SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
                 if (swf != null) {
                     swf.as3Cache.put(pack, result);
                 }
@@ -155,10 +158,10 @@ public class DecompilerPool {
     public HighlightedText decompile(ASMSource src, ActionList actions) throws InterruptedException {
         Future<HighlightedText> future = submitTask(src, actions, null);
         SWF swf = src.getSwf();
-        if (!swfToFutures.containsKey(swf)) {
-            swfToFutures.put(swf, new ArrayList<>());
+        if (!openableToFutures.containsKey(swf)) {
+            openableToFutures.put(swf, new ArrayList<>());
         }
-        swfToFutures.get(swf).add(future);
+        openableToFutures.get(swf).add(future);
         try {
             return future.get();
         } catch (InterruptedException ex) {
@@ -167,7 +170,7 @@ public class DecompilerPool {
         } catch (ExecutionException ex) {
             Logger.getLogger(DecompilerPool.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            List<Future<HighlightedText>> futures = swfToFutures.get(swf);
+            List<Future<HighlightedText>> futures = openableToFutures.get(swf);
             if (futures != null) {
                 futures.remove(future);
             }
@@ -179,11 +182,11 @@ public class DecompilerPool {
     public HighlightedText decompile(ScriptPack pack) throws InterruptedException {
         Future<HighlightedText> future = submitTask(pack, null);
 
-        SWF swf = pack.getSwf();
-        if (!swfToFutures.containsKey(swf)) {
-            swfToFutures.put(swf, new ArrayList<>());
+        Openable openable = pack.getOpenable();
+        if (!openableToFutures.containsKey(openable)) {
+            openableToFutures.put(openable, new ArrayList<>());
         }
-        swfToFutures.get(swf).add(future);
+        openableToFutures.get(openable).add(future);
         try {
             return future.get();
         } catch (InterruptedException ex) {
@@ -192,7 +195,7 @@ public class DecompilerPool {
         } catch (ExecutionException ex) {
             Logger.getLogger(DecompilerPool.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            List<Future<HighlightedText>> futures = swfToFutures.get(swf);
+            List<Future<HighlightedText>> futures = openableToFutures.get(openable);
             if (futures != null) {
                 futures.remove(future);
             }
@@ -208,7 +211,7 @@ public class DecompilerPool {
     }
     
     public void destroySwf(SWF swf){
-        List<Future<HighlightedText>> futures = swfToFutures.get(swf);
+        List<Future<HighlightedText>> futures = openableToFutures.get(swf);
         if(futures!=null){
            for(Future<HighlightedText> future:futures){
                future.cancel(true);

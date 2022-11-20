@@ -626,7 +626,7 @@ public class DumpTree extends JTree {
             return null;
         }
         long address = range.getPos();
-        return searchTimelinedForTag(item.getSwf(), address);
+        return searchTimelinedForTag((SWF) item.getOpenable(), address);
     }
     
     public Timelined getTimelinedForItem(TreeItem item) {
@@ -674,7 +674,7 @@ public class DumpTree extends JTree {
         for (DumpInfo sd : d.getChildInfos()) {
             if (sd instanceof DumpInfoSwfNode) {
                 DumpInfoSwfNode si = (DumpInfoSwfNode) sd;
-                if (si.getSwf() == item.getSwf()) {                    
+                if (si.getSwf() == item.getOpenable()) {                    
                     DumpInfo di = si;
                     while (model.getChildCount(di) > 0) {
                         boolean found = false;
