@@ -889,23 +889,58 @@ public class Main {
             for (Entry<String, SeekableInputStream> streamEntry : bundle.getAll().entrySet()) {
                 InputStream stream = streamEntry.getValue();
                 stream.reset();
-                CancellableWorker<SWF> worker = new CancellableWorker<SWF>() {
-                    @Override
-                    public SWF doInBackground() throws Exception {
-                        final CancellableWorker worker = this;
-                        String fileKey = fname + "/" + streamEntry.getKey();
-                        SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
+                CancellableWorker<? extends Openable> worker = null;
+                if (streamEntry.getKey().toLowerCase().endsWith(".abc")) {
+                    CancellableWorker<ABC> abcWorker = new CancellableWorker<ABC>() {
+                        private ABC open(InputStream is, String file, String fileTitle) throws IOException, InterruptedException {
+                            SWF dummySwf = new SWF();
+                            dummySwf.setFileTitle(fileTitle != null ? fileTitle : file);
+                            FileAttributesTag fileAttributes = new FileAttributesTag(dummySwf);
+                            fileAttributes.actionScript3 = true;
+                            dummySwf.addTag(fileAttributes);
+                            fileAttributes.setTimelined(dummySwf);
+                            DoABC2Tag doABC2Tag = new DoABC2Tag(dummySwf);
+                            dummySwf.addTag(doABC2Tag);
+                            doABC2Tag.setTimelined(dummySwf);
+                            dummySwf.clearModified();
+                            startWork(AppStrings.translate("work.reading.abc"), this);
+                            ABC abc = new ABC(new ABCInputStream(new MemoryInputStream(Helper.readStream(is))), dummySwf, doABC2Tag, file, fileTitle);
+                            doABC2Tag.setABC(abc);
+                            return abc;
+                        }
 
-                        String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
-                        SWF swf = new SWF(stream, null, streamEntry.getKey(), new ProgressListener() {
-                            @Override
-                            public void progress(int p) {
-                                startWork(AppStrings.translate("work.reading.swf"), p, worker);
-                            }
-                        }, Configuration.parallelSpeedUp.get(), charset);
-                        return swf;
-                    }
-                };
+                        @Override
+                        protected ABC doInBackground() throws Exception {
+                            return open(stream, null, streamEntry.getKey());
+                        }
+
+                        @Override
+                        protected void done() {
+                            stopWork();
+                        }
+
+                    };
+                    worker = abcWorker;
+                } else {
+                    CancellableWorker<SWF> swfWorker = new CancellableWorker<SWF>() {
+                        @Override
+                        public SWF doInBackground() throws Exception {
+                            final CancellableWorker worker = this;
+                            String fileKey = fname + "/" + streamEntry.getKey();
+                            SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
+
+                            String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
+                            SWF swf = new SWF(stream, null, streamEntry.getKey(), new ProgressListener() {
+                                @Override
+                                public void progress(int p) {
+                                    startWork(AppStrings.translate("work.reading.swf"), p, worker);
+                                }
+                            }, Configuration.parallelSpeedUp.get(), charset);
+                            return swf;
+                        }
+                    };
+                    worker = swfWorker;
+                }
                 loadingDialog.setWorker(worker);
                 worker.execute();
 
@@ -919,7 +954,7 @@ public class Main {
             InputStream fInputStream = inputStream;
 
             CancellableWorker<? extends Openable> worker = null;
-            
+
             if (sourceInfo.getKind() == OpenableSourceKind.ABC) {
                 CancellableWorker<ABC> abcWorker = new CancellableWorker<ABC>() {
                     private ABC open(InputStream is, String file, String fileTitle) throws IOException, InterruptedException {
@@ -934,11 +969,11 @@ public class Main {
                         doABC2Tag.setTimelined(dummySwf);
                         dummySwf.clearModified();
                         startWork(AppStrings.translate("work.reading.abc"), this);
-                        ABC abc = new ABC(new ABCInputStream(new MemoryInputStream(Helper.readFile(file))), dummySwf, doABC2Tag, file, fileTitle);
+                        ABC abc = new ABC(new ABCInputStream(new MemoryInputStream(Helper.readStream(is))), dummySwf, doABC2Tag, file, fileTitle);
                         doABC2Tag.setABC(abc);
                         return abc;
                     }
-                        
+
                     @Override
                     protected ABC doInBackground() throws Exception {
                         return open(fInputStream, sourceInfo.getFile(), sourceInfo.getFileTitle());
@@ -947,8 +982,8 @@ public class Main {
                     @Override
                     protected void done() {
                         stopWork();
-                    }                                        
-                    
+                    }
+
                 };
                 worker = abcWorker;
             } else if (sourceInfo.getKind() == OpenableSourceKind.SWF) {
@@ -1134,7 +1169,7 @@ public class Main {
         for (Openable openable : result) {
 
             openable.setOpenableList(result);
-            
+
             if (openable instanceof SWF) {
                 SWF swf = (SWF) openable;
                 logger.log(Level.INFO, "");
@@ -1270,7 +1305,7 @@ public class Main {
 
         try {
             if (mode == SaveFileMode.EXE) {
-                saveFileToExe((SWF)openable, exeExportMode, tmpFile);
+                saveFileToExe((SWF) openable, exeExportMode, tmpFile);
             } else {
                 try ( FileOutputStream fos = new FileOutputStream(tmpFile);  BufferedOutputStream bos = new BufferedOutputStream(fos)) {
                     openable.saveTo(bos);
@@ -1766,7 +1801,7 @@ public class Main {
                 return AppStrings.translate("filter.abc");
             }
         };
-        
+
         ExeExportMode exeExportMode = null;
         if (mode == SaveFileMode.EXE) {
             exeExportMode = Configuration.exeExportMode.get();
@@ -1806,14 +1841,14 @@ public class Main {
                 }
             };
             fc.setFileFilter(exeFilter);
-        } else if ((openable instanceof SWF) && ((SWF)openable).gfx) {
+        } else if ((openable instanceof SWF) && ((SWF) openable).gfx) {
             fc.addChoosableFileFilter(swfFilter);
             fc.setFileFilter(gfxFilter);
         } else if (openable instanceof SWF) {
             fc.setFileFilter(swfFilter);
             fc.addChoosableFileFilter(gfxFilter);
         } else if (openable instanceof ABC) {
-            fc.setFileFilter(abcFilter);            
+            fc.setFileFilter(abcFilter);
         }
         final String extension = ext;
         fc.setAcceptAllFileFilterUsed(false);
@@ -1826,15 +1861,15 @@ public class Main {
                     if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(extension)) {
                         fileName += extension;
                     }
-                    ((SWF)openable).gfx = false;
+                    ((SWF) openable).gfx = false;
                 }
                 if (selFilter == gfxFilter) {
                     if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(".gfx")) {
                         fileName += ".gfx";
                     }
-                    ((SWF)openable).gfx = true;
+                    ((SWF) openable).gfx = true;
                 }
-                
+
                 if (selFilter == abcFilter) {
                     if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(".abc")) {
                         fileName += ".abc";
@@ -1965,7 +2000,7 @@ public class Main {
             }
         };
         fc.addChoosableFileFilter(iggyFilter);
-        
+
         FileFilter abcFilter = new FileFilter() {
             @Override
             public boolean accept(File f) {

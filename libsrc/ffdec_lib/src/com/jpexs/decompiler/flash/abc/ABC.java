@@ -511,7 +511,7 @@ public class ABC implements Openable {
         this.parentTag = tag;
         this.file = file;
         this.fileTitle = fileTitle;
-        if (file != null) {
+        if (file != null || fileTitle != null) {
             isOpenable = true;
         }
         
