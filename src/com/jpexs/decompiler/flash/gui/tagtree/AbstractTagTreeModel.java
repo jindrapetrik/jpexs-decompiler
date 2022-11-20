@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -171,7 +172,7 @@ public abstract class AbstractTagTreeModel implements TreeModel {
     public void valueForPathChanged(TreePath path, Object newValue) {
     }
     
-    public abstract void updateSwf(SWF swf);
+    public abstract void updateOpenable(Openable openable);
     
     public TreeItem getParent(TreeItem obj) {
         return (TreeItem)getTreePath(obj).getParentPath().getLastPathComponent();

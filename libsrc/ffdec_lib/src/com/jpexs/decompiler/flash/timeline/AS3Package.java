@@ -112,7 +112,7 @@ public class AS3Package extends AS3ClassTreeItem {
     public List<AS3ClassTreeItem> getAllChildren() {
         List<AS3ClassTreeItem> result = new ArrayList<>(getChildCount());
         result.addAll(subPackages.values());
-        result.addAll(scripts.values());
+        result.addAll(getScriptPacks());
         return result;
     }
 
@@ -122,11 +122,14 @@ public class AS3Package extends AS3ClassTreeItem {
         }
 
         index -= subPackages.size();
-        return getScriptPacks().get(index);
+        if (index < getScriptPacks().size()) {
+            return getScriptPacks().get(index);
+        }
+        return null;
     }
 
     public int getChildCount() {
-        return subPackages.size() + scripts.size();
+        return subPackages.size() + getScriptPacks().size();
     }
 
     public int getIndexOfChild(AS3ClassTreeItem child) {
