@@ -3737,7 +3737,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 if (this.openables.contains(treeItemSwf.openableList)) {
                     setTagTreeSelectedNode(getCurrentTree(), treeItem);
                 }
-            } else {
+            } else if (openable != null) {
                 if (this.openables.contains(openable.getOpenableList())) {
                     setTagTreeSelectedNode(getCurrentTree(), treeItem);
                 }

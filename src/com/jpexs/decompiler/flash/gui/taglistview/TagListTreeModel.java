@@ -350,9 +350,9 @@ public class TagListTreeModel extends AbstractTagTreeModel {
     }
     
     @Override
-    public void updateSwf(SWF swf) {
+    public void updateOpenable(Openable openable) {
         swfHeaders.clear();
-        TreePath changedPath = getTreePath(swf == null ? root : swf);
+        TreePath changedPath = getTreePath(openable == null ? root : openable);
         fireTreeStructureChanged(new TreeModelEvent(this, changedPath));
         calculateCollisions();
     }  
