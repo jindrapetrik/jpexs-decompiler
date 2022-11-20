@@ -840,7 +840,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (firstItem instanceof ABC) {
                 addAs3ClassMenuItem.setVisible(true);                
             }
-            if ((firstItem instanceof ABCContainerTag) && mainPanel.getCurrentView() == MainPanel.VIEW_TAGLIST) {
+            if (firstItem instanceof ABCContainerTag) {
                 addAs3ClassMenuItem.setVisible(true);
                 exportABCMenuItem.setVisible(true);
             }

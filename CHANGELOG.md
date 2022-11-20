@@ -15,7 +15,7 @@ All notable changes to this project will be documented in this file.
 - Flattened ActionScript packages (one row per package instead package tree), can be turned off in settings
 - [#1820] Opening standalone ABC files (*.abc)
 - Classes tree inside DoABC tags in taglist view
-- Export ABC data from DoABC tags in taglist view
+- Export ABC data from DoABC tags
 
 ### Fixed
 - [#1869] Replace references now replaces all references, not just PlaceObject
