@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 
 /**
@@ -40,7 +41,7 @@ public class FrameScript implements TreeItem, Exportable {
     }
 
     @Override
-    public SWF getSwf() {
+    public Openable getOpenable() {
         return swf;
     }
 

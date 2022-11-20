@@ -19,8 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.decompiler.flash.ApplicationInfo;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFBundle;
-import com.jpexs.decompiler.flash.SWFSourceInfo;
+import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
@@ -28,7 +27,7 @@ import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
-import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
@@ -65,6 +64,8 @@ import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import com.jpexs.decompiler.flash.Bundle;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 
 /**
  *
@@ -76,7 +77,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     private KeyEventDispatcher keyEventDispatcher;
 
-    private SWF swf;
+    private Openable openable;
 
     private ConfigurationItemChangeListener<Boolean> configListenerAutoDeobfuscate;
     
@@ -131,18 +132,18 @@ public abstract class MainFrameMenu implements MenuBuilder {
         return true;
     }
 
-    private boolean saveSwf(SWF swf) {
+    private boolean saveOpenable(Openable openable) {
         boolean saved = false;
-        if (swf != null) {
-            if (swf.swfList != null && swf.swfList.isBundle()) {
-                File savedFile = new File(swf.swfList.sourceInfo.getFile());
+        if (openable != null) {
+            if (openable.getOpenableList() != null && openable.getOpenableList().isBundle()) {
+                File savedFile = new File(openable.getOpenableList().sourceInfo.getFile());
                 Main.startSaving(savedFile);
-                SWFBundle bundle = swf.swfList.bundle;
+                Bundle bundle = openable.getOpenableList().bundle;
                 if (!bundle.isReadOnly()) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     try {
-                        swf.saveTo(baos);
-                        saved = bundle.putSWF(swf.getFileTitle(), new ByteArrayInputStream(baos.toByteArray()));
+                        openable.saveTo(baos);
+                        saved = bundle.putOpenable(openable.getFileTitle(), new ByteArrayInputStream(baos.toByteArray()));
                     } catch (IOException ex) {
                         Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
                     }
@@ -150,29 +151,30 @@ public abstract class MainFrameMenu implements MenuBuilder {
                     ViewMessages.showMessageDialog(mainFrame.getWindow(), translate("error.readonly.cannotSave"), translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
                 Main.stopSaving(savedFile);
-            } else if (swf.binaryData != null) {
+            } else if ((openable instanceof SWF) && ((SWF)openable).binaryData != null) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 try {
-                    swf.saveTo(baos);
+                    openable.saveTo(baos);
+                    SWF swf = (SWF) openable;
                     swf.binaryData.binaryData = new ByteArrayRange(baos.toByteArray());
                     swf.binaryData.setModified(true);
-                    saved = saveSwf(swf.binaryData.getSwf()); //save parent swf                   
+                    saved = saveOpenable(swf.binaryData.getSwf()); //save parent swf                   
                 } catch (IOException ex) {
                     Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, "Cannot save SWF", ex);
                 }
-            } else if (swf.getFile() == null) {
-                saved = saveAs(swf, SaveFileMode.SAVEAS);
+            } else if (openable.getFile() == null) {
+                saved = saveAs(openable, SaveFileMode.SAVEAS);
             } else {
                 try {
-                    Main.saveFile(swf, swf.getFile());
+                    Main.saveFile(openable, openable.getFile());
                     saved = true;
                 } catch (Exception | OutOfMemoryError | StackOverflowError ex) {
                     Main.handleSaveError(ex);
                 }
             }
             if (saved) {
-                swf.clearModified();
-                mainFrame.getPanel().refreshTree(swf);
+                openable.clearModified();
+                mainFrame.getPanel().refreshTree(openable);
             }
         }
         return saved;
@@ -186,7 +188,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return false;
         }
-        return saveSwf(swf);
+        return saveOpenable(openable);
     }
 
     protected boolean saveAsActionPerformed(ActionEvent evt) {
@@ -194,11 +196,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return false;
         }
 
-        if (swf != null) {
-            if (saveAs(swf, SaveFileMode.SAVEAS)) {
-                if (swf.swfList != null) { //binarydata won't clear modified on saveas                    
-                    if (!isSwfReadOnly(swf)) {
-                        swf.clearModified();
+        if (openable != null) {
+            if (saveAs(openable, SaveFileMode.SAVEAS)) {
+                if (openable.getOpenableList() != null) { //binarydata won't clear modified on saveas                    
+                    if (!isSwfReadOnly(openable)) {
+                        openable.clearModified();
                     }
                 }
             }
@@ -209,15 +211,15 @@ public abstract class MainFrameMenu implements MenuBuilder {
         return false;
     }
 
-    private boolean isSwfReadOnly(SWF swf) {
-        return swf.swfList != null && swf.swfList.bundle != null && swf.swfList.bundle.isReadOnly();
+    private boolean isSwfReadOnly(Openable openable) {
+        return openable.getOpenableList() != null && openable.getOpenableList().bundle != null && openable.getOpenableList().bundle.isReadOnly();
     }
 
-    private boolean saveAs(SWF swf, SaveFileMode mode) {
+    private boolean saveAs(Openable openable, SaveFileMode mode) {
         View.checkAccess();
 
-        if (Main.saveFileDialog(swf, mode)) {
-            updateComponents(swf);
+        if (Main.saveFileDialog(openable, mode)) {
+            updateComponents(openable);
             return true;
         }
         return false;
@@ -228,8 +230,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        if (swf != null) {
-            saveAs(swf, SaveFileMode.EXE);
+        if (openable != null) {
+            saveAs(openable, SaveFileMode.EXE);
         }
     }
 
@@ -238,11 +240,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        if (swf == null) {
+        if (openable == null) {
             return;
         }
-        Main.closeFile(swf.swfList);
-        swf = null;
+        Main.closeFile(openable.getOpenableList());
+        openable = null;
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -257,10 +259,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return false;
         }
 
-        if (swf != null) {
+        if (openable != null) {
             boolean result = Main.closeAll();            
             if (result) {                
-                swf = null;
+                openable = null;
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     @Override
@@ -280,7 +282,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        mainFrame.getPanel().importText(swf);
+        mainFrame.getPanel().importText((SWF) openable);
     }
 
     protected void importScriptActionPerformed(ActionEvent evt) {
@@ -288,28 +290,28 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        mainFrame.getPanel().importScript(swf);
+        mainFrame.getPanel().importScript((SWF) openable);
     }
 
     protected void importImagesActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
         }
-        mainFrame.getPanel().importImage(swf);
+        mainFrame.getPanel().importImage((SWF) openable);
     }
     
     protected void importShapesActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
         }
-        mainFrame.getPanel().importShape(swf, false);
+        mainFrame.getPanel().importShape((SWF) openable, false);
     }
 
     protected void importShapesNoFillActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
         }
-        mainFrame.getPanel().importShape(swf, true);
+        mainFrame.getPanel().importShape((SWF) openable, true);
     }
     
     protected void importSymbolClassActionPerformed(ActionEvent evt) {
@@ -317,7 +319,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        mainFrame.getPanel().importSymbolClass(swf);
+        mainFrame.getPanel().importSymbolClass((SWF) openable);
     }
 
     protected boolean exportAllActionPerformed(ActionEvent evt) {
@@ -339,7 +341,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     protected boolean export(boolean onlySelected) {
         View.checkAccess();
 
-        if (swf != null) {
+        if (openable != null) {
             mainFrame.getPanel().export(onlySelected);
             return true;
         }
@@ -352,7 +354,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        mainFrame.getPanel().exportFla(swf);
+        mainFrame.getPanel().exportFla((SWF) openable);
     }
 
     protected void importXmlActionPerformed(ActionEvent evt) {
@@ -386,8 +388,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     protected boolean search(ActionEvent evt, Boolean searchInText) {
         View.checkAccess();
 
-        if (swf != null) {
-            mainFrame.getPanel().searchInActionScriptOrText(searchInText, swf, false);
+        if (openable != null) {
+            mainFrame.getPanel().searchInActionScriptOrText(searchInText, openable, false);
             return true;
         }
 
@@ -395,7 +397,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected boolean replaceActionPerformed(ActionEvent evt) {
-        if (swf != null) {
+        if (openable != null) {
             mainFrame.getPanel().replaceText();
             return true;
         }
@@ -421,7 +423,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        mainFrame.getPanel().renameOneIdentifier(swf);
+        mainFrame.getPanel().renameOneIdentifier((SWF) openable);
     }
 
     protected void renameColliding(ActionEvent evt) {
@@ -431,7 +433,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        mainFrame.getPanel().renameColliding(swf);
+        mainFrame.getPanel().renameColliding(openable);
     }
 
     protected void renameInvalidIdentifiers(ActionEvent evt) {
@@ -441,7 +443,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        mainFrame.getPanel().renameIdentifiers(swf);
+        mainFrame.getPanel().renameIdentifiers(openable);
     }
 
     protected void deobfuscationActionPerformed(ActionEvent evt) {
@@ -463,7 +465,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected void switchDebugger() {
-        DebuggerTools.switchDebugger(swf);
+        DebuggerTools.switchDebugger((SWF) openable);
     }
 
     protected void debuggerShowLogActionPerformed(ActionEvent evt) {
@@ -471,7 +473,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected void debuggerInjectLoader(ActionEvent evt) {
-        DebuggerTools.injectDebugLoader(swf);
+        DebuggerTools.injectDebugLoader((SWF) openable);
         refreshDecompiled();
     }
 
@@ -480,7 +482,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         rtd.setVisible(true);
         if (rtd.getValue() != null) {
             String fname = rtd.getValue();
-            DebuggerTools.replaceTraceCalls(swf, fname);
+            DebuggerTools.replaceTraceCalls((SWF) openable, fname);
             mainFrame.getPanel().refreshDecompiled();
             Configuration.lastDebuggerReplaceFunction.set(rtd.getValue());
         }
@@ -499,11 +501,17 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected void removeNonScripts() {
-        mainFrame.getPanel().removeNonScripts(swf);
+        if (openable instanceof SWF) {
+            return;
+        }
+        mainFrame.getPanel().removeNonScripts((SWF) openable);
     }
 
     protected void removeExceptSelected() {
-        mainFrame.getPanel().removeExceptSelected(swf);
+        if (openable instanceof SWF) {
+            return;
+        }
+        mainFrame.getPanel().removeExceptSelected((SWF) openable);
     }
 
     protected void refreshDecompiled() {
@@ -602,14 +610,17 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected boolean reloadActionPerformed(ActionEvent evt) {
-        if (swf != null) {
+        if (openable != null) {
             if (!Configuration.showCloseConfirmation.get() || ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-                if (swf.swfList == null) {
-                    if (swf.binaryData != null) {
-                        mainFrame.getPanel().loadFromBinaryTag(swf.binaryData);
+                if (openable.getOpenableList() == null) {
+                    if (openable instanceof SWF) {
+                        SWF swf = (SWF) openable;
+                        if (swf.binaryData != null) {
+                            mainFrame.getPanel().loadFromBinaryTag(swf.binaryData);
+                        }
                     }
                 } else {
-                    Main.reloadFile(swf.swfList);
+                    Main.reloadFile(openable.getOpenableList());
                 }
             }
         }
@@ -617,7 +628,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected boolean reloadAllActionPerformed(ActionEvent evt) {
-        if (swf != null) {
+        if (openable != null) {
             if (!Configuration.showCloseConfirmation.get() || ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.reloadAll"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                 Main.reloadApp();
             }
@@ -769,39 +780,47 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     public void updateComponents() {
-        updateComponents(swf);
+        updateComponents(openable);
     }
 
-    public void updateComponents(SWF swf) {
-        this.swf = swf;
+    public void updateComponents(Openable openable) {
+        this.openable = openable;
         boolean isRunning = Main.isRunning();
         boolean isDebugRunning = Main.isDebugRunning();
         boolean isDebugPaused = Main.isDebugPaused();
 
         boolean isRunningOrDebugging = isRunning || isDebugRunning;
 
-        boolean swfSelected = swf != null;
+        SWF swf = (openable instanceof SWF) ? (SWF) openable : null;
+        boolean openableSelected = openable != null;
+        boolean swfSelected = openable instanceof SWF;
         boolean isWorking = Main.isWorking();
         List<ABCContainerTag> abcList = swf != null ? swf.getAbcList() : null;
-        boolean hasAbc = swfSelected && abcList != null && !abcList.isEmpty();
+        boolean hasAbc = openableSelected && abcList != null && !abcList.isEmpty();
         boolean hasDebugger = hasAbc && DebuggerTools.hasDebugger(swf);
         MainPanel mainPanel = mainFrame.getPanel();
         boolean swfLoaded = mainPanel != null ? !mainPanel.getSwfs().isEmpty() : false;
-        boolean swfIsNew = swfSelected && swf.swfList != null && swf.swfList.sourceInfo.isEmpty();
+        boolean swfIsNew = openableSelected && openable.getOpenableList() != null && openable.getOpenableList().sourceInfo.isEmpty();
 
         boolean allSameSwf = true;
         if (mainPanel != null) {
             List<TreeItem> items = mainPanel.getCurrentTree().getSelected();
             SWF firstSwf = null;
             for (TreeItem item : items) {
-                if (item instanceof SWFList) {
+                if (item instanceof OpenableList) {
                     allSameSwf = false;
                     break;
                 }
                 if (firstSwf == null) {
-                    firstSwf = item.getSwf();
+                    Openable fopenable = item.getOpenable();
+                    if (fopenable instanceof SWF) {
+                        firstSwf = (SWF) fopenable;
+                    } else {
+                        allSameSwf = false;
+                        break;
+                    }
                 } else {
-                    if (item.getSwf() != firstSwf) {
+                    if (item.getOpenable() != firstSwf) {
                         allSameSwf = false;
                         break;
                     }
@@ -811,39 +830,39 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         setMenuEnabled("_/open", !isWorking);
         setMenuEnabled("/file/open", !isWorking);
-        setMenuEnabled("_/save", swfSelected && !isWorking);
-        setMenuEnabled("/file/save", swfSelected && !isWorking);
-        setMenuEnabled("_/saveAs", swfSelected && !isWorking);
-        setMenuEnabled("/file/saveAs", swfSelected && !isWorking);
+        setMenuEnabled("_/save", openableSelected && !isWorking);
+        setMenuEnabled("/file/save", openableSelected && !isWorking);
+        setMenuEnabled("_/saveAs", openableSelected && !isWorking);
+        setMenuEnabled("/file/saveAs", openableSelected && !isWorking);
         setMenuEnabled("/file/saveAsExe", swfSelected && !isWorking);
-        setMenuEnabled("_/close", swfSelected && !isWorking);
-        setMenuEnabled("/file/close", swfSelected && !isWorking);
+        setMenuEnabled("_/close", openableSelected && !isWorking);
+        setMenuEnabled("/file/close", openableSelected && !isWorking);
         setMenuEnabled("_/closeAll", swfLoaded && !isWorking);
         setMenuEnabled("/file/closeAll", swfLoaded && !isWorking);
-        setMenuEnabled("/file/reload", swfSelected && !swfIsNew && !isWorking);
+        setMenuEnabled("/file/reload", openableSelected && !swfIsNew && !isWorking);
 
-        setMenuEnabled("/file/export", swfSelected);
-        setMenuEnabled("_/exportAll", swfSelected && !isWorking);
-        setMenuEnabled("/file/export/exportAll", swfSelected && !isWorking);
+        setMenuEnabled("/file/export", openableSelected);
+        setMenuEnabled("_/exportAll", openableSelected && !isWorking);
+        setMenuEnabled("/file/export/exportAll", openableSelected && !isWorking);
         setMenuEnabled("_/exportFla", swfSelected && !isWorking);
-        setMenuEnabled("/file/export/exportFla", allSameSwf && swfSelected && !isWorking);
-        setMenuEnabled("_/exportSelected", swfSelected && !isWorking);
-        setMenuEnabled("/file/export/exportSelected", swfSelected && !isWorking);
+        setMenuEnabled("/file/export/exportFla", allSameSwf && openableSelected && !isWorking);
+        setMenuEnabled("_/exportSelected", openableSelected && !isWorking);
+        setMenuEnabled("/file/export/exportSelected", openableSelected && !isWorking);
         setMenuEnabled("/file/export/exportXml", swfSelected && !isWorking);
 
-        setMenuEnabled("/file/import", swfSelected);
+        setMenuEnabled("/file/import", openableSelected);
         setMenuEnabled("/file/import/importText", allSameSwf && swfSelected && !isWorking);
         setMenuEnabled("/file/import/importScript", allSameSwf && swfSelected && !isWorking);
         setMenuEnabled("/file/import/importOther", allSameSwf && swfSelected && !isWorking);
         setMenuEnabled("/file/import/importXml", allSameSwf && swfSelected && !isWorking);
 
-        setMenuEnabled("/tools/deobfuscation", swfSelected);
+        setMenuEnabled("/tools/deobfuscation", openableSelected);
         setMenuEnabled("/tools/deobfuscation/renameOneIdentifier", swfSelected && !isWorking);
         setMenuEnabled("/tools/deobfuscation/renameInvalidIdentifiers", swfSelected && !isWorking);
         setMenuEnabled("/tools/deobfuscation/renameColliding", swfSelected && !isWorking);
         setMenuEnabled("/tools/deobfuscation/deobfuscation", hasAbc);
 
-        setMenuEnabled("/tools/search", swfSelected);
+        setMenuEnabled("/tools/search", openableSelected);
         setMenuEnabled("/tools/replace", swfSelected);
         setMenuEnabled("/tools/timeline", swfSelected);
         setMenuEnabled("/tools/showProxy", !isWorking);
@@ -880,9 +899,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         StringBuilder titleBuilder = new StringBuilder();
         titleBuilder.append(ApplicationInfo.applicationVerName);
 
-        if (Configuration.displayFileName.get() && swf != null) {
+        if (Configuration.displayFileName.get() && openable != null) {
             titleBuilder.append(" - ");
-            titleBuilder.append(swf.getFullPathTitle());
+            titleBuilder.append(openable.getFullPathTitle());
         }
         mainFrame.setTitle(titleBuilder.toString());
 
@@ -1212,12 +1231,12 @@ public abstract class MainFrameMenu implements MenuBuilder {
             addMenuItem("/debug/openTestSwfs", "Open test SWFs", "continue16", e -> {
                 String path;
 
-                SWFSourceInfo[] sourceInfos = new SWFSourceInfo[2];
+                OpenableSourceInfo[] sourceInfos = new OpenableSourceInfo[2];
                 String mainPath = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
                 path = mainPath + "\\..\\..\\libsrc\\ffdec_lib\\testdata\\as2\\as2.swf";
-                sourceInfos[0] = new SWFSourceInfo(null, path, null);
+                sourceInfos[0] = new OpenableSourceInfo(null, path, null);
                 path = mainPath + "\\..\\..\\libsrc\\ffdec_lib\\testdata\\as3\\as3.swf";
-                sourceInfos[1] = new SWFSourceInfo(null, path, null);
+                sourceInfos[1] = new OpenableSourceInfo(null, path, null);
                 Main.openFile(sourceInfos);
             }, PRIORITY_MEDIUM, null, true, null, false);
             addMenuItem("/debug/createNewSwf", "Create new SWF", "continue16", e -> {
@@ -1229,7 +1248,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                     Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                Main.openFile(new SWFSourceInfo(new ByteArrayInputStream(baos.toByteArray()), "new.swf", "New SWF"));
+                Main.openFile(new OpenableSourceInfo(new ByteArrayInputStream(baos.toByteArray()), "new.swf", "New SWF"));
             }, PRIORITY_MEDIUM, null, true, null, false);
             finishMenu("/debug");
         }
@@ -1303,7 +1322,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
 
         if (swf != null) {
-            List<Integer> indices = Main.searchResultsStorage.getIndicesForSwf(swf);
+            List<Integer> indices = Main.searchResultsStorage.getIndicesForOpenable(swf);
             int j = 0;
             for (int i = 0; i < indices.size(); i++) {
                 final int fi = indices.get(i);
@@ -1320,7 +1339,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                     } else {
                         sr = new SearchResultsDialog<>(Main.getDefaultDialogsOwner(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
                     }
-                    sr.setResults(Main.searchResultsStorage.getSearchResultsAt(mainFrame.getPanel().getAllSwfs(), fi));
+                    sr.setResults(Main.searchResultsStorage.getSearchResultsAt(mainFrame.getPanel().getAllOpenablesAndSwfs(), fi));
                     sr.setVisible(true);
                     Main.getMainFrame().getPanel().searchResultsDialogs.add(sr);
                 };
@@ -1337,7 +1356,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     protected void clearRecentSearchesForCurrentSwfActionPerformed(ActionEvent evt) {
         if (ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.recentSearches.clear"), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
-            Main.searchResultsStorage.clearForSwf(swf);
+            Main.searchResultsStorage.clearForOpenable(openable);
         }
     }
 
@@ -1381,17 +1400,17 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     public boolean runActionPerformed(ActionEvent evt) {
-        Main.run(swf);
+        Main.run((SWF) openable);
         return true;
     }
 
     public boolean debugActionPerformed(ActionEvent evt) {
-        Main.runDebug(swf, false);
+        Main.runDebug((SWF) openable, false);
         return true;
     }
 
     public boolean debugPCodeActionPerformed(ActionEvent evt) {
-        Main.runDebug(swf, true);
+        Main.runDebug((SWF) openable, true);
         return true;
     }
 

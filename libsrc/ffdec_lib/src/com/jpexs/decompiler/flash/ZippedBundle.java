@@ -38,7 +38,7 @@ import java.util.zip.ZipOutputStream;
  *
  * @author JPEXS
  */
-public class ZippedSWFBundle implements SWFBundle {
+public class ZippedBundle implements Bundle {
 
     protected Set<String> keySet = new HashSet<>();
 
@@ -48,15 +48,15 @@ public class ZippedSWFBundle implements SWFBundle {
 
     protected File filename;
 
-    public ZippedSWFBundle(InputStream is) throws IOException {
+    public ZippedBundle(InputStream is) throws IOException {
         this(is, null);
     }
 
-    public ZippedSWFBundle(File filename) throws IOException {
+    public ZippedBundle(File filename) throws IOException {
         this(null, filename);
     }
 
-    protected ZippedSWFBundle(InputStream is, File filename) throws IOException {
+    protected ZippedBundle(InputStream is, File filename) throws IOException {
         initBundle(is, filename);
     }
 
@@ -90,7 +90,7 @@ public class ZippedSWFBundle implements SWFBundle {
     }
 
     @Override
-    public SeekableInputStream getSWF(String key) throws IOException {
+    public SeekableInputStream getOpenable(String key) throws IOException {
         if (!keySet.contains(key)) {
             return null;
         }
@@ -118,7 +118,7 @@ public class ZippedSWFBundle implements SWFBundle {
     public Map<String, SeekableInputStream> getAll() throws IOException {
         Map<String, SeekableInputStream> ret = new HashMap<>();
         for (String key : getKeys()) { // cache everything first
-            ret.put(key, getSWF(key));
+            ret.put(key, getOpenable(key));
         }
         return ret;
     }
@@ -134,7 +134,7 @@ public class ZippedSWFBundle implements SWFBundle {
     }
 
     @Override
-    public boolean putSWF(String key, InputStream swfIs) throws IOException {
+    public boolean putOpenable(String key, InputStream swfIs) throws IOException {
         if (this.isReadOnly()) {
             return false;
         }

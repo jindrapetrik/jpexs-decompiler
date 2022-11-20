@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.search;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -87,7 +88,7 @@ public class ActionSearchResult implements ScriptSearchResult {
     }
 
     @Override
-    public SWF getSWF() {
+    public Openable getOpenable() {
         return src.getSwf();
     }
 }

@@ -787,7 +787,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     }
                 } else if (treeItem instanceof Frame) {
                     Frame fn = (Frame) treeItem;
-                    SWF sourceSwf = fn.getSwf();
+                    SWF sourceSwf = (SWF) fn.getOpenable();
                     if (fn.timeline.timelined == sourceSwf) {
                         SetBackgroundColorTag setBgColorTag = sourceSwf.getBackgroundColor();
                         if (setBgColorTag != null) {
@@ -825,7 +825,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 }
             } else if (treeItem instanceof Frame) {
                 Frame fn = (Frame) treeItem;
-                SWF sourceSwf = fn.getSwf();
+                SWF sourceSwf = (SWF) fn.getOpenable();
                 if (fn.timeline.timelined == sourceSwf) {
                     SetBackgroundColorTag setBgColorTag = sourceSwf.getBackgroundColor();
                     if (setBgColorTag != null) {

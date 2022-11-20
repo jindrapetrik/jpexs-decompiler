@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.dumpview;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 
 /**
  *
@@ -24,16 +25,20 @@ import com.jpexs.decompiler.flash.SWF;
  */
 public class DumpInfoSwfNode extends DumpInfo {
 
-    private final SWF swf;
+    private final Openable openable;
 
-    public DumpInfoSwfNode(SWF swf, String name, String type, Object value, long startByte, long lengthBytes) {
+    public DumpInfoSwfNode(Openable openable, String name, String type, Object value, long startByte, long lengthBytes) {
         super(name, type, value, startByte, lengthBytes);
-        this.swf = swf;
+        this.openable = openable;
     }
 
     @Override
+    public Openable getOpenable() {
+        return openable;
+    }       
+    
     public SWF getSwf() {
-        return swf;
+        return (SWF) openable;
     }
 
     public static DumpInfoSwfNode getSwfNode(DumpInfo dumpInfo) {

@@ -17,8 +17,10 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -170,8 +172,9 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
             String groupName = translate("menu.recentSearches");
             searchHistoryPanel.addButtonGroup(groupName);
 
-            SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
-            List<Integer> indices = Main.searchResultsStorage.getIndicesForSwf(swf);
+            Openable openable = Main.getMainFrame().getPanel().getCurrentOpenable();
+            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
+            List<Integer> indices = Main.searchResultsStorage.getIndicesForOpenable(openable);
 
             int height = 0;
             height = searchHistoryPanel.getInsets().top + searchHistoryPanel.getInsets().bottom + 6/*groupInset top*/ + new JLabel(groupName).getPreferredSize().height + 4 /*layoutGap*/;
@@ -196,7 +199,7 @@ public class MainFrameRibbonMenu extends MainFrameMenu {
                     } else {
                         sr = new SearchResultsDialog<>(Main.getDefaultDialogsOwner(), searched, Main.searchResultsStorage.isIgnoreCaseAt(fi), Main.searchResultsStorage.isRegExpAt(fi), listeners);
                     }
-                    sr.setResults(Main.searchResultsStorage.getSearchResultsAt(Main.getMainFrame().getPanel().getAllSwfs(), fi));
+                    sr.setResults(Main.searchResultsStorage.getSearchResultsAt(Main.getMainFrame().getPanel().getAllOpenablesAndSwfs(), fi));
                     sr.setVisible(true);
                     Main.getMainFrame().getPanel().searchResultsDialogs.add(sr);
                 });

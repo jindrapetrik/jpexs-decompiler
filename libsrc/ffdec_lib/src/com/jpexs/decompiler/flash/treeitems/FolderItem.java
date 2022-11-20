@@ -45,7 +45,7 @@ public class FolderItem implements TreeItem {
     }
 
     @Override
-    public SWF getSwf() {
+    public Openable getOpenable() {
         return swf;
     }
 

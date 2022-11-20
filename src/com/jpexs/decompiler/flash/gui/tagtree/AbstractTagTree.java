@@ -18,7 +18,8 @@ package com.jpexs.decompiler.flash.gui.tagtree;
 
 import com.jpexs.decompiler.flash.SWC;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.ZippedSWFBundle;
+import com.jpexs.decompiler.flash.ZippedBundle;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
@@ -88,7 +89,8 @@ import com.jpexs.decompiler.flash.timeline.FrameScript;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
-import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
@@ -332,10 +334,10 @@ public abstract class AbstractTagTree extends JTree {
             return TreeNodeType.FLASH;
         }
 
-        if (t instanceof SWFList) {
-            SWFList slist = (SWFList) t;
+        if (t instanceof OpenableList) {
+            OpenableList slist = (OpenableList) t;
             if (slist.isBundle()) {
-                if (slist.bundle.getClass() == ZippedSWFBundle.class) {
+                if (slist.bundle.getClass() == ZippedBundle.class) {
                     return TreeNodeType.BUNDLE_ZIP;
                 } else if (slist.bundle.getClass() == SWC.class) {
                     return TreeNodeType.BUNDLE_SWC;
@@ -381,6 +383,10 @@ public abstract class AbstractTagTree extends JTree {
 
         if (t instanceof FolderItem) {
             return TreeNodeType.FOLDER;
+        }
+        
+        if (t instanceof ABC) {
+            return TreeNodeType.ABC;
         }
 
         return TreeNodeType.FOLDER;
@@ -493,15 +499,15 @@ public abstract class AbstractTagTree extends JTree {
         return !getSelection(mainPanel.getCurrentSwf()).isEmpty();
     }
 
-    public abstract List<TreeItem> getSelection(SWF swf);
+    public abstract List<TreeItem> getSelection(Openable openable);
 
-    public static List<TreeItem> getSelection(SWF swf, List<TreeItem> sel) {
+    public static List<TreeItem> getSelection(Openable openable, List<TreeItem> sel) {
         List<TreeItem> ret = new ArrayList<>();
         for (TreeItem d : sel) {
-            if (d instanceof SWFList) {
+            if (d instanceof OpenableList) {
                 continue;
             }
-            if (swf != null && d.getSwf() != swf) {
+            if (openable != null && d.getOpenable() != openable) {
                 continue;
             }
 
@@ -574,7 +580,7 @@ public abstract class AbstractTagTree extends JTree {
         return ret;
     }
     
-    public void updateSwfs(SWF[] swfs) {
+    public void updateSwfs(Openable[] openables) {
         AbstractTagTreeModel ttm = getModel();
         if (ttm != null) {
             List<List<String>> expandedNodes = View.getExpandedNodes(this);

@@ -31,7 +31,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author JPEXS
  */
-public class SWC extends ZippedSWFBundle {
+public class SWC extends ZippedBundle {
 
     public SWC(InputStream is) throws IOException {
         super(is);

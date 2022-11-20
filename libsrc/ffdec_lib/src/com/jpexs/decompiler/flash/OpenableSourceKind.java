@@ -14,17 +14,12 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.treeitems;
-
-import com.jpexs.decompiler.flash.SWF;
+package com.jpexs.decompiler.flash;
 
 /**
  *
  * @author JPEXS
  */
-public interface TreeItem {
-
-    public Openable getOpenable();
-
-    public boolean isModified();
+public enum OpenableSourceKind {
+    ABC, SWF, BUNDLE
 }

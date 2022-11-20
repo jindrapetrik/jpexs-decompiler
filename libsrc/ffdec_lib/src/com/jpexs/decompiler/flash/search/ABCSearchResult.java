@@ -22,12 +22,14 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,7 +58,7 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
     private static final int SERIAL_VERSION_MINOR = 0;
 
     @SuppressWarnings("unchecked")
-    public ABCSearchResult(SWF swf, InputStream is) throws IOException, ScriptNotFoundException {
+    public ABCSearchResult(Openable openable, InputStream is) throws IOException, ScriptNotFoundException {
         ObjectInputStream ois = new ObjectInputStream(is);
         int versionMajor = ois.read();
         ois.read(); //minor
@@ -78,7 +80,19 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
         this.classIndex = ois.readInt();
         this.traitId = ois.readInt();
         boolean packFound = false;
-        for (ScriptPack pack : swf.getAS3Packs()) {
+         
+        List<ScriptPack> packs;
+        
+        if (openable instanceof SWF) {
+            packs = ((SWF)openable).getAS3Packs();
+        } else {
+            ABC abc = (ABC)openable;
+            List<ABC> allAbcs = new ArrayList<>();
+            allAbcs.add(abc);
+            packs = abc.getScriptPacks(null, allAbcs);
+        }
+        
+        for (ScriptPack pack : packs) {
             if (cp.equals(pack.getClassPath()) && traitIndices.equals(pack.traitIndices)) {
                 this.scriptPack = pack;
                 packFound = true;
@@ -176,7 +190,7 @@ public class ABCSearchResult implements Serializable, ScriptSearchResult {
     }
 
     @Override
-    public SWF getSWF() {
-        return scriptPack.getSwf();
+    public Openable getOpenable() {
+        return scriptPack.getOpenable();
     }
 }

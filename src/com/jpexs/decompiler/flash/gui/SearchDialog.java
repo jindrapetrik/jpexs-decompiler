@@ -78,7 +78,7 @@ public class SearchDialog extends AppDialog {
         }
     }
 
-    public SearchDialog(Window owner, boolean replace, String selection, boolean selectionFirst) {
+    public SearchDialog(Window owner, boolean replace, String selection, boolean selectionFirst, boolean currentAbc) {
         super(owner);
         setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
         ignoreCaseCheckBox.setSelected(true);
@@ -111,7 +111,7 @@ public class SearchDialog extends AppDialog {
         if (selection != null) {
             scopeItems.add(translate("scope.selection").replace("%selection%", selection));
         }
-        scopeItems.add(translate("scope.currentFile"));
+        scopeItems.add(translate(currentAbc ? "scope.currentFile.abc" : "scope.currentFile"));
         scopeItems.add(translate("scope.allFiles"));
         panField.add(new JLabel(translate("label.scope")));
         scopeComboBox = new JComboBox<>(scopeItems.toArray(new String[scopeItems.size()]));

@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.iggy.conversion;
 
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFBundle;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.MemoryInputStream;
@@ -30,12 +29,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import com.jpexs.decompiler.flash.Bundle;
 
 /**
  *
  * @author JPEXS
  */
-public class IggySwfBundle implements SWFBundle {
+public class IggySwfBundle implements Bundle {
 
     private IggyFile iggyFile;
 
@@ -83,7 +83,7 @@ public class IggySwfBundle implements SWFBundle {
     }
 
     @Override
-    public SeekableInputStream getSWF(String key) throws IOException {
+    public SeekableInputStream getOpenable(String key) throws IOException {
         SWF swf = IggyToSwfConvertor.getSwf(iggyFile);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         swf.saveTo(baos);
@@ -95,7 +95,7 @@ public class IggySwfBundle implements SWFBundle {
     public Map<String, SeekableInputStream> getAll() throws IOException {
         Map<String, SeekableInputStream> ret = new HashMap<>();
         for (String key : getKeys()) {
-            ret.put(key, getSWF(key));
+            ret.put(key, getOpenable(key));
         }
         return ret;
     }
@@ -111,7 +111,7 @@ public class IggySwfBundle implements SWFBundle {
     }
 
     @Override
-    public boolean putSWF(String key, InputStream is) throws IOException {
+    public boolean putOpenable(String key, InputStream is) throws IOException {
         try {
             SWF swf = new SWF(is, false, false);
             SwfToIggyConvertor.updateIggy(iggyFile.getSwf(), swf);

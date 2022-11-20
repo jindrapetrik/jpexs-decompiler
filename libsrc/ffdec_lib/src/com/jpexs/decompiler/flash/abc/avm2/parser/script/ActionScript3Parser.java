@@ -2619,7 +2619,7 @@ public class ActionScript3Parser {
             }
 
             SWC swc = new SWC(new FileInputStream(Configuration.getPlayerSWC()));
-            SWF swf = new SWF(swc.getSWF("library.swf"), true);
+            SWF swf = new SWF(swc.getOpenable("library.swf"), true);
             playerGlobalAbcIndex = new AbcIndexing(swf);
         }
         if (airGlobalAbcIndex == null) {
@@ -2627,7 +2627,7 @@ public class ActionScript3Parser {
                 return;
             }
             SWC swc = new SWC(new FileInputStream(Configuration.getAirSWC()));
-            SWF swf = new SWF(swc.getSWF("library.swf"), true);
+            SWF swf = new SWF(swc.getOpenable("library.swf"), true);
             airGlobalAbcIndex = new AbcIndexing(swf);
         }
     }

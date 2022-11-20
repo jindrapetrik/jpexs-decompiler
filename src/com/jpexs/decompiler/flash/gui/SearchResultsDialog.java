@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.search.SearchResult;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -86,7 +87,7 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
     private String text;
     private final boolean ignoreCase;
 
-    private Map<SWF, List<SearchResult>> swfToResults = new LinkedHashMap<>();
+    private Map<Openable, List<SearchResult>> openableToResults = new LinkedHashMap<>();
 
     public SearchResultsDialog(Window owner, String text, boolean ignoreCase, boolean regExp, List<SearchListener<E>> listeners) {
         super(owner);
@@ -388,30 +389,30 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
     }
 
     public void setResults(List<E> results) {
-        swfToResults.clear();
+        openableToResults.clear();
         for (E e : results) {
-            if (!swfToResults.containsKey(e.getSWF())) {
-                swfToResults.put(e.getSWF(), new ArrayList<>());
+            if (!openableToResults.containsKey(e.getOpenable())) {
+                openableToResults.put(e.getOpenable(), new ArrayList<>());
             }
-            swfToResults.get(e.getSWF()).add(e);
+            openableToResults.get(e.getOpenable()).add(e);
         }
         updateModel();
     }
 
     private void updateModel() {
-        boolean showSwfTitles = swfToResults.size() > 1;
+        boolean showSwfTitles = openableToResults.size() > 1;
 
         if (showSwfTitles) {
             BasicTreeNode rootNode = new BasicTreeNode("root");
             List<BasicTreeNode> swfNodes = new ArrayList<>();
-            for (SWF s : swfToResults.keySet()) {
+            for (Openable s : openableToResults.keySet()) {
                 BasicTreeNode swfNode = new BasicTreeNode(s);
                 if (showSwfTitles) {
                     rootNode.addChild(swfNode);
                     swfNode.setParent(rootNode);
                     swfNodes.add(swfNode);
                 }
-                for (SearchResult r : swfToResults.get(s)) {
+                for (SearchResult r : openableToResults.get(s)) {
                     BasicTreeNode rNode = new BasicTreeNode(r);
                     if (showSwfTitles) {
                         swfNode.addChild(rNode);
@@ -430,8 +431,8 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
         } else {
             DefaultListModel<SearchResult> model = (DefaultListModel<SearchResult>) resultsList.getModel();
             model.clear();
-            if (!swfToResults.isEmpty()) {
-                List<SearchResult> elements = swfToResults.get(swfToResults.keySet().iterator().next());
+            if (!openableToResults.isEmpty()) {
+                List<SearchResult> elements = openableToResults.get(openableToResults.keySet().iterator().next());
                 for (SearchResult e : elements) {
                     model.addElement(e);
                 }
@@ -442,12 +443,12 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
     }
 
     public void removeSwf(SWF swf) {
-        swfToResults.remove(swf);
+        openableToResults.remove(swf);
         updateModel();
     }
 
     public boolean isEmpty() {
-        return swfToResults.isEmpty();
+        return openableToResults.isEmpty();
     }
 
     private void gotoButtonActionPerformed(ActionEvent evt) {
@@ -460,7 +461,7 @@ public class SearchResultsDialog<E extends SearchResult> extends AppDialog {
 
     @SuppressWarnings("unchecked")
     private void gotoElement() {
-        if (swfToResults.size() > 1) {
+        if (openableToResults.size() > 1) {
             BasicTreeNode selection = (BasicTreeNode) resultsTree.getLastSelectedPathComponent();
             if (selection.getData() instanceof SearchResult) {
                 for (SearchListener<E> listener : listeners) {

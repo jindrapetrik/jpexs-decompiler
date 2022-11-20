@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,7 @@ public class AS2Package implements TreeItem {
     
 
     @Override
-    public SWF getSwf() {
+    public Openable getOpenable() {
         return swf;
     }
 

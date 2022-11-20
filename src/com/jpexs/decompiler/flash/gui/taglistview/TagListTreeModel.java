@@ -28,7 +28,8 @@ import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.HeaderItem;
-import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,11 +47,11 @@ public class TagListTreeModel extends AbstractTagTreeModel {
 
     private final TagListTreeRoot root = new TagListTreeRoot();
 
-    private List<SWFList> swfs;
+    private List<OpenableList> swfs;
     
     private Map<SWF, HeaderItem> swfHeaders = new HashMap<>();         
     
-    public TagListTreeModel(List<SWFList> swfs) {
+    public TagListTreeModel(List<OpenableList> swfs) {
         this.swfs = swfs;
     }           
     
@@ -80,13 +81,13 @@ public class TagListTreeModel extends AbstractTagTreeModel {
         TreeItem parentNode = (TreeItem) parent;       
 
         if (parentNode == root) {
-            SWFList swfList = swfs.get(index);
+            OpenableList swfList = swfs.get(index);
             if (!swfList.isBundle()) {
                 return swfList.get(0);
             }
             return swfList;
-        } else if (parentNode instanceof SWFList) {
-            return ((SWFList) parentNode).swfs.get(index);
+        } else if (parentNode instanceof OpenableList) {
+            return ((OpenableList) parentNode).items.get(index);
         } else if (parentNode instanceof SWF) {
             if (index == 0) {
                 return getSwfHeader((SWF) parentNode);
@@ -118,8 +119,8 @@ public class TagListTreeModel extends AbstractTagTreeModel {
         TreeItem parentNode = (TreeItem) parent;
         if (parentNode == root) {
             return swfs.size();
-        } else if (parentNode instanceof SWFList) {
-            return  ((SWFList) parentNode).swfs.size();
+        } else if (parentNode instanceof OpenableList) {
+            return  ((OpenableList) parentNode).items.size();
         } else if (parentNode instanceof SWF) {
             return ((SWF) parentNode).getTimeline().getFrameCount() + 1;
         } else if (parentNode instanceof HeaderItem) {
@@ -156,12 +157,12 @@ public class TagListTreeModel extends AbstractTagTreeModel {
         TreeItem parentNode = (TreeItem) parent;       
 
         if (parentNode == root) {
-             SWFList swfList = child instanceof SWFList
-                    ? (SWFList) child
-                    : ((SWF) child).swfList;
-            return swfs.indexOf(swfList);
-        } else if (parentNode instanceof SWFList) {
-            return ((SWFList) parentNode).swfs.indexOf(child);
+             OpenableList openableListswfList = child instanceof OpenableList
+                    ? (OpenableList) child
+                    : ((Openable) child).getOpenableList();
+            return swfs.indexOf(openableListswfList);
+        } else if (parentNode instanceof OpenableList) {
+            return ((OpenableList) parentNode).items.indexOf(child);
         } else if (parentNode instanceof SWF) {
             
             HeaderItem header = getSwfHeader((SWF) parentNode);
@@ -210,7 +211,7 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             List<SWF> toRemove = new ArrayList<>();
             for (SWF swf : swfHeaders.keySet()) {
                 SWF swf2 = swf.getRootSwf();
-                if (swf2 != null && !swfs.contains(swf2.swfList)) {
+                if (swf2 != null && !swfs.contains(swf2.openableList)) {
                     toRemove.add(swf);
                 }
             }
@@ -274,15 +275,15 @@ public class TagListTreeModel extends AbstractTagTreeModel {
         TreeItem parentNode = (TreeItem) parent;
         if (parentNode == root) {
             List<TreeItem> result = new ArrayList<>(swfs.size());
-            for (SWFList swfList : swfs) {
+            for (OpenableList swfList : swfs) {
                 if (!swfList.isBundle()) {
                     result.add(swfList.get(0));
                 }
                 result.add(swfList);
             }
             return result;
-        } else if (parentNode instanceof SWFList) {
-            return ((SWFList) parentNode).swfs;
+        } else if (parentNode instanceof OpenableList) {
+            return ((OpenableList) parentNode).items;
         } else if (parentNode instanceof SWF) {
             List<TreeItem> ret = new ArrayList<>();
             ret.add(getSwfHeader((SWF)parentNode));

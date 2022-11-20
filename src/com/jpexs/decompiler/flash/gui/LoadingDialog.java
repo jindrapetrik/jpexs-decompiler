@@ -45,7 +45,7 @@ public class LoadingDialog extends AppDialog {
 
     private final JProgressBar progressBar = new JProgressBar(0, 100);
 
-    public void setWroker(CancellableWorker<?> worker) {
+    public void setWorker(CancellableWorker<?> worker) {
         this.worker = worker;
     }
 

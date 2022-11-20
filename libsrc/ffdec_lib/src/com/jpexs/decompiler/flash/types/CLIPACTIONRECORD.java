@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.HideInRawEdit;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
@@ -173,9 +174,15 @@ public class CLIPACTIONRECORD implements ASMSource, Serializable, HasSwfAndTag {
     }
 
     @Override
+    public Openable getOpenable() {
+        return swf;
+    }
+
+    @Override
     public SWF getSwf() {
         return swf;
     }
+    
 
     /**
      * Events to which this handler applies

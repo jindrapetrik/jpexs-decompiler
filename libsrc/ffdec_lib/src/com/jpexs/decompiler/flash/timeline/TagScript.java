@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.timeline;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.Exportable;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +51,7 @@ public class TagScript implements TreeItem, Exportable {
     }
 
     @Override
-    public SWF getSwf() {
+    public Openable getOpenable() {
         return swf;
     }
 

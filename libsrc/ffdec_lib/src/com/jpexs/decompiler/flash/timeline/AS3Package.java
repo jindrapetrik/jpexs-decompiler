@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ import java.util.TreeMap;
  */
 public class AS3Package extends AS3ClassTreeItem {
 
-    private final SWF swf;
+    private final Openable openable;
 
     public String packageName;
 
@@ -48,10 +49,10 @@ public class AS3Package extends AS3ClassTreeItem {
     
     private boolean defaultPackage;
 
-    public AS3Package(String packageName, SWF swf, boolean flat, boolean defaultPackage) {
+    public AS3Package(String packageName, Openable openable, boolean flat, boolean defaultPackage) {
         super(packageName, "", null);
         this.flat = flat;
-        this.swf = swf;
+        this.openable = openable;
         this.packageName = packageName;
         this.defaultPackage = defaultPackage;
     }
@@ -63,8 +64,8 @@ public class AS3Package extends AS3ClassTreeItem {
     
 
     @Override
-    public SWF getSwf() {
-        return swf;
+    public Openable getOpenable() {
+        return openable;
     }
 
     public List<AS3Package> getSubPackages() {

@@ -14,31 +14,35 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash;
+package com.jpexs.decompiler.flash.treeitems;
 
-import com.jpexs.helpers.streams.SeekableInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-import java.util.Set;
+import java.io.OutputStream;
 
 /**
  *
  * @author JPEXS
  */
-public interface SWFBundle {
-
-    public int length();
-
-    public Set<String> getKeys();
-
-    public SeekableInputStream getSWF(String key) throws IOException;
-
-    public Map<String, SeekableInputStream> getAll() throws IOException;
-
-    public String getExtension();
-
-    public boolean isReadOnly();
-
-    public boolean putSWF(String key, InputStream is) throws IOException;
+public interface Openable extends TreeItem {
+    public String getFileTitle();
+    
+    public String getShortPathTitle();
+    
+    public String getShortFileName();
+   
+    public String getFile();
+    
+    public String getTitleOrShortFileName();
+    
+    public String getFullPathTitle();
+    
+    public void setOpenableList(OpenableList openableList);
+    
+    public OpenableList getOpenableList();
+    
+    public void saveTo(OutputStream os) throws IOException;
+    
+    public void setFile(String file);
+    
+    public void clearModified();
 }

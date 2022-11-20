@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
@@ -181,8 +182,8 @@ public class ButtonAction implements ASMSource {
     }
 
     @Override
-    public SWF getSwf() {
-        return buttonTag.getSwf();
+    public Openable getOpenable() {
+        return buttonTag.getOpenable();
     }
 
     @Override
@@ -198,6 +199,11 @@ public class ButtonAction implements ASMSource {
     @Override
     public Tag getTag() {
         return buttonTag;
+    }
+
+    @Override
+    public SWF getSwf() {
+        return (SWF) getOpenable();
     }
     
     

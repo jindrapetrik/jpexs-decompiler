@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
@@ -25,6 +26,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +42,7 @@ import javax.swing.tree.TreePath;
  */
 public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel {
 
-    private final SWF swf;
+    private final Openable openable;
 
     private List<ScriptPack> list;
 
@@ -58,18 +60,36 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
         super(null, null, null);
         this.flat = flat;
         root = new AS3Package(null, swf, flat, false);
-        this.swf = swf;
+        this.openable = swf;
         this.list = swf.getAS3Packs();
+        setFilter(null);
+    }
+    
+    public ClassesListTreeModel(ABC abc, boolean flat) {
+        super(null, null, null);
+        this.flat = flat;
+        root = new AS3Package(null, abc, flat, false);
+        this.openable = abc;
+        List<ABC> allAbcs = new ArrayList<>();
+        allAbcs.add(abc);
+        this.list = abc.getScriptPacks(null, allAbcs);
         setFilter(null);
     }
 
     @Override
-    public SWF getSwf() {
-        return swf;
+    public Openable getOpenable() {
+        return openable;
     }
 
     public final void update() {
-        this.list = swf.getAS3Packs();
+        if (openable instanceof SWF) {
+            this.list = ((SWF)openable).getAS3Packs();
+        } else if (openable instanceof ABC) {
+            ABC abc = (ABC) openable;
+            List<ABC> allAbcs = new ArrayList<>();
+            allAbcs.add(abc);
+            this.list = abc.getScriptPacks(null, allAbcs);
+        }
         TreeModelEvent event = new TreeModelEvent(this, new TreePath(root));
         for (TreeModelListener listener : listeners) {
             listener.treeStructureChanged(event);
@@ -81,8 +101,10 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
 
         List<String> ignoredClasses = new ArrayList<>();
         List<String> ignoredNss = new ArrayList<>();
-        if (Configuration._ignoreAdditionalFlexClasses.get()) {
-            getSwf().getFlexMainClass(ignoredClasses, ignoredNss);
+        if (Configuration._ignoreAdditionalFlexClasses.get()) {     
+            if (openable instanceof SWF) {
+                ((SWF)openable).getFlexMainClass(ignoredClasses, ignoredNss);
+            }
         }
 
         filter = (filter == null || filter.isEmpty()) ? null : filter.toLowerCase(Locale.ENGLISH);
@@ -124,7 +146,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
             }
             AS3Package pkg = root.getSubPackage(fullName);
             if (pkg == null) {
-                pkg = new AS3Package(fullName, swf, true, defaultPackage);
+                pkg = new AS3Package(fullName, openable, true, defaultPackage);
                 root.addSubPackage(pkg);
             }
             return pkg;
@@ -134,7 +156,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
             String pathElement = packageStr.get(i);
             AS3Package pkg = parent.getSubPackage(pathElement);
             if (pkg == null) {
-                pkg = new AS3Package(pathElement, swf, false, false);
+                pkg = new AS3Package(pathElement, openable, false, false);
                 parent.addSubPackage(pkg);
             }
 
@@ -238,11 +260,11 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
             return false;
         }
 
-        return swf.equals(((ClassesListTreeModel) obj).swf);
+        return openable.equals(((ClassesListTreeModel) obj).openable);
     }
 
     @Override
     public int hashCode() {
-        return ClassesListTreeModel.class.hashCode() ^ swf.hashCode();
+        return ClassesListTreeModel.class.hashCode() ^ openable.hashCode();
     }
 }

@@ -18,7 +18,7 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
-import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.helpers.Helper;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -129,7 +129,7 @@ public final class MainFrameRibbon extends AppRibbonFrame {
                     StringBuilder sbt = new StringBuilder();
 
                     boolean first = true;
-                    for (SWFList swf : panel.getSwfs()) {
+                    for (OpenableList swf : panel.getSwfs()) {
                         if (!first) {
                             sb.append(File.pathSeparator);
                             sbt.append(File.pathSeparator);

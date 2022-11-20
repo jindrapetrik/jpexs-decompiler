@@ -14,17 +14,31 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.treeitems;
+package com.jpexs.decompiler.flash;
 
-import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.helpers.streams.SeekableInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+import java.util.Set;
 
 /**
  *
  * @author JPEXS
  */
-public interface TreeItem {
+public interface Bundle {
 
-    public Openable getOpenable();
+    public int length();
 
-    public boolean isModified();
+    public Set<String> getKeys();
+
+    public SeekableInputStream getOpenable(String key) throws IOException;
+
+    public Map<String, SeekableInputStream> getAll() throws IOException;
+
+    public String getExtension();
+
+    public boolean isReadOnly();
+
+    public boolean putOpenable(String key, InputStream is) throws IOException;
 }

@@ -88,7 +88,8 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.FolderItem;
-import com.jpexs.decompiler.flash.treeitems.SWFList;
+import com.jpexs.decompiler.flash.treeitems.Openable;
+import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -154,7 +155,7 @@ public class TagTree extends AbstractTagTree {
                 boolean hasFocus) {
 
             TreeItem val = (TreeItem) value;
-            if (val != null && !(val instanceof SWFList) && val.getSwf() == null) {
+            if (val != null && !(val instanceof OpenableList) && val.getOpenable() == null) {
                 // SWF was closed
                 value = null;
             }
@@ -307,7 +308,7 @@ public class TagTree extends AbstractTagTree {
     }
 
     @Override
-    public List<TreeItem> getSelection(SWF swf) {
+    public List<TreeItem> getSelection(Openable openable) {
         List<TreeItem> sel;
         if (mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
             sel = getAllSelected();
@@ -319,7 +320,7 @@ public class TagTree extends AbstractTagTree {
                 getAllSubs(treeItem, sel);
             }
         }
-        return getSelection(swf, sel);
+        return getSelection(openable, sel);
     }
 
     public List<AS3ClassTreeItem> getTagsWithType(List<AS3ClassTreeItem> list, TreeNodeType type) {

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagStub;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -147,13 +148,13 @@ public class DumpInfo implements TreeItem {
     }
 
     @Override
-    public SWF getSwf() {
+    public Openable getOpenable() {
         Tag tag = tagToResolve != null ? tagToResolve : resolvedTag;
         if (tag != null) {
-            return tag.getSwf();
+            return tag.getOpenable();
         }
 
-        return DumpInfoSwfNode.getSwfNode(this).getSwf();
+        return DumpInfoSwfNode.getSwfNode(this).getOpenable();
     }
 
     @Override

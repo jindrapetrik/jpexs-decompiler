@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.importers.As3ScriptReplaceExceptionItem;
 import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import java.io.ByteArrayInputStream;
@@ -263,7 +264,9 @@ public class MxmlcAs3ScriptReplacer extends MxmlcRunner implements As3ScriptRepl
             swcFile = new File(pkgDir, "out.swc");
 
             //Make copy without the old script
-            SWF swfCopy = recompileSWF(pack.getSwf());
+            Openable openable = pack.getOpenable();
+            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
+            SWF swfCopy = recompileSWF(swf);
 
             List<ABC> modAbcs = new ArrayList<>();
 
