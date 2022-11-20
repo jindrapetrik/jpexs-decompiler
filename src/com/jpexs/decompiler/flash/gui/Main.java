@@ -934,7 +934,9 @@ public class Main {
                         doABC2Tag.setTimelined(dummySwf);
                         dummySwf.clearModified();
                         startWork(AppStrings.translate("work.reading.abc"), this);
-                        return new ABC(new ABCInputStream(new MemoryInputStream(Helper.readFile(file))), dummySwf, doABC2Tag, file, fileTitle);
+                        ABC abc = new ABC(new ABCInputStream(new MemoryInputStream(Helper.readFile(file))), dummySwf, doABC2Tag, file, fileTitle);
+                        doABC2Tag.setABC(abc);
+                        return abc;
                     }
                         
                     @Override

@@ -1548,10 +1548,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         List<TreeItem> sel = getTree().getSelected();
         if (!sel.isEmpty()) {
             SWF swf = null;
+            Openable openable = null;
             String preselected = "";
             if (sel.get(0) instanceof ClassesListTreeModel) {
                 ClassesListTreeModel cl = (ClassesListTreeModel) sel.get(0);
-                Openable openable = cl.getOpenable();
+                openable = cl.getOpenable();
                 if (openable instanceof SWF) {
                     swf = (SWF) openable;
                 } else {
@@ -1560,7 +1561,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
             if (sel.get(0) instanceof AS3Package) {
                 AS3Package pkg = (AS3Package) sel.get(0);
-                Openable openable = pkg.getOpenable();
+                openable = pkg.getOpenable();
                 if (openable instanceof SWF) {
                     swf = (SWF) openable;
                 } else {
@@ -1572,6 +1573,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                     if (path[p] instanceof ClassesListTreeModel) {
                         break;
                     }
+                    if (path[p] instanceof ABC) {
+                        break;
+                    }
                     if (((AS3Package) path[p]).isDefaultPackage()) {
                         break;
                     }
@@ -1580,12 +1584,12 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
 
             TreePath scriptsPath = tree.getSelectionPaths()[0];
-            while (!(scriptsPath.getLastPathComponent() instanceof ClassesListTreeModel)) {
+            while (!(scriptsPath.getLastPathComponent() instanceof ClassesListTreeModel) && !(scriptsPath.getLastPathComponent() instanceof ABC)) {
                 scriptsPath = scriptsPath.getParentPath();
             }
 
             {
-                AddClassDialog acd = new AddClassDialog(Main.getDefaultDialogsOwner(), swf);
+                AddClassDialog acd = new AddClassDialog(Main.getDefaultDialogsOwner(), openable);
                 if (acd.showDialog(preselected) != AppDialog.OK_OPTION) {
                     return;
                 }

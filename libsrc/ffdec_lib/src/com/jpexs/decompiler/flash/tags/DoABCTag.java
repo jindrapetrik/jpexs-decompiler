@@ -110,4 +110,9 @@ public class DoABCTag extends Tag implements ABCContainerTag {
             }
         }
     }
+    
+    @Override
+    public void setABC(ABC abc) {
+        this.abc = abc;
+    }   
 }

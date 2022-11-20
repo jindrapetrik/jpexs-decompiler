@@ -48,4 +48,8 @@ public class RootABCContainerTag implements ABCContainerTag {
     public String toString() {
         return " - all - ";
     }
+
+    @Override
+    public void setABC(ABC abc) {
+    }        
 }

@@ -87,6 +87,10 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
             public int compareTo(ABCContainerTag o) {
                 return 0;
             }
+
+            @Override
+            public void setABC(ABC abc) {
+            }                        
         });
         MethodBody b = new MethodBody(abc, new Traits(), new byte[0], new ABCException[0]);
         AVM2Code code = ASM3Parser.parse(abc, new StringReader(str), null, b, new MethodInfo());
@@ -118,6 +122,10 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
             public int compareTo(ABCContainerTag o) {
                 return 0;
             }
+
+            @Override
+            public void setABC(ABC abc) {
+            }                                    
         });
         ActionScript3Parser par = new ActionScript3Parser(abc, new ArrayList<>(), false);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);

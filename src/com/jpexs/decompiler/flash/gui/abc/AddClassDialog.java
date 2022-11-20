@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -25,6 +26,7 @@ import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -60,24 +62,29 @@ public class AddClassDialog extends AppDialog {
     private Tag selectedPosition;
     private Timelined selectedTimelined;
     private int result = ERROR_OPTION;
-    
-    private SWF swf;
-    
+
+    private Openable openable;
+
     private int abcCount = 0;
-    
+
     private JRadioButton existingAbcTagRadioButton = new JRadioButton(translate("abc.where.existing"));
     private JRadioButton newAbcTagRadioButton = new JRadioButton(translate("abc.where.new"));
 
-    public AddClassDialog(Window owner, SWF swf) {
+    public AddClassDialog(Window owner, Openable openable) {
         super(owner);
-        this.swf = swf;
+        this.openable = openable;
         abcCount = 0;
-        for(Tag t : swf.getTags()) {
-            if (t instanceof ABCContainerTag) {               
-               abcCount++;
+        if (openable instanceof SWF) {
+            SWF swf = (SWF) openable;
+            for (Tag t : swf.getTags()) {
+                if (t instanceof ABCContainerTag) {
+                    abcCount++;
+                }
             }
+        } else {
+            abcCount = 1;
         }
-        
+
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setTitle(translate("dialog.title"));
 
@@ -101,18 +108,23 @@ public class AddClassDialog extends AppDialog {
         });
         ButtonGroup abcTargetButtonGroup = new ButtonGroup();
         abcTargetButtonGroup.add(existingAbcTagRadioButton);
-        abcTargetButtonGroup.add(newAbcTagRadioButton);        
+        abcTargetButtonGroup.add(newAbcTagRadioButton);
         existingAbcTagRadioButton.setSelected(true);
         abcTargetPanel.add(existingAbcTagRadioButton);
         abcTargetPanel.add(newAbcTagRadioButton);
-        
+
         if (abcCount == 0) {
             newAbcTagRadioButton.setSelected(true);
             abcTargetPanel.setVisible(false);
         }
-        
+
+        if (openable instanceof ABC) {
+            existingAbcTagRadioButton.setSelected(true);
+            abcTargetPanel.setVisible(false);
+        }
+
         JPanel buttonsPanel = new JPanel(new FlowLayout());
-        proceedButton.addActionListener(this::okButtonActionPerformed);                
+        proceedButton.addActionListener(this::okButtonActionPerformed);
         cancelButton.addActionListener(this::cancelButtonActionPerformed);
         buttonsPanel.add(proceedButton);
         buttonsPanel.add(cancelButton);
@@ -121,7 +133,7 @@ public class AddClassDialog extends AppDialog {
         classNameLabel.setAlignmentX(JLabel.CENTER);
         cnt.add(classNameLabel);
         cnt.add(classNameTextField);
-        
+
         cnt.add(abcTargetPanel);
 
         cnt.add(buttonsPanel);
@@ -154,14 +166,13 @@ public class AddClassDialog extends AppDialog {
     }
 
     private void checkEnabled() {
-        
+
         if (existingAbcTagRadioButton.isSelected() && abcCount == 1) {
             proceedButton.setText(translate("button.ok"));
         } else {
             proceedButton.setText(translate("button.proceed"));
         }
-        
-        
+
         boolean ok = true;
 
         if (classNameTextField.getText().isEmpty()) {
@@ -173,16 +184,32 @@ public class AddClassDialog extends AppDialog {
         }
 
         if (ok) {
-            SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
-            List<String> classNames = new ArrayList<>();
-            classNames.add(classNameTextField.getText());
-            try {
-                List<ScriptPack> scriptPacks = swf.getScriptPacksByClassNames(classNames);
-                if (!scriptPacks.isEmpty()) {
+
+            if (openable instanceof SWF) {
+                SWF swf = (SWF) openable;
+                List<String> classNames = new ArrayList<>();
+                classNames.add(classNameTextField.getText());
+                try {
+                    List<ScriptPack> scriptPacks = swf.getScriptPacksByClassNames(classNames);
+                    if (!scriptPacks.isEmpty()) {
+                        ok = false;
+                    }
+                } catch (Exception ex) {
                     ok = false;
                 }
-            } catch (Exception ex) {
-                ok = false;
+            }
+            if (openable instanceof ABC) {
+                ABC abc = (ABC) openable;
+                List<ABC> allAbcs = new ArrayList<>();
+                allAbcs.add(abc);
+                try {
+                    List<ScriptPack> scriptPacks = abc.findScriptPacksByPath(classNameTextField.getText(), allAbcs);
+                    if (!scriptPacks.isEmpty()) {
+                        ok = false;
+                    }
+                } catch (Exception ex) {
+                    ok = false;
+                }
             }
         }
 
@@ -194,27 +221,31 @@ public class AddClassDialog extends AppDialog {
             return;
         }
         setVisible(false);
-        if (existingAbcTagRadioButton.isSelected()) {
-            SelectDoABCDialog selectDoABCDialog = new SelectDoABCDialog(owner, swf);
-            selectedAbcContainer = selectDoABCDialog.showDialog();
-            if (selectedAbcContainer == null) {
-                cancelButtonActionPerformed(evt);
-                return;
+        if (openable instanceof ABC) {
+            selectedAbcContainer = ((ABC) openable).parentTag;
+        } else {
+            if (existingAbcTagRadioButton.isSelected()) {
+                SelectDoABCDialog selectDoABCDialog = new SelectDoABCDialog(owner, (SWF) openable);
+                selectedAbcContainer = selectDoABCDialog.showDialog();
+                if (selectedAbcContainer == null) {
+                    cancelButtonActionPerformed(evt);
+                    return;
+                }
+            }
+            if (newAbcTagRadioButton.isSelected()) {
+                SelectTagPositionDialog selectTagPositionDialog = new SelectTagPositionDialog(owner, (SWF) openable, true);
+                if (selectTagPositionDialog.showDialog() != OK_OPTION) {
+                    cancelButtonActionPerformed(evt);
+                    return;
+                }
+                selectedPosition = selectTagPositionDialog.getSelectedTag();
+                selectedTimelined = selectTagPositionDialog.getSelectedTimelined();
             }
         }
-        if (newAbcTagRadioButton.isSelected()) {
-            SelectTagPositionDialog selectTagPositionDialog = new SelectTagPositionDialog(owner, swf, true);
-            if (selectTagPositionDialog.showDialog() != OK_OPTION) {
-                cancelButtonActionPerformed(evt);
-                return;
-            }
-            selectedPosition = selectTagPositionDialog.getSelectedTag();
-            selectedTimelined = selectTagPositionDialog.getSelectedTimelined();
-        }
-        
+
         result = OK_OPTION;
         selectedClass = classNameTextField.getText();
-        setVisible(false);        
+        setVisible(false);
     }
 
     private void cancelButtonActionPerformed(ActionEvent evt) {
@@ -229,6 +260,7 @@ public class AddClassDialog extends AppDialog {
     public int showDialog() {
         return showDialog("");
     }
+
     public int showDialog(String pkg) {
         classNameTextField.setText(pkg);
         selectedClass = null;
@@ -253,5 +285,5 @@ public class AddClassDialog extends AppDialog {
 
     public ABCContainerTag getSelectedAbcContainer() {
         return selectedAbcContainer;
-    }               
+    }
 }
