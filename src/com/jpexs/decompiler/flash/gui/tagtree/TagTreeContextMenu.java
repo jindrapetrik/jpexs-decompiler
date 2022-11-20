@@ -923,6 +923,10 @@ public class TagTreeContextMenu extends JPopupMenu {
                 importTextsMenuItem.setVisible(true);
                 importSwfXmlMenuItem.setVisible(true);
             }
+            
+            if (firstItem instanceof ABC) {
+                importScriptsMenuItem.setVisible(true);
+            }
 
             if (!mainPanel.clipboardEmpty()) {
                 if ((firstItem instanceof SWF) || (firstItem instanceof DefineSpriteTag) || (firstItem instanceof Frame)) {
