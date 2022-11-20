@@ -1711,7 +1711,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public static SWFHeader decodeHeader(byte[] headerData) throws IOException {
         String signature = new String(headerData, 0, 3, Utf8Helper.charset);
         if (!swfSignatures.contains(signature)) {
-            throw new SwfOpenException("Invalid SWF file, wrong signature.");
+            throw new SwfOpenException(AppResources.translate("error.swf.invalid"));
         }
 
         int version = headerData[3];
@@ -1733,7 +1733,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
         // SWFheader: signature, version and fileSize
         if (is.read(hdr) != 8) {
-            throw new SwfOpenException("SWF header is too short");
+            throw new SwfOpenException(AppResources.translate("error.swf.headerTooShort"));
         }
 
         SWFHeader header = decodeHeader(hdr);

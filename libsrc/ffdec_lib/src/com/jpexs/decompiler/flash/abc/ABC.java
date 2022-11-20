@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc;
 
+import com.jpexs.decompiler.flash.AppResources;
 import com.jpexs.decompiler.flash.DeobfuscationListener;
 import com.jpexs.decompiler.flash.EndOfStreamException;
 import com.jpexs.decompiler.flash.EventListener;
@@ -513,6 +514,20 @@ public class ABC implements Openable {
         if (file != null) {
             isOpenable = true;
         }
+        
+        try {
+            read(ais, swf);
+        } catch (IOException ie) {
+            throw new ABCOpenException(AppResources.translate("error.abc.invalid"), ie);
+        }
+        //this will read all method body codes. TODO: make this ondemand
+        refreshMultinameNamespaceSuffixes();
+        getMethodIndexing();
+
+        SWFDecompilerPlugin.fireAbcParsed(this, swf);
+    }
+    
+    private void read(ABCInputStream ais, SWF swf) throws IOException {
         int minor_version = ais.readU16("minor_version");
         int major_version = ais.readU16("major_version");
         version = new ABCVersion(major_version, minor_version);
@@ -735,12 +750,6 @@ public class ABC implements Openable {
 
             SWFDecompilerPlugin.fireMethodBodyParsed(this, mb, swf);
         }
-
-        //this will read all method body codes. TODO: make this ondemand
-        refreshMultinameNamespaceSuffixes();
-        getMethodIndexing();
-
-        SWFDecompilerPlugin.fireAbcParsed(this, swf);
     }
 
     public void saveToStream(OutputStream os) throws IOException {

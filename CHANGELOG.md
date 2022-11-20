@@ -44,6 +44,7 @@ All notable changes to this project will be documented in this file.
 - Show in tag list from tag scripts
 - Move/Copy tag to action on tag scripts
 - [#1879] False tag order error with SoundStreamHead
+- Error messages during SWF/ABC reading have correct error icon and title, are translatable
 
 ### Changed
 - GFX - DefineExternalImage2 no longer handled as character
