@@ -1674,9 +1674,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private List<TreeItem> getSelection(Openable openable, List<TreeItem> selection) {
         if (currentView == MainPanel.VIEW_RESOURCES) {
-            return selection == null ? tagTree.getSelection(openable) : tagTree.getSelection(openable, selection);
+            return selection == null ? tagTree.getSelection(openable) : tagTree.getSelectionAndAllSubs(openable, selection);
         } else if (currentView == MainPanel.VIEW_TAGLIST) {
-            return selection == null ? tagListTree.getSelection(openable) : tagListTree.getSelection(openable, selection);
+            return selection == null ? tagListTree.getSelection(openable) : tagListTree.getSelectionAndAllSubs(openable, selection);
         }
         return new ArrayList<>();
     }

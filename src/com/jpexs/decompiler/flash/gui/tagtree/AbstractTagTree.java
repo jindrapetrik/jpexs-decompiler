@@ -507,7 +507,17 @@ public abstract class AbstractTagTree extends JTree {
     public boolean hasExportableNodes() {
         return !getSelection(mainPanel.getCurrentSwf()).isEmpty();
     }
+   
+    public List<TreeItem> getSelectionAndAllSubs(Openable openable, List<TreeItem> selection) {
+        List<TreeItem> sel = new ArrayList<>();
 
+        for (TreeItem treeItem : selection) {
+            sel.add(treeItem);
+            getAllSubs(treeItem, sel);
+        }
+        return getSelection(openable, sel);
+    }
+    
     public abstract List<TreeItem> getSelection(Openable openable);
 
     public static List<TreeItem> getSelection(Openable openable, List<TreeItem> sel) {
