@@ -456,20 +456,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void moveSwfListUpDown(TreeItem item, boolean up) {
-        OpenableList swfList = null;
-        if (item instanceof SWF) {
-            SWF swf = (SWF) item;
-            if (swf.openableList != null && !swf.openableList.isBundle() && swf.openableList.size() == 1) {
-                swfList = swf.openableList;
+        OpenableList openableList = null;
+        if (item instanceof Openable) {
+            Openable openable = (Openable) item;
+            if (openable.getOpenableList() != null && !openable.getOpenableList().isBundle() && openable.getOpenableList().size() == 1) {
+                openableList = openable.getOpenableList();
             } else {
                 return;
             }
         } else if (item instanceof OpenableList) {
-            swfList = (OpenableList) item;
+            openableList = (OpenableList) item;
         } else {
             return;
         }
-        int index = openables.indexOf(swfList);
+        int index = openables.indexOf(openableList);
 
         List<List<String>> expandedTagTree = View.getExpandedNodes(tagTree);
         List<List<String>> expandedTagListTree = View.getExpandedNodes(tagListTree);
