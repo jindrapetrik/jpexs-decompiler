@@ -3237,14 +3237,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return r;
     }
 
-    public void importScript(final SWF swf) {
-        As3ScriptReplacerInterface as3ScriptReplacer = getAs3ScriptReplacer(Main.isSwfAir(swf));
+    public void importScript(final Openable openable) {
+        As3ScriptReplacerInterface as3ScriptReplacer = getAs3ScriptReplacer(Main.isSwfAir(openable));
         if (as3ScriptReplacer == null) {
             return;
         }
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importScripts"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportScriptsInfo);
 
-        String flexLocation = Configuration.flexSdkLocation.get();
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
@@ -3260,13 +3259,27 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 @Override
                 public Void doInBackground() throws Exception {
+                    
+                    SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
+                    
                     new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true), new ScriptImporterProgressListener() {
                         @Override
                         public void scriptImported() {
                             countAs2++;
                         }
                     });
-                    new AS3ScriptImporter().importScripts(as3ScriptReplacer, scriptsFolder, swf.getAS3Packs(), new ScriptImporterProgressListener() {
+                    
+                    List<ScriptPack> packs;
+                    if (openable instanceof SWF) {
+                        packs = swf.getAS3Packs();
+                    } else {
+                        List<ABC> allAbcs = new ArrayList<>();
+                        ABC abc = (ABC) openable;
+                        allAbcs.add(abc);
+                        packs = abc.getScriptPacks(null, allAbcs);
+                    }
+                    
+                    new AS3ScriptImporter().importScripts(as3ScriptReplacer, scriptsFolder, packs, new ScriptImporterProgressListener() {
                         @Override
                         public void scriptImported() {
                             countAs3++;
