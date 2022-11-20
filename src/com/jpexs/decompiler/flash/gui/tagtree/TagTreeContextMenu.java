@@ -1545,7 +1545,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void textSearchActionPerformed(ActionEvent evt) {
-        Main.getMainFrame().getPanel().searchInActionScriptOrText(null, Main.getMainFrame().getPanel().getCurrentSwf(), true);
+        Main.getMainFrame().getPanel().searchInActionScriptOrText(null, Main.getMainFrame().getPanel().getCurrentOpenable(), true);
     }
 
     private void addAs3ClassActionPerformed(ActionEvent evt) {
