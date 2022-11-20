@@ -825,6 +825,12 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (firstItem instanceof AS3Package) {
                 addAs3ClassMenuItem.setVisible(true);
             }
+            if (firstItem instanceof ABC) {
+                addAs3ClassMenuItem.setVisible(true);
+            }
+            if ((firstItem instanceof ABCContainerTag) && mainPanel.getCurrentView() == MainPanel.VIEW_TAGLIST) {
+                addAs3ClassMenuItem.setVisible(true);
+            }
 
             if (firstItem instanceof CharacterTag) {
                 CharacterTag ct = (CharacterTag) firstItem;
@@ -1553,20 +1559,17 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (sel.get(0) instanceof ClassesListTreeModel) {
                 ClassesListTreeModel cl = (ClassesListTreeModel) sel.get(0);
                 openable = cl.getOpenable();
-                if (openable instanceof SWF) {
-                    swf = (SWF) openable;
-                } else {
-                    swf = ((ABC)openable).getSwf();
-                }
             }
+            if (sel.get(0) instanceof ABC) {
+                openable = (ABC) sel.get(0);
+            }
+            if (sel.get(0) instanceof ABCContainerTag) {
+                openable = ((Tag) sel.get(0)).getOpenable();
+            }
+            
             if (sel.get(0) instanceof AS3Package) {
                 AS3Package pkg = (AS3Package) sel.get(0);
-                openable = pkg.getOpenable();
-                if (openable instanceof SWF) {
-                    swf = (SWF) openable;
-                } else {
-                    swf = ((ABC)openable).getSwf();
-                }
+                openable = pkg.getOpenable();                
                 TreePath tp = tree.getSelectionPaths()[0];
                 Object[] path = tp.getPath();
                 for (int p = path.length - 1; p >= 0; p--) {
@@ -1584,6 +1587,12 @@ public class TagTreeContextMenu extends JPopupMenu {
                     }
                     preselected = ((AS3Package) path[p]).packageName + "." + preselected;
                 }
+            }
+            
+            if (openable instanceof SWF) {
+                swf = (SWF) openable;
+            } else {
+                swf = ((ABC)openable).getSwf();
             }
 
             TreePath scriptsPath = tree.getSelectionPaths()[0];
@@ -1673,7 +1682,6 @@ public class TagTreeContextMenu extends JPopupMenu {
                     item = scriptsPath.getLastPathComponent();
                 }               
 
-                //Object item = scriptsPath.getLastPathComponent();                
                 loopparts: for (int i = 0; i < parts.length; i++) {
                     for (TreeItem ti : tree.getModel().getAllChildren(item)) {
                         if ((ti instanceof AS3Package) && ((AS3Package)ti).isFlat()) {
