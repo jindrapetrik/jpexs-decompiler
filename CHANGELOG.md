@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [17.0.0] - 2022-11-20
 ### Added
 - [#1870] AS3 Adding new class - Target DoABC tag or position can be selected to prevent Error 1014
 - [#1871] Toogle buttons for disabling subsprite animation, display preview of sprites/frames
