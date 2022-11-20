@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#1680] Pinning items
 - Indices in brackets for items with same name (like two subsequent DoAction tags)
 - Flattened ActionScript packages (one row per package instead package tree), can be turned off in settings
-- Opening ABC file format (*.abc)
+- [#1820] Opening standalone ABC files (*.abc)
 - Classes tree inside DoABC tags in taglist view
 
 ### Fixed
@@ -2630,6 +2630,7 @@ All notable changes to this project will be documented in this file.
 [#1803]: https://www.free-decompiler.com/flash/issues/1803
 [#1501]: https://www.free-decompiler.com/flash/issues/1501
 [#1680]: https://www.free-decompiler.com/flash/issues/1680
+[#1820]: https://www.free-decompiler.com/flash/issues/1820
 [#1869]: https://www.free-decompiler.com/flash/issues/1869
 [#1872]: https://www.free-decompiler.com/flash/issues/1872
 [#1692]: https://www.free-decompiler.com/flash/issues/1692
