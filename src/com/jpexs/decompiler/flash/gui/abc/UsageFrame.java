@@ -138,7 +138,7 @@ public class UsageFrame extends AppDialog implements MouseListener {
                 setTrait.run();
             } else {
                 decompiledTextArea.addScriptListener(setTrait);
-                abcPanel.hilightScript(abcPanel.getSwf(), icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(icu.getAbc().constants, true).toRawString());
+                abcPanel.hilightScript(abcPanel.getOpenable(), icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(icu.getAbc().constants, true).toRawString());
             }
         }
     }

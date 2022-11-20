@@ -71,6 +71,7 @@ import com.jpexs.decompiler.flash.gui.abc.tablemodels.StringTableModel;
 import com.jpexs.decompiler.flash.gui.abc.tablemodels.UIntTableModel;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.editor.LinkHandler;
+import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTreeModel;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -84,6 +85,8 @@ import com.jpexs.decompiler.flash.search.ScriptSearchListener;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.timeline.AS3Package;
+import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.CancellableWorker;
@@ -139,6 +142,7 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.Highlighter;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import jsyntaxpane.Token;
 import jsyntaxpane.TokenType;
@@ -160,9 +164,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     public ABC abc;
 
     private final JPanel toolbarPanel;
-    
+
     private final JComboBox<String> libraryComboBox;
-    
+
     public final DecompiledEditorPane decompiledTextArea;
 
     public final JScrollPane decompiledScrollPane;
@@ -232,7 +236,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     }
 
     public void setAbc(ABC abc) {
-        View.checkAccess();               
+        View.checkAccess();
 
         if (abc == this.abc) {
             return;
@@ -242,7 +246,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             libraryComboBox.setSelectedIndex(Main.LIBRARY_AIR);
         } else {
             libraryComboBox.setSelectedIndex(Main.LIBRARY_FLASH);
-        }       
+        }
         this.abc = abc;
         setDecompiledEditMode(false);
         navigator.setAbc(abc);
@@ -285,7 +289,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     public SWF getSwf() {
         return abc == null ? null : abc.getSwf();
     }
-    
+
     public Openable getOpenable() {
         return abc == null ? null : abc.getOpenable();
     }
@@ -956,20 +960,19 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         iconsPanel.add(removeTraitButton);
 
         scriptNameLabel = new JLabel("-");
-        
-        JPanel topPanel = new JPanel(new BorderLayout());        
+
+        JPanel topPanel = new JPanel(new BorderLayout());
         //iconsPanel.setAlignmentX(0);
         topPanel.add(scriptNameLabel, BorderLayout.NORTH);
-        
+
         toolbarPanel = new JPanel(new BorderLayout());
         toolbarPanel.add(iconsPanel, BorderLayout.WEST);
-        
-        
+
         JPanel librarySelectPanel = new JPanel(new FlowLayout());
         libraryComboBox = new JComboBox<>();
         libraryComboBox.addItem("AIR (airglobal.swc)");
         libraryComboBox.addItem("Flash (playerglobal.swc)");
-        libraryComboBox.setSelectedIndex(Main.LIBRARY_FLASH);       
+        libraryComboBox.setSelectedIndex(Main.LIBRARY_FLASH);
         libraryComboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -981,13 +984,13 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 conf.setCustomData(CustomConfigurationKeys.KEY_LIBRARY, "" + libraryComboBox.getSelectedIndex());
             }
         });
-        
+
         librarySelectPanel.add(new JLabel(AppStrings.translate("library")));
-        librarySelectPanel.add(libraryComboBox);        
+        librarySelectPanel.add(libraryComboBox);
         toolbarPanel.add(librarySelectPanel, BorderLayout.EAST);
-        
+
         topPanel.add(toolbarPanel, BorderLayout.CENTER);
-        
+
         iconDecPanel.add(topPanel, BorderLayout.NORTH);
 
         JPanel panelWithHint = new JPanel(new BorderLayout());
@@ -1363,35 +1366,79 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         setVisible(true);
     }
 
-    public void hilightScript(SWF swf, String name) {
-        View.checkAccess();
-
-        TagTreeModel ttm = (TagTreeModel) mainPanel.tagTree.getModel();
-        TreeItem scriptsNode = ttm.getScriptsNode(swf);
-        if (scriptsNode instanceof ClassesListTreeModel) {
-            ClassesListTreeModel clModel = (ClassesListTreeModel) scriptsNode;
-            ScriptPack pack = null;
-            for (ScriptPack item : clModel.getList()) {
-                if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
-                    continue;
+    public void hilightScript(Openable openable, String name) {
+        
+        TreeItem scriptNode = null;
+        if (openable instanceof SWF) {
+            SWF swf = (SWF) openable;
+            if (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES) {
+                scriptNode = mainPanel.tagTree.getModel().getScriptsNode(swf);
+            } else {
+                List<ABC> allAbcs = new ArrayList<>();
+                for (ABCContainerTag container : swf.getAbcList()) {
+                    allAbcs.add(container.getABC());
                 }
-
-                ClassPath classPath = item.getClassPath();
-
-                // first check the className to avoid calling unnecessary toString
-                if (name.endsWith(classPath.className + classPath.namespaceSuffix) && classPath.toRawString().equals(name)) {
-                    pack = item;
-                    break;
+                loopcontainer: for (ABCContainerTag container : swf.getAbcList()) {
+                    List<ScriptPack> packs = container.getABC().getScriptPacks(null, allAbcs);
+                    for (ScriptPack pack : packs) {   
+                        ClassPath classPath = pack.getClassPath();
+                        if (name.endsWith(classPath.className + classPath.namespaceSuffix) && classPath.toRawString().equals(name)) {
+                            scriptNode  = (Tag) container;
+                            break loopcontainer;
+                        }
+                    }
                 }
             }
-
-            if (pack != null) {
-                if (mainPanel.getCurrentView() != MainPanel.VIEW_RESOURCES) {
-                    mainPanel.showView(MainPanel.VIEW_RESOURCES);
-                }
-                hilightScript(pack);
-            }                
+        } else if (openable instanceof ABC) {
+            scriptNode = (ABC) openable;
         }
+        
+        if (scriptNode != null) {
+            hilightScript(openable, name, scriptNode);
+        }
+    }
+    
+    public void hilightScript(Openable openable, String name, TreeItem scriptNode) {
+        View.checkAccess();
+
+        Object item;
+
+        if ((mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES) && (openable instanceof SWF)) {
+            item = mainPanel.tagTree.getModel().getScriptsNode((SWF) openable);
+        } else if (openable instanceof ABC) {
+            item = openable;
+        } else { //SWF on taglist, should be DoABCContainer
+            item = scriptNode;
+        }
+
+        AbstractTagTree tree = mainPanel.getCurrentTree();
+
+        String pkg = name.contains(".") ? name.substring(0, name.lastIndexOf(".")) : "";
+        String parts[] = name.split("\\.");
+
+        loopparts:
+        for (int i = 0; i < parts.length; i++) {
+            for (TreeItem ti : tree.getModel().getAllChildren(item)) {
+                if ((ti instanceof AS3Package) && ((AS3Package) ti).isFlat()) {
+                    AS3Package pti = (AS3Package) ti;
+                    if ((pkg.isEmpty() && pti.isDefaultPackage()) || (!pti.isDefaultPackage() && pkg.equals(pti.packageName))) {
+                        item = pti;
+                        i = parts.length - 1 - 1;
+                        break;
+                    }
+                    continue;
+                }
+                if (ti instanceof AS3ClassTreeItem) {
+                    AS3ClassTreeItem cti = (AS3ClassTreeItem) ti;
+
+                    if (parts[i].equals(cti.getNameWithNamespaceSuffix())) {
+                        item = ti;
+                        break;
+                    }
+                }
+            }
+        }
+        mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), (TreeItem) item);
     }
 
     public void hilightScript(ScriptPack pack) {
@@ -1483,11 +1530,11 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         toolbarPanel.setVisible(!val);
     }
 
-    private void editDecompiledButtonActionPerformed(ActionEvent evt) {        
+    private void editDecompiledButtonActionPerformed(ActionEvent evt) {
         scriptReplacer = mainPanel.getAs3ScriptReplacer(Main.isSwfAir(getOpenable()));
         if (scriptReplacer == null) {
             return;
-        }        
+        }
 
         if (ViewMessages.showConfirmDialog(this, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS3Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
             pack = decompiledTextArea.getScriptLeaf();
@@ -1510,22 +1557,35 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         }
     }
 
+    public TreeItem getScriptNodeForPack(ScriptPack pack) {
+        TreePath scriptsPath = mainPanel.getCurrentTree().getModel().getTreePath(pack);
+        while (!(scriptsPath.getLastPathComponent() instanceof ClassesListTreeModel)
+                && !(scriptsPath.getLastPathComponent() instanceof ABC)
+                && !(scriptsPath.getLastPathComponent() instanceof ABCContainerTag)) {
+            scriptsPath = scriptsPath.getParentPath();
+        }
+        return (TreeItem) scriptsPath.getLastPathComponent();
+    }
+
     private void saveDecompiledButtonActionPerformed(ActionEvent evt) {
+        final ABC localAbc = abc;
         int oldIndex = pack.scriptIndex;
         SWF.uncache(pack);
         try {
             String oldSp = pack.getClassPath().toRawString();
+
+            TreeItem scriptNode = getScriptNodeForPack(pack);                    
+            
             String as = decompiledTextArea.getText();
-            abc.replaceScriptPack(scriptReplacer, pack, as);
+            localAbc.replaceScriptPack(scriptReplacer, pack, as);
             scriptReplacer.deinitReplacement(pack);
             lastDecompiled = as;
             setDecompiledEditMode(false);
             mainPanel.updateClassesList();
 
             if (oldSp != null) {
-                hilightScript(getSwf(), oldSp);
+                hilightScript(localAbc.getOpenable(), oldSp, scriptNode);
             }
-
             reload();
             ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
         } catch (As3ScriptReplaceException asre) {
