@@ -232,7 +232,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenu changeCharsetMenu;
 
     private JMenuItem pinMenuItem;
-    
+
     private JMenuItem unpinMenuItem;
 
     private JMenuItem unpinAllMenuItem;
@@ -263,7 +263,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         expandRecursiveMenuItem = new JMenuItem(mainPanel.translate("contextmenu.expandAll"));
         expandRecursiveMenuItem.addActionListener(this::expandRecursiveActionPerformed);
         expandRecursiveMenuItem.setIcon(View.getIcon("expand16"));
-        add(expandRecursiveMenuItem);       
+        add(expandRecursiveMenuItem);
 
         changeCharsetMenu = new JMenu();
         JMenu currentCharsetMenu = changeCharsetMenu;
@@ -543,7 +543,6 @@ public class TagTreeContextMenu extends JPopupMenu {
         textSearchMenuItem.setIcon(View.getIcon("search16"));
         add(textSearchMenuItem);
 
-        
         pinMenuItem = new JMenuItem(AppStrings.translate("contextmenu.pin"));
         pinMenuItem.setIcon(View.getIcon("pinned16"));
         pinMenuItem.addActionListener(new ActionListener() {
@@ -553,7 +552,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
         });
         add(pinMenuItem);
-        
+
         unpinMenuItem = new JMenuItem(AppStrings.translate("contextmenu.unpin"));
         unpinMenuItem.setIcon(View.getIcon("pin16"));
         unpinMenuItem.addActionListener(new ActionListener() {
@@ -583,7 +582,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             }
         });
         add(unpinOthersMenuItem);
-        
+
         closeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.closeSwf"));
         closeMenuItem.addActionListener(this::closeSwfActionPerformed);
         closeMenuItem.setIcon(View.getIcon("close16"));
@@ -801,26 +800,31 @@ public class TagTreeContextMenu extends JPopupMenu {
         boolean allSelectedSameParent = !items.isEmpty();
         if (allSelectedSameParent) {
             AbstractTagTreeModel model = tree.getModel();
-            TreePath parent = model.getTreePath(items.get(0)).getParentPath();
+            TreePath thisPath = model.getTreePath(items.get(0));
+            TreePath parent = thisPath == null ? null : thisPath.getParentPath();
 
-            for (TreeItem item : items) {
-                TreePath currentParent = model.getTreePath(item).getParentPath();
+            if (parent == null) {
+                allSelectedSameParent = false;
+            } else {
+                for (TreeItem item : items) {
+                    TreePath currentParent = model.getTreePath(item).getParentPath();
 
-                if (!currentParent.equals(parent)) {
-                    allSelectedSameParent = false;
-                    break;
+                    if (!currentParent.equals(parent)) {
+                        allSelectedSameParent = false;
+                        break;
+                    }
                 }
             }
         }
 
         boolean hasExportableNodes = tree.hasExportableNodes();
 
-        expandRecursiveMenuItem.setVisible(false);      
+        expandRecursiveMenuItem.setVisible(false);
         pinMenuItem.setVisible(false);
         unpinMenuItem.setVisible(false);
         unpinAllMenuItem.setVisible(false);
-        unpinOthersMenuItem.setVisible(false);        
-        
+        unpinOthersMenuItem.setVisible(false);
+
         removeMenuItem.setVisible(canRemove);
         removeWithDependenciesMenuItem.setVisible(canRemove && !allDoNotHaveDependencies);
         cloneMenuItem.setVisible(allSelectedIsTagOrFrame && allSelectedSameParent);
@@ -943,10 +947,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                 addAs3ClassMenuItem.setVisible(true);
                 exportABCMenuItem.setVisible(true);
             }
-            
-                        
+
             if (mainPanel.isPinned(firstItem)) {
-                int pinCount = mainPanel.getPinCount();            
+                int pinCount = mainPanel.getPinCount();
                 unpinMenuItem.setVisible(true);
                 if (pinCount > 1) {
                     unpinAllMenuItem.setVisible(true);
@@ -964,7 +967,8 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
             }
 
-            TreeItem parent = (TreeItem) tree.getModel().getTreePath(firstItem).getParentPath().getLastPathComponent();
+            TreePath thisPath = tree.getModel().getTreePath(firstItem);
+            TreeItem parent = thisPath == null ? null : (TreeItem) thisPath.getParentPath().getLastPathComponent();
             boolean parentIsFolder = parent instanceof FolderItem;
             boolean parentIsTopLevelFrame = false;
             if (parent instanceof Frame) {
@@ -1270,7 +1274,11 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void addAddTagBeforeAfterMenuItems(boolean before, JMenu addTagMenu, TreeItem item, AddTagActionListener listener) {
-        TreeItem parent = (TreeItem) getTree().getModel().getTreePath(item).getParentPath().getLastPathComponent();
+        TreePath thisPath = getTree().getModel().getTreePath(item);
+        TreeItem parent = thisPath == null ? null : (TreeItem) thisPath.getParentPath().getLastPathComponent();
+        if (parent == null) {
+            return;
+        }
         Map<Integer, TagTypeInfo> classes = Tag.getKnownClasses();
 
         SWF currentSwf = mainPanel.getCurrentSwf();
@@ -1887,7 +1895,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                             }
                         }
 
-                        TreePath selection = mainPanel.tagTree.getSelectionPath();
+                        TreePath selection = mainPanel.tagTree.getModel().getTreePath(sel.get(0));
                         TreePath swfPath = selection.getParentPath();
                         tim.resetTimeline();
                         mainPanel.refreshTree(swf);
@@ -2262,11 +2270,11 @@ public class TagTreeContextMenu extends JPopupMenu {
     private void removeItemActionPerformed(ActionEvent evt, boolean removeDependencies) {
 
         List<TreePath> tps = new ArrayList<>();
-       
+
         List<TreeItem> sel = getSelectedItems();
         for (TreeItem treeItem : sel) {
             tps.add(getTree().getModel().getTreePath(treeItem));
-        }                
+        }
 
         List<Tag> tagsToRemove = new ArrayList<>();
         List<Object> itemsToRemove = new ArrayList<>();
