@@ -905,11 +905,15 @@ public class TagTreeContextMenu extends JPopupMenu {
                 addFramesAfterMenuItem.setVisible(true);
             }
 
-            if (mainPanel.getCurrentView() == MainPanel.VIEW_TAGLIST && !(firstItem instanceof ShowFrameTag)) {
+            if (mainPanel.getCurrentView() == MainPanel.VIEW_TAGLIST && 
+                    !(firstItem instanceof ShowFrameTag) &&
+                    !(firstItem instanceof AS3Package)) {
                 showInResourcesViewTagMenuItem.setVisible(true);
             }
 
-            if (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES && !isFolder) {
+            if (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES && 
+                    !isFolder &&
+                    !(firstItem instanceof AS3Package)) {
                 showInTagListViewTagMenuItem.setVisible(true);
             }
 
