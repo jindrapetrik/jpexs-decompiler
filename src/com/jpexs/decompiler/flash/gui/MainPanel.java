@@ -2341,7 +2341,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         List<Openable> allOpenables = new ArrayList<>();
         for (OpenableList slist : getSwfs()) {
             for (Openable o : slist.items) {
-                allOpenables.add((SWF) o);
+                allOpenables.add(o);
                 if (o instanceof SWF) {            
                     List<SWF> subSwfs = new ArrayList<>();
                     Main.populateSwfs((SWF) o, subSwfs);
