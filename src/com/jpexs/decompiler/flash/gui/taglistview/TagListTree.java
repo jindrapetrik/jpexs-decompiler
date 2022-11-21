@@ -223,8 +223,21 @@ class TreeTransferHandler extends TransferHandler {
             } else if (dest instanceof SWF) {                
                 SWF swf = (SWF) dest;
                 timelined = swf;
-                Frame frame = swf.getTimeline().getFrame(childIndex - 1/*header*/);
+                int frameIndex = childIndex - 1/*header*/ - 1;
+                if (frameIndex == -1) {
+                    frameIndex = 0;
+                }
+                Frame frame = swf.getTimeline().getFrame(frameIndex);
                 position = frame.allInnerTags.get(0);                
+            } else if (dest instanceof DefineSpriteTag) {
+                DefineSpriteTag sprite = (DefineSpriteTag) dest;
+                timelined = sprite;
+                int frameIndex = childIndex - 1;
+                if (frameIndex == -1) {
+                    frameIndex = 0;
+                }
+                Frame frame = sprite.getTimeline().getFrame(frameIndex);
+                position = frame.allInnerTags.get(0);
             } else if (dest instanceof Tag) {
                 timelined = ((Tag) dest).getTimelined();
                 position = (Tag) dest;
