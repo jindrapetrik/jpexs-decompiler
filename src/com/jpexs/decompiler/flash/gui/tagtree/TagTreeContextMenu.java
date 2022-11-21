@@ -2551,14 +2551,16 @@ public class TagTreeContextMenu extends JPopupMenu {
                     // embedded swf
                     swf.binaryData.innerSwf = null;
                     swf.clearTagSwfs();
-                    mainPanel.refreshTree();
                 } else {
                     Main.closeFile(swf.openableList);
                 }
+            } else if (item instanceof Openable) {
+                Main.closeFile(((Openable) item).getOpenableList());
             } else if (item instanceof OpenableList) {
                 Main.closeFile((OpenableList) item);
             }
-        }
+        }        
+        mainPanel.refreshTree();
     }
 
     private void cloneActionPerformed(ActionEvent e) {

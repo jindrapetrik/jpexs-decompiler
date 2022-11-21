@@ -240,10 +240,23 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        if (openable == null) {
-            return;
+        for (TreeItem item : mainFrame.getPanel().getCurrentTree().getSelected()) {
+            if (item instanceof SWF) {
+                SWF swf = (SWF) item;
+                if (swf.binaryData != null) {
+                    // embedded swf
+                    swf.binaryData.innerSwf = null;
+                    swf.clearTagSwfs();                    
+                } else {
+                    Main.closeFile(swf.openableList);
+                }
+            } else if (item instanceof Openable) {
+                Main.closeFile(((Openable) item).getOpenableList());
+            } else if (item instanceof OpenableList) {
+                Main.closeFile((OpenableList) item);
+            }
         }
-        Main.closeFile(openable.getOpenableList());
+        mainFrame.getPanel().refreshTree();
         openable = null;
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -804,12 +817,16 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         boolean allSameSwf = true;
         boolean allSameOpenable = true;
+        boolean openableOrListSelected = openable != null;
         if (mainPanel != null) {
             List<TreeItem> items = mainPanel.getCurrentTree().getSelected();
             SWF firstSwf = null;
             Openable firstOpenable = null;
             for (TreeItem item : items) {
                 if (item instanceof OpenableList) {
+                    if (items.size() == 1) {
+                        openableOrListSelected = true;
+                    }
                     allSameSwf = false;
                     break;
                 }
@@ -844,8 +861,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
         setMenuEnabled("_/saveAs", openableSelected && !isWorking);
         setMenuEnabled("/file/saveAs", openableSelected && !isWorking);
         setMenuEnabled("/file/saveAsExe", swfSelected && !isWorking);
-        setMenuEnabled("_/close", openableSelected && !isWorking);
-        setMenuEnabled("/file/close", openableSelected && !isWorking);
+        setMenuEnabled("_/close", openableOrListSelected && !isWorking);
+        setMenuEnabled("/file/close", openableOrListSelected && !isWorking);
         setMenuEnabled("_/closeAll", swfLoaded && !isWorking);
         setMenuEnabled("/file/closeAll", swfLoaded && !isWorking);
         setMenuEnabled("/file/reload", openableSelected && !swfIsNew && !isWorking);
