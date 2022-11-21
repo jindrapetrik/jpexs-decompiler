@@ -109,9 +109,9 @@ public class JpegFixer {
         }
 
         //main removing EOI+SOI
-        while ((val = is.read()) > -1) {
+        loopread: while ((val = is.read()) > -1) {
             if (val == 0xFF) {
-                val = is.read();
+                val = is.read();                
                 if (val == 0) {
                     os.write(0xFF);
                     os.write(val);
@@ -127,10 +127,36 @@ public class JpegFixer {
                     os.write(0xFF);
                     os.write(EOI);
                     os.write(0xFF);
-                    os.write(val);
+                    if (val != -1) {
+                        os.write(val);
+                    }
                 } else if (val != EOI) {
                     os.write(0xFF);
-                    os.write(val);
+                    if (val != -1) {
+                        os.write(val);
+                    }
+                }
+                
+                if (val != -1 && JpegMarker.markerHasLength(val)) {
+                    int len1 = is.read();
+                    if (len1 == -1) {
+                        break;
+                    }
+                    int len2 = is.read();
+                    if (len2 == -1) {
+                        os.write(len1);
+                        break;
+                    }
+                    os.write(len1);
+                    os.write(len2);
+                    int len = (len1 << 8) + len2;                    
+                    for (int i = 0; i < len - 2; i++) {
+                        int val2 = is.read();
+                        if (val2 == -1) {
+                            break loopread;
+                        }
+                        os.write(val2);
+                    }
                 }
 
                 prevEoi = val == EOI;
