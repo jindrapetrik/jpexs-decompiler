@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#1880] JPEG Fixer
 - Close action from menu not available on bundles (zip, etc...)
+- [#1881] Wrong locale reference for invalid tag order
 
 ## [17.0.0] - 2022-11-20
 ### Added
@@ -2633,6 +2634,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1880]: https://www.free-decompiler.com/flash/issues/1880
+[#1881]: https://www.free-decompiler.com/flash/issues/1881
 [#1870]: https://www.free-decompiler.com/flash/issues/1870
 [#1871]: https://www.free-decompiler.com/flash/issues/1871
 [#1875]: https://www.free-decompiler.com/flash/issues/1875
