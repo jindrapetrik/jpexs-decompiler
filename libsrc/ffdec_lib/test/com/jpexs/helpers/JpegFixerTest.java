@@ -37,40 +37,84 @@ public class JpegFixerTest {
     public static Object[][] provideSamples() {
         return new Object[][]{
             {
-                new byte[]{(byte) 0xFF, (byte) EOI, (byte) 0xFF, (byte) SOI, (byte) 0xFF, (byte) SOI, (byte) 0x21, (byte) 0xFF, (byte) EOI},
-                new byte[]{(byte) 0xFF, (byte) SOI, (byte) 0x21, (byte) 0xFF, (byte) EOI},},
+                new byte[]{(byte) 0xFF, (byte) EOI, (byte) 0xFF, (byte) SOI, (byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x21,
+                    (byte) 0xFF, (byte) EOI},
+                new byte[]{(byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x21,
+                    (byte) 0xFF, (byte) EOI},},
             {
                 new byte[]{(byte) 0xFF, (byte) EOI, (byte) 0xFF, (byte) SOI},
                 new byte[]{(byte) 0xFF, (byte) EOI, (byte) 0xFF, (byte) SOI},},
             {
-                new byte[]{(byte) 0xFF, (byte) EOI, (byte) 0xFF, (byte) SOI, 0x23},
-                new byte[]{(byte) 0xFF, (byte) EOI, (byte) 0xFF, (byte) SOI, 0x23},},
+                new byte[]{(byte) 0xFF, (byte) EOI, (byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x23
+                },
+                new byte[]{(byte) 0xFF, (byte) EOI, (byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x23
+                },},
             {
                 new byte[]{(byte) 0xFF, (byte) EOI},
-                new byte[]{(byte) 0xFF, (byte) EOI},},
+                new byte[]{(byte) 0xFF, (byte) EOI}},
             {
                 new byte[]{(byte) 0xFF},
-                new byte[]{(byte) 0xFF},},
+                new byte[]{(byte) 0xFF}
+            },
             {
                 new byte[]{(byte) 0x26},
-                new byte[]{(byte) 0x26},},
+                new byte[]{(byte) 0x26}
+            },
+            {
+                new byte[]{(byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x27},
+                new byte[]{(byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x27}
+            },
             {
                 new byte[]{},
-                new byte[]{},},
+                new byte[]{}},
             {
-                new byte[]{(byte) 0xFF, (byte) SOI, 0x27, 0x37, 0x47, 0x57, (byte) 0xFF, (byte) EOI},
-                new byte[]{(byte) 0xFF, (byte) SOI, 0x27, 0x37, 0x47, 0x57, (byte) 0xFF, (byte) EOI}
+                new byte[]{(byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x29,
+                     (byte) 0xFF, (byte) EOI},
+                new byte[]{(byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x29,
+                     (byte) 0xFF, (byte) EOI}
             },
             {
-                new byte[]{(byte) 0xFF, (byte) SOI, 0x28, 0x38, (byte) 0xFF, (byte) EOI, (byte) 0xFF, (byte) SOI, 0x48, 0x58, (byte) 0xFF, (byte) EOI},
-                new byte[]{(byte) 0xFF, (byte) SOI, 0x28, 0x38, 0x48, 0x58, (byte) 0xFF, (byte) EOI}
+                new byte[]{(byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x2A,
+                     (byte) 0xFF, (byte) EOI, (byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x3A,
+                     (byte) 0xFF, (byte) EOI},
+                new byte[]{(byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x2A,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x3A,
+                     (byte) 0xFF, (byte) EOI}
             },
             {
-                new byte[]{(byte) 0xFF, (byte) SOI, 0x29, (byte) 0xFF, (byte) SOI, 0x39, (byte) 0xFF, (byte) EOI},
-                new byte[]{(byte) 0xFF, (byte) SOI, 0x29, 0x39, (byte) 0xFF, (byte) EOI},},
+                new byte[]{(byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x2B,
+                     (byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x3B,
+                     (byte) 0xFF, (byte) EOI},
+                new byte[]{(byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x2B,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x3B,
+                     (byte) 0xFF, (byte) EOI},},
             {
-                new byte[]{(byte) 0xFF, (byte) SOI, (byte) 0xFF, (byte) SOI, 0x2A, (byte) 0xFF, (byte) EOI},
-                new byte[]{(byte) 0xFF, (byte) SOI, 0x2A, (byte) 0xFF, (byte) EOI}
+                new byte[]{(byte) 0xFF, (byte) SOI, (byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x2C,
+                     (byte) 0xFF, (byte) EOI},
+                new byte[]{(byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x03, 0x2C,
+                     (byte) 0xFF, (byte) EOI}
+            },
+            {
+                new byte[]{(byte) 0xFF, (byte) SOI, (byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x06, (byte) 0xFF, (byte) EOI, (byte) 0xFF, (byte) SOI,
+                     (byte) 0xFF, (byte) EOI},
+                new byte[]{(byte) 0xFF, (byte) SOI,
+                    (byte) 0xFF, (byte) JpegMarker.APP0, 0x00, 0x06, (byte) 0xFF, (byte) EOI, (byte) 0xFF, (byte) SOI,
+                     (byte) 0xFF, (byte) EOI}
             }
         };
     }

@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - PR119 Option to set scale factor in advanced settings (Set it to 2.0 on Mac retina displays)
 
+### Fixed
+- [#1880] JPEG Fixer
+
 ## [17.0.0] - 2022-11-20
 ### Added
 - [#1870] AS3 Adding new class - Target DoABC tag or position can be selected to prevent Error 1014
@@ -2497,7 +2500,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.3.1...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.0...dev
+[17.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.3.1...version17.0.0
 [16.3.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.3.0...version16.3.1
 [16.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.2.0...version16.3.0
 [16.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.1.0...version16.2.0
@@ -2627,6 +2631,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1880]: https://www.free-decompiler.com/flash/issues/1880
 [#1870]: https://www.free-decompiler.com/flash/issues/1870
 [#1871]: https://www.free-decompiler.com/flash/issues/1871
 [#1875]: https://www.free-decompiler.com/flash/issues/1875
