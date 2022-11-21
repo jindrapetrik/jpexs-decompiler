@@ -42,6 +42,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -682,7 +683,7 @@ public class View {
         }
         return conf;
     }
-
+    
     public static BufferedImage toCompatibleImage(BufferedImage image) {
         if (image.getColorModel().equals(getDefaultConfiguration().getColorModel())) {
             return image;
