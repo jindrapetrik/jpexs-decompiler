@@ -105,8 +105,8 @@ public class OpenableSourceInfo {
         return file;
     }
 
-    public boolean isBundle() {
-        if (inputStream == null) {
+    public boolean isBundle() {        
+        if (inputStream == null && file != null) {
             File fileObj = new File(file);
             String fileName = fileObj.getName();
             if (fileName.startsWith("asdec_") && fileName.endsWith(".tmp")) {
