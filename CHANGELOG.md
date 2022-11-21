@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- PR119 Option to set scale factor in advanced settings (Set it to 2.0 on Mac retina displays)
 
 ## [17.0.0] - 2022-11-20
 ### Added

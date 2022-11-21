@@ -812,6 +812,11 @@ public final class Configuration {
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> flattenASPackages = null;
     
+    @ConfigurationDefaultDouble(1.0)
+    @ConfigurationCategory("display")
+    @ConfigurationName("gui.scale")
+    public static ConfigurationItem<Double> uiScale = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

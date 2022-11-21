@@ -142,6 +142,7 @@ import com.jpexs.decompiler.flash.abc.ABCOpenException;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.helpers.MemoryInputStream;
+import java.awt.GraphicsDevice;
 
 /**
  * Main executable class
@@ -2073,6 +2074,8 @@ public class Main {
         return null;
     }
 
+    
+    
     private static void initGui() {
         if (GraphicsEnvironment.isHeadless()) {
             System.err.println("Error: Your system does not support Graphic User Interface");
@@ -2081,6 +2084,10 @@ public class Main {
 
         System.setProperty("sun.java2d.d3d", "false");
         System.setProperty("sun.java2d.noddraw", "true");
+        
+        if (System.getProperty("sun.java2d.uiScale") == null) { //it was not set by commandline, etc.       
+            System.setProperty("sun.java2d.uiScale", "" + Configuration.uiScale.get());
+        }
 
         if (Configuration.hwAcceleratedGraphics.get()) {
             System.setProperty("sun.java2d.opengl", Configuration._debugMode.get() ? "True" : "true");
