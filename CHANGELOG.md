@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - [#1880] JPEG Fixer
+- Close action from menu not available on bundles (zip, etc...)
 
 ## [17.0.0] - 2022-11-20
 ### Added
