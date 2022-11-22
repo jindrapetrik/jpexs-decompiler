@@ -2,7 +2,6 @@
 All notable changes to this project will be documented in this file.
 
 ##[Unreleased]
-- Nothing new yet
 
 ##[17.0.2] - 2022-11-22
 ### Fixed
