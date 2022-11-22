@@ -66,6 +66,9 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.treeitems.Openable;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  *
@@ -80,9 +83,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
     private Openable openable;
 
     private ConfigurationItemChangeListener<Boolean> configListenerAutoDeobfuscate;
-    
-    private ConfigurationItemChangeListener<Boolean> configListenerFlattenASPackages;
 
+    private ConfigurationItemChangeListener<Boolean> configListenerFlattenASPackages;
 
     private ConfigurationItemChangeListener<Boolean> configListenerSimplifyExpressions;
 
@@ -151,7 +153,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                     ViewMessages.showMessageDialog(mainFrame.getWindow(), translate("error.readonly.cannotSave"), translate("error"), JOptionPane.ERROR_MESSAGE);
                 }
                 Main.stopSaving(savedFile);
-            } else if ((openable instanceof SWF) && ((SWF)openable).binaryData != null) {
+            } else if ((openable instanceof SWF) && ((SWF) openable).binaryData != null) {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 try {
                     openable.saveTo(baos);
@@ -239,22 +241,28 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return;
         }
-
+        Set<OpenableList> listsToClose = new LinkedHashSet<>();
         for (TreeItem item : mainFrame.getPanel().getCurrentTree().getSelected()) {
-            if (item instanceof SWF) {
-                SWF swf = (SWF) item;
-                if (swf.binaryData != null) {
-                    // embedded swf
-                    swf.binaryData.innerSwf = null;
-                    swf.clearTagSwfs();                    
-                } else {
-                    Main.closeFile(swf.openableList);
+            if (item instanceof OpenableList) {
+                listsToClose.add((OpenableList) item);
+            } else {
+                Openable itemOpenable = item.getOpenable();
+                if (itemOpenable instanceof SWF) {
+                    SWF swf = (SWF) itemOpenable;
+                    if (swf.binaryData != null) {
+                        // embedded swf
+                        swf.binaryData.innerSwf = null;
+                        swf.clearTagSwfs();
+                    } else {
+                        listsToClose.add(swf.openableList);
+                    }
+                } else if (itemOpenable != null) {
+                    listsToClose.add(itemOpenable.getOpenableList());
                 }
-            } else if (item instanceof Openable) {
-                Main.closeFile(((Openable) item).getOpenableList());
-            } else if (item instanceof OpenableList) {
-                Main.closeFile((OpenableList) item);
             }
+        }
+        for (OpenableList list : listsToClose) {
+            Main.closeFile(list);
         }
         mainFrame.getPanel().refreshTree();
         openable = null;
@@ -273,8 +281,8 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
 
         if (openable != null) {
-            boolean result = Main.closeAll();            
-            if (result) {                
+            boolean result = Main.closeAll();
+            if (result) {
                 openable = null;
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
@@ -312,7 +320,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
         mainFrame.getPanel().importImage((SWF) openable);
     }
-    
+
     protected void importShapesActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
@@ -326,7 +334,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
         mainFrame.getPanel().importShape((SWF) openable, true);
     }
-    
+
     protected void importSymbolClassActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
@@ -508,7 +516,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
     protected void clearRecentSearchesActionPerformed(ActionEvent evt) {
         Main.searchResultsStorage.clear();
     }
-    
+
     protected void clearPinnedItemsActionPerformed(ActionEvent evt) {
         mainFrame.getPanel().destroyPins();
     }
@@ -678,7 +686,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
         Configuration.autoOpenLoadedSWFs.set(selected);
     }
-    
+
     protected void flattenASPackagesActionPerformed(ActionEvent evt) {
         AbstractButton button = (AbstractButton) evt.getSource();
         boolean selected = button.isSelected();
@@ -838,7 +846,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                         allSameOpenable = false;
                     }
                 }
-                if (firstSwf == null) {                                       
+                if (firstSwf == null) {
                     if (fopenable instanceof SWF) {
                         firstSwf = (SWF) fopenable;
                     } else {
@@ -1133,7 +1141,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/settings/advancedSettings/advancedSettings", translate("menu.advancedsettings.advancedsettings"), "settings32", this::advancedSettingsActionPerformed, PRIORITY_TOP, null, true, null, false);
         addMenuItem("/settings/advancedSettings/clearRecentFiles", translate("menu.tools.otherTools.clearRecentFiles"), "clearrecent16", this::clearRecentFilesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/settings/advancedSettings/clearRecentSearches", translate("menu.tools.otherTools.clearRecentSearches"), "clearrecent16", this::clearRecentSearchesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
-        addMenuItem("/settings/advancedSettings/clearPinnedItems", translate("menu.tools.otherTools.clearPinnedItems"), "clearrecent16", this::clearPinnedItemsActionPerformed, PRIORITY_MEDIUM, null, true, null, false);                
+        addMenuItem("/settings/advancedSettings/clearPinnedItems", translate("menu.tools.otherTools.clearPinnedItems"), "clearrecent16", this::clearPinnedItemsActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         finishMenu("/settings/advancedSettings");
 
         finishMenu("/settings");
@@ -1181,7 +1189,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         Configuration.autoOpenLoadedSWFs.addListener(configListenerAutoOpenLoadedSWFs = (Boolean newValue) -> {
             setMenuChecked("/settings/autoOpenLoadedSWFs", newValue);
         });
-        
+
         setMenuChecked("/settings/flattenASPackages", Configuration.flattenASPackages.get());
         Configuration.flattenASPackages.addListener(configListenerFlattenASPackages = (Boolean newValue) -> {
             setMenuChecked("/settings/flattenASPackages", newValue);
