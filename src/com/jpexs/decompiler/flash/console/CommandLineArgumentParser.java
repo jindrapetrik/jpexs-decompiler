@@ -216,6 +216,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.jpexs.decompiler.flash.Bundle;
+import com.jpexs.decompiler.flash.gui.translator.Translator;
 
 /**
  *
@@ -908,7 +909,9 @@ public class CommandLineArgumentParser {
             command = nextParam.substring(1);
         }
 
-        if (command.equals("swf2exe")) {
+        if (command.equals("translator")) {
+            Translator.main(new String[]{});
+        } else if (command.equals("swf2exe")) {
             parseSwf2Exe(args, charset);
         } else if (command.equals("abcmerge")) {
             parseAbcMerge(args, charset);

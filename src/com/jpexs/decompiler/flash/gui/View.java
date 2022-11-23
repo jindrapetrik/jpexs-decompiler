@@ -152,7 +152,7 @@ public class View {
      * Sets windows Look and Feel
      */
     public static void setLookAndFeel() {
-
+        
         // Save default font for Chinese characters
         final Font defaultFont = (new JLabel()).getFont();
         try {
