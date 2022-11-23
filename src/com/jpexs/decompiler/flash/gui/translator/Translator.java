@@ -367,11 +367,11 @@ public class Translator extends JFrame implements ItemListener {
                 String resource = ((ResourceItem) resourcesComboBox.getSelectedItem()).resource;
 
                 if (comments.containsKey(resource)
-                        && comments.get(resource).containsKey(locale)
-                        && comments.get(resource).get(locale).containsKey(key)) {
+                        && comments.get(resource).containsKey("en")
+                        && comments.get(resource).get("en").containsKey(key)) {
 
                     //"General Public License"
-                    String comment = comments.get(resource).get(locale).get(key);
+                    String comment = comments.get(resource).get("en").get(key);
                     if (comment.contains("General Public License")) {
                         label.setIcon(null);
                         label.setToolTipText(null);
@@ -1145,9 +1145,9 @@ public class Translator extends JFrame implements ItemListener {
                         }
                     }
                     if (comments.containsKey(resource)
-                            && comments.get(resource).containsKey(locale)
-                            && comments.get(resource).get(locale).containsKey(key)) {
-                        String comment = comments.get(resource).get(locale).get(key);
+                            && comments.get(resource).containsKey("en")
+                            && comments.get(resource).get("en").containsKey(key)) {
+                        String comment = comments.get(resource).get("en").get(key);
                         comment = "#" + comment.replace("\r\n", "\r\n#") + "\r\n";
                         zipOut.write(comment.getBytes("UTF-8"));
                     }
