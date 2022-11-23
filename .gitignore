@@ -24,6 +24,7 @@ Thumbs.db
 /testdata/recompile/
 /build_exe.xml
 /build_exe64.xml
+/build_translator_exe.xml
 /coverage.ec
 /libsrc/jsyntaxpane/jsyntaxpane/src/target/
 hs_err_pid*.log

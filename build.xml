@@ -444,16 +444,66 @@
             </launch4jConfig>
         </echoxml>
     </target>    
-    <target name="-exe-linux" unless="is_windows" depends="-load-tools,-exe-config">
+    
+    <target name="-exe-translator-config"> 
+        <echoxml file="${translator_exe.config}">
+            <launch4jConfig>
+                <dontWrapJar>true</dontWrapJar>
+                <headerType>gui</headerType>
+                <jar>${jar.filename}.jar</jar>
+                <outfile>${basedir}/${dist.dir}/${translator_exe.filename}.exe</outfile>
+                <errTitle></errTitle>
+                <cmdLine>-translator</cmdLine>
+                <chdir></chdir>
+                <priority>normal</priority>
+                <downloadUrl>http://java.com/download</downloadUrl>
+                <supportUrl></supportUrl>
+                <customProcName>false</customProcName>
+                <stayAlive>false</stayAlive>
+                <restartOnCrash>false</restartOnCrash>
+                <manifest></manifest>
+                <icon></icon>
+                <jre>
+                    <path></path>
+                    <minVersion>${min.java.version}</minVersion>
+                    <maxVersion></maxVersion>
+                    <jdkPreference>preferJre</jdkPreference>
+                    <runtimeBits>64/32</runtimeBits>
+                    <maxHeapPercent>${max.heap.size.percent}</maxHeapPercent>                    
+                </jre>                
+                <versionInfo>
+                    <fileVersion>${version.number}</fileVersion>
+                    <txtFileVersion>${version}${version.suffix}</txtFileVersion>
+                    <fileDescription>${translator_product.name}</fileDescription>
+                    <copyright>${vendor}</copyright>
+                    <productVersion>${version.number}</productVersion>
+                    <txtProductVersion>${version}${version.suffix}</txtProductVersion>
+                    <productName>${translator_product.name}</productName>
+                    <companyName></companyName>
+                    <internalName>${translator_internal.name}</internalName>
+                    <originalFilename>${translator_exe.filename}.exe</originalFilename>
+                </versionInfo>
+            </launch4jConfig>
+        </echoxml>
+    </target>    
+    <target name="-exe-linux" unless="is_windows" depends="-load-tools,-exe-config,-exe-translator-config">
         <java jar="${launch4j.path}/launch4j.jar" fork="true">
             <arg line="${exe.config}" />
+        </java>
+        <java jar="${launch4j.path}/launch4j.jar" fork="true">
+            <arg line="${translator_exe.config}" />
         </java>
     </target>
-    <target name="-exe-windows" if="is_windows" depends="-load-tools,-exe-config">
+    <target name="-exe-windows" if="is_windows" depends="-load-tools,-exe-config,-exe-translator-config">
         <java jar="${launch4j.path}/launch4j.jar" fork="true">
             <arg line="${exe.config}" />
         </java>
+        <java jar="${launch4j.path}/launch4j.jar" fork="true">
+            <arg line="${translator_exe.config}" />
+        </java>
     </target>   
+         
+    
     <target name="exe" depends="-set-gui-type,-exe-linux,-exe-windows">
         
     </target>
