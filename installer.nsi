@@ -615,6 +615,8 @@ Section "FFDec" SecDummy
   File "dist\ffdec.jar"
   File "dist\icon.ico"
   File "dist\license.txt"
+  File "dist\translator.bat"
+  File "dist\translator.exe"
   
   SetOutPath "$INSTDIR"  
   File /r "dist\lib"
