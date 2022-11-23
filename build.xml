@@ -535,7 +535,7 @@
 
     </target>
 
-    <target name="release" depends="library,archive,deb,osx-app-archive,installer,osx-app-installer,locales">
+    <target name="release" depends="library,archive,deb,osx-app-archive,installer,osx-app-installer">
 
     </target>
          
@@ -552,49 +552,7 @@
         <fixcrlf srcdir="${dist.dir}" includes="**/*.txt" eol="crlf" preservelastmodified="true" />
         <fixcrlf srcdir="${dist.dir}" includes="**/*.sh" eol="lf" preservelastmodified="true" />
         <fixcrlf srcdir="${dist.dir}" includes="**/*.bat" eol="crlf" preservelastmodified="true" />
-    </target>
-    
-    <target name="locales" depends="-loadversion">
-        <delete dir="${locales.target.dir}"/>
-        <mkdir dir="${locales.target.dir}/${project.name}"/>
-        <copy todir="${locales.target.dir}/${project.name}">
-            <fileset dir="${locales.dir}" includes="**/*.*"/>
-        </copy>
-        <mkdir dir="${locales.target.dir}/jsyntaxpane/bundle/"/>
-        <copy todir="${locales.target.dir}/jsyntaxpane/bundle/">
-            <fileset dir="libsrc/jsyntaxpane/jsyntaxpane/src/main/resources/jsyntaxpane" includes="**/*.*"/>
-        </copy>
-        <mkdir dir="${locales.target.dir}/jsyntaxpane/defaultsyntaxkit"/>
-        <copy todir="${locales.target.dir}/jsyntaxpane/defaultsyntaxkit">
-            <fileset dir="libsrc/jsyntaxpane/jsyntaxpane/src/main/resources/META-INF/services/jsyntaxpane/defaultsyntaxkit" includes="**/*.*"/>
-        </copy>
-        <mkdir dir="${locales.target.dir}/jsyntaxpane/syntaxkits/flasmsyntaxkit"/>
-        <copy todir="${locales.target.dir}/jsyntaxpane/syntaxkits/flasmsyntaxkit">
-            <fileset dir="libsrc/jsyntaxpane/jsyntaxpane/src/main/resources/META-INF/services/jsyntaxpane/syntaxkits/flasmsyntaxkit" includes="**/config*.properties"/>
-        </copy>
-        <mkdir dir="${locales.target.dir}/jsyntaxpane/syntaxkits/flasm3syntaxkit"/>
-        <copy todir="${locales.target.dir}/jsyntaxpane/syntaxkits/flasm3syntaxkit">
-            <fileset dir="libsrc/jsyntaxpane/jsyntaxpane/src/main/resources/META-INF/services/jsyntaxpane/syntaxkits/flasm3syntaxkit" includes="**/config*.properties"/>
-        </copy>
-        <mkdir dir="${locales.target.dir}/jsyntaxpane/syntaxkits/flasm3methodinfosyntaxkit"/>
-        <copy todir="${locales.target.dir}/jsyntaxpane/syntaxkits/flasm3methodinfosyntaxkit">
-            <fileset dir="libsrc/jsyntaxpane/jsyntaxpane/src/main/resources/META-INF/services/jsyntaxpane/syntaxkits/flasm3methodinfosyntaxkit" includes="**/config*.properties"/>
-        </copy>
-        <mkdir dir="${locales.target.dir}/lib"/>
-        <copy todir="${locales.target.dir}/lib">
-            <fileset dir="${locales.lib.dir}" includes="**/*.*"/>
-        </copy>
-        <mkdir dir="${locales.target.dir}/nsis"/>
-        <copy todir="${locales.target.dir}/nsis">
-            <fileset dir="nsis_locales" includes="**/*.*"/>
-        </copy>                                
-        <echo file="${locales.target.dir}/readme.txt">${project.name} ${version}${version.suffix} localization pack
-            -------------------------------------------------------------------            
-            Please follow instructions on https://github.com/jindrapetrik/jpexs-decompiler
-        </echo>
-        <property name="lang.file" value="${releases.dir}/${prefix.filename}_${version}${version.suffix}_lang.zip" />
-        <zip destfile="${lang.file}" basedir="${locales.target.dir}"/>
-    </target>
+    </target>    
     
     <target name="-nightly-suffix" if="nightly">        
         <property name="version.suffix" value="_nightly${version.build}"/>         
@@ -857,7 +815,7 @@
         
     </target>
     
-    <target name="new-version-locales" depends="-new-version-set,locales">
+    <target name="new-version-locales" depends="-new-version-set">
         
     </target>
     
