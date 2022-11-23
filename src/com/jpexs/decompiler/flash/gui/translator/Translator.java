@@ -1036,7 +1036,13 @@ public class Translator extends JFrame implements ItemListener {
                     }
                     break;
                 case "resource":
-                    resourcesComboBox.setSelectedItem(value);
+                    for (int i = 0; i < resourcesComboBox.getItemCount(); i++) {
+                        ResourceItem item = (ResourceItem) resourcesComboBox.getItemAt(i);
+                        if (item.resource.equals(value)) {
+                            resourcesComboBox.setSelectedIndex(i);
+                            break;
+                        }
+                    }
                     break;
                 case "window.x":
                     int x = Integer.parseInt(value);
