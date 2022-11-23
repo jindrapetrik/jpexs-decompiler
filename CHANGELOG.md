@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ##[Unreleased]
+### Added
 - Translator tool for easier localization
 
 ##[17.0.2] - 2022-11-22
