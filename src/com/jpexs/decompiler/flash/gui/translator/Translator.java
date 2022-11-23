@@ -741,12 +741,12 @@ public class Translator extends JFrame implements ItemListener {
         updateRowHeights(table);
         View.centerScreen(this);
 
-        List<Image> images = new ArrayList<>();
+        /*List<Image> images = new ArrayList<>();
         images.add(View.loadImage("icon16"));
         images.add(View.loadImage("icon32"));
         images.add(View.loadImage("icon48"));
         images.add(View.loadImage("icon256"));
-        setIconImages(images);
+        setIconImages(images);*/
         load();
         loadWindow();
 
