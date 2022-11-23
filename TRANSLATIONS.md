@@ -35,3 +35,7 @@ If you would like to translate FFDec to your language, please follow these steps
  - Issue tracker (preffered) - Search for an issue with title `Translation: xxxx`, create new if it does not exist
  - or e-mail it to `jindra.petrik@gmail.com`
 
+## Translating NSIS installer files
+Windows NSIS installer is translated separately (No translation tool for it),
+See list of existing NSIS languages [here](https://github.com/jindrapetrik/jpexs-decompiler/tree/dev/nsis_locales)
+and create new `.nsh` file for new installer language.
