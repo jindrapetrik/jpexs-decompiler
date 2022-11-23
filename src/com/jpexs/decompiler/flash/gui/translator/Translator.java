@@ -202,13 +202,13 @@ public class Translator extends JFrame implements ItemListener {
                                 if (s.type == SymbolType.COMMENT) {
                                     if (((String) s.value).trim().equals(DO_NOT_EDIT)) {
                                         hidden = true;
+                                    } 
+                                    if (comment.isEmpty()) {
+                                        comment = (String) s.value;
                                     } else {
-                                        if (comment.isEmpty()) {
-                                            comment = (String) s.value;
-                                        } else {
-                                            comment = comment + "\r\n" + s.value;
-                                        }
+                                        comment = comment + "\r\n" + s.value;
                                     }
+
                                     s = lexer.lex();
                                     continue;
                                 }
@@ -750,7 +750,7 @@ public class Translator extends JFrame implements ItemListener {
         load();
         loadWindow();
 
-        saveAll();//fixme
+        //saveAll();
     }
 
     private void updateCounts() {
