@@ -57,12 +57,12 @@ if($load_from == "-filever")
                    "type_name" => "Mac OS X Application (zipped)",
                    "type_icon" => "zip"
                ],
-               [
+               /*[
                    "file_name" => "ffdec_${filever_tag}_lang.zip",
                    "ossupport" => ["java"],
                    "type_name" => "Language pack for translators (zipped)",
                    "type_icon" => "zip"
-               ],
+               ],*/
                [
                    "file_name" => "ffdec_lib_${filever_tag}.zip",
                    "ossupport" => ["java"],
