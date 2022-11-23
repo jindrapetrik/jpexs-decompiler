@@ -31,5 +31,7 @@ If you would like to translate FFDec to your language, please follow these steps
 4. If you create brand new locale, you will be asked for its code
  See [table](http://www.loc.gov/standards/iso639-2/php/code_list.php) (ISO 639-1 Code) for available codes.
 5. When you are ready, use `Export JPT` button to export modified strings to an archive (.jpt extension)
-6. Send that archive to us, you can use either Issue tracker (preffered) or e-mail contact `jindra.petrik@gmail.com`
+6. Send that archive to us, you can use either 
+ - Issue tracker (preffered) - Search for an issue with title `Translation: xxxx`, create new if it does not exist
+ - or e-mail it to `jindra.petrik@gmail.com`
 
