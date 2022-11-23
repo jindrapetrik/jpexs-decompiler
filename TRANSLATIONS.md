@@ -34,6 +34,7 @@ If you would like to translate FFDec to your language, please follow these steps
 6. Send that archive to us, you can use either 
  - Issue tracker (preffered) - Search for an issue with title `Translation: xxxx`, create new if it does not exist
  - or e-mail it to `jindra.petrik@gmail.com`
+7. There's no need to translate everything. Some resource packs are HUGE (like `docs/pcode/AS3`) and generally not needed.
 
 ## Translating NSIS installer files
 Windows NSIS installer is translated separately (No translation tool for it),
