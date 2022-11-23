@@ -185,7 +185,11 @@ public class DeclarationAVM2Item extends AVM2Item {
         }
 
         writer.append("var ");
-        return assignment.toString(writer, localData);
+        assignment.toString(writer, localData);
+        writer.append(":");
+
+        type.appendTry(writer, localData);
+        return writer;
     }
 
     @Override

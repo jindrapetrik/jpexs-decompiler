@@ -438,7 +438,7 @@ public class ActionScript2ModificationTest extends ActionScript2TestBase {
                 + "label_2:Jump label_3\n"
                 + "label_3:Jump label_4\n"
                 + "label_4:";
-        ActionJump jump = new ActionJump(0, Utf8Helper.charsetName );
+        ActionJump jump = new ActionJump(0, Utf8Helper.charsetName);
         jump.setAddress(9);
         jump.setJumpOffset(24 - 9 - 5);
         testAddActionNormal(actionsString, expectedResult, jump, 3);

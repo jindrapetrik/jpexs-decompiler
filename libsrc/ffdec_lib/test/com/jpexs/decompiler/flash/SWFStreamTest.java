@@ -54,10 +54,10 @@ public class SWFStreamTest {
     public void testFB() throws IOException {
         double f = 5.25;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName)) {
+        try ( SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName)) {
             sos.writeFB(20, f);
         }
-        try (SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
+        try ( SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
             assertTrue(Double.compare(f, sis.readFB(20, "test")) == 0);
         }
     }
@@ -65,14 +65,14 @@ public class SWFStreamTest {
     @Test
     public void testUB() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName)) {
+        try ( SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName)) {
             sos.writeUB(5, 1);
             sos.writeUB(6, 2);
             sos.writeUB(7, 3);
             sos.writeUB(8, 4);
             sos.writeUB(9, 5);
         }
-        try (SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
+        try ( SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
             assertEquals(1, sis.readUB(5, "test"));
             assertEquals(2, sis.readUB(6, "test"));
             assertEquals(3, sis.readUB(7, "test"));
@@ -84,14 +84,14 @@ public class SWFStreamTest {
     @Test
     public void testSB() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName)) {
+        try ( SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName)) {
             sos.writeSB(5, -1);
             sos.writeSB(6, 2);
             sos.writeSB(7, -3);
             sos.writeSB(8, 4);
             sos.writeSB(9, -5);
         }
-        try (SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
+        try ( SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
             assertEquals(-1, sis.readSB(5, "test"));
             assertEquals(2, sis.readSB(6, "test"));
             assertEquals(-3, sis.readSB(7, "test"));
@@ -185,11 +185,11 @@ public class SWFStreamTest {
     public void testRECT() throws IOException {
         RECT rect;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName)) {
+        try ( SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName)) {
             rect = new RECT(-0x80000000, 0x7FFFFFFF, -0x80000000, 0x7FFFFFFF);
             sos.writeRECT(rect);
         }
-        try (SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
+        try ( SWFInputStream sis = new SWFInputStream(null, baos.toByteArray())) {
             RECT readRECT = sis.readRECT("test");
             assertEquals(readRECT.Xmin, -0x3FFFFFFF);
             assertEquals(readRECT.Xmax, 0x3FFFFFFF);

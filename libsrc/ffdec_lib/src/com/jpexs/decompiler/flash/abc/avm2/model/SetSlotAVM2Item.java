@@ -52,6 +52,9 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
     public void visit(GraphTargetVisitorInterface visitor) {
         visitor.visit(scope);
         visitor.visit(slotObject);
+        if (value != null) {
+            visitor.visit(value);
+        }
     }
 
     @Override

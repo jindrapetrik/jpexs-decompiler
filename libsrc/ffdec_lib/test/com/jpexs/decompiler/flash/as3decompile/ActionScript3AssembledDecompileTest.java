@@ -24,7 +24,8 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
 
     @Test
     public void testDeclareReg() {
-        decompileMethod("assembled", "testDeclareReg", "with(other)\r\n"
+        decompileMethod("assembled", "testDeclareReg", "var other:XML;\r\n"
+                + "with(other)\r\n"
                 + "{\r\n"
                 + "trace(\"hey\");\r\n"
                 + "}\r\n",
@@ -155,8 +156,8 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
 
     @Test
     public void testSetSlotDup() {
-        decompileMethod("assembled", "testSetSlotDup", "var _loc5_:int = 5;\r\n"
-                + "var myslot:int;\r\n"
+        decompileMethod("assembled", "testSetSlotDup", "var myslot:int;\r\n"
+                + "var _loc5_:int = 5;\r\n"
                 + "myname.somemethod(\"okay\",myslot = _loc5_);\r\n"
                 + "myname.start();\r\n",
                  false);
@@ -338,8 +339,9 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
 
     @Test
     public void testTryDoWhile2() {
-        decompileMethod("assembled", "testTryDoWhile2", "trace(\"hello\");\r\n"
-                + "var _loc5_:* = Math.random();\r\n"
+        decompileMethod("assembled", "testTryDoWhile2", "var _loc5_:*;\r\n"
+                + "trace(\"hello\");\r\n"
+                + "_loc5_ = Math.random();\r\n"
                 + "do\r\n"
                 + "{\r\n"
                 + "try\r\n"
@@ -357,9 +359,12 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
 
     @Test
     public void testTryWhile() {
-        decompileMethod("assembled", "testTryWhile", "try\r\n"
+        decompileMethod("assembled", "testTryWhile", "var a:String;\r\n"
+                + "var b:String;\r\n"
+                + "var c:String;\r\n"
+                + "try\r\n"
                 + "{\r\n"
-                + "var c:String = \"aa\";\r\n"
+                + "c = \"aa\";\r\n"
                 + "while(c)\r\n"
                 + "{\r\n"
                 + "if(b)\r\n"

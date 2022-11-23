@@ -97,7 +97,7 @@ public class SwfXmlExportImportTest extends FileTestBase {
             new SwfXmlExporter().exportXml(swf, outFile);
 
             SWF swf2 = new SWF();
-            try (FileInputStream fis = new FileInputStream(outFile)) {
+            try ( FileInputStream fis = new FileInputStream(outFile)) {
                 new SwfXmlImporter().importSwf(swf2, fis);
             }
 

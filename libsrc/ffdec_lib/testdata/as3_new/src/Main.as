@@ -101,6 +101,7 @@ package
 		TestTryIf;
 		TestTryReturn;
 		TestTryReturn2;
+        TestUndefined;
 		TestUsagesTry;
 		TestVector;
 		TestVector2;		
