@@ -120,13 +120,16 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testCompoundAssignments() {
-        decompileMethod("classic", "testCompoundAssignments", "var b:* = [10,20,30];\r\n"
-                + "var a:int = 0;\r\n"
+        decompileMethod("classic", "testCompoundAssignments", "var b:*;\r\n"
+                + "var a:int;\r\n"
+                + "var t:MyTest;\r\n"
+                + "b = [10,20,30];\r\n"
+                + "a = 0;\r\n"
                 + "trace(\"a += 5\");\r\n"
                 + "a += 5;\r\n"
                 + "trace(\"arr[call()] = arr[call()] + 2;\");\r\n"
                 + "b[this.calc()] = b[this.calc()] + 2;\r\n"
-                + "var t:MyTest = new MyTest();\r\n"
+                + "t = new MyTest();\r\n"
                 + "trace(\"t.attr *= 10\");\r\n"
                 + "t.attr *= 10;\r\n"
                 + "trace(\"attr -= 5\");\r\n"
@@ -390,7 +393,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testFinallyZeroJump() {
-        decompileMethod("classic", "testFinallyZeroJump", "var str:String = param1;\r\n"
+        decompileMethod("classic", "testFinallyZeroJump", "var str:String;\r\n"
+                + "str = param1;\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "}\r\n"
@@ -648,18 +652,24 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testForXml() {
-        decompileMethod("classic", "testForXml", "var c:int = 0;\r\n"
+        decompileMethod("classic", "testForXml", "var myXML:XML;\r\n"
+                + "var k:*;\r\n"
+                + "var len:int;\r\n"
+                + "var a:int;\r\n"
+                + "var b:int;\r\n"
+                + "var i:int;\r\n"
+                + "var c:int = 0;\r\n"
                 + "var name:String = \"ahoj\";\r\n"
-                + "var myXML:XML = <order id=\"604\">\r\n"
+                + "myXML = <order id=\"604\">\r\n"
                 + "<book isbn=\"12345\">\r\n"
                 + "<title>{name}</title>\r\n"
                 + "</book>\r\n"
                 + "</order>;\r\n"
-                + "var k:* = null;\r\n"
-                + "var len:int = 5;\r\n"
-                + "var a:int = 5;\r\n"
-                + "var b:int = 6;\r\n"
-                + "for(var i:int = 0; i < len; k = myXML.book.(@isbn == \"12345\"))\r\n"
+                + "k = null;\r\n"
+                + "len = 5;\r\n"
+                + "a = 5;\r\n"
+                + "b = 6;\r\n"
+                + "for(i = 0; i < len; k = myXML.book.(@isbn == \"12345\"))\r\n"
                 + "{\r\n"
                 + "c = 1;\r\n"
                 + "if(c == 2)\r\n"
@@ -893,7 +903,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testIfFinally() {
-        decompileMethod("classic", "testIfFinally", "var a:int = Math.random();\r\n"
+        decompileMethod("classic", "testIfFinally", "var a:int;\r\n"
+                + "a = Math.random();\r\n"
                 + "if(a == 5)\r\n"
                 + "{\r\n"
                 + "try\r\n"
@@ -1062,10 +1073,11 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "first = \"value1\";\r\n"
                 + "var traceParameter:Function = function(aParam:String):String\r\n"
                 + "{\r\n"
+                + "var traceParam2:Function;\r\n"
                 + "var second:String = null;\r\n"
                 + "second = \"value2\";\r\n"
                 + "second += \"cc\";\r\n"
-                + "var traceParam2:Function = function(bParam:String):String\r\n"
+                + "traceParam2 = function(bParam:String):String\r\n"
                 + "{\r\n"
                 + "trace(bParam + \",\" + aParam);\r\n"
                 + "return first + second + aParam + bParam;\r\n"
@@ -1213,7 +1225,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testNamedAnonFunctions() {
-        decompileMethod("classic", "testNamedAnonFunctions", "var test:* = new function testFunc(param1:*, param2:int, param3:Array):Boolean\r\n"
+        decompileMethod("classic", "testNamedAnonFunctions", "var test:*;\r\n"
+                + "test = new function testFunc(param1:*, param2:int, param3:Array):Boolean\r\n"
                 + "{\r\n"
                 + "return (param1 as TestClass2).attrib1 == 5;\r\n"
                 + "};\r\n",
@@ -1454,7 +1467,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testTryIf() {
-        decompileMethod("classic", "testTryIf", "var a:int = Math.random();\r\n"
+        decompileMethod("classic", "testTryIf", "var a:int;\r\n"
+                + "a = Math.random();\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "if(a > 5 && a < 50)\r\n"
@@ -1500,13 +1514,17 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testTryReturn2() {
-        decompileMethod("classic", "testTryReturn2", "var c:Boolean = false;\r\n"
+        decompileMethod("classic", "testTryReturn2", "var a:Boolean;\r\n"
+                + "var b:Boolean;\r\n"
+                + "var d:Boolean;\r\n"
+                + "var e:Boolean;\r\n"
+                + "var c:Boolean = false;\r\n"
                 + "trace(\"before\");\r\n"
-                + "var a:Boolean = true;\r\n"
-                + "var b:Boolean = false;\r\n"
+                + "a = true;\r\n"
+                + "b = false;\r\n"
                 + "c = true;\r\n"
-                + "var d:Boolean = false;\r\n"
-                + "var e:Boolean = true;\r\n"
+                + "d = false;\r\n"
+                + "e = true;\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "if(a)\r\n"
@@ -1542,8 +1560,31 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testUndefined() {
+        decompileMethod("classic", "testUndefined", "var f:*;\r\n"
+                + "var i:int = 0;\r\n"
+                + "var j:int = 0;\r\n"
+                + "var c:int = 0;\r\n"
+                + "c = 5 + i;\r\n"
+                + "f = function():*\r\n"
+                + "{\r\n"
+                + "trace(c);\r\n"
+                + "trace(j);\r\n"
+                + "};\r\n"
+                + "while(i < 10)\r\n"
+                + "{\r\n"
+                + "trace(i);\r\n"
+                + "i++;\r\n"
+                + "}\r\n"
+                + "f();\r\n",
+                 false);
+    }
+
+    @Test
     public void testUsagesTry() {
-        decompileMethod("classic", "testUsagesTry", "var k:int = 5;\r\n"
+        decompileMethod("classic", "testUsagesTry", "var a:Boolean;\r\n"
+                + "var b:Boolean;\r\n"
+                + "var k:int = 5;\r\n"
                 + "switch(k)\r\n"
                 + "{\r\n"
                 + "case 0:\r\n"
@@ -1552,8 +1593,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "case 1:\r\n"
                 + "trace(\"2\");\r\n"
                 + "}\r\n"
-                + "var a:Boolean = true;\r\n"
-                + "var b:Boolean = true;\r\n"
+                + "a = true;\r\n"
+                + "b = true;\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "if(b)\r\n"
@@ -1673,8 +1714,10 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testWhileTry2() {
-        decompileMethod("classic", "testWhileTry2", "var j:* = undefined;\r\n"
-                + "for(var i:* = 0; i < 100; i++)\r\n"
+        decompileMethod("classic", "testWhileTry2", "var j:*;\r\n"
+                + "var i:*;\r\n"
+                + "j = undefined;\r\n"
+                + "for(i = 0; i < 100; i++)\r\n"
                 + "{\r\n"
                 + "try\r\n"
                 + "{\r\n"
@@ -1699,17 +1742,20 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testXml() {
-        decompileMethod("classic", "testXml", "var g:XML = null;\r\n"
+        decompileMethod("classic", "testXml", "var myXML:XML;\r\n"
+                + "var k:*;\r\n"
+                + "var all:String;\r\n"
+                + "var g:XML = null;\r\n"
                 + "var testCdata:XML = null;\r\n"
                 + "var testComment:XML = null;\r\n"
                 + "var name:String = \"ahoj\";\r\n"
-                + "var myXML:XML = <order id=\"604\">\r\n"
+                + "myXML = <order id=\"604\">\r\n"
                 + "<book isbn=\"12345\">\r\n"
                 + "<title>{name}</title>\r\n"
                 + "</book>\r\n"
                 + "</order>;\r\n"
-                + "var k:* = myXML.@id;\r\n"
-                + "var all:String = myXML.@*.toXMLString();\r\n"
+                + "k = myXML.@id;\r\n"
+                + "all = myXML.@*.toXMLString();\r\n"
                 + "k = myXML.book;\r\n"
                 + "k = myXML.book.(@isbn == \"12345\");\r\n"
                 + "g = <script>\r\n"

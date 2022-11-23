@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Translator tool for easier localization
 
+### Fixed
+- [#1769] Missing some body trait variable declaration
+
 ## [17.0.2] - 2022-11-22
 ### Fixed
 - [#1882] Close button on the menu toolbar
@@ -2512,6 +2515,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.2...dev
+[17.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.1...version17.0.2
 [17.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.0...version17.0.1
 [17.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.3.1...version17.0.0
 [16.3.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.3.0...version16.3.1
@@ -2643,6 +2648,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1769]: https://www.free-decompiler.com/flash/issues/1769
 [#1882]: https://www.free-decompiler.com/flash/issues/1882
 [#1880]: https://www.free-decompiler.com/flash/issues/1880
 [#1881]: https://www.free-decompiler.com/flash/issues/1881
@@ -2723,7 +2729,6 @@ All notable changes to this project will be documented in this file.
 [#1763]: https://www.free-decompiler.com/flash/issues/1763
 [#1766]: https://www.free-decompiler.com/flash/issues/1766
 [#1773]: https://www.free-decompiler.com/flash/issues/1773
-[#1769]: https://www.free-decompiler.com/flash/issues/1769
 [#1750]: https://www.free-decompiler.com/flash/issues/1750
 [#1485]: https://www.free-decompiler.com/flash/issues/1485
 [#1681]: https://www.free-decompiler.com/flash/issues/1681

@@ -80,7 +80,7 @@ public class ActionScript3AssemblerTest extends ActionScriptTestBase {
 
             @Override
             public void setABC(ABC abc) {
-            }                        
+            }
         });
     }
 

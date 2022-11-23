@@ -1066,9 +1066,10 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
         decompileMethod("classic_air", "testInlineFunctions", "var first:String = \"value1\";\r\n"
                 + "var traceParameter:Function = function(aParam:String):String\r\n"
                 + "{\r\n"
+                + "var traceParam2:Function;\r\n"
                 + "var second:String = \"value2\";\r\n"
                 + "second = second + \"cc\";\r\n"
-                + "var traceParam2:Function = function(bParam:String):String\r\n"
+                + "traceParam2 = function(bParam:String):String\r\n"
                 + "{\r\n"
                 + "trace(bParam + \",\" + aParam);\r\n"
                 + "return first + second + aParam + bParam;\r\n"
@@ -1216,7 +1217,8 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testNamedAnonFunctions() {
-        decompileMethod("classic_air", "testNamedAnonFunctions", "var test:* = new (function():*\r\n"
+        decompileMethod("classic_air", "testNamedAnonFunctions", "var test:*;\r\n"
+                + "test = new (function():*\r\n"
                 + "{\r\n"
                 + "var testFunc:Function;\r\n"
                 + "return testFunc = function(param1:*, param2:int, param3:Array):Boolean\r\n"
@@ -1545,6 +1547,27 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "}\r\n"
                 + "trace(\"after\");\r\n"
                 + "return \"X\";\r\n",
+                 false);
+    }
+
+    @Test
+    public void testUndefined() {
+        decompileMethod("classic_air", "testUndefined", "var i:int;\r\n"
+                + "var j:int;\r\n"
+                + "var c:int;\r\n"
+                + "var f:*;\r\n"
+                + "c = 5 + i;\r\n"
+                + "f = function():*\r\n"
+                + "{\r\n"
+                + "trace(c);\r\n"
+                + "trace(j);\r\n"
+                + "};\r\n"
+                + "while(i < 10)\r\n"
+                + "{\r\n"
+                + "trace(i);\r\n"
+                + "i++;\r\n"
+                + "}\r\n"
+                + "f();\r\n",
                  false);
     }
 

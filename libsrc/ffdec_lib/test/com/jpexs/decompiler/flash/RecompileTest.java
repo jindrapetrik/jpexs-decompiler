@@ -50,7 +50,7 @@ public class RecompileTest extends FileTestBase {
     public void testAS3InstructionParsing(String filePath) {
         try {
             Configuration._debugCopy.set(false);
-            try (FileInputStream fis = new FileInputStream(filePath)) {
+            try ( FileInputStream fis = new FileInputStream(filePath)) {
                 SWF swf = new SWF(new BufferedInputStream(fis), false);
                 for (ABCContainerTag abcTag : swf.getAbcList()) {
                     ABC abc = abcTag.getABC();
@@ -69,7 +69,7 @@ public class RecompileTest extends FileTestBase {
     @Test(dataProvider = "provideFiles")
     public void testRecompile(String filePath) {
         try {
-            try (FileInputStream fis = new FileInputStream(filePath)) {
+            try ( FileInputStream fis = new FileInputStream(filePath)) {
                 Configuration._debugCopy.set(true);
                 SWF swf = new SWF(new BufferedInputStream(fis), false);
                 swf.saveTo(new ByteArrayOutputStream());

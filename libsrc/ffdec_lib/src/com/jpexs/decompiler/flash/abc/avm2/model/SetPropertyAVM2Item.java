@@ -68,7 +68,9 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
     public void visit(GraphTargetVisitorInterface visitor) {
         visitor.visit(object);
         visitor.visit(propertyName);
-        visitor.visit(value);
+        if (value != null) {
+            visitor.visit(value);
+        }
     }
 
     public SetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem value) {

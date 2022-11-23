@@ -96,7 +96,8 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
 
     @Test(dataProvider = "swfNamesProvider")
     public void testTryCatchInIf2(String swfUsed) {
-        decompileMethod(swfUsed, "testTryCatchInIf2", "var a:int = Math.random();\r\n"
+        decompileMethod(swfUsed, "testTryCatchInIf2", "var a:int;\r\n"
+                + "a = Math.random();\r\n"
                 + "if(a > 10)\r\n"
                 + "{\r\n"
                 + "try\r\n"
@@ -515,7 +516,8 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
 
     @Test(dataProvider = "swfNamesProvider")
     public void testTryCatchWith(String swfUsed) {
-        decompileMethod(swfUsed, "testTryCatchWith", "var a:MyTest = new MyTest();\r\n"
+        decompileMethod(swfUsed, "testTryCatchWith", "var a:MyTest;\r\n"
+                + "a = new MyTest();\r\n"
                 + "trace(\"before with\");\r\n"
                 + "with(a)\r\n"
                 + "{\r\n"
@@ -744,7 +746,8 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
 
     @Test(dataProvider = "swfNamesProvider")
     public void testTryFinallyReturnNested(String swfUsed) {
-        decompileMethod(swfUsed, "testTryFinallyReturnNested", "var a:int = Math.random() * 5;\r\n"
+        decompileMethod(swfUsed, "testTryFinallyReturnNested", "var a:int;\r\n"
+                + "a = Math.random() * 5;\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "trace(\"before try2\");\r\n"
@@ -776,7 +779,8 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
 
     @Test(dataProvider = "swfNamesProvider")
     public void testTryFinallyReturnNested2(String swfUsed) {
-        decompileMethod(swfUsed, "testTryFinallyReturnNested2", "var a:int = Math.random() * 5;\r\n"
+        decompileMethod(swfUsed, "testTryFinallyReturnNested2", "var a:int;\r\n"
+                + "a = Math.random() * 5;\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "try\r\n"
@@ -828,7 +832,8 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
 
     @Test(dataProvider = "swfNamesProvider")
     public void testTryFinallyReturnVoid(String swfUsed) {
-        decompileMethod(swfUsed, "testTryFinallyReturnVoid", "var a:int = Math.random() * 5;\r\n"
+        decompileMethod(swfUsed, "testTryFinallyReturnVoid", "var a:int;\r\n"
+                + "a = Math.random() * 5;\r\n"
                 + "trace(\"before try\");\r\n"
                 + "try\r\n"
                 + "{\r\n"
