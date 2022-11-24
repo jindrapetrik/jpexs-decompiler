@@ -22,10 +22,18 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.TypeItem;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -41,7 +49,21 @@ public class GetLexIns extends InstructionDefinition {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int multinameIndex = ins.operands[0];
         Multiname multiname = localData.getConstants().getMultiname(multinameIndex);
-        stack.push(new GetLexAVM2Item(ins, localData.lineStartInstruction, multiname, localData.getConstants()));
+        String multinameStr = multiname.getName(localData.abc.constants, new ArrayList<>(), true, true);
+        GraphTargetItem slotType = TypeItem.UNBOUNDED;
+        for (Trait t : localData.methodBody.traits.traits) {
+            if (t instanceof TraitSlotConst) {
+                TraitSlotConst tsc = (TraitSlotConst) t;
+                if (Objects.equals(
+                        tsc.getName(localData.abc).getName(localData.abc.constants, new ArrayList<>(), true, true),
+                        multinameStr
+                )) {
+                    slotType = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
+                    break;
+                }
+            }
+        }
+        stack.push(new GetLexAVM2Item(ins, localData.lineStartInstruction, multiname, localData.getConstants(), slotType));
     }
 
     @Override

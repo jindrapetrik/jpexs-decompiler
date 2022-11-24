@@ -74,7 +74,7 @@ public class StrictNeqAVM2Item extends BinaryOpItem implements LogicalOpItem, If
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(DottedChain.BOOLEAN);
+        return TypeItem.BOOLEAN;
     }
 
     @Override

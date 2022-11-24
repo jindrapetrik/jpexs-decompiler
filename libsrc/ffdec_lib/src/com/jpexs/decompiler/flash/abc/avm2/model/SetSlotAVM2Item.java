@@ -47,6 +47,8 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
     public GraphTargetItem compoundValue;
 
     public String compoundOperator;
+    
+    public GraphTargetItem type;
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
@@ -67,12 +69,13 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
         this.declaration = declaration;
     }
 
-    public SetSlotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope, GraphTargetItem slotObject, int slotIndex, Multiname slotName, GraphTargetItem value) {
+    public SetSlotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope, GraphTargetItem slotObject, int slotIndex, Multiname slotName, GraphTargetItem value, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.slotName = slotName;
         this.scope = scope;
         this.slotObject = slotObject;
         this.slotIndex = slotIndex;
+        this.type = type;
     }
 
     @Override
@@ -96,9 +99,9 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
             return compoundValue.toString(writer, localData);
         }
         writer.append(" = ");
-        if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
+        /*if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
             return value.value.toString(writer, localData);
-        }
+        }*/
         return value.toString(writer, localData);
     }
 
@@ -115,7 +118,7 @@ public class SetSlotAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assign
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetSlotAVM2Item(getInstruction(), getLineStartIns(), scope, slotObject, slotIndex, slotName);
+        return new GetSlotAVM2Item(getInstruction(), getLineStartIns(), scope, slotObject, slotIndex, slotName, type);
     }
 
     @Override

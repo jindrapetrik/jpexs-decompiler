@@ -48,6 +48,8 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
     public GraphTargetItem compoundValue;
 
     public String compoundOperator;
+    
+    public GraphTargetItem type;
 
     @Override
     public DeclarationAVM2Item getDeclaration() {
@@ -73,11 +75,12 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
         }
     }
 
-    public SetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem value) {
+    public SetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem value, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT);
         this.object = object;
-        this.propertyName = propertyName;
+        this.propertyName = propertyName;        
         this.value = value;
+        this.type = type;
     }
 
     @Override
@@ -92,15 +95,15 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
         }
 
         writer.append(" = ");
-        if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
+        /*if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
             return value.value.toString(writer, localData);
-        }
+        }*/
         return value.toString(writer, localData);
     }
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetPropertyAVM2Item(getInstruction(), getLineStartIns(), object, propertyName);
+        return new GetPropertyAVM2Item(getInstruction(), getLineStartIns(), object, propertyName, type);
     }
 
     @Override
@@ -122,7 +125,8 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
 
     @Override
     public GraphTargetItem returnType() {
-        return TypeItem.UNBOUNDED;
+        return value.returnType();
+        //return TypeItem.UNBOUNDED;
     }
 
     @Override

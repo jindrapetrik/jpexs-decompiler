@@ -41,6 +41,8 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
     public GraphTargetItem compoundValue;
 
     public String compoundOperator;
+    
+    public GraphTargetItem type;
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
@@ -59,10 +61,11 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
         this.declaration = declaration;
     }
 
-    public InitPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, FullMultinameAVM2Item propertyName, GraphTargetItem value) {
+    public InitPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, FullMultinameAVM2Item propertyName, GraphTargetItem value, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.object = object;
         this.propertyName = propertyName;
+        this.type = type;
     }
 
     @Override
@@ -81,7 +84,7 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetPropertyAVM2Item(getInstruction(), getLineStartIns(), object, propertyName);
+        return new GetPropertyAVM2Item(getInstruction(), getLineStartIns(), object, propertyName, type);
     }
 
     @Override

@@ -99,7 +99,8 @@ public class SetSuperAVM2Item extends AVM2Item implements SetTypeAVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return TypeItem.UNBOUNDED;
+        return value.returnType();
+        //return TypeItem.UNBOUNDED;
     }
 
     @Override

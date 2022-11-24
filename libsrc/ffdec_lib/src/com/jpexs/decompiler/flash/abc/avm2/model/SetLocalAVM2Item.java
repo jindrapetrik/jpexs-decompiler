@@ -72,9 +72,9 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
             return compoundValue.toString(writer, localData);
         }
         writer.append(" = ");
-        if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
+        /*if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
             return value.value.toString(writer, localData);
-        }
+        }*/
         return value.toString(writer, localData);
     }
 
@@ -141,8 +141,8 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
     }
 
     @Override
-    public GraphTargetItem returnType() {
-        return TypeItem.UNBOUNDED;
+    public GraphTargetItem returnType() {        
+        return value.returnType();
     }
 
     @Override

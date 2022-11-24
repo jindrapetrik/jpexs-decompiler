@@ -45,7 +45,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     @Test
     public void testCallLocal() {
         decompileMethod("classic_air", "testCallLocal", "var f:Function = getF();\r\n"
-                + "var b:int = f(1,3);\r\n",
+                + "var b:int = int(f(1,3));\r\n",
                  false);
     }
 
@@ -76,7 +76,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var extraLine:Boolean = false;\r\n"
                 + "var r:int = 7;\r\n"
                 + "var t:int = 0;\r\n"
-                + "t = this.getInt();\r\n"
+                + "t = int(this.getInt());\r\n"
                 + "if(t + 1 < g.length)\r\n"
                 + "{\r\n"
                 + "t++;\r\n"
@@ -215,6 +215,16 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testConvert() {
+        decompileMethod("classic_air", "testConvert", "var s:String = \"a\";\r\n"
+                + "var i:int = int(s);\r\n"
+                + "var j:int = int(n);\r\n"
+                + "s = String(j);\r\n"
+                + "s = ns;\r\n",
+                 false);
+    }
+
+    @Test
     public void testDecl2() {
         decompileMethod("classic_air", "testDecl2", "var k:int = 0;\r\n"
                 + "var i:int = 5;\r\n"
@@ -237,7 +247,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var vint:int = 0;\r\n"
                 + "var vuint:uint = 0;\r\n"
                 + "var vclass:TestClass1 = null;\r\n"
-                + "var vnumber:* = NaN;\r\n"
+                + "var vnumber:Number = NaN;\r\n"
                 + "var vobject:Object = null;\r\n"
                 + "vall = 6;\r\n"
                 + "vstr = \"hello\";\r\n"
@@ -270,7 +280,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testDeobfuscation() {
-        decompileMethod("classic_air", "testDeobfuscation", "var r:int = Math.random();\r\n"
+        decompileMethod("classic_air", "testDeobfuscation", "var r:int = int(Math.random());\r\n"
                 + "if(r > 5)\r\n"
                 + "{\r\n"
                 + "trace(\"A\");\r\n"
@@ -428,7 +438,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var a:int = 4;\r\n"
                 + "var b:int = 7;\r\n"
                 + "var c:int = 9;\r\n"
-                + "for(i = uint(0); i < len; x = a > 4 && b < 2 || c > 10)\r\n"
+                + "for(i = 0; i < len; x = a > 4 && b < 2 || c > 10)\r\n"
                 + "{\r\n"
                 + "c = 1;\r\n"
                 + "if(c == 2)\r\n"
@@ -559,7 +569,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
         decompileMethod("classic_air", "testForGoto", "var i:* = 0;\r\n"
                 + "var c:int = 0;\r\n"
                 + "var len:int = 5;\r\n"
-                + "for(i = uint(0); i < len; i++)\r\n"
+                + "for(i = 0; i < len; i++)\r\n"
                 + "{\r\n"
                 + "c = 1;\r\n"
                 + "if(c == 2)\r\n"
@@ -842,7 +852,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
         decompileMethod("classic_air", "testGotos7", "var i:int = 0;\r\n"
                 + "for(i = 0; i < 10; i++)\r\n"
                 + "{\r\n"
-                + "switch(int(i))\r\n"
+                + "switch(i)\r\n"
                 + "{\r\n"
                 + "case 0:\r\n"
                 + "trace(\"zero\");\r\n"
@@ -899,7 +909,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testIfFinally() {
-        decompileMethod("classic_air", "testIfFinally", "var a:int = Math.random();\r\n"
+        decompileMethod("classic_air", "testIfFinally", "var a:int = int(Math.random());\r\n"
                 + "if(a == 5)\r\n"
                 + "{\r\n"
                 + "try\r\n"
@@ -969,7 +979,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testIgnoreAndOr() {
-        decompileMethod("classic_air", "testIgnoreAndOr", "var k:int = Math.random();\r\n"
+        decompileMethod("classic_air", "testIgnoreAndOr", "var k:int = int(Math.random());\r\n"
                 + "if(k > 5)\r\n"
                 + "{\r\n"
                 + "trace(\"A\");\r\n"
@@ -1184,7 +1194,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     @Test
     public void testMissingDefault() {
         decompileMethod("classic_air", "testMissingDefault", "var jj:int = 1;\r\n"
-                + "switch(int(jj) - 1)\r\n"
+                + "switch(jj - 1)\r\n"
                 + "{\r\n"
                 + "case 0:\r\n"
                 + "jj = 1;\r\n"
@@ -1462,7 +1472,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testTryIf() {
-        decompileMethod("classic_air", "testTryIf", "var a:int = Math.random();\r\n"
+        decompileMethod("classic_air", "testTryIf", "var a:int = int(Math.random());\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "if(a > 5 && a < 50)\r\n"
@@ -1572,7 +1582,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     @Test
     public void testUsagesTry() {
         decompileMethod("classic_air", "testUsagesTry", "var k:int = 5;\r\n"
-                + "switch(int(k))\r\n"
+                + "switch(k)\r\n"
                 + "{\r\n"
                 + "case 0:\r\n"
                 + "trace(\"1\");\r\n"

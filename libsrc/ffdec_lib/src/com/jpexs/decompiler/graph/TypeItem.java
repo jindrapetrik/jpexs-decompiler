@@ -35,6 +35,14 @@ public class TypeItem extends GraphTargetItem {
     public static TypeItem BOOLEAN = new TypeItem(DottedChain.BOOLEAN);
 
     public static TypeItem STRING = new TypeItem(DottedChain.STRING);
+    
+    public static TypeItem NUMBER = new TypeItem(DottedChain.NUMBER);
+    
+    public static TypeItem INT = new TypeItem(DottedChain.INT);
+    
+    public static TypeItem UINT = new TypeItem(DottedChain.UINT);
+    
+    public static TypeItem UNDEFINED = new TypeItem(DottedChain.UNDEFINED);
 
     public static TypeItem ARRAY = new TypeItem(DottedChain.ARRAY);
 

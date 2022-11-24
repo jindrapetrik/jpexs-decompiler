@@ -106,7 +106,7 @@ public class DeclarationAVM2Item extends AVM2Item {
                 coerType = ((ConvertAVM2Item) lti.value).type;
             }
             //strip coerce if its declared as this type
-            if (coerType.equals(type) && !coerType.equals(TypeItem.UNBOUNDED)) {
+            if ((lti.value instanceof CoerceAVM2Item) && coerType.equals(type) && !coerType.equals(TypeItem.UNBOUNDED)) {
                 val = val.value;
             }
             srcData.declaredType = (coerType instanceof TypeItem) ? ((TypeItem) coerType).fullTypeName : DottedChain.ALL;

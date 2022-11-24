@@ -29,15 +29,21 @@ import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.ecma.ArrayType;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.ObjectType;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -121,7 +127,23 @@ public class GetPropertyIns extends InstructionDefinition {
                 }
             }
         }
-        stack.push(new GetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname));
+        
+        GraphTargetItem propertyType = TypeItem.UNBOUNDED;
+        String multinameStr = localData.abc.constants.getMultiname(multiname.multinameIndex).getName(localData.abc.constants, new ArrayList<>(), true, true);
+        
+        for (Trait t : localData.methodBody.traits.traits) {
+            if (t instanceof TraitSlotConst) {
+                TraitSlotConst tsc = (TraitSlotConst) t;
+                if (Objects.equals(
+                        tsc.getName(localData.abc).getName(localData.abc.constants, new ArrayList<>(), true, true),
+                        multinameStr
+                )) {
+                    propertyType = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
+                    break;
+                }
+            }
+        }
+        stack.push(new GetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, propertyType));
     }
 
     @Override

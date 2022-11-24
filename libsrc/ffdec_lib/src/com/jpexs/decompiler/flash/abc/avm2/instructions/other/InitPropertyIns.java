@@ -23,9 +23,15 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.TypeItem;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -44,7 +50,23 @@ public class InitPropertyIns extends InstructionDefinition {
         GraphTargetItem val = stack.pop();
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
-        InitPropertyAVM2Item result = new InitPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, val);
+        
+        GraphTargetItem propertyType = TypeItem.UNBOUNDED;
+        String multinameStr = localData.abc.constants.getMultiname(multiname.multinameIndex).getName(localData.abc.constants, new ArrayList<>(), true, true);
+        
+        for (Trait t : localData.methodBody.traits.traits) {
+            if (t instanceof TraitSlotConst) {
+                TraitSlotConst tsc = (TraitSlotConst) t;
+                if (Objects.equals(
+                        tsc.getName(localData.abc).getName(localData.abc.constants, new ArrayList<>(), true, true),
+                        multinameStr
+                )) {
+                    propertyType = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
+                    break;
+                }
+            }
+        }
+        InitPropertyAVM2Item result = new InitPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, val, propertyType);
         SetPropertyIns.handleCompound(localData, obj, multiname, val, output, result);
         output.add(result);
     }

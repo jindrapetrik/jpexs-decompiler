@@ -44,13 +44,16 @@ public class CallPropertyAVM2Item extends AVM2Item {
     public List<GraphTargetItem> arguments;
 
     public boolean isVoid;
+    
+    public GraphTargetItem type;
 
-    public CallPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, boolean isVoid, GraphTargetItem receiver, GraphTargetItem propertyName, List<GraphTargetItem> arguments) {
+    public CallPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, boolean isVoid, GraphTargetItem receiver, GraphTargetItem propertyName, List<GraphTargetItem> arguments, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.receiver = receiver;
         this.propertyName = propertyName;
         this.arguments = arguments;
         this.isVoid = isVoid;
+        this.type = type;
     }
 
     @Override
@@ -83,7 +86,7 @@ public class CallPropertyAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return TypeItem.UNBOUNDED;
+        return type;
     }
 
     @Override
