@@ -32,9 +32,13 @@ import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.helpers.Reference;
 import java.util.List;
@@ -136,7 +140,20 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
             }
         }
 
-        SetSlotAVM2Item result = new SetSlotAVM2Item(ins, localData.lineStartInstruction, obj, objnoreg, slotIndex, slotname, value);
+        GraphTargetItem slotType = TypeItem.UNBOUNDED;
+        if (obj instanceof NewActivationAVM2Item) {
+            for (Trait t : localData.methodBody.traits.traits) {
+                if (t instanceof TraitSlotConst) {
+                    TraitSlotConst tsc = (TraitSlotConst)t;
+                    if (tsc.slot_id == slotIndex) {
+                        slotType = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        SetSlotAVM2Item result = new SetSlotAVM2Item(ins, localData.lineStartInstruction, obj, objnoreg, slotIndex, slotname, value, slotType);
 
         if (value.getNotCoerced() instanceof CompoundableBinaryOp) {
             if (!obj.hasSideEffect()) {

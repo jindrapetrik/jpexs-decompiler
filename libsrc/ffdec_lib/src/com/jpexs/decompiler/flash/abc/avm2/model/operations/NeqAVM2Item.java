@@ -71,7 +71,7 @@ public class NeqAVM2Item extends BinaryOpItem implements LogicalOpItem, IfCondit
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(DottedChain.BOOLEAN);
+        return TypeItem.BOOLEAN;
     }
 
     @Override

@@ -27,6 +27,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -95,6 +96,28 @@ public class AddAVM2Item extends BinaryOpItem implements CompoundableBinaryOp {
 
     @Override
     public GraphTargetItem returnType() {
+        if (leftSide.returnType().equals(TypeItem.STRING) || rightSide.returnType().equals(TypeItem.STRING)) {
+            return TypeItem.STRING;
+        }
+        if (leftSide.returnType().equals(TypeItem.INT) && rightSide.returnType().equals(TypeItem.INT)) {
+            return TypeItem.INT;
+        }
+        
+        if ((leftSide.returnType().equals(TypeItem.INT) && rightSide.returnType().equals(TypeItem.UINT))||
+            (leftSide.returnType().equals(TypeItem.UINT) && rightSide.returnType().equals(TypeItem.INT))
+                ) {
+            return TypeItem.INT;
+        }                
+        
+        if (leftSide.returnType().equals(TypeItem.UINT) && rightSide.returnType().equals(TypeItem.UINT)) {
+            return TypeItem.UINT;
+        }
+                
+        if (leftSide.returnType().equals(TypeItem.NUMBER) || rightSide.returnType().equals(TypeItem.NUMBER)) {
+            return TypeItem.NUMBER;
+        }
+        
+        
         return new UnboundedTypeItem();
     }
 

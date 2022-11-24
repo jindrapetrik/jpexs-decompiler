@@ -25,6 +25,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.UnaryOpItem;
 import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.util.List;
@@ -81,6 +82,7 @@ public class TypeOfAVM2Item extends UnaryOpItem {
 
     @Override
     public GraphTargetItem returnType() {
-        return new UnboundedTypeItem();
+        return TypeItem.STRING;
+        //return new UnboundedTypeItem();
     }
 }

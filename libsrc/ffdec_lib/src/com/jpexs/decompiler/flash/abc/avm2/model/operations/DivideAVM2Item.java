@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -83,7 +84,8 @@ public class DivideAVM2Item extends BinaryOpItem implements CompoundableBinaryOp
 
     @Override
     public GraphTargetItem returnType() {
-        return new UnboundedTypeItem();
+        return TypeItem.NUMBER;
+        //return new UnboundedTypeItem();
     }
 
     @Override

@@ -34,12 +34,15 @@ import java.util.Objects;
 public class GetLexAVM2Item extends AVM2Item implements SimpleValue {
 
     public Multiname propertyName;
+    
+    public GraphTargetItem type;
 
     private final DottedChain fullPropertyName;
 
-    public GetLexAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Multiname propertyName, AVM2ConstantPool constants) {
+    public GetLexAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Multiname propertyName, AVM2ConstantPool constants, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.propertyName = propertyName;
+        this.type = type;
         this.fullPropertyName = propertyName.getNameWithNamespace(constants, true);
     }
 
@@ -56,7 +59,7 @@ public class GetLexAVM2Item extends AVM2Item implements SimpleValue {
 
     @Override
     public GraphTargetItem returnType() {
-        return TypeItem.UNBOUNDED;
+        return type;
     }
 
     @Override

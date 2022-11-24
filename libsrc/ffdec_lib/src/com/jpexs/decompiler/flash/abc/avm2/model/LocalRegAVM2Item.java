@@ -131,6 +131,9 @@ public class LocalRegAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
+        if (computedValue != null) {
+            return computedValue.returnType();
+        }
         return TypeItem.UNBOUNDED;
     }
 

@@ -22,6 +22,7 @@ package
 		TestCatchFinally;
 		TestChain2;
 		TestChainedAssignments;
+        TestConvert;
 		TestComplexExpressions;
 		TestContinueLevels;
 		TestComma;

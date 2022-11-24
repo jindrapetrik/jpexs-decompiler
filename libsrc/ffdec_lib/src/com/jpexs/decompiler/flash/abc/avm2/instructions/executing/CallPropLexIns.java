@@ -22,10 +22,12 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.ecma.NotCompileTime;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.TypeItem;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +81,24 @@ public class CallPropLexIns extends CallPropertyIns {
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem receiver = stack.pop();
 
-        stack.push(new CallPropertyAVM2Item(ins, localData.lineStartInstruction, false, receiver, multiname, args));
+        GraphTargetItem type = TypeItem.UNBOUNDED;
+
+        if (receiver instanceof FindPropertyAVM2Item) {
+            FindPropertyAVM2Item fprop = (FindPropertyAVM2Item) receiver;
+            if (fprop.propertyName.equals(multiname)) {
+                switch (multiname.resolvedMultinameName) {
+                    case "Boolean":
+                    case "int":
+                    case "uint":
+                    case "Number":
+                    case "String":
+                        type = new TypeItem(multiname.resolvedMultinameName);
+                        break;                    
+                }
+            }
+        }
+        
+        stack.push(new CallPropertyAVM2Item(ins, localData.lineStartInstruction, false, receiver, multiname, args, type));
     }
 
     @Override

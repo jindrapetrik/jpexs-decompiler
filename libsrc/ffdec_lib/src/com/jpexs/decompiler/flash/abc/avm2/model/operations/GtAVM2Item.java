@@ -77,7 +77,7 @@ public class GtAVM2Item extends BinaryOpItem implements LogicalOpItem, IfConditi
 
     @Override
     public GraphTargetItem returnType() {
-        return new TypeItem(DottedChain.BOOLEAN);
+        return TypeItem.BOOLEAN;
     }
 
     @Override

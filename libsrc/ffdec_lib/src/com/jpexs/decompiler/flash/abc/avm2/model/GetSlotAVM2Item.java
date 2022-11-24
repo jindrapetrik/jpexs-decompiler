@@ -38,13 +38,16 @@ public class GetSlotAVM2Item extends AVM2Item {
     public GraphTargetItem slotObject;
 
     public int slotIndex;
+    
+    public GraphTargetItem slotType;
 
-    public GetSlotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope, GraphTargetItem slotObject, int slotIndex, Multiname slotName) {
+    public GetSlotAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem scope, GraphTargetItem slotObject, int slotIndex, Multiname slotName, GraphTargetItem slotType) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.slotName = slotName;
         this.scope = scope;
         this.slotObject = slotObject;
         this.slotIndex = slotIndex;
+        this.slotType = slotType;
     }
 
     @Override
@@ -73,7 +76,7 @@ public class GetSlotAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return TypeItem.UNBOUNDED;
+        return slotType;
     }
 
     @Override

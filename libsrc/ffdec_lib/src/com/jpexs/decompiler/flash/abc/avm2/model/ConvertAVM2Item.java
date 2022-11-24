@@ -21,7 +21,10 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
+import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.LocalData;
+import com.jpexs.decompiler.graph.model.TrueItem;
 import java.util.Objects;
 import java.util.Set;
 
@@ -48,9 +51,32 @@ public class ConvertAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        type.toString(writer, localData).append("(");
+        boolean displayConvert = true;
+        GraphTargetItem valueReturnType = value.returnType();
+        /*if (valueReturnType instanceof TypeItem) {
+            TypeItem ti = (TypeItem)valueReturnType;
+            ti.fullTypeName.toRawString()
+        }*/
+        switch (type.toString()) {
+            case "Boolean":
+                displayConvert = !valueReturnType.equals(TypeItem.BOOLEAN);
+                break;
+            case "Number":
+            case "int":
+            case "uint":
+                displayConvert = !valueReturnType.equals(TypeItem.INT) && !valueReturnType.equals(TypeItem.NUMBER) && !valueReturnType.equals(TypeItem.UINT);
+                break;
+            case "String":
+                displayConvert = !valueReturnType.equals(TypeItem.STRING);
+                break;            
+        }
+        if (displayConvert) {
+            type.toString(writer, localData).append("(");
+        }
         value.toString(writer, localData);
-        writer.append(")");
+        if (displayConvert) {
+            writer.append(")");
+        }
         return writer;
     }
 

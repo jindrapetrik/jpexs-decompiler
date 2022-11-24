@@ -40,8 +40,12 @@ import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import java.util.ArrayList;
@@ -338,7 +342,23 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
             }
         }
 
-        SetPropertyAVM2Item result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value);
+        GraphTargetItem propertyType = TypeItem.UNBOUNDED;
+        String multinameStr = localData.abc.constants.getMultiname(multiname.multinameIndex).getName(localData.abc.constants, new ArrayList<>(), true, true);
+        
+        for (Trait t : localData.methodBody.traits.traits) {
+            if (t instanceof TraitSlotConst) {
+                TraitSlotConst tsc = (TraitSlotConst) t;
+                if (Objects.equals(
+                        tsc.getName(localData.abc).getName(localData.abc.constants, new ArrayList<>(), true, true),
+                        multinameStr
+                )) {
+                    propertyType = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
+                    break;
+                }
+            }
+        }
+        
+        SetPropertyAVM2Item result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value, propertyType);
         handleCompound(localData, obj, multiname, value, output, result);
 
         SetTypeIns.handleResult(value, stack, output, localData, result, -1);
