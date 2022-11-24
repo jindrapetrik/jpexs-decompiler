@@ -1066,10 +1066,9 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
         decompileMethod("classic_air", "testInlineFunctions", "var first:String = \"value1\";\r\n"
                 + "var traceParameter:Function = function(aParam:String):String\r\n"
                 + "{\r\n"
-                + "var traceParam2:Function;\r\n"
                 + "var second:String = \"value2\";\r\n"
                 + "second = second + \"cc\";\r\n"
-                + "traceParam2 = function(bParam:String):String\r\n"
+                + "var traceParam2:Function = function(bParam:String):String\r\n"
                 + "{\r\n"
                 + "trace(bParam + \",\" + aParam);\r\n"
                 + "return first + second + aParam + bParam;\r\n"
@@ -1217,8 +1216,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testNamedAnonFunctions() {
-        decompileMethod("classic_air", "testNamedAnonFunctions", "var test:*;\r\n"
-                + "test = new (function():*\r\n"
+        decompileMethod("classic_air", "testNamedAnonFunctions", "var test:* = new (function():*\r\n"
                 + "{\r\n"
                 + "var testFunc:Function;\r\n"
                 + "return testFunc = function(param1:*, param2:int, param3:Array):Boolean\r\n"

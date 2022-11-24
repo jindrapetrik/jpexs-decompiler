@@ -1922,14 +1922,47 @@ public class AVM2Code implements Cloneable {
                 }
 
                 value = value.getNotCoerced();
-                if (!((value instanceof NumberValueAVM2Item)
+                /*if (!((value instanceof NumberValueAVM2Item)
                         || (value instanceof StringAVM2Item)
                         || (value instanceof TrueItem)
                         || (value instanceof FalseItem)
                         || (value instanceof UndefinedAVM2Item)
                         || (value instanceof NullAVM2Item)
-                        || (value instanceof NewFunctionAVM2Item)
-                        )) {
+                        || (value instanceof NewFunctionAVM2Item))) {
+                    break;
+                }*/
+                Reference<Boolean> hasPrevReference = new Reference<>(false);
+                value.visitRecursivelyNoBlock(new AbstractGraphTargetVisitor() {
+                    @Override
+                    public void visit(GraphTargetItem subItem) {
+                        Multiname propertyMultiName;
+                        String propertyName;
+                        if (subItem instanceof GetPropertyAVM2Item) {
+                            GetPropertyAVM2Item propItem = (GetPropertyAVM2Item) subItem;
+                            if (propItem.object instanceof FindPropertyAVM2Item) {
+                                propertyMultiName = abc.constants.getMultiname(((FullMultinameAVM2Item) propItem.propertyName).multinameIndex);
+                            } else {
+                                return;
+                            }
+                        } else if (subItem instanceof GetLexAVM2Item) {
+                            GetLexAVM2Item lex = (GetLexAVM2Item) subItem;
+                            propertyMultiName = lex.propertyName;
+                        } else {
+                            return;
+                        }
+                        propertyName = propertyMultiName.getName(abc.constants, new ArrayList<>(), true, true);
+
+                        if (traits.containsKey(propertyName)) {
+                            Slot sl = new Slot(new NewActivationAVM2Item(null, null), propertyMultiName);
+                            if (!paramNames.contains(propertyName)) {
+                                if (traits.containsKey(propertyName) && !beginDeclaredSlotsNames.contains(propertyName)) {
+                                    hasPrevReference.setVal(true);                                    
+                                }
+                            }
+                        }
+                    }
+                });
+                if (hasPrevReference.getVal()) {
                     break;
                 }
 
