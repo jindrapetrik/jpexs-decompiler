@@ -2016,49 +2016,7 @@ public class AVM2Code implements Cloneable {
                     int reg = ((LocalRegAVM2Item) fi.expression.object).regIndex;
                     fi.expression.object = handleDeclareReg(minreg, fi.expression.object, declaredRegisters, declaredSlots, reg);
                 }
-            }
-
-            for (GraphTargetItem subItem : itemsOnLine) {
-                Multiname propertyMultiName;
-                String propertyName;
-                if (subItem instanceof GetPropertyAVM2Item) {
-                    GetPropertyAVM2Item propItem = (GetPropertyAVM2Item) subItem;
-                    if (propItem.object instanceof FindPropertyAVM2Item) {
-                        propertyMultiName = abc.constants.getMultiname(((FullMultinameAVM2Item) propItem.propertyName).multinameIndex);
-                    } else {
-                        continue;
-                    }
-                } else if (subItem instanceof GetLexAVM2Item) {
-                    GetLexAVM2Item lex = (GetLexAVM2Item) subItem;
-                    propertyMultiName = lex.propertyName;
-                } else {
-                    continue;
-                }
-                propertyName = propertyMultiName.getName(abc.constants, new ArrayList<>(), true, true);
-
-                if (traits.containsKey(propertyName)) {
-                    Slot sl = new Slot(new NewActivationAVM2Item(null, null), propertyMultiName);
-                    if (!paramNames.contains(propertyName)) {
-
-                        if (slotListIndexOf(declaredSlots, propertyName, abc) == -1) {
-                            TraitSlotConst tsc = traits.get(propertyName);
-                            GraphTargetItem type = PropertyAVM2Item.multinameToType(tsc.type_index, abc.constants);
-                            DeclarationAVM2Item d = new DeclarationAVM2Item(subItem, type);
-                            declaredSlotsDec.add(d);
-                            declaredSlots.add(sl);
-
-                            if (subItem == currentItem) {
-                                items.set(i, d);
-                            } else {
-                                d.showValue = false;
-                                items.add(i, d);
-                                i++;
-                            }
-
-                        }
-                    }
-                }
-            }
+            }           
 
             for (GraphTargetItem subItem : itemsOnLine) {
                 if (subItem instanceof SetLocalAVM2Item) {
