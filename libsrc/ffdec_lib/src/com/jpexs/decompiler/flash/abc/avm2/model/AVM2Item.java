@@ -107,13 +107,24 @@ public abstract class AVM2Item extends GraphTargetItem {
         if (empty) {
             return propertyName.toString(writer, localData);
         }
+        
         if (propertyName instanceof FullMultinameAVM2Item) {
+            
+            //TODO: use type information in the GUI
+            /*HighlightData data = new HighlightData();
+            int multinameIndex = ((FullMultinameAVM2Item) propertyName).multinameIndex;
+            int namespaceIndex = localData.constantsAvm2.getMultiname(multinameIndex).namespace_index;
+            data.specialValue = object.returnType().toString();
+            data.namespaceIndex = namespaceIndex;*/
+            
             if (((FullMultinameAVM2Item) propertyName).name != null) {
-                if (((FullMultinameAVM2Item) propertyName).namespace != null) {
-                    writer.append(".");
-                }
+                /*if (((FullMultinameAVM2Item) propertyName).namespace != null) {                    
+                    writer.hilightSpecial(".", HighlightSpecialType.PROPERTY_PARENT_TYPE, 0, data);                    
+                }*/
+                writer.append(".");
                 return propertyName.toString(writer, localData);
             } else {
+                //writer.hilightSpecial(".", HighlightSpecialType.PROPERTY_PARENT_TYPE, 0, data);
                 writer.append(".");
                 return propertyName.toString(writer, localData);
             }
