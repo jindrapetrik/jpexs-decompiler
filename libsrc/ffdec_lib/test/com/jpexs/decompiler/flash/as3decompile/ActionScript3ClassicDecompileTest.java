@@ -76,7 +76,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "var extraLine:Boolean = false;\r\n"
                 + "var r:int = 7;\r\n"
                 + "var t:int = 0;\r\n"
-                + "t = int(this.getInt());\r\n"
+                + "t = this.getInt();\r\n"
                 + "if(t + 1 < g.length)\r\n"
                 + "{\r\n"
                 + "t++;\r\n"
@@ -217,7 +217,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     public void testConvert() {
         decompileMethod("classic", "testConvert", "var s:String = \"a\";\r\n"
                 + "var i:int = int(s);\r\n"
-                + "var j:int = int(this.n);\r\n"
+                + "var j:int = this.n;\r\n"
                 + "s = String(j);\r\n"
                 + "s = this.ns;\r\n",
                  false);
@@ -279,7 +279,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testDeobfuscation() {
-        decompileMethod("classic", "testDeobfuscation", "var r:int = int(Math.random());\r\n"
+        decompileMethod("classic", "testDeobfuscation", "var r:int = Math.random();\r\n"
                 + "if(r > 5)\r\n"
                 + "{\r\n"
                 + "trace(\"A\");\r\n"
@@ -974,7 +974,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testIgnoreAndOr() {
-        decompileMethod("classic", "testIgnoreAndOr", "var k:int = int(Math.random());\r\n"
+        decompileMethod("classic", "testIgnoreAndOr", "var k:int = Math.random();\r\n"
                 + "if(k > 5)\r\n"
                 + "{\r\n"
                 + "trace(\"A\");\r\n"
