@@ -324,7 +324,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 AssignableAVM2Item.dupSetTemp(localData, this, tempVal2),
                 ins(AVM2Instructions.PushWith)
         ));
-        localData.scopeStack.add(new LocalRegAVM2Item(null, null, tempVal2.getVal(), null));
+        localData.scopeStack.add(new LocalRegAVM2Item(null, null, tempVal2.getVal(), null, new TypeItem("Object") /*?*/));
         forBody.addAll(toInsList(item.value.toSource(localData, this)));
         List<AVM2Instruction> trueBody = new ArrayList<>();
         trueBody.addAll(toInsList(AssignableAVM2Item.getTemp(localData, this, xmlListReg)));
@@ -547,7 +547,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         ret.addAll(item.scope.toSource(localData, this));
         Reference<Integer> tempReg = new Reference<>(0);
         ret.addAll(AssignableAVM2Item.dupSetTemp(localData, this, tempReg));
-        localData.scopeStack.add(new WithObjectAVM2Item(null, null, new LocalRegAVM2Item(null, null, tempReg.getVal(), null)));
+        localData.scopeStack.add(new WithObjectAVM2Item(null, null, new LocalRegAVM2Item(null, null, tempReg.getVal(), null, new TypeItem("Object") /*?*/)));
         ret.add(ins(AVM2Instructions.PushWith));
         ret.addAll(generate(localData, item.items));
         ret.add(ins(AVM2Instructions.PopScope));
@@ -842,7 +842,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
             }
             localData.catchesTempRegs.add(tempReg.getVal());
-            localData.scopeStack.add(new LocalRegAVM2Item(null, null, tempReg.getVal(), null));
+            localData.scopeStack.add(new LocalRegAVM2Item(null, null, tempReg.getVal(), null, new TypeItem("Object") /*?*/));
             localData.catchesOpenedLoops.add(new ArrayList<>(localData.openedLoops));
             catchCmd.addAll(generateToInsList(localData, item.catchCommands.get(c)));
             localData.catchesOpenedLoops.remove(localData.catchesOpenedLoops.size() - 1);
@@ -1657,7 +1657,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         if (className != null) {
             String fullClassName = pkg.addWithSuffix(className).toRawString();
             registerTypes.add(new TypeItem(fullClassName));
-            localData.scopeStack.add(new LocalRegAVM2Item(null, null, registerNames.size(), null));
+            localData.scopeStack.add(new LocalRegAVM2Item(null, null, registerNames.size(), null, new TypeItem(fullClassName)));
             registerNames.add("this");
             registerLines.add(0); //?
 
@@ -1704,7 +1704,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             registerLines.add(0); //?
             localData.activationReg = registerNames.size() - 1;
             registerTypes.add(new TypeItem("Object"));
-            localData.scopeStack.add(new LocalRegAVM2Item(null, null, localData.activationReg, null));
+            localData.scopeStack.add(new LocalRegAVM2Item(null, null, localData.activationReg, null, new TypeItem("Object")));
         }
 
         String mask = Configuration.registerNameFormat.get();

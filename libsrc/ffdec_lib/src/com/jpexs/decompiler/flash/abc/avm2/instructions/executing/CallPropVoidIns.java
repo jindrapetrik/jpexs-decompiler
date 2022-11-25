@@ -96,6 +96,13 @@ public class CallPropVoidIns extends InstructionDefinition {
                         break;                    
                 }
             }
+        } else {
+            if (localData.abcIndex != null) {
+                GraphTargetItem receiverType = receiver.returnType();
+                if (!receiverType.equals(TypeItem.UNBOUNDED)) {
+                    type = localData.abcIndex.findPropertyCallType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multinameIndex).namespace_index,true, true);                    
+                }                                
+            }
         }
         output.add(new CallPropertyAVM2Item(ins, localData.lineStartInstruction, true, receiver, multiname, args, type));
     }

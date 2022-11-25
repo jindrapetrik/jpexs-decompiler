@@ -27,7 +27,6 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
-import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -50,7 +49,7 @@ public class GetLexIns extends InstructionDefinition {
         int multinameIndex = ins.operands[0];
         Multiname multiname = localData.getConstants().getMultiname(multinameIndex);
         String multinameStr = multiname.getName(localData.abc.constants, new ArrayList<>(), true, true);
-        GraphTargetItem slotType = TypeItem.UNBOUNDED;
+        GraphTargetItem slotType = null;
         for (Trait t : localData.methodBody.traits.traits) {
             if (t instanceof TraitSlotConst) {
                 TraitSlotConst tsc = (TraitSlotConst) t;
@@ -62,6 +61,27 @@ public class GetLexIns extends InstructionDefinition {
                     break;
                 }
             }
+        }
+
+        if (slotType == null) {
+            if (localData.abcIndex != null) {
+                String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.abc.constants, true).toRawString();                
+                GraphTargetItem thisPropType = currentClassName == null ? TypeItem.UNBOUNDED : localData.abcIndex.findPropertyType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multinameIndex).namespace_index, true, true);
+                if (!thisPropType.equals(TypeItem.UNBOUNDED)) {
+                    slotType = thisPropType;
+                }
+                
+                if (slotType == null) {
+                    TypeItem ti = new TypeItem(multiname.getNameWithNamespace(localData.abc.constants, true));
+                    if (localData.abcIndex.findClass(ti) != null) {
+                        slotType = ti;
+                    }
+                }
+            }
+        }
+
+        if (slotType == null) {
+            slotType = TypeItem.UNBOUNDED;
         }
         stack.push(new GetLexAVM2Item(ins, localData.lineStartInstruction, multiname, localData.getConstants(), slotType));
     }

@@ -40,11 +40,13 @@ public class LocalRegAVM2Item extends AVM2Item {
 
     public GraphTargetItem computedValue;
 
+    public GraphTargetItem type;
+    
     private final Object computedResult;
 
-    private boolean isCT = false;
+    private boolean isCT = false;        
 
-    public LocalRegAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex, GraphTargetItem computedValue) {
+    public LocalRegAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex, GraphTargetItem computedValue, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.regIndex = regIndex;
         if (computedValue == null) {
@@ -56,6 +58,7 @@ public class LocalRegAVM2Item extends AVM2Item {
             computedResult = null;
         }
         this.computedValue = computedValue;
+        this.type = type;
     }
 
     @Override
@@ -131,10 +134,7 @@ public class LocalRegAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        if (computedValue != null) {
-            return computedValue.returnType();
-        }
-        return TypeItem.UNBOUNDED;
+        return type;
     }
 
     @Override

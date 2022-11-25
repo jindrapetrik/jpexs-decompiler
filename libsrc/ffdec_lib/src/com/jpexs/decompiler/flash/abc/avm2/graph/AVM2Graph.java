@@ -633,7 +633,7 @@ public class AVM2Graph extends Graph {
         return setLocalPosToGetLocalPos;
     }
 
-    public static List<GraphTargetItem> translateViaGraph(AbcIndexing abcIndex, String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs, boolean thisHasDefaultToPrimitive) throws InterruptedException {
+    public static List<GraphTargetItem> translateViaGraph(AbcIndexing abcIndex, String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs, boolean thisHasDefaultToPrimitive) throws InterruptedException {
         AVM2Graph g = new AVM2Graph(abcIndex, code, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames, localRegAssigmentIps, refs);
 
         AVM2LocalData localData = new AVM2LocalData();
@@ -644,7 +644,9 @@ public class AVM2Graph extends Graph {
         localData.scopeStack = scopeStack;
         localData.methodBody = body;
         localData.abc = abc;
+        localData.abcIndex = abcIndex;
         localData.localRegNames = localRegNames;
+        localData.localRegTypes = localRegTypes;
         localData.fullyQualifiedNames = fullyQualifiedNames;
         localData.scriptIndex = scriptIndex;
         localData.ip = 0;
@@ -1505,11 +1507,11 @@ public class AVM2Graph extends Graph {
 
             List<GraphTargetItem> otherSide = new ArrayList<>();
             if (leftReg > 0) {
-                switchedObject = new LocalRegAVM2Item(null, null, leftReg, null);
+                switchedObject = new LocalRegAVM2Item(null, null, leftReg, null, TypeItem.UNBOUNDED /*?*/);
                 caseValuesMap = caseValuesMapRight;
                 otherSide = caseValuesMapLeft;
             } else if (rightReg > 0) {
-                switchedObject = new LocalRegAVM2Item(null, null, rightReg, null);
+                switchedObject = new LocalRegAVM2Item(null, null, rightReg, null, TypeItem.UNBOUNDED /*?*/);
                 otherSide = caseValuesMapRight;
             }
 

@@ -58,6 +58,8 @@ public class AVM2LocalData extends BaseLocalData {
     public AbcIndexing abcIndex;
 
     public HashMap<Integer, String> localRegNames;
+    
+    public HashMap<Integer, GraphTargetItem> localRegTypes;
 
     public List<DottedChain> fullyQualifiedNames;
 
@@ -146,6 +148,7 @@ public class AVM2LocalData extends BaseLocalData {
         abc = localData.abc;
         abcIndex = localData.abcIndex;
         localRegNames = localData.localRegNames;
+        localRegTypes = localData.localRegTypes;
         fullyQualifiedNames = localData.fullyQualifiedNames;
         parsedExceptions = localData.parsedExceptions;
         finallyJumps = localData.finallyJumps;

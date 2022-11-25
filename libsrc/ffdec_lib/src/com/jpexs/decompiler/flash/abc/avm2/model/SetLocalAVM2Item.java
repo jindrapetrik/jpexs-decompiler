@@ -80,7 +80,7 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
 
     @Override
     public GraphTargetItem getObject() {
-        return new LocalRegAVM2Item(getInstruction(), getLineStartIns(), regIndex, null);
+        return new LocalRegAVM2Item(getInstruction(), getLineStartIns(), regIndex, null, value.returnType());
     }
 
     @Override
