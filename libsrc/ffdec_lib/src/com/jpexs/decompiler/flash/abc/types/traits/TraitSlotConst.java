@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.AssignedValue;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -108,7 +109,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return writer;
     }
 
-    public void getValueStr(ScriptExportMode exportMode, Trait parent, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public void getValueStr(AbcIndexing abcIndex, ScriptExportMode exportMode, Trait parent, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (convertData.assignedValues.containsKey(this)) {
 
             AssignedValue assignment = convertData.assignedValues.get(this);
@@ -122,7 +123,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                 writer.newLine();
             }
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
-                assignment.value.toString(writer, LocalData.create(abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>()));
+                assignment.value.toString(writer, LocalData.create(abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>()));
             }
             writer.endMethod();
             writer.endTrait();
@@ -144,7 +145,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public GraphTextWriter toString(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         getMetaData(parent, convertData, abc, writer);
         Multiname n = getName(abc);
         boolean showModifier = true;
@@ -162,22 +163,22 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (convertData.assignedValues.containsKey(this)) {
             GraphTargetItem val = convertData.assignedValues.get(this).value;
             if (val instanceof NewFunctionAVM2Item) {
-                return val.toString(writer, LocalData.create(abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>()));
+                return val.toString(writer, LocalData.create(abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>()));
             }
         }
         getNameStr(writer, abc, fullyQualifiedNames);
         if (value_kind != 0 || convertData.assignedValues.containsKey(this)) {
             writer.appendNoHilight(" = ");
-            getValueStr(exportMode, parent, convertData, writer, abc, fullyQualifiedNames);
+            getValueStr(abcIndex, exportMode, parent, convertData, writer, abc, fullyQualifiedNames);
         }
         return writer.appendNoHilight(";").newLine();
     }
 
     @Override
-    public void convert(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         getNameStr(writer, abc, fullyQualifiedNames);
         if (value_kind != 0 || convertData.assignedValues.containsKey(this)) {
-            getValueStr(exportMode, parent, convertData, writer, abc, fullyQualifiedNames);
+            getValueStr(abcIndex,exportMode, parent, convertData, writer, abc, fullyQualifiedNames);
         }
     }
 

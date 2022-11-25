@@ -243,9 +243,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         }
 
         if (Main.isSwfAir(abc.getOpenable())) {
-            libraryComboBox.setSelectedIndex(Main.LIBRARY_AIR);
+            libraryComboBox.setSelectedIndex(SWF.LIBRARY_AIR);
         } else {
-            libraryComboBox.setSelectedIndex(Main.LIBRARY_FLASH);
+            libraryComboBox.setSelectedIndex(SWF.LIBRARY_FLASH);
         }
         this.abc = abc;
         setDecompiledEditMode(false);
@@ -972,7 +972,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         libraryComboBox = new JComboBox<>();
         libraryComboBox.addItem("AIR (airglobal.swc)");
         libraryComboBox.addItem("Flash (playerglobal.swc)");
-        libraryComboBox.setSelectedIndex(Main.LIBRARY_FLASH);
+        libraryComboBox.setSelectedIndex(SWF.LIBRARY_FLASH);
         libraryComboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {

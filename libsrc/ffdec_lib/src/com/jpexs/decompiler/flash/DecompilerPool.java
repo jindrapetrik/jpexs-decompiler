@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.action.ActionList;
@@ -89,7 +90,7 @@ public class DecompilerPool {
         return submit(callable);
     }
 
-    public Future<HighlightedText> submitTask(ScriptPack pack, ScriptDecompiledListener<HighlightedText> listener) {
+    public Future<HighlightedText> submitTask(AbcIndexing abcIndex, ScriptPack pack, ScriptDecompiledListener<HighlightedText> listener) {
         Callable<HighlightedText> callable = new Callable<HighlightedText>() {
             @Override
             public HighlightedText call() throws Exception {
@@ -104,7 +105,7 @@ public class DecompilerPool {
                 }
                 boolean parallel = Configuration.parallelSpeedUp.get();
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-                pack.toSource(writer, script == null ? null : script.traits.traits, new ConvertData(), ScriptExportMode.AS, parallel, false);
+                pack.toSource(abcIndex, writer, script == null ? null : script.traits.traits, new ConvertData(), ScriptExportMode.AS, parallel, false);
 
                 HighlightedText result = new HighlightedText(writer);
                 Openable openable = pack.getOpenable();
@@ -179,8 +180,8 @@ public class DecompilerPool {
         return null;
     }
 
-    public HighlightedText decompile(ScriptPack pack) throws InterruptedException {
-        Future<HighlightedText> future = submitTask(pack, null);
+    public HighlightedText decompile(AbcIndexing abcIndex, ScriptPack pack) throws InterruptedException {
+        Future<HighlightedText> future = submitTask(abcIndex, pack, null);
 
         Openable openable = pack.getOpenable();
         if (!openableToFutures.containsKey(openable)) {

@@ -108,9 +108,9 @@ public abstract class ActionScript3DecompileTestBase extends ActionScriptTestBas
 
             Configuration.autoDeobfuscate.set(methodName.toLowerCase().contains("obfus"));
 
-            abc.bodies.get(bodyIndex).convert(new ConvertData(), "run", ScriptExportMode.AS, isStatic, abc.bodies.get(bodyIndex).method_info, scriptIndex, clsIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true, new HashSet<>());
+            abc.bodies.get(bodyIndex).convert(swf.getAbcIndex(), new ConvertData(), "run", ScriptExportMode.AS, isStatic, abc.bodies.get(bodyIndex).method_info, scriptIndex, clsIndex, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true, new HashSet<>());
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            abc.bodies.get(bodyIndex).toString("run", ScriptExportMode.AS, abc, null, writer, new ArrayList<>(), new HashSet<>());
+            abc.bodies.get(bodyIndex).toString(swf.getAbcIndex(), "run", ScriptExportMode.AS, abc, null, writer, new ArrayList<>(), new HashSet<>());
         } catch (InterruptedException ex) {
             fail();
             return;

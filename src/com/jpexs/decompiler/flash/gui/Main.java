@@ -213,15 +213,14 @@ public class Main {
     public static CancellableWorker deobfuscatePCodeWorker = null;
     public static CancellableWorker swfPrepareWorker = null;
 
-    public static final int LIBRARY_AIR = 0;
-    public static final int LIBRARY_FLASH = 1;
+    
 
     public static boolean isSwfAir(Openable openable) {
         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(openable.getShortPathTitle());
         if (conf != null) {
-            String libraryAsStr = conf.getCustomData(CustomConfigurationKeys.KEY_LIBRARY, "" + LIBRARY_FLASH);
+            String libraryAsStr = conf.getCustomData(CustomConfigurationKeys.KEY_LIBRARY, "" + SWF.LIBRARY_FLASH);
             int libraryAsInt = Integer.parseInt(libraryAsStr);
-            return libraryAsInt == LIBRARY_AIR;
+            return libraryAsInt == SWF.LIBRARY_AIR;
         }
         return false;
     }

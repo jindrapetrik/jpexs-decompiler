@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -106,7 +107,7 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public void convert(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         if (classIndex < 0) {
             writeImportsUsages(scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
         }
@@ -117,7 +118,7 @@ public class TraitMethodGetterSetter extends Trait {
         if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
             if (!(classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1)) {
                 if (bodyIndex != -1) {
-                    abc.bodies.get(bodyIndex).convert(convertData, path, exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true, new HashSet<>());
+                    abc.bodies.get(bodyIndex).convert(abcIndex, convertData, path, exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true, new HashSet<>());
                 }
             }
         }
@@ -125,7 +126,7 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public GraphTextWriter toString(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
 
         if (classIndex < 0) {
             writeImportsUsages(scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
@@ -144,7 +145,7 @@ public class TraitMethodGetterSetter extends Trait {
                     convertTraitHeader(abc, writer);
                 }
                 if (bodyIndex != -1) {
-                    abc.bodies.get(bodyIndex).toString(path, exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
+                    abc.bodies.get(bodyIndex).toString(abcIndex, path, exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
                 }
             } else {
                 String retTypeRaw = abc.method_info.get(method_info).getReturnTypeRaw(abc.constants, fullyQualifiedNames);

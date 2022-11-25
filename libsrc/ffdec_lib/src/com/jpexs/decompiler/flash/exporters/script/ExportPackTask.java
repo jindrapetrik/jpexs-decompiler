@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.RunnableIOExResult;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
 import com.jpexs.helpers.Helper;
 import java.io.File;
@@ -55,8 +56,10 @@ public class ExportPackTask implements Callable<File> {
     long stopTime;
 
     EventListener eventListener;
+    
+    AbcIndexing abcIndex;
 
-    public ExportPackTask(AbortRetryIgnoreHandler handler, int index, int count, ClassPath path, ScriptPack pack, File file, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {
+    public ExportPackTask(AbcIndexing abcIndex, AbortRetryIgnoreHandler handler, int index, int count, ClassPath path, ScriptPack pack, File file, ScriptExportSettings exportSettings, boolean parallel, EventListener evl) {
         this.pack = pack;
         this.file = file;
         this.exportSettings = exportSettings;
@@ -66,6 +69,7 @@ public class ExportPackTask implements Callable<File> {
         this.parallel = parallel;
         this.handler = handler;
         this.eventListener = evl;
+        this.abcIndex = abcIndex;
     }
 
     @Override
@@ -74,7 +78,7 @@ public class ExportPackTask implements Callable<File> {
             @Override
             public void run() throws IOException, InterruptedException {
                 startTime = System.currentTimeMillis();
-                this.result = pack.export(file, exportSettings, parallel);
+                this.result = pack.export(abcIndex, file, exportSettings, parallel);
                 stopTime = System.currentTimeMillis();
             }
         };

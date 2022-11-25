@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -93,8 +94,8 @@ public class NewFunctionAVM2Item extends AVM2Item {
         abc.method_info.get(methodIndex).getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);
         writer.startBlock();
         if (body != null) {
-            body.convert(new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), fullyQualifiedNames, null, false, new HashSet<>(localData.seenMethods));
-            body.toString(path + "/inner", ScriptExportMode.AS, abc, null, writer, fullyQualifiedNames, new HashSet<>(localData.seenMethods));
+            body.convert(localData.abcIndex, new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), fullyQualifiedNames, null, false, new HashSet<>(localData.seenMethods));
+            body.toString(localData.abcIndex, path + "/inner", ScriptExportMode.AS, abc, null, writer, fullyQualifiedNames, new HashSet<>(localData.seenMethods));
         }
         writer.endBlock();
         writer.endMethod();
