@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NewArrayAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewObjectAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -73,6 +74,8 @@ import com.jpexs.decompiler.flash.cache.AS2Cache;
 import com.jpexs.decompiler.flash.cache.AS3Cache;
 import com.jpexs.decompiler.flash.cache.ScriptDecompiledListener;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
+import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
 import com.jpexs.decompiler.flash.ecma.Null;
@@ -181,6 +184,7 @@ import java.awt.geom.AffineTransform;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -380,6 +384,13 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     private static final DecompilerPool decompilerPool = new DecompilerPool();
 
+    @Internal
+    private AbcIndexing abcIndex;
+
+    private static AbcIndexing playerGlobalAbcIndex;
+
+    private static AbcIndexing airGlobalAbcIndex;
+
     public static final String AS2_PKG_PREFIX = "__Packages.";
 
     public static List<String> swfSignatures = Arrays.asList(
@@ -395,6 +406,43 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * Color to paint when there is an error (missing image, ...)
      */
     public static final Color ERROR_COLOR = Color.red;
+
+    public static final int LIBRARY_AIR = 0;
+    public static final int LIBRARY_FLASH = 1;
+    
+    public static AbcIndexing getPlayerGlobalAbcIndex() {
+        return playerGlobalAbcIndex;
+    }
+
+    public static AbcIndexing getAirGlobalAbcIndex() {
+        return airGlobalAbcIndex;
+    }        
+
+    public AbcIndexing getAbcIndex() {
+        return abcIndex;
+    }
+    
+
+    public static void initPlayer() throws IOException, InterruptedException {
+        if (playerGlobalAbcIndex == null) {
+            /*if (Configuration.getPlayerSWC() == null) {
+                throw new IOException("Player SWC library not found, please place it to " + Configuration.getFlashLibPath());
+            }*/
+
+            if (Configuration.getPlayerSWC() != null) {
+                SWC swc = new SWC(new FileInputStream(Configuration.getPlayerSWC()));
+                SWF swf = new SWF(swc.getOpenable("library.swf"), true);
+                playerGlobalAbcIndex = new AbcIndexing(swf);
+            }
+        }
+        if (airGlobalAbcIndex == null) {
+            if (Configuration.getAirSWC() != null) {
+                SWC swc = new SWC(new FileInputStream(Configuration.getAirSWC()));
+                SWF swf = new SWF(swc.getOpenable("library.swf"), true);
+                airGlobalAbcIndex = new AbcIndexing(swf);
+            }
+        }
+    }
 
     public String getCharset() {
         return charset;
@@ -986,7 +1034,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         byte[] uncompressedData = saveToByteArray();
         compress(new ByteArrayInputStream(uncompressedData), os, compression, lzmaProperties);
     }
-    
+
     public void saveTo(OutputStream os, boolean gfx) throws IOException {
         checkCharset();
         byte[] uncompressedData = saveToByteArray(gfx);
@@ -1413,6 +1461,20 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
 
         getASMs(true); // Add scriptNames to ASMs
+        
+        boolean air = false;
+        SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(getShortPathTitle());
+        if (conf != null) {
+            if (conf.getCustomData(CustomConfigurationKeys.KEY_LIBRARY, "" + LIBRARY_FLASH).equals("" + LIBRARY_AIR)) {
+                air = true;
+            }
+        }
+        abcIndex = new AbcIndexing(air ? SWF.getAirGlobalAbcIndex() : SWF.getPlayerGlobalAbcIndex());
+        for (Tag tag:tags) {
+            if (tag instanceof ABCContainerTag) {                
+                abcIndex.addAbc(((ABCContainerTag)tag).getABC());
+            }
+        }
     }
 
     private void resolveImported(UrlResolver resolver) {
@@ -1974,7 +2036,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         } else if (treeItem instanceof AS2Package) {
             AS2Package as2Package = (AS2Package) treeItem;
             for (TreeItem subItem : as2Package.subPackages.values()) {
-                if ((subItem instanceof AS2Package) && ((AS2Package)subItem).isDefaultPackage()) {
+                if ((subItem instanceof AS2Package) && ((AS2Package) subItem).isDefaultPackage()) {
                     getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, path);
                 } else {
                     getASMs(exportFileNames, subItem, nodesToExport, exportAll, asmsToExport, path + File.separator + getASMPath(exportFileNames, subItem));
@@ -1998,8 +2060,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 return String.join(File.separator, parts);
             }
         }
-        
-        
+
         if (!exportFileName) {
             return treeItem.toString();
         }
@@ -2893,7 +2954,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public static void uncache(ScriptPack pack) {
         if (pack != null) {
             Openable openable = pack.getOpenable();
-            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
+            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
             if (swf != null) {
                 swf.as3Cache.remove(pack);
             }
@@ -2925,7 +2986,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public static boolean isCached(ScriptPack pack) {
         if (pack != null) {
             Openable openable = pack.getOpenable();
-            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
+            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
             if (swf != null) {
                 return swf.as3Cache.isCached(pack);
             }
@@ -2959,7 +3020,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public static HighlightedText getFromCache(ScriptPack pack) {
         if (pack != null) {
             Openable openable = pack.getOpenable();
-            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
+            SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
             if (swf != null) {
                 return swf.as3Cache.get(pack);
             }
@@ -3020,7 +3081,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     public static HighlightedText getCached(ScriptPack pack) throws InterruptedException {
         Openable openable = pack.getOpenable();
-        SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
+        SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
         HighlightedText res;
         if (swf != null) {
             res = swf.as3Cache.get(pack);
@@ -3029,7 +3090,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             }
         }
 
-        return decompilerPool.decompile(pack);
+        return decompilerPool.decompile(swf.abcIndex, pack);
     }
 
     public static Future<HighlightedText> getCachedFuture(ASMSource src, ActionList actions, ScriptDecompiledListener<HighlightedText> listener) throws InterruptedException {
@@ -3051,7 +3112,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     public static Future<HighlightedText> getCachedFuture(ScriptPack pack, ScriptDecompiledListener<HighlightedText> listener) throws InterruptedException {
         Openable openable = pack.getOpenable();
-        SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
+        SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
         HighlightedText res;
         if (swf != null) {
             res = swf.as3Cache.get(pack);
@@ -3064,7 +3125,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             }
         }
 
-        return decompilerPool.submitTask(pack, listener);
+        return decompilerPool.submitTask(swf.abcIndex, pack, listener);
     }
 
     public DecompilerPool getDecompilerPool() {
@@ -3975,7 +4036,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
                                 int mi = ((TraitMethodGetterSetter) t).method_info;
                                 try {
-                                    documentPack.abc.findBody(mi).convert(new ConvertData(), "??", ScriptExportMode.AS, true, mi, documentPack.scriptIndex, cindex, documentPack.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
+                                    documentPack.abc.findBody(mi).convert(abcIndex, new ConvertData(), "??", ScriptExportMode.AS, true, mi, documentPack.scriptIndex, cindex, documentPack.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
                                     List<GraphTargetItem> infos = documentPack.abc.findBody(mi).convertedItems;
                                     if (!infos.isEmpty()) {
                                         if (infos.get(0) instanceof IfItem) {
@@ -4051,7 +4112,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                                                         if (tr instanceof TraitClass) {
                                                                             int ci = ((TraitClass) tr).class_info;
                                                                             int cinit = p.abc.class_info.get(ci).cinit_index;
-                                                                            p.abc.findBody(cinit).convert(new ConvertData(), "??", ScriptExportMode.AS, true, cinit, p.scriptIndex, cindex, p.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
+                                                                            p.abc.findBody(cinit).convert(abcIndex, new ConvertData(), "??", ScriptExportMode.AS, true, cinit, p.scriptIndex, cindex, p.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
                                                                             List<GraphTargetItem> cinitBody = p.abc.findBody(cinit).convertedItems;
                                                                             for (GraphTargetItem cit : cinitBody) {
                                                                                 if (cit instanceof SetPropertyAVM2Item) {
@@ -4172,5 +4233,5 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     @Override
     public OpenableList getOpenableList() {
         return openableList;
-    }                        
+    }
 }

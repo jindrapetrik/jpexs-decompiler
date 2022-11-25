@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -1715,7 +1716,7 @@ public class XFLConverter {
                         continue;
                     }
                     final ScriptPack spriteScriptPack = characterScriptPacks.containsKey(sprite.spriteId) ? characterScriptPacks.get(sprite.spriteId) : null;
-                    convertTimeline(sprite.spriteId, nonLibraryShapes, backgroundColor, tags, sprite.getTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files, symbolStr, spriteScriptPack);
+                    convertTimeline(swf.getAbcIndex(), sprite.spriteId, nonLibraryShapes, backgroundColor, tags, sprite.getTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files, symbolStr, spriteScriptPack);
 
                 } else if (symbol instanceof ShapeTag) {
                     itemIcon = "1";
@@ -2616,7 +2617,7 @@ public class XFLConverter {
         return -1;
     }
 
-    private static Map<Integer, String> getFrameScriptsFromPack(ScriptPack pack) {
+    private static Map<Integer, String> getFrameScriptsFromPack(AbcIndexing abcIndex, ScriptPack pack) {
         Map<Integer, String> ret = new HashMap<>();
         int classIndex = getPackMainClassId(pack);
         if (classIndex > -1) {
@@ -2625,7 +2626,7 @@ public class XFLConverter {
             int constructorMethodIndex = instanceInfo.iinit_index;
             MethodBody constructorBody = abc.findBody(constructorMethodIndex);
             try {
-                constructorBody.convert(new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
+                constructorBody.convert(abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
 
                 Map<Integer, Multiname> frameToTraitMultiname = new HashMap<>();
 
@@ -2691,9 +2692,9 @@ public class XFLConverter {
                         MethodBody frameBody = abc.findBody(methodIndex);
 
                         StringBuilder scriptBuilder = new StringBuilder();
-                        frameBody.convert(new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
+                        frameBody.convert(abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
                         StringBuilderTextWriter writer = new StringBuilderTextWriter(Configuration.getCodeFormatting(), scriptBuilder);
-                        frameBody.toString("??", ScriptExportMode.AS, abc, methodTrait, writer, new ArrayList<>(), new HashSet<>());
+                        frameBody.toString(abcIndex, "??", ScriptExportMode.AS, abc, methodTrait, writer, new ArrayList<>(), new HashSet<>());
 
                         String script = scriptBuilder.toString();
                         ret.put(frame, script);
@@ -2707,7 +2708,7 @@ public class XFLConverter {
         return ret;
     }
 
-    private boolean convertActionScriptLayer(int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException {
+    private boolean convertActionScriptLayer(AbcIndexing abcIndex, int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException {
         boolean hasScript = false;
 
         String script = "";
@@ -2728,7 +2729,7 @@ public class XFLConverter {
         Map<Integer, String> frameToScriptMap = new HashMap<>();
 
         if (scriptPack != null) {
-            frameToScriptMap = getFrameScriptsFromPack(scriptPack);
+            frameToScriptMap = getFrameScriptsFromPack(abcIndex, scriptPack);
         }
 
         for (Tag t : timeLineTags) {
@@ -2943,12 +2944,12 @@ public class XFLConverter {
         return outlineColor.toHexRGB();
     }
 
-    private void convertTimeline(int spriteId, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException {
+    private void convertTimeline(AbcIndexing abcIndex, int spriteId, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException {
         writer.writeStartElement("DOMTimeline", new String[]{"name", name});
         writer.writeStartElement("layers");
 
         boolean hasLabel = convertLabelsLayer(spriteId, tags, timelineTags, backgroundColor, writer);
-        boolean hasScript = convertActionScriptLayer(spriteId, tags, timelineTags, backgroundColor, writer, scriptPack);
+        boolean hasScript = convertActionScriptLayer(abcIndex, spriteId, tags, timelineTags, backgroundColor, writer, scriptPack);
 
         int index = 0;
 
@@ -3612,7 +3613,7 @@ public class XFLConverter {
 
             domDocument.writeStartElement("timelines");
             ScriptPack documentScriptPack = characterScriptPacks.containsKey(0) ? characterScriptPacks.get(0) : null;
-            convertTimeline(0, nonLibraryShapes, backgroundColor, swf.getTags(), swf.getTags(), characters, "Scene 1", flaVersion, files, domDocument, documentScriptPack);
+            convertTimeline(swf.getAbcIndex(), 0, nonLibraryShapes, backgroundColor, swf.getTags(), swf.getTags(), characters, "Scene 1", flaVersion, files, domDocument, documentScriptPack);
             domDocument.writeEndElement();
 
             if (hasAmfMetadata) {

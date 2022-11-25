@@ -149,9 +149,7 @@ public class ActionScript3Parser {
 
 //    private final AbcIndexing otherABCs;
     //private static final List<ABC> playerABCs = new ArrayList<>();
-    private static AbcIndexing playerGlobalAbcIndex;
     
-    private static AbcIndexing airGlobalAbcIndex;
 
     private long uniqId() {
         uniqLast++;
@@ -2602,9 +2600,9 @@ public class ActionScript3Parser {
     }
 
     public ActionScript3Parser(ABC abc, List<ABC> otherAbcs, boolean air) throws IOException, InterruptedException {
-        initPlayer();
+        SWF.initPlayer();
 
-        abcIndex = new AbcIndexing(air ? airGlobalAbcIndex : playerGlobalAbcIndex);
+        abcIndex = new AbcIndexing(air ? SWF.getAirGlobalAbcIndex() : SWF.getPlayerGlobalAbcIndex());
         for (ABC a : otherAbcs) {
             abcIndex.addAbc(a);
         }
@@ -2612,29 +2610,11 @@ public class ActionScript3Parser {
         abcIndex.addAbc(abc);
     }
 
-    private static void initPlayer() throws IOException, InterruptedException {
-        if (playerGlobalAbcIndex == null) {
-            if (Configuration.getPlayerSWC() == null) {
-                throw new IOException("Player SWC library not found, please place it to " + Configuration.getFlashLibPath());
-            }
-
-            SWC swc = new SWC(new FileInputStream(Configuration.getPlayerSWC()));
-            SWF swf = new SWF(swc.getOpenable("library.swf"), true);
-            playerGlobalAbcIndex = new AbcIndexing(swf);
-        }
-        if (airGlobalAbcIndex == null) {
-            if (Configuration.getAirSWC() == null) {
-                return;
-            }
-            SWC swc = new SWC(new FileInputStream(Configuration.getAirSWC()));
-            SWF swf = new SWF(swc.getOpenable("library.swf"), true);
-            airGlobalAbcIndex = new AbcIndexing(swf);
-        }
-    }
+    
 
     public static void compile(String src, ABC abc, List<ABC> otherABCs, String fileName, int classPos, int scriptIndex, boolean air) throws AVM2ParseException, IOException, InterruptedException, CompilationException {
         //List<ABC> parABCs = new ArrayList<>();
-        initPlayer();
+        SWF.initPlayer();
         ActionScript3Parser parser = new ActionScript3Parser(abc, otherABCs, air);
         boolean success = false;
         ABC originalAbc = ((ABCContainerTag) ((Tag) abc.parentTag).cloneTag()).getABC();
@@ -2659,7 +2639,7 @@ public class ActionScript3Parser {
     public static void compile(SWF swf, String src, String dst, int classPos, int scriptIndex, boolean air) {
         System.err.println("WARNING: AS3 compiler is not finished yet. This is only used for debuggging!");
         try {
-            initPlayer();
+            SWF.initPlayer();
             ABC abc = new ABC(null);
             ActionScript3Parser parser = new ActionScript3Parser(abc, new ArrayList<>(), air);
             parser.addScript(new String(Helper.readFile(src), Utf8Helper.charset), src, classPos, scriptIndex);

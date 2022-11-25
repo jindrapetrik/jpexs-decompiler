@@ -92,13 +92,13 @@ public class FullMultinameAVM2Item extends AVM2Item {
     public boolean isTopLevel(String tname, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) throws InterruptedException {
         String cname;
         if (name != null) {
-            cname = name.toString(LocalData.create(abc, localRegNames, fullyQualifiedNames, seenMethods));
+            cname = name.toString(LocalData.create(null, abc, localRegNames, fullyQualifiedNames, seenMethods));
         } else {
             cname = (abc.constants.getMultiname(multinameIndex).getName(abc.constants, fullyQualifiedNames, true, true));
         }
         String cns = "";
         if (namespace != null) {
-            cns = namespace.toString(LocalData.create(abc, localRegNames, fullyQualifiedNames, seenMethods));
+            cns = namespace.toString(LocalData.create(null, abc, localRegNames, fullyQualifiedNames, seenMethods));
         } else {
             Namespace ns = abc.constants.getMultiname(multinameIndex).getNamespace(abc.constants);
             if ((ns != null) && (ns.name_index != 0)) {

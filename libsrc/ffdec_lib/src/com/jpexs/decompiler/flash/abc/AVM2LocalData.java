@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.CodeStats;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -53,6 +54,8 @@ public class AVM2LocalData extends BaseLocalData {
     public MethodBody methodBody;
 
     public ABC abc;
+    
+    public AbcIndexing abcIndex;
 
     public HashMap<Integer, String> localRegNames;
 
@@ -141,6 +144,7 @@ public class AVM2LocalData extends BaseLocalData {
         scopeStack = localData.scopeStack;
         methodBody = localData.methodBody;
         abc = localData.abc;
+        abcIndex = localData.abcIndex;
         localRegNames = localData.localRegNames;
         fullyQualifiedNames = localData.fullyQualifiedNames;
         parsedExceptions = localData.parsedExceptions;

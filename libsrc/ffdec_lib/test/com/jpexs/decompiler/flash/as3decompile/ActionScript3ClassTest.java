@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.as3decompile;
 
 import com.jpexs.decompiler.flash.ActionScript3DecompileTestBase;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
@@ -50,7 +51,8 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
         DoABC2Tag tag = null;
         ABC abc = null;
         ScriptPack scriptPack = null;
-        for (Tag t : getSwf(swfId).getTags()) {
+        SWF swf = getSwf(swfId);
+        for (Tag t : swf.getTags()) {
             if (t instanceof DoABC2Tag) {
                 tag = (DoABC2Tag) t;
                 abc = tag.getABC();
@@ -65,7 +67,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
         HighlightedTextWriter writer = null;
         try {
             writer = new HighlightedTextWriter(new CodeFormatting(), false);
-            scriptPack.toSource(writer, abc.script_info.get(scriptPack.scriptIndex).traits.traits, new ConvertData(), ScriptExportMode.AS, false, false);
+            scriptPack.toSource(swf.getAbcIndex(), writer, abc.script_info.get(scriptPack.scriptIndex).traits.traits, new ConvertData(), ScriptExportMode.AS, false, false);
         } catch (InterruptedException ex) {
             fail();
         }

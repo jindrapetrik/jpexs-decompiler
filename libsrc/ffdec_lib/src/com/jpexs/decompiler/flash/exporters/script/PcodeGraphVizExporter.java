@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.exporters.script;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.graph.AVM2Graph;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.action.ActionGraph;
 import com.jpexs.decompiler.flash.action.ActionList;
@@ -85,8 +86,8 @@ public class PcodeGraphVizExporter {
         export(gr, writer);
     }
 
-    public void exportAs3(ABC abc, MethodBody body, GraphTextWriter writer) throws InterruptedException {
-        AVM2Graph gr = new AVM2Graph(body.getCode(), abc, body, false, -1, -1, new HashMap<>(), new ScopeStack(), new HashMap<>(), new ArrayList<>(), new HashMap<>(), body.getCode().visitCode(body));
+    public void exportAs3(AbcIndexing abcIndex, ABC abc, MethodBody body, GraphTextWriter writer) throws InterruptedException {
+        AVM2Graph gr = new AVM2Graph(abcIndex, body.getCode(), abc, body, false, -1, -1, new HashMap<>(), new ScopeStack(), new HashMap<>(), new ArrayList<>(), new HashMap<>(), body.getCode().visitCode(body));
         export(gr, writer);
     }
 

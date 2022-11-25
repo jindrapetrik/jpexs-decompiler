@@ -145,8 +145,8 @@ public class AS3Generator {
                             
                             Configuration.autoDeobfuscate.set(clsName.toLowerCase().contains("obfus"));
                             
-                            b.convert(new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true, new HashSet<>());
-                            b.toString("", ScriptExportMode.AS, abc, null, src, new ArrayList<>(), new HashSet<>());
+                            b.convert(swf.getAbcIndex(),new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true, new HashSet<>());
+                            b.toString(swf.getAbcIndex(), "", ScriptExportMode.AS, abc, null, src, new ArrayList<>(), new HashSet<>());
                             String[] srcs = src.toString().split("[\r\n]+");
                             for (int i = 0; i < srcs.length; i++) {
                                 String ss = srcs[i];

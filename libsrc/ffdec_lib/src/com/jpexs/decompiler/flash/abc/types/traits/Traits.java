@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -130,8 +131,10 @@ public class Traits implements Cloneable, Serializable {
         Trait parent;
 
         ConvertData convertData;
+        
+        AbcIndexing abcIndex;
 
-        public TraitConvertTask(Trait trait, Trait parent, ConvertData convertData, boolean makePackages, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, int traitIndex, boolean parallel) {
+        public TraitConvertTask(AbcIndexing abcIndex, Trait trait, Trait parent, ConvertData convertData, boolean makePackages, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, int traitIndex, boolean parallel) {
             this.trait = trait;
             this.parent = parent;
             this.convertData = convertData;
@@ -146,20 +149,21 @@ public class Traits implements Cloneable, Serializable {
             this.fullyQualifiedNames = fullyQualifiedNames;
             this.traitIndex = traitIndex;
             this.parallel = parallel;
+            this.abcIndex = abcIndex;
         }
 
         @Override
         public Void call() throws InterruptedException {
             if (makePackages) {
-                trait.convertPackaged(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+                trait.convertPackaged(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
             } else {
-                trait.convert(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+                trait.convert(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
             }
             return null;
         }
     }
 
-    public GraphTextWriter toString(Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, List<Integer> ignoredTraitNames) throws InterruptedException {
+    public GraphTextWriter toString(AbcIndexing abcIndex, Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, List<Integer> ignoredTraitNames) throws InterruptedException {
 
         List<Trait> ordered = new ArrayList<>(traits);
         loopi:
@@ -231,9 +235,9 @@ public class Traits implements Cloneable, Serializable {
                 writer.startTrait(h);
             }
             if (makePackages) {
-                trait.toStringPackaged(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+                trait.toStringPackaged(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
             } else {
-                trait.toString(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+                trait.toString(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
             }
             if (trait instanceof TraitClass) {
                 writer.endClass();
@@ -244,10 +248,10 @@ public class Traits implements Cloneable, Serializable {
         return writer;
     }
 
-    public void convert(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         if (!parallel || traits.size() < 2) {
             for (int t = 0; t < traits.size(); t++) {
-                TraitConvertTask task = new TraitConvertTask(traits.get(t), parent, convertData, makePackages, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, t, parallel);
+                TraitConvertTask task = new TraitConvertTask(abcIndex, traits.get(t), parent, convertData, makePackages, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, t, parallel);
                 task.call();
             }
         } else {
@@ -257,7 +261,7 @@ public class Traits implements Cloneable, Serializable {
             futureResults = new ArrayList<>();
             for (int t = 0; t < traits.size(); t++) {
                 // each convert task needs a separate NulWriter, because they are executed parallel
-                TraitConvertTask task = new TraitConvertTask(traits.get(t), parent, convertData, makePackages, path, abc, isStatic, exportMode, scriptIndex, classIndex, new NulWriter(), fullyQualifiedNames, t, parallel);
+                TraitConvertTask task = new TraitConvertTask(abcIndex, traits.get(t), parent, convertData, makePackages, path, abc, isStatic, exportMode, scriptIndex, classIndex, new NulWriter(), fullyQualifiedNames, t, parallel);
                 Future<Void> future = executor.submit(task);
                 futureResults.add(future);
             }

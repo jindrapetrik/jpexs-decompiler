@@ -116,7 +116,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public GraphTextWriter toString(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
 
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
         Multiname instanceInfoMultiname = instanceInfo.getName(abc.constants);
@@ -136,7 +136,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         //static variables & constants
         ClassInfo classInfo = abc.class_info.get(class_info);
-        classInfo.static_traits.toString(new Class[]{TraitSlotConst.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>());
+        classInfo.static_traits.toString(abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>());
 
         //static initializer
         int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);
@@ -146,7 +146,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
                 if (!classInitializerIsEmpty) {
                     writer.startBlock();
-                    abc.bodies.get(bodyIndex).toString(path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
+                    abc.bodies.get(bodyIndex).toString(abcIndex, path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
                     writer.endBlock();
                 } else {
                     //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
@@ -164,7 +164,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //instance variables
-        instanceInfo.instance_traits.toString(new Class[]{TraitSlotConst.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>());
+        instanceInfo.instance_traits.toString(abcIndex, new Class[]{TraitSlotConst.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>());
 
         //instance initializer - constructor
         if (!instanceInfo.isInterface()) {
@@ -194,7 +194,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.appendNoHilight(")").startBlock();
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
                 if (body != null) {
-                    body.toString(path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
+                    body.toString(abcIndex, path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
                 }
             }
 
@@ -204,10 +204,10 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //static methods
-        classInfo.static_traits.toString(new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>());
+        classInfo.static_traits.toString(abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, new ArrayList<>());
 
         //instance methods
-        instanceInfo.instance_traits.toString(new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, convertData.ignoreFrameScripts ? frameTraitNames : new ArrayList<>());
+        instanceInfo.instance_traits.toString(abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, convertData.ignoreFrameScripts ? frameTraitNames : new ArrayList<>());
 
         writer.endBlock(); // class
         writer.endClass();
@@ -216,7 +216,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void convert(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
 
         fullyQualifiedNames = new ArrayList<>();
 
@@ -244,7 +244,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.mark();
             List<Traits> ts = new ArrayList<>();
             ts.add(classInfo.static_traits);
-            abc.bodies.get(bodyIndex).convert(convertData, path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
+            abc.bodies.get(bodyIndex).convert(abcIndex, convertData, path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
             classInitializerIsEmpty = !writer.getMark();
         }
 
@@ -255,7 +255,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 List<Traits> ts = new ArrayList<>();
                 ts.add(instanceInfo.instance_traits);
                 MethodBody constructorBody = abc.bodies.get(bodyIndex);
-                constructorBody.convert(convertData, path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
+                constructorBody.convert(abcIndex, convertData, path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
 
                 if (convertData.ignoreFrameScripts) {
                     //find all addFrameScript(xx,this.method) in constructor
@@ -310,9 +310,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //static variables,constants & methods
-        classInfo.static_traits.convert(this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        classInfo.static_traits.convert(abcIndex, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
 
-        instanceInfo.instance_traits.convert(this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        instanceInfo.instance_traits.convert(abcIndex, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
     }
 
     @Override
