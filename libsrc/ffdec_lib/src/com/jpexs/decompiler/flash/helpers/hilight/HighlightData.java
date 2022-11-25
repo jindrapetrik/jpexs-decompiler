@@ -44,12 +44,15 @@ public class HighlightData implements Cloneable, Serializable {
     public long firstLineOffset = -1;
 
     public int regIndex = -1;
+    
+    public int namespaceIndex = -1;
 
     public boolean isEmpty() {
         return !declaration && declaredType == null && localName == null
                 && subtype == null && specialValue == null
                 && index == 0 && offset == 0 && regIndex == -1 && firstLineOffset == -1
-                && fileOffset == -1;
+                && fileOffset == -1
+                && namespaceIndex == -1;
     }
 
     public void merge(HighlightData data) {
@@ -85,6 +88,9 @@ public class HighlightData implements Cloneable, Serializable {
         }
         if (data.fileOffset != -1) {
             fileOffset = data.fileOffset;
+        }
+        if (data.namespaceIndex != -1) {
+            namespaceIndex = data.namespaceIndex;
         }
     }
 
