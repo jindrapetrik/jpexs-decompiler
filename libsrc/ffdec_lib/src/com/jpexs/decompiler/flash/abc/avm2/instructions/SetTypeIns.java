@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import java.util.List;
 
@@ -59,7 +60,7 @@ public interface SetTypeIns {
                         result.value = value;
                         output.add(result);
                         for (int i = 0; i < numDups; i++) {
-                            stack.push(new LocalRegAVM2Item(null, localData.lineStartInstruction, regId, value));
+                            stack.push(new LocalRegAVM2Item(null, localData.lineStartInstruction, regId, value, localData.localRegTypes.containsKey(regId) ? localData.localRegTypes.get(regId) : TypeItem.UNBOUNDED));
                         }
                         return;
                     } else {
@@ -74,7 +75,7 @@ public interface SetTypeIns {
 
                         if (regId > -1 && AVM2Item.mustStayIntact2(insideDup.getNotCoerced())) { //hack
                             output.add(result);
-                            stack.push(new LocalRegAVM2Item(null, localData.lineStartInstruction, regId, value));
+                            stack.push(new LocalRegAVM2Item(null, localData.lineStartInstruction, regId, value, localData.localRegTypes.containsKey(regId) ? localData.localRegTypes.get(regId) : TypeItem.UNBOUNDED));
                             return;
                         }
 

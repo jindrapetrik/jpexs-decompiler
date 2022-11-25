@@ -202,6 +202,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
         localData.methodBody = body;
         localData.abc = abc;
         localData.localRegNames = new HashMap<>();
+        localData.localRegTypes = new HashMap<>();
         localData.scriptIndex = scriptIndex;
         localData.ip = 0;
         localData.code = body.getCode();

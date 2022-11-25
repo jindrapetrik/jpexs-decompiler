@@ -419,6 +419,27 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }        
 
     public AbcIndexing getAbcIndex() {
+        if (abcIndex != null) {
+            return abcIndex;
+        }
+        boolean air = false;
+        SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(getShortPathTitle());
+        if (conf != null) {
+            if (conf.getCustomData(CustomConfigurationKeys.KEY_LIBRARY, "" + LIBRARY_FLASH).equals("" + LIBRARY_AIR)) {
+                air = true;
+            }
+        }   
+        try {
+            SWF.initPlayer();
+        } catch (IOException | InterruptedException ex) {
+            Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        abcIndex = new AbcIndexing(air ? SWF.getAirGlobalAbcIndex() : SWF.getPlayerGlobalAbcIndex());
+        for (Tag tag:tags) {
+            if (tag instanceof ABCContainerTag) {                
+                abcIndex.addAbc(((ABCContainerTag)tag).getABC());
+            }
+        }
         return abcIndex;
     }
     
@@ -1460,21 +1481,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             clearScriptCache();
         }
 
-        getASMs(true); // Add scriptNames to ASMs
-        
-        boolean air = false;
-        SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(getShortPathTitle());
-        if (conf != null) {
-            if (conf.getCustomData(CustomConfigurationKeys.KEY_LIBRARY, "" + LIBRARY_FLASH).equals("" + LIBRARY_AIR)) {
-                air = true;
-            }
-        }
-        abcIndex = new AbcIndexing(air ? SWF.getAirGlobalAbcIndex() : SWF.getPlayerGlobalAbcIndex());
-        for (Tag tag:tags) {
-            if (tag instanceof ABCContainerTag) {                
-                abcIndex.addAbc(((ABCContainerTag)tag).getABC());
-            }
-        }
+        getASMs(true); // Add scriptNames to ASMs                     
     }
 
     private void resolveImported(UrlResolver resolver) {
@@ -3090,7 +3097,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             }
         }
 
-        return decompilerPool.decompile(swf.abcIndex, pack);
+        return decompilerPool.decompile(swf.getAbcIndex(), pack);
     }
 
     public static Future<HighlightedText> getCachedFuture(ASMSource src, ActionList actions, ScriptDecompiledListener<HighlightedText> listener) throws InterruptedException {
@@ -3125,7 +3132,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             }
         }
 
-        return decompilerPool.submitTask(swf.abcIndex, pack, listener);
+        return decompilerPool.submitTask(swf.getAbcIndex(), pack, listener);
     }
 
     public DecompilerPool getDecompilerPool() {
@@ -4036,7 +4043,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
                                 int mi = ((TraitMethodGetterSetter) t).method_info;
                                 try {
-                                    documentPack.abc.findBody(mi).convert(abcIndex, new ConvertData(), "??", ScriptExportMode.AS, true, mi, documentPack.scriptIndex, cindex, documentPack.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
+                                    documentPack.abc.findBody(mi).convert(getAbcIndex(), new ConvertData(), "??", ScriptExportMode.AS, true, mi, documentPack.scriptIndex, cindex, documentPack.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
                                     List<GraphTargetItem> infos = documentPack.abc.findBody(mi).convertedItems;
                                     if (!infos.isEmpty()) {
                                         if (infos.get(0) instanceof IfItem) {
@@ -4112,7 +4119,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                                                         if (tr instanceof TraitClass) {
                                                                             int ci = ((TraitClass) tr).class_info;
                                                                             int cinit = p.abc.class_info.get(ci).cinit_index;
-                                                                            p.abc.findBody(cinit).convert(abcIndex, new ConvertData(), "??", ScriptExportMode.AS, true, cinit, p.scriptIndex, cindex, p.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
+                                                                            p.abc.findBody(cinit).convert(getAbcIndex(), new ConvertData(), "??", ScriptExportMode.AS, true, cinit, p.scriptIndex, cindex, p.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
                                                                             List<GraphTargetItem> cinitBody = p.abc.findBody(cinit).convertedItems;
                                                                             for (GraphTargetItem cit : cinitBody) {
                                                                                 if (cit instanceof SetPropertyAVM2Item) {

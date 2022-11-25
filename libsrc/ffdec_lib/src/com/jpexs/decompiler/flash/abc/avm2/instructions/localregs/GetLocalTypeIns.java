@@ -43,6 +43,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
 import java.util.List;
 
@@ -167,8 +168,14 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                 }
             }
         }
-
-        stack.push(new LocalRegAVM2Item(ins, localData.lineStartInstruction, regId, computedValue));
+        GraphTargetItem type = TypeItem.UNBOUNDED;
+        
+        if (localData.localRegTypes.containsKey(regId)) {
+            type = localData.localRegTypes.get(regId);            
+        } else if (computedValue != null) {
+            type = computedValue.returnType();
+        }
+        stack.push(new LocalRegAVM2Item(ins, localData.lineStartInstruction, regId, computedValue, type));
     }
 
     @Override

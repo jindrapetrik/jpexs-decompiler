@@ -36,6 +36,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -170,7 +171,7 @@ public abstract class InstructionDefinition implements Serializable {
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) throws InterruptedException {
     }
 
-    public void translate(Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, Reference<GraphSourceItem> lineStartItem, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2Instruction ins, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code, boolean thisHasDefaultToPrimitive) throws InterruptedException {
+    public void translate(AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, Reference<GraphSourceItem> lineStartItem, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, AVM2Instruction ins, List<GraphTargetItem> output, MethodBody body, ABC abc, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, String path, HashMap<Integer, Integer> localRegsAssignmentIps, int ip, HashMap<Integer, List<Integer>> refs, AVM2Code code, boolean thisHasDefaultToPrimitive) throws InterruptedException {
         AVM2LocalData localData = new AVM2LocalData();
         localData.isStatic = isStatic;
         localData.scriptIndex = scriptIndex;
@@ -180,7 +181,9 @@ public abstract class InstructionDefinition implements Serializable {
         localData.scopeStack = scopeStack;
         localData.methodBody = body;
         localData.abc = abc;
+        localData.abcIndex = abcIndex;
         localData.localRegNames = localRegNames;
+        localData.localRegTypes = localRegTypes;
         localData.fullyQualifiedNames = fullyQualifiedNames;
         localData.localRegAssignmentIps = localRegsAssignmentIps;
         localData.ip = ip;

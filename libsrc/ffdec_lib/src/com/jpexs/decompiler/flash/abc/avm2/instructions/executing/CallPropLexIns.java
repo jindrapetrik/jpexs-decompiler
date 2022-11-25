@@ -96,6 +96,13 @@ public class CallPropLexIns extends CallPropertyIns {
                         break;                    
                 }
             }
+        } else {
+            if (localData.abcIndex != null) {
+                GraphTargetItem receiverType = receiver.returnType();
+                if (!receiverType.equals(TypeItem.UNBOUNDED)) {
+                    type = localData.abcIndex.findPropertyCallType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multinameIndex).namespace_index,true, true);                    
+                }                                
+            }
         }
         
         stack.push(new CallPropertyAVM2Item(ins, localData.lineStartInstruction, false, receiver, multiname, args, type));
