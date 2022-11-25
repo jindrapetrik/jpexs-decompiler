@@ -76,7 +76,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var extraLine:Boolean = false;\r\n"
                 + "var r:int = 7;\r\n"
                 + "var t:int = 0;\r\n"
-                + "t = int(this.getInt());\r\n"
+                + "t = this.getInt();\r\n"
                 + "if(t + 1 < g.length)\r\n"
                 + "{\r\n"
                 + "t++;\r\n"
@@ -218,7 +218,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     public void testConvert() {
         decompileMethod("classic_air", "testConvert", "var s:String = \"a\";\r\n"
                 + "var i:int = int(s);\r\n"
-                + "var j:int = int(n);\r\n"
+                + "var j:int = n;\r\n"
                 + "s = String(j);\r\n"
                 + "s = ns;\r\n",
                  false);
@@ -280,7 +280,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testDeobfuscation() {
-        decompileMethod("classic_air", "testDeobfuscation", "var r:int = int(Math.random());\r\n"
+        decompileMethod("classic_air", "testDeobfuscation", "var r:int = Math.random();\r\n"
                 + "if(r > 5)\r\n"
                 + "{\r\n"
                 + "trace(\"A\");\r\n"
@@ -909,7 +909,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testIfFinally() {
-        decompileMethod("classic_air", "testIfFinally", "var a:int = int(Math.random());\r\n"
+        decompileMethod("classic_air", "testIfFinally", "var a:int = Math.random();\r\n"
                 + "if(a == 5)\r\n"
                 + "{\r\n"
                 + "try\r\n"
@@ -979,7 +979,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testIgnoreAndOr() {
-        decompileMethod("classic_air", "testIgnoreAndOr", "var k:int = int(Math.random());\r\n"
+        decompileMethod("classic_air", "testIgnoreAndOr", "var k:int = Math.random();\r\n"
                 + "if(k > 5)\r\n"
                 + "{\r\n"
                 + "trace(\"A\");\r\n"
@@ -1244,7 +1244,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var a:* = ns::unnamespacedFunc();\r\n"
                 + "var b:* = ns::[name];\r\n"
                 + "trace(b.c);\r\n"
-                + "var c:* = myInternal::neco;\r\n",
+                + "var c:int = myInternal::neco;\r\n",
                  false);
     }
 
@@ -1472,7 +1472,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testTryIf() {
-        decompileMethod("classic_air", "testTryIf", "var a:int = int(Math.random());\r\n"
+        decompileMethod("classic_air", "testTryIf", "var a:int = Math.random();\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "if(a > 5 && a < 50)\r\n"

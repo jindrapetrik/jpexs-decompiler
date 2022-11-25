@@ -118,10 +118,10 @@ public abstract class AVM2Item extends GraphTargetItem {
             data.namespaceIndex = namespaceIndex;*/
             
             if (((FullMultinameAVM2Item) propertyName).name != null) {
-                /*if (((FullMultinameAVM2Item) propertyName).namespace != null) {                    
-                    writer.hilightSpecial(".", HighlightSpecialType.PROPERTY_PARENT_TYPE, 0, data);                    
-                }*/
-                writer.append(".");
+                if (((FullMultinameAVM2Item) propertyName).namespace != null) {                    
+                    writer.append(".");
+                    //writer.hilightSpecial(".", HighlightSpecialType.PROPERTY_PARENT_TYPE, 0, data);                    
+                }
                 return propertyName.toString(writer, localData);
             } else {
                 //writer.hilightSpecial(".", HighlightSpecialType.PROPERTY_PARENT_TYPE, 0, data);

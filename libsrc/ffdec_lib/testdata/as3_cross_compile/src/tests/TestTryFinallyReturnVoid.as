@@ -9,7 +9,7 @@ package tests
 		
 		public function run() : void
 		{
-			var a:int = int(Math.random() * 5);
+			var a:int = Math.random() * 5;
 			trace("before try");
 			try
 			{

@@ -10,7 +10,7 @@ package tests
 		
 		public function run():void
 		{
-			var a:int = int(Math.random());
+			var a:int = Math.random();
 			
 			if (a > 10)
 			{

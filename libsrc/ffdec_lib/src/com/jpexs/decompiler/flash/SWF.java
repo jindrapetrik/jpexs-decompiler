@@ -409,14 +409,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     public static final int LIBRARY_AIR = 0;
     public static final int LIBRARY_FLASH = 1;
-    
+
     public static AbcIndexing getPlayerGlobalAbcIndex() {
         return playerGlobalAbcIndex;
     }
 
     public static AbcIndexing getAirGlobalAbcIndex() {
         return airGlobalAbcIndex;
-    }        
+    }
 
     public AbcIndexing getAbcIndex() {
         if (abcIndex != null) {
@@ -428,21 +428,20 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             if (conf.getCustomData(CustomConfigurationKeys.KEY_LIBRARY, "" + LIBRARY_FLASH).equals("" + LIBRARY_AIR)) {
                 air = true;
             }
-        }   
+        }
         try {
             SWF.initPlayer();
         } catch (IOException | InterruptedException ex) {
             Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
         }
         abcIndex = new AbcIndexing(air ? SWF.getAirGlobalAbcIndex() : SWF.getPlayerGlobalAbcIndex());
-        for (Tag tag:tags) {
-            if (tag instanceof ABCContainerTag) {                
-                abcIndex.addAbc(((ABCContainerTag)tag).getABC());
+        for (Tag tag : tags) {
+            if (tag instanceof ABCContainerTag) {
+                abcIndex.addAbc(((ABCContainerTag) tag).getABC());
             }
         }
         return abcIndex;
     }
-    
 
     public static void initPlayer() throws IOException, InterruptedException {
         if (playerGlobalAbcIndex == null) {
@@ -1608,6 +1607,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public String getTitleOrShortFileName() {
         if (fileTitle != null) {
             return fileTitle;
+        }
+        if (file == null) {
+            return "_";
         }
         return new File(file).getName();
     }

@@ -10,7 +10,7 @@ package tests
 		
 		public function run() : String
 		{
-			var a:int = int(Math.random() * 5);
+			var a:int = Math.random() * 5;
 			try
 			{
 				try
