@@ -95,10 +95,16 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "var b:int = 0;\r\n"
                 + "var c:int = 0;\r\n"
                 + "var d:int = 0;\r\n"
+                + "var f:int = 0;\r\n"
                 + "d = c = b = a = 5;\r\n"
                 + "var e:TestClass2 = TestClass2.createMe(\"test\");\r\n"
                 + "e.attrib1 = e.attrib2 = e.attrib3 = this.getCounter();\r\n"
-                + "this.traceIt(e.toString());\r\n",
+                + "this.traceIt(e.toString());\r\n"
+                + "this.prop = f = a = 4;\r\n"
+                + "if(f == 2)\r\n"
+                + "{\r\n"
+                + "trace(\"OK: \" + f);\r\n"
+                + "}\r\n",
                  false);
     }
 

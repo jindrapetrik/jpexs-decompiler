@@ -128,50 +128,52 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                             }
                         }
                     }
-                }
-                else if (setItem.value.getNotCoerced() instanceof SetLocalAVM2Item) {
+                } else if (setItem.value.getNotCoerced() instanceof SetLocalAVM2Item) {
                     SetLocalAVM2Item setLocal = (SetLocalAVM2Item) setItem.value.getNotCoerced();
                     if (setLocal.regIndex == regId) {
-                        if ((setItem.value instanceof CoerceAVM2Item) || (setItem.value instanceof ConvertAVM2Item)) {
-                            setItem.value.value = setLocal.value;
-                        } else {
-                            setItem.value = setLocal.value;
-                        }
+                        int setLocalIp = localData.code.adr2pos(setLocal.getSrc().getAddress());                    
+                        if (localData.setLocalPosToGetLocalPos.get(setLocalIp).size() == 1) {                    
+                            if ((setItem.value instanceof CoerceAVM2Item) || (setItem.value instanceof ConvertAVM2Item)) {
+                                setItem.value.value = setLocal.value;
+                            } else {
+                                setItem.value = setLocal.value;
+                            }
 
-                        output.remove(output.size() - 1);
+                            output.remove(output.size() - 1);
 
-                        if (setItem instanceof SetPropertyAVM2Item) {
-                            if ((setItem.value instanceof IncrementAVM2Item) || (setItem.value instanceof DecrementAVM2Item)) {
-                                boolean isIncrement = (setItem.value instanceof IncrementAVM2Item);
-                                if (setItem.value.value instanceof GetPropertyAVM2Item) {
-                                    SetPropertyAVM2Item setProp = (SetPropertyAVM2Item) setItem;
-                                    GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setItem.value.value;
-                                    if (getProp.object.getThroughDuplicate() == setProp.object) {
-                                        if (((FullMultinameAVM2Item) setProp.propertyName).compareSame((FullMultinameAVM2Item) getProp.propertyName)) {
-                                            if (getProp.object instanceof DuplicateItem) {
-                                                getProp.object = getProp.object.value;
-                                            }
-                                            if (isIncrement) {
-                                                setItem = new PreIncrementAVM2Item(setProp.getSrc(), localData.lineStartInstruction, getProp);
-                                            } else {
-                                                setItem = new PreDecrementAVM2Item(setProp.getSrc(), localData.lineStartInstruction, getProp);
+                            if (setItem instanceof SetPropertyAVM2Item) {
+                                if ((setItem.value instanceof IncrementAVM2Item) || (setItem.value instanceof DecrementAVM2Item)) {
+                                    boolean isIncrement = (setItem.value instanceof IncrementAVM2Item);
+                                    if (setItem.value.value instanceof GetPropertyAVM2Item) {
+                                        SetPropertyAVM2Item setProp = (SetPropertyAVM2Item) setItem;
+                                        GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) setItem.value.value;
+                                        if (getProp.object.getThroughDuplicate() == setProp.object) {
+                                            if (((FullMultinameAVM2Item) setProp.propertyName).compareSame((FullMultinameAVM2Item) getProp.propertyName)) {
+                                                if (getProp.object instanceof DuplicateItem) {
+                                                    getProp.object = getProp.object.value;
+                                                }
+                                                if (isIncrement) {
+                                                    setItem = new PreIncrementAVM2Item(setProp.getSrc(), localData.lineStartInstruction, getProp);
+                                                } else {
+                                                    setItem = new PreDecrementAVM2Item(setProp.getSrc(), localData.lineStartInstruction, getProp);
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
 
-                        stack.add(setItem);
-                        return;
+                            stack.add(setItem);
+                            return;
+                        }
                     }
                 }
             }
         }
         GraphTargetItem type = TypeItem.UNBOUNDED;
-        
+
         if (localData.localRegTypes.containsKey(regId)) {
-            type = localData.localRegTypes.get(regId);            
+            type = localData.localRegTypes.get(regId);
         } else if (computedValue != null) {
             type = computedValue.returnType();
         }

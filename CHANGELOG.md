@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#1769] AS3 - Missing some body trait variable declaration
 - [#1769], [#1888] AS3 - Missing casts like int()
+- [#1890] AS3 - Chained assignments in some special cases
 
 ## [17.0.2] - 2022-11-22
 ### Fixed
@@ -2651,6 +2652,7 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1769]: https://www.free-decompiler.com/flash/issues/1769
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
+[#1890]: https://www.free-decompiler.com/flash/issues/1890
 [#1882]: https://www.free-decompiler.com/flash/issues/1882
 [#1880]: https://www.free-decompiler.com/flash/issues/1880
 [#1881]: https://www.free-decompiler.com/flash/issues/1881
