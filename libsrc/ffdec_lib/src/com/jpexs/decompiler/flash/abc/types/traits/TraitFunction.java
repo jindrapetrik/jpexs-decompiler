@@ -90,6 +90,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         writer.startBlock();
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
+            //writeUses(scriptIndex, classIndex, isStatic, abc, writer);                    
             abc.bodies.get(bodyIndex).toString(abcIndex,path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
         }
         writer.endBlock();

@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - [#1891] AS3 - duplicate variable declaration in some cases
 - All SWF classes inside DoABC tags in the taglist view
 - Exception on package selection inside DoABC tag on taglist view
+- [#1892] AS3 - Package internal custom namespaces
 
 ## [17.0.2] - 2022-11-22
 ### Fixed
@@ -2661,6 +2662,7 @@ All notable changes to this project will be documented in this file.
 [#1890]: https://www.free-decompiler.com/flash/issues/1890
 [#1810]: https://www.free-decompiler.com/flash/issues/1810
 [#1891]: https://www.free-decompiler.com/flash/issues/1891
+[#1892]: https://www.free-decompiler.com/flash/issues/1892
 [#1882]: https://www.free-decompiler.com/flash/issues/1882
 [#1880]: https://www.free-decompiler.com/flash/issues/1880
 [#1881]: https://www.free-decompiler.com/flash/issues/1881

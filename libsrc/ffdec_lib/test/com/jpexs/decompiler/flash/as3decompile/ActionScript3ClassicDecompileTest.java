@@ -1266,7 +1266,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "var a:* = ns::unnamespacedFunc();\r\n"
                 + "var b:* = ns::[name];\r\n"
                 + "trace(b.c);\r\n"
-                + "var c:* = myInternal::neco;\r\n",
+                + "var c:* = myInternal::neco;\r\n"
+                + "var d:* = this.myInternal2::neco;\r\n",
                  false);
     }
 

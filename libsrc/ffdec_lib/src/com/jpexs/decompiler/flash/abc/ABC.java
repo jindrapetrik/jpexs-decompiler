@@ -2128,10 +2128,13 @@ public class ABC implements Openable {
             return null;
         }
         Namespace ns = constants.getNamespace(link_ns_index);
-        if (ns.kind != Namespace.KIND_NAMESPACE) {
+        if (ns.kind != Namespace.KIND_NAMESPACE && ns.kind != Namespace.KIND_PACKAGE_INTERNAL) {
             return null;
         }
         String name = constants.getString(ns.name_index);
+        if (name.equals("http://adobe.com/AS3/2006/builtin")) {
+            return null;
+        }
         for (ABCContainerTag abcTag : getAbcTags()) {
             DottedChain dc = abcTag.getABC().nsValueToName(name);
             nsname = dc.getLast();

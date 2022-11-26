@@ -190,6 +190,21 @@ public abstract class Trait implements Cloneable, Serializable {
         return false;
     }
 
+    
+    public void writeUses(int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer) throws InterruptedException {
+        List<Dependency> dependencies = new ArrayList<>();
+        List<String> uses = new ArrayList<>();
+        String customNs = null;
+        Namespace ns = getName(abc).getNamespace(abc.constants);
+        if (ns.kind == Namespace.KIND_NAMESPACE) {
+            customNs = ns.getName(abc.constants).toRawString();
+        }
+        getDependencies(scriptIndex, classIndex, isStatic, customNs, abc, dependencies, uses, null, new ArrayList<>());
+        for (String us : uses) {
+            writer.appendNoHilight("use namespace " + us + ";").newLine();
+        }
+    }
+    
     public void writeImportsUsages(int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
 
         List<String> namesInThisPackage = new ArrayList<>();
@@ -275,12 +290,12 @@ public abstract class Trait implements Cloneable, Serializable {
         if (hasImport) {
             writer.newLine();
         }
-        for (String us : uses) {
+        /*for (String us : uses) {
             writer.appendNoHilight("use namespace " + us + ";").newLine();
         }
         if (uses.size() > 0) {
             writer.newLine();
-        }
+        }*/
     }
 
     public final GraphTextWriter getMetaData(Trait parent, ConvertData convertData, ABC abc, GraphTextWriter writer) {

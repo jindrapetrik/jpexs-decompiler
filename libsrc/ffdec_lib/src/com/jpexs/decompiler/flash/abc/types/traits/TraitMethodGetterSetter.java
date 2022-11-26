@@ -145,6 +145,7 @@ public class TraitMethodGetterSetter extends Trait {
                     convertTraitHeader(abc, writer);
                 }
                 if (bodyIndex != -1) {
+                    //writeUses(scriptIndex, classIndex, isStatic, abc, writer);
                     abc.bodies.get(bodyIndex).toString(abcIndex, path, exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
                 }
             } else {
