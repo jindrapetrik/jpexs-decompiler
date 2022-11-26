@@ -12,9 +12,10 @@ package tests
     
 		public function run():void
 		{
-			var s:String = "a";
+            var s:String = "a";
             var i:int = int(s);
             var j:int = n;
+            var a:*;
             s = String(j);
             s = ns;
             
@@ -23,6 +24,10 @@ package tests
             
             s = TestConvert.TEST;
             i = this.TEST;
+            
+            i = Number("4") * 5;
+            i = a * 6;
+            i = a;           
 		}
 	}
 }

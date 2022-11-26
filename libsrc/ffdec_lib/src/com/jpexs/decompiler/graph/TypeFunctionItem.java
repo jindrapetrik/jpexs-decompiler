@@ -33,7 +33,7 @@ public class TypeFunctionItem extends GraphTargetItem {
 
     public static TypeFunctionItem ARRAY = new TypeFunctionItem("Array");
 
-    public static UnboundedTypeItem UNBOUNDED = new UnboundedTypeItem();
+    public static UnboundedTypeItem UNBOUNDED = TypeItem.UNBOUNDED;
 
     public String fullTypeName;
 

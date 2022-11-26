@@ -25,7 +25,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.UnaryOpItem;
-import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
+
 import java.util.List;
 
 /**
@@ -53,6 +53,6 @@ public class BitNotAVM2Item extends UnaryOpItem {
     @Override
     public GraphTargetItem returnType() {
         return TypeItem.INT; //?
-        //return new UnboundedTypeItem();
+        //return TypeItem.UNBOUNDED;
     }
 }

@@ -25,8 +25,8 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
-import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +97,6 @@ public abstract class ActionItem extends GraphTargetItem implements Serializable
 
     @Override
     public GraphTargetItem returnType() {
-        return new UnboundedTypeItem();
+        return TypeItem.UNBOUNDED;
     }
 }

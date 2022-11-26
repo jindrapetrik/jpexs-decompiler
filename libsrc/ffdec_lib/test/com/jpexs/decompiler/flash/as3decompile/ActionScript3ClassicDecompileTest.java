@@ -45,7 +45,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     @Test
     public void testCallLocal() {
         decompileMethod("classic", "testCallLocal", "var f:Function = this.getF();\r\n"
-                + "var b:int = int(f(1,3));\r\n",
+                + "var b:int = f(1,3);\r\n",
                  false);
     }
 
@@ -221,7 +221,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testConvert() {
-        decompileMethod("classic", "testConvert", "var s:String = \"a\";\r\n"
+        decompileMethod("classic", "testConvert", "var a:* = undefined;\r\n"
+                + "var s:String = \"a\";\r\n"
                 + "var i:int = int(s);\r\n"
                 + "var j:int = this.n;\r\n"
                 + "s = String(j);\r\n"
@@ -229,7 +230,10 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "s = String(i == 4 ? \"\" : i);\r\n"
                 + "s = i == 4 ? \"\" : String(i);\r\n"
                 + "s = TestConvert.TEST;\r\n"
-                + "i = this.TEST;\r\n",
+                + "i = this.TEST;\r\n"
+                + "i = Number(\"4\") * 5;\r\n"
+                + "i = a * 6;\r\n"
+                + "i = a;\r\n",
                  false);
     }
 

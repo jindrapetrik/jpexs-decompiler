@@ -36,7 +36,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
-import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
+
 import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -199,30 +199,26 @@ public class NameAVM2Item extends AssignableAVM2Item {
             ttype = ((UnresolvedAVM2Item) ttype).resolved;
         }
         AVM2Instruction ins;
-        if (ttype instanceof UnboundedTypeItem) {
-            ins = ins(AVM2Instructions.CoerceA);
-        } else {
-            switch (ttype.toString()) {
-                case "int":
-                    ins = ins(AVM2Instructions.ConvertI);
-                    break;
-                case "*":
-                    ins = ins(AVM2Instructions.CoerceA);
-                    break;
-                case "String":
-                    ins = ins(AVM2Instructions.CoerceS);
-                    break;
-                case "Boolean":
-                    ins = ins(AVM2Instructions.ConvertB);
-                    break;
-                case "uint":
-                    ins = ins(AVM2Instructions.ConvertU);
-                    break;
-                default:
-                    int type_index = AVM2SourceGenerator.resolveType(localData, ttype, ((AVM2SourceGenerator) generator).abcIndex);
-                    ins = ins(AVM2Instructions.Coerce, type_index);
-                    break;
-            }
+        switch (ttype.toString()) {
+            case "int":
+                ins = ins(AVM2Instructions.ConvertI);
+                break;
+            case "*":
+                ins = ins(AVM2Instructions.CoerceA);
+                break;
+            case "String":
+                ins = ins(AVM2Instructions.CoerceS);
+                break;
+            case "Boolean":
+                ins = ins(AVM2Instructions.ConvertB);
+                break;
+            case "uint":
+                ins = ins(AVM2Instructions.ConvertU);
+                break;
+            default:
+                int type_index = AVM2SourceGenerator.resolveType(localData, ttype, ((AVM2SourceGenerator) generator).abcIndex);
+                ins = ins(AVM2Instructions.Coerce, type_index);
+                break;
         }
         return ins;
     }

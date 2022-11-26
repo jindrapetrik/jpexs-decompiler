@@ -20,8 +20,9 @@ import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
-import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
+
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +77,6 @@ public class InterfaceAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
-        return new UnboundedTypeItem(); //FIXME
+        return TypeItem.UNBOUNDED; //FIXME
     }
 }

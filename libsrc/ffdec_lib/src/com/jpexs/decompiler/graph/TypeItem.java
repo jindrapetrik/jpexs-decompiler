@@ -47,8 +47,12 @@ public class TypeItem extends GraphTargetItem {
     public static TypeItem ARRAY = new TypeItem(DottedChain.ARRAY);
 
     public static UnboundedTypeItem UNBOUNDED = new UnboundedTypeItem();
+    
+    public static TypeItem UNKNOWN = new TypeItem("--UNKNOWN--");
 
     public final DottedChain fullTypeName;
+    
+    public boolean printRaw = false;
 
     public TypeItem(String s) {
         this(s == null ? new DottedChain(new String[]{}, new String[]{""}) : DottedChain.parseWithSuffix(s));
