@@ -226,7 +226,9 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var i:int = int(s);\r\n"
                 + "var j:int = n;\r\n"
                 + "s = String(j);\r\n"
-                + "s = ns;\r\n",
+                + "s = ns;\r\n"
+                + "s = String(i == 4 ? \"\" : i);\r\n"
+                + "s = i == 4 ? \"\" : String(i);\r\n",
                  false);
     }
 
