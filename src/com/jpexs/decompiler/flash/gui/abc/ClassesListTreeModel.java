@@ -42,7 +42,7 @@ import javax.swing.tree.TreePath;
  */
 public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel {
 
-    private final Openable openable;
+    private final Openable targetItem;
 
     private List<ScriptPack> list;
 
@@ -60,7 +60,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
         super(null, null, null);
         this.flat = flat;
         root = new AS3Package(null, swf, flat, false);
-        this.openable = swf;
+        this.targetItem = swf;
         this.list = swf.getAS3Packs();
         setFilter(null);
     }
@@ -68,8 +68,8 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     public ClassesListTreeModel(ABC abc, boolean flat) {
         super(null, null, null);
         this.flat = flat;
-        root = new AS3Package(null, abc, flat, false);
-        this.openable = abc;
+        root = new AS3Package(null, abc.getOpenable(), flat, false);
+        this.targetItem = abc;
         List<ABC> allAbcs = new ArrayList<>();
         allAbcs.add(abc);
         this.list = abc.getScriptPacks(null, allAbcs);
@@ -78,14 +78,14 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
 
     @Override
     public Openable getOpenable() {
-        return openable;
+        return targetItem.getOpenable();
     }
 
     public final void update() {
-        if (openable instanceof SWF) {
-            this.list = ((SWF)openable).getAS3Packs();
-        } else if (openable instanceof ABC) {
-            ABC abc = (ABC) openable;
+        if (targetItem instanceof SWF) {
+            this.list = ((SWF)targetItem).getAS3Packs();
+        } else if (targetItem instanceof ABC) {
+            ABC abc = (ABC) targetItem;
             List<ABC> allAbcs = new ArrayList<>();
             allAbcs.add(abc);
             this.list = abc.getScriptPacks(null, allAbcs);
@@ -102,8 +102,8 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
         List<String> ignoredClasses = new ArrayList<>();
         List<String> ignoredNss = new ArrayList<>();
         if (Configuration._ignoreAdditionalFlexClasses.get()) {     
-            if (openable instanceof SWF) {
-                ((SWF)openable).getFlexMainClass(ignoredClasses, ignoredNss);
+            if (targetItem instanceof SWF) {
+                ((SWF)targetItem).getFlexMainClass(ignoredClasses, ignoredNss);
             }
         }
 
@@ -146,7 +146,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
             }
             AS3Package pkg = root.getSubPackage(fullName);
             if (pkg == null) {
-                pkg = new AS3Package(fullName, openable, true, defaultPackage);
+                pkg = new AS3Package(fullName, getOpenable(), true, defaultPackage);
                 root.addSubPackage(pkg);
             }
             return pkg;
@@ -156,7 +156,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
             String pathElement = packageStr.get(i);
             AS3Package pkg = parent.getSubPackage(pathElement);
             if (pkg == null) {
-                pkg = new AS3Package(pathElement, openable, false, false);
+                pkg = new AS3Package(pathElement, getOpenable(), false, false);
                 parent.addSubPackage(pkg);
             }
 
@@ -260,11 +260,11 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
             return false;
         }
 
-        return openable.equals(((ClassesListTreeModel) obj).openable);
+        return targetItem.equals(((ClassesListTreeModel) obj).targetItem);
     }
 
     @Override
     public int hashCode() {
-        return ClassesListTreeModel.class.hashCode() ^ openable.hashCode();
+        return ClassesListTreeModel.class.hashCode() ^ targetItem.hashCode();
     }
 }

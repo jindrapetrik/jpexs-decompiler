@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#1810] AS3 Direct editation - Calls inside submethods using this
 - [#1891] AS3 - duplicate variable declaration in some cases
 - All SWF classes inside DoABC tags in the taglist view
+- Exception on package selection inside DoABC tag on taglist view
 
 ## [17.0.2] - 2022-11-22
 ### Fixed
