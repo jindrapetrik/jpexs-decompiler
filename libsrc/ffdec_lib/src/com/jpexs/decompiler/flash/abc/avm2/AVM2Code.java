@@ -2048,6 +2048,11 @@ public class AVM2Code implements Cloneable {
                                         sp.setDeclaration(d);
                                         declaredPropsDec.add(d);
                                         declaredProperties.add(propName.resolvedMultinameName);
+                                        
+                                        Slot sl = new Slot(new NewActivationAVM2Item(null, null), abc.constants.getMultiname(tsc.name_index));
+                                        declaredSlotsDec.add(d);
+                                        declaredSlots.add(sl);
+                                        
                                         if (subItem == currentItem) {
                                             items.set(i, d);
                                         } else {
@@ -2081,6 +2086,9 @@ public class AVM2Code implements Cloneable {
                                 ssti.setDeclaration(d);
                                 declaredSlotsDec.add(d);
                                 declaredSlots.add(sl);
+                                
+                                declaredPropsDec.add(d);
+                                declaredProperties.add(slotPropertyName);
 
                                 if (subItem == currentItem) {
                                     items.set(i, d);
