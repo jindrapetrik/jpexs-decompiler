@@ -13,6 +13,9 @@ package tests
             var j:int = n;
             s = String(j);
             s = ns;
+            
+            s = String((i == 4) ? "" : i);
+            s = (i == 4) ? "" : String(i);
 		}
 	}
 }
