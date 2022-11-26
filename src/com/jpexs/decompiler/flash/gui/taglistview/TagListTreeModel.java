@@ -75,7 +75,7 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             return abcTagsClassesTree.get(abcContainer);
         }
         
-        ClassesListTreeModel model = new ClassesListTreeModel(abcContainer.getSwf(), Configuration.flattenASPackages.get());
+        ClassesListTreeModel model = new ClassesListTreeModel(abcContainer.getABC(), Configuration.flattenASPackages.get());
         abcTagsClassesTree.put(abcContainer, model);
         return model;
     }
