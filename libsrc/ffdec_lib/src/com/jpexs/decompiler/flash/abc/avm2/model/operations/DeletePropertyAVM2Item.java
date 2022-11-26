@@ -45,13 +45,15 @@ public class DeletePropertyAVM2Item extends AVM2Item {
     public GraphTargetItem object;
 
     public GraphTargetItem propertyName;
-
+    
     private int line;
 
+    public boolean isStatic;
+    
     //Constructor for compiler
     public DeletePropertyAVM2Item(GraphTargetItem property, int line) {
-        this(null, null, property, null);
-        this.line = line;
+        this(null, null, property, null, false);
+        this.line = line;        
     }
 
     @Override
@@ -60,16 +62,17 @@ public class DeletePropertyAVM2Item extends AVM2Item {
         visitor.visit(propertyName);
     }
 
-    public DeletePropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName) {
+    public DeletePropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_UNARY);
         this.object = object;
         this.propertyName = propertyName;
+        this.isStatic = isStatic;
     }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         writer.append("delete ");
-        formatProperty(writer, object, propertyName, localData);
+        formatProperty(writer, object, propertyName, localData, isStatic);
         return writer;
     }
 
