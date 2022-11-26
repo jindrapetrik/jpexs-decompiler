@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -194,7 +195,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
         selectedLabel.setIcon(val ? View.getIcon("editing16") : null);
     }
 
-    public void showCard(final String name, final Trait trait, int traitIndex) {
+    public void showCard(final String name, final Trait trait, int traitIndex, ABC abc) {
         View.execInEventDispatch(() -> {
             CardLayout layout = (CardLayout) innerPanel.getLayout();
             layout.show(innerPanel, name);
@@ -286,8 +287,8 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
             if (trait == null) {
                 traitNameLabel.setText("-");
             } else if (abcPanel != null) {
-                Multiname traitName = trait.getName(abcPanel.abc);
-                String traitNameStr = traitName == null ? "" : traitName.getName(abcPanel.abc.constants, null, false, true);
+                Multiname traitName = trait.getName(abc);
+                String traitNameStr = traitName == null ? "" : traitName.getName(abc.constants, null, false, true);
                 traitNameLabel.setText(traitNameStr);
             }
         });
