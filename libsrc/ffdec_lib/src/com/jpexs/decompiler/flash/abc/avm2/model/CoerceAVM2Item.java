@@ -105,6 +105,9 @@ public class CoerceAVM2Item extends AVM2Item {
         if (typeObj instanceof UnboundedTypeItem) {
             return typeObj;
         }
+        if (typeObj instanceof ApplyTypeAVM2Item) {
+            return typeObj;
+        }
         return new TypeItem(typeObj.toString());
     }
 

@@ -123,4 +123,24 @@ public class ApplyTypeAVM2Item extends AVM2Item {
         );
     }
 
+    @Override
+    public String toString() {
+        String ret = object.toString();
+        if (!params.isEmpty()) {
+            ret += ".<";
+            boolean first = true;
+            for (GraphTargetItem param : params) {
+                if (!first) {
+                    ret += ", ";
+                }
+                ret += param.toString();
+                first = false;
+            }
+            ret += ">";
+        }
+        return ret;
+    }
+    
+    
+
 }
