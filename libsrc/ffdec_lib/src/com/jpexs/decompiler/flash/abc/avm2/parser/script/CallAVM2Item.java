@@ -119,11 +119,7 @@ public class CallAVM2Item extends AVM2Item {
             PropertyAVM2Item prop = (PropertyAVM2Item) callable;
             obj = prop.object;
             if (obj == null) {
-
-                /*List<ABC> allAbcs = new ArrayList<>();
-                 allAbcs.add(g.abc);
-                 allAbcs.addAll(g.allABCs);
-                 */ String cname = localData.currentClass;
+                String cname = localData.currentClass;
                 DottedChain pkgName = localData.pkg;
                 Reference<String> outName = new Reference<>("");
                 Reference<DottedChain> outNs = new Reference<>(DottedChain.EMPTY);
@@ -141,8 +137,7 @@ public class CallAVM2Item extends AVM2Item {
                         otherNs.add(n.getCpoolIndex(g.abcIndex));
                     }
                 }
-
-                if (cname != null && AVM2SourceGenerator.searchPrototypeChain(null, otherNs, localData.privateNs, localData.protectedNs, true, g.abcIndex, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType) && (localData.getFullClass().equals(outNs.getVal().addWithSuffix(outName.getVal()).toRawString()))) {
+                if (!localData.subMethod && cname != null && AVM2SourceGenerator.searchPrototypeChain(null, otherNs, localData.privateNs, localData.protectedNs, true, g.abcIndex, pkgName, cname, prop.propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType) && (localData.getFullClass().equals(outNs.getVal().addWithSuffix(outName.getVal()).toRawString()))) {
                     NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, false, "this", "", null, false, new ArrayList<>(), abcIndex);
                     nobj.setRegNumber(0);
                     obj = nobj;
