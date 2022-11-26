@@ -268,7 +268,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         nattributes[nattributes.length - 1] = attribute;
         nparts[nparts.length - 1] = name;
         nnamespaceSuffixes[nparts.length - 1] = namespaceSuffix;
-        return new DottedChain(nparts, nnamespaceSuffixes);
+        return new DottedChain(nattributes, nparts, nnamespaceSuffixes);
     }
 
     protected String toString(boolean as3, boolean raw, boolean withSuffix) {
@@ -284,7 +284,9 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
             if (i > 0) {
                 ret.append(".");
             }
-
+            if (attributes[i]) {
+                ret.append("@");
+            }
             String part = parts[i];
             boolean lastStar = i == length - 1 && "*".equals(part);
             ret.append((raw || lastStar) ? part : IdentifiersDeobfuscation.printIdentifier(as3, part));

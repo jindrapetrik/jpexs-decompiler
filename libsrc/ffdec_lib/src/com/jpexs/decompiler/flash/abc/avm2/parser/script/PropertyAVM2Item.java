@@ -379,9 +379,6 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
 
         if (propIndex == 0 && !mustExist) {
             String pname = propertyName;
-            if (attribute) {
-                pname = pname.substring(1);
-            }
             Multiname multiname;
             if (attribute && pname.isEmpty()) {
                 multiname = Multiname.createMultinameL(true,
