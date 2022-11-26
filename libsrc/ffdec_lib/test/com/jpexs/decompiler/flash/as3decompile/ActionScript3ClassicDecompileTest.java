@@ -233,7 +233,12 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "i = this.TEST;\r\n"
                 + "i = Number(\"4\") * 5;\r\n"
                 + "i = a * 6;\r\n"
-                + "i = a;\r\n",
+                + "i = a;\r\n"
+                + "var o:Object = {\r\n"
+                + "0:\"A\",\r\n"
+                + "1:\"B\",\r\n"
+                + "2:\"C\"\r\n"
+                + "};\r\n",
                  false);
     }
 

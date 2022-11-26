@@ -9,7 +9,7 @@ package tests
         public static var TEST:String = "Hello";
         
         public var TEST:int = 5;
-    
+        
 		public function run():void
 		{
             var s:String = "a";
@@ -27,7 +27,13 @@ package tests
             
             i = Number("4") * 5;
             i = a * 6;
-            i = a;           
+            i = a;
+            
+            var o:Object = {
+            0: "A",
+            1: "B",
+            2: "C"
+            };           
 		}
 	}
 }
