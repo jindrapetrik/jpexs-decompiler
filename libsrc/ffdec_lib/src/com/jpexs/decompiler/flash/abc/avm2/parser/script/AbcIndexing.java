@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 /**
  * Indexing of ABCs for faster access. Indexes ABC classes for faster class and
@@ -101,6 +102,10 @@ public final class AbcIndexing {
      */
     public static class PropertyDef {
 
+        private static final String BUILT_IN_NS = "http://adobe.com/AS3/2006/builtin";
+
+        private static Map<ABC, Integer> builtInNsPerAbc = new WeakHashMap<>();
+
         private final String propName;
 
         private final GraphTargetItem parent;
@@ -133,13 +138,23 @@ public final class AbcIndexing {
          * private/protected namespace reolving
          */
         public PropertyDef(String propName, GraphTargetItem parent, ABC abc, int propNsIndex) {
+
+            int builtInIndex = -1;
+            if (abc != null) {
+                if (!builtInNsPerAbc.containsKey(abc)) {
+                    int index = abc.constants.getNamespaceId(Namespace.KIND_NAMESPACE, BUILT_IN_NS, 0, true);
+                    builtInNsPerAbc.put(abc, index);
+                }
+                builtInIndex = builtInNsPerAbc.get(abc);
+            }
+
             this.propName = propName;
             this.parent = parent;
             if (abc == null || propNsIndex <= 0) {
                 return;
             }
             int k = abc.constants.getNamespace(propNsIndex).kind;
-            if (k != Namespace.KIND_PACKAGE) {
+            if (k != Namespace.KIND_PACKAGE &&  propNsIndex != builtInIndex) {
                 setPrivate(abc, propNsIndex);
             }
         }
@@ -256,7 +271,7 @@ public final class AbcIndexing {
         public ABC abc;
 
         public GraphTargetItem returnType;
-        
+
         public GraphTargetItem callReturnType;
 
         public ValueKind value;
@@ -304,7 +319,7 @@ public final class AbcIndexing {
     private final Map<PropertyNsDef, TraitIndex> classNsProperties = new HashMap<>();
 
     private final Map<PropertyNsDef, TraitIndex> scriptProperties = new HashMap<>();
-    
+
     public ClassIndex findClass(GraphTargetItem cls) {
         if (!classes.containsKey(cls)) {
             if (parent == null) {
@@ -314,7 +329,7 @@ public final class AbcIndexing {
         }
         return classes.get(cls);
     }
-    
+
     public GraphTargetItem findPropertyType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance) {
         TraitIndex traitIndex = findProperty(new PropertyDef(propName, cls, abc, ns), findStatic, findInstance);
         if (traitIndex == null) {
@@ -322,8 +337,8 @@ public final class AbcIndexing {
         }
         return traitIndex.returnType;
     }
-    
-    public GraphTargetItem findPropertyCallType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance) {        
+
+    public GraphTargetItem findPropertyCallType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance) {
         TraitIndex traitIndex = findProperty(new PropertyDef(propName, cls, abc, ns), findStatic, findInstance);
         if (traitIndex == null) {
             return TypeItem.UNBOUNDED;
@@ -375,15 +390,15 @@ public final class AbcIndexing {
         return null;
     }
 
-    public TraitIndex findProperty(PropertyDef prop, boolean findStatic, boolean findInstance) {               
+    public TraitIndex findProperty(PropertyDef prop, boolean findStatic, boolean findInstance) {
         /*System.out.println("searching " + prop);
-        for(PropertyDef p:instanceProperties.keySet()) {
-            if (p.parent.equals(new TypeItem("MyClass"))) {
-                System.out.println("- "+p);
+        for (PropertyDef p : instanceProperties.keySet()) {
+            if (p.parent.equals(new TypeItem("String"))) {
+                System.out.println("- " + p);
             }
         }
         System.out.println("-----------");*/
-        
+
         //search all static first
         if (findStatic && classProperties.containsKey(prop)) {
             if (!classProperties.containsKey(prop)) {
@@ -411,7 +426,7 @@ public final class AbcIndexing {
                 return instanceProperties.get(prop);
             }
         }
-               
+
         //now search parent class
         AbcIndexing.ClassIndex ci = findClass(prop.parent);
         if (ci != null && ci.parent != null && (prop.abc == null || prop.propNsIndex == 0)) {
@@ -428,14 +443,14 @@ public final class AbcIndexing {
                 return pti;
             }
         }
-        
+
         if (parent != null) {
             TraitIndex pti = parent.findProperty(prop, findStatic, findInstance);
             if (pti != null) {
                 return pti;
             }
         }
-        
+
         return null;
     }
 
@@ -469,16 +484,16 @@ public final class AbcIndexing {
                 return TypeItem.UNBOUNDED;
             }
             return PropertyAVM2Item.multinameToType(abc.method_info.get(tmgs.method_info).ret_type, abc.constants);
-        }        
-        
+        }
+
         if (t instanceof TraitFunction) {
             TraitFunction tf = (TraitFunction) t;
             return PropertyAVM2Item.multinameToType(abc.method_info.get(tf.method_info).ret_type, abc.constants);
-        
+
         }
         return TypeItem.UNBOUNDED;
     }
-    
+
     private static GraphTargetItem getTraitReturnType(ABC abc, Trait t) {
         if (t instanceof TraitSlotConst) {
             TraitSlotConst tsc = (TraitSlotConst) t;
@@ -500,8 +515,8 @@ public final class AbcIndexing {
                 }
             }
             return new TypeItem(DottedChain.FUNCTION);
-        }        
-        
+        }
+
         if (t instanceof TraitFunction) {
             return new TypeItem(DottedChain.FUNCTION);
         }
@@ -517,7 +532,7 @@ public final class AbcIndexing {
             }
             if (map != null) {
                 PropertyDef dp = new PropertyDef(t.getName(abc).getName(abc.constants, new ArrayList<>() /*?*/, true, false), multinameToType(name_index, abc.constants), abc, abc.constants.getMultiname(t.name_index).namespace_index);
-                map.put(dp, new TraitIndex(t, abc, getTraitReturnType(abc, t), getTraitCallReturnType(abc, t), propValue, multinameToType(name_index, abc.constants)));                
+                map.put(dp, new TraitIndex(t, abc, getTraitReturnType(abc, t), getTraitCallReturnType(abc, t), propValue, multinameToType(name_index, abc.constants)));
             }
             if (mapNs != null) {
                 Multiname m = abc.constants.getMultiname(t.name_index);

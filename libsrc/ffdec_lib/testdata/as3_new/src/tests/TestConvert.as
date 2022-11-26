@@ -34,6 +34,8 @@ package tests
             1: "B",
             2: "C"
             };           
+            
+            i = int(s.charAt(10));
 		}
 	}
 }
