@@ -101,7 +101,7 @@ import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
-import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
+
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Reference;
 import java.io.ByteArrayOutputStream;
@@ -1523,7 +1523,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     }
 
     public int typeName(SourceGeneratorLocalData localData, GraphTargetItem type) throws CompilationException {
-        if (type instanceof UnboundedTypeItem) {
+        if (type.equals(TypeItem.UNBOUNDED)) {
             return 0;
         }
         if (("" + type).equals("*")) {

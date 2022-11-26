@@ -102,7 +102,7 @@ public class TernarOpItem extends GraphTargetItem {
                 && (onFalse.returnType().equals(TypeItem.NUMBER) || onFalse.returnType().equals(TypeItem.INT) || onFalse.returnType().equals(TypeItem.UINT))) {
             return TypeItem.NUMBER;
         }
-        return TypeItem.UNBOUNDED;
+        return TypeItem.UNKNOWN;
     }
 
     @Override

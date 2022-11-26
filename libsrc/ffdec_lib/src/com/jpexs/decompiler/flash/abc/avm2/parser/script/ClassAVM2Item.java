@@ -22,9 +22,10 @@ import com.jpexs.decompiler.graph.Block;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
 import com.jpexs.decompiler.graph.model.LocalData;
-import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -125,6 +126,6 @@ public class ClassAVM2Item extends AVM2Item implements Block {
 
     @Override
     public GraphTargetItem returnType() {
-        return new UnboundedTypeItem(); //FIXME
+        return TypeItem.UNBOUNDED; //FIXME
     }
 }

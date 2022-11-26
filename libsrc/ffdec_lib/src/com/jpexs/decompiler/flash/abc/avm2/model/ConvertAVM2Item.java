@@ -59,15 +59,20 @@ public class ConvertAVM2Item extends AVM2Item {
         }*/
         switch (type.toString()) {
             case "Boolean":
-                displayConvert = !valueReturnType.equals(TypeItem.BOOLEAN);
+                displayConvert = !valueReturnType.equals(TypeItem.BOOLEAN) &&
+                                 !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
             case "Number":
             case "int":
             case "uint":
-                displayConvert = !valueReturnType.equals(TypeItem.INT) && !valueReturnType.equals(TypeItem.NUMBER) && !valueReturnType.equals(TypeItem.UINT);
+                displayConvert = !valueReturnType.equals(TypeItem.INT) && 
+                                !valueReturnType.equals(TypeItem.NUMBER) && 
+                                !valueReturnType.equals(TypeItem.UINT) &&
+                                !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
             case "String":
-                displayConvert = !valueReturnType.equals(TypeItem.STRING);
+                displayConvert = !valueReturnType.equals(TypeItem.STRING) &&
+                                 !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;            
         }
         if (displayConvert) {

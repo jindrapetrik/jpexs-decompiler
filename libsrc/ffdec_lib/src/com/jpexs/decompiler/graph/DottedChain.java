@@ -31,6 +31,8 @@ import java.util.List;
 public class DottedChain implements Serializable, Comparable<DottedChain> {
 
     public static final DottedChain EMPTY = new DottedChain(true);
+    
+    public static final DottedChain UNBOUNDED = new DottedChain(new String[]{"*"});
 
     public static final DottedChain TOPLEVEL = new DottedChain(new String[]{});
 

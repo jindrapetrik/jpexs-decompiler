@@ -113,7 +113,7 @@ import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
-import com.jpexs.decompiler.graph.model.UnboundedTypeItem;
+
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
@@ -174,7 +174,7 @@ public class ActionScript3Parser {
     private GraphTargetItem type(List<List<NamespaceItem>> allOpenedNamespaces, TypeItem thisType, NamespaceItem pkg, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException, InterruptedException {
         ParsedSymbol s = lex();
         if (s.type == SymbolType.MULTIPLY) {
-            return new UnboundedTypeItem();
+            return TypeItem.UNBOUNDED;
         } else if (s.type == SymbolType.VOID) {
             return new TypeItem(DottedChain.VOID);
         } else {
@@ -531,7 +531,7 @@ public class ActionScript3Parser {
                     paramTypes.add(currentType = type(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, variables));
                     s = lex();
                 } else {
-                    paramTypes.add(currentType = new UnboundedTypeItem());
+                    paramTypes.add(currentType = TypeItem.UNBOUNDED);
                 }
                 if (s.type == SymbolType.ASSIGN) {
                     GraphTargetItem currentValue = expression(allOpenedNamespaces, thisType, pkg, new Reference<>(false), importedClasses, openedNamespaces, null, isMethod, isMethod, isMethod, variables, false);
@@ -554,7 +554,7 @@ public class ActionScript3Parser {
         if (s.type == SymbolType.COLON) {
             retType = type(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, variables);
         } else {
-            retType = new UnboundedTypeItem();
+            retType = TypeItem.UNBOUNDED;
             lexer.pushback(s);
         }
         List<GraphTargetItem> body = null;
@@ -1492,7 +1492,7 @@ public class ActionScript3Parser {
                         type = type(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, variables);
                         s = lex();
                     } else {
-                        type = new UnboundedTypeItem();
+                        type = TypeItem.UNBOUNDED;
                     }
 
                     if (s.type == SymbolType.ASSIGN) {

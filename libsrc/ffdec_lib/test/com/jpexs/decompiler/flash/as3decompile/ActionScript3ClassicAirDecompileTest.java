@@ -45,7 +45,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     @Test
     public void testCallLocal() {
         decompileMethod("classic_air", "testCallLocal", "var f:Function = getF();\r\n"
-                + "var b:int = int(f(1,3));\r\n",
+                + "var b:int = f(1,3);\r\n",
                  false);
     }
 
@@ -222,15 +222,19 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testConvert() {
-        decompileMethod("classic_air", "testConvert", "var s:String = \"a\";\r\n"
+        decompileMethod("classic_air", "testConvert", "var a:* = undefined;\r\n"
+                + "var s:String = \"a\";\r\n"
                 + "var i:int = int(s);\r\n"
-                + "var j:int = n;\r\n"
-                + "s = String(j);\r\n"
+                + "var j:int;\r\n"
+                + "s = String(j = n);\r\n"
                 + "s = ns;\r\n"
                 + "s = String(i == 4 ? \"\" : i);\r\n"
                 + "s = i == 4 ? \"\" : String(i);\r\n"
                 + "s = TestConvert.TEST;\r\n"
-                + "i = this.TEST;\r\n",
+                + "i = this.TEST;\r\n"
+                + "i = 4 * 5;\r\n"
+                + "i = a * 6;\r\n"
+                + "i = a;\r\n",
                  false);
     }
 
