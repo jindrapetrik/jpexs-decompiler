@@ -109,6 +109,18 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         return writer;
     }
 
+    private boolean hasValueStr(ABC abc, ConvertData convertData) {
+        if (convertData.assignedValues.containsKey(this)) {
+            return true;
+        }
+        if (value_kind == ValueKind.CONSTANT_Namespace) {
+                if (abc.constants.getNamespace(value_index).kind == Namespace.KIND_PACKAGE_INTERNAL) {
+                    return false;
+                }
+            }
+        return value_kind != 0;
+    }
+    
     public void getValueStr(AbcIndexing abcIndex, ScriptExportMode exportMode, Trait parent, ConvertData convertData, GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (convertData.assignedValues.containsKey(this)) {
 
@@ -130,7 +142,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             return;
         }
 
-        if (value_kind != 0) {
+        if (value_kind != 0) {            
             ValueKind val = new ValueKind(value_index, value_kind);
             writer.hilightSpecial(val.toString(abc.constants), HighlightSpecialType.TRAIT_VALUE);
         }
@@ -167,7 +179,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             }
         }
         getNameStr(writer, abc, fullyQualifiedNames);
-        if (value_kind != 0 || convertData.assignedValues.containsKey(this)) {
+        if (hasValueStr(abc, convertData)) {
             writer.appendNoHilight(" = ");
             getValueStr(abcIndex, exportMode, parent, convertData, writer, abc, fullyQualifiedNames);
         }
@@ -177,7 +189,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     @Override
     public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         getNameStr(writer, abc, fullyQualifiedNames);
-        if (value_kind != 0 || convertData.assignedValues.containsKey(this)) {
+        if (hasValueStr(abc, convertData)) {
             getValueStr(abcIndex,exportMode, parent, convertData, writer, abc, fullyQualifiedNames);
         }
     }
