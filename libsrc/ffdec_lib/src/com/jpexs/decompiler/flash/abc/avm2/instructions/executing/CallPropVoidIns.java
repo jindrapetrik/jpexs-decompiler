@@ -23,12 +23,14 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,30 +82,9 @@ public class CallPropVoidIns extends InstructionDefinition {
         }
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
 
-        GraphTargetItem receiver = stack.pop();
-        GraphTargetItem type = TypeItem.UNBOUNDED;
-
-        if (receiver instanceof FindPropertyAVM2Item) {
-            FindPropertyAVM2Item fprop = (FindPropertyAVM2Item) receiver;
-            if (fprop.propertyName.equals(multiname)) {
-                switch (multiname.resolvedMultinameName) {
-                    case "Boolean":
-                    case "int":
-                    case "uint":
-                    case "Number":
-                    case "String":
-                        type = new TypeItem(multiname.resolvedMultinameName);
-                        break;                    
-                }
-            }
-        } else {
-            if (localData.abcIndex != null) {
-                GraphTargetItem receiverType = receiver.returnType();
-                if (!receiverType.equals(TypeItem.UNBOUNDED)) {
-                    type = localData.abcIndex.findPropertyCallType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multinameIndex).namespace_index,true, true);                    
-                }                                
-            }
-        }
+        GraphTargetItem receiver = stack.pop();        
+        Reference<Boolean> isStatic = new Reference<>(false);
+        GraphTargetItem type = GetPropertyIns.resolvePropertyType(localData, receiver, multiname, isStatic, true);
         output.add(new CallPropertyAVM2Item(ins, localData.lineStartInstruction, true, receiver, multiname, args, type));
     }
 

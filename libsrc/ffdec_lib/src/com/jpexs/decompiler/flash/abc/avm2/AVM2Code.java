@@ -1977,7 +1977,7 @@ public class AVM2Code implements Cloneable {
                         Slot sl = new Slot(new NewActivationAVM2Item(null, null), abc.constants.getMultiname(traits.get(traitName).name_index));
                         TraitSlotConst tsc = (TraitSlotConst) traits.get(traitName);
                         GraphTargetItem type = PropertyAVM2Item.multinameToType(tsc.type_index, abc.constants);
-                        DeclarationAVM2Item d = new DeclarationAVM2Item(new GetLexAVM2Item(null, null, sl.multiname, abc.constants, type), type);
+                        DeclarationAVM2Item d = new DeclarationAVM2Item(new GetLexAVM2Item(null, null, sl.multiname, abc.constants, type, false), type);
                         declaredSlotsDec.add(d);
                         declaredSlots.add(sl);
 

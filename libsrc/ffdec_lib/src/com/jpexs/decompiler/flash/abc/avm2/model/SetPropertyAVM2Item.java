@@ -50,6 +50,8 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
     public String compoundOperator;
     
     public GraphTargetItem type;
+    
+    public boolean isStatic;
 
     @Override
     public DeclarationAVM2Item getDeclaration() {
@@ -75,12 +77,13 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
         }
     }
 
-    public SetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem value, GraphTargetItem type) {
+    public SetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem value, GraphTargetItem type, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT);
         this.object = object;
         this.propertyName = propertyName;        
         this.value = value;
         this.type = type;
+        this.isStatic = isStatic;
     }
 
     @Override
@@ -103,7 +106,7 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetPropertyAVM2Item(getInstruction(), getLineStartIns(), object, propertyName, type);
+        return new GetPropertyAVM2Item(getInstruction(), getLineStartIns(), object, propertyName, type, isStatic);
     }
 
     @Override
