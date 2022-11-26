@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - [#1890] AS3 - Chained assignments in some special cases
 - [#1810] AS3 Direct editation - XML attribute handling
 - [#1810] AS3 Direct editation - Calls inside submethods using this
+- [#1891] AS3 - duplicate variable declaration in some cases
 
 ## [17.0.2] - 2022-11-22
 ### Fixed
@@ -2656,6 +2657,7 @@ All notable changes to this project will be documented in this file.
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1890]: https://www.free-decompiler.com/flash/issues/1890
 [#1810]: https://www.free-decompiler.com/flash/issues/1810
+[#1891]: https://www.free-decompiler.com/flash/issues/1891
 [#1882]: https://www.free-decompiler.com/flash/issues/1882
 [#1880]: https://www.free-decompiler.com/flash/issues/1880
 [#1881]: https://www.free-decompiler.com/flash/issues/1881
