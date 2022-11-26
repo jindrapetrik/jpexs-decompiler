@@ -31,5 +31,5 @@ public enum HighlightSpecialType {
     TRY_TYPE, TRY_NAME,
     TEXT,
     ATTR_METADATA, ATTR_FINAL, ATTR_OVERRIDE, ATTR_0x8,
-    PROPERTY_PARENT_TYPE
+    PROPERTY_TYPE
 }

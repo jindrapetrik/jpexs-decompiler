@@ -46,14 +46,17 @@ public class CallPropertyAVM2Item extends AVM2Item {
     public boolean isVoid;
     
     public GraphTargetItem type;
+    
+    public boolean isStatic;
 
-    public CallPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, boolean isVoid, GraphTargetItem receiver, GraphTargetItem propertyName, List<GraphTargetItem> arguments, GraphTargetItem type) {
+    public CallPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, boolean isVoid, GraphTargetItem receiver, GraphTargetItem propertyName, List<GraphTargetItem> arguments, GraphTargetItem type, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.receiver = receiver;
         this.propertyName = propertyName;
         this.arguments = arguments;
         this.isVoid = isVoid;
         this.type = type;
+        this.isStatic = isStatic;
     }
 
     @Override
@@ -65,7 +68,7 @@ public class CallPropertyAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        formatProperty(writer, receiver, propertyName, localData);
+        formatProperty(writer, receiver, propertyName, localData, isStatic);
         writer.spaceBeforeCallParenthesies(arguments.size());
         writer.append("(");
         for (int a = 0; a < arguments.size(); a++) {

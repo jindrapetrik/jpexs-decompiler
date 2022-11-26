@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperVoidIns;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
@@ -32,6 +33,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.action.deobfuscation.BrokenScriptDetector;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.Main;
@@ -44,6 +46,7 @@ import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.helpers.hilight.Highlighting;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Reference;
 import java.awt.Point;
@@ -317,27 +320,96 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         return -1;
     }
 
-    public boolean getPropertyTypeAtPos(int pos, Reference<Integer> abcIndex, Reference<Integer> classIndex, Reference<Integer> traitIndex, Reference<Boolean> classTrait, Reference<Integer> multinameIndex, Reference<ABC> abcUsed) {
+    public boolean getPropertyTypeAtPos(AbcIndexing indexing, int pos, Reference<Integer> abcIndex, Reference<Integer> classIndex, Reference<Integer> traitIndex, Reference<Boolean> classTrait, Reference<Integer> multinameIndex, Reference<ABC> abcUsed) {
 
         int m = getMultinameAtPos(pos, true, abcUsed);
-        if (m <= 0) {
+        
+        if (indexing == null) {
             return false;
         }
+        /*int m = getMultinameAtPos(pos, true, abcUsed);
+        if (m <= 0) {
+            return false;
+        }*/
         SyntaxDocument sd = (SyntaxDocument) getDocument();
         Token t = sd.getTokenAt(pos + 1);
         Token lastToken = t;
         Token prev;
-        while (t.type == TokenType.IDENTIFIER || t.type == TokenType.KEYWORD || t.type == TokenType.REGEX) {
-            prev = sd.getPrevToken(t);
-            if (prev != null) {
-                if (!".".equals(prev.getString(sd))) {
-                    break;
-                }
-                t = sd.getPrevToken(prev);
-            } else {
+        String propName = t.getString(sd);
+        if (!(t.type == TokenType.IDENTIFIER || t.type == TokenType.KEYWORD || t.type == TokenType.REGEX)) {
+            return false;
+        }
+        prev = sd.getPrevToken(t);
+        if (prev == null) {
+            return false;
+        }
+        if (!".".equals(prev.getString(sd))) {
+            return false;
+        }
+        Highlighting sh = Highlighting.search(highlightedText.getSpecialHighlights(), new HighlightData(), prev.start, prev.start);
+        if (sh == null) {
+            return false;
+        }
+        
+        HighlightData data = sh.getProperties();
+        
+        String parentType = data.propertyType;
+        if (parentType.equals("*")) {
+            return false;
+        }
+        AbcIndexing.TraitIndex propertyTraitIndex = indexing.findProperty(new AbcIndexing.PropertyDef(propName, new TypeItem(parentType), getABC(), data.namespaceIndex), data.isStatic, !data.isStatic);
+        if (propertyTraitIndex == null) {
+            return false;
+        }
+        
+        List<ABCContainerTag> abcs = getABC().getSwf().getAbcList();
+        int index = 0;
+        boolean found = false;
+        for (ABCContainerTag cnt:abcs) {
+            if (cnt.getABC() == propertyTraitIndex.abc) {
+                abcIndex.setVal(index);
+                found = true;
+                break;
+            }
+            index++;
+        }
+        if (!found) {
+            return false;
+        }
+        
+        abcUsed.setVal(propertyTraitIndex.abc);
+        
+        index = propertyTraitIndex.abc.findClassByName(propertyTraitIndex.objType.toString());
+        if (index == -1) {
+            return false;
+        }
+        classIndex.setVal(index);
+        
+        classTrait.setVal(data.isStatic);
+        
+        Traits ts;
+        if (data.isStatic) {
+            ts = propertyTraitIndex.abc.class_info.get(index).static_traits;
+        } else {
+            ts = propertyTraitIndex.abc.instance_info.get(index).instance_traits;
+        }
+        
+        found = false;
+        for (int i = 0; i < ts.traits.size(); i++) {
+            if (ts.traits.get(i) == propertyTraitIndex.trait) {
+                traitIndex.setVal(i);
+                found = true;
                 break;
             }
         }
+        if (!found) {
+            return false;
+        }
+        
+        multinameIndex.setVal(propertyTraitIndex.trait.name_index);
+        
+        return true;
+        /*
         if (t.type != TokenType.IDENTIFIER && t.type != TokenType.KEYWORD && t.type != TokenType.REGEX) {
             return false;
         }
@@ -346,9 +418,8 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         DottedChain currentType = locTypeRef.getVal();
         if (currentType.equals(DottedChain.ALL)) {
             return false;
-        }
-        boolean found;
-
+        }     
+         
         while (!currentType.equals(DottedChain.ALL)) {
             String ident = t.getString(sd);
             found = false;
@@ -361,7 +432,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                     InstanceInfo ii = a.instance_info.get(cindex);
                     for (int j = 0; j < ii.instance_traits.traits.size(); j++) {
                         Trait tr = ii.instance_traits.traits.get(j);
-                        if (ident.equals(tr.getName(a).getName(a.constants, null, false /*NOT RAW!*/, true))) {
+                        if (ident.equals(tr.getName(a).getName(a.constants, null, false --not raw--, true))) { 
                             classIndex.setVal(cindex);
                             abcIndex.setVal(i);
                             traitIndex.setVal(j);
@@ -376,7 +447,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                     ClassInfo ci = a.class_info.get(cindex);
                     for (int j = 0; j < ci.static_traits.traits.size(); j++) {
                         Trait tr = ci.static_traits.traits.get(j);
-                        if (ident.equals(tr.getName(a).getName(a.constants, null, false /*NOT RAW!*/, true))) {
+                        if (ident.equals(tr.getName(a).getName(a.constants, null, false --not raw--, true))) {
                             classIndex.setVal(cindex);
                             abcIndex.setVal(i);
                             traitIndex.setVal(j);
@@ -402,7 +473,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             }
             t = sd.getNextToken(t);
         }
-        return true;
+        return true;*/
     }
 
     public int getMultinameAtPos(int pos, Reference<ABC> abcUsed) {

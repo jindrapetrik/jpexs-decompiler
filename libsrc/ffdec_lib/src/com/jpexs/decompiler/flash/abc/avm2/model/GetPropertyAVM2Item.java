@@ -141,7 +141,7 @@ public class GetPropertyAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        return formatProperty(writer, object, propertyName, localData);
+        return formatProperty(writer, object, propertyName, localData, isStatic);
     }
 
     @Override

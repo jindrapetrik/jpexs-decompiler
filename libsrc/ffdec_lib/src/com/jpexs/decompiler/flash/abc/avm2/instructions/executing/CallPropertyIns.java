@@ -86,7 +86,7 @@ public class CallPropertyIns extends InstructionDefinition {
         Reference<Boolean> isStatic = new Reference<>(false);
         GraphTargetItem type = GetPropertyIns.resolvePropertyType(localData, receiver, multiname, isStatic, true);
         
-        stack.push(new CallPropertyAVM2Item(ins, localData.lineStartInstruction, false, receiver, multiname, args, type));
+        stack.push(new CallPropertyAVM2Item(ins, localData.lineStartInstruction, false, receiver, multiname, args, type, isStatic.getVal()));
     }
 
     @Override

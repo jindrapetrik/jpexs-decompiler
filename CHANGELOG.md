@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - Translator tool for easier localization
+- AS3 improved goto declaration for properties and methods
 
 ### Fixed
 - [#1769] AS3 - Missing some body trait variable declaration

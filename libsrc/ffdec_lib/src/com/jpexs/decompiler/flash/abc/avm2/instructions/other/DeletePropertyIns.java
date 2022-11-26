@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.DeletePropertyAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
+import com.jpexs.helpers.Reference;
 import java.util.List;
 
 /**
@@ -55,8 +56,9 @@ public class DeletePropertyIns extends InstructionDefinition {
         int multinameIndex = ins.operands[0];
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
-        //stack.add(new BooleanAVM2Item(ins, localData.lineStartInstruction, Boolean.TRUE));//property successfully deleted
-        stack.add(new DeletePropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname));
+        Reference<Boolean> isStatic = new Reference<>(false);
+        GraphTargetItem type = GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, true);        
+        stack.add(new DeletePropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, isStatic.getVal()));
     }
 
     @Override

@@ -26,6 +26,8 @@ import com.jpexs.decompiler.flash.abc.avm2.model.clauses.ExceptionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightData;
+import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
@@ -72,7 +74,7 @@ public abstract class AVM2Item extends GraphTargetItem {
         return true;
     }
 
-    protected GraphTextWriter formatProperty(GraphTextWriter writer, GraphTargetItem object, GraphTargetItem propertyName, LocalData localData) throws InterruptedException {
+    protected GraphTextWriter formatProperty(GraphTextWriter writer, GraphTargetItem object, GraphTargetItem propertyName, LocalData localData, boolean isStatic) throws InterruptedException {
         boolean empty = object.getThroughDuplicate() instanceof FindPropertyAVM2Item;
         if (object instanceof LocalRegAVM2Item) {
             if (((LocalRegAVM2Item) object).computedValue != null) {
@@ -110,22 +112,22 @@ public abstract class AVM2Item extends GraphTargetItem {
         
         if (propertyName instanceof FullMultinameAVM2Item) {
             
-            //TODO: use type information in the GUI
-            /*HighlightData data = new HighlightData();
+            HighlightData data = new HighlightData();
             int multinameIndex = ((FullMultinameAVM2Item) propertyName).multinameIndex;
             int namespaceIndex = localData.constantsAvm2.getMultiname(multinameIndex).namespace_index;
-            data.specialValue = object.returnType().toString();
-            data.namespaceIndex = namespaceIndex;*/
+            data.propertyType = object.returnType().toString();
+            data.namespaceIndex = namespaceIndex;
+            data.isStatic = isStatic;
             
             if (((FullMultinameAVM2Item) propertyName).name != null) {
                 if (((FullMultinameAVM2Item) propertyName).namespace != null) {                    
-                    writer.append(".");
-                    //writer.hilightSpecial(".", HighlightSpecialType.PROPERTY_PARENT_TYPE, 0, data);                    
+                    //writer.append(".");
+                    writer.hilightSpecial(".", HighlightSpecialType.PROPERTY_TYPE, 0, data);
                 }
                 return propertyName.toString(writer, localData);
             } else {
-                //writer.hilightSpecial(".", HighlightSpecialType.PROPERTY_PARENT_TYPE, 0, data);
-                writer.append(".");
+                writer.hilightSpecial(".", HighlightSpecialType.PROPERTY_TYPE, 0, data);
+                //writer.append(".");
                 return propertyName.toString(writer, localData);
             }
         } else {
