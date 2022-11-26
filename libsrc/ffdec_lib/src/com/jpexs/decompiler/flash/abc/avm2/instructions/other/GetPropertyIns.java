@@ -161,7 +161,14 @@ public class GetPropertyIns extends InstructionDefinition {
                 if (type == null) {
                     if (localData.abcIndex != null) {
                         String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.abc.constants, true).toRawString();
-                        GraphTargetItem thisPropType = currentClassName == null ? TypeItem.UNBOUNDED : localData.abcIndex.findPropertyType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true);
+                        GraphTargetItem thisPropType = TypeItem.UNBOUNDED;
+                        if (currentClassName != null) {
+                            if (call) {
+                                thisPropType = localData.abcIndex.findPropertyCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true);
+                            } else {
+                                thisPropType = localData.abcIndex.findPropertyType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true);                            
+                            }
+                        }
                         if (!thisPropType.equals(TypeItem.UNBOUNDED)) {
                             type = thisPropType;
                         }
