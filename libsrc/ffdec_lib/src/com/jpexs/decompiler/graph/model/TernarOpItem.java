@@ -23,6 +23,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
 import com.jpexs.decompiler.graph.SourceGenerator;
+import com.jpexs.decompiler.graph.TypeItem;
 import java.util.List;
 import java.util.Objects;
 
@@ -94,7 +95,14 @@ public class TernarOpItem extends GraphTargetItem {
 
     @Override
     public GraphTargetItem returnType() {
-        return onTrue.returnType();
+        if (onTrue.returnType().equals(onFalse.returnType())) {
+            return onTrue.returnType();
+        }
+        if ((onTrue.returnType().equals(TypeItem.NUMBER) || onTrue.returnType().equals(TypeItem.INT) || onTrue.returnType().equals(TypeItem.UINT))
+                && (onFalse.returnType().equals(TypeItem.NUMBER) || onFalse.returnType().equals(TypeItem.INT) || onFalse.returnType().equals(TypeItem.UINT))) {
+            return TypeItem.NUMBER;
+        }
+        return TypeItem.UNBOUNDED;
     }
 
     @Override
