@@ -63,6 +63,7 @@ public class GetLexIns extends InstructionDefinition {
             }
         }
 
+        boolean isStatic = false;
         if (slotType == null) {
             if (localData.abcIndex != null) {
                 String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.abc.constants, true).toRawString();                
@@ -75,6 +76,7 @@ public class GetLexIns extends InstructionDefinition {
                     TypeItem ti = new TypeItem(multiname.getNameWithNamespace(localData.abc.constants, true));
                     if (localData.abcIndex.findClass(ti) != null) {
                         slotType = ti;
+                        isStatic = true;
                     }
                 }
             }
@@ -83,7 +85,7 @@ public class GetLexIns extends InstructionDefinition {
         if (slotType == null) {
             slotType = TypeItem.UNBOUNDED;
         }
-        stack.push(new GetLexAVM2Item(ins, localData.lineStartInstruction, multiname, localData.getConstants(), slotType));
+        stack.push(new GetLexAVM2Item(ins, localData.lineStartInstruction, multiname, localData.getConstants(), slotType, isStatic));
     }
 
     @Override

@@ -42,6 +42,7 @@ import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -128,7 +129,17 @@ public class GetPropertyIns extends InstructionDefinition {
                 }
             }
         }
-        
+        Reference<Boolean> isStatic = new Reference<>(false);
+        GraphTargetItem type = resolvePropertyType(localData, obj, multiname, isStatic, false);
+
+        stack.push(new GetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, type, isStatic.getVal()));
+    }
+
+    public static GraphTargetItem resolvePropertyType(
+            AVM2LocalData localData,
+            GraphTargetItem obj,
+            FullMultinameAVM2Item multiname,
+            Reference<Boolean> isStatic, boolean call) {
         GraphTargetItem type = null;
         String multinameStr = localData.abc.constants.getMultiname(multiname.multinameIndex).getName(localData.abc.constants, new ArrayList<>(), true, true);
         if (obj instanceof FindPropertyAVM2Item) {
@@ -146,19 +157,20 @@ public class GetPropertyIns extends InstructionDefinition {
                         }
                     }
                 }
-                
+
                 if (type == null) {
                     if (localData.abcIndex != null) {
-                        String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.abc.constants, true).toRawString();                
-                        GraphTargetItem thisPropType = currentClassName == null ? TypeItem.UNBOUNDED : localData.abcIndex.findPropertyType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multinameIndex).namespace_index, true, true);
+                        String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.abc.constants, true).toRawString();
+                        GraphTargetItem thisPropType = currentClassName == null ? TypeItem.UNBOUNDED : localData.abcIndex.findPropertyType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true);
                         if (!thisPropType.equals(TypeItem.UNBOUNDED)) {
                             type = thisPropType;
                         }
 
                         if (type == null) {
-                            TypeItem ti = new TypeItem(localData.abc.constants.getMultiname(multinameIndex).getNameWithNamespace(localData.abc.constants, true));
+                            TypeItem ti = new TypeItem(localData.abc.constants.getMultiname(multiname.multinameIndex).getNameWithNamespace(localData.abc.constants, true));
                             if (localData.abcIndex.findClass(ti) != null) {
                                 type = ti;
+                                isStatic.setVal(true);
                             }
                         }
                     }
@@ -168,16 +180,32 @@ public class GetPropertyIns extends InstructionDefinition {
             if (localData.abcIndex != null) {
                 GraphTargetItem receiverType = obj.returnType();
                 if (!receiverType.equals(TypeItem.UNBOUNDED)) {
-                    type = localData.abcIndex.findPropertyType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multinameIndex).namespace_index,true, true);
-                }                                
+
+                    boolean parentStatic = false;
+                    if (obj instanceof GetLexAVM2Item) {
+                        if (((GetLexAVM2Item) obj).isStatic) {
+                            parentStatic = true;
+                        }
+                    }
+                    if (obj instanceof GetPropertyAVM2Item) {
+                        if (((GetPropertyAVM2Item) obj).isStatic) {
+                            parentStatic = true;
+                        }
+                    }
+
+                    if (call) {
+                        type = localData.abcIndex.findPropertyCallType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic);
+                    } else {
+                        type = localData.abcIndex.findPropertyType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic);
+                    }
+                }
             }
         }
-        
+
         if (type == null) {
             type = TypeItem.UNBOUNDED;
         }
-        
-        stack.push(new GetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, type));
+        return type;
     }
 
     @Override

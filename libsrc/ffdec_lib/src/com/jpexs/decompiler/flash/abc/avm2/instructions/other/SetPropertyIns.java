@@ -48,6 +48,7 @@ import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.CompoundableBinaryOp;
 import com.jpexs.decompiler.graph.model.DuplicateItem;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -342,6 +343,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
             }
         }
 
+        /*
         GraphTargetItem propertyType = TypeItem.UNBOUNDED;
         String multinameStr = localData.abc.constants.getMultiname(multiname.multinameIndex).getName(localData.abc.constants, new ArrayList<>(), true, true);
         
@@ -357,8 +359,11 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                 }
             }
         }
+        */
+        Reference<Boolean> isStatic = new Reference<>(false);
+        GraphTargetItem type = GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, false);
         
-        SetPropertyAVM2Item result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value, propertyType);
+        SetPropertyAVM2Item result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value, type, isStatic.getVal());
         handleCompound(localData, obj, multiname, value, output, result);
 
         SetTypeIns.handleResult(value, stack, output, localData, result, -1);

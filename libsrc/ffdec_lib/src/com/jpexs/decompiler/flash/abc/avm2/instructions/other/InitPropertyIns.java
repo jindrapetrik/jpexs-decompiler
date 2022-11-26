@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -51,7 +52,7 @@ public class InitPropertyIns extends InstructionDefinition {
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
         
-        GraphTargetItem propertyType = TypeItem.UNBOUNDED;
+        /*GraphTargetItem propertyType = TypeItem.UNBOUNDED;
         String multinameStr = localData.abc.constants.getMultiname(multiname.multinameIndex).getName(localData.abc.constants, new ArrayList<>(), true, true);
         
         for (Trait t : localData.methodBody.traits.traits) {
@@ -65,8 +66,12 @@ public class InitPropertyIns extends InstructionDefinition {
                     break;
                 }
             }
-        }
-        InitPropertyAVM2Item result = new InitPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, val, propertyType);
+        }*/
+        
+        Reference<Boolean> isStatic = new Reference<>(false);
+        GraphTargetItem type = GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, false);
+        
+        InitPropertyAVM2Item result = new InitPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, val, type, isStatic.getVal());
         SetPropertyIns.handleCompound(localData, obj, multiname, val, output, result);
         output.add(result);
     }

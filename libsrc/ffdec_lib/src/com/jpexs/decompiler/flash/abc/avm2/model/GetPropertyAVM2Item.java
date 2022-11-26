@@ -48,6 +48,8 @@ public class GetPropertyAVM2Item extends AVM2Item {
     public GraphTargetItem propertyName;
     
     public GraphTargetItem type;
+    
+    public boolean isStatic;
 
     @Override
     public void visit(GraphTargetVisitorInterface visitor) {
@@ -129,11 +131,12 @@ public class GetPropertyAVM2Item extends AVM2Item {
         return null;
     }
 
-    public GetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem type) {
+    public GetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem type, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.object = object;
         this.propertyName = propertyName;
         this.type = type;
+        this.isStatic = isStatic;
     }
 
     @Override

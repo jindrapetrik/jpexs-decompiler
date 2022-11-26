@@ -227,7 +227,9 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "s = String(j);\r\n"
                 + "s = this.ns;\r\n"
                 + "s = String(i == 4 ? \"\" : i);\r\n"
-                + "s = i == 4 ? \"\" : String(i);\r\n",
+                + "s = i == 4 ? \"\" : String(i);\r\n"
+                + "s = TestConvert.TEST;\r\n"
+                + "i = this.TEST;\r\n",
                  false);
     }
 
