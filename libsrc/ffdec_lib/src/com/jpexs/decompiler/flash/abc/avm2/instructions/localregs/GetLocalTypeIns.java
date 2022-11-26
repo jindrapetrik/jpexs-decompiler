@@ -41,6 +41,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.ecma.Undefined;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -71,7 +72,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
 
         if (regId == 0) {
             if ((localData.classIndex >= localData.getInstanceInfo().size()) || localData.classIndex < 0) {
-                stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, null, false));
+                stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, DottedChain.OBJECT /*?*/, false));
                 return;
             }
             if (localData.isStatic) {
