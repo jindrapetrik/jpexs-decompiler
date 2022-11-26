@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - [#1769], [#1888] AS3 - Missing casts like int()
 - [#1890] AS3 - Chained assignments in some special cases
 - [#1810] AS3 Direct editation - XML attribute handling
+- [#1810] AS3 Direct editation - Calls inside submethods using this
 
 ## [17.0.2] - 2022-11-22
 ### Fixed
