@@ -189,7 +189,7 @@ public class DependencyParser {
     private static boolean parseUsagesFromNS(String ignoredCustom, ABC abc, List<Dependency> dependencies, List<String> uses, int namespace_index, DottedChain ignorePackage, String name) {
         Namespace ns = abc.constants.getNamespace(namespace_index);
 
-        if (ns.kind == Namespace.KIND_NAMESPACE) {
+        if (ns.kind == Namespace.KIND_NAMESPACE || ns.kind == Namespace.KIND_PACKAGE_INTERNAL) {
             String nsVal = ns.getName(abc.constants).toRawString();
             for (ABCContainerTag abcTag : abc.getAbcTags()) {
                 DottedChain nsimport = abcTag.getABC().nsValueToName(nsVal);
@@ -199,7 +199,7 @@ public class DependencyParser {
                 if (!nsimport.isEmpty()) {
 
                     Dependency depNs = new Dependency(nsimport, DependencyType.NAMESPACE);
-                    if (!nsimport.getWithoutLast().equals(ignorePackage) && !dependencies.contains(depNs)) {
+                    if ((ignorePackage == null || !nsimport.getWithoutLast().equals(ignorePackage)) && !dependencies.contains(depNs)) {
                         dependencies.add(depNs);
                     }
                     if (ignoredCustom != null && nsVal.equals(ignoredCustom)) {
