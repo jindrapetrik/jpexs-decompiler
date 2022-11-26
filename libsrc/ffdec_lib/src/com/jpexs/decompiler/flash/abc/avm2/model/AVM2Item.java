@@ -115,7 +115,14 @@ public abstract class AVM2Item extends GraphTargetItem {
             HighlightData data = new HighlightData();
             int multinameIndex = ((FullMultinameAVM2Item) propertyName).multinameIndex;
             int namespaceIndex = localData.constantsAvm2.getMultiname(multinameIndex).namespace_index;
-            data.propertyType = object.returnType().toString();
+            GraphTargetItem returnType = object.returnType();
+            if (returnType instanceof ApplyTypeAVM2Item) {
+                ApplyTypeAVM2Item ati = (ApplyTypeAVM2Item)returnType;
+                data.propertyType = ati.object.toString();
+                data.propertySubType = ati.params.get(0).toString();
+            } else {
+                data.propertyType = returnType.toString();
+            }
             data.namespaceIndex = namespaceIndex;
             data.isStatic = isStatic;
             

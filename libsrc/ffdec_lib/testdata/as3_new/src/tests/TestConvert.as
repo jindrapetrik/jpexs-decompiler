@@ -36,6 +36,14 @@ package tests
             };           
             
             i = int(s.charAt(10));
+            
+            var v:Vector.<String> = new Vector.<String>();
+            v.push("A");
+            v.push("B");
+            i = int(v[0]);
+            s = v[1];
+            s = v.join("x");
+            i = int(v.join("x"));
 		}
 	}
 }

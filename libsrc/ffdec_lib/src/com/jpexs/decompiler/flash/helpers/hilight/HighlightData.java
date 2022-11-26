@@ -50,6 +50,8 @@ public class HighlightData implements Cloneable, Serializable {
     public boolean isStatic = false;
     
     public String propertyType;
+    
+    public String propertySubType;
 
     public boolean isEmpty() {
         return !declaration && declaredType == null && localName == null
@@ -57,7 +59,8 @@ public class HighlightData implements Cloneable, Serializable {
                 && index == 0 && offset == 0 && regIndex == -1 && firstLineOffset == -1
                 && fileOffset == -1
                 && namespaceIndex == -1
-                && propertyType == null;
+                && propertyType == null
+                && propertySubType == null;
     }
 
     public void merge(HighlightData data) {
@@ -102,6 +105,9 @@ public class HighlightData implements Cloneable, Serializable {
         }
         if (data.propertyType != null) {
             propertyType = data.propertyType;
+        }
+        if (data.propertySubType != null) {
+            propertySubType = data.propertySubType;
         }
     }
 

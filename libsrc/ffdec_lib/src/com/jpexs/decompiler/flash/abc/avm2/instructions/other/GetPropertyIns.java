@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
 import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2ExecutionException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
@@ -166,7 +167,7 @@ public class GetPropertyIns extends InstructionDefinition {
                             if (call) {
                                 thisPropType = localData.abcIndex.findPropertyCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true);
                             } else {
-                                thisPropType = localData.abcIndex.findPropertyType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true);                            
+                                thisPropType = localData.abcIndex.findPropertyType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true);
                             }
                         }
                         if (!thisPropType.equals(TypeItem.UNBOUNDED)) {
@@ -197,13 +198,42 @@ public class GetPropertyIns extends InstructionDefinition {
                     if (obj instanceof GetPropertyAVM2Item) {
                         if (((GetPropertyAVM2Item) obj).isStatic) {
                             parentStatic = true;
-                        }
+                        }                    
                     }
-
-                    if (call) {
-                        type = localData.abcIndex.findPropertyCallType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic);
-                    } else {
-                        type = localData.abcIndex.findPropertyType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic);
+                    if (receiverType instanceof ApplyTypeAVM2Item) {
+                        ApplyTypeAVM2Item ati = (ApplyTypeAVM2Item) receiverType;  
+                        if (localData.abc.constants.getMultiname(multiname.multinameIndex).needsName()) {
+                            if (call) {
+                                type = TypeItem.UNBOUNDED; /*?*/
+                            } else {
+                                type = ati.params.get(0);
+                            }
+                        } else {
+                            receiverType = ati.object;
+                            
+                            if (receiverType.equals(new TypeItem("__AS3__.vec.Vector"))) {
+                                String paramStr = ati.params.get(0).toString();
+                                switch(paramStr) {
+                                    case "double":
+                                    case "int":
+                                    case "uint":
+                                        receiverType = new TypeItem("__AS3__.vec.Vector$" + paramStr);
+                                        break;
+                                    default:
+                                        receiverType = new TypeItem("__AS3__.vec.Vector$object");
+                                }
+                            }
+                            
+                            //TODO: handle method calls to return proper param type results
+                        }
+                    } 
+                    if (type == null)
+                    {
+                        if (call) {
+                            type = localData.abcIndex.findPropertyCallType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic);
+                        } else {
+                            type = localData.abcIndex.findPropertyType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic);
+                        }
                     }
                 }
             }

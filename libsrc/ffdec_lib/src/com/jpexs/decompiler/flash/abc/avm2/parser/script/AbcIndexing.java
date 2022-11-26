@@ -393,7 +393,7 @@ public final class AbcIndexing {
     public TraitIndex findProperty(PropertyDef prop, boolean findStatic, boolean findInstance) {
         /*System.out.println("searching " + prop);
         for (PropertyDef p : instanceProperties.keySet()) {
-            if (p.parent.equals(new TypeItem("String"))) {
+            if (p.parent.equals(new TypeItem("__AS3__.vec.Vector"))) {
                 System.out.println("- " + p);
             }
         }

@@ -239,7 +239,14 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "1:\"B\",\r\n"
                 + "2:\"C\"\r\n"
                 + "};\r\n"
-                + "i = int(s.charAt(10));\r\n",
+                + "i = int(s.charAt(10));\r\n"
+                + "var v:Vector.<String> = new Vector.<String>();\r\n"
+                + "v.push(\"A\");\r\n"
+                + "v.push(\"B\");\r\n"
+                + "i = int(v[0]);\r\n"
+                + "s = v[1];\r\n"
+                + "s = v.join(\"x\");\r\n"
+                + "i = int(v.join(\"x\"));\r\n",
                  false);
     }
 
