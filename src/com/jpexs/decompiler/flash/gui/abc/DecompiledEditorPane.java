@@ -135,7 +135,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     }
 
     public void setNoTrait() {
-        abcPanel.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD, null, 0);
+        abcPanel.detailPanel.showCard(DetailPanel.UNSUPPORTED_TRAIT_CARD, null, 0, null);
     }
 
     public void hilightSpecial(HighlightSpecialType type, long index) {
@@ -224,7 +224,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 trait = null;
             }
         }
-        abcPanel.detailPanel.showCard(DetailPanel.METHOD_GETTER_SETTER_TRAIT_CARD, trait, traitIndex);
+        abcPanel.detailPanel.showCard(DetailPanel.METHOD_GETTER_SETTER_TRAIT_CARD, trait, traitIndex, abc);
         MethodCodePanel methodCodePanel = abcPanel.detailPanel.methodTraitPanel.methodCodePanel;
         if (reset || (methodCodePanel.getBodyIndex() != bi)) {
             methodCodePanel.setBodyIndex(scriptName, bi, abc, name, trait, script.scriptIndex);
@@ -658,7 +658,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                         final Trait ftrait = currentTrait;
                         final int ftraitIndex = lastTraitIndex;
                         View.execInEventDispatch(() -> {
-                            abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD, ftrait, ftraitIndex);
+                            abcPanel.detailPanel.showCard(DetailPanel.SLOT_CONST_TRAIT_CARD, ftrait, ftraitIndex, abc);
                         });
                         abcPanel.detailPanel.setEditMode(false);
                         currentMethodHighlight = null;
