@@ -238,7 +238,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "0:\"A\",\r\n"
                 + "1:\"B\",\r\n"
                 + "2:\"C\"\r\n"
-                + "};\r\n",
+                + "};\r\n"
+                + "i = int(s.charAt(10));\r\n",
                  false);
     }
 
