@@ -616,9 +616,10 @@ Section "FFDec" SecDummy
   File "dist\icon.ico"
   File "dist\license.txt"
   File "dist\translator.bat"
-  File "dist\translator.exe"
+  File "dist\translator.exe"  
   
   SetOutPath "$INSTDIR"  
+  File /r "dist\flashlib"
   File /r "dist\lib"
 
  ;create start-menu items
