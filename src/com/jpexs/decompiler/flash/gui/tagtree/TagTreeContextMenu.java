@@ -568,7 +568,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         unpinAllMenuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainPanel.clearPins();
+                mainPanel.destroyPins();
             }
         });
         add(unpinAllMenuItem);
