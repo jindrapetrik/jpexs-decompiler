@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Translator tool for easier localization
 - AS3 improved goto declaration for properties and methods
+- playerglobal.swc and airglobal.swf now part of FFDec bundle
 
 ### Fixed
 - [#1769] AS3 - Missing some body trait variable declaration

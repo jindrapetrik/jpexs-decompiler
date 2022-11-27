@@ -56,5 +56,4 @@ jobs:
         export CICD_TEMP=${{ runner.temp }}
         chmod a+x ./cicd_scripts/*.sh
         ./cicd_scripts/before_install.sh
-        ./cicd_scripts/install.sh
         ./cicd_scripts/script.sh

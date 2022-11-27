@@ -543,7 +543,7 @@
         
     </target>                         
         
-    <target name="dist" depends="build,exe">
+    <target name="res">
         <copy todir="${dist.dir}">
             <fileset dir="${resources.dir}" includes="**/*.*"/>
         </copy>
@@ -552,6 +552,9 @@
         <fixcrlf srcdir="${dist.dir}" includes="**/*.txt" eol="crlf" preservelastmodified="true" />
         <fixcrlf srcdir="${dist.dir}" includes="**/*.sh" eol="lf" preservelastmodified="true" />
         <fixcrlf srcdir="${dist.dir}" includes="**/*.bat" eol="crlf" preservelastmodified="true" />
+    </target>    
+    <target name="dist" depends="build,exe">
+        
     </target>    
     
     <target name="-nightly-suffix" if="nightly">        
@@ -645,7 +648,7 @@
         
     </target>
     
-    <target name="build" depends="-loadversion,build_lib,-copy-lib,-timestamp,-suffix,compile">        
+    <target name="build" depends="-loadversion,build_lib,-copy-lib,-timestamp,-suffix,compile,res">        
         <mkdir dir="${dist.dir}"/>
         <!-- <delete dir="${dist.lib.dir}"/> -->
         <mkdir dir="${dist.lib.dir}"/>
@@ -885,17 +888,8 @@
                                                                                                                                                                                                                                                                                                     
     <target name="-get-home" depends="-get-home-from-user-windows-appdata,-get-home-from-user-windows-home,-get-home-from-user-osx-home,-get-home-from-user,-get-home-no">        
         
-    </target>
+    </target> 
     
-    <target name="-get-playerglobal-home" depends="-get-home">
-        <property name="playerglobal.homedir" value="${app.homedir}/flashlib"/>
-        <mkdir dir="${playerglobal.homedir}"/>
-        <echo message="PlayerGlobal homedir: ${playerglobal.homedir}" level="info"/>
-    </target>
-    
-    <target name="download-playerglobal" depends="-get-playerglobal-home">
-        <copy file="${adobe.playerglobal.path}" todir="${playerglobal.homedir}" />                
-    </target>
     <target name="fix-src-endoflines">
         <fixcrlf srcdir="${src.dir}" includes="**/*.java" />
         <fixcrlf srcdir="${src.dir}" includes="**/*.properties" />
@@ -907,7 +901,4 @@
         <fixcrlf srcdir="${src.dir}" includes="**/*.sh" eol="lf" />
         <ant antfile="${core.lib.script}" target="fix-src-endoflines" inheritAll="false" usenativebasedir="true" />        
     </target>
-    <target name="deps" depends="download-playerglobal">
-        
-    </target>        
 </project>
