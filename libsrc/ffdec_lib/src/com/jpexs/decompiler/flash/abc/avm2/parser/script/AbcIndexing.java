@@ -34,6 +34,7 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -354,6 +355,18 @@ public final class AbcIndexing {
         return classes.get(cls);
     }
 
+    public void findPropertyTypeOrCallType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance, boolean findProtected, Reference<GraphTargetItem> type, Reference<GraphTargetItem> callType) {
+        TraitIndex traitIndex = findProperty(new PropertyDef(propName, cls, abc, ns), findStatic, findInstance, findProtected);
+        if (traitIndex == null) {
+            type.setVal(TypeItem.UNBOUNDED);
+            callType.setVal(TypeItem.UNBOUNDED);
+        } else {
+            type.setVal(traitIndex.returnType);
+            callType.setVal(traitIndex.callReturnType);
+        }
+    }
+    
+    
     public GraphTargetItem findPropertyType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance, boolean findProtected) {
         TraitIndex traitIndex = findProperty(new PropertyDef(propName, cls, abc, ns), findStatic, findInstance, findProtected);
         if (traitIndex == null) {

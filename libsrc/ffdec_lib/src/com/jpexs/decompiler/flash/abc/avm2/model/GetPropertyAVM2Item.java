@@ -49,6 +49,8 @@ public class GetPropertyAVM2Item extends AVM2Item {
     
     public GraphTargetItem type;
     
+    public GraphTargetItem callType;
+    
     public boolean isStatic;
 
     @Override
@@ -131,11 +133,12 @@ public class GetPropertyAVM2Item extends AVM2Item {
         return null;
     }
 
-    public GetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem type, boolean isStatic) {
+    public GetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem type, GraphTargetItem callType, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.object = object;
         this.propertyName = propertyName;
         this.type = type;
+        this.callType = callType;
         this.isStatic = isStatic;
     }
 

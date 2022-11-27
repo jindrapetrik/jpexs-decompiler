@@ -51,6 +51,8 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
     
     public GraphTargetItem type;
     
+    public GraphTargetItem callType;
+    
     public boolean isStatic;
 
     @Override
@@ -77,12 +79,13 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
         }
     }
 
-    public SetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem value, GraphTargetItem type, boolean isStatic) {
+    public SetPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, GraphTargetItem value, GraphTargetItem type, GraphTargetItem callType, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT);
         this.object = object;
         this.propertyName = propertyName;        
         this.value = value;
         this.type = type;
+        this.callType = callType;
         this.isStatic = isStatic;
     }
 
@@ -106,7 +109,7 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetPropertyAVM2Item(getInstruction(), getLineStartIns(), object, propertyName, type, isStatic);
+        return new GetPropertyAVM2Item(getInstruction(), getLineStartIns(), object, propertyName, type, callType, isStatic);
     }
 
     @Override

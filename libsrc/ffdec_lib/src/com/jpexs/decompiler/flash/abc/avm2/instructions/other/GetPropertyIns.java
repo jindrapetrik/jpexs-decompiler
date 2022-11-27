@@ -31,14 +31,17 @@ import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.ecma.ArrayType;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.ObjectType;
 import com.jpexs.decompiler.flash.ecma.Undefined;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -131,17 +134,20 @@ public class GetPropertyIns extends InstructionDefinition {
             }
         }
         Reference<Boolean> isStatic = new Reference<>(false);
-        GraphTargetItem type = resolvePropertyType(localData, obj, multiname, isStatic, false);
+        Reference<GraphTargetItem> type = new Reference<>(null);
+        Reference<GraphTargetItem> callType = new Reference<>(null);
+        resolvePropertyType(localData, obj, multiname, isStatic, type, callType);
 
-        stack.push(new GetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, type, isStatic.getVal()));
+        stack.push(new GetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, type.getVal(), callType.getVal(), isStatic.getVal()));
     }
 
-    public static GraphTargetItem resolvePropertyType(
+    public static void resolvePropertyType(
             AVM2LocalData localData,
             GraphTargetItem obj,
             FullMultinameAVM2Item multiname,
-            Reference<Boolean> isStatic, boolean call) {
-        GraphTargetItem type = null;
+            Reference<Boolean> isStatic, Reference<GraphTargetItem> type, Reference<GraphTargetItem> callType) {
+        type.setVal(TypeItem.UNBOUNDED);
+        callType.setVal(TypeItem.UNBOUNDED);
         String multinameStr = localData.abc.constants.getMultiname(multiname.multinameIndex).getName(localData.abc.constants, new ArrayList<>(), true, true);
         if (obj instanceof FindPropertyAVM2Item) {
             FindPropertyAVM2Item fprop = (FindPropertyAVM2Item) obj;
@@ -153,32 +159,40 @@ public class GetPropertyIns extends InstructionDefinition {
                                 tsc.getName(localData.abc).getName(localData.abc.constants, new ArrayList<>(), true, true),
                                 multinameStr
                         )) {
-                            type = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
-                            break;
+                            GraphTargetItem ty = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
+                            type.setVal(ty);
+                            callType.setVal(ty);
+                            return;
                         }
                     }
                 }
 
-                if (type == null) {
+                if (type.getVal().equals(TypeItem.UNBOUNDED)) {
                     if (localData.abcIndex != null) {
                         String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.abc.constants, true).toRawString();
                         GraphTargetItem thisPropType = TypeItem.UNBOUNDED;
                         if (currentClassName != null) {
-                            if (call) {
-                                thisPropType = localData.abcIndex.findPropertyCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true, true);
-                            } else {
-                                thisPropType = localData.abcIndex.findPropertyType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true, true);
-                            }
+                            localData.abcIndex.findPropertyTypeOrCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true, true, type, callType);
                         }
-                        if (!thisPropType.equals(TypeItem.UNBOUNDED)) {
-                            type = thisPropType;
-                        }
-
-                        if (type == null) {
+                        if (type.getVal().equals(TypeItem.UNBOUNDED)) {
                             TypeItem ti = new TypeItem(localData.abc.constants.getMultiname(multiname.multinameIndex).getNameWithNamespace(localData.abc.constants, true));
                             if (localData.abcIndex.findClass(ti) != null) {
-                                type = ti;
+                                type.setVal(ti);
+                                callType.setVal(TypeItem.UNBOUNDED);
                                 isStatic.setVal(true);
+                                return;
+                            }
+
+                            Namespace ns = localData.abc.constants.getMultiname(multiname.multinameIndex).getNamespace(localData.abc.constants);
+                            if (ns != null) {
+                                String rawNs = ns.getRawName(localData.abc.constants);
+                                AbcIndexing.TraitIndex traitIndex = localData.abcIndex.findScriptProperty(multinameStr, DottedChain.parseWithSuffix(rawNs));
+                                if (traitIndex != null) {
+                                    type.setVal(traitIndex.returnType);
+                                    callType.setVal(traitIndex.callReturnType);
+                                    isStatic.setVal(true); //?
+                                    return;
+                                }
                             }
                         }
                     }
@@ -198,22 +212,21 @@ public class GetPropertyIns extends InstructionDefinition {
                     if (obj instanceof GetPropertyAVM2Item) {
                         if (((GetPropertyAVM2Item) obj).isStatic) {
                             parentStatic = true;
-                        }                    
+                        }
                     }
                     if (receiverType instanceof ApplyTypeAVM2Item) {
-                        ApplyTypeAVM2Item ati = (ApplyTypeAVM2Item) receiverType;  
+                        ApplyTypeAVM2Item ati = (ApplyTypeAVM2Item) receiverType;
                         if (localData.abc.constants.getMultiname(multiname.multinameIndex).needsName()) {
-                            if (call) {
-                                type = TypeItem.UNBOUNDED; /*?*/
-                            } else {
-                                type = ati.params.get(0);
-                            }
+                            callType.setVal(TypeItem.UNBOUNDED);
+                            /*?*/
+                            type.setVal(ati.params.get(0));
+                            return;
                         } else {
                             receiverType = ati.object;
-                            
+
                             if (receiverType.equals(new TypeItem("__AS3__.vec.Vector"))) {
                                 String paramStr = ati.params.get(0).toString();
-                                switch(paramStr) {
+                                switch (paramStr) {
                                     case "double":
                                     case "int":
                                     case "uint":
@@ -223,26 +236,14 @@ public class GetPropertyIns extends InstructionDefinition {
                                         receiverType = new TypeItem("__AS3__.vec.Vector$object");
                                 }
                             }
-                            
+
                             //TODO: handle method calls to return proper param type results
                         }
-                    } 
-                    if (type == null)
-                    {
-                        if (call) {
-                            type = localData.abcIndex.findPropertyCallType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic, false);
-                        } else {
-                            type = localData.abcIndex.findPropertyType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic, false);
-                        }
                     }
+                    localData.abcIndex.findPropertyTypeOrCallType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic, false, type, callType);
                 }
             }
         }
-
-        if (type == null) {
-            type = TypeItem.UNBOUNDED;
-        }
-        return type;
     }
 
     @Override

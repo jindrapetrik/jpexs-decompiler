@@ -37,14 +37,17 @@ public class GetLexAVM2Item extends AVM2Item implements SimpleValue {
     
     public GraphTargetItem type;
     
-    public boolean isStatic;
+    public GraphTargetItem callType;
+    
+    public boolean isStatic;        
 
     private final DottedChain fullPropertyName;
 
-    public GetLexAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Multiname propertyName, AVM2ConstantPool constants, GraphTargetItem type, boolean isStatic) {
+    public GetLexAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Multiname propertyName, AVM2ConstantPool constants, GraphTargetItem type, GraphTargetItem callType, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.propertyName = propertyName;
         this.type = type;
+        this.callType = callType;
         this.fullPropertyName = propertyName.getNameWithNamespace(constants, true);
         this.isStatic = isStatic;
     }

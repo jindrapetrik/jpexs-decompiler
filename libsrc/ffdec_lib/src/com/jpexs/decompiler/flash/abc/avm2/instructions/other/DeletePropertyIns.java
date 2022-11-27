@@ -57,7 +57,9 @@ public class DeletePropertyIns extends InstructionDefinition {
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
         GraphTargetItem obj = stack.pop();
         Reference<Boolean> isStatic = new Reference<>(false);
-        GraphTargetItem type = GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, true);        
+        Reference<GraphTargetItem> type = new Reference<>(null);
+        Reference<GraphTargetItem> callType = new Reference<>(null);
+        GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, type, callType);      
         stack.add(new DeletePropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, isStatic.getVal()));
     }
 
