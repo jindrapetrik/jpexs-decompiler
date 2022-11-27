@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
+import java.net.URISyntaxException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -1228,7 +1229,31 @@ public final class Configuration {
         return getUrlFromDownloadsHtml(".*<a href=\"([^\"]*flashplayer[^\"]*_sa\\.i386\\.tar\\.gz)\".*");
     }
 
-    public static File getPlayerSWC() {
+    private static File getFFDecFlashLib(String name) {
+        try {
+            File ffdecLibJarFile = new File(Configuration.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            File ffdecDirectory = null;
+            if (ffdecLibJarFile.getAbsolutePath().endsWith(".jar")) {
+                ffdecDirectory = ffdecLibJarFile.getParentFile().getParentFile();                
+            } else if (ffdecLibJarFile.getAbsolutePath().replace("\\", "/").endsWith("libsrc/ffdec_lib/build/classes")) {
+                ffdecDirectory = ffdecLibJarFile.getParentFile().getParentFile().getParentFile().getParentFile();
+                ffdecDirectory = new File(Path.combine(ffdecDirectory.getAbsolutePath(), "resources"));
+            } else {
+                return null;
+            }
+            File flashLibDirectory = new File(Path.combine(ffdecDirectory.getAbsolutePath(), "flashlib"));
+            File flashLib = new File(Path.combine(flashLibDirectory.getAbsolutePath(), name));
+            
+            if (!flashLib.exists()) {
+                return null;
+            }
+            return flashLib;
+        } catch (URISyntaxException ex) {
+            return null;
+        }
+    }
+    
+    public static File getPlayerSWC() {        
         String libLocation = playerLibLocation.get("");
         File ret = null;
         if (!libLocation.isEmpty()) {
@@ -1238,6 +1263,9 @@ public final class Configuration {
             ret = getPlayerSwcOld();
             if (ret != null) {
                 playerLibLocation.set(ret.getAbsolutePath());
+            }
+            if (ret == null) {
+                ret = getFFDecFlashLib("playerglobal32_0.swc");
             }
         }
         return ret;
@@ -1253,6 +1281,9 @@ public final class Configuration {
             ret = getAirSwcOld();
             if (ret != null) {
                 airLibLocation.set(ret.getAbsolutePath());
+            }
+            if (ret == null) {
+                ret = getFFDecFlashLib("airglobal.swc");
             }
         }
         return ret;
