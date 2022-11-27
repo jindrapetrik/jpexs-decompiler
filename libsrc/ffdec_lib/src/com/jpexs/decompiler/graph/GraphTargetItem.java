@@ -44,6 +44,7 @@ import com.jpexs.decompiler.graph.model.TrueItem;
 import com.jpexs.helpers.Reference;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -332,13 +333,26 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public GraphTextWriter appendTry(GraphTextWriter writer, LocalData localData, String implicitCoerce) throws InterruptedException {
         GraphTargetItem t = this;
-        /*if (!implicitCoerce.isEmpty()) {    //if implicit coerce equals explicit
-            if (t instanceof ConvertAVM2Item) {
+        if (!implicitCoerce.isEmpty()) {    //if implicit oerce equals explicit
+            /*if (t instanceof ConvertAVM2Item) {
                 if (implicitCoerce.equals((((ConvertAVM2Item) t).type.toString()))) {
                     t = t.value;
                 }
+            }*/
+            if (localData.abc != null) { //its AS3
+                List<String> numberTypes = Arrays.asList("int", "uint", "Number");
+                String returnTypeStr = t.returnType().toString();
+                
+                //To avoid Error: Implicit coercion of a value of type XXX to an unrelated type YYY
+                if (!t.returnType().equals(TypeItem.UNBOUNDED) &&
+                        !implicitCoerce.equals(returnTypeStr) &&
+                        !(numberTypes.contains(implicitCoerce) && numberTypes.contains(returnTypeStr)) &&
+                        !(implicitCoerce.equals("Boolean"))
+                        ) {
+                    t = new ConvertAVM2Item(null, null, t, new TypeItem(implicitCoerce));
+                }
             }
-        }*/
+        }
         if (!implicitCoerce.isEmpty() && Configuration.simplifyExpressions.get()) {
             t = t.simplify(implicitCoerce);
         }

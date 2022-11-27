@@ -128,7 +128,7 @@ public class FullMultinameAVM2Item extends AVM2Item {
             if (name instanceof IntegerValueAVM2Item) {
                 name.toString(writer, localData);
             } else {
-                name.toStringString(writer, localData);
+                name.toString(writer, localData);
             }
             writer.append("]");
         } else {

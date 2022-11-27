@@ -1027,6 +1027,23 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testImplicitCoerce() {
+        decompileMethod("classic", "testImplicitCoerce", "var j:int = 2;\r\n"
+                + "var i:int = 5;\r\n"
+                + "var r:* = Math.random();\r\n"
+                + "if(Boolean(j & Number(r == 1)) && Boolean(5))\r\n"
+                + "{\r\n"
+                + "trace(\"OK\");\r\n"
+                + "}\r\n"
+                + "var s:String = \"hello: \" + r;\r\n"
+                + "if(Boolean(s))\r\n"
+                + "{\r\n"
+                + "trace(\"F\");\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testImportedVar() {
         decompileMethod("classic", "testImportedVar", "trace(myvar);\r\n"
                 + "myvar = 5;\r\n",
