@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - All SWF classes inside DoABC tags in the taglist view
 - Exception on package selection inside DoABC tag on taglist view
 - [#1892] AS3 - Package internal custom namespaces
+- Unpin all context menu not clearing pins properly
 
 ## [17.0.2] - 2022-11-22
 ### Fixed
