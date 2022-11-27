@@ -46,6 +46,7 @@ package
 		TestForEachObjectArray;
 		TestForEachObjectAttribute;
 		TestForEachReturn;
+		TestForEachReturn2;
 		TestForGoto;
 		TestForIn;
 		TestForInIf;

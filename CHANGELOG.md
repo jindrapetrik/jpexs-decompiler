@@ -20,7 +20,8 @@ All notable changes to this project will be documented in this file.
 - Unpin all context menu not clearing pins properly
 - AS3 - RegExp escaping
 - AS3 - Avoid Error Implicit coercion of a value of type XXX to an unrelated type YYY
-- AS3 - XML - get descendants operator parenthesis 
+- AS3 - XML - get descendants operator parenthesis
+- Switch decompilation in some corner cases
 
 ## [17.0.2] - 2022-11-22
 ### Fixed

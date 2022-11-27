@@ -593,6 +593,28 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testForEachReturn2() {
+        decompileMethod("classic", "testForEachReturn2", "var item:* = undefined;\r\n"
+                + "var obj:* = null;\r\n"
+                + "var x:* = 5;\r\n"
+                + "if(x != null)\r\n"
+                + "{\r\n"
+                + "obj = {};\r\n"
+                + "item = {};\r\n"
+                + "switch(item[\"key\"])\r\n"
+                + "{\r\n"
+                + "case 1:\r\n"
+                + "case 2:\r\n"
+                + "case 3:\r\n"
+                + "case 4:\r\n"
+                + "return item;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "return null;\r\n",
+                 false);
+    }
+
+    @Test
     public void testForGoto() {
         decompileMethod("classic", "testForGoto", "var c:int = 0;\r\n"
                 + "var len:int = 5;\r\n"
