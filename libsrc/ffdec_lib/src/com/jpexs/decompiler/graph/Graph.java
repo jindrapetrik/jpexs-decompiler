@@ -63,6 +63,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -343,7 +344,7 @@ public class Graph {
         return null;
     }
 
-    public GraphPart getMostCommonPart(BaseLocalData localData, List<GraphPart> parts, List<Loop> loops, List<ThrowState> throwStates) throws InterruptedException {
+    public GraphPart getMostCommonPart(BaseLocalData localData, List<GraphPart> parts, List<Loop> loops, List<ThrowState> throwStates, List<GraphPart> stopPart) throws InterruptedException {
         if (parts.isEmpty()) {
             return null;
         }
@@ -373,6 +374,7 @@ public class Graph {
         }
         int maxCommonLevel = -1;
         GraphPart maxCommonPart = null;
+        Set<PartCommon> commonSet = new TreeSet<>();
         for (GraphPart r : allReachable) {
             if (loopContinues.contains(r)) {
                 continue;
@@ -432,15 +434,61 @@ public class Graph {
                     return r;
                 }
             }
-            if (commonLevel > maxCommonLevel) {
+            /*if (commonLevel > maxCommonLevel) {                
                 maxCommonPart = r;
                 maxCommonLevel = commonLevel;
+                commonSet.add(e)
+            }*/
+            commonSet.add(new PartCommon(r, commonLevel));
+        }
+
+        Set<GraphPart> partsLeadingToStopPart = new LinkedHashSet<>();
+        if (stopPart != null) {
+            for (GraphPart p : parts) {
+                for (GraphPart sp : stopPart) {
+                    if (sp == p || p.leadsTo(localData, this, code, sp, loops, throwStates, false)) {
+                        partsLeadingToStopPart.add(p);
+                    }
+                }
             }
         }
-        if (maxCommonLevel <= 1) {
-            return null;
+
+        loopc:
+        for (PartCommon pc : commonSet) {
+            for (GraphPart p : partsLeadingToStopPart) {
+                if (p != pc.part && !p.leadsTo(localData, this, code, pc.part, loops, throwStates, false)) {
+                    continue loopc;
+                }
+            }
+            if (pc.level <= 1) {
+                return null;
+            }
+            return pc.part;
         }
-        return maxCommonPart;
+
+        return null;
+    }
+
+    private class PartCommon implements Comparable<PartCommon> {
+
+        public GraphPart part;
+        public int level;
+
+        public PartCommon(GraphPart part, int level) {
+            this.part = part;
+            this.level = level;
+        }
+
+        @Override
+        public int compareTo(PartCommon o) {
+            return o.level - level;
+        }
+
+        @Override
+        public String toString() {
+            return "" + part.toString() + " (level=" + level;
+        }
+
     }
 
     public GraphPart getNextNoJump(GraphPart part, BaseLocalData localData) {
@@ -1132,8 +1180,7 @@ public class Graph {
                 }
                 continue;
                 
-                */
-                
+                 */
                 if ((!onTrue.isEmpty()) && (!onFalse.isEmpty())) {
                     if ((onFalse.get(onFalse.size() - 1) instanceof ExitItem) || (onFalse.get(onFalse.size() - 1) instanceof BreakItem)) {
                         if (onTrue.get(onTrue.size() - 1) instanceof ContinueItem) {
@@ -1141,8 +1188,7 @@ public class Graph {
                         }
                     }
                 }
-                
-                
+
                 /*
                 if (xx) {
                     A;
@@ -1159,7 +1205,7 @@ public class Graph {
                 }
                 B;
                 
-                */
+                 */
                 if ((!onTrue.isEmpty()) && (!onFalse.isEmpty())) {
                     GraphTargetItem last = onTrue.get(onTrue.size() - 1);
                     if ((last instanceof ExitItem) || (last instanceof ContinueItem) || (last instanceof BreakItem)) {
@@ -1167,8 +1213,6 @@ public class Graph {
                         onFalse.clear();
                     }
                 }
-
-                
 
                 //Prefer continue/return/throw/break in onTrue rather than onFalse
                 if (!onFalse.isEmpty()
@@ -1580,7 +1624,7 @@ public class Graph {
                 getLoopsWalk(localData, next, loops, throwStates, stopPart, false, visited, level);
             }
         } else if (part.nextParts.size() > 2 || partIsSwitch(part)) {
-            GraphPart next = getMostCommonPart(localData, part.nextParts, loops, throwStates);
+            GraphPart next = getMostCommonPart(localData, part.nextParts, loops, throwStates, stopPart);
 
             for (GraphPart p : part.nextParts) {
                 List<GraphPart> stopPart2 = stopPart == null ? new ArrayList<>() : new ArrayList<>(stopPart);
@@ -3137,7 +3181,7 @@ public class Graph {
         }
 
         //gotoTargets
-        GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops, throwStates);
+        GraphPart breakPart = getMostCommonPart(localData, caseBodyParts, loops, throwStates, stopPart);
         //removeEdgeToFromList(gotoTargets, breakPart);
 
         List<List<GraphTargetItem>> caseCommands = new ArrayList<>();
@@ -3235,7 +3279,7 @@ public class Graph {
                     caseValuesMap.remove(caseValuesMap.size() - 1);
                     valuesMapping.remove(valuesMapping.size() - 1);
                     if (cnt2 == 1) {
-                        caseCommands.remove(lastc);
+                        caseCommands.remove(caseCommands.size() - 1);
                     }
                 }
             }

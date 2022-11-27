@@ -1015,7 +1015,7 @@ public class AVM2Graph extends Graph {
                     System.err.println("- " + p);
                 }*/
 
-                afterPart = getMostCommonPart(localData, partsToCalCommon, loops, throwStates);
+                afterPart = getMostCommonPart(localData, partsToCalCommon, loops, throwStates, new ArrayList<>() /*?*/);
                 //System.err.println("result: " + afterPart);
             }
 

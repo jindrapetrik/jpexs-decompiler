@@ -597,6 +597,28 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testForEachReturn2() {
+        decompileMethod("classic_air", "testForEachReturn2", "var item:* = undefined;\r\n"
+                + "var obj:* = null;\r\n"
+                + "var x:int = 5;\r\n"
+                + "if(x != null)\r\n"
+                + "{\r\n"
+                + "obj = {};\r\n"
+                + "item = {};\r\n"
+                + "switch(item[\"key\"])\r\n"
+                + "{\r\n"
+                + "case 1:\r\n"
+                + "case 2:\r\n"
+                + "case 3:\r\n"
+                + "case 4:\r\n"
+                + "return item;\r\n"
+                + "}\r\n"
+                + "}\r\n"
+                + "return null;\r\n",
+                 false);
+    }
+
+    @Test
     public void testForGoto() {
         decompileMethod("classic_air", "testForGoto", "var i:* = 0;\r\n"
                 + "var c:int = 0;\r\n"
@@ -1472,13 +1494,13 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "switch(int(code) - 2)\r\n"
                 + "{\r\n"
                 + "case 0:\r\n"
+                + "case 1:\r\n"
                 + "if(a)\r\n"
                 + "{\r\n"
                 + "trace(\"A\");\r\n"
                 + "break;\r\n"
                 + "}\r\n"
                 + "break;\r\n"
-                + "case 1:\r\n"
                 + "}\r\n"
                 + "trace(\"B\");\r\n",
                  false);
