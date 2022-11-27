@@ -72,9 +72,9 @@ public class GetLexIns extends InstructionDefinition {
                 GraphTargetItem thisPropType = TypeItem.UNBOUNDED;
                 if (currentClassName != null) {
                     if (call) {
-                        thisPropType = localData.abcIndex.findPropertyCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multinameIndex).namespace_index, true, true);
+                        thisPropType = localData.abcIndex.findPropertyCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multinameIndex).namespace_index, true, true, true);
                     } else {
-                        thisPropType = localData.abcIndex.findPropertyType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multinameIndex).namespace_index, true, true);
+                        thisPropType = localData.abcIndex.findPropertyType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multinameIndex).namespace_index, true, true, true);
                     }
                 }
                 if (!thisPropType.equals(TypeItem.UNBOUNDED)) {

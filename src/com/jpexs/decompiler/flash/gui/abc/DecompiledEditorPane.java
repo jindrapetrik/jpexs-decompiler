@@ -357,7 +357,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         if (parentType.equals("*")) {
             return false;
         }
-        AbcIndexing.TraitIndex propertyTraitIndex = indexing.findProperty(new AbcIndexing.PropertyDef(propName, new TypeItem(parentType), getABC(), data.namespaceIndex), data.isStatic, !data.isStatic);
+        AbcIndexing.TraitIndex propertyTraitIndex = indexing.findProperty(new AbcIndexing.PropertyDef(propName, new TypeItem(parentType), getABC(), data.namespaceIndex), data.isStatic, !data.isStatic, true);
         if (propertyTraitIndex == null) {
             return false;
         }

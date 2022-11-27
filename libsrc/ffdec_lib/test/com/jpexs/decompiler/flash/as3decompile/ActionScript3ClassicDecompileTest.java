@@ -221,9 +221,11 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testConvert() {
-        decompileMethod("classic", "testConvert", "var a:* = undefined;\r\n"
-                + "var s:String = \"a\";\r\n"
-                + "var i:int = int(s);\r\n"
+        decompileMethod("classic", "testConvert", "var s:String = null;\r\n"
+                + "var i:int = 0;\r\n"
+                + "var a:* = undefined;\r\n"
+                + "s = \"a\";\r\n"
+                + "i = int(s);\r\n"
                 + "var j:int = this.n;\r\n"
                 + "s = String(j);\r\n"
                 + "s = this.ns;\r\n"
@@ -246,7 +248,9 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "i = int(v[0]);\r\n"
                 + "s = v[1];\r\n"
                 + "s = v.join(\"x\");\r\n"
-                + "i = int(v.join(\"x\"));\r\n",
+                + "i = int(v.join(\"x\"));\r\n"
+                + "i = int(prot);\r\n"
+                + "s = prot;\r\n",
                  false);
     }
 

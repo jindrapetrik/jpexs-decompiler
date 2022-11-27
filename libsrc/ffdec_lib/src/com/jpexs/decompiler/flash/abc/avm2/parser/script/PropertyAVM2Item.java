@@ -219,7 +219,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             // however this namespace is in the ABC of the super class and not in abcIndex.getSelectedAbc()
                             AbcIndexing.ClassIndex ci = abcIndex.findClass(objType);
                             int superProtectedNs = ci.abc.instance_info.get(ci.index).protectedNS;
-                            AbcIndexing.TraitIndex sp = abcIndex.findProperty(new AbcIndexing.PropertyDef(propertyName, objType, ci.abc, superProtectedNs), false, true);
+                            AbcIndexing.TraitIndex sp = abcIndex.findProperty(new AbcIndexing.PropertyDef(propertyName, objType, ci.abc, superProtectedNs), false, true, true);
                             if (sp != null) {
                                 objType = sp.objType;
                                 Namespace ns = sp.trait.getName(sp.abc).getNamespace(sp.abc.constants);
