@@ -73,6 +73,7 @@ public class RegExpAvm2Item extends AVM2Item implements Callable {
                     //not escaped / char, returning null
                     return null;
                 }
+                ret.append("/");
             } else if (c == '\\') {
                 ret.append("\\");
                 escape = true;
