@@ -222,9 +222,11 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testConvert() {
-        decompileMethod("classic_air", "testConvert", "var a:* = undefined;\r\n"
-                + "var s:String = \"a\";\r\n"
-                + "var i:int = int(s);\r\n"
+        decompileMethod("classic_air", "testConvert", "var s:* = null;\r\n"
+                + "var i:int = 0;\r\n"
+                + "var a:* = undefined;\r\n"
+                + "s = \"a\";\r\n"
+                + "i = int(s);\r\n"
                 + "var j:int;\r\n"
                 + "s = String(j = n);\r\n"
                 + "s = ns;\r\n"
@@ -247,7 +249,9 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "i = int(v[0]);\r\n"
                 + "s = v[1];\r\n"
                 + "s = v.join(\"x\");\r\n"
-                + "i = int(v.join(\"x\"));\r\n",
+                + "i = int(v.join(\"x\"));\r\n"
+                + "i = int(prot);\r\n"
+                + "s = prot;\r\n",
                  false);
     }
 

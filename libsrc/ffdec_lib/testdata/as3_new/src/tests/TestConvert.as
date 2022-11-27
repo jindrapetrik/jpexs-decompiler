@@ -1,7 +1,8 @@
 package tests
 {
+    import tests_classes.TestConvertParent;
 	
-	public class TestConvert
+	public class TestConvert extends TestConvertParent
 	{
         private var n:int = 1;
         private var ns:String = "b";
@@ -12,8 +13,10 @@ package tests
         
 		public function run():void
 		{
-            var s:String = "a";
-            var i:int = int(s);
+            var s:String;
+            var i:int;            
+            s = "a";
+            i = int(s);
             var j:int = n;
             var a:*;
             s = String(j);
@@ -44,6 +47,9 @@ package tests
             s = v[1];
             s = v.join("x");
             i = int(v.join("x"));
+            
+            i = int(prot);
+            s = prot;
 		}
 	}
 }

@@ -165,9 +165,9 @@ public class GetPropertyIns extends InstructionDefinition {
                         GraphTargetItem thisPropType = TypeItem.UNBOUNDED;
                         if (currentClassName != null) {
                             if (call) {
-                                thisPropType = localData.abcIndex.findPropertyCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true);
+                                thisPropType = localData.abcIndex.findPropertyCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true, true);
                             } else {
-                                thisPropType = localData.abcIndex.findPropertyType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true);
+                                thisPropType = localData.abcIndex.findPropertyType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true, true);
                             }
                         }
                         if (!thisPropType.equals(TypeItem.UNBOUNDED)) {
@@ -230,9 +230,9 @@ public class GetPropertyIns extends InstructionDefinition {
                     if (type == null)
                     {
                         if (call) {
-                            type = localData.abcIndex.findPropertyCallType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic);
+                            type = localData.abcIndex.findPropertyCallType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic, false);
                         } else {
-                            type = localData.abcIndex.findPropertyType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic);
+                            type = localData.abcIndex.findPropertyType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic, false);
                         }
                     }
                 }
