@@ -65,7 +65,14 @@ public class GetDescendantsAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        object.toString(writer, localData);
+        if (object.getPrecedence() > precedence) {
+            writer.append("(");
+            object.toString(writer, localData);
+            writer.append(")");
+        } else {
+            object.toString(writer, localData);
+        }
+        
         writer.append("..");
         return multiname.toString(writer, localData);
     }
