@@ -24,10 +24,13 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
+import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -46,12 +49,13 @@ public class GetLexIns extends InstructionDefinition {
         super(0x60, "getlex", new int[]{AVM2Code.DAT_MULTINAME_INDEX}, true);
     }
 
-    public static GraphTargetItem resolveLexType(
+    public static void resolveLexType(
             AVM2LocalData localData,
             GraphTargetItem obj,
             int multinameIndex,
-            Reference<Boolean> isStatic, boolean call) {
-        GraphTargetItem type = null;
+            Reference<Boolean> isStatic, Reference<GraphTargetItem> type, Reference<GraphTargetItem> callType) {
+        type.setVal(TypeItem.UNBOUNDED);
+        callType.setVal(TypeItem.UNBOUNDED);
         String multinameStr = localData.abc.constants.getMultiname(multinameIndex).getName(localData.abc.constants, new ArrayList<>(), true, true);
         for (Trait t : localData.methodBody.traits.traits) {
             if (t instanceof TraitSlotConst) {
@@ -60,41 +64,41 @@ public class GetLexIns extends InstructionDefinition {
                         tsc.getName(localData.abc).getName(localData.abc.constants, new ArrayList<>(), true, true),
                         multinameStr
                 )) {
-                    type = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
-                    break;
+                    GraphTargetItem ty = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
+                    type.setVal(ty);
+                    callType.setVal(ty);
+                    return;
                 }
             }
         }
 
-        if (type == null) {
-            if (localData.abcIndex != null) {
-                String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.abc.constants, true).toRawString();
-                GraphTargetItem thisPropType = TypeItem.UNBOUNDED;
-                if (currentClassName != null) {
-                    if (call) {
-                        thisPropType = localData.abcIndex.findPropertyCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multinameIndex).namespace_index, true, true, true);
-                    } else {
-                        thisPropType = localData.abcIndex.findPropertyType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multinameIndex).namespace_index, true, true, true);
-                    }
-                }
-                if (!thisPropType.equals(TypeItem.UNBOUNDED)) {
-                    type = thisPropType;
-                }
+        if (localData.abcIndex != null) {
+            String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.abc.constants, true).toRawString();
+            if (currentClassName != null) {
+                localData.abcIndex.findPropertyTypeOrCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multinameIndex).namespace_index, true, true, true, type, callType);
+            }
 
-                if (type == null) {
-                    TypeItem ti = new TypeItem(localData.abc.constants.getMultiname(multinameIndex).getNameWithNamespace(localData.abc.constants, true));
-                    if (localData.abcIndex.findClass(ti) != null) {
-                        type = ti;
+            if (type.getVal().equals(TypeItem.UNBOUNDED)) {
+                TypeItem ti = new TypeItem(localData.abc.constants.getMultiname(multinameIndex).getNameWithNamespace(localData.abc.constants, true));
+                if (localData.abcIndex.findClass(ti) != null) {
+                    type.setVal(ti);
+                    callType.setVal(TypeItem.UNBOUNDED);
+                    isStatic.setVal(true);
+                    return;
+                }
+                Namespace ns = localData.abc.constants.getMultiname(multinameIndex).getNamespace(localData.abc.constants);
+                if (ns != null) {
+                    String rawNs = ns.getRawName(localData.abc.constants);
+                    AbcIndexing.TraitIndex traitIndex = localData.abcIndex.findScriptProperty(multinameStr, DottedChain.parseWithSuffix(rawNs));
+                    if (traitIndex != null) {
+                        type.setVal(traitIndex.returnType);
+                        callType.setVal(traitIndex.callReturnType);
                         isStatic.setVal(true);
+                        return;
                     }
                 }
             }
         }
-
-        if (type == null) {
-            type = TypeItem.UNBOUNDED;
-        }
-        return type;
     }
 
     @Override
@@ -102,8 +106,10 @@ public class GetLexIns extends InstructionDefinition {
         int multinameIndex = ins.operands[0];
         Multiname multiname = localData.getConstants().getMultiname(multinameIndex);
         Reference<Boolean> isStatic = new Reference<>(false);
-        GraphTargetItem type = GetLexIns.resolveLexType(localData, null, multinameIndex, isStatic, false);
-        stack.push(new GetLexAVM2Item(ins, localData.lineStartInstruction, multiname, localData.getConstants(), type, isStatic.getVal()));
+        Reference<GraphTargetItem> type = new Reference<>(null);
+        Reference<GraphTargetItem> callType = new Reference<>(null);
+        GetLexIns.resolveLexType(localData, null, multinameIndex, isStatic, type, callType);
+        stack.push(new GetLexAVM2Item(ins, localData.lineStartInstruction, multiname, localData.getConstants(), type.getVal(), callType.getVal(), isStatic.getVal()));
     }
 
     @Override

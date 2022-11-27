@@ -81,12 +81,14 @@ public class CallPropLexIns extends CallPropertyIns {
         }
 
         FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
-        GraphTargetItem receiver = stack.pop();
+        GraphTargetItem obj = stack.pop();
 
         Reference<Boolean> isStatic = new Reference<>(false);
-        GraphTargetItem type = GetPropertyIns.resolvePropertyType(localData, receiver, multiname, isStatic, true);
+        Reference<GraphTargetItem> type = new Reference<>(null);
+        Reference<GraphTargetItem> callType = new Reference<>(null);
+        GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, type, callType);
         
-        stack.push(new CallPropertyAVM2Item(ins, localData.lineStartInstruction, false, receiver, multiname, args, type, isStatic.getVal()));
+        stack.push(new CallPropertyAVM2Item(ins, localData.lineStartInstruction, false, obj, multiname, args, callType.getVal(), isStatic.getVal()));
     }
 
     @Override

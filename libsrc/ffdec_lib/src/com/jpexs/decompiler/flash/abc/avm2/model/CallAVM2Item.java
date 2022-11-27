@@ -226,6 +226,12 @@ public class CallAVM2Item extends AVM2Item {
 
     @Override
     public GraphTargetItem returnType() {
+        if (function instanceof GetPropertyAVM2Item) {
+            return ((GetPropertyAVM2Item)function).callType;
+        }
+        if (function instanceof GetLexAVM2Item) {
+            return ((GetLexAVM2Item)function).callType;
+        }
         return TypeItem.UNBOUNDED;
     }
 

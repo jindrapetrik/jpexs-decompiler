@@ -361,9 +361,11 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         }
         */
         Reference<Boolean> isStatic = new Reference<>(false);
-        GraphTargetItem type = GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, false);
+        Reference<GraphTargetItem> type = new Reference<>(null);
+        Reference<GraphTargetItem> callType = new Reference<>(null);
+        GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, type, callType);
         
-        SetPropertyAVM2Item result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value, type, isStatic.getVal());
+        SetPropertyAVM2Item result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value, type.getVal(), callType.getVal(), isStatic.getVal());
         handleCompound(localData, obj, multiname, value, output, result);
 
         SetTypeIns.handleResult(value, stack, output, localData, result, -1);

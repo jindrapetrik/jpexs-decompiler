@@ -69,9 +69,11 @@ public class InitPropertyIns extends InstructionDefinition {
         }*/
         
         Reference<Boolean> isStatic = new Reference<>(false);
-        GraphTargetItem type = GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, false);
+        Reference<GraphTargetItem> type = new Reference<>(null);
+        Reference<GraphTargetItem> callType = new Reference<>(null);
+        GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, type, callType);
         
-        InitPropertyAVM2Item result = new InitPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, val, type, isStatic.getVal());
+        InitPropertyAVM2Item result = new InitPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, val, type.getVal(), callType.getVal(), isStatic.getVal());
         SetPropertyIns.handleCompound(localData, obj, multiname, val, output, result);
         output.add(result);
     }

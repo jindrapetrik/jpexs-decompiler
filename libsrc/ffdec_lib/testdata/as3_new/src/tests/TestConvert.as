@@ -1,6 +1,7 @@
 package tests
 {
     import tests_classes.TestConvertParent;
+    import flash.utils.getTimer;
 	
 	public class TestConvert extends TestConvertParent
 	{
@@ -50,6 +51,8 @@ package tests
             
             i = int(prot);
             s = prot;
+            
+            s = String(getTimer());
 		}
 	}
 }

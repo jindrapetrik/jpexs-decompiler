@@ -44,6 +44,8 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
     
     public GraphTargetItem type;
     
+    public GraphTargetItem callType;
+    
     public boolean isStatic;
 
     @Override
@@ -63,11 +65,12 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
         this.declaration = declaration;
     }
 
-    public InitPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, FullMultinameAVM2Item propertyName, GraphTargetItem value, GraphTargetItem type, boolean isStatic) {
+    public InitPropertyAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, FullMultinameAVM2Item propertyName, GraphTargetItem value, GraphTargetItem type, GraphTargetItem callType, boolean isStatic) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.object = object;
         this.propertyName = propertyName;
         this.type = type;
+        this.callType = callType;
         this.isStatic = isStatic;
     }
 
@@ -87,7 +90,7 @@ public class InitPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, A
 
     @Override
     public GraphTargetItem getObject() {
-        return new GetPropertyAVM2Item(getInstruction(), getLineStartIns(), object, propertyName, type, isStatic);
+        return new GetPropertyAVM2Item(getInstruction(), getLineStartIns(), object, propertyName, type, callType, isStatic);
     }
 
     @Override

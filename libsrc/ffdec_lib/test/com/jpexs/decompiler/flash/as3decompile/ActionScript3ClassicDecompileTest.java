@@ -250,7 +250,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "s = v.join(\"x\");\r\n"
                 + "i = int(v.join(\"x\"));\r\n"
                 + "i = int(prot);\r\n"
-                + "s = prot;\r\n",
+                + "s = prot;\r\n"
+                + "s = String(getTimer());\r\n",
                  false);
     }
 
