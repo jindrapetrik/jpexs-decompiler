@@ -66,6 +66,7 @@ package
 		TestIfInIf;
 		TestIfTry;
 		TestIgnoreAndOr;
+        TestImplicitCoerce;
 		TestImportedVar;
 		TestInc2;
 		TestIncDec;

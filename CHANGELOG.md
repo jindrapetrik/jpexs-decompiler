@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - [#1892] AS3 - Package internal custom namespaces
 - Unpin all context menu not clearing pins properly
 - AS3 - RegExp escaping
+- Avoid Error Implicit coercion of a value of type XXX to an unrelated type YYY
 
 ## [17.0.2] - 2022-11-22
 ### Fixed

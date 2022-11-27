@@ -54,7 +54,7 @@ public class NameValuePair extends AVM2Item {
         if ((name instanceof ConvertAVM2Item) && ((ConvertAVM2Item)name).type.equals(TypeItem.STRING)) {
             name = name.value;
         }
-        name.toStringString(writer, localData);
+        name.toString(writer, localData);
         if (needsParents) {
             writer.append(")");
         }        

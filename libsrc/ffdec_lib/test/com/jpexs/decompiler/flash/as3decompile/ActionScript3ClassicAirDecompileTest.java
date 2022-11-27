@@ -1032,6 +1032,23 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testImplicitCoerce() {
+        decompileMethod("classic_air", "testImplicitCoerce", "var j:int = 2;\r\n"
+                + "var i:int = 5;\r\n"
+                + "var r:* = Math.random();\r\n"
+                + "if(j & Number(r == 1) && 5)\r\n"
+                + "{\r\n"
+                + "trace(\"OK\");\r\n"
+                + "}\r\n"
+                + "var s:String = \"hello: \" + r;\r\n"
+                + "if(s)\r\n"
+                + "{\r\n"
+                + "trace(\"F\");\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testImportedVar() {
         decompileMethod("classic_air", "testImportedVar", "trace(myvar);\r\n"
                 + "myvar = 5;\r\n",
