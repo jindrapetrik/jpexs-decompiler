@@ -90,8 +90,10 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         writer.startBlock();
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            //writeUses(scriptIndex, classIndex, isStatic, abc, writer);                    
-            abc.bodies.get(bodyIndex).toString(abcIndex,path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
+            //writeUses(scriptIndex, classIndex, isStatic, abc, writer);               
+            List<MethodBody> callStack = new ArrayList<>();
+            callStack.add(abc.bodies.get(bodyIndex));
+            abc.bodies.get(bodyIndex).toString(callStack, abcIndex,path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
         }
         writer.endBlock();
 
@@ -108,7 +110,9 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         convertHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (bodyIndex != -1) {
-            abc.bodies.get(bodyIndex).convert(abcIndex, convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true, new HashSet<>());
+            List<MethodBody> callStack = new ArrayList<>();
+            callStack.add(abc.bodies.get(bodyIndex));
+            abc.bodies.get(bodyIndex).convert(callStack, abcIndex, convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true, new HashSet<>());
         }
         writer.endMethod();
     }

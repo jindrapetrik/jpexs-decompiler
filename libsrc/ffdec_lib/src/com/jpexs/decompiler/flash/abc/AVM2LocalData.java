@@ -52,6 +52,8 @@ public class AVM2LocalData extends BaseLocalData {
     public ScopeStack scopeStack;
 
     public MethodBody methodBody;
+    
+    public List<MethodBody> callStack;
 
     public ABC abc;
     
@@ -145,6 +147,7 @@ public class AVM2LocalData extends BaseLocalData {
         localRegs = localData.localRegs;
         scopeStack = localData.scopeStack;
         methodBody = localData.methodBody;
+        callStack = localData.callStack;
         abc = localData.abc;
         abcIndex = localData.abcIndex;
         localRegNames = localData.localRegNames;

@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.NewFunctionAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.AssignedValue;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
@@ -135,7 +136,9 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
                 writer.newLine();
             }
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
-                assignment.value.toString(writer, LocalData.create(abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>()));
+                List<MethodBody> callStack = new ArrayList<>();
+                callStack.add(abc.bodies.get(abc.findBodyIndex(assignment.method)));
+                assignment.value.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>()));
             }
             writer.endMethod();
             writer.endTrait();
@@ -175,7 +178,10 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (convertData.assignedValues.containsKey(this)) {
             GraphTargetItem val = convertData.assignedValues.get(this).value;
             if (val instanceof NewFunctionAVM2Item) {
-                return val.toString(writer, LocalData.create(abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>()));
+                List<MethodBody> callStack = new ArrayList<>();
+                AssignedValue assignment = convertData.assignedValues.get(this);
+                callStack.add(abc.bodies.get(abc.findBodyIndex(assignment.method)));
+                return val.toString(writer, LocalData.create(callStack, abcIndex, abc, new HashMap<>(), fullyQualifiedNames, new HashSet<>()));
             }
         }
         getNameStr(writer, abc, fullyQualifiedNames);

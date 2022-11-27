@@ -2626,7 +2626,9 @@ public class XFLConverter {
             int constructorMethodIndex = instanceInfo.iinit_index;
             MethodBody constructorBody = abc.findBody(constructorMethodIndex);
             try {
-                constructorBody.convert(abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
+                List<MethodBody> callStack = new ArrayList<>();
+                callStack.add(constructorBody);
+                constructorBody.convert(callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, constructorMethodIndex, pack.scriptIndex, classIndex, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
 
                 Map<Integer, Multiname> frameToTraitMultiname = new HashMap<>();
 
@@ -2692,9 +2694,11 @@ public class XFLConverter {
                         MethodBody frameBody = abc.findBody(methodIndex);
 
                         StringBuilder scriptBuilder = new StringBuilder();
-                        frameBody.convert(abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
+                        callStack = new ArrayList<>();
+                        callStack.add(frameBody);
+                        frameBody.convert(callStack, abcIndex, new ConvertData(), "??", ScriptExportMode.AS, false, methodIndex, pack.scriptIndex, classIndex, abc, methodTrait, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
                         StringBuilderTextWriter writer = new StringBuilderTextWriter(Configuration.getCodeFormatting(), scriptBuilder);
-                        frameBody.toString(abcIndex, "??", ScriptExportMode.AS, abc, methodTrait, writer, new ArrayList<>(), new HashSet<>());
+                        frameBody.toString(callStack, abcIndex, "??", ScriptExportMode.AS, abc, methodTrait, writer, new ArrayList<>(), new HashSet<>());
 
                         String script = scriptBuilder.toString();
                         ret.put(frame, script);

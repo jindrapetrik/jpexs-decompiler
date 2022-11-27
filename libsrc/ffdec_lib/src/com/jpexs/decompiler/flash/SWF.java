@@ -4045,7 +4045,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
                                 int mi = ((TraitMethodGetterSetter) t).method_info;
                                 try {
-                                    documentPack.abc.findBody(mi).convert(getAbcIndex(), new ConvertData(), "??", ScriptExportMode.AS, true, mi, documentPack.scriptIndex, cindex, documentPack.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
+                                    List<MethodBody> callStack = new ArrayList<>();
+                                    callStack.add(documentPack.abc.findBody(mi)); 
+                                    documentPack.abc.findBody(mi).convert(callStack, getAbcIndex(), new ConvertData(), "??", ScriptExportMode.AS, true, mi, documentPack.scriptIndex, cindex, documentPack.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
                                     List<GraphTargetItem> infos = documentPack.abc.findBody(mi).convertedItems;
                                     if (!infos.isEmpty()) {
                                         if (infos.get(0) instanceof IfItem) {
@@ -4121,7 +4123,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                                                         if (tr instanceof TraitClass) {
                                                                             int ci = ((TraitClass) tr).class_info;
                                                                             int cinit = p.abc.class_info.get(ci).cinit_index;
-                                                                            p.abc.findBody(cinit).convert(getAbcIndex(), new ConvertData(), "??", ScriptExportMode.AS, true, cinit, p.scriptIndex, cindex, p.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
+                                                                            callStack = new ArrayList<>();
+                                                                            callStack.add(p.abc.findBody(cinit)); 
+                                                                            p.abc.findBody(cinit).convert(callStack, getAbcIndex(), new ConvertData(), "??", ScriptExportMode.AS, true, cinit, p.scriptIndex, cindex, p.abc, t, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), new ArrayList<>(), true, new HashSet<>());
                                                                             List<GraphTargetItem> cinitBody = p.abc.findBody(cinit).convertedItems;
                                                                             for (GraphTargetItem cit : cinitBody) {
                                                                                 if (cit instanceof SetPropertyAVM2Item) {

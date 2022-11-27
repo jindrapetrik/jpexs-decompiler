@@ -199,6 +199,9 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
         localData.localRegs = new HashMap<>(body.max_regs);
         localData.localRegAssignmentIps = new HashMap<>();
         localData.scopeStack = new ScopeStack(true);
+        List<MethodBody> callStack = new ArrayList<>();
+        callStack.add(body);
+        localData.callStack = callStack;
         localData.methodBody = body;
         localData.abc = abc;
         localData.localRegNames = new HashMap<>();

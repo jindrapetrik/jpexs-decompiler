@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -57,17 +58,20 @@ public class GetLexIns extends InstructionDefinition {
         type.setVal(TypeItem.UNBOUNDED);
         callType.setVal(TypeItem.UNBOUNDED);
         String multinameStr = localData.abc.constants.getMultiname(multinameIndex).getName(localData.abc.constants, new ArrayList<>(), true, true);
-        for (Trait t : localData.methodBody.traits.traits) {
-            if (t instanceof TraitSlotConst) {
-                TraitSlotConst tsc = (TraitSlotConst) t;
-                if (Objects.equals(
-                        tsc.getName(localData.abc).getName(localData.abc.constants, new ArrayList<>(), true, true),
-                        multinameStr
-                )) {
-                    GraphTargetItem ty = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
-                    type.setVal(ty);
-                    callType.setVal(ty);
-                    return;
+        for (int b = localData.callStack.size() - 1; b >= 0; b--) {
+            MethodBody body = localData.callStack.get(b);
+            for (Trait t : body.traits.traits) {
+                if (t instanceof TraitSlotConst) {
+                    TraitSlotConst tsc = (TraitSlotConst) t;
+                    if (Objects.equals(
+                            tsc.getName(localData.abc).getName(localData.abc.constants, new ArrayList<>(), true, true),
+                            multinameStr
+                    )) {
+                        GraphTargetItem ty = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
+                        type.setVal(ty);
+                        callType.setVal(ty);
+                        return;
+                    }
                 }
             }
         }

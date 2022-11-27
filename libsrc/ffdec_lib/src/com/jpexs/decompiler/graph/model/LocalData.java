@@ -19,6 +19,7 @@ package com.jpexs.decompiler.graph.model;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.graph.DottedChain;
 import java.util.HashMap;
@@ -39,6 +40,8 @@ public class LocalData {
     public AVM2ConstantPool constantsAvm2;
     
     public AbcIndexing abcIndex;
+    
+    public List<MethodBody> callStack;
 
     public HashMap<Integer, String> localRegNames;
 
@@ -54,7 +57,7 @@ public class LocalData {
         return localData;
     }
 
-    public static LocalData create(AbcIndexing abcIndex, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) {
+    public static LocalData create(List<MethodBody> callStack, AbcIndexing abcIndex, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) {
         LocalData localData = new LocalData();
         localData.abc = abc;
         localData.constantsAvm2 = abc.constants;
@@ -62,6 +65,7 @@ public class LocalData {
         localData.fullyQualifiedNames = fullyQualifiedNames;
         localData.seenMethods = seenMethods;
         localData.abcIndex = abcIndex;
+        localData.callStack = callStack;
         return localData;
     }
 }
