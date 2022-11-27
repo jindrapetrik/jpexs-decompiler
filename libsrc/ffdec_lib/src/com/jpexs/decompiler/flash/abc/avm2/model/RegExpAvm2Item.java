@@ -65,9 +65,19 @@ public class RegExpAvm2Item extends AVM2Item implements Callable {
 
     public static String escapeRegExpString(String s) {
         StringBuilder ret = new StringBuilder(s.length());
+        boolean escape = false;
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if (c == '\n') {
+            if (c == '/') {
+                if (!escape) {
+                    //not escaped / char, returning null
+                    return null;
+                }
+            } else if (c == '\\') {
+                ret.append("\\");
+                escape = true;
+                continue;
+            } else if (c == '\n') {
                 ret.append("\\n");
             } else if (c == '\r') {
                 ret.append("\\r");
@@ -82,6 +92,7 @@ public class RegExpAvm2Item extends AVM2Item implements Callable {
             } else {
                 ret.append(c);
             }
+            escape = false;
         }
 
         return ret.toString();
@@ -90,19 +101,23 @@ public class RegExpAvm2Item extends AVM2Item implements Callable {
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         if (Configuration.useRegExprLiteral.get()) {
-            writer.append("/");
-            writer.append(escapeRegExpString(pattern));
-            writer.append("/");
-            writer.append(modifier);
-        } else {
-            writer.append("new RegExp(");
-            writer.append("\"" + Helper.escapeActionScriptString(pattern) + "\"");
-            if (!(modifier == null || modifier.isEmpty())) {
-                writer.append(",");
-                writer.append("\"" + modifier + "\"");
+            String escaped = escapeRegExpString(pattern);
+            if (escaped != null) {
+                writer.append("/");
+                writer.append(escaped);
+                writer.append("/");
+                writer.append(modifier);
+                return writer;
             }
-            writer.append(")");
         }
+
+        writer.append("new RegExp(");
+        writer.append("\"" + Helper.escapeActionScriptString(pattern) + "\"");
+        if (!(modifier == null || modifier.isEmpty())) {
+            writer.append(",");
+            writer.append("\"" + modifier + "\"");
+        }
+        writer.append(")");
         return writer;
     }
 
