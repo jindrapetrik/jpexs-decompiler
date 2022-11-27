@@ -118,7 +118,9 @@ public class TraitMethodGetterSetter extends Trait {
         if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
             if (!(classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1)) {
                 if (bodyIndex != -1) {
-                    abc.bodies.get(bodyIndex).convert(abcIndex, convertData, path, exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true, new HashSet<>());
+                    List<MethodBody> callStack = new ArrayList<>();
+                    callStack.add(abc.bodies.get(bodyIndex));
+                    abc.bodies.get(bodyIndex).convert(callStack, abcIndex, convertData, path, exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true, new HashSet<>());
                 }
             }
         }
@@ -146,7 +148,9 @@ public class TraitMethodGetterSetter extends Trait {
                 }
                 if (bodyIndex != -1) {
                     //writeUses(scriptIndex, classIndex, isStatic, abc, writer);
-                    abc.bodies.get(bodyIndex).toString(abcIndex, path, exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
+                    List<MethodBody> callStack = new ArrayList<>();
+                    callStack.add(abc.bodies.get(bodyIndex));
+                    abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path, exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
                 }
             } else {
                 String retTypeRaw = abc.method_info.get(method_info).getReturnTypeRaw(abc.constants, fullyQualifiedNames);

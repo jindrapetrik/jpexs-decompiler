@@ -146,7 +146,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
                 if (!classInitializerIsEmpty) {
                     writer.startBlock();
-                    abc.bodies.get(bodyIndex).toString(abcIndex, path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
+                    List<MethodBody> callStack = new ArrayList<>();
+                    callStack.add(abc.bodies.get(bodyIndex));
+                    abc.bodies.get(bodyIndex).toString(callStack, abcIndex, path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
                     writer.endBlock();
                 } else {
                     //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
@@ -194,7 +196,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.appendNoHilight(")").startBlock();
             if (exportMode != ScriptExportMode.AS_METHOD_STUBS) {
                 if (body != null) {
-                    body.toString(abcIndex, path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
+                    List<MethodBody> callStack = new ArrayList<>();
+                    callStack.add(body);
+                    body.toString(callStack, abcIndex, path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, abc, this, writer, fullyQualifiedNames, new HashSet<>());
                 }
             }
 
@@ -244,7 +248,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
             writer.mark();
             List<Traits> ts = new ArrayList<>();
             ts.add(classInfo.static_traits);
-            abc.bodies.get(bodyIndex).convert(abcIndex, convertData, path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
+            List<MethodBody> callStack = new ArrayList<>();
+            callStack.add(abc.bodies.get(bodyIndex));               
+            abc.bodies.get(bodyIndex).convert(callStack, abcIndex, convertData, path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
             classInitializerIsEmpty = !writer.getMark();
         }
 
@@ -255,7 +261,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 List<Traits> ts = new ArrayList<>();
                 ts.add(instanceInfo.instance_traits);
                 MethodBody constructorBody = abc.bodies.get(bodyIndex);
-                constructorBody.convert(abcIndex, convertData, path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
+                List<MethodBody> callStack = new ArrayList<>();
+                callStack.add(constructorBody);                
+                constructorBody.convert(callStack, abcIndex, convertData, path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
 
                 if (convertData.ignoreFrameScripts) {
                     //find all addFrameScript(xx,this.method) in constructor

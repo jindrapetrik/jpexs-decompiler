@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
@@ -92,13 +93,13 @@ public class FullMultinameAVM2Item extends AVM2Item {
     public boolean isTopLevel(String tname, ABC abc, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, Set<Integer> seenMethods) throws InterruptedException {
         String cname;
         if (name != null) {
-            cname = name.toString(LocalData.create(null, abc, localRegNames, fullyQualifiedNames, seenMethods));
+            cname = name.toString(LocalData.create(new ArrayList<>(), null, abc, localRegNames, fullyQualifiedNames, seenMethods));
         } else {
             cname = (abc.constants.getMultiname(multinameIndex).getName(abc.constants, fullyQualifiedNames, true, true));
         }
         String cns = "";
         if (namespace != null) {
-            cns = namespace.toString(LocalData.create(null, abc, localRegNames, fullyQualifiedNames, seenMethods));
+            cns = namespace.toString(LocalData.create(new ArrayList<>(), null, abc, localRegNames, fullyQualifiedNames, seenMethods));
         } else {
             Namespace ns = abc.constants.getMultiname(multinameIndex).getNamespace(abc.constants);
             if ((ns != null) && (ns.name_index != 0)) {

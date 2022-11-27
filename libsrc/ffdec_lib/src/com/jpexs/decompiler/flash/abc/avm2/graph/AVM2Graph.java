@@ -633,7 +633,7 @@ public class AVM2Graph extends Graph {
         return setLocalPosToGetLocalPos;
     }
 
-    public static List<GraphTargetItem> translateViaGraph(AbcIndexing abcIndex, String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs, boolean thisHasDefaultToPrimitive) throws InterruptedException {
+    public static List<GraphTargetItem> translateViaGraph(List<MethodBody> callStack, AbcIndexing abcIndex, String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs, boolean thisHasDefaultToPrimitive) throws InterruptedException {
         AVM2Graph g = new AVM2Graph(abcIndex, code, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames, localRegAssigmentIps, refs);
 
         AVM2LocalData localData = new AVM2LocalData();
@@ -643,6 +643,7 @@ public class AVM2Graph extends Graph {
         localData.localRegs = localRegs;
         localData.scopeStack = scopeStack;
         localData.methodBody = body;
+        localData.callStack = callStack;
         localData.abc = abc;
         localData.abcIndex = abcIndex;
         localData.localRegNames = localRegNames;
