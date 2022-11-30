@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - Switch decompilation in some corner cases
 - [#1894] Switches vs loops decompilation (now with two passes)
 - [#1894] AS3 - XML filters in some corner cases
+- [#1887] AS3 - strict equals operator decompilation
 
 ## [17.0.2] - 2022-11-22
 ### Fixed
@@ -2672,6 +2673,7 @@ All notable changes to this project will be documented in this file.
 [#1891]: https://www.free-decompiler.com/flash/issues/1891
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
 [#1894]: https://www.free-decompiler.com/flash/issues/1894
+[#1887]: https://www.free-decompiler.com/flash/issues/1887
 [#1882]: https://www.free-decompiler.com/flash/issues/1882
 [#1880]: https://www.free-decompiler.com/flash/issues/1880
 [#1881]: https://www.free-decompiler.com/flash/issues/1881

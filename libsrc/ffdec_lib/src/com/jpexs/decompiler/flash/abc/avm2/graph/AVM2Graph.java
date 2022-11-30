@@ -1455,6 +1455,7 @@ public class AVM2Graph extends Graph {
             List<GraphTargetItem> caseValuesMapRight = new ArrayList<>();
 
             StrictEqAVM2Item set = (StrictEqAVM2Item) stack.pop();
+            StrictEqAVM2Item firstSet = set;
             caseValuesMapLeft.add(set.leftSide);
             caseValuesMapRight.add(set.rightSide);
 
@@ -1521,7 +1522,7 @@ public class AVM2Graph extends Graph {
             }
 
             if ((leftReg < 0 && rightReg < 0) || (cnt == 1)) {
-                stack.push(set);
+                stack.push(firstSet);
             } else {
                 part = part.nextParts.get(1);
                 GraphPart defaultPart = part;
