@@ -1656,6 +1656,9 @@ public class AVM2Graph extends Graph {
 
     @Override
     protected GraphTargetItem checkLoop(List<GraphTargetItem> output, LoopItem loopItem, BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates, TranslateStack stack) {
+        if (debugDoNotProcess) {
+            return loopItem;
+        }
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         if (loopItem instanceof WhileItem) {
             WhileItem w = (WhileItem) loopItem;
@@ -1775,6 +1778,8 @@ public class AVM2Graph extends Graph {
                                                     regIndex = setLocal.regIndex;
                                                 }
                                             }
+                                        } else if (output.get(i) instanceof PushItem) {
+                                            //ignored
                                         } else {
                                             break;
                                         }
@@ -1795,6 +1800,8 @@ public class AVM2Graph extends Graph {
                                             setLocalIp = avm2code.adr2pos(setLocal.getSrc().getAddress());
                                             break;
                                         }
+                                    } else if (output.get(i) instanceof PushItem){
+                                        //allowed
                                     } else {
                                         break;
                                     }
@@ -1818,11 +1825,21 @@ public class AVM2Graph extends Graph {
                                         if (setLocal.regIndex == regIndex) {
                                             setLocal.value = filter;
                                         }
+                                    } else if (output.get(i) instanceof PushItem) {
+                                        //ignored
                                     } else {
                                         break;
                                     }
                                 }
 
+                                for (int i = output.size() - 2 /*last is loop*/; i >= 0; i--) {
+                                    if (output.get(i) instanceof PushItem) {
+                                        PushItem pu = (PushItem)output.remove(i);
+                                        stack.push(pu.value);
+                                    } else {
+                                        break;
+                                    }
+                                }
                                 if (usages.isEmpty()) {
                                     output.add(filter);
                                 } else {
@@ -2010,7 +2027,9 @@ public class AVM2Graph extends Graph {
 
     @Override
     protected void finalProcess(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
-
+        if (debugDoNotProcess) {
+            return;
+        }
         if (level == 0) {
             if (!list.isEmpty()) {
                 if (list.get(list.size() - 1) instanceof ReturnVoidAVM2Item) {
