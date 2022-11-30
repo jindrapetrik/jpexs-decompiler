@@ -63,6 +63,7 @@ import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
 import com.jpexs.decompiler.graph.Graph;
+import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphPartChangeException;
 import com.jpexs.decompiler.graph.GraphSource;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -1009,11 +1010,11 @@ public abstract class Action implements GraphSourceItem {
         return variables2;
     }
 
-    public static List<GraphTargetItem> actionsPartToTree(SecondPassData secondPassData, boolean insideDoInitAction, Reference<GraphSourceItem> fi, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, TranslateStack stack, List<Action> actions, int start, int end, int version, int staticOperation, String path, String charset) throws InterruptedException, GraphPartChangeException {
+    public static List<GraphTargetItem> actionsPartToTree(Set<GraphPart> switchParts, SecondPassData secondPassData, boolean insideDoInitAction, Reference<GraphSourceItem> fi, HashMap<Integer, String> registerNames, HashMap<String, GraphTargetItem> variables, HashMap<String, GraphTargetItem> functions, TranslateStack stack, List<Action> actions, int start, int end, int version, int staticOperation, String path, String charset) throws InterruptedException, GraphPartChangeException {
         if (start < actions.size() && (end > 0) && (start > 0)) {
             logger.log(Level.FINE, "Entering {0}-{1}{2}", new Object[]{start, end, actions.size() > 0 ? (" (" + actions.get(start).toString() + " - " + actions.get(end == actions.size() ? end - 1 : end) + ")") : ""});
         }
-        ActionLocalData localData = new ActionLocalData(secondPassData, insideDoInitAction, registerNames, variables, functions);
+        ActionLocalData localData = new ActionLocalData(switchParts, secondPassData, insideDoInitAction, registerNames, variables, functions);
         localData.lineStartAction = fi.getVal();
         List<GraphTargetItem> output = new ArrayList<>();
         int ip = start;

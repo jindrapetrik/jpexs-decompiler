@@ -112,7 +112,7 @@ public class ActionGraphSource extends GraphSource {
     public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
         Reference<GraphSourceItem> fi = new Reference<>(localData.lineStartInstruction);
 
-        List<GraphTargetItem> r = Action.actionsPartToTree(localData.secondPassData, this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path, charset);
+        List<GraphTargetItem> r = Action.actionsPartToTree(localData.allSwitchParts, localData.secondPassData, this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path, charset);
         localData.lineStartInstruction = fi.getVal();
         return r;
     }

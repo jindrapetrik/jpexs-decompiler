@@ -73,6 +73,8 @@ public class GraphPart implements Serializable {
     public int finishedTime;
 
     public int order;
+    
+    public int numBlocks = Integer.MAX_VALUE;
 
     //public List<GraphPart> throwParts = new ArrayList<>();
 
@@ -122,6 +124,16 @@ public class GraphPart implements Serializable {
         order = ordered.size();
         ordered.add(this);
         return time;
+    }
+    
+    public void setNumblocks(int numBlocks) {
+        this.numBlocks = numBlocks;
+        numBlocks++;
+        for (GraphPart next : nextParts) {
+            if (next.numBlocks > numBlocks) {
+                next.setNumblocks(numBlocks);
+            }
+        }        
     }
 
     private boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops, List<ThrowState> throwStates, boolean useThrow) throws InterruptedException {

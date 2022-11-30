@@ -110,6 +110,7 @@ package
 		TestVector2;		
 		TestWhileAnd;
 		TestWhileBreak;
+        TestWhileBreak2;
 		TestWhileContinue;
 		TestWhileTry;
 		TestWhileTry2;		

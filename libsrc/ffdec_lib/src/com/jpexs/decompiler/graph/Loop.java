@@ -19,6 +19,7 @@ package com.jpexs.decompiler.graph;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -64,7 +65,12 @@ public class Loop implements Serializable {
         for (GraphPart p : backEdges) {
             edgesAsStr.add(p.toString());
         }
-        return "loop(id:" + id + (loopPreContinue != null ? ",precontinue:" + loopPreContinue : "") + ",continue:" + loopContinue + ", break:" + loopBreak + ", phase:" + phase + ", backedges: " + String.join(",", edgesAsStr) + ")";
+        Set<String> bcAsStr = new LinkedHashSet<>();
+        for (int i = 0; i < breakCandidates.size(); i++) {
+            bcAsStr.add(breakCandidates.get(i) + " - level " + breakCandidatesLevels.get(i) +" - numblocks " + breakCandidates.get(i).numBlocks);
+        }
+
+        return "loop(id:" + id + (loopPreContinue != null ? ",precontinue:" + loopPreContinue : "") + ",continue:" + loopContinue + ", break:" + loopBreak + ", phase:" + phase + ", backedges: " + String.join(",", edgesAsStr) + ", breakCandidates: " + String.join(",", bcAsStr) + ")";
     }
 
     @Override
