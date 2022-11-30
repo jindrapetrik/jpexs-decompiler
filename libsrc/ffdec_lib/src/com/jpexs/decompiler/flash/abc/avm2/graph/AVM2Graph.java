@@ -339,25 +339,27 @@ public class AVM2Graph extends Graph {
                 int finEndIp = avm2code.adr2pos(ex.end, true) - 1;
                 GraphPart prevFinallyEndPart = searchPart(finEndIp, allParts);
 
-                for (int j = prevFinallyEndPart.start; j <= prevFinallyEndPart.end; j++) {
-                    AVM2Instruction ins = avm2code.code.get(j);
-                    if (ins.definition instanceof NopIns) {
+                if (prevFinallyEndPart != null) {
+                    for (int j = prevFinallyEndPart.start; j <= prevFinallyEndPart.end; j++) {
+                        AVM2Instruction ins = avm2code.code.get(j);
+                        if (ins.definition instanceof NopIns) {
 
-                    } else if (ins.definition instanceof PushByteIns) {
-                        defaultPushByte = ins.operands[0];
-                        localData.pushDefaultPart.put(e, prevFinallyEndPart);
-                    } else if (ins.definition instanceof JumpIns) {
-                    } else {
-                        if (localData.pushDefaultPart.containsKey(e)) {
-                            localData.pushDefaultPart.remove(e);
+                        } else if (ins.definition instanceof PushByteIns) {
+                            defaultPushByte = ins.operands[0];
+                            localData.pushDefaultPart.put(e, prevFinallyEndPart);
+                        } else if (ins.definition instanceof JumpIns) {
+                        } else {
+                            if (localData.pushDefaultPart.containsKey(e)) {
+                                localData.pushDefaultPart.remove(e);
+                            }
+                            defaultPushByte = null;
+                            break;
                         }
-                        defaultPushByte = null;
-                        break;
                     }
                 }
 
                 if (defaultPushByte == null) {
-                    if (avm2code.code.get(prevFinallyEndPart.end).definition instanceof JumpIns) {
+                    if (prevFinallyEndPart != null && (avm2code.code.get(prevFinallyEndPart.end).definition instanceof JumpIns)) {
                         prevFinallyEndPart = prevFinallyEndPart.nextParts.get(0);
                         if (prevFinallyEndPart.nextParts.size() == 1 && prevFinallyEndPart.nextParts.get(0).refs.size() > 1) {
                             for (int j = prevFinallyEndPart.start; j <= prevFinallyEndPart.end; j++) {
