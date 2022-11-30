@@ -1864,7 +1864,9 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testXml() {
-        decompileMethod("classic", "testXml", "var g:XML = null;\r\n"
+        decompileMethod("classic", "testXml", "var list:Vector.<int> = null;\r\n"
+                + "var i:int = 0;\r\n"
+                + "var g:XML = null;\r\n"
                 + "var testCdata:XML = null;\r\n"
                 + "var testComment:XML = null;\r\n"
                 + "var name:String = \"ahoj\";\r\n"
@@ -1877,6 +1879,9 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "var all:String = myXML.@*.toXMLString();\r\n"
                 + "k = myXML.book;\r\n"
                 + "k = myXML.book.(@isbn == \"12345\");\r\n"
+                + "list = new Vector.<int>();\r\n"
+                + "i = int(Math.random());\r\n"
+                + "list[i] = myXML.book.(@isbn == i + 1);\r\n"
                 + "g = <script>\r\n"
                 + "<![CDATA[\r\n"
                 + "function() {\r\n"

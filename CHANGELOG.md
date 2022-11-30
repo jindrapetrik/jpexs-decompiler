@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - XML - get descendants operator parenthesis
 - Switch decompilation in some corner cases
 - [#1894] Switches vs loops decompilation (now with two passes)
+- [#1894] AS3 - XML filters in some corner cases
 
 ## [17.0.2] - 2022-11-22
 ### Fixed

@@ -90,6 +90,7 @@ public class Graph {
     private boolean debugPrintLoopList = false;
     private boolean debugGetLoops = false;
     private boolean debugPrintGraph = false;
+    protected boolean debugDoNotProcess = false;
 
     private static final Logger logger = Logger.getLogger(Graph.class.getName());
 
@@ -913,6 +914,9 @@ public class Graph {
     }
 
     private void finalProcessAll(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) throws InterruptedException {
+        if (debugDoNotProcess) {
+            return;
+        }
         finalProcess(list, level, localData, path);
         for (GraphTargetItem item : list) {
             if (item instanceof Block) {
@@ -1191,6 +1195,9 @@ public class Graph {
     }
 
     protected void processIfs(List<GraphTargetItem> list) {
+        if (debugDoNotProcess) {
+            return;
+        }
         for (int i = 0; i < list.size(); i++) {
             GraphTargetItem item = list.get(i);
             if ((item instanceof LoopItem) && (item instanceof Block)) {
