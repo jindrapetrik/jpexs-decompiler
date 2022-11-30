@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [17.0.3] - 2022-11-30
 ### Added
 - Translator tool for easier localization
 - AS3 improved goto declaration for properties and methods
