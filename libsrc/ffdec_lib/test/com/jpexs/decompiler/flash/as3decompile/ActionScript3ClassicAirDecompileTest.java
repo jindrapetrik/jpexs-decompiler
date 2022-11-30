@@ -252,7 +252,17 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "i = int(v.join(\"x\"));\r\n"
                 + "i = int(prot);\r\n"
                 + "s = prot;\r\n"
-                + "s = String(getTimer());\r\n",
+                + "s = String(getTimer());\r\n"
+                + "var x:XML;\r\n"
+                + "s = x = <list>\r\n"
+                + "<item id=\"1\">1</item>\r\n"
+                + "<item id=\"2\">2</item>\r\n"
+                + "<item id=\"3\">3</item>\r\n"
+                + "</list>;\r\n"
+                + "trace(\"a\");\r\n"
+                + "var xlist:XMLList = x.item;\r\n"
+                + "trace(\"b\");\r\n"
+                + "i = int(xlist[i].@id);\r\n",
                  false);
     }
 
