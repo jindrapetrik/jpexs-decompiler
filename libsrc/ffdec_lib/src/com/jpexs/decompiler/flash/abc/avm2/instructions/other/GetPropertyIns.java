@@ -244,7 +244,16 @@ public class GetPropertyIns extends InstructionDefinition {
                             //TODO: handle method calls to return proper param type results
                         }
                     }
+                    if (receiverType.equals(new TypeItem("XMLList"))) {
+                        if (multiname.name != null && multiname.name.returnType().equals(TypeItem.INT)) {
+                            type.setVal(new TypeItem("XML"));
+                            return;
+                        }
+                    }
                     localData.abcIndex.findPropertyTypeOrCallType(localData.abc, receiverType, multiname.resolvedMultinameName, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, parentStatic, !parentStatic, false, type, callType);
+                    if (receiverType.equals(new TypeItem("XML")) && !type.getVal().equals(new TypeItem("Function"))) {
+                        type.setVal(new TypeItem("XMLList"));
+                    }                    
                 }
             }
         }

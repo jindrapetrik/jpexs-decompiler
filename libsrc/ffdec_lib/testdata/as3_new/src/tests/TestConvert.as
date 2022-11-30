@@ -53,6 +53,19 @@ package tests
             s = prot;
             
             s = String(getTimer());
+            
+            
+            var x:XML = <list>
+	 						<item id="1">1</item>
+							<item id="2">2</item>
+							<item id="3">3</item>
+						</list>;
+            s = x;
+            trace("a");
+		    var xlist:XMLList = x.item;
+            trace("b");
+            i = int(xlist[i].@id);
+            							
 		}
 	}
 }
