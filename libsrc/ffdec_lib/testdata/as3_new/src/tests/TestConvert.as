@@ -52,8 +52,7 @@ package tests
             i = int(prot);
             s = prot;
             
-            s = String(getTimer());
-            
+            s = String(getTimer());            
             
             var x:XML = <list>
 	 						<item id="1">1</item>
@@ -65,6 +64,8 @@ package tests
 		    var xlist:XMLList = x.item;
             trace("b");
             i = int(xlist[i].@id);
+            trace("c");
+            i = int(x.item[i].@id);
             							
 		}
 	}

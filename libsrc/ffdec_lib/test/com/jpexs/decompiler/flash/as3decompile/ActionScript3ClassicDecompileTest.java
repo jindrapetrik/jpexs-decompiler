@@ -261,7 +261,9 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "trace(\"a\");\r\n"
                 + "var xlist:XMLList = x.item;\r\n"
                 + "trace(\"b\");\r\n"
-                + "i = int(xlist[i].@id);\r\n",
+                + "i = int(xlist[i].@id);\r\n"
+                + "trace(\"c\");\r\n"
+                + "i = int(x.item[i].@id);\r\n",
                  false);
     }
 
