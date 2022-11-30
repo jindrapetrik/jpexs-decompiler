@@ -29,5 +29,5 @@ import java.util.List;
 public class ActionSecondPassData extends SecondPassData {
     List<List<GraphPart>> switchParts = new ArrayList<>();
     List<List<GraphPart>> switchOnFalseParts = new ArrayList<>();
-    List<List<GraphTargetItem>> switchCaseExpressions = new ArrayList<>();
+    List<List<GraphTargetItem>> switchCaseExpressions = new ArrayList<>();        
 }

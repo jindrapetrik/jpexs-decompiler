@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - Avoid Error Implicit coercion of a value of type XXX to an unrelated type YYY
 - AS3 - XML - get descendants operator parenthesis
 - Switch decompilation in some corner cases
+- [#1894] Switches vs loops decompilation (now with two passes)
 
 ## [17.0.2] - 2022-11-22
 ### Fixed
@@ -2669,6 +2670,7 @@ All notable changes to this project will be documented in this file.
 [#1810]: https://www.free-decompiler.com/flash/issues/1810
 [#1891]: https://www.free-decompiler.com/flash/issues/1891
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
+[#1894]: https://www.free-decompiler.com/flash/issues/1894
 [#1882]: https://www.free-decompiler.com/flash/issues/1882
 [#1880]: https://www.free-decompiler.com/flash/issues/1880
 [#1881]: https://www.free-decompiler.com/flash/issues/1881

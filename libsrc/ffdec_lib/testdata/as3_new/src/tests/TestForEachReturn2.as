@@ -11,8 +11,8 @@ package tests
             {
                 obj = {};
                 var item = {};
-                //for each (var item in obj)
-                //{
+                for each (var item in obj)
+                {
                     switch (item["key"])
                     {
                         case 1:
@@ -21,9 +21,9 @@ package tests
                         case 4:
                             return item;
                     };                    
-                //};
+                };
             };
-            return null;
+            return null;                        
 		}
 	}
 }
