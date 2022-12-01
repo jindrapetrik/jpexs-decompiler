@@ -1304,7 +1304,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     parent = ((UnresolvedAVM2Item) parent).resolved;
                 }
                 if (parent instanceof TypeItem) {
-                    ClassIndex ci = abcIndex.findClass(parent);
+                    ClassIndex ci = abcIndex.findClass(parent, null, null/*FIXME?*/);
                     if (ci != null) {
                         int mi = ci.abc.class_info.get(ci.index).cinit_index;
                         MethodBody pcinit = ci.abc.findBody(mi);
@@ -1971,7 +1971,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                  */
                 int parentConstMinAC = 0;
 
-                AbcIndexing.ClassIndex ci = abcIndex.findClass(new TypeItem(superType));
+                AbcIndexing.ClassIndex ci = abcIndex.findClass(new TypeItem(superType), null, null/*FIXME?*/);
 
                 if (ci != null) {
                     MethodInfo pmi = ci.abc.method_info.get(ci.abc.instance_info.get(ci.index).iinit_index);
@@ -2483,7 +2483,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     mbCode.add(ins(AVM2Instructions.PushNull));
                 } else {
 
-                    AbcIndexing.ClassIndex ci = abcIndex.findClass(AbcIndexing.multinameToType(abc.instance_info.get(tc.class_info).name_index, constants));
+                    AbcIndexing.ClassIndex ci = abcIndex.findClass(AbcIndexing.multinameToType(abc.instance_info.get(tc.class_info).name_index, constants), null, null/*FIXME?*/);
                     while (ci != null && ci.parent != null) {
                         ci = ci.parent;
                         Multiname origM = ci.abc.constants.getMultiname(ci.abc.instance_info.get(ci.index).name_index);
@@ -2589,16 +2589,16 @@ public class AVM2SourceGenerator implements SourceGenerator {
             if (tsc.type_index == 0) {
                 return TypeItem.UNBOUNDED;
             }
-            return PropertyAVM2Item.multinameToType(tsc.type_index, abc.getSelectedAbc().constants);
+            return AbcIndexing.multinameToType(tsc.type_index, abc.getSelectedAbc().constants);
         }
         if (t instanceof TraitMethodGetterSetter) {
             TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) t;
             if (tmgs.kindType == Trait.TRAIT_GETTER) {
-                return PropertyAVM2Item.multinameToType(abc.getSelectedAbc().method_info.get(tmgs.method_info).ret_type, abc.getSelectedAbc().constants);
+                return AbcIndexing.multinameToType(abc.getSelectedAbc().method_info.get(tmgs.method_info).ret_type, abc.getSelectedAbc().constants);
             }
             if (tmgs.kindType == Trait.TRAIT_SETTER) {
                 if (abc.getSelectedAbc().method_info.get(tmgs.method_info).param_types.length > 0) {
-                    return PropertyAVM2Item.multinameToType(abc.getSelectedAbc().method_info.get(tmgs.method_info).param_types[0], abc.getSelectedAbc().constants);
+                    return AbcIndexing.multinameToType(abc.getSelectedAbc().method_info.get(tmgs.method_info).param_types[0], abc.getSelectedAbc().constants);
                 } else {
                     return TypeItem.UNBOUNDED;
                 }
@@ -2662,7 +2662,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
     }
 
     public static void parentNames(AbcIndexing abc, int name_index, List<Integer> indices, List<String> names, List<String> namespaces, List<ABC> outABCs) {
-        AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(abc.getSelectedAbc().constants.getMultiname(name_index).getNameWithNamespace(abc.getSelectedAbc().constants, true /*FIXME!!*/)));
+        AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(abc.getSelectedAbc().constants.getMultiname(name_index).getNameWithNamespace(abc.getSelectedAbc().constants, true /*FIXME!!*/)), null, null/*FIXME?*/);
         while (ci != null) {
             int ni = ci.abc.instance_info.get(ci.index).name_index;
             indices.add(ni);
@@ -2761,7 +2761,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
          }*/
         ABC abc = abcIndex.getSelectedAbc();
         AVM2ConstantPool constants = abc.constants;
-        AbcIndexing.ClassIndex ci = abcIndex.findClass(new TypeItem(dname));
+        AbcIndexing.ClassIndex ci = abcIndex.findClass(new TypeItem(dname), null, null/*FIXME?*/);
         if (ci != null) {
             Multiname m = ci.abc.instance_info.get(ci.index).getName(ci.abc.constants);
             if (m != null) {

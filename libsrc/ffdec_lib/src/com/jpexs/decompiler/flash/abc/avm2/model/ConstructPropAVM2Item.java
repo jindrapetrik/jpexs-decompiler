@@ -36,12 +36,15 @@ public class ConstructPropAVM2Item extends AVM2Item {
     public GraphTargetItem propertyName;
 
     public List<GraphTargetItem> args;
+    
+    public GraphTargetItem type;
 
-    public ConstructPropAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, List<GraphTargetItem> args) {
+    public ConstructPropAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem object, GraphTargetItem propertyName, List<GraphTargetItem> args, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.object = object;
         this.propertyName = propertyName;
         this.args = args;
+        this.type = type;
     }
 
     @Override
@@ -71,8 +74,8 @@ public class ConstructPropAVM2Item extends AVM2Item {
     }
 
     @Override
-    public GraphTargetItem returnType() {
-        return TypeItem.UNBOUNDED;
+    public GraphTargetItem returnType() {        
+        return type;
     }
 
     @Override

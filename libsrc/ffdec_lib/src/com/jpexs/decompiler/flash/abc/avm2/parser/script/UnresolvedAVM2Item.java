@@ -363,7 +363,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             DottedChain pkg = classChain.getWithoutLast();
 
             TypeItem ti = new TypeItem(pkg.addWithSuffix(name.get(0)));           
-            AbcIndexing.ClassIndex ci = abc.findClass(ti);
+            AbcIndexing.ClassIndex ci = abc.findClass(ti, null, null/*FIXME?*/);
 
             if (ci != null) {
                 resolved = ti;
@@ -412,7 +412,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         if (!isProperty) {
             for (int i = 0; i < name.size(); i++) {
                 DottedChain fname = name.subChain(i + 1);
-                AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(fname));
+                AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(fname), null, null/*FIXME?*/);
                 if (ci != null) {
                     if (!subtypes.isEmpty() && name.size() > i + 1) {
                         continue;
@@ -441,7 +441,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
                 n.resolveCustomNs(abcIndex, importedClasses, pkg, openedNamespaces, localData);
                 Namespace ons = abc.getSelectedAbc().constants.getNamespace(n.getCpoolIndex(abc));
                 TypeItem ti = new TypeItem(ons.getName(abc.getSelectedAbc().constants).addWithSuffix(name.get(0)));
-                AbcIndexing.ClassIndex ci = abc.findClass(ti);
+                AbcIndexing.ClassIndex ci = abc.findClass(ti, null, null/*FIXME?*/);
                 if (ci != null) {
                     if (!subtypes.isEmpty() && name.size() > 1) {
                         continue;
@@ -471,7 +471,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
             boolean isSuper = name.get(0).equals("super");
             GraphTargetItem ntype = thisType;
             if (isSuper) {
-                AbcIndexing.ClassIndex ci = abc.findClass(thisType);
+                AbcIndexing.ClassIndex ci = abc.findClass(thisType, null, null/*FIXME?*/);
                 if (ci == null) {
                     throw new CompilationException("This class not found", line);
                 }

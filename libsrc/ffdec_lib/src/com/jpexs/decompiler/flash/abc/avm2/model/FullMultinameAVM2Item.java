@@ -56,6 +56,9 @@ public class FullMultinameAVM2Item extends AVM2Item {
         this.namespace = null;
         this.property = property;
         this.resolvedMultinameName = resolvedMultinameName;
+        if (property == false) {
+            System.err.println("xxx");
+        }
     }
 
     public FullMultinameAVM2Item(boolean property, GraphSourceItem instruction, GraphSourceItem lineStartIns, int multinameIndex, String resolvedMultinameName) {
@@ -65,6 +68,9 @@ public class FullMultinameAVM2Item extends AVM2Item {
         this.name = null;
         this.namespace = null;
         this.property = property;
+        if (property == false) {
+            System.err.println("xxx");
+        }
     }
 
     public FullMultinameAVM2Item(boolean property, GraphSourceItem instruction, GraphSourceItem lineStartIns, int multinameIndex, String resolvedMultinameName, GraphTargetItem name, GraphTargetItem namespace) {
@@ -74,6 +80,9 @@ public class FullMultinameAVM2Item extends AVM2Item {
         this.namespace = namespace;
         this.property = property;
         this.resolvedMultinameName = resolvedMultinameName;
+        if (property == false) {
+            System.err.println("xxx");
+        }
     }
 
     @Override
