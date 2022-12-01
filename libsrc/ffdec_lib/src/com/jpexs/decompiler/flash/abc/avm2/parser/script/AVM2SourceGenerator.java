@@ -2447,11 +2447,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return traits;
     }
 
-    public ScriptInfo generateScriptInfo(List<List<NamespaceItem>> allOpenedNamespaces, SourceGeneratorLocalData localData, List<GraphTargetItem> commands, int classPos) throws AVM2ParseException, CompilationException {
+    public void generateScriptInfo(ScriptInfo scriptInfo, List<List<NamespaceItem>> allOpenedNamespaces, SourceGeneratorLocalData localData, List<GraphTargetItem> commands, int classPos) throws AVM2ParseException, CompilationException {
         Reference<Integer> class_index = new Reference<>(classPos);
-        ScriptInfo si = new ScriptInfo();
-        localData.currentScript = si;
-        Trait[] traitArr = generateTraitsPhase1(new ArrayList<>(), new ArrayList<>(), null, null, true, localData, commands, si.traits, class_index);
+        localData.currentScript = scriptInfo;
+        Trait[] traitArr = generateTraitsPhase1(new ArrayList<>(), new ArrayList<>(), null, null, true, localData, commands, scriptInfo.traits, class_index);
         generateTraitsPhase2(new ArrayList<>(), null/*FIXME*/, commands, traitArr, new ArrayList<>(), localData);
 
         abcIndex.refreshSelected();
@@ -2470,7 +2469,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         Map<Trait, Integer> initScopes = new HashMap<>();
 
-        for (Trait t : si.traits.traits) {
+        for (Trait t : scriptInfo.traits.traits) {
             if (t instanceof TraitClass) {
                 TraitClass tc = (TraitClass) t;
                 DottedChain className = tc.getName(abc).getNameWithNamespace(abc.constants, true);
@@ -2520,27 +2519,27 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
 
         abc.addMethodBody(mb);
-        si.init_index = mb.method_info;
+        scriptInfo.init_index = mb.method_info;
         localData.pkg = DottedChain.EMPTY;
-        generateTraitsPhase3(new ArrayList<>(), 1/*??*/, false, null, null, true, localData, commands, si.traits, traitArr, initScopes, class_index);
+        generateTraitsPhase3(new ArrayList<>(), 1/*??*/, false, null, null, true, localData, commands, scriptInfo.traits, traitArr, initScopes, class_index);
 
         int maxSlotId = 0;
-        for (int k = 0; k < si.traits.traits.size(); k++) {
-            if (si.traits.traits.get(k) instanceof TraitSlotConst) {
-                TraitSlotConst ti = (TraitSlotConst) si.traits.traits.get(k);
+        for (int k = 0; k < scriptInfo.traits.traits.size(); k++) {
+            if (scriptInfo.traits.traits.get(k) instanceof TraitSlotConst) {
+                TraitSlotConst ti = (TraitSlotConst) scriptInfo.traits.traits.get(k);
                 if (ti.slot_id > maxSlotId) {
                     maxSlotId = ti.slot_id;
                 }
             }
         }
-        for (int k = 0; k < si.traits.traits.size(); k++) {
-            if ((si.traits.traits.get(k) instanceof TraitMethodGetterSetter) && (commands.get(k) instanceof MethodAVM2Item)) {
+        for (int k = 0; k < scriptInfo.traits.traits.size(); k++) {
+            if ((scriptInfo.traits.traits.get(k) instanceof TraitMethodGetterSetter) && (commands.get(k) instanceof MethodAVM2Item)) {
                 MethodAVM2Item mai = (MethodAVM2Item) commands.get(k);
                 if (mai.outsidePackage) {
-                    TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) si.traits.traits.get(k);
+                    TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) scriptInfo.traits.traits.get(k);
                     TraitSlotConst nts = new TraitSlotConst();
-                    nts.name_index = si.traits.traits.get(k).name_index;
-                    nts.metadata = si.traits.traits.get(k).metadata;
+                    nts.name_index = scriptInfo.traits.traits.get(k).name_index;
+                    nts.metadata = scriptInfo.traits.traits.get(k).metadata;
 
                     nts.slot_id = maxSlotId + 1;
                     maxSlotId++;
@@ -2548,7 +2547,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     nts.value_index = 0;
                     nts.value_kind = 0;
                     int methodinfo = tmgs.method_info;
-                    si.traits.traits.set(k, nts);
+                    scriptInfo.traits.traits.set(k, nts);
                     mbCode.add(ins(AVM2Instructions.NewFunction, methodinfo));
                     mbCode.add(ins(AVM2Instructions.InitProperty, nts.name_index));
                 }
@@ -2557,8 +2556,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
 
         mbCode.add(ins(AVM2Instructions.ReturnVoid));
         mb.autoFillStats(abc, 1, false);
-
-        return si;
+        
     }
 
     public static void parentNamesAddNames(AbcIndexing abc, int name_index, List<Integer> indices, List<String> names, List<String> namespaces) {
