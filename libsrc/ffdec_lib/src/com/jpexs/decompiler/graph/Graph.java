@@ -363,7 +363,7 @@ public class Graph {
             }
         }
 
-        List<Set<GraphPart>> reachable = new ArrayList<>();
+        Map<GraphPart, Set<GraphPart>> reachable = new HashMap<>();
         Set<GraphPart> allReachable = new LinkedHashSet<>();
         for (GraphPart p : parts) {
             LinkedHashSet<GraphPart> r1 = new LinkedHashSet<>();
@@ -371,12 +371,10 @@ public class Graph {
             Set<GraphPart> r2 = new LinkedHashSet<>();
             r2.add(p);
             r2.addAll(r1);
-            reachable.add(r2);
+            reachable.put(p, r2);
             allReachable.add(p);
             allReachable.addAll(r1);
         }
-        int maxCommonLevel = -1;
-        GraphPart maxCommonPart = null;
         Set<PartCommon> commonSet = new TreeSet<>();
         for (GraphPart r : allReachable) {
             if (loopContinues.contains(r)) {
@@ -389,7 +387,7 @@ public class Graph {
                     commonLevel++;
                     continue;
                 }
-                if (!p.leadsTo(localData, this, code, r, loops, throwStates, false)) {
+                if (!reachable.get(p).contains(r)) {
                     common = false;
                 } else {
                     commonLevel++;
@@ -434,6 +432,9 @@ public class Graph {
                 }
 
                 if (common) {
+                    if (debugPrintLoopList) {
+                        System.err.println("all time common: " + r);
+                    }
                     return r;
                 }
             }
@@ -455,33 +456,33 @@ public class Graph {
                 }
             }
         }
-
+ 
         if (debugPrintLoopList) {
             System.err.println("commonset:");
             for (PartCommon pc : commonSet) {
                 System.err.println("- " + pc);
             }
-            
+
             System.err.println("parts:");
-                for(GraphPart p :parts) {
-                    System.err.println("- "+p);
-                }
+            for (GraphPart p : parts) {
+                System.err.println("- " + p);
+            }
 
             if (stopPart != null) {
                 System.err.println("stopparts:");
-                for(GraphPart p :stopPart) {
-                    System.err.println("- "+p);
+                for (GraphPart p : stopPart) {
+                    System.err.println("- " + p);
                 }
             }
-            
+
             System.err.println("partsLeadingToStopPart:");
             for (GraphPart p : partsLeadingToStopPart) {
                 System.err.println("- " + p);
             }
-            
-            if (partsLeadingToStopPart.isEmpty()) {
+
+            /*if (partsLeadingToStopPart.isEmpty()) {
                 return null; //?
-            }
+            }*/
         }
 
         loopc:
@@ -518,7 +519,11 @@ public class Graph {
 
         @Override
         public int compareTo(PartCommon o) {
-            return o.level - level;
+            int ret = o.level - level;
+            if (ret == 0) {
+                ret = part.start - o.part.start;
+            }
+            return ret;
         }
 
         @Override
@@ -655,7 +660,7 @@ public class Graph {
 
         if (localData.secondPassData == null) {
             SecondPassData secondPassData = prepareSecondPass(ret);
-            if (secondPassData == null) {                
+            if (secondPassData == null) {
                 if (!localData.allSwitchParts.isEmpty()) {
                     secondPassData = new SecondPassData();
                     secondPassData.allSwitchParts = localData.allSwitchParts;
@@ -1885,24 +1890,23 @@ public class Graph {
             GraphPart winner = null;
             int winnerCount = 0;
             int winnerNumBlock = Integer.MAX_VALUE;
-            
+
             Set<GraphPart> bannedCandidates = new HashSet<>();
-            if(localData.secondPassData != null) {
+            if (localData.secondPassData != null) {
                 bannedCandidates = localData.secondPassData.allSwitchParts;
             }
-            
+
             if (debugPrintLoopList) {
                 System.err.println("bannedCandidates:");
-                for(GraphPart p:bannedCandidates) {
-                    System.err.println("- "+p);
+                for (GraphPart p : bannedCandidates) {
+                    System.err.println("- " + p);
                 }
-                
             }
-            
+
             for (GraphPart cand : currentLoop.breakCandidates) {
                 if (bannedCandidates.contains(cand)) {
                     if (debugPrintLoopList) {
-                        System.err.println("cand "+cand+" is banned");
+                        System.err.println("cand " + cand + " is banned");
                     }
                     continue;
                 }
@@ -2790,7 +2794,7 @@ public class Graph {
                             }
 
                             boolean isAllNotBlock = true;
-                            for (GraphTargetItem ti: precoCommands) {
+                            for (GraphTargetItem ti : precoCommands) {
                                 if (ti instanceof Block) {
                                     isAllNotBlock = false;
                                     break;
@@ -3208,7 +3212,7 @@ public class Graph {
             }
         }
     }
-       
+
     protected SwitchItem handleSwitch(GraphTargetItem switchedObject,
             GraphSourceItem switchStartItem, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, Set<GraphPart> allParts, TranslateStack stack, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, BaseLocalData localData, int staticOperation, String path,
             List<GraphTargetItem> caseValuesMap, GraphPart defaultPart, List<GraphPart> caseBodyParts, Reference<GraphPart> nextRef, Reference<GraphTargetItem> tiRef) throws InterruptedException {
@@ -3318,6 +3322,9 @@ public class Graph {
             for (int j = i + 1; j < caseBodies.size(); j++) {
                 GraphPart b2 = caseBodies.get(j);
                 if (b2.leadsTo(localData, this, code, b, loops, throwStates, false)) {
+                    if (b.leadsTo(localData, this, code, b2, loops, throwStates, false)) { //unstructured code
+                        continue;
+                    }
                     caseBodies.remove(j);
                     caseBodies.add(i, b2);
                     i--;
@@ -3346,8 +3353,8 @@ public class Graph {
                 }
             }
 
-            localData.allSwitchParts.add(caseBodies.get(i));                    
-            
+            localData.allSwitchParts.add(caseBodies.get(i));
+
             List<GraphPart> stopPart2x = new ArrayList<>(stopPart);
             List<StopPartKind> stopPartKind2x = new ArrayList<>(stopPartKind);
             for (GraphPart b : caseBodies) {

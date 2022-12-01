@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#1888] Casts for missing types, cast handling for script local classes
+- [#1895] Handling of unstructured switch
 
 ## [17.0.3] - 2022-11-30
 ### Added
@@ -2537,7 +2538,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.2...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.3...dev
+[17.0.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.2...version17.0.3
 [17.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.1...version17.0.2
 [17.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.0...version17.0.1
 [17.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version16.3.1...version17.0.0
@@ -2670,8 +2672,9 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
-[#1769]: https://www.free-decompiler.com/flash/issues/1769
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
+[#1895]: https://www.free-decompiler.com/flash/issues/1895
+[#1769]: https://www.free-decompiler.com/flash/issues/1769
 [#1890]: https://www.free-decompiler.com/flash/issues/1890
 [#1810]: https://www.free-decompiler.com/flash/issues/1810
 [#1891]: https://www.free-decompiler.com/flash/issues/1891
