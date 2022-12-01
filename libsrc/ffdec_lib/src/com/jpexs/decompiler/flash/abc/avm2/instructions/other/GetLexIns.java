@@ -55,8 +55,8 @@ public class GetLexIns extends InstructionDefinition {
             GraphTargetItem obj,
             int multinameIndex,
             Reference<Boolean> isStatic, Reference<GraphTargetItem> type, Reference<GraphTargetItem> callType) {
-        type.setVal(TypeItem.UNBOUNDED);
-        callType.setVal(TypeItem.UNBOUNDED);
+        type.setVal(TypeItem.UNKNOWN);
+        callType.setVal(TypeItem.UNKNOWN);
         String multinameStr = localData.abc.constants.getMultiname(multinameIndex).getName(localData.abc.constants, new ArrayList<>(), true, true);
         for (int b = localData.callStack.size() - 1; b >= 0; b--) {
             MethodBody body = localData.callStack.get(b);
@@ -67,7 +67,7 @@ public class GetLexIns extends InstructionDefinition {
                             tsc.getName(localData.abc).getName(localData.abc.constants, new ArrayList<>(), true, true),
                             multinameStr
                     )) {
-                        GraphTargetItem ty = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
+                        GraphTargetItem ty = AbcIndexing.multinameToType(tsc.type_index, localData.abc.constants);
                         type.setVal(ty);
                         callType.setVal(ty);
                         return;
@@ -82,9 +82,10 @@ public class GetLexIns extends InstructionDefinition {
                 localData.abcIndex.findPropertyTypeOrCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multinameIndex).namespace_index, true, true, true, type, callType);
             }
 
-            if (type.getVal().equals(TypeItem.UNBOUNDED)) {
-                TypeItem ti = new TypeItem(localData.abc.constants.getMultiname(multinameIndex).getNameWithNamespace(localData.abc.constants, true));
-                if (localData.abcIndex.findClass(ti) != null) {
+            if (type.getVal().equals(TypeItem.UNKNOWN)) {
+                //TypeItem ti = new TypeItem(localData.abc.constants.getMultiname(multinameIndex).getNameWithNamespace(localData.abc.constants, true));
+                GraphTargetItem ti = AbcIndexing.multinameToType(multinameIndex, localData.abc.constants);
+                if (localData.abcIndex.findClass(ti, localData.abc, localData.scriptIndex) != null) {
                     type.setVal(ti);
                     callType.setVal(TypeItem.UNBOUNDED);
                     isStatic.setVal(true);

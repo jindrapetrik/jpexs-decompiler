@@ -104,41 +104,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         return abc.getSelectedAbc().constants.getNamespaceSetId(nssa, true);
     }
 
-    private static GraphTargetItem multinameToType(Set<Integer> visited, int m_index, AVM2ConstantPool constants) {
-        if (visited.contains(m_index)) {
-            Logger.getLogger(PropertyAVM2Item.class.getName()).log(Level.WARNING, "Recursive typename detected");
-            return null;
-        }
-        if (m_index == 0) {
-            return TypeItem.UNBOUNDED;
-        }
-        Multiname m = constants.getMultiname(m_index);
-        if (m.kind == Multiname.TYPENAME) {
-            visited.add(m_index);
-            GraphTargetItem obj = multinameToType(visited, m.qname_index, constants);
-            if (obj == null) {
-                return null;
-            }
-            List<GraphTargetItem> params = new ArrayList<>();
-            for (int pm : m.params) {
-                GraphTargetItem r = multinameToType(visited, pm, constants);
-                if (r == null) {
-                    return null;
-                }
-                if (pm == 0) {
-                    r = new NullAVM2Item(null, null);
-                }
-                params.add(r);
-            }
-            return new ApplyTypeAVM2Item(null, null, obj, params);
-        } else {
-            return new TypeItem(m.getNameWithNamespace(constants, true));
-        }
-    }
-
-    public static GraphTargetItem multinameToType(int m_index, AVM2ConstantPool constants) {
-        return multinameToType(new HashSet<>(), m_index, constants);
-    }
+    
 
     public void resolve(boolean mustExist, SourceGeneratorLocalData localData, Reference<Boolean> isType, Reference<GraphTargetItem> objectType, Reference<GraphTargetItem> propertyType, Reference<Integer> propertyIndex, Reference<ValueKind> propertyValue, Reference<ABC> propertyValueABC) throws CompilationException {
         Integer namespaceSuffixInt = null;
@@ -217,7 +183,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                             // super is special cause its static type is the super class, but it still allows access to protected members
                             // so for super to work we need to also allow the protected namespace of the super class
                             // however this namespace is in the ABC of the super class and not in abcIndex.getSelectedAbc()
-                            AbcIndexing.ClassIndex ci = abcIndex.findClass(objType);
+                            AbcIndexing.ClassIndex ci = abcIndex.findClass(objType, null, null/*FIXME?*/);
                             int superProtectedNs = ci.abc.instance_info.get(ci.index).protectedNS;
                             AbcIndexing.TraitIndex sp = abcIndex.findProperty(new AbcIndexing.PropertyDef(propertyName, objType, ci.abc, superProtectedNs), false, true, true);
                             if (sp != null) {
@@ -252,7 +218,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                                     if (t instanceof TraitSlotConst) {
                                         TraitSlotConst tsc = (TraitSlotConst) t;
                                         objType = new TypeItem(DottedChain.FUNCTION);
-                                        propType = multinameToType(tsc.type_index, constants);
+                                        propType = AbcIndexing.multinameToType(tsc.type_index, constants);
                                         propIndex = tsc.name_index;
                                         if (!localData.traitUsages.containsKey(b)) {
                                             localData.traitUsages.put(b, new ArrayList<>());

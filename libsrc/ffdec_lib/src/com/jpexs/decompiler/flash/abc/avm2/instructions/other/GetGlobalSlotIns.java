@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -56,7 +57,7 @@ public class GetGlobalSlotIns extends InstructionDefinition {
                 if (t instanceof TraitSlotConst) {
                     TraitSlotConst tsc = (TraitSlotConst)t;
                     if (tsc.slot_id == slotIndex) {
-                        slotType = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
+                        slotType = AbcIndexing.multinameToType(tsc.type_index, localData.abc.constants);
                         break;
                     }
                 }

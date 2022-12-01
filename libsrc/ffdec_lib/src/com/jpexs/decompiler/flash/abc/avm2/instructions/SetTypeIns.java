@@ -60,7 +60,7 @@ public interface SetTypeIns {
                         result.value = value;
                         output.add(result);
                         for (int i = 0; i < numDups; i++) {
-                            stack.push(new LocalRegAVM2Item(null, localData.lineStartInstruction, regId, value, localData.localRegTypes.containsKey(regId) ? localData.localRegTypes.get(regId) : TypeItem.UNBOUNDED));
+                            stack.push(new LocalRegAVM2Item(null, localData.lineStartInstruction, regId, value, localData.localRegTypes.containsKey(regId) ? localData.localRegTypes.get(regId) : value.returnType()));
                         }
                         return;
                     } else {

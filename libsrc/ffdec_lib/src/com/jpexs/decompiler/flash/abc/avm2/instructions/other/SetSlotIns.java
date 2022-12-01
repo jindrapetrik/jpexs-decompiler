@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.PostIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -146,7 +147,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
                 if (t instanceof TraitSlotConst) {
                     TraitSlotConst tsc = (TraitSlotConst)t;
                     if (tsc.slot_id == slotIndex) {
-                        slotType = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
+                        slotType = AbcIndexing.multinameToType(tsc.type_index, localData.abc.constants);
                         break;
                     }
                 }

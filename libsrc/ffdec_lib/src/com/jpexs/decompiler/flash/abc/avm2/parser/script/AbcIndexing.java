@@ -20,12 +20,14 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.model.ApplyTypeAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.NullAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.ClassInfo;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
@@ -43,6 +45,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Indexing of ABCs for faster access. Indexes ABC classes for faster class and
@@ -312,6 +316,52 @@ public final class AbcIndexing {
             this.objType = objType;
         }
     }
+    
+    private static class ClassDef {
+        public GraphTargetItem type;
+        public DottedChain pkg;       
+        
+        public ClassDef(GraphTargetItem type, ABC abc, Integer scriptIndex) {
+            this.type = type;
+            if (scriptIndex != null) {
+                for (Trait t : abc.script_info.get(scriptIndex).traits.traits) {
+                    Namespace ns = t.getName(abc).getNamespace(abc.constants);
+                    if (ns.kind == Namespace.KIND_PACKAGE) {
+                        pkg = ns.getName(abc.constants);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 17 * hash + Objects.hashCode(this.type);
+            hash = 17 * hash + Objects.hashCode(this.pkg);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final ClassDef other = (ClassDef) obj;
+            if (!Objects.equals(this.type, other.type)) {
+                return false;
+            }
+            return Objects.equals(this.pkg, other.pkg);
+        }
+        
+        
+                      
+    }
 
     public static class ClassIndex {
 
@@ -320,20 +370,57 @@ public final class AbcIndexing {
         public ABC abc;
 
         public ClassIndex parent;
+        
+        public Integer scriptIndex;
 
         @Override
         public String toString() {
             return abc.constants.getMultiname(abc.instance_info.get(index).name_index).getNameWithNamespace(abc.constants, true).toPrintableString(true);
         }
 
-        public ClassIndex(int index, ABC abc, ClassIndex parent) {
+        public ClassIndex(int index, ABC abc, ClassIndex parent, Integer scriptIndex) {
             this.index = index;
             this.abc = abc;
             this.parent = parent;
+            this.scriptIndex = scriptIndex;
         }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 37 * hash + this.index;
+            hash = 37 * hash + System.identityHashCode(this.abc);
+            hash = 37 * hash + Objects.hashCode(this.parent);
+            hash = 37 * hash + Objects.hashCode(this.scriptIndex);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final ClassIndex other = (ClassIndex) obj;
+            if (this.index != other.index) {
+                return false;
+            }
+            if (this.abc != other.abc) {
+                return false;
+            }
+            if (!Objects.equals(this.parent, other.parent)) {
+                return false;
+            }
+            return Objects.equals(this.scriptIndex, other.scriptIndex);
+        }               
     }
 
-    private final Map<GraphTargetItem, ClassIndex> classes = new HashMap<>();
+    private final Map<ClassDef, ClassIndex> classes = new HashMap<>();
 
     private final Map<PropertyDef, TraitIndex> instanceProperties = new HashMap<>();
 
@@ -343,23 +430,30 @@ public final class AbcIndexing {
 
     private final Map<PropertyNsDef, TraitIndex> classNsProperties = new HashMap<>();
 
-    private final Map<PropertyNsDef, TraitIndex> scriptProperties = new HashMap<>();
-
-    public ClassIndex findClass(GraphTargetItem cls) {
-        if (!classes.containsKey(cls)) {
-            if (parent == null) {
-                return null;
-            }
-            return parent.findClass(cls);
+    private final Map<PropertyNsDef, TraitIndex> scriptProperties = new HashMap<>();   
+    
+    public ClassIndex findClass(GraphTargetItem cls, ABC abc, Integer scriptIndex) {
+        ClassDef keyWithScriptIndex = new ClassDef(cls, abc, scriptIndex);
+        if (classes.containsKey(keyWithScriptIndex)) {
+            return classes.get(keyWithScriptIndex);
         }
-        return classes.get(cls);
+        
+        ClassDef keyWithNoScriptIndex = new ClassDef(cls, abc, null);
+        if (classes.containsKey(keyWithNoScriptIndex)) {
+            return classes.get(keyWithNoScriptIndex);
+        }
+        
+        if (parent == null) {
+            return null;
+        }
+        return parent.findClass(cls, abc, scriptIndex);                
     }
 
     public void findPropertyTypeOrCallType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance, boolean findProtected, Reference<GraphTargetItem> type, Reference<GraphTargetItem> callType) {
         TraitIndex traitIndex = findProperty(new PropertyDef(propName, cls, abc, ns), findStatic, findInstance, findProtected);
         if (traitIndex == null) {
-            type.setVal(TypeItem.UNBOUNDED);
-            callType.setVal(TypeItem.UNBOUNDED);
+            type.setVal(TypeItem.UNKNOWN);
+            callType.setVal(TypeItem.UNKNOWN);
         } else {
             type.setVal(traitIndex.returnType);
             callType.setVal(traitIndex.callReturnType);
@@ -465,7 +559,7 @@ public final class AbcIndexing {
         }
 
         //now search parent class
-        AbcIndexing.ClassIndex ci = findClass(prop.parent);
+        AbcIndexing.ClassIndex ci = findClass(prop.parent, prop.abc, null);
         if (ci != null && ci.parent != null && (prop.abc == null || prop.propNsIndex == 0)) {
             AbcIndexing.ClassIndex ciParent = ci.parent;
             DottedChain parentClass = ciParent.abc.instance_info.get(ciParent.index).getName(ciParent.abc.constants).getNameWithNamespace(ciParent.abc.constants, true);
@@ -495,22 +589,44 @@ public final class AbcIndexing {
         return null;
     }
 
-    public static GraphTargetItem multinameToType(int m_index, AVM2ConstantPool constants) {
+    private static GraphTargetItem multinameToType(Set<Integer> visited, int m_index, AVM2ConstantPool constants) {
+        if (visited.contains(m_index)) {
+            Logger.getLogger(AbcIndexing.class.getName()).log(Level.WARNING, "Recursive typename detected");
+            return null;
+        }
         if (m_index == 0) {
             return TypeItem.UNBOUNDED;
         }
         Multiname m = constants.getMultiname(m_index);
         if (m.kind == Multiname.TYPENAME) {
-            GraphTargetItem obj = multinameToType(m.qname_index, constants);
+            visited.add(m_index);
+            GraphTargetItem obj = multinameToType(visited, m.qname_index, constants);
+            if (obj == null) {
+                return null;
+            }
             List<GraphTargetItem> params = new ArrayList<>();
             for (int pm : m.params) {
-                params.add(multinameToType(pm, constants));
+                GraphTargetItem r = multinameToType(visited, pm, constants);
+                if (r == null) {
+                    return null;
+                }
+                if (pm == 0) {
+                    r = new NullAVM2Item(null, null);
+                }
+                params.add(r);
             }
             return new ApplyTypeAVM2Item(null, null, obj, params);
         } else {
+            if (m.namespace_index != 0 && m.getNamespace(constants).kind == Namespace.KIND_PRIVATE) {
+                return new TypeItem(m.getName(constants, new ArrayList<>(), true, true), "ns:"+m.namespace_index);
+            }
             return new TypeItem(m.getNameWithNamespace(constants, true));
         }
     }
+
+    public static GraphTargetItem multinameToType(int m_index, AVM2ConstantPool constants) {
+        return multinameToType(new HashSet<>(), m_index, constants);
+    }    
 
     private static GraphTargetItem getTraitCallReturnType(ABC abc, Trait t) {
         if (t instanceof TraitSlotConst) {
@@ -524,12 +640,12 @@ public final class AbcIndexing {
             if (tmgs.kindType == Trait.TRAIT_SETTER) {
                 return TypeItem.UNBOUNDED;
             }
-            return PropertyAVM2Item.multinameToType(abc.method_info.get(tmgs.method_info).ret_type, abc.constants);
+            return multinameToType(abc.method_info.get(tmgs.method_info).ret_type, abc.constants);
         }
 
         if (t instanceof TraitFunction) {
             TraitFunction tf = (TraitFunction) t;
-            return PropertyAVM2Item.multinameToType(abc.method_info.get(tf.method_info).ret_type, abc.constants);
+            return multinameToType(abc.method_info.get(tf.method_info).ret_type, abc.constants);
 
         }
         return TypeItem.UNBOUNDED;
@@ -541,16 +657,16 @@ public final class AbcIndexing {
             if (tsc.type_index == 0) {
                 return TypeItem.UNBOUNDED;
             }
-            return PropertyAVM2Item.multinameToType(tsc.type_index, abc.constants);
+            return multinameToType(tsc.type_index, abc.constants);
         }
         if (t instanceof TraitMethodGetterSetter) {
             TraitMethodGetterSetter tmgs = (TraitMethodGetterSetter) t;
             if (tmgs.kindType == Trait.TRAIT_GETTER) {
-                return PropertyAVM2Item.multinameToType(abc.method_info.get(tmgs.method_info).ret_type, abc.constants);
+                return multinameToType(abc.method_info.get(tmgs.method_info).ret_type, abc.constants);
             }
             if (tmgs.kindType == Trait.TRAIT_SETTER) {
                 if (abc.method_info.get(tmgs.method_info).param_types.length > 0) {
-                    return PropertyAVM2Item.multinameToType(abc.method_info.get(tmgs.method_info).param_types[0], abc.constants);
+                    return multinameToType(abc.method_info.get(tmgs.method_info).param_types[0], abc.constants);
                 } else {
                     return TypeItem.UNBOUNDED;
                 }
@@ -601,8 +717,8 @@ public final class AbcIndexing {
 
     public void removeAbc(ABC abc) {
         abcs.remove(abc);
-        Set<GraphTargetItem> gti_keys = new HashSet<>(classes.keySet());
-        for (GraphTargetItem key : gti_keys) {
+        Set<ClassDef> gti_keys = new HashSet<>(classes.keySet());
+        for (ClassDef key : gti_keys) {
             if (classes.get(key).abc == abc) {
                 classes.remove(key);
             }
@@ -650,29 +766,39 @@ public final class AbcIndexing {
             return;
         }
         List<ClassIndex> addedClasses = new ArrayList<>();
+        
         for (int i = 0; i < abc.instance_info.size(); i++) {
-            InstanceInfo ii = abc.instance_info.get(i);
-            if (ii.deleted) {
-                continue;
-            }
-            ClassInfo ci = abc.class_info.get(i);
-            ClassIndex cindex = new ClassIndex(i, abc, null);
-            addedClasses.add(cindex);
-            GraphTargetItem cname = multinameToType(ii.name_index, abc.constants);
-            classes.put(cname, cindex);
-
-            indexTraits(abc, ii.name_index, ii.instance_traits, instanceProperties, instanceNsProperties);
-            indexTraits(abc, ii.name_index, ci.static_traits, classProperties, classNsProperties);
+            
         }
-        for (int i = 0; i < abc.script_info.size(); i++) {
+        for (int i = 0; i < abc.script_info.size(); i++) {            
             indexTraits(abc, 0, abc.script_info.get(i).traits, null, scriptProperties);
+            for (int t = 0; t <  abc.script_info.get(i).traits.traits.size(); t++) {
+                Trait tr = abc.script_info.get(i).traits.traits.get(t);
+                if (tr instanceof TraitClass) {
+                    TraitClass tc = (TraitClass)tr;                    
+                    InstanceInfo ii = abc.instance_info.get(tc.class_info);
+                    if (ii.deleted) {
+                        continue;
+                    }
+                    ClassInfo ci = abc.class_info.get(tc.class_info);
+                    int nsKind = abc.constants.getMultiname(tc.name_index).getNamespace(abc.constants).kind;
+                    Integer classScriptIndex = nsKind == Namespace.KIND_PACKAGE ? null : i;
+                    ClassIndex cindex = new ClassIndex(tc.class_info, abc, null, classScriptIndex);
+                    addedClasses.add(cindex);
+                    GraphTargetItem cname = multinameToType(ii.name_index, abc.constants);
+                    classes.put(new ClassDef(cname, abc, classScriptIndex), cindex);
+
+                    indexTraits(abc, ii.name_index, ii.instance_traits, instanceProperties, instanceNsProperties);
+                    indexTraits(abc, ii.name_index, ci.static_traits, classProperties, classNsProperties);
+                }
+            }
         }
 
         for (ClassIndex cindex : addedClasses) {
             int parentClassName = abc.instance_info.get(cindex.index).super_index;
             if (parentClassName > 0) {
                 TypeItem parentClass = new TypeItem(abc.constants.getMultiname(parentClassName).getNameWithNamespace(abc.constants, true));
-                ClassIndex parentClassIndex = findClass(parentClass);
+                ClassIndex parentClassIndex = findClass(parentClass, abc, null);
                 if (parentClassIndex == null) {
                     //Parent class can be deleted, do not check. TODO: handle this better
                     //throw new RuntimeException("Parent class " + parentClass + " definition not found!");

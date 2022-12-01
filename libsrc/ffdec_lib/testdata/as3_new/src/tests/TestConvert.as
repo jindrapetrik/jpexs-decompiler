@@ -66,7 +66,14 @@ package tests
             i = int(xlist[i].@id);
             trace("c");
             i = int(x.item[i].@id);
-            							
+            				
+            var lc:LocalClass = new LocalClass();
+            i = lc.attr;      
+            s = String(lc.attr);                      			
 		}
 	}
+}
+
+class LocalClass{
+    public var attr:int = 5;
 }

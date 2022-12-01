@@ -172,7 +172,7 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
 
     @Test
     public void testSwitch() {
-        decompileMethod("assembled", "testSwitch", "switch(somevar)\r\n"
+        decompileMethod("assembled", "testSwitch", "switch(int(somevar))\r\n"
                 + "{\r\n"
                 + "case 0:\r\n"
                 + "var _loc2_:String = \"X\";\r\n"

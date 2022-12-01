@@ -147,8 +147,8 @@ public class GetPropertyIns extends InstructionDefinition {
             GraphTargetItem obj,
             FullMultinameAVM2Item multiname,
             Reference<Boolean> isStatic, Reference<GraphTargetItem> type, Reference<GraphTargetItem> callType) {
-        type.setVal(TypeItem.UNBOUNDED);
-        callType.setVal(TypeItem.UNBOUNDED);
+        type.setVal(TypeItem.UNKNOWN);
+        callType.setVal(TypeItem.UNKNOWN);
         String multinameStr = localData.abc.constants.getMultiname(multiname.multinameIndex).getName(localData.abc.constants, new ArrayList<>(), true, true);
         if (obj instanceof FindPropertyAVM2Item) {
             FindPropertyAVM2Item fprop = (FindPropertyAVM2Item) obj;
@@ -162,7 +162,7 @@ public class GetPropertyIns extends InstructionDefinition {
                                     tsc.getName(localData.abc).getName(localData.abc.constants, new ArrayList<>(), true, true),
                                     multinameStr
                             )) {
-                                GraphTargetItem ty = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
+                                GraphTargetItem ty = AbcIndexing.multinameToType(tsc.type_index, localData.abc.constants);
                                 type.setVal(ty);
                                 callType.setVal(ty);
                                 return;
@@ -171,16 +171,15 @@ public class GetPropertyIns extends InstructionDefinition {
                     }
                 }
 
-                if (type.getVal().equals(TypeItem.UNBOUNDED)) {
+                if (type.getVal().equals(TypeItem.UNKNOWN)) {
                     if (localData.abcIndex != null) {
                         String currentClassName = localData.classIndex == -1 ? null : localData.abc.instance_info.get(localData.classIndex).getName(localData.abc.constants).getNameWithNamespace(localData.abc.constants, true).toRawString();
-                        GraphTargetItem thisPropType = TypeItem.UNBOUNDED;
                         if (currentClassName != null) {
                             localData.abcIndex.findPropertyTypeOrCallType(localData.abc, new TypeItem(currentClassName), multinameStr, localData.abc.constants.getMultiname(multiname.multinameIndex).namespace_index, true, true, true, type, callType);
                         }
-                        if (type.getVal().equals(TypeItem.UNBOUNDED)) {
-                            TypeItem ti = new TypeItem(localData.abc.constants.getMultiname(multiname.multinameIndex).getNameWithNamespace(localData.abc.constants, true));
-                            if (localData.abcIndex.findClass(ti) != null) {
+                        if (type.getVal().equals(TypeItem.UNKNOWN)) {                            
+                            GraphTargetItem ti = AbcIndexing.multinameToType(multiname.multinameIndex, localData.abc.constants);//new TypeItem(localData.abc.constants.getMultiname(multiname.multinameIndex).getNameWithNamespace(localData.abc.constants, true));
+                            if (localData.abcIndex.findClass(ti, localData.abc, localData.scriptIndex) != null) {
                                 type.setVal(ti);
                                 callType.setVal(TypeItem.UNBOUNDED);
                                 isStatic.setVal(true);
@@ -205,7 +204,7 @@ public class GetPropertyIns extends InstructionDefinition {
         } else {
             if (localData.abcIndex != null) {
                 GraphTargetItem receiverType = obj.returnType();
-                if (!receiverType.equals(TypeItem.UNBOUNDED)) {
+                if (!receiverType.equals(TypeItem.UNBOUNDED) && !receiverType.equals(TypeItem.UNKNOWN)) {
 
                     boolean parentStatic = false;
                     if (obj instanceof GetLexAVM2Item) {

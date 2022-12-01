@@ -108,6 +108,9 @@ public class CoerceAVM2Item extends AVM2Item {
         if (typeObj instanceof ApplyTypeAVM2Item) {
             return typeObj;
         }
+        if (typeObj instanceof TypeItem) {
+            return typeObj;
+        }                
         return new TypeItem(typeObj.toString());
     }
 

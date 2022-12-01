@@ -264,7 +264,10 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "trace(\"b\");\r\n"
                 + "i = int(xlist[i].@id);\r\n"
                 + "trace(\"c\");\r\n"
-                + "i = int(x.item[i].@id);\r\n",
+                + "i = int(x.item[i].@id);\r\n"
+                + "var lc:LocalClass;\r\n"
+                + "i = (lc = new LocalClass()).attr;\r\n"
+                + "s = String(lc.attr);\r\n",
                  false);
     }
 
@@ -1390,7 +1393,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testProperty() {
-        decompileMethod("classic_air", "testProperty", "var d:* = new TestClass1();\r\n"
+        decompileMethod("classic_air", "testProperty", "var d:TestClass1 = new TestClass1();\r\n"
                 + "var k:int = 15;\r\n"
                 + "if(k == 15)\r\n"
                 + "{\r\n"

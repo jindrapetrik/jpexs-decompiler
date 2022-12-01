@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2TypeErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -80,7 +81,7 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int multinameIndex = ins.operands[0];
-        stack.push(new CoerceAVM2Item(ins, localData.lineStartInstruction, stack.pop(), PropertyAVM2Item.multinameToType(multinameIndex, localData.getConstants())));
+        stack.push(new CoerceAVM2Item(ins, localData.lineStartInstruction, stack.pop(), AbcIndexing.multinameToType(multinameIndex, localData.getConstants())));
     }
 
     @Override
@@ -96,6 +97,6 @@ public class CoerceIns extends InstructionDefinition implements CoerceOrConvertT
     @Override
     public GraphTargetItem getTargetType(AVM2ConstantPool constants, AVM2Instruction ins) {
         int multinameIndex = ins.operands[0];
-        return PropertyAVM2Item.multinameToType(multinameIndex, constants);
+        return AbcIndexing.multinameToType(multinameIndex, constants);
     }
 }

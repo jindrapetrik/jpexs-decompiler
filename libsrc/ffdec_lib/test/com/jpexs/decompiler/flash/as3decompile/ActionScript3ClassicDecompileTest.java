@@ -141,9 +141,9 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "trace(\"arr[2] += 5\");\r\n"
                 + "b[2] += 5;\r\n"
                 + "trace(\"arr[call()] /= 5\");\r\n"
-                + "b[this.calc()] = b[this.calc()] / 5;\r\n"
+                + "b[this.calc()] = Number(b[this.calc()]) / 5;\r\n"
                 + "trace(\"arr[call()][call()] &= 10;\");\r\n"
-                + "b[this.calc()][this.calc()] = b[this.calc()][this.calc()] & 10;\r\n"
+                + "b[this.calc()][this.calc()] = Number(b[this.calc()][this.calc()]) & 10;\r\n"
                 + "try\r\n"
                 + "{\r\n"
                 + "trace(\"in try\");\r\n"
@@ -263,7 +263,10 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "trace(\"b\");\r\n"
                 + "i = int(xlist[i].@id);\r\n"
                 + "trace(\"c\");\r\n"
-                + "i = int(x.item[i].@id);\r\n",
+                + "i = int(x.item[i].@id);\r\n"
+                + "var lc:LocalClass = new LocalClass();\r\n"
+                + "i = lc.attr;\r\n"
+                + "s = String(lc.attr);\r\n",
                  false);
     }
 
@@ -1385,7 +1388,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testProperty() {
-        decompileMethod("classic", "testProperty", "var d:* = new TestClass1();\r\n"
+        decompileMethod("classic", "testProperty", "var d:TestClass1 = new TestClass1();\r\n"
                 + "var k:* = 7 + 8;\r\n"
                 + "if(k == 15)\r\n"
                 + "{\r\n"

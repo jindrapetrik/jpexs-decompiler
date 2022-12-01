@@ -5,7 +5,7 @@ package tests
 	{
 		public function run():*
 		{
-			var d:* = new TestClass1();
+			var d:TestClass1 = new TestClass1();
 			var k:* = 7 + 8;
 			if (k == 15)
 			{

@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- [#1888] Casts for missing types, cast handling for script local classes
 
 ## [17.0.3] - 2022-11-30
 ### Added
