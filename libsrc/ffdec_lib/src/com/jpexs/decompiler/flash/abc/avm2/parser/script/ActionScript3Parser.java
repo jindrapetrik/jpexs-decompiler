@@ -85,6 +85,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.TypeOfAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.URShiftAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
@@ -149,8 +150,6 @@ public class ActionScript3Parser {
 
 //    private final AbcIndexing otherABCs;
     //private static final List<ABC> playerABCs = new ArrayList<>();
-    
-
     private long uniqId() {
         uniqLast++;
         return uniqLast;
@@ -328,7 +327,7 @@ public class ActionScript3Parser {
                         lexer.pushback(s);
                     }
                 }
-                
+
                 if (ns != null) {
                     ret = new NamespacedAVM2Item(ns, propName, propItem, ret, attr, openedNamespaces, null);
                 } else {
@@ -348,7 +347,7 @@ public class ActionScript3Parser {
     private GraphTargetItem name(List<List<NamespaceItem>> allOpenedNamespaces, TypeItem thisType, NamespaceItem pkg, Reference<Boolean> needsActivation, boolean typeOnly, List<NamespaceItem> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables, List<DottedChain> importedClasses) throws IOException, AVM2ParseException, InterruptedException {
         ParsedSymbol s = lex();
         DottedChain name = new DottedChain(new String[]{}, new String[]{""});
-        boolean attribute  = false;
+        boolean attribute = false;
         String name2 = "";
         if (s.type == SymbolType.ATTRIBUTE) {
             attribute = true;
@@ -383,7 +382,7 @@ public class ActionScript3Parser {
                     }
                     attrBracket = true;
                     continue;
-                }                
+                }
             } else {
                 expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.NAMESPACE, SymbolType.MULTIPLY);
                 name2 += s.value.toString();
@@ -394,7 +393,7 @@ public class ActionScript3Parser {
                 nsSuffix = "#" + s.value;
                 s = lex();
             }
-            name = name.add(attribute, name2, nsSuffix);            
+            name = name.add(attribute, name2, nsSuffix);
         }
         String nsname = null;
         String nsprop = null;
@@ -421,7 +420,7 @@ public class ActionScript3Parser {
             variables.add(unr);
             ret = unr;
         }
-        if (nsname != null) {            
+        if (nsname != null) {
             UnresolvedAVM2Item ns = new UnresolvedAVM2Item(new ArrayList<>(), importedClasses, typeOnly, null, lexer.yyline(), new DottedChain(new String[]{nsname}), null, openedNamespaces, abcIndex);
             variables.add(ns);
             ret = new NamespacedAVM2Item(ns, nsprop, nspropItem, ret, nsAtribute, openedNamespaces, null);
@@ -559,7 +558,7 @@ public class ActionScript3Parser {
         }
         List<GraphTargetItem> body = null;
         List<AssignableAVM2Item> subvariables = new ArrayList<>();
-        subvariables.add(new NameAVM2Item(thisType, lexer.yyline(), false, "this", "",  null, true, openedNamespaces, abcIndex));
+        subvariables.add(new NameAVM2Item(thisType, lexer.yyline(), false, "this", "", null, true, openedNamespaces, abcIndex));
         for (int i = 0; i < paramNames.size() - (hasRest ? 1 : 0); i++) {
             subvariables.add(new NameAVM2Item(paramTypes.get(i), lexer.yyline(), false, paramNames.get(i), "", null, true, openedNamespaces, abcIndex));
         }
@@ -756,7 +755,7 @@ public class ActionScript3Parser {
                         }
                     } else {
                         fname = s.value.toString();
-                    }                                                            
+                    }
                     if (fname.equals(classNameStr)) { //constructor
                         if (isStatic) {
                             throw new AVM2ParseException("Constructor cannot be static", lexer.yyline());
@@ -777,14 +776,14 @@ public class ActionScript3Parser {
                             isStatic = true;
                         }
                         {
-                         
+
                             s = lex();
                             if (s.type == SymbolType.NAMESPACESUFFIX) {
                                 namespace = new NamespaceItem((Integer) s.value);
                             } else {
                                 lexer.pushback(s);
                             }
-                            
+
                             MethodAVM2Item ft = method(allOpenedNamespaces, outsidePackage, isPrivate, metadata, namespace, isInterface, customNs, new Reference<>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, fname, true, new ArrayList<>());
 
                             if (isGetter) {
@@ -866,12 +865,12 @@ public class ActionScript3Parser {
                     expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER);
                     String vcname = s.value.toString();
                     s = lex();
-                    
+
                     if (s.type == SymbolType.NAMESPACESUFFIX) {
                         namespace = new NamespaceItem((Integer) s.value);
                         s = lex();
                     }
-                    
+
                     GraphTargetItem type;
                     if (s.type == SymbolType.COLON) {
                         type = type(allOpenedNamespaces, thisType, pkg, new Reference<>(false), importedClasses, openedNamespaces, new ArrayList<>());
@@ -1798,7 +1797,7 @@ public class ActionScript3Parser {
                                 }
 
                             }
-                        }                                                
+                        }
 
                         catchCommands.add(cc);
                         s = lex();
@@ -2351,13 +2350,13 @@ public class ActionScript3Parser {
                     s = lex();
                     expected(s, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.STRING, SymbolType.INTEGER, SymbolType.DOUBLE, SymbolType.PARENT_OPEN);
 
-                    GraphTargetItem n;                    
+                    GraphTargetItem n;
                     if (s.type == SymbolType.PARENT_OPEN) { //special for obfuscated SWFs
-                        n = expression(allOpenedNamespaces, thisType,pkg,needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables, false);
+                        n = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables, false);
                         expectedType(SymbolType.PARENT_CLOSE);
                     } else {
                         n = new StringAVM2Item(null, null, s.value.toString());
-                    }                    
+                    }
                     expectedType(SymbolType.COLON);
                     GraphTargetItem v = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, allowRemainder, variables, false);
 
@@ -2590,7 +2589,15 @@ public class ActionScript3Parser {
         AVM2SourceGenerator gen = new AVM2SourceGenerator(abcIndex);
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
                 new HashMap<>(), 0, Boolean.FALSE, 0);
-        abcIndex.getSelectedAbc().script_info.add(gen.generateScriptInfo(allOpenedNamespaces, localData, items, classPos));
+        ScriptInfo si = new ScriptInfo();
+        abcIndex.getSelectedAbc().script_info.add(si);
+        try {
+            gen.generateScriptInfo(si, allOpenedNamespaces, localData, items, classPos);
+        } catch (Exception ex) {
+            abcIndex.getSelectedAbc().script_info.remove(si);
+            throw ex;
+        }
+
     }
 
     public void addScript(String s, String fileName, int classPos, int scriptIndex) throws AVM2ParseException, IOException, CompilationException, InterruptedException {
@@ -2609,8 +2616,6 @@ public class ActionScript3Parser {
 
         abcIndex.addAbc(abc);
     }
-
-    
 
     public static void compile(String src, ABC abc, List<ABC> otherABCs, String fileName, int classPos, int scriptIndex, boolean air) throws AVM2ParseException, IOException, InterruptedException, CompilationException {
         //List<ABC> parABCs = new ArrayList<>();
@@ -2643,7 +2648,7 @@ public class ActionScript3Parser {
             ABC abc = new ABC(null);
             ActionScript3Parser parser = new ActionScript3Parser(abc, new ArrayList<>(), air);
             parser.addScript(new String(Helper.readFile(src), Utf8Helper.charset), src, classPos, scriptIndex);
-            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(dst)))) {
+            try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(dst)))) {
                 abc.saveToStream(fos);
 
             }
