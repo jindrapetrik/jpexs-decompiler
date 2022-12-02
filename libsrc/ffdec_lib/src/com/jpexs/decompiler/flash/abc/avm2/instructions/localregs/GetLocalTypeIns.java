@@ -133,7 +133,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                     SetLocalAVM2Item setLocal = (SetLocalAVM2Item) setItem.value.getNotCoerced();
                     if (setLocal.regIndex == regId) {
                         int setLocalIp = localData.code.adr2pos(setLocal.getSrc().getAddress());                    
-                        if (localData.setLocalPosToGetLocalPos.get(setLocalIp).size() == 1) {                    
+                        if (localData.getSetLocalUsages(setLocalIp).size() == 1) {                    
                             if ((setItem.value instanceof CoerceAVM2Item) || (setItem.value instanceof ConvertAVM2Item)) {
                                 setItem.value.value = setLocal.value;
                             } else {
