@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- [#1897] Close menu button without selecting specific item
 
 ## [17.0.4] - 2022-12-02
 ### Fixed
@@ -2541,7 +2543,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.3...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.4...dev
+[17.0.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.3...version17.0.4
 [17.0.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.2...version17.0.3
 [17.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.1...version17.0.2
 [17.0.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.0...version17.0.1
@@ -2675,6 +2678,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1897]: https://www.free-decompiler.com/flash/issues/1897
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1895]: https://www.free-decompiler.com/flash/issues/1895
 [#1896]: https://www.free-decompiler.com/flash/issues/1896
