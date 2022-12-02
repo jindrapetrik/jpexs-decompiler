@@ -237,6 +237,21 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
     }
 
+    private void enumerateListsToClose(Set<OpenableList> listsToClose, Openable openable) {
+        if (openable instanceof SWF) {
+            SWF swf = (SWF) openable;
+            if (swf.binaryData != null) {
+                // embedded swf
+                swf.binaryData.innerSwf = null;
+                swf.clearTagSwfs();
+            } else {
+                listsToClose.add(swf.openableList);
+            }
+        } else if (openable != null) {
+            listsToClose.add(openable.getOpenableList());
+        }
+    }
+    
     protected void closeActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
@@ -247,19 +262,11 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 listsToClose.add((OpenableList) item);
             } else {
                 Openable itemOpenable = item.getOpenable();
-                if (itemOpenable instanceof SWF) {
-                    SWF swf = (SWF) itemOpenable;
-                    if (swf.binaryData != null) {
-                        // embedded swf
-                        swf.binaryData.innerSwf = null;
-                        swf.clearTagSwfs();
-                    } else {
-                        listsToClose.add(swf.openableList);
-                    }
-                } else if (itemOpenable != null) {
-                    listsToClose.add(itemOpenable.getOpenableList());
-                }
+                enumerateListsToClose(listsToClose, itemOpenable);
             }
+        }
+        if (openable != null) {
+            enumerateListsToClose(listsToClose, openable);
         }
         for (OpenableList list : listsToClose) {
             Main.closeFile(list);
