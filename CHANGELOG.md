@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#1888] Casts for missing types, cast handling for script local classes
 - [#1895] Handling of unstructured switch
+- [#1896] NullPointer during deobfuscation
 
 ## [17.0.3] - 2022-11-30
 ### Added
@@ -2674,6 +2675,7 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1895]: https://www.free-decompiler.com/flash/issues/1895
+[#1896]: https://www.free-decompiler.com/flash/issues/1896
 [#1769]: https://www.free-decompiler.com/flash/issues/1769
 [#1890]: https://www.free-decompiler.com/flash/issues/1890
 [#1810]: https://www.free-decompiler.com/flash/issues/1810
