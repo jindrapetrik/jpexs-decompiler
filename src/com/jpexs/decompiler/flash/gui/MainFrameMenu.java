@@ -18,8 +18,9 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.debugger.flash.DebuggerCommands;
 import com.jpexs.decompiler.flash.ApplicationInfo;
-import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.OpenableSourceInfo;
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
@@ -27,6 +28,7 @@ import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.helpers.CheckResources;
 import com.jpexs.decompiler.flash.search.ScriptSearchResult;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
+import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.helpers.ByteArrayRange;
@@ -52,8 +54,10 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -64,11 +68,6 @@ import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import com.jpexs.decompiler.flash.Bundle;
-import com.jpexs.decompiler.flash.treeitems.Openable;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  *

@@ -25,8 +25,6 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.ConstructSu
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperVoidIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
-import com.jpexs.decompiler.flash.abc.types.ClassInfo;
-import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;

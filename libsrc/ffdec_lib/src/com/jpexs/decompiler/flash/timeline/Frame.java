@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.timeline;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;

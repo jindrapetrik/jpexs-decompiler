@@ -16,15 +16,14 @@
  */
 package com.jpexs.decompiler.flash.treeitems;
 
-import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFContainerItem;
+import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.OpenableSourceInfo;
+import com.jpexs.decompiler.flash.SWFContainerItem;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import com.jpexs.decompiler.flash.Bundle;
 
 /**
  *

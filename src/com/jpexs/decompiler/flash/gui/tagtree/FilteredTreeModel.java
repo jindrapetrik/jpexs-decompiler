@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
-import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 

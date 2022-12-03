@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.tagtree.TreeRoot;
 import com.jpexs.decompiler.flash.timeline.TagScript;
@@ -24,18 +23,13 @@ import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import javax.swing.BorderFactory;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.tree.TreePath;
 
 /**
  *

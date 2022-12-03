@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.dumpview;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagStub;

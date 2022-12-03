@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 
-import com.jpexs.decompiler.flash.SWC;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.ABC;
@@ -87,7 +86,6 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
-import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -114,14 +112,12 @@ import com.jpexs.decompiler.graph.model.PushItem;
 import com.jpexs.decompiler.graph.model.SwitchItem;
 import com.jpexs.decompiler.graph.model.TernarOpItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
-
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

@@ -33,7 +33,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.SetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreDecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.PreIncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;

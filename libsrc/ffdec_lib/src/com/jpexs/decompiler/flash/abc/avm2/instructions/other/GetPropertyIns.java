@@ -32,7 +32,6 @@ import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;

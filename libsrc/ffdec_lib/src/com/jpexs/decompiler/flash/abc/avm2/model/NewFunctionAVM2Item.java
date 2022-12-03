@@ -17,7 +17,6 @@
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
 import com.jpexs.decompiler.flash.abc.ABC;
-import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.configuration.Configuration;
