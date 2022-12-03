@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#1898] Keyboard shortcut to remove tags (DEL, SHIFT+DEL)
+
 ### Fixed
 - [#1897] Close menu button without selecting specific item
 
@@ -2678,6 +2681,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1898]: https://www.free-decompiler.com/flash/issues/1898
 [#1897]: https://www.free-decompiler.com/flash/issues/1897
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1895]: https://www.free-decompiler.com/flash/issues/1895
