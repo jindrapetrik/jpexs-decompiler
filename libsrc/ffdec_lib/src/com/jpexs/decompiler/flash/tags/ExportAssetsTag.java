@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Makes portions of a SWF file available for import by other SWF files
@@ -148,4 +149,9 @@ public class ExportAssetsTag extends SymbolClassTypeTag {
         }
         return modified;
     }
+
+    @Override
+    public void getNeededCharacters(Set<Integer> needed) {
+        needed.addAll(tags);
+    }        
 }
