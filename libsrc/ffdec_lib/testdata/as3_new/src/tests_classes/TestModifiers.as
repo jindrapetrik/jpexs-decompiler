@@ -8,8 +8,6 @@ package tests_classes
         internal var attr_inst_internal:int = 3;
         protected var attr_inst_protected:int = 4;
         
-        explicit var attr_exp:int = 9;
-        
         private static var attr_stat_private:int = 5;
         public static var attr_stat_public:int = 6;
         internal static var attr_stat_internal:int = 7;

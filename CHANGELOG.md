@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - [#1884] Memory search - Logged exception when cannot get page range
 - [#1884] Memory search - Exception on sorting by pid
 - [#1006] AS3 - Warning - Function value used where type Boolean was expected
+- AS3 - Resolving types on static protected namespaced properties
 
 ### Changed
 - Quick search needs minimum of 3 characters
