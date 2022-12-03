@@ -659,7 +659,7 @@ public class ActionScript3Parser {
             List<Map.Entry<String, Map<String, String>>> metadata = parseMetadata();
             s = lex();
 
-            while (s.isType(SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER)) {
+            while (s.isType(SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER, SymbolType.INTERNAL)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
                         throw new AVM2ParseException("Only one final keyword allowed", lexer.yyline());
@@ -709,6 +709,9 @@ public class ActionScript3Parser {
                         if (isInterface) {
                             throw new AVM2ParseException("Interface cannot have public, private or protected modifier", lexer.yyline());
                         }
+                        break;
+                    case INTERNAL:
+                        namespace = packageInternalNs;
                         break;
                 }
                 s = lex();
