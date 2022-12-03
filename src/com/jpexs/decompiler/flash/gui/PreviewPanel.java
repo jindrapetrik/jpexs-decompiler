@@ -1099,11 +1099,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             swf.assignClassesToSymbols();
             swf.assignExportNamesToSymbols();
             mainPanel.refreshTree(swf);
-            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), tag);
             genericEditButton.setVisible(true);
             genericSaveButton.setVisible(false);
             genericCancelButton.setVisible(false);
             genericTagPanel.setEditMode(false, null);
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), tag);            
         }
     }
 
@@ -1124,13 +1124,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             placeImagePanel.freeTransformDepth(-1);
             placeTag.getTimelined().resetTimeline();
         }
+        Tag hilightTag = null;
         if (placeEditMode == PLACE_EDIT_RAW) {
             if (placeGenericPanel.save()) {
                 Tag tag = placeGenericPanel.getTag();
                 SWF swf = tag.getSwf();
                 tag.getTimelined().resetTimeline();
                 mainPanel.refreshTree(swf);
-                mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), tag);
+                hilightTag = tag;                
             }
             placeGenericPanel.setEditMode(false, null);
         }
@@ -1139,6 +1140,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeSaveButton.setVisible(false);
         placeCancelButton.setVisible(false);
         mainPanel.repaintTree();
+        if (hilightTag != null) {
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), hilightTag);
+        }
     }
 
     private void editPlaceTagButtonActionPerformed(ActionEvent evt) {
