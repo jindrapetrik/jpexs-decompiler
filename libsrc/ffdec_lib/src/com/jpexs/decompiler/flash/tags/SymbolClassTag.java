@@ -142,6 +142,10 @@ public class SymbolClassTag extends SymbolClassTypeTag {
 
     @Override
     public void getNeededCharacters(Set<Integer> needed) {
-        needed.addAll(tags);
-    }        
+        for (int t : tags) {
+            if (t != 0) { //main class
+                needed.add(t);
+            }
+        }
+    }
 }
