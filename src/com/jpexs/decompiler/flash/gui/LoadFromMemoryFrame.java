@@ -26,6 +26,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -43,11 +44,13 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -55,10 +58,15 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.SwingWorker.StateValue;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
 /**
@@ -80,6 +88,8 @@ public class LoadFromMemoryFrame extends AppFrame {
     private DefaultListModel<com.jpexs.process.Process> model;
 
     private DefaultTableModel resTableModel;
+    
+    private List<Object[]> results = new ArrayList<>();
 
     private final JTable tableRes;
 
@@ -88,7 +98,11 @@ public class LoadFromMemoryFrame extends AppFrame {
     private boolean processing = false;
 
     private final JProgressBar progress;
+    
+    private JCheckBox hexCheckbox;
 
+    private JTextField alignField;
+    
     private class SelectProcessWorker extends SwingWorker<List<SwfInMemory>, Object> {
 
         private final List<com.jpexs.process.Process> procs;
@@ -129,15 +143,39 @@ public class LoadFromMemoryFrame extends AppFrame {
     private void addResultRow(SwfInMemory swf) {
         if (swf != null) {
             com.jpexs.process.Process process = swf.process;
-            resTableModel.addRow(new Object[]{swf.version, swf.fileSize, process.getPid(), process.getFileName(), swf.address});
+            results.add(new Object[]{swf.version, swf.fileSize, process.getPid(), process.getFileName(), swf.address});
         } else {
             String notFound = translate("notfound");
-            resTableModel.addRow(new Object[]{notFound, 0, "", "", 0});
+            results.add(new Object[]{0, 0L, 0L, notFound, 0L});
+        }
+        refreshTable();
+    }
+    
+    private void refreshTable() {
+        int align = 0;
+        if (!alignField.getText().trim().isEmpty()) {
+            try{
+                align = Integer.parseInt(alignField.getText().trim());
+                if (align < 0) {
+                    align = 0;
+                }
+            } catch(NumberFormatException nfe) {
+                
+            }
+        }
+            
+        resTableModel.setRowCount(0);
+        for (Object[] rowData:results) {
+            long address = (long) rowData[4];
+            if (align == 0 || (address % align) == 0) {
+                resTableModel.addRow(rowData);
+            }
         }
     }
 
     private void refreshList() {
         model.clear();
+        results.clear();
         processList = ProcessTools.listProcesses();
         if (processList != null) {
             Collections.sort(processList);
@@ -164,7 +202,7 @@ public class LoadFromMemoryFrame extends AppFrame {
                 return;
             }
             str.mark(Integer.MAX_VALUE);
-            OpenableSourceInfo sourceInfo = new OpenableSourceInfo(str, null, swf.process + " [" + (index + 1) + "]");
+            OpenableSourceInfo sourceInfo = new OpenableSourceInfo(str, null, swf.process + " [" + swf.address + "]");
             Main.openFile(sourceInfo);
         }
     }
@@ -176,6 +214,7 @@ public class LoadFromMemoryFrame extends AppFrame {
 
         selProcesses = list.getSelectedValuesList();
         if (!selProcesses.isEmpty()) {
+            results.clear();
             processing = true;
             tableRes.setEnabled(false);
             resTableModel.getDataVector().removeAllElements();
@@ -237,9 +276,9 @@ public class LoadFromMemoryFrame extends AppFrame {
                     case 0:
                         return Integer.class;
                     case 1:
-                        return Integer.class;
+                        return Long.class;
                     case 2:
-                        return String.class;
+                        return Long.class;
                     case 3:
                         return String.class;
                     case 4:
@@ -258,9 +297,38 @@ public class LoadFromMemoryFrame extends AppFrame {
         resTableModel.addColumn(translate("column.pid"));
         resTableModel.addColumn(translate("column.processName"));
         resTableModel.addColumn(translate("column.address"));
+        
         tableRes = new JTable(resTableModel);
         TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(resTableModel);
         tableRes.setRowSorter(sorter);
+        TableCellRenderer hexRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel ret = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                
+                if (hexCheckbox.isSelected()) {
+                    String hexStr = "";
+                    if (value instanceof Integer) {
+                        hexStr = Integer.toHexString((Integer)value);                        
+                    }
+                    if (value instanceof Long) {
+                        hexStr = Long.toHexString((Long)value);
+                    }
+                    if (hexStr.length() % 2 == 1) {
+                        hexStr = "0" + hexStr;
+                    }
+                    hexStr = "0x" + hexStr;
+                    ret.setText(hexStr);
+                    ret.setFont(new Font(Font.MONOSPACED, Font.PLAIN, ret.getFont().getSize()));                    
+                }
+                ret.setHorizontalAlignment(JLabel.RIGHT);
+                
+                return ret;
+            }
+            
+        };
+        tableRes.getColumn(translate("column.fileSize")).setCellRenderer(hexRenderer);
+        tableRes.getColumn(translate("column.address")).setCellRenderer(hexRenderer);
         list = new JList<>(model);
         list.addKeyListener(new KeyAdapter() {
             @Override
@@ -330,7 +398,39 @@ public class LoadFromMemoryFrame extends AppFrame {
         leftPanel.add(leftButtonsPanel, BorderLayout.SOUTH);
 
         JPanel rightPanel = new JPanel(new BorderLayout());
-        rightPanel.add(new FasterScrollPane(tableRes), BorderLayout.CENTER);
+        
+        JPanel rightCentralPanel = new JPanel(new BorderLayout());
+        rightCentralPanel.add(new FasterScrollPane(tableRes), BorderLayout.CENTER);
+        
+        JPanel modePanel = new JPanel(new FlowLayout());
+        
+        hexCheckbox = new JCheckBox(translate("hex"));
+        hexCheckbox.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                tableRes.repaint();
+            }
+        });
+        modePanel.add(hexCheckbox);
+        
+        JLabel alignLabel = new JLabel(translate("align"));
+        alignField = new JTextField(3);
+        alignField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                refreshTable();
+            }            
+        });
+        JLabel bytesLabel = new JLabel(translate("align.bytes"));
+        
+        modePanel.add(Box.createHorizontalStrut(20));
+        modePanel.add(alignLabel);
+        modePanel.add(alignField);
+        modePanel.add(bytesLabel);
+        
+        rightCentralPanel.add(modePanel, BorderLayout.SOUTH);
+        
+        rightPanel.add(rightCentralPanel, BorderLayout.CENTER);
         JPanel rightButtonsPanel = new JPanel(new FlowLayout());
         JButton openButton = new JButton(translate("button.open"));
         openButton.addActionListener(this::openSwfButtonActionPerformed);
@@ -352,6 +452,8 @@ public class LoadFromMemoryFrame extends AppFrame {
         progress.setVisible(false);
         rightPanel.add(statePanel, BorderLayout.NORTH);
 
+        
+        
         cnt.add(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel), BorderLayout.CENTER);
         View.setWindowIcon(this);
         View.centerScreen(this);
