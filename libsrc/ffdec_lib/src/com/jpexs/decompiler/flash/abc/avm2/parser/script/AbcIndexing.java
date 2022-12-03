@@ -171,7 +171,7 @@ public final class AbcIndexing {
             }
             int k = abc.constants.getNamespace(propNsIndex).kind;
             if (k != Namespace.KIND_PACKAGE && propNsIndex != builtInIndex) {
-                if (k == Namespace.KIND_PROTECTED) {
+                if (k == Namespace.KIND_PROTECTED || k == Namespace.KIND_STATIC_PROTECTED) {
                     setProtected(abc, propNsIndex);
                 } else {
                     setPrivate(abc, propNsIndex);

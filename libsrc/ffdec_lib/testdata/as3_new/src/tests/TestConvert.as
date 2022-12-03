@@ -49,8 +49,11 @@ package tests
             s = v.join("x");
             i = int(v.join("x"));
             
-            i = int(prot);
-            s = prot;
+            i = prot;
+            s = String(prot);
+            
+            i = sprot;
+            s = String(sprot);
             
             s = String(getTimer());            
             
