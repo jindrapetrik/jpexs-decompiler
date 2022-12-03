@@ -140,6 +140,7 @@ import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
+import com.jpexs.decompiler.flash.tags.ProductInfoTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -4619,6 +4620,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof DefineBinaryDataTag) {
             DefineBinaryDataTag binaryTag = (DefineBinaryDataTag) treeItem;
             previewPanel.showBinaryPanel(binaryTag);
+        } else if (treeItem instanceof ProductInfoTag) {
+            ProductInfoTag productInfoTag = (ProductInfoTag) treeItem;
+            previewPanel.showProductInfoPanel(productInfoTag);
         } else if (treeItem instanceof UnknownTag) {
             UnknownTag unknownTag = (UnknownTag) treeItem;
             previewPanel.showUnknownPanel(unknownTag);
@@ -4935,6 +4939,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof PlaceObjectTypeTag) {
             showPreview(treeItem, previewPanel, getFrameForTreeItem(treeItem), null);
+            showCard(CARDPREVIEWPANEL);
+        } else if (treeItem instanceof ProductInfoTag) {
+            showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
         } else if (treeItem instanceof Tag) {
             showGenericTag((Tag) treeItem);

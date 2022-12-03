@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.ProductInfoTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
@@ -63,6 +64,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -91,6 +98,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private static final String GENERIC_TAG_CARD = "GENERICTAG";
 
     private static final String BINARY_TAG_CARD = "BINARYTAG";
+    
+    private static final String PRODUCTINFO_TAG_CARD = "PRODUCTINFOTAG";
 
     private static final String UNKNOWN_TAG_CARD = "UNKNOWNTAG";
 
@@ -201,6 +210,13 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     //used only for flash player
     private TreeItem currentItem;
+    
+    private JLabel productValueLabel = new JLabel();
+    private JLabel editionValueLabel = new JLabel();
+    private JLabel versionValueLabel = new JLabel();
+    private JLabel buildValueLabel = new JLabel();
+    private JLabel compileDateValueLabel = new JLabel();
+        
 
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
@@ -221,6 +237,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         viewerCards.add(createFlashPlayerPanel(flashPanel), FLASH_VIEWER_CARD);
         viewerCards.add(createImagesCard(), DRAW_PREVIEW_CARD);
         viewerCards.add(createBinaryCard(), BINARY_TAG_CARD);
+        viewerCards.add(createProductInfoCard(), PRODUCTINFO_TAG_CARD);
         viewerCards.add(createUnknownCard(), UNKNOWN_TAG_CARD);
         viewerCards.add(createMetadataCard(), METADATA_TAG_CARD);
         viewerCards.add(createGenericTagCard(), GENERIC_TAG_CARD);
@@ -517,6 +534,63 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         binaryCard.add(createBinaryButtonsPanel(), BorderLayout.SOUTH);
         return binaryCard;
     }
+    
+    private JPanel createProductInfoCard() {
+        JPanel productInfoCard = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel tablePanel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        JLabel productLabel = new JLabel(AppStrings.translate("productinfo.product"));
+        productLabel.setHorizontalAlignment(JLabel.RIGHT);
+        JLabel editionLabel = new JLabel(AppStrings.translate("productinfo.edition"));
+        editionLabel.setHorizontalAlignment(JLabel.RIGHT);
+        JLabel versionLabel = new JLabel(AppStrings.translate("productinfo.version"));
+        versionLabel.setHorizontalAlignment(JLabel.RIGHT);
+        JLabel buildLabel = new JLabel(AppStrings.translate("productinfo.build"));
+        buildLabel.setHorizontalAlignment(JLabel.RIGHT);
+        JLabel compileDateLabel = new JLabel(AppStrings.translate("productinfo.compileDate"));
+        compileDateLabel.setHorizontalAlignment(JLabel.RIGHT);
+        
+        c.insets = new Insets(3,3,3,3);
+        
+        c.weightx = 1;
+        c.weighty = 1;
+        
+        c.gridy = 0;
+        
+        c.gridx = 0;                
+        tablePanel.add(productLabel, c);
+        c.gridx = 1;
+        tablePanel.add(productValueLabel, c);
+        
+        c.gridy++;
+        c.gridx = 0;        
+        tablePanel.add(editionLabel, c);
+        c.gridx = 1;
+        tablePanel.add(editionValueLabel, c);
+        
+        c.gridy++;
+        c.gridx = 0;        
+        tablePanel.add(versionLabel, c);
+        c.gridx = 1;
+        tablePanel.add(versionValueLabel, c);
+        
+        c.gridy++;
+        c.gridx = 0;        
+        tablePanel.add(buildLabel, c);
+        c.gridx = 1;
+        tablePanel.add(buildValueLabel, c);
+        
+        c.gridy++;
+        c.gridx = 0;        
+        tablePanel.add(compileDateLabel, c);
+        c.gridx = 1;
+        tablePanel.add(compileDateValueLabel, c);
+        
+        productInfoCard.add(tablePanel);
+        
+        return productInfoCard;
+    }
 
     private JPanel createUnknownCard() {
         JPanel unknownCard = new JPanel(new BorderLayout());
@@ -740,6 +814,51 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     public void showBinaryPanel(DefineBinaryDataTag binaryDataTag) {
         showCardLeft(BINARY_TAG_CARD);
         binaryPanel.setBinaryData(binaryDataTag);
+        parametersPanel.setVisible(false);
+    }
+    
+    public void showProductInfoPanel(ProductInfoTag productInfoTag) {
+        showCardLeft(PRODUCTINFO_TAG_CARD);
+        if (productInfoTag.productID == 0L) {
+            productValueLabel.setText(AppStrings.translate("productinfo.product.unknown"));
+        } else if (productInfoTag.productID == 1L) {
+            productValueLabel.setText("Macromedia Flex for J2EE");
+        } else if (productInfoTag.productID == 2L) {
+            productValueLabel.setText("Macromedia Flex for .NET");
+        } else if (productInfoTag.productID == 3L) {
+            productValueLabel.setText("Apache/Adobe Flex");
+        } else {
+            productValueLabel.setText("(" + productInfoTag.productID + ")");
+        }
+        
+        if (productInfoTag.edition == 0L) {
+            editionValueLabel.setText("Developer Edition");
+        } else if (productInfoTag.edition == 1L) {
+            editionValueLabel.setText("Full Commercial Edition");
+        } else if (productInfoTag.edition == 2L) {
+            editionValueLabel.setText("Non Commercial Edition");
+        } else if (productInfoTag.edition == 3L) {
+            editionValueLabel.setText("Educational Edition");
+        } else if (productInfoTag.edition == 4L) {
+            editionValueLabel.setText("Not For Resale (NFR) Edition");
+        } else if (productInfoTag.edition == 5L) {
+            editionValueLabel.setText("Trial Edition");
+        } else if (productInfoTag.edition == 6L) {
+            editionValueLabel.setText(AppStrings.translate("productinfo.edition.none"));
+        } else {
+            editionValueLabel.setText("(" + productInfoTag.productID + ")");
+        }
+        
+        versionValueLabel.setText("" + productInfoTag.majorVersion + "." + productInfoTag.minorVersion);
+        BigInteger buildBigInteger = new BigInteger("" + productInfoTag.buildHigh);
+        buildBigInteger = buildBigInteger.shiftLeft(32).add(new BigInteger("" + productInfoTag.buildLow));
+        buildValueLabel.setText("" + buildBigInteger);
+        
+        long compilationDate = (productInfoTag.compilationDateHigh << 32) + productInfoTag.compilationDateLow;           
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+        
+        compileDateValueLabel.setText(df.format(new Date(compilationDate)) + " UTC");
         parametersPanel.setVisible(false);
     }
 
