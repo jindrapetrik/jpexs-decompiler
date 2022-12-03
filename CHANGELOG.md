@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - Resolving types on static protected namespaced properties
 - Hiding selection after raw editation save
 - Proper disabling switching items or other actions on editation
+- Raw editor item count and edit display
 
 ### Changed
 - Quick search needs minimum of 3 characters
