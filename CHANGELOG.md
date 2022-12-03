@@ -6,12 +6,15 @@ All notable changes to this project will be documented in this file.
 - [#1898] Keyboard shortcut to remove tags (DEL, SHIFT+DEL)
 - [#1511], [#1765] Quick search tree (Ctrl+F) for everything, not just AS3 classes
 - Quick search (Ctrl+F) for tag list view
+- [#1884] Memory search - show size and adress in hex, show only aligned to N bytes
 
 ### Fixed
 - [#1897] Close menu button without selecting specific item
 - Reading UI32 values
 - Parsing obfuscated namespaces with hash character "#"
 - Tag dependency checking
+- [#1884] Memory search - Logged exception when cannot get page range
+- [#1884] Memory search - Exception on sorting by pid
 
 ### Changed
 - Quick search needs minimum of 3 characters
@@ -2692,6 +2695,7 @@ All notable changes to this project will be documented in this file.
 [#1898]: https://www.free-decompiler.com/flash/issues/1898
 [#1511]: https://www.free-decompiler.com/flash/issues/1511
 [#1765]: https://www.free-decompiler.com/flash/issues/1765
+[#1884]: https://www.free-decompiler.com/flash/issues/1884
 [#1897]: https://www.free-decompiler.com/flash/issues/1897
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1895]: https://www.free-decompiler.com/flash/issues/1895
