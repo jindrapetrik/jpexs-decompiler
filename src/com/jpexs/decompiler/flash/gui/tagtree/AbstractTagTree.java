@@ -108,6 +108,7 @@ import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -119,6 +120,8 @@ public abstract class AbstractTagTree extends JTree {
     public TagTreeContextMenu contextPopupMenu;
 
     protected final MainPanel mainPanel;
+    
+    private AbstractTagTreeModel fullModel;
 
     private static final Map<TreeNodeType, Icon> ICONS;
     
@@ -134,6 +137,14 @@ public abstract class AbstractTagTree extends JTree {
         }        
     }
 
+    @Override
+    public void setModel(TreeModel newModel) {
+        super.setModel(newModel);
+        if (newModel instanceof AbstractTagTreeModel) {
+            this.fullModel = (AbstractTagTreeModel)newModel;
+        }
+    }
+        
     public MainPanel getMainPanel() {
         return mainPanel;
     }
@@ -392,20 +403,19 @@ public abstract class AbstractTagTree extends JTree {
         return TreeNodeType.FOLDER;
     }             
     
-    @Override
-    public AbstractTagTreeModel getModel() {
-        return (AbstractTagTreeModel) super.getModel();
+    public AbstractTagTreeModel getFullModel() {
+        return fullModel;
     }
     
     public void expandRoot() {
-        AbstractTagTreeModel ttm = getModel();
-        TreeItem root = ttm.getRoot();
+        TreeModel ttm = getModel();
+        Object root = ttm.getRoot();
         expandPath(new TreePath(new Object[]{root}));
     }
     
     public void expandFirstLevelNodes() {
-        AbstractTagTreeModel ttm = getModel();
-        TreeItem root = ttm.getRoot();
+        TreeModel ttm = getModel();
+        Object root = ttm.getRoot();
         int childCount = ttm.getChildCount(root);
         for (int i = 0; i < childCount; i++) {
             expandPath(new TreePath(new Object[]{root, ttm.getChild(root, i)}));
@@ -419,12 +429,13 @@ public abstract class AbstractTagTree extends JTree {
             TreePath tp = View.getTreePathByPathStrings(this, Arrays.asList(path));
             if (tp != null) {
                 // the current view is the Resources view, otherwise tp is null
-                if (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES) {
+                /*if (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES) {
                     mainPanel.tagTree.expandPath(tp.getParentPath());
                 }
                 if (mainPanel.getCurrentView() == MainPanel.VIEW_TAGLIST) {
                     mainPanel.tagListTree.expandPath(tp.getParentPath());
-                }                
+                */               
+                expandPath(tp.getParentPath());
             }
         }
     }
@@ -454,7 +465,7 @@ public abstract class AbstractTagTree extends JTree {
     }
     
     public void getAllSubs(TreeItem o, List<TreeItem> ret) {
-        AbstractTagTreeModel tm = getModel();
+        AbstractTagTreeModel tm = getFullModel();
         for (TreeItem c : tm.getAllChildren(o)) {
             ret.add(c);
             getAllSubs(c, ret);
@@ -600,7 +611,7 @@ public abstract class AbstractTagTree extends JTree {
     }
     
     public void updateSwfs(Openable[] openables) {
-        AbstractTagTreeModel ttm = getModel();
+        AbstractTagTreeModel ttm = getFullModel();
         if (ttm != null) {
             List<List<String>> expandedNodes = View.getExpandedNodes(this);
             ttm.updateOpenable(null); // todo: honfika: update only the changed swfs, but there was an exception when i tried it
@@ -623,7 +634,7 @@ public abstract class AbstractTagTree extends JTree {
     }
     
     public String getItemPathString(TreeItem item) {
-        TreePath path = getModel().getTreePath(item);
+        TreePath path = getFullModel().getTreePath(item);
         if (path == null) {
             return null;
         }
@@ -631,12 +642,12 @@ public abstract class AbstractTagTree extends JTree {
     }
     
     public final void calculateCollisions() {
-        getModel().calculateCollisions();
+        getFullModel().calculateCollisions();
     }
     
     public String pathToString(TreePath path) {
         StringBuilder sb = new StringBuilder();
-        AbstractTagTreeModel model = getModel();
+        AbstractTagTreeModel model = getFullModel();
         if (path != null) {
             boolean first = true;
             for (Object p : path.getPath()) {
@@ -772,4 +783,8 @@ public abstract class AbstractTagTree extends JTree {
         }
         return new ArrayList<>();
     }
+
+    
+    
+    
 }

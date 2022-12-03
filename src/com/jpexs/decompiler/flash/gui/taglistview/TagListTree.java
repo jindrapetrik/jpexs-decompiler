@@ -64,8 +64,8 @@ public class TagListTree extends AbstractTagTree {
     }
 
     @Override
-    public TagListTreeModel getModel() {
-        return (TagListTreeModel) super.getModel();
+    public TagListTreeModel getFullModel() {
+        return (TagListTreeModel) super.getFullModel();
     }
 
     @Override
@@ -242,12 +242,12 @@ class TreeTransferHandler extends TransferHandler {
                 timelined = ((Tag) dest).getTimelined();
                 position = (Tag) dest;
             } else {
-                int childCount = tree.getModel().getChildCount(dest);
+                int childCount = tree.getFullModel().getChildCount(dest);
                 TreeItem child;
                 if (childIndex >= childCount) {
-                    child = tree.getModel().getChild(dest, childCount - 1);
+                    child = tree.getFullModel().getChild(dest, childCount - 1);
                 } else {
-                    child = tree.getModel().getChild(dest, childIndex);                    
+                    child = tree.getFullModel().getChild(dest, childIndex);                    
                 }
                 if (child instanceof SWF) {
                     SWF swf = (SWF) child;

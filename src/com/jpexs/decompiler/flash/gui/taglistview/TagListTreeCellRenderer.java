@@ -148,7 +148,7 @@ public class TagListTreeCellRenderer extends DefaultTreeCellRenderer {
                     semiTransparent = true;
                 }
                 
-                AbstractTagTreeModel model = aTree.getModel();
+                AbstractTagTreeModel model = aTree.getFullModel();
                 int itemIndex = model.getItemIndex(val);
                 if (itemIndex > 1) {
                     lab.setText(lab.getText() + " [" + itemIndex + "]");

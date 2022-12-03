@@ -491,7 +491,7 @@ public class View {
         int rowCount = tree.getRowCount();
         for (int i = 0; i < rowCount; i++) {
             try {
-                TreePath path = tree.getPathForRow(i);
+                TreePath path = tree.getPathForRow(i);               
                 if (tree.isExpanded(path)) {
                     List<String> pathAsStringList = new ArrayList<>();
                     for (Object pathCompnent : path.getPath()) {

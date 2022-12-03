@@ -1372,7 +1372,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         if (openable instanceof SWF) {
             SWF swf = (SWF) openable;
             if (mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES) {
-                scriptNode = mainPanel.tagTree.getModel().getScriptsNode(swf);
+                scriptNode = mainPanel.tagTree.getFullModel().getScriptsNode(swf);
             } else {
                 List<ABC> allAbcs = new ArrayList<>();
                 for (ABCContainerTag container : swf.getAbcList()) {
@@ -1404,7 +1404,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         Object item;
 
         if ((mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES) && (openable instanceof SWF)) {
-            item = mainPanel.tagTree.getModel().getScriptsNode((SWF) openable);
+            item = mainPanel.tagTree.getFullModel().getScriptsNode((SWF) openable);
         } else if (openable instanceof ABC) {
             item = openable;
         } else { //SWF on taglist, should be DoABCContainer
@@ -1418,7 +1418,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         loopparts:
         for (int i = 0; i < parts.length; i++) {
-            for (TreeItem ti : tree.getModel().getAllChildren(item)) {
+            for (TreeItem ti : tree.getFullModel().getAllChildren(item)) {
                 if ((ti instanceof AS3Package) && ((AS3Package) ti).isFlat()) {
                     AS3Package pti = (AS3Package) ti;
                     if ((pkg.isEmpty() && pti.isDefaultPackage()) || (!pti.isDefaultPackage() && pkg.equals(pti.packageName))) {
@@ -1444,7 +1444,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     public void hilightScript(ScriptPack pack) {
         View.checkAccess();
 
-        AbstractTagTreeModel ttm = mainPanel.getCurrentTree().getModel();
+        AbstractTagTreeModel ttm = mainPanel.getCurrentTree().getFullModel();
         TreePath tp = ttm.getTreePath(pack);
         if (tp == null) {
             mainPanel.closeTagTreeSearch();
@@ -1558,7 +1558,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     }
 
     public TreeItem getScriptNodeForPack(ScriptPack pack) {
-        TreePath scriptsPath = mainPanel.getCurrentTree().getModel().getTreePath(pack);
+        TreePath scriptsPath = mainPanel.getCurrentTree().getFullModel().getTreePath(pack);
         while (!(scriptsPath.getLastPathComponent() instanceof ClassesListTreeModel)
                 && !(scriptsPath.getLastPathComponent() instanceof ABC)
                 && !(scriptsPath.getLastPathComponent() instanceof ABCContainerTag)) {

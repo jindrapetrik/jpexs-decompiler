@@ -328,7 +328,7 @@ public class PinButton extends JPanel {
     }
     
     private String getTreeItemPath(TreeItem item) {
-        TreePath path = mainPanel.getCurrentTree().getModel().getTreePath(item);
+        TreePath path = mainPanel.getCurrentTree().getFullModel().getTreePath(item);
         if (path == null) {
             return "";
         }
