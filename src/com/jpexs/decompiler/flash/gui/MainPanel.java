@@ -511,6 +511,21 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private void handleTreeKeyPressed(KeyEvent e) {
         AbstractTagTree tree = (AbstractTagTree) e.getSource();
+        if ((e.getKeyCode() == KeyEvent.VK_DELETE) && !e.isControlDown() && !e.isAltDown()) {
+            TreePath[] paths = tree.getSelectionPaths();
+            if (paths == null || paths.length == 0) {
+                return;
+            }
+            List<TreeItem> items = new ArrayList<>();
+            for (TreePath treePath : paths) {
+                TreeItem item = (TreeItem) treePath.getLastPathComponent();
+                items.add(item);
+            }
+            if (contextPopupMenu.canRemove(items)) {
+                contextPopupMenu.update(items);
+                contextPopupMenu.removeItemActionPerformed(null, e.isShiftDown());
+            }
+        }
         if ((e.getKeyCode() == 'C' || e.getKeyCode() == 'X') && (e.isControlDown())) {
             TreePath[] paths = tree.getSelectionPaths();
             if (paths == null || paths.length == 0) {

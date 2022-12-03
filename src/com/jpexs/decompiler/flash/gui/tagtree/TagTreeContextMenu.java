@@ -282,14 +282,14 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         add(changeCharsetMenu);
 
-        removeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.remove"));
+        removeMenuItem = new JMenuItem(mainPanel.translate("contextmenu.remove") + " (DEL)");
         removeMenuItem.addActionListener((ActionEvent e) -> {
             removeItemActionPerformed(e, false);
         });
         removeMenuItem.setIcon(View.getIcon("remove16"));
         add(removeMenuItem);
 
-        removeWithDependenciesMenuItem = new JMenuItem(mainPanel.translate("contextmenu.removeWithDependencies"));
+        removeWithDependenciesMenuItem = new JMenuItem(mainPanel.translate("contextmenu.removeWithDependencies") + " (SHIFT+DEL)");
         removeWithDependenciesMenuItem.addActionListener((ActionEvent e) -> {
             removeItemActionPerformed(e, true);
         });
@@ -624,32 +624,14 @@ public class TagTreeContextMenu extends JPopupMenu {
         return mainPanel.getCurrentTree();
     }
 
-    public void update(final List<TreeItem> items) {
-
-        if (items.isEmpty()) {
-            return;
-        }
-
-        this.items = items;
-
-        AbstractTagTree tree = getTree();
-
-        final List<OpenableList> swfs = mainPanel.getSwfs();
-
-        boolean canRemove = true;
-        boolean allDoNotHaveDependencies = true;
+    public boolean canRemove(final List<TreeItem> items) {
         for (TreeItem item : items) {
             if (!(item instanceof Tag) && !(item instanceof Frame)) {
                 if (item instanceof TagScript) {
-                    Tag tag = ((TagScript) item).getTag();
-                    if (tag instanceof DoActionTag || tag instanceof DoInitActionTag) {
-                        allDoNotHaveDependencies = false;
-                    }
                     continue;
                 }
 
                 if (item instanceof AS2Package) {
-                    allDoNotHaveDependencies = false;
                     continue;
                 }
 
@@ -675,10 +657,44 @@ public class TagTreeContextMenu extends JPopupMenu {
                     continue;
                 }
 
-                canRemove = false;
-                break;
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public void update(final List<TreeItem> items) {
+
+        if (items.isEmpty()) {
+            return;
+        }
+
+        this.items = items;
+
+        AbstractTagTree tree = getTree();
+
+        final List<OpenableList> swfs = mainPanel.getSwfs();
+
+        boolean canRemove = canRemove(items);
+        boolean allDoNotHaveDependencies = true;
+        for (TreeItem item : items) {
+            if (!(item instanceof Tag) && !(item instanceof Frame)) {
+                if (item instanceof TagScript) {
+                    Tag tag = ((TagScript) item).getTag();
+                    if (tag instanceof DoActionTag || tag instanceof DoInitActionTag) {
+                        allDoNotHaveDependencies = false;
+                        break;
+                    }
+                    continue;
+                }
+
+                if (item instanceof AS2Package) {
+                    allDoNotHaveDependencies = false;
+                    break;                  
+                }
             } else {
                 allDoNotHaveDependencies = false;
+                break;
             }
         }
 
@@ -2267,7 +2283,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
     }
 
-    private void removeItemActionPerformed(ActionEvent evt, boolean removeDependencies) {
+    public void removeItemActionPerformed(ActionEvent evt, boolean removeDependencies) {
 
         List<TreePath> tps = new ArrayList<>();
 
