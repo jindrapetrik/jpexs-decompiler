@@ -88,6 +88,25 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
     }
 
     
+    public static final DottedChain parseNoSuffix(String name) {
+        if (name == null) {
+            return DottedChain.EMPTY;
+        } else if (name.isEmpty()) {
+            return DottedChain.TOPLEVEL;
+        } else {
+            String parts[] = name.split("\\.");
+            String nsSuffixes[] = new String[parts.length];
+            int i = 0;
+            for (String part : parts) {
+                String nameNoSuffix = part;
+                parts[i] = nameNoSuffix;
+                nsSuffixes[i] = "";
+                i++;
+            }
+            
+            return new DottedChain(parts, nsSuffixes);
+        }
+    }
     public static final DottedChain parseWithSuffix(String name) {
         if (name == null) {
             return DottedChain.EMPTY;
