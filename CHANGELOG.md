@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - [#1884] Memory search - show size and adress in hex, show only aligned to N bytes
 - AS3 - "internal" keyword support
 - ProductInfo tag information display
+- DebugId tag proper display and editation
 
 ### Fixed
 - [#1897] Close menu button without selecting specific item
