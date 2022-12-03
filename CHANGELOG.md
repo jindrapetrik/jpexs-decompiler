@@ -9,6 +9,9 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#1897] Close menu button without selecting specific item
 
+### Changed
+- Quick search needs minimum of 3 characters
+
 ## [17.0.4] - 2022-12-02
 ### Fixed
 - [#1888] Casts for missing types, cast handling for script local classes

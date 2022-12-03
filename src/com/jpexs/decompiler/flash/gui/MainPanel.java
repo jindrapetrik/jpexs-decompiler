@@ -1586,6 +1586,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             tagTree.updateUI();
         }
     }
+    
+    private boolean isFilterEmpty(String filter) {
+        return filter.trim().length() < 3;
+    }
 
     public void doFilter() {
         View.checkAccess();      
@@ -1598,7 +1602,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         String newFilter = filterField.getText();
                 
         
-        if (oldFilter.trim().equals("")) {
+        if (isFilterEmpty(oldFilter)) {
             unfilteredExpandedNodes = View.getExpandedNodes(tagTree);                        
         }
         
@@ -1607,7 +1611,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }                                
         
         tagTree.setModel(new FilteredTreeModel(newFilter, tagTree.getFullModel()));        
-        if (!newFilter.trim().isEmpty()) {
+        if (!isFilterEmpty(newFilter)) {
             for (int i = 0; i < tagTree.getRowCount(); i++) {
                 tagTree.expandRow(i);
             }
