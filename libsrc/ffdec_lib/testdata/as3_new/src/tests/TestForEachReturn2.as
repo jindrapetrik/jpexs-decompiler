@@ -6,12 +6,11 @@ package tests
 		public function run():*
 		{
 			var obj:* = null;
-            var x = 5;            
+            var x:* = 5;            
             if (x != null)
             {
                 obj = {};
-                var item = {};
-                for each (var item in obj)
+                for each (var item:* in obj)
                 {
                     switch (item["key"])
                     {

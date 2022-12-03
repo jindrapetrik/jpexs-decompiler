@@ -8,7 +8,7 @@ package tests
             var i:int;
             var j:int
             var c:int = 5 + i;
-            var f = function() {
+            var f:Function = function(): void {
                 trace(c);
                 trace(j);
             };

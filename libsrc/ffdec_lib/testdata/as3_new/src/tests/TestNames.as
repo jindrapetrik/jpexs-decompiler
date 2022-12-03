@@ -9,7 +9,7 @@ package tests
 	{
         myInternal var neco:int;
         myInternal2 var neco:int;
-        var nic:int;
+        internal var nic:int;
 		
 		public function run():*
 		{

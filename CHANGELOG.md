@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - Tag dependency checking
 - [#1884] Memory search - Logged exception when cannot get page range
 - [#1884] Memory search - Exception on sorting by pid
+- [#1006] AS3 - Warning - Function value used where type Boolean was expected
 
 ### Changed
 - Quick search needs minimum of 3 characters
@@ -2697,6 +2698,7 @@ All notable changes to this project will be documented in this file.
 [#1765]: https://www.free-decompiler.com/flash/issues/1765
 [#1884]: https://www.free-decompiler.com/flash/issues/1884
 [#1897]: https://www.free-decompiler.com/flash/issues/1897
+[#1006]: https://www.free-decompiler.com/flash/issues/1006
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1895]: https://www.free-decompiler.com/flash/issues/1895
 [#1896]: https://www.free-decompiler.com/flash/issues/1896
