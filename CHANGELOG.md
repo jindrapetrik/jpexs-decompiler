@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - [#1898] Keyboard shortcut to remove tags (DEL, SHIFT+DEL)
-- [#1765] Quick search tree (Ctrl+F) for everything, not just AS3 classes
+- [#1511], [#1765] Quick search tree (Ctrl+F) for everything, not just AS3 classes
 - Quick search (Ctrl+F) for tag list view
 
 ### Fixed
@@ -2689,6 +2689,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1898]: https://www.free-decompiler.com/flash/issues/1898
+[#1511]: https://www.free-decompiler.com/flash/issues/1511
 [#1765]: https://www.free-decompiler.com/flash/issues/1765
 [#1897]: https://www.free-decompiler.com/flash/issues/1897
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
