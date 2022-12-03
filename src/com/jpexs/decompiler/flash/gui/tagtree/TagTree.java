@@ -82,6 +82,8 @@ import com.jpexs.decompiler.flash.tags.StartSoundTag;
 import com.jpexs.decompiler.flash.tags.SymbolClassTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
@@ -212,7 +214,7 @@ public class TagTree extends AbstractTagTree {
                     List<String> missingAsStr = new ArrayList<>();
                     for (int v : missingNeededCharacters) {
                         missingAsStr.add("" + v);
-                    }
+                    }                    
                     if (missingAsStr.size() == 1) {
                         setToolTipText(AppStrings.translate("error.missing.characterTag.single").replace("%tag%", missingAsStr.get(0)));
                     } else {

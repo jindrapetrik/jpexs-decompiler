@@ -612,19 +612,8 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
         if (tim == null) {
             return needed2;
         }
-        ReadOnlyTagList tags = tim.getTags();
-        for (int i = tags.indexOf(this) - 1; i >= -1; i--) {
-            if (i == -1) {
-                if (tim instanceof SWF) {
-                    break;
-                } else {
-                    Timelined parent = ((Tag) tim).getTimelined();
-                    tags = parent.getTags();
-                    i = tags.indexOf((Tag) tim);
-                    tim = parent;
-                    continue;
-                }
-            }
+        ReadOnlyTagList tags = tim.getTags();        
+        for (int i = tags.indexOf(this) - 1; i >= 0; i--) {            
             if (tags.get(i) instanceof CharacterTag) {
                 int charId = ((CharacterTag) tags.get(i)).getCharacterId();
                 needed2.remove(charId);
