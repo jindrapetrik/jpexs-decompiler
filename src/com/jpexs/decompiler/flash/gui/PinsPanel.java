@@ -157,6 +157,9 @@ public class PinsPanel extends JPanel {
             pinButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    if (mainPanel.checkEdited()) {
+                        return;
+                    }
                     current = pinButton.getItem();
                     if (lastSelectedButton != null) {
                         lastSelectedButton.setSelected(false);

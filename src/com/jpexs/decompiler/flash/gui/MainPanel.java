@@ -660,35 +660,37 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public boolean isClipboardCut() {
         return clipboardCut;
+    }   
+    
+    public boolean checkEdited() {
+        if (abcPanel != null && abcPanel.isEditing()) {
+            abcPanel.tryAutoSave();
+        }
+
+        if (actionPanel != null && actionPanel.isEditing()) {
+            actionPanel.tryAutoSave();
+        }
+
+        if (previewPanel.isEditing()) {
+            previewPanel.tryAutoSave();
+        }
+
+        if (headerPanel.isEditing()) {
+            headerPanel.tryAutoSave();
+        }
+
+        return (abcPanel != null && abcPanel.isEditing())
+                || (actionPanel != null && actionPanel.isEditing())
+                || previewPanel.isEditing() || headerPanel.isEditing();
     }
 
     private class MyTreeSelectionModel extends DefaultTreeSelectionModel {
 
-        private boolean isModified() {
-            if (abcPanel != null && abcPanel.isEditing()) {
-                abcPanel.tryAutoSave();
-            }
-
-            if (actionPanel != null && actionPanel.isEditing()) {
-                actionPanel.tryAutoSave();
-            }
-
-            if (previewPanel.isEditing()) {
-                previewPanel.tryAutoSave();
-            }
-
-            if (headerPanel.isEditing()) {
-                headerPanel.tryAutoSave();
-            }
-
-            return (abcPanel != null && abcPanel.isEditing())
-                    || (actionPanel != null && actionPanel.isEditing())
-                    || previewPanel.isEditing() || headerPanel.isEditing();
-        }
+        
 
         @Override
         public void addSelectionPath(TreePath path) {
-            if (isModified()) {
+            if (checkEdited()) {
                 return;
             }
 
@@ -697,7 +699,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         @Override
         public void addSelectionPaths(TreePath[] paths) {
-            if (isModified()) {
+            if (checkEdited()) {
                 return;
             }
 
@@ -706,7 +708,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         @Override
         public void setSelectionPath(TreePath path) {
-            if (isModified()) {
+            if (checkEdited()) {
                 return;
             }
 
@@ -715,7 +717,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         @Override
         public void setSelectionPaths(TreePath[] pPaths) {
-            if (isModified()) {
+            if (checkEdited()) {
                 return;
             }
 
@@ -724,7 +726,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         @Override
         public void clearSelection() {
-            if (isModified()) {
+            if (checkEdited()) {
                 return;
             }
 
@@ -732,7 +734,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         public void setSelection(TreePath[] selection) {
-            if (isModified()) {
+            if (checkEdited()) {
                 return;
             }
 
@@ -741,7 +743,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         @Override
         public void removeSelectionPath(TreePath path) {
-            if (isModified()) {
+            if (checkEdited()) {
                 return;
             }
 
@@ -750,7 +752,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         @Override
         public void removeSelectionPaths(TreePath[] paths) {
-            if (isModified()) {
+            if (checkEdited()) {
                 return;
             }
 
@@ -1900,7 +1902,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                     ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), singleScriptFile, false);
                     String singleFileName = Path.combine(scriptsFolder, openable.getShortFileName() + scriptExportSettings.getFileExtension());
-                    try ( FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
+                    try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                         scriptExportSettings.singleFileWriter = writer;
                         if (swf.isAS3()) {
                             ret.addAll(new AS3ScriptExporter().exportActionScript3(swf, handler, scriptsFolder, as3scripts, scriptExportSettings, parallel, evl));
@@ -2007,7 +2009,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), singleScriptFile, false);
             String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
-            try ( FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
+            try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                 scriptExportSettings.singleFileWriter = writer;
                 swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl);
             }
@@ -2124,7 +2126,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 ScriptExportSettings scriptExportSettings = new ScriptExportSettings(exportMode, singleScriptFile, false);
                 String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
-                try ( FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
+                try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                     scriptExportSettings.singleFileWriter = writer;
                     swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl);
                 }
@@ -3528,7 +3530,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
                 try {
-                    try ( FileInputStream fis = new FileInputStream(selfile)) {
+                    try (FileInputStream fis = new FileInputStream(selfile)) {
                         new SwfXmlImporter().importSwf(swf, fis);
                     }
                     swf.clearAllCache();
