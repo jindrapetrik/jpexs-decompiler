@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - [#1006] AS3 - Warning - Function value used where type Boolean was expected
 - AS3 - Resolving types on static protected namespaced properties
 - Hiding selection after raw editation save
+- Proper disabling switching items or other actions on editation
 
 ### Changed
 - Quick search needs minimum of 3 characters

@@ -128,6 +128,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return false;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return false;
+        }
 
         Main.openFileDialog();
         return true;
@@ -182,6 +185,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected void newActionPerformed(ActionEvent evt) {
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
         Main.newFile();
     }
 
@@ -189,11 +195,17 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return false;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return false;
+        }
         return saveOpenable(openable);
     }
 
     protected boolean saveAsActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
+            return false;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
             return false;
         }
 
@@ -230,6 +242,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
 
         if (openable != null) {
             saveAs(openable, SaveFileMode.EXE);
@@ -253,6 +268,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
     
     protected void closeActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
+            return;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
             return;
         }
         Set<OpenableList> listsToClose = new LinkedHashSet<>();
@@ -285,6 +303,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return false;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return false;
+        }
 
         if (openable != null) {
             boolean result = Main.closeAll();
@@ -308,12 +329,18 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
 
         mainFrame.getPanel().importText((SWF) openable);
     }
 
     protected void importScriptActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
+            return;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
             return;
         }
 
@@ -324,11 +351,17 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
         mainFrame.getPanel().importImage((SWF) openable);
     }
 
     protected void importShapesActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
+            return;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
             return;
         }
         mainFrame.getPanel().importShape((SWF) openable, false);
@@ -338,11 +371,17 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
         mainFrame.getPanel().importShape((SWF) openable, true);
     }
 
     protected void importSymbolClassActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
+            return;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
             return;
         }
 
@@ -353,12 +392,18 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return false;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return false;
+        }
 
         return export(false);
     }
 
     protected boolean exportSelectedActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
+            return false;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
             return false;
         }
 
@@ -380,6 +425,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
 
         mainFrame.getPanel().exportFla((SWF) openable);
     }
@@ -388,12 +436,18 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
 
         mainFrame.getPanel().importSwfXml(mainFrame.getPanel().getCurrentTree().getSelected());
     }
 
     protected void exportXmlActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
+            return;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
             return;
         }
 
@@ -436,6 +490,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
 
         Main.showProxy();
     }
@@ -449,6 +506,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
 
         mainFrame.getPanel().renameOneIdentifier((SWF) openable);
     }
@@ -457,6 +517,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         View.checkAccess();
 
         if (Main.isWorking()) {
+            return;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
             return;
         }
 
@@ -469,6 +532,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
 
         mainFrame.getPanel().renameIdentifiers(openable);
     }
@@ -477,12 +543,18 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
 
         mainFrame.getPanel().deobfuscate();
     }
 
     protected void setSubLimiter(ActionEvent evt) {
         if (Main.isWorking()) {
+            return;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
             return;
         }
 
@@ -600,6 +672,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
 
         if (!Main.checkForUpdates()) {
             ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), translate("update.check.nonewversion"), translate("update.check.title"), JOptionPane.INFORMATION_MESSAGE);
@@ -608,6 +683,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
 
     protected void helpUsActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
+            return;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
             return;
         }
 
@@ -621,6 +699,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
 
         String homePageURL = ApplicationInfo.PROJECT_PAGE;
         if (!View.navigateUrl(homePageURL)) {
@@ -632,11 +713,17 @@ public abstract class MainFrameMenu implements MenuBuilder {
         if (Main.isWorking()) {
             return;
         }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
 
         Main.about();
     }
 
     protected boolean reloadActionPerformed(ActionEvent evt) {
+        if (mainFrame.getPanel().checkEdited()) {
+            return false;
+        }
         if (openable != null) {
             if (!Configuration.showCloseConfirmation.get() || ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.reload"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                 if (openable.getOpenableList() == null) {
@@ -655,6 +742,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected boolean reloadAllActionPerformed(ActionEvent evt) {
+        if (mainFrame.getPanel().checkEdited()) {
+            return false;
+        }
         if (openable != null) {
             if (!Configuration.showCloseConfirmation.get() || ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.reloadAll"), translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
                 Main.reloadApp();
@@ -668,6 +758,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     protected void advancedSettingsActionPerformed(ActionEvent evt) {
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
         Main.advancedSettings();
     }
 
@@ -719,6 +812,9 @@ public abstract class MainFrameMenu implements MenuBuilder {
      }
      }*/
     protected void setLanguageActionPerformed(ActionEvent evt) {
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
         new SelectLanguageDialog(Main.getDefaultDialogsOwner()).display();
     }
 
@@ -1303,15 +1399,37 @@ public abstract class MainFrameMenu implements MenuBuilder {
     public void showTagListView() {
         viewTagListActionPerformed(null);
     }
+    
+    private void reselectView() {
+        switch(mainFrame.getPanel().getCurrentView()) {
+            case MainPanel.VIEW_RESOURCES:
+                setMenuChecked("/file/view/viewResources", true);
+                break;
+            case MainPanel.VIEW_TAGLIST:
+                setMenuChecked("/file/view/viewTagList", true);
+                break;
+            case MainPanel.VIEW_DUMP:
+                setMenuChecked("/file/view/viewHex", true);
+                break;
+        }
+    }
 
     private void viewResourcesActionPerformed(ActionEvent evt) {
+        if (mainFrame.getPanel().checkEdited()) {
+            reselectView();
+            return;
+        }
         Configuration.dumpView.set(false);
         mainFrame.getPanel().showView(MainPanel.VIEW_RESOURCES);
         setGroupSelection("view", "/file/view/viewResources");
         setMenuChecked("/tools/timeline", false);
-    }
-
+    }   
+    
     private void viewHexActionPerformed(ActionEvent evt) {
+        if (mainFrame.getPanel().checkEdited()) {
+            reselectView();
+            return;
+        }
         Configuration.dumpView.set(true);
         MainPanel mainPanel = mainFrame.getPanel();
         if (mainPanel.isModified()) {
@@ -1324,6 +1442,10 @@ public abstract class MainFrameMenu implements MenuBuilder {
     }
 
     private void viewTagListActionPerformed(ActionEvent evt) {
+        if (mainFrame.getPanel().checkEdited()) {
+            reselectView();
+            return;
+        }
         Configuration.dumpView.set(false);
         MainPanel mainPanel = mainFrame.getPanel();
         mainPanel.showView(MainPanel.VIEW_TAGLIST);
