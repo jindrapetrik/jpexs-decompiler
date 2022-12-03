@@ -101,7 +101,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
     private final boolean addAllFolders;
 
     private final Map<TreeItem, TreePath> pathCache = new HashMap<>();
-    
+
     private final Map<ABC, ClassesListTreeModel> abcClassesTree = new WeakHashMap<>();
 
     public TagTreeModel(List<OpenableList> swfs, boolean addAllFolders) {
@@ -116,8 +116,8 @@ public class TagTreeModel extends AbstractTagTreeModel {
     }
 
     public void updateSwfs(CollectionChangedEvent e) {
-        if (e.getAction() != CollectionChangedAction.ADD &&
-                e.getAction() != CollectionChangedAction.MOVE) {
+        if (e.getAction() != CollectionChangedAction.ADD
+                && e.getAction() != CollectionChangedAction.MOVE) {
             List<SWF> toRemove = new ArrayList<>();
             for (SWF swf : swfInfos.keySet()) {
                 SWF swf2 = swf.getRootSwf();
@@ -142,12 +142,6 @@ public class TagTreeModel extends AbstractTagTreeModel {
                 fireTreeNodesRemoved(new TreeModelEvent(this, rootPath, new int[]{e.getOldIndex()}, new Object[]{e.getOldItem()}));
                 break;
             }
-            /*case MOVE: {
-                TreePath rootPath = new TreePath(new Object[]{root});
-                fireTreeNodesRemoved(new TreeModelEvent(this, rootPath, new int[]{e.getOldIndex()}, new Object[]{e.getOldItem()}));
-                fireTreeNodesInserted(new TreeModelEvent(this, rootPath, new int[]{e.getNewIndex()}, new Object[]{e.getNewItem()}));
-                break;
-            }*/
             default:
                 fireTreeStructureChanged(new TreeModelEvent(this, new TreePath(root)));
         }
@@ -159,7 +153,7 @@ public class TagTreeModel extends AbstractTagTreeModel {
         swfInfos.clear();
         abcClassesTree.clear();
         TreePath changedPath = getTreePath(openable == null ? root : openable);
-        fireTreeStructureChanged(new TreeModelEvent(this, changedPath));        
+        fireTreeStructureChanged(new TreeModelEvent(this, changedPath));
         calculateCollisions();
     }
 
@@ -420,22 +414,20 @@ public class TagTreeModel extends AbstractTagTreeModel {
                     return newPath;
                 }
             } else {
-                
-                
+
                 TreeItem objNoTs = obj;
                 if (obj instanceof TagScript) {
                     objNoTs = ((TagScript) obj).getTag();
                 }
-                
+
                 TreeItem nNoTs = n;
                 if (n instanceof TagScript) {
                     nNoTs = ((TagScript) n).getTag();
                 }
-                
-                
+
                 if (objNoTs == nNoTs) {
                     return newPath;
-                }                                               
+                }
             }
 
             ret = searchTreeItem(obj, n, newPath);
@@ -508,8 +500,9 @@ public class TagTreeModel extends AbstractTagTreeModel {
             for (OpenableList swfList : swfs) {
                 if (!swfList.isBundle()) {
                     result.add(swfList.get(0));
+                } else {
+                    result.add(swfList);
                 }
-                result.add(swfList);
             }
             return result;
         } else if (parentNode instanceof OpenableList) {
@@ -776,12 +769,12 @@ public class TagTreeModel extends AbstractTagTreeModel {
 
         return -1;
     }
-    
+
     private ClassesListTreeModel getClassesListTreeModel(ABC abc) {
         if (abcClassesTree.containsKey(abc)) {
             return abcClassesTree.get(abc);
         }
-        
+
         ClassesListTreeModel model = new ClassesListTreeModel(abc, Configuration.flattenASPackages.get());
         abcClassesTree.put(abc, model);
         return model;

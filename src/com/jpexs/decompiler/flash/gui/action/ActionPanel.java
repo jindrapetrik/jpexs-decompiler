@@ -1140,7 +1140,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
         addScriptListener(onScriptComplete);
 
-        AbstractTagTreeModel ttm = mainPanel.getCurrentTree().getModel();
+        AbstractTagTreeModel ttm = mainPanel.getCurrentTree().getFullModel();
         TreePath tp = ttm.getTreePath(result.getSrc());
         mainPanel.getCurrentTree().setSelectionPath(tp);
         mainPanel.getCurrentTree().scrollPathToVisible(tp);

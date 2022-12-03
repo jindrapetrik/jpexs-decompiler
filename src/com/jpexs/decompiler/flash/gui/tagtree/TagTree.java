@@ -106,6 +106,7 @@ import java.util.Set;
 import javax.swing.JTree;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreePath;
 
 /**
  *
@@ -126,7 +127,7 @@ public class TagTree extends AbstractTagTree {
             setOpaque(false);
             if (View.isOceanic()) {
                 setBackgroundNonSelectionColor(Color.white);
-            }
+            }            
         }
 
         @Override
@@ -225,7 +226,7 @@ public class TagTree extends AbstractTagTree {
             if (aTree.getMainPanel().isClipboardCut() && aTree.getMainPanel().clipboardContains(val)) {
                 semiTransparent = true;
             }
-            int itemIndex = aTree.getModel().getItemIndex(val);
+            int itemIndex = aTree.getFullModel().getItemIndex(val);
             if (itemIndex > 1) {
                 setText(val.toString() + " [" + itemIndex + "]");
             }
@@ -237,6 +238,7 @@ public class TagTree extends AbstractTagTree {
     public TagTree(TagTreeModel treeModel, MainPanel mainPanel) {
         super(treeModel, mainPanel);
         setCellRenderer(new TagTreeCellRenderer());
+        setShowsRootHandles(true);
     }
 
     public static List<Integer> getSwfFolderItemNestedTagIds(String folderName, boolean gfx) {
@@ -344,8 +346,8 @@ public class TagTree extends AbstractTagTree {
     }
 
     @Override
-    public TagTreeModel getModel() {
-        return (TagTreeModel) super.getModel();
+    public TagTreeModel getFullModel() {
+        return (TagTreeModel) super.getFullModel();
     }
-
+    
 }

@@ -815,7 +815,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         boolean allSelectedSameParent = !items.isEmpty();
         if (allSelectedSameParent) {
-            AbstractTagTreeModel model = tree.getModel();
+            AbstractTagTreeModel model = tree.getFullModel();
             TreePath thisPath = model.getTreePath(items.get(0));
             TreePath parent = thisPath == null ? null : thisPath.getParentPath();
 
@@ -983,7 +983,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
             }
 
-            TreePath thisPath = tree.getModel().getTreePath(firstItem);
+            TreePath thisPath = tree.getFullModel().getTreePath(firstItem);
             TreeItem parent = thisPath == null ? null : (TreeItem) thisPath.getParentPath().getLastPathComponent();
             boolean parentIsFolder = parent instanceof FolderItem;
             boolean parentIsTopLevelFrame = false;
@@ -1290,7 +1290,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void addAddTagBeforeAfterMenuItems(boolean before, JMenu addTagMenu, TreeItem item, AddTagActionListener listener) {
-        TreePath thisPath = getTree().getModel().getTreePath(item);
+        TreePath thisPath = getTree().getFullModel().getTreePath(item);
         TreeItem parent = thisPath == null ? null : (TreeItem) thisPath.getParentPath().getLastPathComponent();
         if (parent == null) {
             return;
@@ -1689,7 +1689,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void expandRecursiveActionPerformed(ActionEvent evt) {
         AbstractTagTree tree = getTree();
-        TreePath path = tree.getModel().getTreePath(getCurrentItem());
+        TreePath path = tree.getFullModel().getTreePath(getCurrentItem());
         if (path == null) {
             return;
         }
@@ -1722,7 +1722,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             if (sel.get(0) instanceof AS3Package) {
                 AS3Package pkg = (AS3Package) sel.get(0);
                 openable = pkg.getOpenable();
-                TreePath tp = tree.getModel().getTreePath(sel.get(0));
+                TreePath tp = tree.getFullModel().getTreePath(sel.get(0));
                 Object[] path = tp.getPath();
                 for (int p = path.length - 1; p >= 0; p--) {
                     if (path[p] instanceof ClassesListTreeModel) {
@@ -1826,7 +1826,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 Object item;
 
                 if ((mainPanel.getCurrentView() == MainPanel.VIEW_RESOURCES) && (openable instanceof SWF)) {
-                    item = mainPanel.tagTree.getModel().getScriptsNode((SWF) openable);
+                    item = mainPanel.tagTree.getFullModel().getScriptsNode((SWF) openable);
                 } else if (openable instanceof ABC) {
                     item = openable;
                 } else { //SWF on taglist, should be DoABCContainer
@@ -1835,7 +1835,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
                 loopparts:
                 for (int i = 0; i < parts.length; i++) {
-                    for (TreeItem ti : tree.getModel().getAllChildren(item)) {
+                    for (TreeItem ti : tree.getFullModel().getAllChildren(item)) {
                         if ((ti instanceof AS3Package) && ((AS3Package) ti).isFlat()) {
                             AS3Package pti = (AS3Package) ti;
                             if ((pkg.isEmpty() && pti.isDefaultPackage()) || (!pti.isDefaultPackage() && pkg.equals(pti.packageName))) {
@@ -1911,12 +1911,12 @@ public class TagTreeContextMenu extends JPopupMenu {
                             }
                         }
 
-                        TreePath selection = mainPanel.tagTree.getModel().getTreePath(sel.get(0));
+                        TreePath selection = mainPanel.tagTree.getFullModel().getTreePath(sel.get(0));
                         TreePath swfPath = selection.getParentPath();
                         tim.resetTimeline();
                         mainPanel.refreshTree(swf);
 
-                        FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getModel().getScriptsNode(swf);
+                        FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getFullModel().getScriptsNode(swf);
                         TreePath scriptsPath = swfPath.pathByAddingChild(scriptsNode);
 
                         if (addScriptDialog.getScriptType() == AddScriptDialog.TYPE_FRAME) {
@@ -1924,7 +1924,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                 if (subItem instanceof FrameScript) {
                                     if (((FrameScript) subItem).getFrame().frame + 1 == targetFrame) {
                                         TreePath framePath = scriptsPath.pathByAddingChild(subItem);
-                                        TreeItem doActionTag = mainPanel.tagTree.getModel().getChild(subItem, 0);
+                                        TreeItem doActionTag = mainPanel.tagTree.getFullModel().getChild(subItem, 0);
                                         TreePath doActionPath = framePath.pathByAddingChild(doActionTag);
                                         mainPanel.tagTree.setSelectionPath(doActionPath);
                                         break;
@@ -1942,7 +1942,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                                 FrameScript fs = (FrameScript) f;
                                                 if (fs.getFrame().frame + 1 == targetFrame) {
                                                     TreePath framePath = spritePath.pathByAddingChild(fs);
-                                                    TreeItem doActionTag = mainPanel.tagTree.getModel().getChild(fs, 0);
+                                                    TreeItem doActionTag = mainPanel.tagTree.getFullModel().getChild(fs, 0);
                                                     TreePath doActionPath = framePath.pathByAddingChild(doActionTag);
                                                     mainPanel.tagTree.setSelectionPath(doActionPath);
                                                     break;
@@ -1968,7 +1968,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                         button.resetTimeline();
                         mainPanel.refreshTree(swf);
 
-                        FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getModel().getScriptsNode(swf);
+                        FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getFullModel().getScriptsNode(swf);
                         TreePath selection = mainPanel.tagTree.getSelectionPath();
                         TreePath swfPath = selection.getParentPath();
                         TreePath scriptsPath = swfPath.pathByAddingChild(scriptsNode);
@@ -2043,7 +2043,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                         tim.resetTimeline();
                         mainPanel.refreshTree(swf);
 
-                        FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getModel().getScriptsNode(swf);
+                        FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getFullModel().getScriptsNode(swf);
                         TreePath scriptsPath = swfPath.pathByAddingChild(scriptsNode);
 
                         for (TreeItem subItem : scriptsNode.subItems) {
@@ -2058,7 +2058,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                                 FrameScript fs = (FrameScript) f;
                                                 if (fs.getFrame().frame + 1 == frame) {
                                                     TreePath framePath = spritePaths.pathByAddingChild(f);
-                                                    List<? extends TreeItem> subs = mainPanel.tagTree.getModel().getAllChildren(fs);
+                                                    List<? extends TreeItem> subs = mainPanel.tagTree.getFullModel().getAllChildren(fs);
                                                     for (TreeItem t : subs) {
                                                         if (t instanceof TagScript) {
                                                             if (((TagScript) t).getTag() == placeType) {
@@ -2079,7 +2079,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                     FrameScript fs = (FrameScript) subItem;
                                     if (fs.getFrame().frame + 1 == frame) {
                                         TreePath framePath = scriptsPath.pathByAddingChild(fs);
-                                        List<? extends TreeItem> subs = mainPanel.tagTree.getModel().getAllChildren(fs);
+                                        List<? extends TreeItem> subs = mainPanel.tagTree.getFullModel().getAllChildren(fs);
                                         for (TreeItem t : subs) {
                                             if (t instanceof TagScript) {
                                                 if (((TagScript) t).getTag() == placeType) {
@@ -2169,7 +2169,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
                             TreePath selection = mainPanel.tagTree.getSelectionPath();
                             TreePath swfPath = selection.getParentPath();
-                            FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getModel().getScriptsNode(swf);
+                            FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getFullModel().getScriptsNode(swf);
                             TreePath scriptsPath = swfPath.pathByAddingChild(scriptsNode);
                             String classParts[] = className.contains(".") ? className.split("\\.") : new String[]{className};
 
@@ -2226,7 +2226,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
                         TreePath selection = mainPanel.tagTree.getSelectionPath();
                         TreePath swfPath = selection.getParentPath();
-                        FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getModel().getScriptsNode(swf);
+                        FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getFullModel().getScriptsNode(swf);
                         TreePath scriptsPath = swfPath.pathByAddingChild(scriptsNode);
                         TreePath doinitPath = scriptsPath.pathByAddingChild(doinit);
                         mainPanel.tagTree.setSelectionPath(doinitPath);
@@ -2263,7 +2263,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     private void populateScriptSubs(TreePath path, TreeItem item, List<TreePath> out) {
-        List<? extends TreeItem> subs = getTree().getModel().getAllChildren(item);
+        List<? extends TreeItem> subs = getTree().getFullModel().getAllChildren(item);
         for (TreeItem t : subs) {
             TreePath tPath = path.pathByAddingChild(t);
             if ((t instanceof TagScript) && (((TagScript) t).getTag() instanceof ASMSource)) {
@@ -2289,7 +2289,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
         List<TreeItem> sel = getSelectedItems();
         for (TreeItem treeItem : sel) {
-            tps.add(getTree().getModel().getTreePath(treeItem));
+            tps.add(getTree().getFullModel().getTreePath(treeItem));
         }
 
         List<Tag> tagsToRemove = new ArrayList<>();
@@ -2548,7 +2548,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     Tag tag = (Tag) item;
                     tag.undo();
                     tag.getSwf().clearAllCache();
-                    tree.getModel().updateNode(item);
+                    tree.getFullModel().updateNode(item);
                 } catch (InterruptedException | IOException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
@@ -2689,7 +2689,7 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void moveTagActionPerformed(ActionEvent evt) {
         Tag t = (Tag) getCurrentItem();
-        TreePath path = getTree().getModel().getTreePath(t);
+        TreePath path = getTree().getFullModel().getTreePath(t);
         Timelined timelined = null;
         for (int i = path.getPathCount() - 1 - 1 /*not last path component*/; i >= 0; i--) {
             if ((path.getPathComponent(i) instanceof DefineSpriteTag) || (path.getPathComponent(i) instanceof SWF)) {
@@ -3262,7 +3262,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
         copyOrMoveTags(itemsToMove, true, timelined, position);
 
-        TreePath path = getTree().getModel().getTreePath(item);
+        TreePath path = getTree().getFullModel().getTreePath(item);
         getTree().setSelectionPath(path);
         getTree().scrollPathToVisible(path);
         mainPanel.repaintTree();
