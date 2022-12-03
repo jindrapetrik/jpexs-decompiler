@@ -1447,7 +1447,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         AbstractTagTreeModel ttm = mainPanel.getCurrentTree().getFullModel();
         TreePath tp = ttm.getTreePath(pack);
         if (tp == null) {
-            mainPanel.closeTagTreeSearch();
+            mainPanel.hideQuickTreeFind();
             tp = ttm.getTreePath(pack);
         }
 

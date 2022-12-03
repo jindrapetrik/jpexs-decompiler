@@ -283,6 +283,7 @@ import jsyntaxpane.DefaultSyntaxKit;
 import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.gui.tagtree.FilteredTreeModel;
 import com.jpexs.decompiler.flash.treeitems.Openable;
+import java.awt.event.ActionListener;
 import javax.swing.tree.TreeModel;
 
 /**
@@ -368,11 +369,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private final JPersistentSplitPane splitPane2;
 
-    private JPanel detailPanel;
+    private JPanel detailPanel;   
 
-    private JTextField filterField = new MyTextField("");
-
-    private JPanel searchPanel;
+    private QuickTreeFindPanel quickTreeFindPanel;
+    
+    private QuickTreeFindPanel quickTagListFindPanel;
 
     private ABCPanel abcPanel;
 
@@ -414,7 +415,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private PinsPanel pinsPanel;
 
-    private List<List<String>> unfilteredExpandedNodes = new ArrayList<>();
+    private List<List<String>> unfilteredTreeExpandedNodes = new ArrayList<>();
+    private List<List<String>> unfilteredTagListExpandedNodes = new ArrayList<>();
     
     public void savePins() {
         pinsPanel.save();
@@ -512,9 +514,22 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         getCurrentTree().scrollPathToVisible(path);
         repaintTree();
     }
+    
+    public void hideQuickTreeFind() {
+        quickTreeFindPanel.setVisible(false);
+        quickTagListFindPanel.setVisible(false);
+    }
 
     private void handleTreeKeyPressed(KeyEvent e) {
         AbstractTagTree tree = (AbstractTagTree) e.getSource();
+        if ((e.getKeyCode() == 'F') && (e.isControlDown())) {
+            if (tree == tagTree) {
+                quickTreeFindPanel.setVisible(true);
+            }
+            if (tree == tagListTree) {
+                quickTagListFindPanel.setVisible(true);
+            }
+        }
         if ((e.getKeyCode() == KeyEvent.VK_DELETE) && !e.isControlDown() && !e.isAltDown()) {
             TreePath[] paths = tree.getSelectionPaths();
             if (paths == null || paths.length == 0) {
@@ -1011,22 +1026,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         displayPanel.add(headerPanel, CARDHEADER);
 
         displayPanel.add(new JPanel(), CARDEMPTYPANEL);
-        showCard(CARDEMPTYPANEL);
-
-        searchPanel = new JPanel();
-        searchPanel.setLayout(new BorderLayout());
-        searchPanel.add(filterField, BorderLayout.CENTER);
-        searchPanel.add(new JLabel(View.getIcon("search16")), BorderLayout.WEST);
-        JLabel closeSearchButton = new JLabel(View.getIcon("cancel16"));
-        closeSearchButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                closeTagTreeSearch();
-            }
-        });
-        closeSearchButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        searchPanel.add(closeSearchButton, BorderLayout.EAST);
-        searchPanel.setVisible(false);
+        showCard(CARDEMPTYPANEL);      
 
         LazyCardLayout treePanelLayout = new LazyCardLayout();
         treePanelLayout.registerLayout(createResourcesViewCard(), RESOURCES_VIEW);
@@ -1036,26 +1036,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         //treePanel.add(searchPanel, BorderLayout.SOUTH);
         //searchPanel.setVisible(false);
-        filterField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                warn();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                warn();
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                warn();
-            }
-
-            public void warn() {
-                doFilter();
-            }
-        });
+        
 
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.add(displayPanel, BorderLayout.CENTER);
@@ -1095,11 +1076,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             @Override
-            public void keyPressed(KeyEvent e) {
-                if ((e.getKeyCode() == 'F') && (e.isControlDown())) {
-                    searchPanel.setVisible(true);
-                    filterField.requestFocusInWindow();
-                }
+            public void keyPressed(KeyEvent e) {                
                 handleTreeKeyPressed(e);
                 if ((e.getKeyCode() == 'G') && (e.isControlDown())) {
                     SWF swf = getCurrentSwf();
@@ -1244,15 +1221,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 refreshTree();
             }
         });
-    }
-
-    public void closeTagTreeSearch() {
-        View.checkAccess();
-
-        filterField.setText("");
-        doFilter();
-        searchPanel.setVisible(false);
-    }
+    } 
 
     public void resetAllTimelines() {
         List<OpenableList> openableLists = new ArrayList<>(openables);
@@ -1398,8 +1367,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (!isWelcomeScreen && openables.isEmpty()) {
             showContentPanelCard(WELCOME_PANEL);
-            isWelcomeScreen = true;
-            closeTagTreeSearch();
+            isWelcomeScreen = true;            
+            quickTagListFindPanel.setVisible(false);
+            quickTreeFindPanel.setVisible(false);
+            doFilter();
         }
 
         mainFrame.setTitle(ApplicationInfo.applicationVerName);
@@ -1591,34 +1562,39 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return filter.trim().length() < 3;
     }
 
-    public void doFilter() {
-        View.checkAccess();      
-        
-        TreeModel model = tagTree.getModel();
+    private void doFilter(AbstractTagTree tree, QuickTreeFindPanel findPanel, List<List<String>> unfilteredExpandedNodes) {
+        TreeModel model = tree.getModel();
         String oldFilter = "";
         if (model instanceof FilteredTreeModel) {
             oldFilter = ((FilteredTreeModel)model).getFilter();
         }        
-        String newFilter = filterField.getText();
+        String newFilter = findPanel.getFilter();
                 
         
         if (isFilterEmpty(oldFilter)) {
-            unfilteredExpandedNodes = View.getExpandedNodes(tagTree);                        
+            unfilteredExpandedNodes.clear();;
+            unfilteredExpandedNodes.addAll(View.getExpandedNodes(tree)); 
         }
         
         if (oldFilter.trim().equals(newFilter.trim())) {
             return;
         }                                
         
-        tagTree.setModel(new FilteredTreeModel(newFilter, tagTree.getFullModel()));        
+        tree.setModel(new FilteredTreeModel(newFilter, tree.getFullModel()));        
         if (!isFilterEmpty(newFilter)) {
-            for (int i = 0; i < tagTree.getRowCount(); i++) {
-                tagTree.expandRow(i);
+            for (int i = 0; i < tree.getRowCount(); i++) {
+                tree.expandRow(i);
             }
         } else {
-            tagTree.setModel(tagTree.getFullModel());            
-            View.expandTreeNodes(tagTree, unfilteredExpandedNodes);
+            tree.setModel(tree.getFullModel());            
+            View.expandTreeNodes(tree, unfilteredExpandedNodes);
         }
+    }
+    
+    public void doFilter() {
+        View.checkAccess();      
+        doFilter(tagTree, quickTreeFindPanel, unfilteredTreeExpandedNodes);
+        doFilter(tagListTree, quickTagListFindPanel, unfilteredTagListExpandedNodes);        
     }
 
     public void renameIdentifier(SWF swf, String identifier) throws InterruptedException {
@@ -4440,6 +4416,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         JPanel r = new JPanel(new BorderLayout());
         r.add(tagListClipboardPanel, BorderLayout.NORTH);
         r.add(new FasterScrollPane(tagListTree), BorderLayout.CENTER);
+        quickTagListFindPanel = new QuickTreeFindPanel();
+        quickTagListFindPanel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                doFilter();
+            }
+        });
+        r.add(quickTagListFindPanel, BorderLayout.SOUTH);
         return r;
     }
 
@@ -4448,7 +4432,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         JPanel r = new JPanel(new BorderLayout());
         r.add(resourcesClipboardPanel, BorderLayout.NORTH);
         r.add(tagTreeScrollPanel = new FasterScrollPane(tagTree), BorderLayout.CENTER);
-        r.add(searchPanel, BorderLayout.SOUTH);
+        quickTreeFindPanel = new QuickTreeFindPanel();
+        quickTreeFindPanel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                doFilter();
+            }
+        });
+        r.add(quickTreeFindPanel, BorderLayout.SOUTH);
         return r;
     }
 
