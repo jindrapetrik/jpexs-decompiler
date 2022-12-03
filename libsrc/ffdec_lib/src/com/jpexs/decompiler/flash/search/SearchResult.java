@@ -16,7 +16,6 @@
  */
 package com.jpexs.decompiler.flash.search;
 
-import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 
 /**

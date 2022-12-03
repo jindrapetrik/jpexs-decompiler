@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.iggy.conversion;
 
+import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.iggy.IggyFile;
 import com.jpexs.helpers.Helper;
@@ -29,7 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import com.jpexs.decompiler.flash.Bundle;
 
 /**
  *

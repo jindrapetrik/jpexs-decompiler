@@ -19,10 +19,10 @@
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import java.io.StringReader;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-import java.math.BigInteger;
 
 
 /**

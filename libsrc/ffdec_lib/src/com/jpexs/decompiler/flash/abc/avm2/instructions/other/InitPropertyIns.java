@@ -23,16 +23,10 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.parser.script.PropertyAVM2Item;
-import com.jpexs.decompiler.flash.abc.types.traits.Trait;
-import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
-import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.helpers.Reference;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  *
