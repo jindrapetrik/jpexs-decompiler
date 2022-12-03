@@ -118,7 +118,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
     private static final int FIELD_INDEX = 0;
 
     private class MyTree extends JTree {
-
+                
         public MyTree() {
             if (View.isOceanic()) {
                 setBackground(Color.white);
@@ -260,7 +260,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
         public MyTreeCellEditor(JTree tree) {
             this.tree = tree;
-        }
+        }                
 
         @Override
         public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row) {
@@ -342,7 +342,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                     FlowLayout fl = new FlowLayout(FlowLayout.LEFT, 0, 0);
                     fl.setAlignOnBaseline(true);
                     pan.setLayout(fl);
-                    JLabel nameLabel = new JLabel(fnode.getNameType(i) + " = ") {
+                    JLabel nameLabel = new JLabel(fnode.getNameType(i) + (editor == null ? "" : " = ")) {
                         @Override
                         public BaselineResizeBehavior getBaselineResizeBehavior() {
                             return Component.BaselineResizeBehavior.CONSTANT_ASCENT;
@@ -405,9 +405,12 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 return false;
             }
             Object obj = path.getLastPathComponent();
-
+            
+            FieldNode fnode = (FieldNode) obj;
+            Field field = fnode.fieldSet.get(FIELD_INDEX);
+            
             boolean ret = super.isCellEditable(e)
-                    && tree.getModel().isLeaf(obj);
+                    && tree.getModel().isLeaf(obj) && hasEditor(fnode.obj, field, fnode.index);
             return ret;
         }
 
@@ -1100,10 +1103,11 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 return filterFields(this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited, mtroot.getId()).size();
             }
             FieldNode fnode = (FieldNode) parent;
-            if (isLeaf(fnode)) {
-                return 0;
-            }
+            
+            
             Field field = fnode.fieldSet.get(FIELD_INDEX);
+            boolean isByteArray = field.getType().equals(byte[].class);
+                                    
             if (ReflectionTools.needsIndex(field) && (fnode.index == -1)) { //Arrays or Lists
                 try {
                     if (field.get(fnode.obj) == null) {
@@ -1118,23 +1122,16 @@ public class GenericTagTreePanel extends GenericTagPanel {
             }
             parent = fnode.getValue(FIELD_INDEX);
 
+            /*if (!hasEditor(fnode.obj, field, fnode.index)) {
+                return 0;
+            }*/
+            
             return filterFields(this, getNodePathName(fnode), parent.getClass(), limited, mtroot.getId()).size();
         }
 
         @Override
         public boolean isLeaf(Object node) {
-            if (node == mtroot) {
-                return false;
-            }
-
-            FieldNode fnode = (FieldNode) node;
-            Field field = fnode.fieldSet.get(FIELD_INDEX);
-            boolean isByteArray = field.getType().equals(byte[].class);
-            if (!isByteArray && ReflectionTools.needsIndex(field) && fnode.index == -1) {
-                return false;
-            }
-            boolean r = hasEditor(fnode.obj, field, fnode.index);
-            return r;
+            return getChildCount(node) == 0;
         }
 
         public void vchanged(TreePath path) {
