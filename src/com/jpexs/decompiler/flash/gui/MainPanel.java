@@ -282,6 +282,8 @@ import javax.swing.tree.TreePath;
 import jsyntaxpane.DefaultSyntaxKit;
 import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.gui.tagtree.FilteredTreeModel;
+import com.jpexs.decompiler.flash.tags.StartSoundTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.treeitems.Openable;
 import java.awt.event.ActionListener;
 import javax.swing.tree.TreeModel;
@@ -369,10 +371,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private final JPersistentSplitPane splitPane2;
 
-    private JPanel detailPanel;   
+    private JPanel detailPanel;
 
     private QuickTreeFindPanel quickTreeFindPanel;
-    
+
     private QuickTreeFindPanel quickTagListFindPanel;
 
     private ABCPanel abcPanel;
@@ -417,7 +419,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private List<List<String>> unfilteredTreeExpandedNodes = new ArrayList<>();
     private List<List<String>> unfilteredTagListExpandedNodes = new ArrayList<>();
-    
+
     public void savePins() {
         pinsPanel.save();
     }
@@ -437,19 +439,19 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void unpinItem(TreeItem item) {
         pinsPanel.removeItem(item);
     }
-    
+
     public void unpinOthers(TreeItem item) {
         pinsPanel.removeOthers(item);
     }
-    
+
     public void pinItem(TreeItem item) {
         pinsPanel.pin(item);
     }
-    
+
     public int getPinCount() {
         return pinsPanel.getPinCount();
     }
-    
+
     public boolean isPinned(TreeItem item) {
         return pinsPanel.isPinned(item);
     }
@@ -514,7 +516,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         getCurrentTree().scrollPathToVisible(path);
         repaintTree();
     }
-    
+
     public void hideQuickTreeFind() {
         quickTreeFindPanel.setVisible(false);
         quickTagListFindPanel.setVisible(false);
@@ -1026,7 +1028,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         displayPanel.add(headerPanel, CARDHEADER);
 
         displayPanel.add(new JPanel(), CARDEMPTYPANEL);
-        showCard(CARDEMPTYPANEL);      
+        showCard(CARDEMPTYPANEL);
 
         LazyCardLayout treePanelLayout = new LazyCardLayout();
         treePanelLayout.registerLayout(createResourcesViewCard(), RESOURCES_VIEW);
@@ -1036,8 +1038,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         //treePanel.add(searchPanel, BorderLayout.SOUTH);
         //searchPanel.setVisible(false);
-        
-
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.add(displayPanel, BorderLayout.CENTER);
         pinsPanel = new PinsPanel(this);
@@ -1076,7 +1076,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
 
             @Override
-            public void keyPressed(KeyEvent e) {                
+            public void keyPressed(KeyEvent e) {
                 handleTreeKeyPressed(e);
                 if ((e.getKeyCode() == 'G') && (e.isControlDown())) {
                     SWF swf = getCurrentSwf();
@@ -1140,7 +1140,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     } else if (e.getAction() == CollectionChangedAction.ADD) {
                         OpenableList list = e.getNewItem();
                         if (!list.isBundle() && list.items.size() == 1) {
-                            tagTree.expandPath(tagTree.getFullModel().getTreePath(list.get(0)));                            
+                            tagTree.expandPath(tagTree.getFullModel().getTreePath(list.get(0)));
                         } else {
                             tagTree.expandPath(tagTree.getFullModel().getTreePath(list));
                         }
@@ -1221,7 +1221,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 refreshTree();
             }
         });
-    } 
+    }
 
     public void resetAllTimelines() {
         List<OpenableList> openableLists = new ArrayList<>(openables);
@@ -1272,7 +1272,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         gcClipboard();
         reload(false);
         View.expandTreeNodes(tagTree, expandedNodes);
-        doFilter();        
+        doFilter();
         pinsPanel.load();
     }
 
@@ -1291,8 +1291,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         gcClipboard();
 
         reload(false);
-        View.expandTreeNodes(getCurrentTree(), expandedNodes);        
-        doFilter();        
+        View.expandTreeNodes(getCurrentTree(), expandedNodes);
+        doFilter();
         pinsPanel.load();
     }
 
@@ -1367,7 +1367,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (!isWelcomeScreen && openables.isEmpty()) {
             showContentPanelCard(WELCOME_PANEL);
-            isWelcomeScreen = true;            
+            isWelcomeScreen = true;
             quickTagListFindPanel.setVisible(false);
             quickTreeFindPanel.setVisible(false);
             doFilter();
@@ -1557,7 +1557,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             tagTree.updateUI();
         }
     }
-    
+
     private boolean isFilterEmpty(String filter) {
         return filter.trim().length() < 3;
     }
@@ -1566,35 +1566,34 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         TreeModel model = tree.getModel();
         String oldFilter = "";
         if (model instanceof FilteredTreeModel) {
-            oldFilter = ((FilteredTreeModel)model).getFilter();
-        }        
+            oldFilter = ((FilteredTreeModel) model).getFilter();
+        }
         String newFilter = findPanel.getFilter();
-                
-        
+
         if (isFilterEmpty(oldFilter)) {
             unfilteredExpandedNodes.clear();;
-            unfilteredExpandedNodes.addAll(View.getExpandedNodes(tree)); 
+            unfilteredExpandedNodes.addAll(View.getExpandedNodes(tree));
         }
-        
+
         if (oldFilter.trim().equals(newFilter.trim())) {
             return;
-        }                                
-        
-        tree.setModel(new FilteredTreeModel(newFilter, tree.getFullModel()));        
+        }
+
+        tree.setModel(new FilteredTreeModel(newFilter, tree.getFullModel()));
         if (!isFilterEmpty(newFilter)) {
             for (int i = 0; i < tree.getRowCount(); i++) {
                 tree.expandRow(i);
             }
         } else {
-            tree.setModel(tree.getFullModel());            
+            tree.setModel(tree.getFullModel());
             View.expandTreeNodes(tree, unfilteredExpandedNodes);
         }
     }
-    
+
     public void doFilter() {
-        View.checkAccess();      
+        View.checkAccess();
         doFilter(tagTree, quickTreeFindPanel, unfilteredTreeExpandedNodes);
-        doFilter(tagListTree, quickTagListFindPanel, unfilteredTagListExpandedNodes);        
+        doFilter(tagListTree, quickTagListFindPanel, unfilteredTagListExpandedNodes);
     }
 
     public void renameIdentifier(SWF swf, String identifier) throws InterruptedException {
@@ -5374,14 +5373,44 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private static void calculateMissingNeededCharacters(Map<TreeItem, Set<Integer>> neededMap, Map<TreeItem, Set<Integer>> missingNeededCharacters, Timelined tim) {
         List<Tag> tags = tim.getTags().toArrayList();
+        Map<Integer, List<CharacterIdTag>> nestedTags = new HashMap<>();
         for (Tag t : tags) {
-            Set<Integer> needed = new LinkedHashSet<>();
-            t.getNeededCharactersDeep(needed);
-            neededMap.put(t, needed);
-            missingNeededCharacters.put(t, t.getMissingNeededCharacters(needed));
-            if (t instanceof DefineSpriteTag) {
-                calculateMissingNeededCharacters(neededMap, missingNeededCharacters, (DefineSpriteTag) t);
+            if ((t instanceof CharacterIdTag) && !(t instanceof CharacterTag) && !(t instanceof SoundStreamHeadTypeTag)) {
+                int characterId = ((CharacterIdTag) t).getCharacterId();
+                if (!nestedTags.containsKey(characterId)) {
+                    nestedTags.put(characterId, new ArrayList<>());
+                }
+                nestedTags.get(characterId).add((CharacterIdTag) t);
             }
+
+            if (!(t instanceof CharacterTag) && !(t instanceof SoundStreamHeadTypeTag)) {
+                int characterId = -1;
+                if (t instanceof CharacterIdTag) {
+                    characterId = ((CharacterIdTag) t).getCharacterId();
+                }
+                Set<Integer> needed = new LinkedHashSet<>();
+                t.getNeededCharactersDeep(needed);
+                neededMap.put(t, needed);
+                if ((t instanceof CharacterIdTag) && !(t instanceof PlaceObjectTypeTag)) {
+                    needed = new HashSet<>();
+                    needed.add(characterId);
+                }
+
+                if ((t instanceof PlaceObjectTypeTag) && (characterId != -1) && nestedTags.containsKey(characterId)) {
+                    for (CharacterIdTag n : nestedTags.get(characterId)) {
+                        ((Tag) n).getNeededCharactersDeep(needed);
+                    }
+                }
+
+                missingNeededCharacters.put(t, t.getMissingNeededCharacters(needed));
+                if (characterId != -1 && tim.getTimeline().swf.getCharacter(characterId) == null) {
+                    missingNeededCharacters.get(t).add(characterId);
+                }
+
+            }
+            /*if (t instanceof DefineSpriteTag) {
+                calculateMissingNeededCharacters(neededMap, missingNeededCharacters, (DefineSpriteTag) t);
+            }*/
         }
     }
 
