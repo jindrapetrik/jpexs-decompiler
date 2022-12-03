@@ -6,8 +6,8 @@ package tests
    {
       public function run() : *
       {
-         var o = new getDefinitionByName("Object")();
-         var o2 = new (getDefinitionByName("Object"))();
+         var o:* = new getDefinitionByName("Object")();
+         var o2:* = new (getDefinitionByName("Object"))();
       }	
    }
 }

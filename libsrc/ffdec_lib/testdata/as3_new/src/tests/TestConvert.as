@@ -69,7 +69,24 @@ package tests
             				
             var lc:LocalClass = new LocalClass();
             i = lc.attr;      
-            s = String(lc.attr);                      			
+            s = String(lc.attr);
+            
+            
+            var f:Function = function():void {};
+            if (Boolean(f)) {
+                trace("OK");
+            }
+            
+            if (i) {
+                trace(i);
+            }
+            if (s) {
+                trace(s);
+            }
+        
+            if (o) {
+                trace("obj");
+            }                     			
 		}
 	}
 }

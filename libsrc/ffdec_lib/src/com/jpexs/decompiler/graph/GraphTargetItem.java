@@ -347,7 +347,7 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
                 if (!t.returnType().equals(TypeItem.UNBOUNDED) &&
                         !implicitCoerce.equals(returnTypeStr) &&
                         !(numberTypes.contains(implicitCoerce) && numberTypes.contains(returnTypeStr)) &&
-                        !(implicitCoerce.equals("Boolean"))
+                        !(implicitCoerce.equals("Boolean") && !returnTypeStr.equals("Function"))
                         ) {
                     t = new ConvertAVM2Item(null, null, t, new TypeItem(implicitCoerce));
                 }
