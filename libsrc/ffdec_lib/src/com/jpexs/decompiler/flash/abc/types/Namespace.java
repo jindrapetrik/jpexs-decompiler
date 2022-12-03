@@ -45,7 +45,7 @@ public class Namespace {
 
     public static final String[] nameSpaceKindNames = new String[]{"Namespace", "PrivateNamespace", "PackageNamespace", "PackageInternalNs", "ProtectedNamespace", "ExplicitNamespace", "StaticProtectedNs"};
 
-    public static final String[] namePrefixes = new String[]{"", "private", "public", "", "protected", "explicit", "protected"};
+    public static final String[] namePrefixes = new String[]{"", "private", "public", "internal", "protected", "explicit", "protected"};
 
     public int kind;
 

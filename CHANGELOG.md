@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - [#1511], [#1765] Quick search tree (Ctrl+F) for everything, not just AS3 classes
 - Quick search (Ctrl+F) for tag list view
 - [#1884] Memory search - show size and adress in hex, show only aligned to N bytes
+- AS3 - "internal" keyword support
 
 ### Fixed
 - [#1897] Close menu button without selecting specific item

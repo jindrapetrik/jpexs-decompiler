@@ -127,6 +127,8 @@ package
 		
 		TestPropertyCoerce;
 		TestUnaryMinus;
+        
+        TestModifiers;
 		
 		public function Main()
 		{
