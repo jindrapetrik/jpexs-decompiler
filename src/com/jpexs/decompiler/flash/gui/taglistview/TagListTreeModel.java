@@ -332,8 +332,9 @@ public class TagListTreeModel extends AbstractTagTreeModel {
             for (OpenableList swfList : swfs) {
                 if (!swfList.isBundle()) {
                     result.add(swfList.get(0));
+                } else {
+                    result.add(swfList);
                 }
-                result.add(swfList);
             }
             return result;
         } else if (parentNode instanceof OpenableList) {

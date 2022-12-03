@@ -4,7 +4,8 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - [#1898] Keyboard shortcut to remove tags (DEL, SHIFT+DEL)
-- [#1765] Quick search tree for everything, not just AS3 classes
+- [#1765] Quick search tree (Ctrl+F) for everything, not just AS3 classes
+- Quick search (Ctrl+F) for tag list view
 
 ### Fixed
 - [#1897] Close menu button without selecting specific item
