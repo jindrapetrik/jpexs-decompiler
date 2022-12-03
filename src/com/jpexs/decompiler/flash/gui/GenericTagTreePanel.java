@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.gui.generictageditors.FullSized;
 import com.jpexs.decompiler.flash.gui.generictageditors.GenericTagEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.NumberEditor;
 import com.jpexs.decompiler.flash.gui.generictageditors.StringEditor;
+import com.jpexs.decompiler.flash.gui.generictageditors.UUIDEditor;
 import com.jpexs.decompiler.flash.gui.tagtree.AbstractTagTree;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -50,6 +51,7 @@ import com.jpexs.decompiler.flash.types.annotations.Multiline;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.Table;
+import com.jpexs.decompiler.flash.types.annotations.UUID;
 import com.jpexs.decompiler.flash.types.annotations.parser.AnnotationParseException;
 import com.jpexs.decompiler.flash.types.annotations.parser.ConditionEvaluator;
 import com.jpexs.helpers.ByteArrayRange;
@@ -300,9 +302,13 @@ public class GenericTagTreePanel extends GenericTagPanel {
                                 
                     swfType = evalSwfType(model, parentPath, swfType);
                     
+                    UUID uuid = field.getAnnotation(UUID.class);
+                    
                     Multiline multiline = field.getAnnotation(Multiline.class);
                     EnumValues enumValues = field.getAnnotation(EnumValues.class);
-                    if (enumValues != null && (type.equals(int.class) || type.equals(Integer.class))) {
+                    if (uuid != null) {
+                        editor = new UUIDEditor(field.getName(), obj, field, index, type);
+                    } else if (enumValues != null && (type.equals(int.class) || type.equals(Integer.class))) {
                         Map<Integer, String> values = new HashMap<>();
                         for (EnumValue enumValue : enumValues.value()) {
                             values.put(enumValue.value(), enumValue.text());
@@ -727,7 +733,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 }
                 return ret.toString();
             }
-
+            
             if (fieldSet.size() == 1) {
                 ret.append(toString(0));
             } else {
@@ -747,7 +753,22 @@ public class GenericTagTreePanel extends GenericTagPanel {
         public String toString(int fieldIndex) {
             String valStr = "";
             Field field = fieldSet.get(fieldIndex);
-            if (ReflectionTools.needsIndex(field) && (index == -1)) {
+            
+            if (field.getAnnotation(UUID.class) != null) {
+                StringBuilder sb = new StringBuilder();
+                byte[] val = (byte[]) getValue(fieldIndex);
+                for(int i = 0; i < val.length; i++) {
+                    String h = Integer.toHexString(val[i] & 0xff);
+                    if (h.length() == 1) {
+                        h = "0" + h;
+                    }
+                    sb.append(h);
+                    if (i == 3 || i == 5 || i == 7 || i == 9) {
+                        sb.append("-");
+                    }
+                }
+                valStr += " = " + sb.toString();
+            } else if (ReflectionTools.needsIndex(field) && (index == -1)) {
                 valStr += "";
             } else if (hasEditor(obj, field, index)) {
                 Object val = getValue(fieldIndex);
@@ -787,6 +808,10 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
 
         public String getType(int fieldIndex) {
+            UUID uuid = fieldSet.get(fieldIndex).getAnnotation(UUID.class);
+            if (uuid != null) {
+                return "UUID";
+            }
             SWFArray swfArray = fieldSet.get(fieldIndex).getAnnotation(SWFArray.class);
             Class<?> declaredType = fieldSet.get(fieldIndex).getType();
             boolean isArray = ReflectionTools.needsIndex(fieldSet.get(fieldIndex)) || swfArray != null;
@@ -1214,8 +1239,12 @@ public class GenericTagTreePanel extends GenericTagPanel {
             type = val.getClass();
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             return false;
-        }        
-        if (type.equals(int.class) || type.equals(Integer.class)
+        }   
+        UUID uuid = field.getAnnotation(UUID.class);
+        
+        if (uuid != null) {
+            return true;
+        } else if (type.equals(int.class) || type.equals(Integer.class)
                 || type.equals(short.class) || type.equals(Short.class)
                 || type.equals(long.class) || type.equals(Long.class)
                 || type.equals(double.class) || type.equals(Double.class)
