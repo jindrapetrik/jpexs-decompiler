@@ -550,7 +550,7 @@ public class SWFInputStream implements AutoCloseable {
      * @throws IOException
      */
     private long readUI32Internal() throws IOException {
-        return (readEx() + (readEx() << 8) + (readEx() << 16) + (readEx() << 24)) & 0xffffffff;
+        return (readEx() + (readEx() << 8) + (readEx() << 16) + (readEx() << 24)) & 0xffffffffL;
     }
 
     /**

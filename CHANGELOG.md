@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - [#1897] Close menu button without selecting specific item
+- Reading UI32 values
 
 ### Changed
 - Quick search needs minimum of 3 characters
