@@ -452,6 +452,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private void handleTreeKeyReleased(KeyEvent e) {
+        if (checkEdited()) {
+            return;
+        }
         AbstractTagTree tree = (AbstractTagTree) e.getSource();
         if ((e.getKeyCode() == KeyEvent.VK_UP
                 || e.getKeyCode() == KeyEvent.VK_DOWN)
@@ -514,6 +517,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private void handleTreeKeyPressed(KeyEvent e) {
+        if (checkEdited()) {
+            return;
+        }
         AbstractTagTree tree = (AbstractTagTree) e.getSource();
         if ((e.getKeyCode() == 'F') && (e.isControlDown())) {
             if (tree == tagTree) {

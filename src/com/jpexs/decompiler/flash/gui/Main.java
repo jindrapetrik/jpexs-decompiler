@@ -135,6 +135,7 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -2673,7 +2674,7 @@ public class Main {
                  */
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if (e.getButton() == MouseEvent.BUTTON1) {
+                    if (SwingUtilities.isLeftMouseButton(e)) {
                         Main.showProxy();
                     }
                 }

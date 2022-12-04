@@ -131,6 +131,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.ToolTipManager;
 import javax.swing.border.BevelBorder;
@@ -1293,7 +1294,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (ctrlDown && e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 1 && !decompiledTextArea.isEditable()) {
+            if (ctrlDown && SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 1 && !decompiledTextArea.isEditable()) {
                 ctrlDown = false;
                 //decompiledTextArea.setCursor(Cursor.getDefaultCursor());
                 //gotoDeclaration();

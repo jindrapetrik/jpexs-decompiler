@@ -51,6 +51,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
@@ -123,7 +124,7 @@ public class FolderPreviewPanel extends JPanel {
                     return;
                 }
 
-                if (e.getButton() == MouseEvent.BUTTON1 || selectedItems.isEmpty()) {
+                if (SwingUtilities.isLeftMouseButton(e) || selectedItems.isEmpty()) {
                     if (!e.isControlDown()) {
                         selectedItems.clear();
                     }
@@ -148,7 +149,7 @@ public class FolderPreviewPanel extends JPanel {
                     }
                 }
 
-                if (e.getButton() == MouseEvent.BUTTON3) {
+                if (SwingUtilities.isRightMouseButton(e)) {
                     mainPanel.getContextPopupMenu().update(new ArrayList<>(selectedItems.values()));
                     mainPanel.getContextPopupMenu().show(FolderPreviewPanel.this, e.getX(), e.getY());
                 }

@@ -34,6 +34,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.tree.TreePath;
@@ -124,10 +125,10 @@ public class PinButton extends JPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    //setBorder(loweredBorder);
-                }
-                if (e.getButton() == MouseEvent.BUTTON3) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    if (mainPanel.checkEdited()) {
+                        return;
+                    }
                     List<TreeItem> itemList = new ArrayList<>();
                     itemList.add(item);
                     mainPanel.getContextPopupMenu().update(itemList);
@@ -137,7 +138,7 @@ public class PinButton extends JPanel {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
                     /*if (selected) {
                         setBorder(loweredBorder);
                     } else {
@@ -223,7 +224,7 @@ public class PinButton extends JPanel {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
                     PinButton.this.pinned = !PinButton.this.pinned;
                     if (PinButton.this.pinned) {
                         button.setToolTipText(AppStrings.translate("unpin"));
