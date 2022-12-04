@@ -1211,9 +1211,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     @Override
     public boolean isEditing() {
         return textPanel.isEditing()
-                || (genericSaveButton.isVisible() && genericSaveButton.isEnabled())
-                || (metadataSaveButton.isVisible() && metadataSaveButton.isEnabled())
-                || (placeSaveButton.isVisible() && placeSaveButton.isEnabled())
+                || genericSaveButton.isVisible()
+                || metadataSaveButton.isVisible()
+                || placeSaveButton.isVisible()
                 || fontPanel.isEditing();
     }
 

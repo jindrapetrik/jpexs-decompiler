@@ -111,7 +111,7 @@ public class FontPanel extends JPanel {
     }
 
     public boolean isEditing() {
-        return buttonSave.isVisible() && buttonSave.isEnabled();
+        return buttonSave.isVisible();
     }
     
     private void setEditable(boolean editable) {
