@@ -178,6 +178,7 @@ And also links to these libraries:
 * [jPacker] (Canvas scripts compression) - MIT License
 * [gnujpdf] (PDF export) - LGPL License
 * [DDSReader] (DDS reading) - MIT License
+* [vlcj] (DefineVideoStream playback) - GPLv3
 
 [GIT]: http://git-scm.com/downloads
 [Netbeans IDE]: http://www.netbeans.org/
@@ -205,3 +206,4 @@ And also links to these libraries:
 [jPacker]: https://code.google.com/p/jpacker/
 [gnujpdf]: http://gnujpdf.sourceforge.net/
 [DDSReader]: https://github.com/npedotnet/DDSReader/
+[vlcj]: https://github.com/caprica/vlcj
