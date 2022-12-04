@@ -1213,7 +1213,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         return textPanel.isEditing()
                 || (genericSaveButton.isVisible() && genericSaveButton.isEnabled())
                 || (metadataSaveButton.isVisible() && metadataSaveButton.isEnabled())
-                || (placeSaveButton.isVisible() && placeSaveButton.isEnabled());
+                || (placeSaveButton.isVisible() && placeSaveButton.isEnabled())
+                || fontPanel.isEditing();
     }
 
     public void selectImageDepth(int depth) {

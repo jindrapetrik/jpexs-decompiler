@@ -81,6 +81,7 @@ public class FontPanel extends JPanel {
     public FontPanel(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
         initComponents();
+        setEditable(false);
     }
 
     public FontTag getFontTag() {
@@ -109,6 +110,10 @@ public class FontPanel extends JPanel {
         return new DefaultComboBoxModel<>(new Vector<>(faceSet));
     }
 
+    public boolean isEditing() {
+        return buttonSave.isVisible() && buttonSave.isEnabled();
+    }
+    
     private void setEditable(boolean editable) {
         if (editable) {
             buttonEdit.setVisible(false);
