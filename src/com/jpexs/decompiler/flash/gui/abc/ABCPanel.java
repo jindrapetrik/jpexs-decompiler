@@ -1821,7 +1821,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     public boolean isEditing() {
         View.checkAccess();
 
-        return detailPanel.isEditing() || isModified();
+        return detailPanel.saveButton.isVisible() || saveDecompiledButton.isVisible();
     }
 
     public DebugPanel getDebugPanel() {
