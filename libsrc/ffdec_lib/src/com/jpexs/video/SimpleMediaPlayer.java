@@ -40,7 +40,7 @@ public class SimpleMediaPlayer {
     private final EmbeddedMediaPlayer embeddedMediaPlayer;
     private final MediaListPlayer mediaListPlayer;
     private final MediaPlayerFactory mediaPlayerFactory;
-    private boolean paused = true;
+    private boolean paused = false;
 
     private long time = 0L;
 
@@ -93,41 +93,7 @@ public class SimpleMediaPlayer {
 
     public void stop() {
         embeddedMediaPlayer.controls().stop();
-    }
-
-    public void pause() {
-        if (paused) {
-            paused = false;
-            if (length != 0) {
-                embeddedMediaPlayer.controls().setPosition(((float) time) / length);
-            }
-            embeddedMediaPlayer.controls().play();
-            return;
-        }
-        embeddedMediaPlayer.controls().pause();
-        paused = true;
-    }
-
-    public void setTime(long time) {
-        synchronized (displayLock) {
-            this.time = time;
-            positionSet = false;
-            if (paused) {
-                singleFrame = true;
-            }
-            embeddedMediaPlayer.controls().setTime(time);
-            embeddedMediaPlayer.controls().play();
-            
-            if (paused) {
-                try {
-                    displayLock.wait();
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(SimpleMediaPlayer.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-        //embeddedMediaPlayer.controls().play();
-    }
+    }   
 
     public void setPosition(float position) {
         synchronized (displayLock) {
@@ -136,9 +102,13 @@ public class SimpleMediaPlayer {
             singleFrame = true;
         }
             //System.out.println("setting position: "+ position);
-            embeddedMediaPlayer.controls().pause();
+            if (!isPaused()) {
+                embeddedMediaPlayer.controls().pause();
+            }
             embeddedMediaPlayer.controls().setPosition(position);
-            embeddedMediaPlayer.controls().play();
+            //embeddedMediaPlayer.controls().nextFrame();
+            setPaused(false);
+            embeddedMediaPlayer.controls().play();            
             /*if (paused) {
                 try {
                     displayLock.wait();
@@ -151,8 +121,12 @@ public class SimpleMediaPlayer {
         //embeddedMediaPlayer.controls().play();
     }
 
-    public boolean isPaused() {
+    public synchronized boolean isPaused() {
         return paused;
+    }
+    
+    public synchronized void setPaused(boolean val) {
+        this.paused = val;
     }
     
     /*public void rewind() {
@@ -230,9 +204,13 @@ public class SimpleMediaPlayer {
 
             @Override
             public void stopped(MediaPlayer mediaPlayer) {
-                System.out.println("stopped");
+                //System.out.println("stopped");
+            }                        
+
+            @Override
+            public void paused(MediaPlayer mediaPlayer) {
+                setPaused(true);
             }
-            
             
             
 
@@ -247,6 +225,7 @@ public class SimpleMediaPlayer {
                 }
                 //System.out.println("playing");
                 finished = false;
+                setPaused(false);
                 //embeddedMediaPlayer.controls().setRepeat(true);
             }
 
@@ -301,7 +280,7 @@ public class SimpleMediaPlayer {
         @Override
         public void display(uk.co.caprica.vlcj.player.base.MediaPlayer mediaPlayer, ByteBuffer[] nativeBuffers, BufferFormat bufferFormat) {            
             synchronized (displayLock) {                
-                if (singleFrame) {                    
+                if (singleFrame) {      
                     singleFrame = false;
                     if (image == null) {
                         this.width = bufferFormat.getWidth();
@@ -326,8 +305,10 @@ public class SimpleMediaPlayer {
                     }
                 }                                
             }
-            embeddedMediaPlayer.controls().pause();
-            sendImage();
+            if (!isPaused()) {
+                embeddedMediaPlayer.controls().pause();
+            }
+            sendImage();           
             //System.out.println("display return");
         }
     }

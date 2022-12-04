@@ -114,9 +114,13 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     private ReadOnlyTagList tags;
 
     @Internal
-    private int lastRatio = -1;
+    private int lastFrame = -1;
 
+    @Internal
     private Timeline timeline;
+    
+    @Internal
+    private Map<Integer, VideoFrameTag> frames;
 
     public static final int CODEC_SORENSON_H263 = 2;
 
@@ -266,24 +270,36 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
             g.setComposite(AlphaComposite.Dst);
             return;
         }
+        if (ratio == -1) {
+            ratio = 0;
+        }
+        
+        Set<Integer> keyFrames = getFrames().keySet();
+        
+        int f = 0;
+        for(int i = 0; i <= ratio; i++) {
+            if (keyFrames.contains(i)) {
+                f = i;
+            }
+        }
+        
         synchronized (DefineVideoStreamTag.class) {
 
-            if (!(activeFrame != null && lastRatio == ratio)) {
+            if (!(activeFrame != null && lastFrame == f)) {
                 synchronized (getFrameLock) {
                     activeFrame = null;
                     getFrameLock.notifyAll();
                 }
                 initPlayer();
-                if (ratio == -1) {
-                    ratio = 0;
-                }
-                //float oneFr = 1f / getNumFrames();
-                ratio--;
-
+                
+                
                 if (mediaPlayer.isFinished()) {
                     return;
                 }
-                mediaPlayer.setPosition((float) ratio / getNumFrames());
+                
+                float oneFr  = 1f / (getNumFrames() + 2);
+                
+                mediaPlayer.setPosition(((float) f) / (getNumFrames() + 2) - (f == 0 ? 0 :  oneFr / 10f));
                 try {
                     synchronized (getFrameLock) {
                         if (activeFrame == null) {
@@ -296,6 +312,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
                     //Logger.getLogger(DefineVideoStreamTag.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+            lastFrame = f;
             synchronized (getFrameLock) {
                 if (activeFrame != null) {
                     //System.out.println("drawed");
@@ -338,20 +355,28 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
         initTimeline();
         return timeline;
     }
+    
+    private Map<Integer, VideoFrameTag> getFrames() {
+        if (this.frames != null) {
+            return this.frames;
+        }
+        Map<Integer, VideoFrameTag> frames = new HashMap<>();
+        SWF.populateVideoFrames(characterID, swf.getTags(), frames);
+        this.frames = frames;
+        return frames;
+    }
 
     private void initTimeline() {
         if (timeline != null) {
             return;
         }
-        Map<Integer, VideoFrameTag> frames = new HashMap<>();
-        SWF.populateVideoFrames(characterID, swf.getTags(), frames);
-        Set<Integer> frameNums = new TreeSet<>(frames.keySet());
+        Set<Integer> frameNums = new TreeSet<>(getFrames().keySet());
         int maxFr = 0;
         for (int f : frameNums) {
             maxFr = f;
         }
         List<Tag> tags = new ArrayList<>();
-        for (int f = 0; f < maxFr; f++) {
+        for (int f = 0; f <= maxFr; f++) {
             if (frames.containsKey(f)) {
                 tags.add(frames.get(f));
             }
@@ -370,6 +395,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     @Override
     public void resetTimeline() {
         timeline = null;
+        frames = null;
     }
 
     @Override
