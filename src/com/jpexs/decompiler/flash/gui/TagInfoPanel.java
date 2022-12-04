@@ -87,6 +87,9 @@ public class TagInfoPanel extends JPanel {
                         item = swf.getTimeline().getFrame(id);
                     }
                     if (item != null) {
+                        if (mainPanel.checkEdited()) {
+                            return;
+                        }
                         mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), item);
                     }
                 }
