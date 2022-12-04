@@ -90,6 +90,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.TreeModelListener;
 import javax.swing.plaf.basic.BasicLabelUI;
@@ -456,7 +457,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
                 TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
                 if (selRow != -1 && selPath != null) {
                     if (e.getClickCount() == 1) {
-                        if (e.getButton() == MouseEvent.BUTTON3) { //right click
+                        if (SwingUtilities.isRightMouseButton(e)) { //right click
                             Object selObject = selPath.getLastPathComponent();
                             if (selObject instanceof FieldNode) {
                                 final FieldNode fnode = (FieldNode) selObject;

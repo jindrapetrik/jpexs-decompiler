@@ -590,7 +590,9 @@ public class TagTreeContextMenu extends JPopupMenu {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
-
+                    if (mainPanel.checkEdited()) {
+                        return;
+                    }
                     int row = getTree().getClosestRowForLocation(e.getX(), e.getY());
                     int[] selectionRows = getTree().getSelectionRows();
                     if (!Helper.contains(selectionRows, row)) {

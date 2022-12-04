@@ -102,7 +102,9 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
+import jsyntaxpane.util.SwingUtils;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
@@ -549,7 +551,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             MouseInputAdapter mouseInputAdapter = new MouseInputAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    if (e.getButton() == MouseEvent.BUTTON1) {
+                    if (SwingUtilities.isLeftMouseButton(e)) {
                         mouseMoved(e); //to correctly calculate mode, because moseMoved event is not called during dragging
                         setDragStart(e.getPoint());
                         
@@ -564,7 +566,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
-                    if (e.getButton() == MouseEvent.BUTTON1) {
+                    if (SwingUtilities.isLeftMouseButton(e)) {
                         dragStart = null;
 
                         if (freeTransformDepth > -1 && mode != Cursor.DEFAULT_CURSOR && registrationPointUpdated != null && transformUpdated != null) {
