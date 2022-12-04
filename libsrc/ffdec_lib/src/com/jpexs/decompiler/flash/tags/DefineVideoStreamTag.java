@@ -16,26 +16,63 @@
  */
 package com.jpexs.decompiler.flash.tags;
 
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.MovieExporter;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
+import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
-import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
+import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.RenderContext;
+import com.jpexs.decompiler.flash.timeline.Timeline;
+import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BasicType;
+import com.jpexs.decompiler.flash.types.ColorTransform;
+import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.SOUNDINFO;
+import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
+import com.jpexs.helpers.SerializableImage;
+import com.jpexs.video.FrameListener;
+import com.jpexs.video.SimpleMediaPlayer;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author JPEXS
  */
 @SWFVersion(from = 6)
-public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
+public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Timelined {
 
     public static final int ID = 60;
 
@@ -64,6 +101,22 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
 
     @SWFType(BasicType.UI8)
     public int codecID;
+
+    @Internal
+    private SimpleMediaPlayer mediaPlayer;
+    @Internal
+    private final Object getFrameLock = new Object();
+
+    @Internal
+    private BufferedImage activeFrame = null;
+
+    @Internal
+    private ReadOnlyTagList tags;
+
+    @Internal
+    private int lastRatio = -1;
+
+    private Timeline timeline;
 
     public static final int CODEC_SORENSON_H263 = 2;
 
@@ -148,5 +201,220 @@ public class DefineVideoStreamTag extends CharacterTag implements BoundedTag {
     @Override
     public RECT getRectWithStrokes() {
         return getRect();
+    }
+
+    private void initPlayer() {
+        if (mediaPlayer != null) { // && !mediaPlayer.isFinished()) {
+            return;
+        }
+        mediaPlayer = new SimpleMediaPlayer();
+        mediaPlayer.addFrameListener(new FrameListener() {
+            @Override
+            public void newFrameRecieved(BufferedImage image) {
+                synchronized (getFrameLock) {
+                    activeFrame = image;
+                    //System.out.println("received frame");
+                    getFrameLock.notifyAll();
+                    /*if (mediaPlayer.isFinished()) {
+                        mediaPlayer.rewind();
+                    }*/
+                }
+            }
+        });
+        MovieExporter exp = new MovieExporter();
+        try {
+            byte[] data = exp.exportMovie(this, MovieExportMode.FLV, true);
+            File tempFile = File.createTempFile("ffdec_video", ".flv");
+            tempFile.deleteOnExit();
+            Helper.writeFile(tempFile.getAbsolutePath(), data);
+            mediaPlayer.play(tempFile.getAbsolutePath());
+            //mediaPlayer.pause();
+
+        } catch (IOException ex) {
+            Logger.getLogger(DefineVideoStreamTag.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Override
+    public int getUsedParameters() {
+        return PARAMETER_RATIO;
+    }
+
+    @Override
+    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked) {
+        return transformation.toTransform().createTransformedShape(new Rectangle2D.Double(0, 0, width * SWF.unitDivisor, height * SWF.unitDivisor));
+    }
+
+    @Override
+    public synchronized void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode) {
+
+        if (!Configuration.vlcPlayerLocation.hasValue() || !new File(Configuration.vlcPlayerLocation.get()).exists()) {
+            Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
+            Matrix mat = transformation;
+            AffineTransform trans = mat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).toTransform();
+            g.setTransform(trans);
+            BoundedTag b = (BoundedTag) this;
+            g.setPaint(new Color(255, 255, 255, 128));
+            g.setComposite(BlendComposite.Invert);
+            g.setStroke(new BasicStroke((int) SWF.unitDivisor));
+            RECT r = b.getRect();
+            g.setFont(g.getFont().deriveFont((float) (12 * SWF.unitDivisor)));
+            g.drawString(toString(), r.Xmin + (int) (3 * SWF.unitDivisor), r.Ymin + (int) (15 * SWF.unitDivisor));
+            g.draw(new Rectangle(r.Xmin, r.Ymin, r.getWidth(), r.getHeight()));
+            g.drawLine(r.Xmin, r.Ymin, r.Xmax, r.Ymax);
+            g.drawLine(r.Xmax, r.Ymin, r.Xmin, r.Ymax);
+            g.setComposite(AlphaComposite.Dst);
+            return;
+        }
+        synchronized (DefineVideoStreamTag.class) {
+
+            if (!(activeFrame != null && lastRatio == ratio)) {
+                synchronized (getFrameLock) {
+                    activeFrame = null;
+                    getFrameLock.notifyAll();
+                }
+                initPlayer();
+                if (ratio == -1) {
+                    ratio = 0;
+                }
+                //float oneFr = 1f / getNumFrames();
+                ratio--;
+
+                if (mediaPlayer.isFinished()) {
+                    return;
+                }
+                mediaPlayer.setPosition((float) ratio / getNumFrames());
+                try {
+                    synchronized (getFrameLock) {
+                        if (activeFrame == null) {
+                            //System.out.println("waiting...");
+                            getFrameLock.wait();
+                            //System.out.println("awakened");
+                        }
+                    }
+                } catch (InterruptedException ex) {
+                    //Logger.getLogger(DefineVideoStreamTag.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            synchronized (getFrameLock) {
+                if (activeFrame != null) {
+                    //System.out.println("drawed");
+                    Graphics2D graphics = (Graphics2D) image.getBufferedImage().getGraphics();
+                    AffineTransform at = transformation.toTransform();
+                    at.preConcatenate(AffineTransform.getScaleInstance(1 / SWF.unitDivisor, 1 / SWF.unitDivisor));
+                    graphics.setTransform(at);
+                    //Point p = transformation.inverse().transform(0, 0);
+                    graphics.drawImage(activeFrame, 0, 0,
+                            (int) Math.round(width * SWF.unitDivisor),
+                            (int) Math.round(height * SWF.unitDivisor),
+                            0, 0, width, height,
+                            null);
+                }
+            }
+        }
+        //System.out.println("toImage return");
+    }
+
+    @Override
+    public void toSVG(SVGExporter exporter, int ratio, ColorTransform colorTransform, int level) throws IOException {
+    }
+
+    @Override
+    public void toHtmlCanvas(StringBuilder result, double unitDivisor) {
+    }
+
+    @Override
+    public int getNumFrames() {
+        return numFrames;
+    }
+
+    @Override
+    public boolean isSingleFrame() {
+        return getNumFrames() == 1;
+    }
+
+    @Override
+    public Timeline getTimeline() {
+        initTimeline();
+        return timeline;
+    }
+
+    private void initTimeline() {
+        if (timeline != null) {
+            return;
+        }
+        Map<Integer, VideoFrameTag> frames = new HashMap<>();
+        SWF.populateVideoFrames(characterID, swf.getTags(), frames);
+        Set<Integer> frameNums = new TreeSet<>(frames.keySet());
+        int maxFr = 0;
+        for (int f : frameNums) {
+            maxFr = f;
+        }
+        List<Tag> tags = new ArrayList<>();
+        for (int f = 0; f < maxFr; f++) {
+            if (frames.containsKey(f)) {
+                tags.add(frames.get(f));
+            }
+            tags.add(new PlaceObject2Tag(swf, false, 1, characterID, new MATRIX(), null, f, null, -1, null));
+            tags.add(new ShowFrameTag(swf));
+        }
+        this.tags = new ReadOnlyTagList(tags);
+
+        timeline = new Timeline(swf, this, characterID, getRect()) {
+            @Override
+            public void getSounds(int frame, int time, ButtonTag mouseOverButton, int mouseButton, List<Integer> sounds, List<String> soundClasses, List<SOUNDINFO> soundInfos) {
+            }
+        };
+    }
+
+    @Override
+    public void resetTimeline() {
+        timeline = null;
+    }
+
+    @Override
+    public ReadOnlyTagList getTags() {
+        initTimeline();
+        return tags;
+    }
+
+    @Override
+    public void removeTag(int index) {
+
+    }
+
+    @Override
+    public void removeTag(Tag tag) {
+
+    }
+
+    @Override
+    public void addTag(Tag tag) {
+    }
+
+    @Override
+    public void addTag(int index, Tag tag) {
+    }
+
+    @Override
+    public void replaceTag(int index, Tag newTag) {
+    }
+
+    @Override
+    public void replaceTag(Tag oldTag, Tag newTag) {
+    }
+
+    @Override
+    public int indexOfTag(Tag tag) {
+        return tags.indexOf(tag);
+    }
+
+    @Override
+    public void setFrameCount(int frameCount) {
+    }
+
+    @Override
+    public int getFrameCount() {
+        return numFrames;
     }
 }

@@ -132,6 +132,7 @@ import com.jpexs.decompiler.flash.tags.DefineButtonTag;
 import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
 import com.jpexs.decompiler.flash.tags.EndTag;
@@ -4608,6 +4609,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
         boolean internalViewer = !isAdobeFlashPlayerEnabled();
+        
+        boolean isVideoButNotDrawable = (treeItem instanceof DefineVideoStreamTag) && (!Configuration.vlcPlayerLocation.hasValue() || !new File(Configuration.vlcPlayerLocation.get()).exists()); 
+        
         if (treeItem instanceof SWF) {
             SWF swf = (SWF) treeItem;
             if (internalViewer) {
@@ -4640,7 +4644,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             SWF imageSWF = makeTimelinedImage(imageTag);
             previewPanel.showImagePanel(imageSWF, imageSWF, 0, false, true, true, true);
 
-        } else if ((treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag)) && internalViewer) {
+        } else if (!isVideoButNotDrawable && (treeItem instanceof DrawableTag) && (!(treeItem instanceof TextTag)) && (!(treeItem instanceof FontTag)) && internalViewer) {
             final Tag tag = (Tag) treeItem;
             DrawableTag d = (DrawableTag) tag;
             Timelined timelined;

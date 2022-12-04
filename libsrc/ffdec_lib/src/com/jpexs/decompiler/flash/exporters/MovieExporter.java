@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -102,8 +103,12 @@ public class MovieExporter {
     }
 
     public byte[] exportMovie(DefineVideoStreamTag videoStream, MovieExportMode mode) throws IOException {
+        return exportMovie(videoStream, mode, false);
+    }
+        
+    public byte[] exportMovie(DefineVideoStreamTag videoStream, MovieExportMode mode, boolean ffdecInternal) throws IOException {
         SWF swf = videoStream.getSwf();
-        HashMap<Integer, VideoFrameTag> frames = new HashMap<>();
+        Map<Integer, VideoFrameTag> frames = new HashMap<>();
         SWF.populateVideoFrames(videoStream.characterID, swf.getTags(), frames);
         if (frames.isEmpty()) {
             return SWFInputStream.BYTE_ARRAY_EMPTY;
@@ -120,10 +125,14 @@ public class MovieExporter {
         int verticalAdjustment = 0;
         int[] frameNumArray = Helper.toIntArray(frames.keySet());
         Arrays.sort(frameNumArray);
+        FLVTAG lastTag = null;
+        int frameNum = 0;
         for (int i = 0; i < frameNumArray.length; i++) {
             VideoFrameTag tag = frames.get(frameNumArray[i]);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
+            frameNum = frameNumArray[i];
+            
             int frameType = 1;
 
             if ((videoStream.codecID == DefineVideoStreamTag.CODEC_VP6)
@@ -190,7 +199,11 @@ public class MovieExporter {
             }
 
             baos.write(tag.videoData.getRangeData());
-            flv.writeTag(new FLVTAG((int) Math.floor(i * 1000.0 / swf.frameRate), new VIDEODATA(frameType, videoStream.codecID, baos.toByteArray())));
+            flv.writeTag(lastTag = new FLVTAG((long)Math.floor(ffdecInternal ? frameNum * 5000.0 : (frameNum * 1000.0 / swf.frameRate)), new VIDEODATA(frameType, videoStream.codecID, baos.toByteArray())));
+        }
+        if (ffdecInternal && lastTag != null) {
+            lastTag.timeStamp = frameNum * 5000 + 5000;
+            flv.writeTag(lastTag);
         }
         return fos.toByteArray();
     }

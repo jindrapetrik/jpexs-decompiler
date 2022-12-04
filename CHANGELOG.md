@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - "internal" keyword support
 - ProductInfo tag information display
 - DebugId tag proper display and editation
+- [#1893] Experimental playback of DefineVideoStream tags with VLC player
 
 ### Fixed
 - [#1897] Close menu button without selecting specific item
@@ -2704,6 +2705,7 @@ All notable changes to this project will be documented in this file.
 [#1511]: https://www.free-decompiler.com/flash/issues/1511
 [#1765]: https://www.free-decompiler.com/flash/issues/1765
 [#1884]: https://www.free-decompiler.com/flash/issues/1884
+[#1893]: https://www.free-decompiler.com/flash/issues/1893
 [#1897]: https://www.free-decompiler.com/flash/issues/1897
 [#1006]: https://www.free-decompiler.com/flash/issues/1006
 [#1888]: https://www.free-decompiler.com/flash/issues/1888

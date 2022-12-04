@@ -2187,7 +2187,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
     }
 
-    public static void populateVideoFrames(int streamId, Iterable<Tag> tags, HashMap<Integer, VideoFrameTag> output) {
+    public static void populateVideoFrames(int streamId, Iterable<Tag> tags, Map<Integer, VideoFrameTag> output) {
         for (Tag t : tags) {
             if (t instanceof VideoFrameTag) {
                 VideoFrameTag videoFrameTag = (VideoFrameTag) t;

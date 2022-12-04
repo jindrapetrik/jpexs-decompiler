@@ -17,6 +17,7 @@
 package com.sun.jna.platform.win32;
 
 import com.sun.jna.IntegerType;
+import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.platform.win32.BaseTSD.LONG_PTR;
@@ -510,7 +511,7 @@ public interface WinDef extends StdCallLibrary {
          * Instantiates a new int ptr.
          */
         public INT_PTR() {
-            super(Pointer.SIZE);
+            super(Native.POINTER_SIZE);
         }
 
         /**
@@ -519,7 +520,7 @@ public interface WinDef extends StdCallLibrary {
          * @param value the value
          */
         public INT_PTR(long value) {
-            super(Pointer.SIZE, value);
+            super(Native.POINTER_SIZE, value);
         }
 
         /**
@@ -541,7 +542,7 @@ public interface WinDef extends StdCallLibrary {
          * Instantiates a new uint ptr.
          */
         public UINT_PTR() {
-            super(Pointer.SIZE);
+            super(Native.POINTER_SIZE);
         }
 
         /**
@@ -550,7 +551,7 @@ public interface WinDef extends StdCallLibrary {
          * @param value the value
          */
         public UINT_PTR(long value) {
-            super(Pointer.SIZE, value, true);
+            super(Native.POINTER_SIZE, value, true);
         }
 
         /**

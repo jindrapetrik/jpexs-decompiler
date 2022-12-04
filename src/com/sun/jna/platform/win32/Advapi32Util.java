@@ -253,7 +253,7 @@ public abstract class Advapi32Util {
             ArrayList<String> result = new ArrayList<>();
             int offset = 0;
             while (offset < data.size()) {
-                String s = data.getString(offset, true);
+                String s = data.getString(offset); //FIXME, true);
                 offset += s.length() * Native.WCHAR_SIZE;
                 offset += Native.WCHAR_SIZE;
                 result.add(s);
@@ -533,7 +533,7 @@ public abstract class Advapi32Util {
         int offset = 0;
         Memory data = new Memory(size);
         for (String s : arr) {
-            data.setString(offset, s, true);
+            data.setString(offset, s);//FIXME, true);
             offset += s.length() * Native.WCHAR_SIZE;
             offset += Native.WCHAR_SIZE;
         }
@@ -771,7 +771,7 @@ public abstract class Advapi32Util {
                 }
                 case WinNT.REG_SZ:
                 case WinNT.REG_EXPAND_SZ: {
-                    keyValues.put(nameString, byteData.getString(0, true));
+                    keyValues.put(nameString, byteData.getString(0)); //FIXME, true);
                     break;
                 }
                 case WinNT.REG_BINARY: {
@@ -784,7 +784,7 @@ public abstract class Advapi32Util {
                     ArrayList<String> result = new ArrayList<>();
                     int offset = 0;
                     while (offset < stringData.size()) {
-                        String s = stringData.getString(offset, true);
+                        String s = stringData.getString(offset); //FIXME, true);
                         offset += s.length() * Native.WCHAR_SIZE;
                         offset += Native.WCHAR_SIZE;
                         result.add(s);
@@ -965,7 +965,7 @@ public abstract class Advapi32Util {
 
         public EventLogRecord(Pointer pevlr) {
             _record = new EVENTLOGRECORD(pevlr);
-            _source = pevlr.getString(_record.size(), true);
+            _source = pevlr.getString(_record.size()); //, true); FIXME
             // data
             if (_record.DataLength.intValue() > 0) {
                 _data = pevlr.getByteArray(_record.DataOffset.intValue(),
@@ -977,7 +977,7 @@ public abstract class Advapi32Util {
                 int count = _record.NumStrings.intValue();
                 long offset = _record.StringOffset.intValue();
                 while (count > 0) {
-                    String s = pevlr.getString(offset, true);
+                    String s = pevlr.getString(offset); //FIXME, true);
                     strings.add(s);
                     offset += s.length() * Native.WCHAR_SIZE;
                     offset += Native.WCHAR_SIZE;
