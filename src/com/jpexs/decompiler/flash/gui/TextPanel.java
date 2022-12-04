@@ -423,6 +423,6 @@ public class TextPanel extends JPanel implements TagEditorPanel {
 
     @Override
     public boolean isEditing() {
-        return textSaveButton.isVisible() && textSaveButton.isEnabled();
+        return textSaveButton.isVisible();
     }
 }
