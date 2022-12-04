@@ -18,6 +18,7 @@ package com.sun.jna.platform.win32;
 
 import com.sun.jna.FromNativeContext;
 import com.sun.jna.Memory;
+import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.PointerType;
@@ -1070,7 +1071,7 @@ public interface WinNT extends WinError, WinDef, WinBase, BaseTSD {
         }
 
         public HANDLEByReference(HANDLE h) {
-            super(Pointer.SIZE);
+            super(Native.POINTER_SIZE);
             setValue(h);
         }
 

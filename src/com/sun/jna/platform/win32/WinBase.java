@@ -16,6 +16,7 @@
  */
 package com.sun.jna.platform.win32;
 
+import com.sun.jna.Native;
 import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
@@ -39,7 +40,7 @@ public interface WinBase extends StdCallLibrary, WinDef, BaseTSD {
      * Constant value representing an invalid HANDLE.
      */
     HANDLE INVALID_HANDLE_VALUE
-            = new HANDLE(Pointer.createConstant(Pointer.SIZE == 8
+            = new HANDLE(Pointer.createConstant(Native.POINTER_SIZE == 8
                     ? -1 : 0xFFFFFFFFL));
 
     /**

@@ -655,7 +655,7 @@
         <copy todir="${dist.lib.dir}">
             <fileset dir="${lib.dir}" includes="**/*.jar"/>
             <fileset dir="${lib.dir}" includes="**/*.exe"/>
-            <fileset dir="${lib.dir}" includes="**/*.txt"/>            
+            <fileset dir="${lib.dir}" includes="**/*.txt"/>                       
         </copy>
         
         
