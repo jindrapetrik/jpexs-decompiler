@@ -202,7 +202,7 @@ public class MovieExporter {
             flv.writeTag(lastTag = new FLVTAG((long)Math.floor(ffdecInternal ? frameNum * 5000.0 : (frameNum * 1000.0 / swf.frameRate)), new VIDEODATA(frameType, videoStream.codecID, baos.toByteArray())));
         }
         if (ffdecInternal && lastTag != null) {
-            lastTag.timeStamp = frameNum * 5000 + 5000;
+            lastTag.timeStamp = frameNum * 5000 + 10000;
             flv.writeTag(lastTag);
         }
         return fos.toByteArray();

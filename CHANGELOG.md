@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - "internal" keyword support
 - ProductInfo tag information display
 - DebugId tag proper display and editation
-- [#1893] Experimental playback of DefineVideoStream tags with VLC player
+- [#1893] Playback of DefineVideoStream tags with VLC player
 
 ### Fixed
 - [#1897] Close menu button without selecting specific item
