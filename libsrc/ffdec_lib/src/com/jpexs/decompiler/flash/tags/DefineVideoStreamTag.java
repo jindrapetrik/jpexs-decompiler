@@ -225,6 +225,10 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
         return getRect();
     }
 
+    public static boolean displayAvailable() {
+        return SimpleMediaPlayer.isAvailable();
+    }
+    
     private void initPlayer() {
         if (mediaPlayer != null) { // && !mediaPlayer.isFinished()) {
             return;

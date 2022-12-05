@@ -198,7 +198,6 @@ import com.jpexs.helpers.Path;
 import com.jpexs.helpers.ProgressListener;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
-import com.jpexs.video.SimpleMediaPlayer;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -4611,7 +4610,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         boolean internalViewer = !isAdobeFlashPlayerEnabled();
         
-        boolean isVideoButNotDrawable = (treeItem instanceof DefineVideoStreamTag) && (!SimpleMediaPlayer.isAvailable()); 
+        boolean isVideoButNotDrawable = (treeItem instanceof DefineVideoStreamTag) && (!DefineVideoStreamTag.displayAvailable()); 
         
         if (treeItem instanceof SWF) {
             SWF swf = (SWF) treeItem;
