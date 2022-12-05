@@ -7,6 +7,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import com.sun.jna.NativeLibrary;
+import com.sun.jna.Platform;
+import com.sun.jna.platform.win32.Advapi32Util;
+import com.sun.jna.platform.win32.WinReg;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,6 +36,7 @@ import uk.co.caprica.vlcj.player.embedded.videosurface.callback.format.RV32Buffe
 import uk.co.caprica.vlcj.player.list.MediaListPlayer;
 import uk.co.caprica.vlcj.player.list.MediaListPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.list.PlaybackMode;
+import uk.co.caprica.vlcj.support.version.LibVlcVersion;
 
 public class SimpleMediaPlayer {
 
@@ -51,17 +55,50 @@ public class SimpleMediaPlayer {
     private boolean positionSet = false;
 
     private boolean loaded = false;
-    
+
     private boolean finished = false;
 
     private boolean singleFrame = false;
 
     private final Object displayLock = new Object();
-    
+
     private String file;
-    
-    private MyRenderCallback callback;   
-    
+
+    private MyRenderCallback callback;
+
+    private static boolean available = true;
+
+    static {
+        if (Platform.isWindows()) {
+            final String VLC_REGISTRY_KEY = "SOFTWARE\\VideoLAN\\VLC";
+            if (Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, VLC_REGISTRY_KEY)) {
+                if (Advapi32Util.registryValueExists(WinReg.HKEY_LOCAL_MACHINE, VLC_REGISTRY_KEY, "InstallDir")) {
+                    String vlcInstallDir = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, VLC_REGISTRY_KEY, "InstallDir");
+                    NativeLibrary.addSearchPath("libvlc", vlcInstallDir);
+                } else {
+                    available = false;
+                }
+            } else {
+                available = false;
+            }
+        }
+
+        if (available) {
+            try {
+                LibVlcVersion version = new LibVlcVersion();
+                if (!version.isSupported()) {
+                    available = false;
+                }
+            } catch (UnsatisfiedLinkError err) {
+                available = false;
+            }
+        }
+    }
+
+    public static boolean isAvailable() {
+        return available;
+    }
+
     public long getLength() {
         return length;
     }
@@ -78,7 +115,7 @@ public class SimpleMediaPlayer {
         loaded = false;
         this.file = file;
         //embeddedMediaPlayer.media().play(file); //.play(file);
-        
+
         MediaList mediaList = mediaPlayerFactory.media().newMediaList();
         mediaList.media().add(file);
 
@@ -93,7 +130,7 @@ public class SimpleMediaPlayer {
 
     public void stop() {
         embeddedMediaPlayer.controls().stop();
-    }   
+    }
 
     public void setPosition(float position) {
         synchronized (displayLock) {
@@ -101,22 +138,21 @@ public class SimpleMediaPlayer {
             positionSet = true;
             singleFrame = true;
         }
-            //System.out.println("setting position: "+ position);
-            if (!isPaused()) {
-                embeddedMediaPlayer.controls().pause();
-            }
-            embeddedMediaPlayer.controls().setPosition(position);
-            //embeddedMediaPlayer.controls().nextFrame();
-            setPaused(false);
-            embeddedMediaPlayer.controls().play();            
-            /*if (paused) {
+        //System.out.println("setting position: "+ position);
+        if (!isPaused()) {
+            embeddedMediaPlayer.controls().pause();
+        }
+        embeddedMediaPlayer.controls().setPosition(position);
+        //embeddedMediaPlayer.controls().nextFrame();
+        setPaused(false);
+        embeddedMediaPlayer.controls().play();
+        /*if (paused) {
                 try {
                     displayLock.wait();
                 } catch (InterruptedException ex) {
                     Logger.getLogger(SimpleMediaPlayer.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }*/
-        
 
         //embeddedMediaPlayer.controls().play();
     }
@@ -124,11 +160,11 @@ public class SimpleMediaPlayer {
     public synchronized boolean isPaused() {
         return paused;
     }
-    
+
     public synchronized void setPaused(boolean val) {
         this.paused = val;
     }
-    
+
     /*public void rewind() {
         System.out.println("rewinding");
         //embeddedMediaPlayer.controls().stop();
@@ -140,7 +176,6 @@ public class SimpleMediaPlayer {
         //embeddedMediaPlayer.controls().play();
         System.out.println("rewound");
     }*/
-
     public SimpleMediaPlayer() {
 
         BufferFormatCallback bufferFormatCallback = new BufferFormatCallback() {
@@ -158,15 +193,14 @@ public class SimpleMediaPlayer {
         callback = new MyRenderCallback(listeners);
         CallbackVideoSurface callbackVideoSurface = new CallbackVideoSurface(bufferFormatCallback, callback,
                 false, VideoSurfaceAdapters.getVideoSurfaceAdapter());
-        
-        NativeLibrary.addSearchPath("libvlc", Configuration.vlcPlayerLocation.get());
+
         mediaPlayerFactory = new MediaPlayerFactory();
 
         embeddedMediaPlayer = mediaPlayerFactory.mediaPlayers().newEmbeddedMediaPlayer();
         callbackVideoSurface.attach(embeddedMediaPlayer);
         embeddedMediaPlayer.videoSurface().set(callbackVideoSurface);
-        embeddedMediaPlayer.videoSurface().attachVideoSurface();                
-                
+        embeddedMediaPlayer.videoSurface().attachVideoSurface();
+
         embeddedMediaPlayer.events().addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
             @Override
             public void lengthChanged(uk.co.caprica.vlcj.player.base.MediaPlayer mediaPlayer, long newLength) {
@@ -185,7 +219,7 @@ public class SimpleMediaPlayer {
             }
 
             @Override
-            public void finished(MediaPlayer mediaPlayer) {                                              
+            public void finished(MediaPlayer mediaPlayer) {
                 /*System.out.println("finished");
                 finished = true;
                 callback.sendImage();
@@ -199,20 +233,17 @@ public class SimpleMediaPlayer {
                         System.out.println("/finished");
                     }                    
                 }.start();*/
-            }        
-                        
+            }
 
             @Override
             public void stopped(MediaPlayer mediaPlayer) {
                 //System.out.println("stopped");
-            }                        
+            }
 
             @Override
             public void paused(MediaPlayer mediaPlayer) {
                 setPaused(true);
             }
-            
-            
 
             @Override
             public void playing(uk.co.caprica.vlcj.player.base.MediaPlayer mediaPlayer) {
@@ -221,7 +252,7 @@ public class SimpleMediaPlayer {
                         embeddedMediaPlayer.controls().setPosition(position);
                     } else {
                         embeddedMediaPlayer.controls().setPosition(((float) time) / length);
-                    }                    
+                    }
                 }
                 //System.out.println("playing");
                 finished = false;
@@ -241,8 +272,6 @@ public class SimpleMediaPlayer {
         });
 
         mediaListPlayer.mediaPlayer().setMediaPlayer(embeddedMediaPlayer);
-        
-       
 
         mediaListPlayer.controls().setMode(PlaybackMode.LOOP);
     }
@@ -251,8 +280,6 @@ public class SimpleMediaPlayer {
         return finished;
     }
 
-    
-    
     private class MyRenderCallback implements RenderCallback {
 
         private List<FrameListener> videoSurfaces;
@@ -264,23 +291,21 @@ public class SimpleMediaPlayer {
         public BufferedImage getImage() {
             return image;
         }
-        
+
         public void sendImage() {
             for (FrameListener fl : videoSurfaces) {
                 fl.newFrameRecieved(this.image);
             }
         }
 
-        
-        
         public MyRenderCallback(List<FrameListener> listeners) {
             this.videoSurfaces = listeners;
         }
 
         @Override
-        public void display(uk.co.caprica.vlcj.player.base.MediaPlayer mediaPlayer, ByteBuffer[] nativeBuffers, BufferFormat bufferFormat) {            
-            synchronized (displayLock) {                
-                if (singleFrame) {      
+        public void display(uk.co.caprica.vlcj.player.base.MediaPlayer mediaPlayer, ByteBuffer[] nativeBuffers, BufferFormat bufferFormat) {
+            synchronized (displayLock) {
+                if (singleFrame) {
                     singleFrame = false;
                     if (image == null) {
                         this.width = bufferFormat.getWidth();
@@ -291,10 +316,9 @@ public class SimpleMediaPlayer {
 
                     nativeBuffers[0].asIntBuffer().get(rgbBuffer, 0, bufferFormat.getHeight() * bufferFormat.getWidth());
                     image.setRGB(0, 0, image.getWidth(), image.getHeight(), rgbBuffer, 0, image.getWidth());
-                    
-                                       
-                }           
-                
+
+                }
+
                 if (!loaded) {
                     loaded = true;
                     //System.out.println("just loaded");
@@ -303,12 +327,12 @@ public class SimpleMediaPlayer {
                     } else {
                         embeddedMediaPlayer.controls().setPosition(((float) time) / length);
                     }
-                }                                
+                }
             }
             if (!isPaused()) {
                 embeddedMediaPlayer.controls().pause();
             }
-            sendImage();           
+            sendImage();
             //System.out.println("display return");
         }
     }

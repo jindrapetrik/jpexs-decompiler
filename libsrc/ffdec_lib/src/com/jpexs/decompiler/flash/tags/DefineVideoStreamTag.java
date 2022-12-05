@@ -252,7 +252,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     @Override
     public synchronized void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode) {
 
-        if (!Configuration.vlcPlayerLocation.hasValue() || !new File(Configuration.vlcPlayerLocation.get()).exists()) {
+        if (!SimpleMediaPlayer.isAvailable()) {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
             Matrix mat = transformation;
             AffineTransform trans = mat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).toTransform();

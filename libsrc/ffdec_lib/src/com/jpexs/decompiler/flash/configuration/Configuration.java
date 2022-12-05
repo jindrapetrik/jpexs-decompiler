@@ -816,12 +816,7 @@ public final class Configuration {
     @ConfigurationDefaultDouble(1.0)
     @ConfigurationCategory("display")
     @ConfigurationName("gui.scale")
-    public static ConfigurationItem<Double> uiScale = null;
-    
-    @ConfigurationDefaultString("")
-    @ConfigurationCategory("paths")
-    @ConfigurationDirectory
-    public static ConfigurationItem<String> vlcPlayerLocation = null;
+    public static ConfigurationItem<Double> uiScale = null;    
     
     private enum OSId {
         WINDOWS, OSX, UNIX
