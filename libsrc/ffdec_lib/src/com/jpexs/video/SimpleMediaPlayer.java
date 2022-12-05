@@ -1,6 +1,7 @@
 package com.jpexs.video;
 
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.helpers.Helper;
 import java.awt.image.BufferedImage;
 import java.lang.annotation.Native;
 import java.nio.ByteBuffer;
@@ -70,10 +71,11 @@ public class SimpleMediaPlayer {
 
     static {
         if (Platform.isWindows()) {
+            boolean needs64bit = Helper.is64BitJre();
             final String VLC_REGISTRY_KEY = "SOFTWARE\\VideoLAN\\VLC";
-            if (Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, VLC_REGISTRY_KEY)) {
-                if (Advapi32Util.registryValueExists(WinReg.HKEY_LOCAL_MACHINE, VLC_REGISTRY_KEY, "InstallDir")) {
-                    String vlcInstallDir = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, VLC_REGISTRY_KEY, "InstallDir");
+            if (Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, VLC_REGISTRY_KEY, needs64bit)) {
+                if (Advapi32Util.registryValueExists(WinReg.HKEY_LOCAL_MACHINE, VLC_REGISTRY_KEY, "InstallDir", needs64bit)) {
+                    String vlcInstallDir = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, VLC_REGISTRY_KEY, "InstallDir", needs64bit);
                     NativeLibrary.addSearchPath("libvlc", vlcInstallDir);
                 } else {
                     available = false;
