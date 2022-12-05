@@ -4,6 +4,9 @@
 # You need 64 bit OS and 64 bit java to set it to higher values
 MEMORY=1024m
 
+# Hide VLC error output
+export VLC_VERBOSE=-1
+
 # Based on Freerapid Downloader startup script - created by Petris 2009
 
 # FFDec requires Oracle Java 8
