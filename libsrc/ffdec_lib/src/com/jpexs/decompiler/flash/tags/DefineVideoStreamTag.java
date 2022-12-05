@@ -121,6 +121,9 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     
     @Internal
     private Map<Integer, VideoFrameTag> frames;
+    
+    private static final List<SimpleMediaPlayer> players = new ArrayList<>();
+    private static List<File> tempFiles = new ArrayList<>();
 
     public static final int CODEC_SORENSON_H263 = 2;
 
@@ -130,6 +133,21 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
 
     public static final int CODEC_VP6_ALPHA = 5;
 
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            @Override
+            public void run() {
+                 for (SimpleMediaPlayer p:players) {
+                     p.stop();
+                 }
+                 for (File f:tempFiles) {
+                     f.delete();
+                 }
+            }
+           
+        });
+    }
+    
     /**
      * Constructor
      *
@@ -212,6 +230,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
             return;
         }
         mediaPlayer = new SimpleMediaPlayer();
+        players.add(mediaPlayer);
         mediaPlayer.addFrameListener(new FrameListener() {
             @Override
             public void newFrameRecieved(BufferedImage image) {
@@ -229,9 +248,9 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
         try {
             byte[] data = exp.exportMovie(this, MovieExportMode.FLV, true);
             File tempFile = File.createTempFile("ffdec_video", ".flv");
-            tempFile.deleteOnExit();
             Helper.writeFile(tempFile.getAbsolutePath(), data);
             mediaPlayer.play(tempFile.getAbsolutePath());
+            tempFiles.add(tempFile);
             //mediaPlayer.pause();
 
         } catch (IOException ex) {
