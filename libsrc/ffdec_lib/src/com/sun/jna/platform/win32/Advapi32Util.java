@@ -75,6 +75,10 @@ public abstract class Advapi32Util {
         public String fqn;
     }
 
+    
+    public static boolean registryKeyExists(HKEY root, String key) {
+        return registryKeyExists(root, key, false);
+    }
     /**
      * Checks whether a registry key exists.
      *
@@ -82,9 +86,9 @@ public abstract class Advapi32Util {
      * @param key Path to the registry key.
      * @return True if the key exists.
      */
-    public static boolean registryKeyExists(HKEY root, String key) {
+    public static boolean registryKeyExists(HKEY root, String key, boolean use64BitKey) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ | WinNT.KEY_WOW64_32KEY, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ | (use64BitKey ? 0 : WinNT.KEY_WOW64_32KEY), phkKey);
         switch (rc) {
             case W32Errors.ERROR_SUCCESS:
                 Advapi32.INSTANCE.RegCloseKey(phkKey.getValue());
@@ -96,6 +100,9 @@ public abstract class Advapi32Util {
         }
     }
 
+    public static boolean registryValueExists(HKEY root, String key, String value) {
+        return registryValueExists(root, key, value, false);
+    }
     /**
      * Checks whether a registry value exists.
      *
@@ -104,9 +111,9 @@ public abstract class Advapi32Util {
      * @param value Value name.
      * @return True if the value exists.
      */
-    public static boolean registryValueExists(HKEY root, String key, String value) {
+    public static boolean registryValueExists(HKEY root, String key, String value, boolean use64bitKey) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ | WinNT.KEY_WOW64_32KEY, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ | (use64bitKey ? 0 : WinNT.KEY_WOW64_32KEY), phkKey);
         try {
             switch (rc) {
                 case W32Errors.ERROR_SUCCESS:
@@ -139,6 +146,9 @@ public abstract class Advapi32Util {
         }
     }
 
+    public static String registryGetStringValue(HKEY root, String key, String value) {
+        return registryGetStringValue(root, key, value, false);
+    }
     /**
      * Get a registry REG_SZ value.
      *
@@ -147,9 +157,9 @@ public abstract class Advapi32Util {
      * @param value Name of the value to retrieve.
      * @return String value.
      */
-    public static String registryGetStringValue(HKEY root, String key, String value) {
+    public static String registryGetStringValue(HKEY root, String key, String value, boolean use64bitKey) {
         HKEYByReference phkKey = new HKEYByReference();
-        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ | WinNT.KEY_WOW64_32KEY, phkKey);
+        int rc = Advapi32.INSTANCE.RegOpenKeyEx(root, key, 0, WinNT.KEY_READ | (use64bitKey ? 0 : WinNT.KEY_WOW64_32KEY), phkKey);
         if (rc != W32Errors.ERROR_SUCCESS) {
             throw new Win32Exception(rc);
         }
