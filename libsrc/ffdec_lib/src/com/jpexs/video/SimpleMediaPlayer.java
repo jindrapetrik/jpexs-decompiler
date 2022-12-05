@@ -184,7 +184,8 @@ public class SimpleMediaPlayer {
 
             @Override
             public BufferFormat getBufferFormat(int sourceWidth, int sourceHeight) {
-                return new RV32BufferFormat(sourceWidth, sourceHeight);
+                //return new RV32BufferFormat(sourceWidth, sourceHeight);
+                return new BufferFormat("BGRA", sourceWidth, sourceHeight, new int[] {sourceWidth * 4}, new int[] {sourceHeight});
             }
 
             @Override
