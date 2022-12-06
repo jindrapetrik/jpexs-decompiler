@@ -5016,6 +5016,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     }
                 }
                 break;
+            case TagTreeModel.FOLDER_MOVIES:
+                for (Tag tag : timelined.getTags()) {
+                    if (tag instanceof DefineVideoStreamTag) {
+                        folderPreviewItems.add(tag);                        
+                    }
+                    if (tag instanceof DefineSpriteTag) {
+                        addFolderPreviewItems(folderPreviewItems, folderName, (DefineSpriteTag) tag);
+                    }
+                }
+                break;
             case TagTreeModel.FOLDER_BUTTONS:
                 for (Tag tag : timelined.getTags()) {
                     if (tag instanceof ButtonTag) {
