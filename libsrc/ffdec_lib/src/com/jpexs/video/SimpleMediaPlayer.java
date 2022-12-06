@@ -9,12 +9,17 @@ import com.sun.jna.NativeLibrary;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
+import uk.co.caprica.vlcj.media.Media;
+import uk.co.caprica.vlcj.media.MediaEventAdapter;
 import uk.co.caprica.vlcj.media.MediaRef;
 import uk.co.caprica.vlcj.medialist.MediaList;
 import uk.co.caprica.vlcj.medialist.MediaListRef;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
+import uk.co.caprica.vlcj.player.base.State;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 import uk.co.caprica.vlcj.player.embedded.videosurface.CallbackVideoSurface;
 import uk.co.caprica.vlcj.player.embedded.videosurface.VideoSurfaceAdapters;
@@ -49,6 +54,8 @@ public class SimpleMediaPlayer {
     private boolean singleFrame = false;
 
     private final Object displayLock = new Object();
+
+    private final Object pauseLock = new Object();
 
     private String file;
 
@@ -115,26 +122,55 @@ public class SimpleMediaPlayer {
             mediaListRef.release();
         }
         mediaListPlayer.controls().play();
+        embeddedMediaPlayer.controls().setPause(true);
     }
 
     public void stop() {
         embeddedMediaPlayer.controls().stop();
     }
+    
+    public float getPosition(){
+        return embeddedMediaPlayer.status().position();
+    }
 
     public void setPosition(float position) {
-        synchronized (displayLock) {
+
+        //System.out.println("setting position: "+ position);
+        if (!isPaused()) {
+            synchronized (pauseLock) {
+                embeddedMediaPlayer.controls().setPause(true);
+                try {
+                    pauseLock.wait();
+                } catch (InterruptedException ex) {
+                    //Logger.getLogger(SimpleMediaPlayer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        
+        //embeddedMediaPlayer.controls().setPosition(0);
+        embeddedMediaPlayer.controls().setPosition(position);        
+        embeddedMediaPlayer.controls().play();
+        
+                /*synchronized (pauseLock) {
+            embeddedMediaPlayer.controls().setPause(true);
+            try {
+                pauseLock.wait();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(SimpleMediaPlayer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }*/
+        
+        //setPaused(false);        
+        /*synchronized (displayLock) {
             this.position = position;
             positionSet = true;
             singleFrame = true;
-        }
-        //System.out.println("setting position: "+ position);
-        if (!isPaused()) {
-            embeddedMediaPlayer.controls().pause();
-        }
-        embeddedMediaPlayer.controls().setPosition(position);
+        }*/
+        //embeddedMediaPlayer.controls().play();
+        //embeddedMediaPlayer.controls().setPause(true);
+        
         //embeddedMediaPlayer.controls().nextFrame();
-        setPaused(false);
-        embeddedMediaPlayer.controls().play();
+        //embeddedMediaPlayer.controls().play();
         /*if (paused) {
                 try {
                     displayLock.wait();
@@ -154,6 +190,10 @@ public class SimpleMediaPlayer {
         this.paused = val;
     }
 
+    public void pause() {
+        embeddedMediaPlayer.controls().pause();
+    }
+    
     /*public void rewind() {
         System.out.println("rewinding");
         //embeddedMediaPlayer.controls().stop();
@@ -172,7 +212,7 @@ public class SimpleMediaPlayer {
             @Override
             public BufferFormat getBufferFormat(int sourceWidth, int sourceHeight) {
                 //return new RV32BufferFormat(sourceWidth, sourceHeight);
-                return new BufferFormat("BGRA", sourceWidth, sourceHeight, new int[] {sourceWidth * 4}, new int[] {sourceHeight});
+                return new BufferFormat("BGRA", sourceWidth, sourceHeight, new int[]{sourceWidth * 4}, new int[]{sourceHeight});
             }
 
             @Override
@@ -191,66 +231,42 @@ public class SimpleMediaPlayer {
         embeddedMediaPlayer.videoSurface().set(callbackVideoSurface);
         embeddedMediaPlayer.videoSurface().attachVideoSurface();
 
-        embeddedMediaPlayer.events().addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
+        MediaPlayerEventAdapter adapter = (new MediaPlayerEventAdapter() {            
+
             @Override
             public void lengthChanged(uk.co.caprica.vlcj.player.base.MediaPlayer mediaPlayer, long newLength) {
-                length = newLength;
-            }
-
-            @Override
-            public void timeChanged(uk.co.caprica.vlcj.player.base.MediaPlayer mediaPlayer, long newTime) {
-                SimpleMediaPlayer.this.time = newTime;
-            }
-
-            @Override
-            public void positionChanged(uk.co.caprica.vlcj.player.base.MediaPlayer mediaPlayer, float newPosition) {
-                SimpleMediaPlayer.this.position = newPosition;
-                //System.out.println("position changed to "+newPosition);
-            }
-
-            @Override
-            public void finished(MediaPlayer mediaPlayer) {
-                /*System.out.println("finished");
-                finished = true;
-                callback.sendImage();
-                new Thread() {
-                    @Override
-                    public void run() {
-                        System.out.println("finished settime 0");
-                        mediaPlayer.controls().setPosition(0f);
-                        System.out.println("finished play");
-                        mediaPlayer.controls().play();
-                        System.out.println("/finished");
-                    }                    
-                }.start();*/
-            }
-
-            @Override
-            public void stopped(MediaPlayer mediaPlayer) {
-                //System.out.println("stopped");
-            }
-
+                //System.out.println("lengthChanged = "+newLength);
+                length = newLength;           
+            }            
+                        
             @Override
             public void paused(MediaPlayer mediaPlayer) {
                 setPaused(true);
+                synchronized (pauseLock) {
+                    pauseLock.notifyAll();
+                }
+                //System.out.println("paused");
             }
 
             @Override
             public void playing(uk.co.caprica.vlcj.player.base.MediaPlayer mediaPlayer) {
-                if (!loaded) {
+                /*if (!loaded) {
                     if (positionSet) {
                         embeddedMediaPlayer.controls().setPosition(position);
                     } else {
                         embeddedMediaPlayer.controls().setPosition(((float) time) / length);
                     }
-                }
-                //System.out.println("playing");
+                }*/
                 finished = false;
-                setPaused(false);
+                setPaused(false);                
+                //System.out.println("playing");
                 //embeddedMediaPlayer.controls().setRepeat(true);
             }
 
         });
+        
+        
+        
         //embeddedMediaPlayer.controls().setRepeat(true);
         mediaListPlayer = mediaPlayerFactory.mediaPlayers().newMediaListPlayer();
 
@@ -264,6 +280,9 @@ public class SimpleMediaPlayer {
         mediaListPlayer.mediaPlayer().setMediaPlayer(embeddedMediaPlayer);
 
         mediaListPlayer.controls().setMode(PlaybackMode.LOOP);
+        
+        embeddedMediaPlayer.events().addMediaPlayerEventListener(adapter);
+        
     }
 
     public boolean isFinished() {
@@ -294,8 +313,18 @@ public class SimpleMediaPlayer {
 
         @Override
         public void display(uk.co.caprica.vlcj.player.base.MediaPlayer mediaPlayer, ByteBuffer[] nativeBuffers, BufferFormat bufferFormat) {
+            if (!isPaused()) {
+                //embeddedMediaPlayer.controls().setPause(true);
+                /*mediaPlayer.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        mediaPlayer.controls().setPause(true);
+                    }
+                    
+                });*/
+            }
             synchronized (displayLock) {
-                if (singleFrame) {
+                if (true) { //singleFrame) {
                     singleFrame = false;
                     if (image == null) {
                         this.width = bufferFormat.getWidth();
@@ -306,10 +335,12 @@ public class SimpleMediaPlayer {
 
                     nativeBuffers[0].asIntBuffer().get(rgbBuffer, 0, bufferFormat.getHeight() * bufferFormat.getWidth());
                     image.setRGB(0, 0, image.getWidth(), image.getHeight(), rgbBuffer, 0, image.getWidth());
-
+                    sendImage();
+                } else {
+                    System.out.println("skipped frame");
                 }
 
-                if (!loaded) {
+                /*if (!loaded) {
                     loaded = true;
                     //System.out.println("just loaded");
                     if (positionSet) {
@@ -317,12 +348,9 @@ public class SimpleMediaPlayer {
                     } else {
                         embeddedMediaPlayer.controls().setPosition(((float) time) / length);
                     }
-                }
+                }*/
             }
-            if (!isPaused()) {
-                embeddedMediaPlayer.controls().pause();
-            }
-            sendImage();
+
             //System.out.println("display return");
         }
     }

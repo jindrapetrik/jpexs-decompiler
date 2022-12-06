@@ -127,6 +127,7 @@ public class MovieExporter {
         Arrays.sort(frameNumArray);
         FLVTAG lastTag = null;
         int frameNum = 0;
+        int internalFrameDelay = 5 * 1000;
         for (int i = 0; i < frameNumArray.length; i++) {
             VideoFrameTag tag = frames.get(frameNumArray[i]);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -199,10 +200,10 @@ public class MovieExporter {
             }
 
             baos.write(tag.videoData.getRangeData());
-            flv.writeTag(lastTag = new FLVTAG((long)Math.floor(ffdecInternal ? frameNum * 5000.0 : (frameNum * 1000.0 / swf.frameRate)), new VIDEODATA(frameType, videoStream.codecID, baos.toByteArray())));
+            flv.writeTag(lastTag = new FLVTAG((long)Math.floor(ffdecInternal ? frameNum * internalFrameDelay : (frameNum * 1000.0 / swf.frameRate)), new VIDEODATA(frameType, videoStream.codecID, baos.toByteArray())));
         }
         if (ffdecInternal && lastTag != null) {
-            lastTag.timeStamp = frameNum * 5000 + 10000;
+            lastTag.timeStamp = frameNum * internalFrameDelay + 2 * internalFrameDelay;
             flv.writeTag(lastTag);
         }
         return fos.toByteArray();
