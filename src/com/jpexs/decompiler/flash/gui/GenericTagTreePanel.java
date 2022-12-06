@@ -1103,12 +1103,19 @@ public class GenericTagTreePanel extends GenericTagPanel {
             if (parent == mtroot) {
                 return filterFields(this, mtroot.getClass().getSimpleName(), mtroot.getClass(), limited, mtroot.getId()).size();
             }
+            
             FieldNode fnode = (FieldNode) parent;
             
             
             Field field = fnode.fieldSet.get(FIELD_INDEX);
+                        
             boolean isByteArray = field.getType().equals(byte[].class);
-                                    
+                        
+            
+            if (hasEditor(fnode.obj, field, fnode.index) || isByteArray) {
+                return 0;
+            }                        
+            
             if (ReflectionTools.needsIndex(field) && (fnode.index == -1)) { //Arrays or Lists
                 try {
                     if (field.get(fnode.obj) == null) {
@@ -1121,11 +1128,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
                 return ReflectionTools.getFieldSubSize(fnode.obj, field);
             }
-            parent = fnode.getValue(FIELD_INDEX);
-
-            /*if (!hasEditor(fnode.obj, field, fnode.index)) {
-                return 0;
-            }*/
+            parent = fnode.getValue(FIELD_INDEX);           
             
             return filterFields(this, getNodePathName(fnode), parent.getClass(), limited, mtroot.getId()).size();
         }
