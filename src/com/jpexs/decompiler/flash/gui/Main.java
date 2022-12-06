@@ -52,6 +52,7 @@ import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
 import com.jpexs.decompiler.flash.gui.proxy.ProxyFrame;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerPlugin;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
@@ -1164,6 +1165,8 @@ public class Main {
         }
 
         result.sourceInfo = sourceInfo;
+        
+        boolean hasVideoStreams = false;
         for (Openable openable : result) {
 
             openable.setOpenableList(result);
@@ -1178,7 +1181,13 @@ public class Main {
                 int height = (int) ((swf.displayRect.Ymax - swf.displayRect.Ymin) / SWF.unitDivisor);
                 logger.log(Level.INFO, "Width: {0}", width);
                 logger.log(Level.INFO, "Height: {0}", height);
-
+                
+                for (Tag t: swf.getTags()) {
+                    if (t instanceof DefineVideoStreamTag) {
+                        hasVideoStreams = true;
+                    }
+                }
+                
                 swf.addEventListener(new EventListener() {
                     @Override
                     public void handleExportingEvent(String type, int index, int count, Object data) {
@@ -1223,6 +1232,16 @@ public class Main {
                     }
                 });
             }
+        }
+        
+        if (hasVideoStreams && !DefineVideoStreamTag.displayAvailable()) {
+            View.execInEventDispatchLater(new Runnable() {
+                @Override
+                public void run() {
+                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("message.video.installvlc").replace("%file%", sourceInfo.getFileTitleOrName()), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningVideoVlc);       
+                }
+                
+            });
         }
 
         return result;
