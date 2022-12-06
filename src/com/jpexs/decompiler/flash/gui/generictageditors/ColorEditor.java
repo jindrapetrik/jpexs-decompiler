@@ -34,6 +34,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -198,7 +199,9 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
         final Color[] col = new Color[]{initialColor};
 
         if (Helper.getJavaVersion() >= 9) {
-            Color c = JColorChooser.showDialog(component, title, initialColor, false);
+            //To properly compile on Java 8, reflection is needed...
+            Method showDialog = JColorChooser.class.getDeclaredMethod("showDialog", Component.class, String.class, Color.class, boolean.class);
+            Color c = (Color) showDialog.invoke(null, component, title, initialColor, false);
             if (c != null) {
                 col[0] = c;
             }
