@@ -816,7 +816,12 @@ public final class Configuration {
     @ConfigurationDefaultDouble(1.0)
     @ConfigurationCategory("display")
     @ConfigurationName("gui.scale")
-    public static ConfigurationItem<Double> uiScale = null;    
+    public static ConfigurationItem<Double> uiScale = null;  
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationName("warning.video.vlc")
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> warningVideoVlc = null;
     
     private enum OSId {
         WINDOWS, OSX, UNIX
