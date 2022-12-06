@@ -307,27 +307,24 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
         }
         
         synchronized (DefineVideoStreamTag.class) {
-
-            if (!(activeFrame != null && lastFrame == f)) {
-                synchronized (getFrameLock) {
-                    activeFrame = null;
-                    getFrameLock.notifyAll();
-                }
+            if (!(activeFrame != null && lastFrame == f)) 
+            {
                 initPlayer();
-                
-                
-                if (mediaPlayer.isFinished()) {
-                    return;
-                }
-                
+                                                
                 float oneFr  = 1f / (getNumFrames() + 2);
                 
+                synchronized (getFrameLock) {
+                    activeFrame = null;
+                }                
                 mediaPlayer.setPosition(((float) f) / (getNumFrames() + 2) - (f == 0 ? 0 :  oneFr / 10f));
+                
                 try {
                     synchronized (getFrameLock) {
                         if (activeFrame == null) {
                             //System.out.println("waiting...");
                             getFrameLock.wait();
+                            Thread.sleep(10); //magic, but should work
+                            mediaPlayer.pause();
                             //System.out.println("awakened");
                         }
                     }
@@ -352,7 +349,6 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
                 }
             }
         }
-        //System.out.println("toImage return");
     }
 
     @Override
