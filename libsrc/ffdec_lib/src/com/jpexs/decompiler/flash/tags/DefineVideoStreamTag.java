@@ -108,11 +108,14 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
 
     public boolean videoFlagsSmoothing;
 
-    @SWFType(BasicType.UI8)
+    @SWFType(BasicType.UI8)    
+    @EnumValue(value = DefineVideoStreamTag.CODEC_JPEG, text = "JPEG (unused)")
     @EnumValue(value = DefineVideoStreamTag.CODEC_SORENSON_H263, text = "Sorenson H.263")
     @EnumValue(value = DefineVideoStreamTag.CODEC_SCREEN_VIDEO, text = "Screen video")
-    @EnumValue(value = DefineVideoStreamTag.CODEC_VP6, text = "VP6")
-    @EnumValue(value = DefineVideoStreamTag.CODEC_VP6_ALPHA, text = "VP6 video with alpha channel")
+    @EnumValue(value = DefineVideoStreamTag.CODEC_VP6, text = "On2 VP6")
+    @EnumValue(value = DefineVideoStreamTag.CODEC_VP6_ALPHA, text = "On2 VP6 video with alpha channel")
+    @EnumValue(value = DefineVideoStreamTag.CODEC_SCREEN_VIDEO_V2, text = "Screen video version 2")
+    @EnumValue(value = DefineVideoStreamTag.CODEC_AVC, text = "AVC")
     public int codecID;
 
     @Internal
@@ -138,13 +141,13 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     private static final List<SimpleMediaPlayer> players = new ArrayList<>();
     private static List<File> tempFiles = new ArrayList<>();
 
+    public static final int CODEC_JPEG = 1;    
     public static final int CODEC_SORENSON_H263 = 2;
-
     public static final int CODEC_SCREEN_VIDEO = 3;
-
     public static final int CODEC_VP6 = 4;
-
     public static final int CODEC_VP6_ALPHA = 5;
+    public static final int CODEC_SCREEN_VIDEO_V2 = 6;
+    public static final int CODEC_AVC = 7; //Is this FLV only, or SWF too?
 
     public static final int DEBLOCKING_USE_VIDEOPACKET_VALUE = 0;
     public static final int DEBLOCKING_OFF = 1;
