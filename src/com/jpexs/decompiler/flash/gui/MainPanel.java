@@ -5092,12 +5092,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private void showFolderPreview(FolderItem item) {
-        if (item.getName().equals(TagTreeModel.FOLDER_OTHERS)) {
+        String folderName = item.getName();
+        if (TagTreeModel.FOLDER_OTHERS.equals(folderName) || TagTreeModel.FOLDER_SCRIPTS.equals(folderName)) {
             showFolderList(item);
             return;
         }
         List<TreeItem> folderPreviewItems = new ArrayList<>();
-        String folderName = item.getName();
         SWF swf = item.swf;
         addFolderPreviewItems(folderPreviewItems, folderName, swf);
 
