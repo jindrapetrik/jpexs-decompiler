@@ -514,6 +514,14 @@ public class SoundTagPlayer implements MediaDisplay {
     public boolean alwaysDisplay() {
         return true;
     }
-    
-    
+
+    @Override
+    public void setMuted(boolean value) {
+        
+    }
+
+    @Override
+    public boolean isMutable() {
+        return true;
+    }        
 }

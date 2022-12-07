@@ -231,12 +231,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private ExportRectangle _viewRect = new ExportRectangle(0, 0, 1, 1);
 
-    private boolean playing = false;     
-    
+    private boolean playing = false;
+
     private boolean autoPlayed = false;
-    
+
     private boolean frozen = false;
-    
+
+    private boolean muted = false;
+
+    private boolean mutable = false;
+
     private boolean alwaysDisplay = false;
 
     private static Cursor loadCursor(String name, int x, int y) throws IOException {
@@ -244,15 +248,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         Image image = ImageIO.read(MainPanel.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/cursors/" + name + ".png"));
         return toolkit.createCustomCursor(image, new Point(x, y), name);
     }
-    
+
     private SerializableImage imgPlay = null;
-    
-    
+
     private SerializableImage getImagePlay() {
         if (imgPlay != null) {
             return imgPlay;
         }
-        
+
         Color bgColor;
         if (Configuration.useRibbonInterface.get()) {
             SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
@@ -261,33 +264,33 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             bgColor = SystemColor.control;
         }
         Color fgColor;
-        if (Configuration.useRibbonInterface.get()) {            
+        if (Configuration.useRibbonInterface.get()) {
             SubstanceSkin skin = SubstanceLookAndFeel.getCurrentSkin();
             fgColor = (skin.getColorScheme(DecorationAreaType.HEADER, ColorSchemeAssociationKind.FILL, ComponentState.ENABLED).getForegroundColor());
         } else {
             fgColor = SystemColor.controlText;
-        }                
-        
+        }
+
         int size = 200;
-        imgPlay = new SerializableImage(size,size,BufferedImage.TYPE_INT_ARGB_PRE);
+        imgPlay = new SerializableImage(size, size, BufferedImage.TYPE_INT_ARGB_PRE);
         imgPlay.fillTransparent();
         Graphics2D g2d = (Graphics2D) imgPlay.getGraphics();
         g2d.setStroke(new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         GeneralPath path = new GeneralPath();
         path.moveTo(0, 0);
-        path.lineTo(size, size/2);
+        path.lineTo(size, size / 2);
         path.lineTo(0, size);
-        path.closePath();    
+        path.closePath();
         g2d.setComposite(AlphaComposite.SrcOver);
         g2d.setPaint(new Color(fgColor.getRed(), fgColor.getGreen(), fgColor.getBlue(), fgColor.getAlpha() / 2));
         g2d.fill(path);
-        g2d.setPaint(fgColor);        
+        g2d.setPaint(fgColor);
         g2d.draw(path);
-        
+
         return imgPlay;
     }
 
-    static {        
+    static {
         try {
             moveCursor = loadCursor("move", 0, 0);
             moveRegPointCursor = loadCursor("move_regpoint", 0, 0);
@@ -422,7 +425,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     public void setFrozen(boolean value) {
         this.frozen = value;
     }
-    
+
     @Override
     public boolean isDisplayed() {
         return autoPlayed;
@@ -432,8 +435,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     public boolean alwaysDisplay() {
         return alwaysDisplay;
     }
-    
-    
+
+    @Override
+    public void setMuted(boolean value) {
+        this.muted = value;
+        if (value) {
+            stopAllSounds();
+        } else {
+            prevFrame = -1; //initiate refreshing frame to play sounds again
+        }
+    }
 
     private class IconPanel extends JPanel {
 
@@ -554,7 +565,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (SwingUtilities.isLeftMouseButton(e)) {
                         mouseMoved(e); //to correctly calculate mode, because moseMoved event is not called during dragging
                         setDragStart(e.getPoint());
-                        
+
                         if (!autoPlayed) {
                             Configuration.autoPlayPreviews.set(true);
                             autoPlayed = true;
@@ -1253,21 +1264,21 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
         }
 
-        private Rectangle calcRect(Zoom z) {           
+        private Rectangle calcRect(Zoom z) {
             synchronized (ImagePanel.this) {
-                if (_img != null || timelined != null) {                    
+                if (_img != null || timelined != null) {
                     //int w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
                     //int h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
                     double zoomDouble = z.fit ? getZoomToFit() : z.value;
                     int w1;
                     int h1;
-                    if (timelined == null || (!autoPlayed && _img != null)) {                        
+                    if (timelined == null || (!autoPlayed && _img != null)) {
                         w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
-                        h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));                    
+                        h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
                     } else {
                         w1 = (int) (timelined.getRectWithStrokes().getWidth() * zoomDouble / SWF.unitDivisor);
                         h1 = (int) (timelined.getRectWithStrokes().getHeight() * zoomDouble / SWF.unitDivisor);
-                    } 
+                    }
 
                     int w2 = getWidth();
                     int h2 = getHeight();
@@ -1443,7 +1454,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     ButtonTag button = iconPanel.mouseOverButton;
                     if (button != null && freeTransformDepth == -1) {
                         DefineButtonSoundTag sounds = button.getSounds();
-                        if (sounds != null && sounds.buttonSoundChar2 != 0) { // OverUpToOverDown
+                        if (!muted && sounds != null && sounds.buttonSoundChar2 != 0) { // OverUpToOverDown
                             playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar2), sounds.buttonSoundInfo2, timer);
                         }
                         List<ByteArrayRange> actions = new ArrayList<>();
@@ -1483,7 +1494,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     lastMouseEvent = e;
                     redraw();
                     ButtonTag button = iconPanel.mouseOverButton;
-                    if (button != null && freeTransformDepth == -1) {
+                    if (!muted && button != null && freeTransformDepth == -1) {
                         DefineButtonSoundTag sounds = button.getSounds();
                         if (sounds != null && sounds.buttonSoundChar3 != 0) { // OverDownToOverUp
                             playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar3), sounds.buttonSoundInfo3, timer);
@@ -1624,7 +1635,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return zoomAvailable;
     }
 
-    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay) {
+    public void setTimelined(final Timelined drawable, final SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable) {
         Stage stage = new Stage(drawable) {
             @Override
             public void callFrame(int frame) {
@@ -1714,11 +1725,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             autoPlayed = autoPlay;
             this.alwaysDisplay = alwaysDisplay;
             this.frozen = frozen;
+            this.muted = muted;
+            this.mutable = mutable;
             this.showObjectsUnderCursor = showObjectsUnderCursor;
             redraw();
-            if (autoPlay) {                
+            if (autoPlay) {
                 play();
-            }            
+            }
         }
 
         synchronized (delayObject) {
@@ -1734,7 +1747,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 clearImagePanel();
             }
         }
-        
+
         fireMediaDisplayStateChanged();
     }
 
@@ -1884,7 +1897,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         fireMediaDisplayStateChanged();
     }
 
-    private static SerializableImage getFrame(ExportRectangle viewRect, SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, int selectedDepth, int freeTransformDepth, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix) {        
+    private static SerializableImage getFrame(ExportRectangle viewRect, SWF swf, int frame, int time, Timelined drawable, RenderContext renderContext, int selectedDepth, int freeTransformDepth, double zoom, Reference<Point2D> registrationPointRef, Reference<Rectangle2D> boundsRef, Matrix transform, Matrix temporaryMatrix) {
         Timeline timeline = drawable.getTimeline();
         SerializableImage img;
         RECT rect = drawable.getRect();
@@ -2183,13 +2196,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         int mouseButton;
         int selectedDepth;
         Zoom zoom;
-        SWF swf;        
+        SWF swf;
 
         synchronized (ImagePanel.this) {
             timelined = this.timelined;
             lastMouseEvent = this.lastMouseEvent;
         }
-        
+
         boolean shownAgain = false;
 
         synchronized (ImagePanel.this) {
@@ -2255,8 +2268,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         Reference<Rectangle2D> boundsRef = new Reference<>(bounds);
 
                         _viewRect = getViewRect();
-                        if (!autoPlayed) {                            
-                            img = getImagePlay(); /*new SerializableImage(
+                        if (!autoPlayed) {
+                            img = getImagePlay();
+                            /*new SerializableImage(
                                     (int) (_viewRect.getWidth() / SWF.unitDivisor),
                                     (int) (_viewRect.getHeight() / SWF.unitDivisor),
                                     BufferedImage.TYPE_4BYTE_ABGR);
@@ -2291,32 +2305,34 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
 
             if (!shownAgain && autoPlayed) {
-                List<Integer> sounds = new ArrayList<>();
-                List<String> soundClasses = new ArrayList<>();
-                List<SOUNDINFO> soundInfos = new ArrayList<>();
-                timeline.getSounds(frame, time, renderContext.mouseOverButton, mouseButton, sounds, soundClasses, soundInfos);
-                for (int cid : swf.getCharacters().keySet()) {
-                    CharacterTag c = swf.getCharacter(cid);
-                    for (int k = 0; k < soundClasses.size(); k++) {
-                        String cls = soundClasses.get(k);
-                        if (cls == null) {
+                if (!muted) {
+                    List<Integer> sounds = new ArrayList<>();
+                    List<String> soundClasses = new ArrayList<>();
+                    List<SOUNDINFO> soundInfos = new ArrayList<>();
+                    timeline.getSounds(frame, time, renderContext.mouseOverButton, mouseButton, sounds, soundClasses, soundInfos);
+                    for (int cid : swf.getCharacters().keySet()) {
+                        CharacterTag c = swf.getCharacter(cid);
+                        for (int k = 0; k < soundClasses.size(); k++) {
+                            String cls = soundClasses.get(k);
+                            if (cls == null) {
+                                continue;
+                            }
+                            if (cls.equals(c.getClassName())) {
+                                sounds.set(k, cid);
+                            }
+                        }
+                    }
+
+                    for (int s = 0; s < sounds.size(); s++) {
+                        int sndId = sounds.get(s);
+                        if (sndId == -1) {
                             continue;
                         }
-                        if (cls.equals(c.getClassName())) {
-                            sounds.set(k, cid);
+                        CharacterTag c = swf.getCharacter(sndId);
+                        if (c instanceof SoundTag) {
+                            SoundTag st = (SoundTag) c;
+                            playSound(st, soundInfos.get(s), thisTimer);
                         }
-                    }
-                }
-
-                for (int s = 0; s < sounds.size(); s++) {
-                    int sndId = sounds.get(s);
-                    if (sndId == -1) {
-                        continue;
-                    }
-                    CharacterTag c = swf.getCharacter(sndId);
-                    if (c instanceof SoundTag) {
-                        SoundTag st = (SoundTag) c;
-                        playSound(st, soundInfos.get(s), thisTimer);
                     }
                 }
                 executeFrame(frame);
@@ -2396,22 +2412,24 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
                     );
 
-                    if (lastMouseOverButton != renderContext.mouseOverButton) {
-                        ButtonTag b = renderContext.mouseOverButton;
-                        if (b != null && freeTransformDepth == -1) {
-                            // New mouse entered
-                            DefineButtonSoundTag sounds = b.getSounds();
-                            if (sounds != null && sounds.buttonSoundChar1 != 0) { // IdleToOverUp
-                                playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar1), sounds.buttonSoundInfo1, timer);
+                    if (!muted) {
+                        if (lastMouseOverButton != renderContext.mouseOverButton) {
+                            ButtonTag b = renderContext.mouseOverButton;
+                            if (b != null && freeTransformDepth == -1) {
+                                // New mouse entered
+                                DefineButtonSoundTag sounds = b.getSounds();
+                                if (sounds != null && sounds.buttonSoundChar1 != 0) { // IdleToOverUp
+                                    playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar1), sounds.buttonSoundInfo1, timer);
+                                }
                             }
-                        }
 
-                        b = lastMouseOverButton;
-                        if (b != null && freeTransformDepth == -1) {
-                            // Old mouse leave
-                            DefineButtonSoundTag sounds = b.getSounds();
-                            if (sounds != null && sounds.buttonSoundChar0 != 0) { // OverUpToIdle
-                                playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar0), sounds.buttonSoundInfo0, timer);
+                            b = lastMouseOverButton;
+                            if (b != null && freeTransformDepth == -1) {
+                                // Old mouse leave
+                                DefineButtonSoundTag sounds = b.getSounds();
+                                if (sounds != null && sounds.buttonSoundChar0 != 0) { // OverUpToIdle
+                                    playSound((SoundTag) swf.getCharacter(sounds.buttonSoundChar0), sounds.buttonSoundInfo0, timer);
+                                }
                             }
                         }
                     }
@@ -2467,7 +2485,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         timelined = null;
         swf = null;
         lda = null;
-        showObjectsUnderCursor = false;        
+        showObjectsUnderCursor = false;
         fireMediaDisplayStateChanged();
     }
 
@@ -2805,5 +2823,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             offsetPoint.y = (int) (offsetPoint.y * zoom.value / newZoom.value);
         }
         zoom(newZoom);
+    }
+
+    @Override
+    public boolean isMutable() {
+        return mutable;
     }
 }
