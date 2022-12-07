@@ -322,12 +322,17 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private final JPanel displayPanel;
 
     public FolderPreviewPanel folderPreviewPanel;
+    
+    public FolderListPanel folderListPanel;
 
     private boolean isWelcomeScreen = true;
 
     private static final String CARDPREVIEWPANEL = "Preview card";
 
     private static final String CARDFOLDERPREVIEWPANEL = "Folder preview card";
+    
+    private static final String CARDFOLDERLISTPANEL = "Folder list card";
+
 
     private static final String CARDEMPTYPANEL = "Empty card";
 
@@ -872,6 +877,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return folderPreviewCard;
     }
 
+    private JPanel createFolderListCard() {
+        JPanel folderListCard = new JPanel(new BorderLayout());
+        folderListPanel = new FolderListPanel(this, new ArrayList<>());
+        folderListCard.add(new FasterScrollPane(folderListPanel), BorderLayout.CENTER);
+
+        return folderListCard;
+    }
+
+    
     private JPanel createDumpPreviewCard() {
         JPanel dumpViewCard = new JPanel(new BorderLayout());
         dumpViewPanel = new DumpViewPanel(dumpTree);
@@ -1022,6 +1036,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         displayPanel.add(previewPanel, CARDPREVIEWPANEL);
         displayPanel.add(createFolderPreviewCard(), CARDFOLDERPREVIEWPANEL);
+        displayPanel.add(createFolderListCard(), CARDFOLDERLISTPANEL);
         displayPanel.add(createDumpPreviewCard(), CARDDUMPVIEW);
 
         headerPanel = new HeaderInfoPanel();
@@ -3716,6 +3731,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         previewPanel.clear();
         headerPanel.clear();
         folderPreviewPanel.clear();
+        folderListPanel.clear();
         if (abcPanel != null) {
             abcPanel.clearSwf();
         }
@@ -4824,6 +4840,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         folderPreviewPanel.clear();
+        folderListPanel.clear();
         previewPanel.clear();
         stopFlashPlayer();
 
@@ -4961,7 +4978,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
         } else if (!(treeItem instanceof ScriptPack)) {
-            showCard(CARDEMPTYPANEL);
+            showFolderList(treeItem);
         }
         if (oldItem instanceof TreeRoot) {
             pinsPanel.setCurrent(null);
@@ -5075,6 +5092,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private void showFolderPreview(FolderItem item) {
+        if (item.getName().equals(TagTreeModel.FOLDER_OTHERS)) {
+            showFolderList(item);
+            return;
+        }
         List<TreeItem> folderPreviewItems = new ArrayList<>();
         String folderName = item.getName();
         SWF swf = item.swf;
@@ -5082,6 +5103,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         folderPreviewPanel.setItems(folderPreviewItems);
         showCard(CARDFOLDERPREVIEWPANEL);
+    }
+    
+    private void showFolderList(TreeItem item) {
+        List<TreeItem> items =  new ArrayList<>(getCurrentTree().getFullModel().getAllChildren(item));
+        folderListPanel.setItems(items);
+        showCard(CARDFOLDERLISTPANEL);
     }
 
     private boolean isFreeing;
