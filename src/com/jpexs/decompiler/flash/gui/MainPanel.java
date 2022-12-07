@@ -4978,7 +4978,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
         } else if (!(treeItem instanceof ScriptPack)) {
-            showFolderList(treeItem);
+            if (treePath == null) {
+                showCard(CARDEMPTYPANEL);
+            } else {
+                showFolderList(treePath);
+            }
         }
         if (oldItem instanceof TreeRoot) {
             pinsPanel.setCurrent(null);
@@ -5094,7 +5098,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private void showFolderPreview(FolderItem item) {
         String folderName = item.getName();
         if (TagTreeModel.FOLDER_OTHERS.equals(folderName) || TagTreeModel.FOLDER_SCRIPTS.equals(folderName)) {
-            showFolderList(item);
+            showFolderList(tagTree.getFullModel().getTreePath(item));
             return;
         }
         List<TreeItem> folderPreviewItems = new ArrayList<>();
@@ -5105,9 +5109,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         showCard(CARDFOLDERPREVIEWPANEL);
     }
     
-    private void showFolderList(TreeItem item) {
-        List<TreeItem> items =  new ArrayList<>(getCurrentTree().getFullModel().getAllChildren(item));
-        folderListPanel.setItems(items);
+    private void showFolderList(TreePath path) {
+        List<TreeItem> items =  new ArrayList<>(getCurrentTree().getFullModel().getAllChildren((TreeItem)path.getLastPathComponent()));
+        folderListPanel.setItems(path, items);
         showCard(CARDFOLDERLISTPANEL);
     }
 
