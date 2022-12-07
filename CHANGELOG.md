@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - Proper disabling switching items or other actions on editation
 - Raw editor item count and edit display
 - Warnings about invalid reflective access in color dialog on Java 9+
+- Folder preview tag names have indices when multiple with same name
 
 ### Changed
 - Quick search needs minimum of 3 characters

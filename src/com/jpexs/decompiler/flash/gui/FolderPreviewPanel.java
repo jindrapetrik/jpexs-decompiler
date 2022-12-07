@@ -79,6 +79,8 @@ public class FolderPreviewPanel extends JPanel {
     public Map<Integer, TreeItem> selectedItems = new HashMap<>();
 
     private Cache<Integer, SerializableImage> cachedPreviews;
+    
+    private MainPanel mainPanel;
 
     private static final int PREVIEW_SIZE = 150;
 
@@ -99,6 +101,7 @@ public class FolderPreviewPanel extends JPanel {
 
     public FolderPreviewPanel(final MainPanel mainPanel, List<TreeItem> items) {
         this.items = items;
+        this.mainPanel = mainPanel;
         cachedPreviews = Cache.getInstance(false, false, "preview", true);
 
         addMouseListener(new MouseAdapter() {
@@ -249,6 +252,12 @@ public class FolderPreviewPanel extends JPanel {
                     } else {
                         s = treeItem.toString();
                     }
+                    
+                    int itemIndex = mainPanel.getCurrentTree().getFullModel().getItemIndex(treeItem);
+                    if (itemIndex > 1) {
+                        s += " [" + itemIndex + "]";
+                    }
+                    
                     g.setFont(f);
                     g.setColor(borderColor);
                     g.drawLine(x * CELL_WIDTH, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE, x * CELL_WIDTH + CELL_WIDTH, y * CELL_HEIGHT + BORDER_SIZE + PREVIEW_SIZE);
