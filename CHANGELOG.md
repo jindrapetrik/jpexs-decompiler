@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - ProductInfo tag information display
 - DebugId tag proper display and editation
 - [#1564], [#1676], [#1697], [#1893] Display of DefineVideoStream tags with VLC player
+- List of treenode subitems on otherwise empty panel (with 32x32 icons)
 
 ### Fixed
 - [#1897] Close menu button without selecting specific item
