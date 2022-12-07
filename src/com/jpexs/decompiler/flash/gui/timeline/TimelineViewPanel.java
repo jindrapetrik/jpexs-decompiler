@@ -49,7 +49,7 @@ public class TimelineViewPanel extends JPanel {
         timeline.setTimelined(timelined);
         add(new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, timeline, previewPanel = new ImagePanel(), Configuration.guiTimeLineSplitPaneDividerLocationPercent));
 
-        previewPanel.setTimelined(timelined, timelined.getTimeline().swf, 0, true, true, !Configuration.animateSubsprites.get(), true);
+        previewPanel.setTimelined(timelined, timelined.getTimeline().swf, 0, true, true, !Configuration.animateSubsprites.get(), true, !Configuration.playFrameSounds.get(), true);
         //previewPanel.setPreferredSize(new Dimension(400,300));
         previewPanel.pause();
         previewPanel.gotoFrame(0);

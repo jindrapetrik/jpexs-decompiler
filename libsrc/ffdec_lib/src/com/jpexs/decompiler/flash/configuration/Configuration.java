@@ -823,6 +823,10 @@ public final class Configuration {
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> warningVideoVlc = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> playFrameSounds = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

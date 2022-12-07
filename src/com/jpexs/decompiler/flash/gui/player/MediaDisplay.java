@@ -77,4 +77,8 @@ public interface MediaDisplay extends Closeable {
     public void setFrozen(boolean value);   
     
     public boolean alwaysDisplay();
+    
+    public void setMuted(boolean value);
+    
+    public boolean isMutable();
 }

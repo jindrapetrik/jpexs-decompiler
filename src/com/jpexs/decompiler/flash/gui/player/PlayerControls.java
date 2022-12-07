@@ -92,7 +92,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
     private static final Icon loopIcon = View.getIcon("loopon16");
 
     private static final Icon noLoopIcon = View.getIcon("loopoff16");
-
+    
     private final JLabel percentLabel = new JLabel("100%");
 
     private final JPanel zoomPanel;
@@ -114,6 +114,8 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
     private final JToggleButton showButton;
     
     private final JToggleButton freezeButton;
+    
+    private final JToggleButton muteButton;
 
     public static final int ZOOM_DECADE_STEPS = 10;
 
@@ -195,8 +197,16 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         freezeButton.setVisible(false);
         freezeButton.setSelected(!Configuration.animateSubsprites.get());
         
+        muteButton = new JToggleButton(View.getIcon("soundmute16"));
+        muteButton.addActionListener(this::muteButtonActionPerformed);
+        muteButton.setToolTipText(AppStrings.translate("button.mute"));
+        muteButton.setVisible(false);
+        muteButton.setSelected(!Configuration.playFrameSounds.get());
+        
+        
         displayButtonsPanel.add(showButton);
         displayButtonsPanel.add(freezeButton);
+        displayButtonsPanel.add(muteButton);
         
         graphicControls.add(displayButtonsPanel, BorderLayout.WEST);
         graphicControls.add(graphicButtonsPanel, BorderLayout.EAST);
@@ -358,7 +368,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         }
 
         View.execInEventDispatchLater(() -> {
-            //updateZoom();
+            muteButton.setVisible(display.isMutable());
             int totalFrames = display.getTotalFrames();
             int currentFrame = display.getCurrentFrame();
             if (currentFrame > totalFrames) {
@@ -589,6 +599,11 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
     private void freezeButtonActionPerformed(ActionEvent evt) {
         display.setFrozen(freezeButton.isSelected());
         Configuration.animateSubsprites.set(!freezeButton.isSelected());
+    }
+    
+    private void muteButtonActionPerformed(ActionEvent evt) {
+        display.setMuted(muteButton.isSelected());
+        Configuration.playFrameSounds.set(!muteButton.isSelected());
     }
 
     private double getRealZoom() {

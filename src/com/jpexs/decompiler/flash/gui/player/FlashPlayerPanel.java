@@ -465,4 +465,14 @@ public final class FlashPlayerPanel extends Panel implements Closeable, MediaDis
     public boolean alwaysDisplay() {
         return true;
     }
+
+    @Override
+    public void setMuted(boolean value) {
+        
+    }
+    
+    @Override
+    public boolean isMutable() {
+        return false;
+    }
 }
