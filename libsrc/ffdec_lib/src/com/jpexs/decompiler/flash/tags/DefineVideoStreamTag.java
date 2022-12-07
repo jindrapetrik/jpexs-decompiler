@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.types.ColorTransform;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
+import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -100,6 +101,10 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     public boolean videoFlagsSmoothing;
 
     @SWFType(BasicType.UI8)
+    @EnumValue(value = DefineVideoStreamTag.CODEC_SORENSON_H263, text = "Sorenson H.263")
+    @EnumValue(value = DefineVideoStreamTag.CODEC_SCREEN_VIDEO, text = "Screen video")
+    @EnumValue(value = DefineVideoStreamTag.CODEC_VP6, text = "VP6")
+    @EnumValue(value = DefineVideoStreamTag.CODEC_VP6_ALPHA, text = "VP6 video with alpha channel")
     public int codecID;
 
     @Internal
