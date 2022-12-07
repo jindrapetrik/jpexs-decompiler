@@ -94,8 +94,16 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     @Reserved
     @SWFType(value = BasicType.UB, count = 4)
     public int reserved;
-
-    @SWFType(value = BasicType.UB, count = 3)
+    
+    @SWFType(value = BasicType.UB, count = 3)    
+    @EnumValue(value = DefineVideoStreamTag.DEBLOCKING_USE_VIDEOPACKET_VALUE, text = "use VIDEOPACKET value")
+    @EnumValue(value = DefineVideoStreamTag.DEBLOCKING_OFF, text = "off")
+    @EnumValue(value = DefineVideoStreamTag.DEBLOCKING_LEVEL1, text = "Level 1 (Fast deblocking filter)")
+    @EnumValue(value = DefineVideoStreamTag.DEBLOCKING_LEVEL2, text = "Level 2 (VP6 only, better deblocking filter)")
+    @EnumValue(value = DefineVideoStreamTag.DEBLOCKING_LEVEL3, text = "Level 3 (VP6 only, better deblocking plus fast deringing filter)")
+    @EnumValue(value = DefineVideoStreamTag.DEBLOCKING_LEVEL4, text = "Level 4 (VP6 only, better deblocking plus better deringing filter)")
+    @EnumValue(value = DefineVideoStreamTag.DEBLOCKING_RESERVED1, text = "Reserved")
+    @EnumValue(value = DefineVideoStreamTag.DEBLOCKING_RESERVED2, text = "Reserved")
     public int videoFlagsDeblocking;
 
     public boolean videoFlagsSmoothing;
@@ -138,6 +146,17 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
 
     public static final int CODEC_VP6_ALPHA = 5;
 
+    public static final int DEBLOCKING_USE_VIDEOPACKET_VALUE = 0;
+    public static final int DEBLOCKING_OFF = 1;
+    public static final int DEBLOCKING_LEVEL1 = 2;
+    public static final int DEBLOCKING_LEVEL2 = 3;
+    public static final int DEBLOCKING_LEVEL3 = 4;
+    public static final int DEBLOCKING_LEVEL4 = 5;
+    public static final int DEBLOCKING_RESERVED1 = 6;
+    public static final int DEBLOCKING_RESERVED2 = 7;
+    
+    
+    
     static {
         Runtime.getRuntime().addShutdownHook(new Thread(){
             @Override
