@@ -1674,6 +1674,10 @@ public class TagTreeContextMenu extends JPopupMenu {
             return;
         }
 
+        TreePath sel = mainPanel.getCurrentTree().getSelectionPath();
+        if (sel == null || sel.getLastPathComponent() != itemr) {
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), itemr);
+        }
         mainPanel.showGenericTag((Tag) itemr);
     }
 
