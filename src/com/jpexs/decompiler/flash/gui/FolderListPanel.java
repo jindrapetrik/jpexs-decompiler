@@ -45,6 +45,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.TreePath;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
@@ -56,7 +57,9 @@ import org.pushingpixels.substance.api.SubstanceSkin;
  * @author JPEXS
  */
 public class FolderListPanel extends JPanel {    
-    private List<TreeItem> items;
+    private List<TreeItem> items;       
+    
+    private TreePath parentPath;
 
     private int selectedIndex = -1;
 
@@ -110,7 +113,9 @@ public class FolderListPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() > 1) {
                     if (selectedIndex > -1) {
-                        mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), FolderListPanel.this.items.get(selectedIndex));
+                        TreeItem selectedItem = FolderListPanel.this.items.get(selectedIndex);                       
+                        TreePath subPath = parentPath.pathByAddingChild(selectedItem);
+                        mainPanel.getCurrentTree().setSelectionPath(subPath);
                     }
                 }
             }
@@ -162,8 +167,9 @@ public class FolderListPanel extends JPanel {
         });
     }
 
-    public synchronized void setItems(List<TreeItem> items) {
+    public synchronized void setItems(TreePath parentPath, List<TreeItem> items) {
         this.items = items;
+        this.parentPath = parentPath;
         revalidate();
         repaint();
         selectedItems.clear();
