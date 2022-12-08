@@ -45,6 +45,7 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
@@ -74,6 +75,8 @@ public class BitmapExporter extends ShapeExporterBase {
     private final SWF swf;
 
     private final GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);  //For correct intersections display;
+    
+    private Shape aliasedShape;
 
     private Paint fillPaint;
 
@@ -104,6 +107,13 @@ public class BitmapExporter extends ShapeExporterBase {
     private static boolean linearGradientColorWarnignShown = false;
 
     private boolean scaleStrokes;
+    
+    private boolean aliasedFill = false;
+
+    @Override
+    public void beginAliasedFills() {
+        aliasedFill = true;
+    }
 
     private class TransformedStroke implements Stroke {
 
@@ -211,6 +221,7 @@ public class BitmapExporter extends ShapeExporterBase {
 
     @Override
     public void beginFills() {
+        aliasedFill = false;
     }
 
     @Override
@@ -597,12 +608,21 @@ public class BitmapExporter extends ShapeExporterBase {
     }
 
     protected void finalizePath() {
-        if (fillPaint != null) {
+        if (fillPaint != null) {           
+            Shape shp = path;
+            if (aliasedFill) {
+                aliasedShape = new BasicStroke((float)(SWF.unitDivisor / unzoom / 2), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND).createStrokedShape(shp);
+                return;
+            } else if (aliasedShape != null) {
+                Area a = new Area(shp);
+                a.add(new Area(aliasedShape));
+                shp = a;
+            }
             graphics.setComposite(AlphaComposite.SrcOver);
             if (fillPaint instanceof MultipleGradientPaint) {
                 AffineTransform oldAf = graphics.getTransform();
                 Shape prevClip = graphics.getClip();
-                graphics.clip(path);
+                graphics.clip(shp);
                 Matrix inverse = null;
                 try {
                     double scx = fillTransform.getScaleX();
@@ -627,7 +647,7 @@ public class BitmapExporter extends ShapeExporterBase {
                 graphics.setPaint(fillPaint);
 
                 if (inverse != null) {
-                    ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
+                    ExportRectangle rect = inverse.transform(new ExportRectangle(shp.getBounds2D()));
                     double minX = rect.xMin;
                     double minY = rect.yMin;
                     graphics.fill(new java.awt.Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
@@ -638,7 +658,7 @@ public class BitmapExporter extends ShapeExporterBase {
             } else if (fillPaint instanceof TexturePaint) {
                 AffineTransform oldAf = graphics.getTransform();
                 Shape prevClip = graphics.getClip();
-                graphics.clip(path);
+                graphics.clip(shp);
                 Matrix inverse = null;
                 if (fillRepeat) {
                     try {
@@ -671,7 +691,7 @@ public class BitmapExporter extends ShapeExporterBase {
                 if (fillRepeat) {
                     if (inverse != null) {
 
-                        ExportRectangle rect = inverse.transform(new ExportRectangle(path.getBounds2D()));
+                        ExportRectangle rect = inverse.transform(new ExportRectangle(shp.getBounds2D()));
                         double minX = rect.xMin;
                         double minY = rect.yMin;
                         graphics.fill(new Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
@@ -685,10 +705,13 @@ public class BitmapExporter extends ShapeExporterBase {
                 graphics.setClip(prevClip);
             } else {
                 graphics.setPaint(fillPaint);
-                graphics.fill(path);
+                graphics.fill(shp);
             }
         }
         if (linePaint != null && lineStroke != null) {
+            if(true) {
+                //return;
+            }
             Shape strokedShape = lineStroke.createStrokedShape(path);
             graphics.setComposite(AlphaComposite.SrcOver);
             if (linePaint instanceof MultipleGradientPaint) {

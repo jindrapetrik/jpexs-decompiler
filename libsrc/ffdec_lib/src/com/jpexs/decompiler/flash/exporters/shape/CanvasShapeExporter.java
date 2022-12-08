@@ -81,6 +81,8 @@ public class CanvasShapeExporter extends ShapeExporterBase {
     protected int fillWidth = 0;
 
     protected int fillHeight = 0;
+    
+    protected boolean aliasedFill = false;
 
     public static String getJsPrefix() {
         return "<script>var canvas=document.getElementById(\"myCanvas\");\r\n"
@@ -168,6 +170,7 @@ public class CanvasShapeExporter extends ShapeExporterBase {
 
     @Override
     public void beginFills() {
+        aliasedFill = false;
     }
 
     @Override
@@ -520,5 +523,10 @@ public class CanvasShapeExporter extends ShapeExporterBase {
 
         fillWidth = 0;
         fillHeight = 0;
+    }
+
+    @Override
+    public void beginAliasedFills() {
+        aliasedFill = true;
     }
 }
