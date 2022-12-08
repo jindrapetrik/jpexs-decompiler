@@ -59,7 +59,7 @@ public class ShapeImporter {
             rect.Ymax = rect.Ymin + (int) (SWF.unitDivisor * dimension.getHeight());
         }
 
-        SHAPEWITHSTYLE shapes = imageTag.getShape(rect, fill);
+        SHAPEWITHSTYLE shapes = imageTag.getShape(rect, fill, st.getShapeNum());
         st.shapes = shapes;
         return (Tag) st;
     }
