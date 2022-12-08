@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - Raw editor item count and edit display
 - Warnings about invalid reflective access in color dialog on Java 9+
 - Folder preview tag names have indices when multiple with same name
+- ShapeImporter fillstyles shapenum
 
 ### Changed
 - Quick search needs minimum of 3 characters
