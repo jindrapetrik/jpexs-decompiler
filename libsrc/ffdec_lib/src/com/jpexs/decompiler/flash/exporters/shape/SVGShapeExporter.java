@@ -50,7 +50,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
 
     private final SWF swf;
 
-    private final SVGExporter exporter;
+    private final SVGExporter exporter;    
 
     public SVGShapeExporter(int shapeNum, SWF swf, SHAPE shape, int id, SVGExporter exporter, Color defaultColor, ColorTransform colorTransform, double zoom) {
         super(shapeNum, swf, shape, colorTransform, zoom);
@@ -58,10 +58,13 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
         this.id = id;
         this.defaultColor = defaultColor;
         this.exporter = exporter;
-    }
+    }       
 
     @Override
     public void beginFill(RGB color) {
+        if (aliasedFill) {
+            return;
+        }
         if (color == null && defaultColor != null) {
             color = new RGB(defaultColor);
         }
@@ -81,6 +84,9 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
 
     @Override
     public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+        if (aliasedFill) {
+            return;
+        }
         finalizePath();
         Element gradient = (type == FILLSTYLE.LINEAR_GRADIENT)
                 ? exporter.createElement("linearGradient")
@@ -141,6 +147,9 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
 
     @Override
     public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
+        if (aliasedFill) {
+            return;
+        }
         finalizePath();
         String patternId = getPattern(bitmapId, matrix, colorTransform);
         if (patternId != null) {

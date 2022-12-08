@@ -38,6 +38,8 @@ public class PathExporter extends ShapeExporterBase {
     private final List<GeneralPath> strokes = new ArrayList<>();
 
     private double thickness = 0;
+    
+    private boolean aliasedFill = false;
 
     private GeneralPath path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
 
@@ -73,7 +75,7 @@ public class PathExporter extends ShapeExporterBase {
 
     @Override
     public void beginFills() {
-
+        aliasedFill = false;
     }
 
     @Override
@@ -150,5 +152,10 @@ public class PathExporter extends ShapeExporterBase {
         }
         paths.add(path);
         path = new GeneralPath(GeneralPath.WIND_EVEN_ODD);  //For correct intersections display
+    }
+
+    @Override
+    public void beginAliasedFills() {
+        aliasedFill = true;
     }
 }

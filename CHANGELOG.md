@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - List of treenode subitems on otherwise empty panel (with 32x32 icons)
 - DefineVideoStream codecId and videoFlagsDeblocking handled as enums in raw editation
 - Option to mute frame sounds
+- Option to fix conflation artifacts in antialising (Default off - it is slow)
 
 ### Fixed
 - [#1897] Close menu button without selecting specific item

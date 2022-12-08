@@ -38,6 +38,8 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
     protected StringBuilder pathData;
 
     protected double zoom;
+    
+    protected boolean aliasedFill;
 
     public DefaultSVGShapeExporter(int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform, double zoom) {
         super(shapeNum, swf, shape, colorTransform);
@@ -54,6 +56,7 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
 
     @Override
     public void beginFills() {
+        aliasedFill = false;
     }
 
     @Override
@@ -75,21 +78,33 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
 
     @Override
     public void beginFill(RGB color) {
+        if (aliasedFill) {
+            return;
+        }
         finalizePath();
     }
 
     @Override
     public void beginGradientFill(int type, GRADRECORD[] gradientRecords, Matrix matrix, int spreadMethod, int interpolationMethod, float focalPointRatio) {
+        if (aliasedFill) {
+            return;
+        }
         finalizePath();
     }
 
     @Override
     public void beginBitmapFill(int bitmapId, Matrix matrix, boolean repeat, boolean smooth, ColorTransform colorTransform) {
+        if (aliasedFill) {
+            return;
+        }
         finalizePath();
     }
 
     @Override
     public void endFill() {
+        if (aliasedFill) {
+            return;
+        }
         finalizePath();
     }
 
@@ -142,4 +157,11 @@ public abstract class DefaultSVGShapeExporter extends ShapeExporterBase {
     protected double roundPixels20(double pixels) {
         return Math.round(pixels * 100) / 100.0;
     }
+
+    @Override
+    public void beginAliasedFills() {
+        aliasedFill = true;
+    }
+    
+    
 }
