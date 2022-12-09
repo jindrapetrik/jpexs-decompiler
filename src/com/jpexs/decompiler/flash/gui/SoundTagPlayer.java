@@ -271,9 +271,7 @@ public class SoundTagPlayer implements MediaDisplay {
 
         loop: while (true) {
 
-            final byte[] data = new byte[16];
-
-            setPausedFlag(false);
+            final byte[] data = new byte[16];            
             setActiveFlag(true);
             long posBytes = 0;
             try {

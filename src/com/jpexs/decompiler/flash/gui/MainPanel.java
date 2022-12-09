@@ -4692,11 +4692,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.setImageReplaceButtonVisible(false, false, false, !((Tag) treeItem).isReadOnly() && (treeItem instanceof DefineSoundTag));
             try {
                 SoundTagPlayer soundThread = new SoundTagPlayer(null, (SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
+                if (!Configuration.autoPlaySounds.get()) {
+                    soundThread.pause();
+                }
                 previewPanel.setMedia(soundThread);
             } catch (LineUnavailableException | IOException | UnsupportedAudioFileException ex) {
                 logger.log(Level.SEVERE, null, ex);
             }
-
         } else if ((treeItem instanceof FontTag) && internalViewer) {
             previewPanel.showFontPanel((FontTag) treeItem);
         } else if ((treeItem instanceof TextTag) && internalViewer) {
