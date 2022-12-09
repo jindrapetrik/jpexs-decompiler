@@ -831,6 +831,10 @@ public final class Configuration {
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> fixAntialiasConflation = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> autoPlaySounds = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
