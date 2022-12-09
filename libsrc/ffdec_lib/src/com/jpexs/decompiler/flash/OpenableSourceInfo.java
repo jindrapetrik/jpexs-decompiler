@@ -87,6 +87,7 @@ public class OpenableSourceInfo {
     public void setFile(String file) {
         this.file = file;
         detectKind();
+        empty = false;
     }
 
     public String getFileTitle() {
