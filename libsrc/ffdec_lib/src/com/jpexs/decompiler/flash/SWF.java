@@ -1680,9 +1680,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                         }
                         //ich.setModified(false);
                         setSwfDeep(ich);
-                        ich.setTimelined(this);
+                        ich.setTimelined(this);                       
                     }
                     updateCharacters();                    
+                    for (CharacterTag ich:importedCharacters) {
+                        if (ich instanceof DefineSpriteTag) {
+                            ((DefineSpriteTag)ich).resetTimeline();
+                        }
+                    }                    
                 }
             }
         }
