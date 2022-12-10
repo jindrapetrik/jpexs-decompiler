@@ -739,11 +739,27 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
 
         boolean allSelectedIsTag = true;
+        boolean allSelectedIsWritable = true;
+        boolean allSelectedIsNotImported = true;
         for (TreeItem item : items) {
-            if (!(item instanceof Tag)) {
+            if (item instanceof Tag) {
+                Tag tag = (Tag) item;
+                if (tag.isReadOnly()) {
+                    allSelectedIsWritable = false;
+                }
+                if (tag.isImported()) {
+                    allSelectedIsNotImported = false;
+                }
+            } else {
                 if (item instanceof TagScript) {
                     Tag tag = ((TagScript) item).getTag();
-                    if (tag instanceof DoActionTag || tag instanceof DoInitActionTag) {
+                    if (tag.isReadOnly()) {
+                        allSelectedIsWritable = false;
+                    }
+                    if (tag.isImported()) {
+                        allSelectedIsNotImported = false;
+                    }
+                    if (tag instanceof DoActionTag || tag instanceof DoInitActionTag) {                        
                         continue;
                     }
                 }
@@ -1188,8 +1204,26 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
 
         for (TreeItem item : items) {
+            if (item instanceof Frame) {
+                if (((Frame)item).timeline.timelined instanceof DefineSpriteTag) {
+                    if (((Tag)((Frame)item).timeline.timelined).isReadOnly()) {
+                        removeMenuItem.setVisible(false);
+                        addTagInsideMenu.setVisible(false);
+                        addFramesAfterMenuItem.setVisible(false);
+                        addFramesBeforeMenuItem.setVisible(false);
+                    }
+                }
+            }
             if (item instanceof Tag) {
                 if (((Tag) item).isReadOnly()) {
+                    attachTagMenu.setVisible(false);
+                    moveUpMenuItem.setVisible(false);
+                    moveDownMenuItem.setVisible(false);
+                    showInHexDumpViewTagMenuItem.setVisible(false);
+                    addFramesBeforeMenuItem.setVisible(false);
+                    addFramesAfterMenuItem.setVisible(false);
+                    addFramesMenuItem.setVisible(false);
+                    moveTagMenuItem.setVisible(false);
                     removeMenuItem.setVisible(false);
                     removeWithDependenciesMenuItem.setVisible(false);
                     undoTagMenuItem.setVisible(false);
@@ -1200,7 +1234,11 @@ public class TagTreeContextMenu extends JPopupMenu {
                     jumpToCharacterMenuItem.setVisible(false);
                     importSwfXmlMenuItem.setVisible(false);
                     addTagInsideMenu.setVisible(false);
+                    addTagBeforeMenu.setVisible(false);
+                    addTagAfterMenu.setVisible(false);
                     moveTagToMenu.setVisible(false);
+                    cutTagToClipboardMenuItem.setVisible(false);
+                    cutTagToClipboardWithDependenciesMenuItem.setVisible(false);
                     openSWFInsideTagMenuItem.setVisible(false);
                 }
             }
