@@ -93,13 +93,21 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     @Internal
     protected boolean imported = false;
+    
+    @Internal
+    protected boolean importedDeep = false;
 
-    public void setImported(boolean imported) {
+    public void setImported(boolean imported, boolean deep) {
         this.imported = imported;
+        this.importedDeep = deep;
     }
 
     public boolean isImported() {
         return imported;
+    }
+    
+    public boolean isImportedDeep() {
+        return importedDeep;
     }
 
     /**

@@ -1531,21 +1531,30 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                     }
 
                     int pos = 0;
+                    Set<Integer> importedTagPos = new HashSet<>();
+                    List<CharacterTag> importedCharacters = new ArrayList<>();
                     for (String key : importedMap2.keySet()) {
                         if (!exportedMap2.containsKey(key)) {
                             continue; //?
                         }
                         int exportedId = exportedMap2.get(key);
                         int importedId = importedMap2.get(key);
+                        int ip = 0;
                         for (Tag cht : iSwf.tags) {
                             if ((cht instanceof CharacterIdTag) && (((CharacterIdTag) cht).getCharacterId() == exportedId) && !(cht instanceof PlaceObjectTypeTag) && !(cht instanceof RemoveTag)) {
                                 CharacterIdTag ch = (CharacterIdTag) cht;
-                                cht.setSwf(this);
                                 ch.setCharacterId(importedId);
-                                cht.setImported(true);
+                                setImportedDeep(cht, false);
                                 tags.add(p + 1 + pos, cht);
-                                pos++;
+                                importedTagPos.add(ip);
+                                if (cht instanceof CharacterTag) {
+                                    importedCharacters.add((CharacterTag)cht);
+                                } else {
+                                    cht.setSwf(this);
+                                }
+                                pos++;                                
                             }
+                            ip++;
                         }
                     }
 
@@ -1554,23 +1563,85 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                     for (String key : classesMap2.keySet()) {
                         int exportedId = classesMap2.get(key);
                         int importedId = newId++;
+                        int ip = 0;
                         for (Tag cht : iSwf.tags) {
-                            if ((cht instanceof CharacterIdTag) && (((CharacterIdTag) cht).getCharacterId() == exportedId) && !(cht instanceof PlaceObjectTypeTag) && !(cht instanceof RemoveTag)) {
+                            if (!importedTagPos.contains(ip) && (cht instanceof CharacterIdTag) && (((CharacterIdTag) cht).getCharacterId() == exportedId) && !(cht instanceof PlaceObjectTypeTag) && !(cht instanceof RemoveTag)) {
                                 CharacterIdTag ch = (CharacterIdTag) cht;
-                                cht.setSwf(this);
+                                
                                 ch.setCharacterId(importedId);
-                                cht.setImported(true);
+                                setImportedDeep(cht, false);
                                 tags.add(p + 1 + pos, cht);
+                                if (cht instanceof CharacterTag) {
+                                    importedCharacters.add((CharacterTag)cht);
+                                } else {
+                                    cht.setSwf(this);
+                                }
                                 pos++;
                             }
+                            ip++;
                         }
                     }
-                    updateCharacters();
+                    
+                    pos = 0;
+                    for (CharacterTag ich:importedCharacters) {
+                        Set<Integer> needed = new LinkedHashSet<>();
+                        ich.getNeededCharactersDeep(needed);
+                        Map<Integer, Integer> replaceCharactersMap = new HashMap<>();
+                        for (int n:needed) {
+                            CharacterTag cht = iSwf.getCharacter(n);
+                            if (cht.getSwf() != iSwf) {
+                                continue; //already imported
+                            }
+                            int importedId = newId++;
+                            cht.setSwf(this);
+                            replaceCharactersMap.put(n, importedId);
+                            cht.setCharacterId(importedId);
+                            setImportedDeep(cht, true);
+                            tags.add(p + 1 + pos, cht);
+                            pos++;
+                        }
+                        
+                        Map<Integer, Integer> replaceCharactersMap2 = new HashMap<>();
+                        
+                        //first map to non existing ids
+                        int iNewId = iSwf.getNextCharacterId();
+                        for (int from:replaceCharactersMap.keySet()) {
+                            int to = iNewId++;
+                            replaceCharactersMap2.put(to, replaceCharactersMap.get(from));
+                            ich.replaceCharacter(from, to);
+                        }
+                        
+                        for (int from:replaceCharactersMap2.keySet()) {
+                            int to = replaceCharactersMap2.get(from);
+                            ich.replaceCharacter(from, to);                            
+                        }
+                        ich.setModified(false);
+                        setSwfDeep(ich);
+                    }
+                    updateCharacters();                    
                 }
             }
         }
     }
 
+    private void setSwfDeep(Tag t) {
+        t.setSwf(this);
+        if (t instanceof DefineSpriteTag) {
+            for(Tag st: ((DefineSpriteTag)t).getTags()) {
+                setSwfDeep(st);
+            }
+        }
+    }
+    
+    private void setImportedDeep(Tag t, boolean deep) {
+        t.setImported(true, deep);
+        if (t instanceof DefineSpriteTag) {
+            for(Tag st: ((DefineSpriteTag)t).getTags()) {
+                setImportedDeep(st, true);
+            }
+        }
+    }
+    
     @Override
     public SWF getOpenable() {
         return this;
