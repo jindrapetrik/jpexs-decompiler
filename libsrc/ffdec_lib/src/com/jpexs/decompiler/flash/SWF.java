@@ -376,11 +376,21 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     @Internal
     private boolean destroyed = false;
 
+    @Internal
     private Set<Integer> cyclicCharacters = null;
 
+    @Internal
     private boolean headerModified = false;
 
+    @Internal
     private String charset = "UTF-8";
+    
+    @Internal
+    private Map<Integer, String> importedTagToClassMapping = new HashMap<>();
+    
+    @Internal
+    private Map<Integer, String> importedTagToExportNameMapping = new HashMap<>();
+    
 
     private static final DecompilerPool decompilerPool = new DecompilerPool();
 
@@ -1454,11 +1464,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         if (!checkOnly) {
             checkInvalidSprites();
             updateCharacters();
-            assignExportNamesToSymbols();
-            assignClassesToSymbols();
             if (resolver != null) {
                 resolveImported(resolver);
             }
+            assignExportNamesToSymbols();
+            assignClassesToSymbols();            
             SWFDecompilerPlugin.fireSwfParsed(this);
         } else {
             boolean hasNonUnknownTag = false;
@@ -1560,8 +1570,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                 importedTagPos.add(ip);
                                 if (cht instanceof CharacterTag) {
                                     importedCharacters.add((CharacterTag)chtCopy);
-                                    ((CharacterTag)chtCopy).setExportName(((CharacterTag)cht).getExportName());
-                                    ((CharacterTag)chtCopy).setClassName(((CharacterTag)cht).getClassName());
+                                    String exportName = ((CharacterTag)cht).getExportName();
+                                    String className = ((CharacterTag)cht).getClassName();
+                                    if (exportName != null) {
+                                        importedTagToExportNameMapping.put(importedId, exportName);
+                                    }
+                                    if (className != null) {
+                                        importedTagToClassMapping.put(importedId, className);
+                                    }
                                 } else {
                                     chtCopy.setTimelined(this);                               
                                     chtCopy.setSwf(this);
@@ -1595,8 +1611,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                 }
                                 if (cht instanceof CharacterTag) {
                                     importedCharacters.add((CharacterTag)chtCopy);
-                                    ((CharacterTag)chtCopy).setExportName(((CharacterTag)cht).getExportName());
-                                    ((CharacterTag)chtCopy).setClassName(((CharacterTag)cht).getClassName());
+                                    String exportName = ((CharacterTag)cht).getExportName();
+                                    String className = ((CharacterTag)cht).getClassName();
+                                    if (exportName != null) {
+                                        importedTagToExportNameMapping.put(importedId, exportName);
+                                    }
+                                    if (className != null) {
+                                        importedTagToClassMapping.put(importedId, className);
+                                    }
                                 } else {
                                     chtCopy.setSwf(this);
                                     chtCopy.setTimelined(this);                                                                
@@ -1795,7 +1817,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public void assignExportNamesToSymbols() {
-        HashMap<Integer, String> exportNames = new HashMap<>();
+        HashMap<Integer, String> exportNames = new HashMap<>(importedTagToExportNameMapping);
         for (Tag t : getTags()) {
             if (t instanceof ExportAssetsTag) {
                 ExportAssetsTag eat = (ExportAssetsTag) t;
@@ -1822,7 +1844,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public void assignClassesToSymbols() {
-        HashMap<Integer, String> classes = new HashMap<>();
+        HashMap<Integer, String> classes = new HashMap<>(importedTagToClassMapping);
         for (Tag t : getTags()) {
             if (t instanceof SymbolClassTag) {
                 SymbolClassTag sct = (SymbolClassTag) t;
@@ -1833,6 +1855,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 }
             }
         }
+        
         for (Tag t : getTags()) {
             if (t instanceof CharacterTag) {
                 CharacterTag ct = (CharacterTag) t;
