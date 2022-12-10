@@ -1237,6 +1237,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     addTagBeforeMenu.setVisible(false);
                     addTagAfterMenu.setVisible(false);
                     moveTagToMenu.setVisible(false);
+                    moveTagToWithDependenciesMenu.setVisible(false);
                     cutTagToClipboardMenuItem.setVisible(false);
                     cutTagToClipboardWithDependenciesMenuItem.setVisible(false);
                     openSWFInsideTagMenuItem.setVisible(false);
