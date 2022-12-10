@@ -469,6 +469,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 return;
             }
             TreeItem item = (TreeItem) paths[0].getLastPathComponent();
+            
+            if (item instanceof Tag) {
+                if (((Tag)item).isReadOnly()) {
+                    return;
+                }                
+            }
+            
+            
             if (e.getKeyCode() == KeyEvent.VK_UP) {
                 contextPopupMenu.moveUpDown(item, true);
             }
@@ -564,6 +572,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     tagItems.add((Tag) item);
                 }
             }
+            boolean allWritable = true;
+            for (TreeItem item:tagItems) {
+                if (((Tag)item).isReadOnly()) {
+                    allWritable = false;
+                    break;
+                }
+            }
+            
             if (e.getKeyCode() == 'C') {
                 if (e.isShiftDown()) {
                     contextPopupMenu.copyTagToClipboardWithDependenciesActionPerformed(null, tagItems);
@@ -571,7 +587,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     contextPopupMenu.copyTagToClipboardActionPerformed(null, tagItems);
                 }
             }
-            if (e.getKeyCode() == 'X') {
+            if (e.getKeyCode() == 'X' && allWritable) {
                 contextPopupMenu.update(tagItems);
                 if (e.isShiftDown()) {
                     contextPopupMenu.cutTagToClipboardWithDependenciesActionPerformed(null);

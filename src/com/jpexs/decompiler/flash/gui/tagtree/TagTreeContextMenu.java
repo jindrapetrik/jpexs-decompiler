@@ -626,8 +626,23 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     public boolean canRemove(final List<TreeItem> items) {
         for (TreeItem item : items) {
-            if (!(item instanceof Tag) && !(item instanceof Frame)) {
+            if (item instanceof Tag)
+            {
+                if (((Tag)item).isReadOnly()) {
+                    return false;
+                }
+            } else if (item instanceof Frame) {
+                Frame frame = (Frame) item;
+                if (frame.timeline.timelined instanceof DefineSpriteTag) {
+                    if (((Tag)frame.timeline.timelined).isReadOnly()) {
+                        return false;
+                    }
+                }
+            } else {
                 if (item instanceof TagScript) {
+                    if (((TagScript)item).getTag().isReadOnly()) {
+                        return false;
+                    }
                     continue;
                 }
 
