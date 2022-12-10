@@ -181,6 +181,11 @@ public class TagTree extends AbstractTagTree {
             }
 
             boolean isModified = val.isModified();
+            
+            if (isReadOnly) {
+                isModified = false;
+            }
+            
             if (isModified) {
                 if (boldFont == null) {
                     Font font = getFont();

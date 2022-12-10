@@ -36,6 +36,7 @@ All notable changes to this project will be documented in this file.
 - PlaceObject tag - do not display export name twice
 - Loading nested characters when Importassets tag used
 - Hide various actions for imported tags
+- Clone tag
 
 ### Changed
 - Quick search needs minimum of 3 characters

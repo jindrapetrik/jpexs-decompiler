@@ -105,6 +105,9 @@ public class TagListTreeCellRenderer extends DefaultTreeCellRenderer {
                 } else {
                     isModified = val.isModified();
                 }
+                if (isReadOnly) {
+                    isModified = false;
+                }
                 if (isModified) {
                     if (boldFont == null) {
                         Font font = getFont();

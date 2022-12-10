@@ -1244,7 +1244,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
 
         for (Tag tag : getTags()) {
-            if (tag.isModified()) {
+            if (tag.isModified() && !tag.isReadOnly()) {
                 return true;
             }
         }
@@ -1531,6 +1531,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                     }
 
                     int pos = 0;
+                    Set<Integer> importedCharIds = new HashSet<>();
                     Set<Integer> importedTagPos = new HashSet<>();
                     List<CharacterTag> importedCharacters = new ArrayList<>();
                     for (String key : importedMap2.keySet()) {
@@ -1542,15 +1543,26 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                         int ip = 0;
                         for (Tag cht : iSwf.tags) {
                             if ((cht instanceof CharacterIdTag) && (((CharacterIdTag) cht).getCharacterId() == exportedId) && !(cht instanceof PlaceObjectTypeTag) && !(cht instanceof RemoveTag)) {
-                                CharacterIdTag ch = (CharacterIdTag) cht;
-                                ch.setCharacterId(importedId);
-                                setImportedDeep(cht, false);
-                                tags.add(p + 1 + pos, cht);
+                                
+                                importedCharIds.add(exportedId);
+                                Tag chtCopy = null;
+                                try {
+                                    chtCopy = cht.cloneTag();
+                                    CharacterIdTag ch = (CharacterIdTag) chtCopy;
+                                    ch.setCharacterId(importedId);
+                                    setImportedDeep(cht, false);
+                                
+                                    tags.add(p + 1 + pos, chtCopy);
+                                } catch (InterruptedException | IOException ex) {
+                                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                                
                                 importedTagPos.add(ip);
                                 if (cht instanceof CharacterTag) {
-                                    importedCharacters.add((CharacterTag)cht);
+                                    importedCharacters.add((CharacterTag)chtCopy);
                                 } else {
-                                    cht.setSwf(this);
+                                    chtCopy.setTimelined(this);                               
+                                    chtCopy.setSwf(this);
                                 }
                                 pos++;                                
                             }
@@ -1566,15 +1578,24 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                         int ip = 0;
                         for (Tag cht : iSwf.tags) {
                             if (!importedTagPos.contains(ip) && (cht instanceof CharacterIdTag) && (((CharacterIdTag) cht).getCharacterId() == exportedId) && !(cht instanceof PlaceObjectTypeTag) && !(cht instanceof RemoveTag)) {
-                                CharacterIdTag ch = (CharacterIdTag) cht;
+                               
+                                importedCharIds.add(exportedId);
+                                 Tag chtCopy = null;
+                                try {
+                                    chtCopy = cht.cloneTag();
+                                    CharacterIdTag ch = (CharacterIdTag) chtCopy;
+                                    ch.setCharacterId(importedId);
+                                    setImportedDeep(chtCopy, false);
                                 
-                                ch.setCharacterId(importedId);
-                                setImportedDeep(cht, false);
-                                tags.add(p + 1 + pos, cht);
+                                    tags.add(p + 1 + pos, chtCopy);
+                                } catch (InterruptedException | IOException ex) {
+                                    Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
+                                }
                                 if (cht instanceof CharacterTag) {
-                                    importedCharacters.add((CharacterTag)cht);
+                                    importedCharacters.add((CharacterTag)chtCopy);
                                 } else {
-                                    cht.setSwf(this);
+                                    chtCopy.setSwf(this);
+                                    chtCopy.setTimelined(this);                                                                
                                 }
                                 pos++;
                             }
@@ -1588,16 +1609,22 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                         ich.getNeededCharactersDeep(needed);
                         Map<Integer, Integer> replaceCharactersMap = new HashMap<>();
                         for (int n:needed) {
+                            if (importedCharIds.contains(n)) {
+                                continue;
+                            }                            
                             CharacterTag cht = iSwf.getCharacter(n);
-                            if (cht.getSwf() != iSwf) {
-                                continue; //already imported
-                            }
                             int importedId = newId++;
-                            cht.setSwf(this);
+                            CharacterTag chtCopy = null;
+                            try {
+                                chtCopy = (CharacterTag)cht.cloneTag();
+                            } catch (InterruptedException | IOException ex) {
+                                Logger.getLogger(SWF.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            chtCopy.setSwf(this);
                             replaceCharactersMap.put(n, importedId);
-                            cht.setCharacterId(importedId);
-                            setImportedDeep(cht, true);
-                            tags.add(p + 1 + pos, cht);
+                            chtCopy.setCharacterId(importedId);
+                            setImportedDeep(chtCopy, true);
+                            tags.add(p + 1 + pos, chtCopy);
                             pos++;
                         }
                         
@@ -1615,8 +1642,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                             int to = replaceCharactersMap2.get(from);
                             ich.replaceCharacter(from, to);                            
                         }
-                        ich.setModified(false);
+                        //ich.setModified(false);
                         setSwfDeep(ich);
+                        ich.setTimelined(this);
                     }
                     updateCharacters();                    
                 }
