@@ -1230,7 +1230,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     replaceMenuItem.setVisible(false);
                     replaceNoFillMenuItem.setVisible(false);
                     replaceWithTagMenuItem.setVisible(false);
-                    rawEditMenuItem.setVisible(false);
+                    //rawEditMenuItem.setVisible(false);
                     jumpToCharacterMenuItem.setVisible(false);
                     importSwfXmlMenuItem.setVisible(false);
                     addTagInsideMenu.setVisible(false);
