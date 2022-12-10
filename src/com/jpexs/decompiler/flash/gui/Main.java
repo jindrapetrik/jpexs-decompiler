@@ -134,6 +134,7 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -149,6 +150,8 @@ import org.pushingpixels.substance.api.SubstanceLookAndFeel;
  * @author JPEXS
  */
 public class Main {
+
+    public static final String IMPORT_ASSETS_SEPARATOR = "{*sep*}";
 
     protected static ProxyFrame proxyFrame;
 
@@ -211,8 +214,6 @@ public class Main {
     public static CancellableWorker importWorker = null;
     public static CancellableWorker deobfuscatePCodeWorker = null;
     public static CancellableWorker swfPrepareWorker = null;
-
-    
 
     public static boolean isSwfAir(Openable openable) {
         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(openable.getShortPathTitle());
@@ -999,6 +1000,24 @@ public class Main {
                         String fileKey = shortName == null ? "" : new File(shortName).getName();
                         SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(fileKey);
                         String charset = conf == null ? Charset.defaultCharset().name() : conf.getCustomData(CustomConfigurationKeys.KEY_CHARSET, Charset.defaultCharset().name());
+                        List<String> loadedUrls = new ArrayList<>();
+                        List<String> loadedStatus = new ArrayList<>();
+
+                        Map<String, String> configuredImportAssets = new HashMap<>();
+                        if (conf != null) {
+                            String impAssetsStr = conf.getCustomData(CustomConfigurationKeys.KEY_LOADED_IMPORT_ASSETS, "");
+                            if (impAssetsStr != null && !impAssetsStr.isEmpty()) {
+                                String[] parts = (impAssetsStr + IMPORT_ASSETS_SEPARATOR).split(Pattern.quote(IMPORT_ASSETS_SEPARATOR));
+                                for (String s : parts) {
+                                    if (!s.isEmpty()) {
+                                        String urlPlusStatus[] = (s + "|").split(Pattern.quote("|"));
+                                        String url = urlPlusStatus[0];
+                                        String status = urlPlusStatus[1];
+                                        configuredImportAssets.put(url, status);
+                                    }
+                                }
+                            }
+                        }
 
                         SWF swf = new SWF(is, file, fileTitle, new ProgressListener() {
                             @Override
@@ -1008,50 +1027,75 @@ public class Main {
                         }, Configuration.parallelSpeedUp.get(), false, true, new UrlResolver() {
                             @Override
                             public SWF resolveUrl(final String url) {
+                                loadedUrls.add(url);
+                                File selFile = null;
                                 int opt = -1;
-                                if (!(yestoall || notoall)) {
-                                    opt = ViewMessages.showOptionDialog(getDefaultMessagesComponent(), AppStrings.translate("message.imported.swf").replace("%url%", url), AppStrings.translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, yesno, AppStrings.translate("button.yes"));
-                                    if (opt == 2) {
-                                        yestoall = true;
+
+                                if (configuredImportAssets.containsKey(url)) {
+                                    String statusStr = configuredImportAssets.get(url);
+                                    if (statusStr.equals("NO")) {
+                                        loadedStatus.add("NO");
+                                        return null;
                                     }
-                                    if (opt == 3) {
-                                        notoall = true;
+                                    if (statusStr.startsWith("CUSTOM:")) {
+                                        selFile = new File(statusStr.substring("CUSTOM:".length()));
+                                    }
+                                } else {
+                                    if (!(yestoall || notoall)) {
+                                        opt = ViewMessages.showOptionDialog(getDefaultMessagesComponent(), AppStrings.translate("message.imported.swf").replace("%url%", url), AppStrings.translate("message.warning"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, yesno, AppStrings.translate("button.yes"));
+                                        if (opt == 2) {
+                                            yestoall = true;
+                                        }
+                                        if (opt == 3) {
+                                            notoall = true;
+                                        }
+                                    }
+
+                                    if (yestoall) {
+                                        opt = 0; // yes
+                                    } else if (notoall) {
+                                        opt = 1; // no
+                                    }
+
+                                    if (opt == 1) //no
+                                    {
+                                        loadedStatus.add("NO");
+                                        return null;
                                     }
                                 }
 
-                                if (yestoall) {
-                                    opt = 0; // yes
-                                } else if (notoall) {
-                                    opt = 1; // no
-                                }
-
-                                if (opt == 1) //no
-                                {
-                                    return null;
-                                }
-
-                                if (url.startsWith("http://") || url.startsWith("https://")) {
+                                if (selFile == null && (url.startsWith("http://") || url.startsWith("https://"))) {
                                     try {
                                         URL u = new URL(url);
-                                        return open(u.openStream(), null, url); //?
+                                        SWF ret = open(u.openStream(), null, url); //?
+                                        loadedStatus.add("YES");
+                                        return ret;
                                     } catch (Exception ex) {
                                         //ignore
                                     }
                                 } else {
-                                    File swf = new File(new File(file).getParentFile(), url);
+                                    File swf = selFile != null ? selFile : new File(new File(file).getParentFile(), url);
                                     if (swf.exists()) {
                                         try {
-                                            return open(new FileInputStream(swf), swf.getAbsolutePath(), swf.getName());
+                                            SWF ret = open(new FileInputStream(swf), swf.getAbsolutePath(), swf.getName());
+                                            if (selFile != null) {
+                                                loadedStatus.add("CUSTOM:" + selFile.getAbsolutePath());
+                                            } else {
+                                                loadedStatus.add("YES");
+                                            }
+                                            return ret;
                                         } catch (Exception ex) {
                                             //ignore
                                         }
                                     }
                                     // try .gfx if .swf failed
-                                    if (url.endsWith(".swf")) {
+                                    if (selFile == null && url.endsWith(".swf")) {
                                         File gfx = new File(new File(file).getParentFile(), url.substring(0, url.length() - 4) + ".gfx");
                                         if (gfx.exists()) {
                                             try {
-                                                return open(new FileInputStream(gfx), gfx.getAbsolutePath(), gfx.getName());
+                                                SWF ret = open(new FileInputStream(gfx), gfx.getAbsolutePath(), gfx.getName());
+                                                loadedStatus.add("YES");
+                                                return ret;
                                             } catch (Exception ex) {
                                                 //ignore
                                             }
@@ -1120,11 +1164,13 @@ public class Main {
                                                 File selFile = Helper.fixDialogFile(fc.getSelectedFile());
                                                 try {
                                                     ret.setVal(open(new FileInputStream(selFile), selFile.getAbsolutePath(), selFile.getName()));
+                                                    loadedStatus.add("CUSTOM:" + selFile.getAbsolutePath());
                                                     break;
-                                                } catch (Exception ex) {
+                                                } catch (Exception ex) {                                                    
                                                     //ignore;
                                                 }
                                             } else {
+                                                loadedStatus.add("NO");
                                                 break;
                                             }
                                         }
@@ -1133,6 +1179,21 @@ public class Main {
                                 return ret.getVal();
                             }
                         }, charset);
+
+                        if (!loadedUrls.isEmpty()) {
+                            SwfSpecificCustomConfiguration cc2 = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
+                            StringBuilder sb = new StringBuilder();
+                            for (int i = 0; i < loadedUrls.size(); i++) {
+                                if (i > 0) {
+                                    sb.append(IMPORT_ASSETS_SEPARATOR);
+                                }
+                                sb.append(loadedUrls.get(i));
+                                sb.append("|");
+                                sb.append(loadedStatus.get(i));
+                            }
+                            cc2.setCustomData(CustomConfigurationKeys.KEY_LOADED_IMPORT_ASSETS, sb.toString());
+                        }
+
                         return swf;
                     }
 
@@ -1165,7 +1226,7 @@ public class Main {
         }
 
         result.sourceInfo = sourceInfo;
-        
+
         boolean hasVideoStreams = false;
         for (Openable openable : result) {
 
@@ -1181,13 +1242,13 @@ public class Main {
                 int height = (int) ((swf.displayRect.Ymax - swf.displayRect.Ymin) / SWF.unitDivisor);
                 logger.log(Level.INFO, "Width: {0}", width);
                 logger.log(Level.INFO, "Height: {0}", height);
-                
-                for (Tag t: swf.getTags()) {
+
+                for (Tag t : swf.getTags()) {
                     if (t instanceof DefineVideoStreamTag) {
                         hasVideoStreams = true;
                     }
                 }
-                
+
                 swf.addEventListener(new EventListener() {
                     @Override
                     public void handleExportingEvent(String type, int index, int count, Object data) {
@@ -1233,14 +1294,14 @@ public class Main {
                 });
             }
         }
-        
+
         if (hasVideoStreams && !DefineVideoStreamTag.displayAvailable()) {
             View.execInEventDispatchLater(new Runnable() {
                 @Override
                 public void run() {
-                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("message.video.installvlc").replace("%file%", sourceInfo.getFileTitleOrName()), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningVideoVlc);       
+                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("message.video.installvlc").replace("%file%", sourceInfo.getFileTitleOrName()), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningVideoVlc);
                 }
-                
+
             });
         }
 
@@ -1558,7 +1619,7 @@ public class Main {
         }
         if (mainFrame != null) {
             mainFrame.setVisible(false);
-            mainFrame.getPanel().closeAll(false);
+            mainFrame.getPanel().closeAll(false, false);
             mainFrame.dispose();
             mainFrame = null;
         }
@@ -1630,7 +1691,7 @@ public class Main {
         if (newFileDialog.showDialog() == AppDialog.OK_OPTION) {
             if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
                 sourceInfos.clear();
-                mainFrame.getPanel().closeAll(false);
+                mainFrame.getPanel().closeAll(false, false);
                 mainFrame.setVisible(false);
                 Helper.freeMem();
             }
@@ -1684,7 +1745,7 @@ public class Main {
 
         if (mainFrame != null && !Configuration.openMultipleFiles.get()) {
             sourceInfos.clear();
-            mainFrame.getPanel().closeAll(false);
+            mainFrame.getPanel().closeAll(false, false);
             mainFrame.setVisible(false);
             Helper.freeMem();
             reloadIndices = null;
@@ -1736,6 +1797,13 @@ public class Main {
     public static void reloadFile(OpenableList swf) {
         View.checkAccess();
 
+        for (Openable o : swf.items) {
+            SwfSpecificCustomConfiguration cc = Configuration.getSwfSpecificCustomConfiguration(o.getShortPathTitle());
+            if (cc != null) {
+                cc.setCustomData(CustomConfigurationKeys.KEY_LOADED_IMPORT_ASSETS, "");
+            }
+        }        
+
         openFile(swf.sourceInfo, null, sourceInfos.indexOf(swf.sourceInfo));
     }
 
@@ -1751,10 +1819,10 @@ public class Main {
         }
     }
 
-    public static boolean closeAll() {
+    public static boolean closeAll(boolean onExit) {
         View.checkAccess();
 
-        boolean closeResult = mainFrame.getPanel().closeAll(true);
+        boolean closeResult = mainFrame.getPanel().closeAll(true, onExit);
         if (closeResult) {
             sourceInfos.clear();
             System.gc();
@@ -2090,8 +2158,6 @@ public class Main {
         return null;
     }
 
-    
-    
     private static void initGui() {
         if (GraphicsEnvironment.isHeadless()) {
             System.err.println("Error: Your system does not support Graphic User Interface");
@@ -2100,7 +2166,7 @@ public class Main {
 
         System.setProperty("sun.java2d.d3d", "false");
         System.setProperty("sun.java2d.noddraw", "true");
-        
+
         if (System.getProperty("sun.java2d.uiScale") == null) { //it was not set by commandline, etc.       
             System.setProperty("sun.java2d.uiScale", "" + Configuration.uiScale.get());
         }

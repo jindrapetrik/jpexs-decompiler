@@ -322,7 +322,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private final JPanel displayPanel;
 
     public FolderPreviewPanel folderPreviewPanel;
-    
+
     public FolderListPanel folderListPanel;
 
     private boolean isWelcomeScreen = true;
@@ -330,9 +330,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private static final String CARDPREVIEWPANEL = "Preview card";
 
     private static final String CARDFOLDERPREVIEWPANEL = "Folder preview card";
-    
-    private static final String CARDFOLDERLISTPANEL = "Folder list card";
 
+    private static final String CARDFOLDERLISTPANEL = "Folder list card";
 
     private static final String CARDEMPTYPANEL = "Empty card";
 
@@ -672,8 +671,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public boolean isClipboardCut() {
         return clipboardCut;
-    }   
-    
+    }
+
     public boolean checkEdited() {
         if (abcPanel != null && abcPanel.isEditing()) {
             abcPanel.tryAutoSave();
@@ -697,8 +696,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private class MyTreeSelectionModel extends DefaultTreeSelectionModel {
-
-        
 
         @Override
         public void addSelectionPath(TreePath path) {
@@ -885,7 +882,6 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return folderListCard;
     }
 
-    
     private JPanel createDumpPreviewCard() {
         JPanel dumpViewCard = new JPanel(new BorderLayout());
         dumpViewPanel = new DumpViewPanel(dumpTree);
@@ -1416,7 +1412,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         return false;
     }
 
-    public boolean closeAll(boolean showCloseConfirmation) {
+    public boolean closeAll(boolean showCloseConfirmation, boolean onExit) {
         View.checkAccess();
 
         if (showCloseConfirmation && isModified()) {
@@ -1456,6 +1452,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         for (SWF swf : swfsToClose) {
             swf.clearTagSwfs();
+            if (!onExit) {
+                SwfSpecificCustomConfiguration cc = Configuration.getSwfSpecificCustomConfiguration(swf.getShortPathTitle());
+                if (cc != null) {
+                    cc.setCustomData(CustomConfigurationKeys.KEY_LOADED_IMPORT_ASSETS, "");
+                }
+            }
         }
 
         refreshTree();
@@ -1510,6 +1512,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         for (SWF swf : swfsToClose) {
             Main.searchResultsStorage.destroySwf(swf);
             pinsPanel.removeOpenable(swf);
+            SwfSpecificCustomConfiguration cc = Configuration.getSwfSpecificCustomConfiguration(swf.getShortPathTitle());
+            if (cc != null) {
+                cc.setCustomData(CustomConfigurationKeys.KEY_LOADED_IMPORT_ASSETS, "");
+            }
         }
 
         openables.remove(openableList);
@@ -1924,7 +1930,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                     ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), singleScriptFile, false);
                     String singleFileName = Path.combine(scriptsFolder, openable.getShortFileName() + scriptExportSettings.getFileExtension());
-                    try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
+                    try ( FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                         scriptExportSettings.singleFileWriter = writer;
                         if (swf.isAS3()) {
                             ret.addAll(new AS3ScriptExporter().exportActionScript3(swf, handler, scriptsFolder, as3scripts, scriptExportSettings, parallel, evl));
@@ -2031,7 +2037,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), singleScriptFile, false);
             String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
-            try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
+            try ( FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                 scriptExportSettings.singleFileWriter = writer;
                 swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl);
             }
@@ -2148,7 +2154,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 ScriptExportSettings scriptExportSettings = new ScriptExportSettings(exportMode, singleScriptFile, false);
                 String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
-                try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
+                try ( FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                     scriptExportSettings.singleFileWriter = writer;
                     swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl);
                 }
@@ -3552,7 +3558,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
                 try {
-                    try (FileInputStream fis = new FileInputStream(selfile)) {
+                    try ( FileInputStream fis = new FileInputStream(selfile)) {
                         new SwfXmlImporter().importSwf(swf, fis);
                     }
                     swf.clearAllCache();
@@ -4625,9 +4631,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
         boolean internalViewer = !isAdobeFlashPlayerEnabled();
-        
-        boolean isVideoButNotDrawable = (treeItem instanceof DefineVideoStreamTag) && (!DefineVideoStreamTag.displayAvailable()); 
-        
+
+        boolean isVideoButNotDrawable = (treeItem instanceof DefineVideoStreamTag) && (!DefineVideoStreamTag.displayAvailable());
+
         if (treeItem instanceof SWF) {
             SWF swf = (SWF) treeItem;
             if (internalViewer) {
@@ -4674,7 +4680,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (treeItem instanceof ShapeTag) {
                 previewPanel.setImageReplaceButtonVisible(false, false, !((Tag) treeItem).isReadOnly(), false);
             }
-            previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), treeItem instanceof ShapeTag, !Configuration.playFrameSounds.get(), (treeItem instanceof DefineSpriteTag)||(treeItem instanceof ButtonTag));
+            previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), treeItem instanceof ShapeTag, !Configuration.playFrameSounds.get(), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag));
         } else if (treeItem instanceof Frame && internalViewer) {
             Frame fn = (Frame) treeItem;
             SWF swf = (SWF) fn.getOpenable();
@@ -5042,7 +5048,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             case TagTreeModel.FOLDER_MOVIES:
                 for (Tag tag : timelined.getTags()) {
                     if (tag instanceof DefineVideoStreamTag) {
-                        folderPreviewItems.add(tag);                        
+                        folderPreviewItems.add(tag);
                     }
                     if (tag instanceof DefineSpriteTag) {
                         addFolderPreviewItems(folderPreviewItems, folderName, (DefineSpriteTag) tag);
@@ -5110,9 +5116,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         folderPreviewPanel.setItems(folderPreviewItems);
         showCard(CARDFOLDERPREVIEWPANEL);
     }
-    
+
     private void showFolderList(TreePath path) {
-        List<TreeItem> items =  new ArrayList<>(getCurrentTree().getFullModel().getAllChildren((TreeItem)path.getLastPathComponent()));
+        List<TreeItem> items = new ArrayList<>(getCurrentTree().getFullModel().getAllChildren((TreeItem) path.getLastPathComponent()));
         folderListPanel.setItems(path, items);
         showCard(CARDFOLDERLISTPANEL);
     }

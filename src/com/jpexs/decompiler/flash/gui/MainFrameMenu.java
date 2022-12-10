@@ -308,7 +308,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         }
 
         if (openable != null) {
-            boolean result = Main.closeAll();
+            boolean result = Main.closeAll(false);
             if (result) {
                 openable = null;
                 Timer timer = new Timer();
