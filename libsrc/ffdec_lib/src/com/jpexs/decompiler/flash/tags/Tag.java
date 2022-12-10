@@ -442,8 +442,8 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     public Tag cloneTag() throws InterruptedException, IOException {
         byte[] data = getData();
-        SWFInputStream tagDataStream = new SWFInputStream(swf, data, getDataPos(), data.length);
-        TagStub copy = new TagStub(swf, getId(), "Unresolved", getOriginalRange(), tagDataStream);
+        SWFInputStream tagDataStream = new SWFInputStream(swf, data, 0, data.length);
+        TagStub copy = new TagStub(swf, getId(), "Unresolved", new ByteArrayRange(data), tagDataStream);
         copy.forceWriteAsLong = forceWriteAsLong;
         return SWFInputStream.resolveTag(copy, 0, false, true, false, false);
     }

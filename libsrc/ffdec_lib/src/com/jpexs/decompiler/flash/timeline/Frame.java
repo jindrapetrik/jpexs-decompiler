@@ -118,7 +118,7 @@ public class Frame implements TreeItem, Exportable {
 
     public boolean isAllInnerTagsModified() {
         for (Tag t : allInnerTags) {
-            if (t.isModified()) {
+            if (t.isModified() && !t.isReadOnly()) {
                 return true;
             }
         }        
@@ -128,12 +128,12 @@ public class Frame implements TreeItem, Exportable {
     @Override
     public boolean isModified() {
         for (Tag t : innerTags) {
-            if (t.isModified()) {
+            if (t.isModified() && !t.isReadOnly()) {
                 return true;
             }
         }
         for (Tag t : actions) {
-            if (t.isModified()) {
+            if (t.isModified() && !t.isReadOnly()) {
                 return true;
             }
         }
@@ -142,7 +142,7 @@ public class Frame implements TreeItem, Exportable {
                 return true;
             }
         }
-        if (showFrameTag != null && showFrameTag.isModified()) {
+        if (showFrameTag != null && showFrameTag.isModified() && !showFrameTag.isReadOnly()) {
             return true;
         }
         return false;
