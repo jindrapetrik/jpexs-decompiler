@@ -102,8 +102,7 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag {
 
         if (getCharacterId() != -1) {
             result += " (" + getCharacterId() + nameAppend + ")";
-        }
-        if (!nameAppend.isEmpty()) {
+        } else if (!nameAppend.isEmpty()) {
             result += " (" + nameAppend + ")";
         }
 

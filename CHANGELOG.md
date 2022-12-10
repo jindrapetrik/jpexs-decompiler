@@ -33,6 +33,7 @@ All notable changes to this project will be documented in this file.
 - Folder preview tag names have indices when multiple with same name
 - ShapeImporter fillstyles shapenum
 - Reload button disabled after saving new file
+- PlaceObject tag - do not display export name twice
 
 ### Changed
 - Quick search needs minimum of 3 characters
