@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.treeitems;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.Tag;
 import java.util.List;
 
 /**
@@ -61,6 +62,9 @@ public class FolderItem implements TreeItem {
         }
 
         for (TreeItem ti : subItems) {
+            if ((ti instanceof Tag) && (((Tag)ti).isReadOnly())) {
+                continue;
+            }
             if (ti.isModified()) {
                 return true;
             }
