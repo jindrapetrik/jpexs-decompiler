@@ -835,6 +835,10 @@ public final class Configuration {
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> autoPlaySounds = null;
     
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> deobfuscateAs12RemoveInvalidNamesAssignments = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
