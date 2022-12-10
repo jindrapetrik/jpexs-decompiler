@@ -1,0 +1,40 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" sharedLibraryURL="imported_as2.swf" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false">
+     <symbols>
+          <Include href="NotImported.xml" loadImmediate="false" itemID="63945a7b-0000025e" lastModified="1670666875"/>
+          <Include href="RedRect.xml" itemID="639454a2-00000255" lastModified="1670665378"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="RedRect" centerPoint3DX="261.5" centerPoint3DY="197.5">
+                                             <matrix>
+                                                  <Matrix tx="149" ty="121"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="112.5" y="76.5"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="NotImported" centerPoint3DX="341.5" centerPoint3DY="334.5">
+                                             <matrix>
+                                                  <Matrix tx="289" ty="297"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="52.5" y="37.5"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="623" publishTime="1670665383"/>
+     </publishHistory>
+</DOMDocument>
