@@ -81,6 +81,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 import org.w3c.dom.Element;
@@ -328,6 +329,18 @@ public class Timeline {
                         fl.characterId = -1;
                     }
                 }
+                String className = po.getClassName();
+                if (className != null) {
+                    fl.className = className;                    
+                    character = swf.getCharacterByClass(className);
+                    if (character instanceof DefineSpriteTag) {
+                        if (swf.getCyclicCharacters().contains(characterId)) {
+                            fl.className = null;
+                        }
+                    }
+                }
+                    
+                
                 if (po.flagMove()) {
                     MATRIX matrix2 = po.getMatrix();
                     if (matrix2 != null) {
@@ -340,6 +353,11 @@ public class Timeline {
                     ColorTransform colorTransForm2 = po.getColorTransform();
                     if (colorTransForm2 != null) {
                         fl.colorTransForm = colorTransForm2;
+                    }
+                    
+                    String className2 = po.getClassName();
+                    if (className2 != null) {
+                        fl.className = className2;
                     }
 
                     CLIPACTIONS clipActions2 = po.getClipActions();
@@ -420,14 +438,15 @@ public class Timeline {
     private synchronized void detectTweens() {
         for (int d = 1; d <= maxDepth; d++) {
             int characterId = -1;
+            String charClassName = null;
             int len = 0;
             for (int f = 0; f <= frames.size(); f++) {
                 DepthState ds = f >= frames.size() ? null : frames.get(f).layers.get(d);
 
-                if (ds != null && characterId != -1 && ds.characterId == characterId) {
+                if (ds != null && (characterId != -1 || charClassName != null) && (ds.characterId == characterId && Objects.equals(ds.className, charClassName))) {
                     len++;
                 } else {
-                    if (characterId != -1) {
+                    if (characterId != -1 || charClassName != null) {
                         int startPos = f - len;
                         List<DepthState> matrices = new ArrayList<>(len);
                         for (int k = 0; k < len; k++) {
@@ -450,6 +469,7 @@ public class Timeline {
                 }
 
                 characterId = ds == null ? -1 : ds.characterId;
+                charClassName = ds == null ? null : ds.className;
             }
         }
     }
@@ -573,13 +593,12 @@ public class Timeline {
         Frame frameObj = getFrame(frame);
         for (int depth : frameObj.layers.keySet()) {
             DepthState layer = frameObj.layers.get(depth);
-            if (layer.characterId != -1) {
-                if (!swf.getCharacters().containsKey(layer.characterId)) {
-                    continue;
-                }
-                usedCharacters.add(layer.characterId);
-                swf.getCharacter(layer.characterId).getNeededCharactersDeep(usedCharacters);
+            CharacterTag ch = layer.getCharacter();
+            if (ch == null) {
+                continue;
             }
+            usedCharacters.add(ch.getCharacterId());
+            ch.getNeededCharactersDeep(usedCharacters); 
         }
     }
 
@@ -1035,14 +1054,14 @@ public class Timeline {
                 continue;
             }
             DepthState layer = frameObj.layers.get(i);
-            if (!swf.getCharacters().containsKey(layer.characterId)) {
-                continue;
-            }
             if (!layer.isVisible) {
                 continue;
             }
 
-            CharacterTag character = swf.getCharacter(layer.characterId);
+            CharacterTag character = layer.getCharacter();
+            if (character == null) {
+                continue;
+            }
             Matrix layerMatrix = new Matrix(layer.matrix);
 
             Matrix mat = transformation.concatenate(layerMatrix);
@@ -1187,14 +1206,14 @@ public class Timeline {
                 continue;
             }
             DepthState layer = frameObj.layers.get(i);
-            if (!swf.getCharacters().containsKey(layer.characterId)) {
-                continue;
-            }
             if (!layer.isVisible) {
                 continue;
             }
 
-            CharacterTag character = swf.getCharacter(layer.characterId);
+            CharacterTag character =layer.getCharacter();
+            if (character == null) {
+                continue;
+            }
 
             ColorTransform clrTrans = colorTransform;
             if (layer.colorTransForm != null && layer.blendMode <= 1) { // Normal blend mode
@@ -1277,7 +1296,7 @@ public class Timeline {
         for (int d = maxDepth; d >= 0; d--) {
             DepthState ds = fr.layers.get(d);
             if (ds != null) {
-                CharacterTag c = swf.getCharacter(ds.characterId);
+                CharacterTag c = ds.getCharacter();
                 if (c instanceof Timelined) {
                     int frameCount = ((Timelined) c).getTimeline().frames.size();
                     if (frameCount == 0) {
@@ -1322,7 +1341,7 @@ public class Timeline {
             if (!layer.isVisible) {
                 continue;
             }
-            CharacterTag character = swf.getCharacter(layer.characterId);
+            CharacterTag character = layer.getCharacter();
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
                 Matrix m = transformation.concatenate(new Matrix(layer.matrix));
@@ -1383,13 +1402,13 @@ public class Timeline {
                 continue;
             }
             DepthState layer = frameObj.layers.get(i);
-            if (!swf.getCharacters().containsKey(layer.characterId)) {
-                continue;
-            }
             if (!layer.isVisible) {
                 continue;
             }
-            CharacterTag character = swf.getCharacter(layer.characterId);
+            CharacterTag character = layer.getCharacter();
+            if (character == null) {
+                continue;
+            }
             if (character instanceof DrawableTag) {
                 DrawableTag drawable = (DrawableTag) character;
                 if (!drawable.isSingleFrame()) {

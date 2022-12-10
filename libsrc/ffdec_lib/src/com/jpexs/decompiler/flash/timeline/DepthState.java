@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject4Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORM;
@@ -45,6 +46,8 @@ public class DepthState {
     public MATRIX matrix;
 
     public String instanceName;
+    
+    public String className;
 
     public ColorTransform colorTransForm;
 
@@ -103,6 +106,7 @@ public class DepthState {
         matrix = obj.matrix;
         instanceName = obj.instanceName;
         colorTransForm = obj.colorTransForm;
+        className = obj.className;
         cacheAsBitmap = obj.cacheAsBitmap;
         blendMode = obj.blendMode;
         filters = obj.filters;
@@ -142,10 +146,23 @@ public class DepthState {
             return new PlaceObject2Tag(swf, false, depth, characterId, matrix, cxForm, ratio, instanceName, clipDepth, clipActions);
         } else if (minPlaceObjectNum == 3) {
             CXFORMWITHALPHA cxForm = colorTransForm == null ? null : new CXFORMWITHALPHA(colorTransForm);
-            return new PlaceObject3Tag(swf, false, depth, null/*todo: className*/, characterId, matrix, cxForm, ratio, instanceName, clipDepth, filters, blendMode, cacheAsBitmap ? 1 : 0, isVisible ? 1 : 0, backGroundColor, clipActions, hasImage);
+            return new PlaceObject3Tag(swf, false, depth, className, characterId, matrix, cxForm, ratio, instanceName, clipDepth, filters, blendMode, cacheAsBitmap ? 1 : 0, isVisible ? 1 : 0, backGroundColor, clipActions, hasImage);
         }
 
         CXFORMWITHALPHA cxForm = colorTransForm == null ? null : new CXFORMWITHALPHA(colorTransForm);
-        return new PlaceObject4Tag(swf, false, depth, null/*todo: className*/, characterId, matrix, cxForm, ratio, instanceName, clipDepth, filters, blendMode, cacheAsBitmap ? 1 : 0, isVisible ? 1 : 0, backGroundColor, clipActions, null, hasImage);
+        return new PlaceObject4Tag(swf, false, depth, className, characterId, matrix, cxForm, ratio, instanceName, clipDepth, filters, blendMode, cacheAsBitmap ? 1 : 0, isVisible ? 1 : 0, backGroundColor, clipActions, null, hasImage);
+    }
+    
+    public CharacterTag getCharacter() {
+        if (characterId == -1) {
+            
+            if (className != null) {
+                return swf.getCharacterByClass(className);
+            }
+            
+            return null;
+        }
+        
+        return swf.getCharacter(characterId);       
     }
 }
