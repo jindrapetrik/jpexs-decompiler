@@ -36,6 +36,7 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.JPanel;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
@@ -201,7 +202,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
             for (; start_f2 >= 1; start_f2--) {
                 DepthState ds = timeline.getFrame(start_f2 - 1).layers.get(d);
                 if (((dsStart == null) != (ds == null))
-                        || (ds != null && dsStart.characterId != ds.characterId)) {
+                        || (ds != null && (dsStart.characterId != ds.characterId || !Objects.equals(dsStart.className, ds.className)))) {
                     break;
                 }
             }
@@ -213,7 +214,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 DepthState flNext = f < max_f ? timeline.getFrame(f + 1).layers.get(d) : null;
                 DepthState flPrev = f > 0 ? timeline.getFrame(f - 1).layers.get(d) : null;
 
-                CharacterTag cht = fl == null ? null : timeline.swf.getCharacter(fl.characterId);
+                CharacterTag cht = fl == null ? null : fl.getCharacter();
                 boolean shapeTween = cht != null && (cht instanceof MorphShapeTag);
                 boolean motionTweenStart = !motionTween && (flNext != null && flNext.motionTween);
                 boolean motionTweenEnd = !motionTween && (flPrev != null && flPrev.motionTween);
@@ -230,7 +231,7 @@ public class TimelineBodyPanel extends JPanel implements MouseListener, KeyListe
                 if (fl == null) {
                     for (; f + 1 < timeline.getFrameCount(); f++) {
                         fl = timeline.getFrame(f + 1).layers.get(d);
-                        if (fl != null && fl.characterId != -1) {
+                        if (fl != null && fl.getCharacter() != null) {
                             break;
                         }
 

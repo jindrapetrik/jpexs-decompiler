@@ -391,12 +391,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     @Internal
     private Map<Integer, String> importedTagToExportNameMapping = new HashMap<>();
     
-
+    @Internal
+    private Map<String, Integer> classToCharacter = new HashMap<>();
+        
     private static final DecompilerPool decompilerPool = new DecompilerPool();
 
     @Internal
     private AbcIndexing abcIndex;
-
+        
     private static AbcIndexing playerGlobalAbcIndex;
 
     private static AbcIndexing airGlobalAbcIndex;
@@ -737,6 +739,14 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     public CharacterTag getCharacter(int characterId) {
         return getCharacters().get(characterId);
+    }
+    
+    public CharacterTag getCharacterByClass(String className) {
+        if (!classToCharacter.containsKey(className)) {
+            return null;
+        }
+        int charId = classToCharacter.get(className);
+        return getCharacter(charId);
     }
 
     public String getExportName(int characterId) {
@@ -1866,6 +1876,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                     ct.setClassName(classes.get(ct.getCharacterId()));
                 }
             }
+        }
+        
+        classToCharacter.clear();        
+        for (int ch:classes.keySet()) {
+            classToCharacter.put(classes.get(ch), ch);
         }
     }
 

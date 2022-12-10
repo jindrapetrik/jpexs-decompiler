@@ -317,7 +317,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
 
             if (ds != null) {
-                CharacterTag cht = swf.getCharacter(ds.characterId);
+                CharacterTag cht = ds.getCharacter();
                 if (cht != null) {
                     if (cht instanceof DrawableTag) {
                         RECT rect = timelined.getRect();
@@ -359,7 +359,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         if (ds != null) {
-            CharacterTag cht = swf.getCharacter(ds.characterId);
+            CharacterTag cht = ds.getCharacter();
             if (cht != null) {
                 if (cht instanceof DrawableTag) {
                     DrawableTag dt = (DrawableTag) cht;
@@ -1400,7 +1400,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
             DepthState ds = f.layers.get(selectedDepth);
             if (ds != null) {
-                CharacterTag cht = timelined.getTimeline().swf.getCharacter(ds.characterId);
+                CharacterTag cht = ds.getCharacter();
                 if (cht != null) {
                     debugLabel.setText(cht.getName());
                 }
@@ -1943,7 +1943,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         if (ds != null) {
-            CharacterTag cht = swf.getCharacter(ds.characterId);
+            CharacterTag cht = ds.getCharacter();
             if (cht != null) {
                 if (cht instanceof DrawableTag) {
                     DrawableTag dt = (DrawableTag) cht;
@@ -1971,7 +1971,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         if (ds != null) {
-            CharacterTag cht = swf.getCharacter(ds.characterId);
+            CharacterTag cht = ds.getCharacter();
             if (cht != null) {
                 if (cht instanceof DrawableTag) {
                     DrawableTag dt = (DrawableTag) cht;
@@ -2365,7 +2365,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
 
                     first = false;
-                    CharacterTag c = swf.getCharacter(ds.characterId);
+                    CharacterTag c = ds.getCharacter();
                     ret.append(c.toString());
                     if (ds.depth > 0) {
                         ret.append(" ");

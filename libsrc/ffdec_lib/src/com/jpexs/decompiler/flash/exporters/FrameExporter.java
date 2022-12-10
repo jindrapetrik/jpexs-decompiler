@@ -737,14 +737,14 @@ public class FrameExporter {
                     continue;
                 }
                 DepthState layer = frameObj.layers.get(i);
-                if (!timeline.swf.getCharacters().containsKey(layer.characterId)) {
-                    continue;
-                }
                 if (!layer.isVisible) {
                     continue;
                 }
 
-                CharacterTag character = timeline.swf.getCharacter(layer.characterId);
+                CharacterTag character = layer.getCharacter();
+                if (character == null) {
+                    continue;
+                }
 
                 Matrix placeMatrix = new Matrix(layer.matrix);
                 placeMatrix.scaleX /= unitDivisor;
@@ -793,7 +793,7 @@ public class FrameExporter {
                             + ctrans.getRedMulti() + "," + ctrans.getGreenMulti() + "," + ctrans.getBlueMulti() + "," + ctrans.getAlphaMulti()
                             + "))";
                 }
-                result.append("\t\t\tplace(\"").append(SWF.getTypePrefix(character)).append(layer.characterId).append("\",canvas,ctx,[").append(placeMatrix.scaleX).append(",")
+                result.append("\t\t\tplace(\"").append(SWF.getTypePrefix(character)).append(layer.getCharacter().getCharacterId()).append("\",canvas,ctx,[").append(placeMatrix.scaleX).append(",")
                         .append(placeMatrix.rotateSkew0).append(",")
                         .append(placeMatrix.rotateSkew1).append(",")
                         .append(placeMatrix.scaleY).append(",")

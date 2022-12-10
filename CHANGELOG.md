@@ -40,6 +40,7 @@ All notable changes to this project will be documented in this file.
 - Clone tag
 - Hide freetransform button in readonly mode
 - Maintain export name/class on imported tags
+- Classnames in PlaceObject
 
 ### Changed
 - Quick search needs minimum of 3 characters
