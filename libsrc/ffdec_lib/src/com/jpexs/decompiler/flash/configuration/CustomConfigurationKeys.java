@@ -9,4 +9,5 @@ public class CustomConfigurationKeys {
     public static final String KEY_LAST_SELECTED_PATH_TAGLIST = "lastSelectedPath.taglist";
     public static final String KEY_CHARSET = "charset";
     public static final String KEY_LIBRARY = "library";    
+    public static final String KEY_LOADED_IMPORT_ASSETS = "loadedImportAssets";
 }

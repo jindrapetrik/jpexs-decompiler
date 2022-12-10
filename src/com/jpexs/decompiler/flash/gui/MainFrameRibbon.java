@@ -157,7 +157,7 @@ public final class MainFrameRibbon extends AppRibbonFrame {
 
                 }
 
-                boolean closeResult = panel.closeAll(true);
+                boolean closeResult = panel.closeAll(true, true);
                 if (closeResult) {
                     Main.exit();
                 }
