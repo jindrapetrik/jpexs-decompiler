@@ -307,22 +307,18 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return false;
         }
 
-        if (openable != null) {
-            boolean result = Main.closeAll(false);
-            if (result) {
-                openable = null;
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        System.gc();
-                    }
-                }, 1000);
-            }
-            return result;
+        boolean result = Main.closeAll(false);
+        if (result) {
+            openable = null;
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    System.gc();
+                }
+            }, 1000);
         }
-
-        return false;
+        return result;
     }
 
     protected void importTextActionPerformed(ActionEvent evt) {
