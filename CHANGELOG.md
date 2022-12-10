@@ -38,6 +38,7 @@ All notable changes to this project will be documented in this file.
 - Hide various actions for imported tags
 - Clone tag
 - Hide freetransform button in readonly mode
+- Maintain export name/class on imported tags
 
 ### Changed
 - Quick search needs minimum of 3 characters

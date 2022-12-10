@@ -1550,7 +1550,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                     chtCopy = cht.cloneTag();
                                     CharacterIdTag ch = (CharacterIdTag) chtCopy;
                                     ch.setCharacterId(importedId);
-                                    setImportedDeep(cht, false);
+                                    setImportedDeep(chtCopy, false);
                                 
                                     tags.add(p + 1 + pos, chtCopy);
                                 } catch (InterruptedException | IOException ex) {
@@ -1560,6 +1560,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                 importedTagPos.add(ip);
                                 if (cht instanceof CharacterTag) {
                                     importedCharacters.add((CharacterTag)chtCopy);
+                                    ((CharacterTag)chtCopy).setExportName(((CharacterTag)cht).getExportName());
+                                    ((CharacterTag)chtCopy).setClassName(((CharacterTag)cht).getClassName());
                                 } else {
                                     chtCopy.setTimelined(this);                               
                                     chtCopy.setSwf(this);
@@ -1585,7 +1587,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                     chtCopy = cht.cloneTag();
                                     CharacterIdTag ch = (CharacterIdTag) chtCopy;
                                     ch.setCharacterId(importedId);
-                                    setImportedDeep(chtCopy, false);
+                                    setImportedDeep(chtCopy, false);                                    
                                 
                                     tags.add(p + 1 + pos, chtCopy);
                                 } catch (InterruptedException | IOException ex) {
@@ -1593,6 +1595,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                 }
                                 if (cht instanceof CharacterTag) {
                                     importedCharacters.add((CharacterTag)chtCopy);
+                                    ((CharacterTag)chtCopy).setExportName(((CharacterTag)cht).getExportName());
+                                    ((CharacterTag)chtCopy).setClassName(((CharacterTag)cht).getClassName());
                                 } else {
                                     chtCopy.setSwf(this);
                                     chtCopy.setTimelined(this);                                                                
