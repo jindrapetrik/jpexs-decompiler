@@ -45,6 +45,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Quick search needs minimum of 3 characters
+- AS1/2 deobfuscation - removing obfuscated declarations is now optional (default: off)
 
 ## [17.0.4] - 2022-12-02
 ### Fixed
