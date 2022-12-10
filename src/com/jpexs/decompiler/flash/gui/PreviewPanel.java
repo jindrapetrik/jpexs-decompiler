@@ -895,11 +895,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeImagePanel.selectDepth(tag.getDepth());
         parametersPanel.setVisible(false);
         placeEditButton.setVisible(!tag.isReadOnly() && !readOnly); 
-        placeFreeTransformButton.setVisible(!tag.isReadOnly() && !readOnly);
         placeEditButton.setEnabled(true);
         placeSaveButton.setVisible(false);
         placeCancelButton.setVisible(false);
-        placeFreeTransformButton.setVisible(!readOnly);
+        placeFreeTransformButton.setVisible(!tag.isReadOnly() && !readOnly);
     }
 
     public void setImageReplaceButtonVisible(boolean showImage, boolean showAlpha, boolean showShape, boolean showSound) {
