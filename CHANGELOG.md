@@ -41,6 +41,7 @@ All notable changes to this project will be documented in this file.
 - Hide freetransform button in readonly mode
 - Maintain export name/class on imported tags
 - Classnames in PlaceObject
+- [#1828] AS1/2 deobfuscation removing variable declarations
 
 ### Changed
 - Quick search needs minimum of 3 characters
@@ -2729,6 +2730,7 @@ All notable changes to this project will be documented in this file.
 [#1181]: https://www.free-decompiler.com/flash/issues/1181
 [#1897]: https://www.free-decompiler.com/flash/issues/1897
 [#1006]: https://www.free-decompiler.com/flash/issues/1006
+[#1828]: https://www.free-decompiler.com/flash/issues/1828
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1895]: https://www.free-decompiler.com/flash/issues/1895
 [#1896]: https://www.free-decompiler.com/flash/issues/1896
@@ -2806,7 +2808,6 @@ All notable changes to this project will be documented in this file.
 [#1838]: https://www.free-decompiler.com/flash/issues/1838
 [#1847]: https://www.free-decompiler.com/flash/issues/1847
 [#1829]: https://www.free-decompiler.com/flash/issues/1829
-[#1828]: https://www.free-decompiler.com/flash/issues/1828
 [#1771]: https://www.free-decompiler.com/flash/issues/1771
 [#1695]: https://www.free-decompiler.com/flash/issues/1695
 [#1752]: https://www.free-decompiler.com/flash/issues/1752

@@ -107,16 +107,18 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         boolean changed = true;
         boolean useVariables = false;
         while (changed) {
-            changed = removeGetTimes(fastActions);
-            changed |= removeObfuscationIfs(fastActions, fakeFunctions, useVariables);
-            changed |= removeObfuscatedUnusedVariables(fastActions);
-
-            actions.setActions(fastActions.toActionList());
-            changed |= ActionListReader.fixConstantPools(null, actions);
-            if (!changed && !useVariables) {
-                useVariables = true;
-                changed = true;
+            while (changed) {
+                changed = removeGetTimes(fastActions);
+                changed |= removeObfuscationIfs(fastActions, fakeFunctions, useVariables);
+                actions.setActions(fastActions.toActionList());
+                changed |= ActionListReader.fixConstantPools(null, actions);
+                if (!changed && !useVariables) {
+                    useVariables = true;
+                    changed = true;
+                }
             }
+            changed = removeObfuscatedUnusedVariables(fastActions);
+            actions.setActions(fastActions.toActionList());
         }
     }
 
