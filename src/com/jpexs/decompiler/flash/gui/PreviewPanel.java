@@ -894,7 +894,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeImagePanel.setTimelined(((Tag) tag).getTimelined(), ((Tag) tag).getSwf(), frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true);
         placeImagePanel.selectDepth(tag.getDepth());
         parametersPanel.setVisible(false);
-        placeEditButton.setVisible(!tag.isReadOnly() && !readOnly);
+        placeEditButton.setVisible(!tag.isReadOnly() && !readOnly); 
+        placeFreeTransformButton.setVisible(!tag.isReadOnly() && !readOnly);
         placeEditButton.setEnabled(true);
         placeSaveButton.setVisible(false);
         placeCancelButton.setVisible(false);
