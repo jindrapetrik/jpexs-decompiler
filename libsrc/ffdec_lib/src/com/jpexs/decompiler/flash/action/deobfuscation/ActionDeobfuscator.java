@@ -117,8 +117,9 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
                     changed = true;
                 }
             }
-            changed = removeObfuscatedUnusedVariables(fastActions);
-            actions.setActions(fastActions.toActionList());
+            //Commented out, as it may remove variables used in another DoAction or inside functions.
+            //changed = removeObfuscatedUnusedVariables(fastActions);
+            //actions.setActions(fastActions.toActionList());
         }
     }
 
@@ -320,6 +321,7 @@ public class ActionDeobfuscator extends SWFDecompilerAdapter {
         return ret;
     }
 
+    //currently unused
     private boolean removeObfuscatedUnusedVariables(FastActionList actions) throws InterruptedException {
         if (actions.isEmpty()) {
             return false;
