@@ -512,6 +512,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         buttonsPanel.add(imageFreeTransformButton);
         buttonsPanel.add(imageFreeTransformSaveButton);
         buttonsPanel.add(imageFreeTransformCancelButton);
+        
+        imageFreeTransformSaveButton.setVisible(false);
+        imageFreeTransformCancelButton.setVisible(false);
 
         previewCnt.add(imagePlayControls = new PlayerControls(mainPanel, imagePanel, buttonsPanel), BorderLayout.SOUTH);
         imagePlayControls.setMedia(imagePanel);
@@ -1357,7 +1360,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 || genericSaveButton.isVisible()
                 || metadataSaveButton.isVisible()
                 || placeSaveButton.isVisible()
-                || fontPanel.isEditing();
+                || fontPanel.isEditing()
+                || imageFreeTransformSaveButton.isVisible();
     }
 
     public void selectImageDepth(int depth) {
