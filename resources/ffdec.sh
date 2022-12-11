@@ -1,110 +1,89 @@
 #!/usr/bin/env bash
 
-# Set following to higher value if you want more memory
-# You need 64 bit OS and 64 bit java to set it to higher values
-MEMORY=1024m
+MEMORY=1024M
 
-# Based on Freerapid Downloader startup script - created by Petris 2009
+REQ_JAVA_VERSION_MAJOR=1
+REQ_JAVA_VERSION_MINOR=8
+REQ_JAVA_VERSION_PATCH=0
 
-# FFDec requires Oracle Java 8
-# Look for java in these directories
-LOOKUP_JRE_DIRS="/usr/lib/jvm/* /opt/java* /opt/jre*"
-# Required version
-REQ_JVER1=1
-REQ_JVER2=8
-REQ_JVER3=0
-REQ_JVER4=0
+check_java () {
+    local JAVA_PATH="$1"
+    local REQ_MAJOR=$2
+    local REQ_MINOR=$3
+    local REQ_PATCH=$4
 
-search_jar_file() {
-    JAR_FILE_CANDIDATES='./ffdec.jar ../dist/ffdec.jar /usr/share/java/ffdec.jar /usr/share/java/ffdec/ffdec.jar /usr/share/java/jpexs-decompiler/ffdec.jar'
-    for f in $JAR_FILE_CANDIDATES ; do
-        [ -r "$f" ] && JAR_FILE="$f" && return 0
+    local JAVA_VERSION_RAW="$($JAVA_PATH --version | grep -E 'openjdk [0-9][0-9]?\.[0-9][0-9]?\.[0-9][0-9]?' | sed 's/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]//g' | sed 's/openjdk//g' | sed 's/ //g')"
+
+    local JAVA_VERSION_MAJOR_STR="$(echo "$JAVA_VERSION_RAW" | sed -r 's/([0-9][0-9]?).[0-9][0-9]?.[0-9][0-9]?/\1/g')"
+    local JAVA_VERSION_MINOR_STR="$(echo "$JAVA_VERSION_RAW" | sed -r 's/[0-9][0-9]?.([0-9][0-9]?).[0-9][0-9]?/\1/g')"
+    local JAVA_VERSION_PATCH_STR="$(echo "$JAVA_VERSION_RAW" | sed -r 's/[0-9][0-9]?.[0-9][0-9]?.([0-9][0-9]?)/\1/g')"
+
+    local JAVA_VERSION_MAJOR=$(expr $JAVA_VERSION_MAJOR_STR + 0)
+    local JAVA_VERSION_MINOR=$(expr $JAVA_VERSION_MINOR_STR + 0)
+    local JAVA_VERSION_PATCH=$(expr $JAVA_VERSION_PATCH_STR + 0)
+
+    if [[ $JAVA_VERSION_MAJOR -lt $REQ_MAJOR ]]; then return 1; fi
+    if [[ $JAVA_VERSION_MINOR -lt $REQ_MINOR ]]; then return 1; fi
+    if [[ $JAVA_VERSION_PATCH -lt $REQ_PATCH ]]; then return 1; fi
+
+    return 0
+}
+
+get_java_version () {
+    local JAVA_PATH="$1"
+    JAVA_VERSION="$($JAVA_PATH --version | grep -E 'openjdk [0-9][0-9]?\.[0-9][0-9]?\.[0-9][0-9]?' | sed 's/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]//g' | sed 's/openjdk//g' | sed 's/ //g')"
+}
+
+find_jar () {
+    local JAR_FILE_CANDIDATES="./ffdec.jar ../dist/ffdec.jar /usr/share/java/ffdec.jar /usr/share/java/ffdec/ffdec.jar /usr/share/java/jpexs-decompiler/ffdec.jar"
+    
+    for JAR in ${JAR_FILE_CANDIDATES[@]}; do
+        if [[ -f "$JAR" ]]; then
+            JAR_PATH="$(realpath "$JAR")"
+            return 0
+        fi
     done
-    echo Unable to find ffdec.jar in the following locations:
-    echo "${JAR_FILE_CANDIDATES// /$'\n'}"
+
     return 1
 }
 
-check_java_version () {
-	JVER1=`echo $JAVA_VERSION_OUTPUT | sed 's/java version "\([0-9]*\)\.[0-9]*\.[0-9]*_[0-9]*".*/\1/'`
-	JVER2=`echo $JAVA_VERSION_OUTPUT | sed 's/java version "[0-9]*\.\([0-9]*\)\.[0-9]*_[0-9]*".*/\1/'`
-	JVER3=`echo $JAVA_VERSION_OUTPUT | sed 's/java version "[0-9]*\.[0-9]*\.\([0-9]*\)_[0-9]*".*/\1/'`
-	JVER4=`echo $JAVA_VERSION_OUTPUT | sed 's/java version "[0-9]*\.[0-9]*\.[0-9]*_\([0-9]*\)".*/\1/'`
+DEFAULT_JAVA="$(dirname "$(dirname "$(realpath "$(which java)")")")"
+LOOKUPS="$DEFAULT_JAVA /usr/lib/jvm/* /opt/java* /opt/jre*"
+JAVA=""
 
-	if [ $JVER1 -gt $REQ_JVER1 ]; then
-		return 0
-	elif [ $JVER1 -lt $REQ_JVER1 ]; then
-		return 1
-	fi
+for JRE in ${LOOKUPS[@]}; do
+    JAVA_PATH="$JRE/bin/java"
+    IS_OK=$(check_java $JAVA_PATH $REQ_JAVA_VERSION_MAJOR $REQ_JAVA_VERSION_MINOR $REQ_JAVA_VERSION_PATCH)
 
-	if [ $JVER2 -gt $REQ_JVER2 ]; then
-		return 0
-	elif [ $JVER2 -lt $REQ_JVER2 ]; then
-		return 1
-	fi
-
-	if [ $JVER3 -gt $REQ_JVER3 ]; then
-		return 0
-	elif [ $JVER3 -lt $REQ_JVER3 ]; then
-		return 1
-	fi
-
-	if [ $JVER4 -lt $REQ_JVER4 ]; then
-		return 1
-	fi
-
-	return 0
-}
-
-# Handle symlinks
-PROGRAM="$0"
-while [ -L "$PROGRAM" ]; do
-	PROGRAM=`readlink -f "$PROGRAM"`
-done
-pushd "`dirname \"$PROGRAM\"`" > /dev/null
-
-search_jar_file || exit 1
-
-if [ ${JAR_FILE:0:1} != '/' ] ; then
-    JAR_FILE=`pwd`/$JAR_FILE
-fi
-
-popd > /dev/null
-
-args=(-Djava.net.preferIPv4Stack=true -Xmx$MEMORY -jar $JAR_FILE "$@")
-
-if [ "`uname`" = "Darwin" ]; then
-	args=(-Xdock:name=FFDec -Xdock:icon=icon.png "${args[@]}")
-fi
-
-# Check default java
-if [ -x "`which java`" ]; then
-	JAVA_VERSION_OUTPUT=`java -version 2>&1`
-	JAVA_VERSION_OUTPUT=`echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/'`
-	check_java_version && exec java "${args[@]}"
-fi
-
-# Test other possible Java locations
-for JRE_PATH in $LOOKUP_JRE_DIRS; do
-	if [ -x "$JRE_PATH/bin/java" ]; then
-		JAVA_VERSION_OUTPUT=`"$JRE_PATH/bin/java" -version 2>&1`
-		JAVA_VERSION_OUTPUT=`echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/'`
-		check_java_version && {
-			export JRE_PATH
-			exec $JRE_PATH/bin/java "${args[@]}"
-		}
-	fi
+    if [[ $IS_OK -eq 0 ]]; then
+        JAVA="$JAVA_PATH"
+        break
+    fi
 done
 
-# Failed
-if [ -x "`which xmessage`" ]; then
-	xmessage -nearmouse -file - <<EOF
-Failed to find a suitable java version.
-Required: $REQ_JVER1.$REQ_JVER2.$REQ_JVER3_$REQ_JVER4 or newer.
-EOF
-else
-	echo Failed to find a suitable java version.
-	echo Required: $REQ_JVER1.$REQ_JVER2.$REQ_JVER3_$REQ_JVER4 or newer.
+if [[ "$JAVA" == "" ]]; then
+    echo "Unable to find a suitable Java version!"
+    exit 1
 fi
 
-exit 1
+get_java_version "$JAVA"
+
+echo "Using Java version: $JAVA_VERSION"
+
+find_jar
+FOUND_JAR_FILE="$(find_jar)"
+
+if [[ $FOUND_JAR_FILE -eq 1 ]]; then
+    echo "Unable to find ffdec.jar!"
+    exit 1
+fi
+
+PROGRAM_ARGS=(-Djava.net.preferIPv4Stack=true -Xmx$MEMORY)
+
+if [ "$(uname)" = "Darwin" ]; then
+	PROGRAM_ARGS=(-Xdock:name=FFDec -Xdock:icon=icon.png "${args[@]}")
+fi
+
+echo "Starting /.../$(basename "$JAVA") ${PROGRAM_ARGS[@]} -jar /.../$(basename "$JAR_PATH") $@"
+
+exec "$JAVA" ${PROGRAM_ARGS[@]} -jar $JAR_PATH $@
