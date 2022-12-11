@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - Experimental option to fix conflation artifacts in antialising (slow)
 - Option to disable autoplay of sounds (DefineSound)
 - [#1181] Remembering choice of loading assets via importassets tag
+- [#1900] Free transform whole sprites
 
 ### Fixed
 - [#1897] Close menu button without selecting specific item
@@ -2729,6 +2730,7 @@ All notable changes to this project will be documented in this file.
 [#1697]: https://www.free-decompiler.com/flash/issues/1697
 [#1893]: https://www.free-decompiler.com/flash/issues/1893
 [#1181]: https://www.free-decompiler.com/flash/issues/1181
+[#1900]: https://www.free-decompiler.com/flash/issues/1900
 [#1897]: https://www.free-decompiler.com/flash/issues/1897
 [#1006]: https://www.free-decompiler.com/flash/issues/1006
 [#1828]: https://www.free-decompiler.com/flash/issues/1828

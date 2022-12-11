@@ -16,11 +16,13 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFHeader;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.PreviewExporter;
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
@@ -29,19 +31,27 @@ import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
+import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
+import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.ProductInfoTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
+import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
+import com.jpexs.decompiler.flash.tags.base.BoundedTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.TagScript;
+import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.BorderLayout;
@@ -67,8 +77,13 @@ import java.io.StringWriter;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -98,7 +113,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private static final String GENERIC_TAG_CARD = "GENERICTAG";
 
     private static final String BINARY_TAG_CARD = "BINARYTAG";
-    
+
     private static final String PRODUCTINFO_TAG_CARD = "PRODUCTINFOTAG";
 
     private static final String UNKNOWN_TAG_CARD = "UNKNOWNTAG";
@@ -141,11 +156,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     // Image tag buttons
     private JButton replaceShapeButton;
-    
+
     private JButton replaceShapeUpdateBoundsButton;
-    
+
     private JButton replaceSoundButton;
-    
+
     private JButton replaceImageButton;
 
     private JButton replaceImageAlphaButton;
@@ -210,13 +225,17 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     //used only for flash player
     private TreeItem currentItem;
-    
+
     private JLabel productValueLabel = new JLabel();
     private JLabel editionValueLabel = new JLabel();
     private JLabel versionValueLabel = new JLabel();
     private JLabel buildValueLabel = new JLabel();
     private JLabel compileDateValueLabel = new JLabel();
-        
+
+    private JButton imageFreeTransformButton;
+
+    private JButton imageFreeTransformSaveButton;
+    private JButton imageFreeTransformCancelButton;
 
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
@@ -276,7 +295,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         parametersPanel.add(displayWithPreview, BorderLayout.CENTER);
         setRightComponent(parametersPanel);
     }
-    
+
     private JPanel createImageButtonsPanel() {
         replaceShapeButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replaceshape16"));
         replaceShapeButton.setMargin(new Insets(3, 3, 3, 10));
@@ -287,7 +306,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
         });
         replaceShapeButton.setVisible(false);
-        
+
         replaceShapeUpdateBoundsButton = new JButton(mainPanel.translate("button.replaceNoFill"), View.getIcon("replaceshape16"));
         replaceShapeUpdateBoundsButton.setMargin(new Insets(3, 3, 3, 10));
         replaceShapeUpdateBoundsButton.addActionListener(new ActionListener() {
@@ -297,7 +316,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
         });
         replaceShapeUpdateBoundsButton.setVisible(false);
-        
+
         replaceSoundButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replacesound16"));
         replaceSoundButton.setMargin(new Insets(3, 3, 3, 10));
         replaceSoundButton.addActionListener(new ActionListener() {
@@ -307,7 +326,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
         });
         replaceSoundButton.setVisible(false);
-        
+
         replaceImageButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replaceimage16"));
         replaceImageButton.setMargin(new Insets(3, 3, 3, 10));
         replaceImageButton.addActionListener(new ActionListener() {
@@ -429,7 +448,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
             JPanel flashPlayPanel2 = new JPanel(new BorderLayout());
             flashPlayPanel2.add(flashPlayPanel, BorderLayout.CENTER);
-            flashPlayPanel2.add(new PlayerControls(mainPanel, flashPanel), BorderLayout.SOUTH);
+            flashPlayPanel2.add(new PlayerControls(mainPanel, flashPanel, null), BorderLayout.SOUTH);
             leftComponent = flashPlayPanel2;
         } else {
             JPanel swtPanel = new JPanel(new GridBagLayout());
@@ -475,7 +494,26 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imagePanel = new ImagePanel();
         imagePanel.setLoop(Configuration.loopMedia.get());
         previewCnt.add(imagePanel, BorderLayout.CENTER);
-        previewCnt.add(imagePlayControls = new PlayerControls(mainPanel, imagePanel), BorderLayout.SOUTH);
+
+        JPanel buttonsPanel = new JPanel(new FlowLayout());
+
+        imageFreeTransformButton = new JButton(mainPanel.translate("button.freetransform"), View.getIcon("freetransform16"));
+        imageFreeTransformButton.setMargin(new Insets(3, 3, 3, 10));
+        imageFreeTransformButton.addActionListener(this::freeTransformImageButtonActionPerformed);
+        
+        imageFreeTransformSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
+        imageFreeTransformSaveButton.setMargin(new Insets(3, 3, 3, 10));
+        imageFreeTransformSaveButton.addActionListener(this::saveImageFreeTransformButtonActionPerformed);
+
+        imageFreeTransformCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
+        imageFreeTransformCancelButton.setMargin(new Insets(3, 3, 3, 10));
+        imageFreeTransformCancelButton.addActionListener(this::cancelImageFreeTransformButtonActionPerformed);
+        
+        buttonsPanel.add(imageFreeTransformButton);
+        buttonsPanel.add(imageFreeTransformSaveButton);
+        buttonsPanel.add(imageFreeTransformCancelButton);
+
+        previewCnt.add(imagePlayControls = new PlayerControls(mainPanel, imagePanel, buttonsPanel), BorderLayout.SOUTH);
         imagePlayControls.setMedia(imagePanel);
         previewPanel.add(previewCnt, BorderLayout.CENTER);
         JLabel prevIntLabel = new HeaderLabel(mainPanel.translate("swfpreview.internal"));
@@ -534,7 +572,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         binaryCard.add(createBinaryButtonsPanel(), BorderLayout.SOUTH);
         return binaryCard;
     }
-    
+
     private JPanel createProductInfoCard() {
         JPanel productInfoCard = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JPanel tablePanel = new JPanel(new GridBagLayout());
@@ -550,45 +588,45 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         buildLabel.setHorizontalAlignment(JLabel.RIGHT);
         JLabel compileDateLabel = new JLabel(AppStrings.translate("productinfo.compileDate"));
         compileDateLabel.setHorizontalAlignment(JLabel.RIGHT);
-        
-        c.insets = new Insets(3,3,3,3);
-        
+
+        c.insets = new Insets(3, 3, 3, 3);
+
         c.weightx = 1;
         c.weighty = 1;
-        
+
         c.gridy = 0;
-        
-        c.gridx = 0;                
+
+        c.gridx = 0;
         tablePanel.add(productLabel, c);
         c.gridx = 1;
         tablePanel.add(productValueLabel, c);
-        
+
         c.gridy++;
-        c.gridx = 0;        
+        c.gridx = 0;
         tablePanel.add(editionLabel, c);
         c.gridx = 1;
         tablePanel.add(editionValueLabel, c);
-        
+
         c.gridy++;
-        c.gridx = 0;        
+        c.gridx = 0;
         tablePanel.add(versionLabel, c);
         c.gridx = 1;
         tablePanel.add(versionValueLabel, c);
-        
+
         c.gridy++;
-        c.gridx = 0;        
+        c.gridx = 0;
         tablePanel.add(buildLabel, c);
         c.gridx = 1;
         tablePanel.add(buildValueLabel, c);
-        
+
         c.gridy++;
-        c.gridx = 0;        
+        c.gridx = 0;
         tablePanel.add(compileDateLabel, c);
         c.gridx = 1;
         tablePanel.add(compileDateValueLabel, c);
-        
+
         productInfoCard.add(tablePanel);
-        
+
         return productInfoCard;
     }
 
@@ -617,7 +655,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeImagePanel = new ImagePanel();
         //imagePanel.setLoop(Configuration.loopMedia.get());
         previewCnt.add(placeImagePanel, BorderLayout.CENTER);
-        PlayerControls placeImagePlayControls = new PlayerControls(mainPanel, placeImagePanel);
+        PlayerControls placeImagePlayControls = new PlayerControls(mainPanel, placeImagePanel, null);
         previewCnt.add(placeImagePlayControls, BorderLayout.SOUTH);
         placeImagePlayControls.setMedia(placeImagePanel);
         previewPanel.add(previewCnt, BorderLayout.CENTER);
@@ -686,10 +724,16 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         showCardLeft(FLASH_VIEWER_CARD);
     }
 
-    public void showImagePanel(Timelined timelined, SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable) {
+    public void showImagePanel(Timelined timelined, SWF swf, int frame, boolean showObjectsUnderCursor, boolean autoPlay, boolean frozen, boolean alwaysDisplay, boolean muted, boolean mutable, boolean allowFreeTransform) {
         showCardLeft(DRAW_PREVIEW_CARD);
         parametersPanel.setVisible(false);
         imagePlayControls.setMedia(imagePanel);
+        imageFreeTransformButton.setVisible(allowFreeTransform);
+        if ((timelined instanceof Tag) && ((Tag) timelined).isReadOnly()) {
+            imageFreeTransformButton.setVisible(false);
+        }
+        imageFreeTransformSaveButton.setVisible(false);
+        imageFreeTransformCancelButton.setVisible(false);
         imagePanel.setTimelined(timelined, swf, frame, showObjectsUnderCursor, autoPlay, frozen, alwaysDisplay, muted, mutable);
     }
 
@@ -728,7 +772,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private void showFontPage(FontTag fontTag) {
         if (!mainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            showImagePanel(MainPanel.makeTimelined(fontTag), fontTag.getSwf(), fontPageNum, true, true, true, true, true, false);
+            showImagePanel(MainPanel.makeTimelined(fontTag), fontTag.getSwf(), fontPageNum, true, true, true, true, true, false, false);
         }
     }
 
@@ -746,7 +790,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void showTextPanel(TextTag textTag) {
         if (!mainPanel.isAdobeFlashPlayerEnabled() /*|| ft instanceof GFxDefineCompactedFont*/) {
-            showImagePanel(MainPanel.makeTimelined(textTag), textTag.getSwf(), 0, true, true, true, true, true, false);
+            showImagePanel(MainPanel.makeTimelined(textTag), textTag.getSwf(), 0, true, true, true, true, true, false, false);
         }
 
         showCardRight(CARDTEXTPANEL);
@@ -816,7 +860,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         binaryPanel.setBinaryData(binaryDataTag);
         parametersPanel.setVisible(false);
     }
-    
+
     public void showProductInfoPanel(ProductInfoTag productInfoTag) {
         showCardLeft(PRODUCTINFO_TAG_CARD);
         if (productInfoTag.productID == 0L) {
@@ -830,7 +874,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         } else {
             productValueLabel.setText("(" + productInfoTag.productID + ")");
         }
-        
+
         if (productInfoTag.edition == 0L) {
             editionValueLabel.setText("Developer Edition");
         } else if (productInfoTag.edition == 1L) {
@@ -848,16 +892,16 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         } else {
             editionValueLabel.setText("(" + productInfoTag.productID + ")");
         }
-        
+
         versionValueLabel.setText("" + productInfoTag.majorVersion + "." + productInfoTag.minorVersion);
         BigInteger buildBigInteger = new BigInteger("" + productInfoTag.buildHigh);
         buildBigInteger = buildBigInteger.shiftLeft(32).add(new BigInteger("" + productInfoTag.buildLow));
         buildValueLabel.setText("" + buildBigInteger);
-        
-        long compilationDate = (productInfoTag.compilationDateHigh << 32) + productInfoTag.compilationDateLow;           
+
+        long compilationDate = (productInfoTag.compilationDateHigh << 32) + productInfoTag.compilationDateLow;
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
-        
+
         compileDateValueLabel.setText(df.format(new Date(compilationDate)) + " UTC");
         parametersPanel.setVisible(false);
     }
@@ -887,14 +931,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         showCardLeft(PLACE_TAG_CARD);
         placeTag = tag;
         oldMatrix = tag.getMatrix();
-        placeSplitPane.setDividerLocation((int) (0.6 * this.getWidth()));        
+        placeSplitPane.setDividerLocation((int) (0.6 * this.getWidth()));
         placeGenericPanel.setVisible(!readOnly);
         placeGenericPanel.setEditMode(false, tag);
         placeImagePanel.selectDepth(-1);
         placeImagePanel.setTimelined(((Tag) tag).getTimelined(), ((Tag) tag).getSwf(), frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true);
         placeImagePanel.selectDepth(tag.getDepth());
         parametersPanel.setVisible(false);
-        placeEditButton.setVisible(!tag.isReadOnly() && !readOnly); 
+        placeEditButton.setVisible(!tag.isReadOnly() && !readOnly);
         placeEditButton.setEnabled(true);
         placeSaveButton.setVisible(false);
         placeCancelButton.setVisible(false);
@@ -916,7 +960,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         prevFontsButton.setVisible(false);
         nextFontsButton.setVisible(false);
     }
-    
+
     private void createAndRunTempSwf(TreeItem treeItem) {
         try {
             File extTempFile = File.createTempFile("ffdec_viewext_", ".swf");
@@ -1103,7 +1147,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             genericSaveButton.setVisible(false);
             genericCancelButton.setVisible(false);
             genericTagPanel.setEditMode(false, null);
-            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), tag);            
+            mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), tag);
         }
     }
 
@@ -1131,7 +1175,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 SWF swf = tag.getSwf();
                 tag.getTimelined().resetTimeline();
                 mainPanel.refreshTree(swf);
-                hilightTag = tag;                
+                hilightTag = tag;
             }
             placeGenericPanel.setEditMode(false, null);
         }
@@ -1166,6 +1210,105 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeFreeTransformButton.setVisible(false);
         placeSaveButton.setVisible(true);
         placeCancelButton.setVisible(true);
+    }
+
+    private void saveImageFreeTransformButtonActionPerformed(ActionEvent evt) {
+        Matrix matrix = new Matrix(imagePanel.getNewMatrix());        
+        
+        imagePanel.freeTransformDepth(-1);        
+        imageFreeTransformButton.setVisible(true);
+        imageFreeTransformCancelButton.setVisible(false);
+        imageFreeTransformSaveButton.setVisible(false);
+        
+        DefineSpriteTag item = (DefineSpriteTag)mainPanel.getCurrentTree().getCurrentTreeItem();
+        for (Tag t:item.getTags()) {
+            if (t instanceof PlaceObjectTypeTag) {
+                PlaceObjectTypeTag pt = (PlaceObjectTypeTag)t;
+                MATRIX placeMatrix = pt.getMatrix();
+                if (placeMatrix != null) {
+                    pt.setMatrix(new Matrix(placeMatrix).preConcatenate(matrix).toMATRIX());
+                    pt.setModified(true);                    
+                }
+            }
+        }
+        item.resetTimeline();
+                
+        mainPanel.reload(true);        
+    } 
+    
+    private void cancelImageFreeTransformButtonActionPerformed(ActionEvent evt) {
+        imagePanel.freeTransformDepth(-1);
+        imageFreeTransformButton.setVisible(true);
+        imageFreeTransformCancelButton.setVisible(false);
+        imageFreeTransformSaveButton.setVisible(false);
+        mainPanel.reload(true);        
+    } 
+    
+    private void freeTransformImageButtonActionPerformed(ActionEvent evt) {
+        TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
+        if (item == null) {
+            return;
+        }
+
+        //previewPanel.showImagePanel(fn.timeline.timelined, swf, fn.frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false);
+        DefineSpriteTag sprite = (DefineSpriteTag) item;
+
+        SWF fSwf = new SWF(sprite.getSwf().getCharset());
+        fSwf.frameCount = 1;
+        fSwf.frameRate = sprite.getSwf().frameRate;
+        fSwf.displayRect = sprite.getSwf().getRect();//sprite.getRect();
+        CharacterTag character = sprite;
+        Set<Integer> needed = new LinkedHashSet<>();
+        character.getNeededCharactersDeep(needed);
+        needed.remove(sprite.getCharacterId());
+        needed.add(sprite.getCharacterId());
+
+        for (int n : needed) {
+            CharacterTag neededCharacter;
+            try {
+                neededCharacter = (CharacterTag) sprite.getSwf().getCharacter(n).cloneTag();
+            } catch (InterruptedException | IOException ex) {
+                Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
+                return;
+            }
+            neededCharacter.setSwf(fSwf);
+            neededCharacter.setTimelined(fSwf);
+            fSwf.addTag(neededCharacter);
+        }
+
+        
+        DefineSpriteTag sprite2 = new DefineSpriteTag(fSwf);
+        sprite2.frameCount = 1;
+        PlaceObject3Tag placeTag = new PlaceObject3Tag(fSwf);
+        placeTag.depth = 1;
+        placeTag.characterId = sprite.getCharacterId();
+        placeTag.placeFlagHasCharacter = true;
+
+        placeTag.matrix = new MATRIX();
+        placeTag.setTimelined(sprite2);
+        sprite2.addTag(placeTag);
+        ShowFrameTag showFrameTag = new ShowFrameTag(fSwf);
+        sprite2.addTag(showFrameTag);
+        
+        
+        placeTag = new PlaceObject3Tag(fSwf);
+        placeTag.depth = 1;
+        placeTag.characterId = sprite2.getCharacterId();
+        placeTag.placeFlagHasCharacter = true;
+
+        placeTag.matrix = new MATRIX();        
+        fSwf.addTag(placeTag);
+        placeTag.setTimelined(fSwf);
+        showFrameTag = new ShowFrameTag(fSwf);
+        fSwf.addTag(showFrameTag);
+        showFrameTag.setTimelined(fSwf);
+
+        imagePanel.setTimelined(sprite2, fSwf, 0, true, true, true, true, true, false);
+        imagePanel.selectDepth(-1);
+        imagePanel.freeTransformDepth(placeTag.getDepth());
+        imageFreeTransformButton.setVisible(false);
+        imageFreeTransformSaveButton.setVisible(true);
+        imageFreeTransformCancelButton.setVisible(true);
     }
 
     private void cancelPlaceTagButtonActionPerformed(ActionEvent evt) {
