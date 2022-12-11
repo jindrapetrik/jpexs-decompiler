@@ -141,7 +141,7 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         underlinedFont = font.deriveFont(fontAttributes);
     }
 
-    public PlayerControls(final MainPanel mainPanel, MediaDisplay display) {
+    public PlayerControls(final MainPanel mainPanel, MediaDisplay display, JPanel middleButtonsPanel) {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -209,6 +209,9 @@ public class PlayerControls extends JPanel implements MediaDisplayListener {
         displayButtonsPanel.add(muteButton);
         
         graphicControls.add(displayButtonsPanel, BorderLayout.WEST);
+        if (middleButtonsPanel != null) {
+            graphicControls.add(middleButtonsPanel, BorderLayout.CENTER);
+        }
         graphicControls.add(graphicButtonsPanel, BorderLayout.EAST);
         graphicControls.setVisible(false);
 
