@@ -50,6 +50,7 @@ import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.RGB;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
+import com.jpexs.decompiler.flash.types.filters.BlendComposite;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Cache;
 import com.jpexs.helpers.Reference;
@@ -554,6 +555,38 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                         
                         g2.drawImage(img.getBufferedImage(), x, y, x + img.getWidth(), y + img.getHeight(), 0, 0, img.getWidth(), img.getHeight(), null);                        
+                        
+                        if (!(timelined instanceof SWF) && freeTransformDepth > -1) {
+                            
+                            int axisX = 0;
+                            int axisY = 0;
+                            double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;                            
+                            RECT timRect = timelined.getRectWithStrokes();
+                            axisX = rect.x - (int)(timRect.Xmin* zoomDouble/ SWF.unitDivisor);
+                            axisY = rect.y - (int)(timRect.Ymin* zoomDouble / SWF.unitDivisor );
+                            g2.setComposite(BlendComposite.Invert);                            
+                            g2.setPaint(new Color(255, 255, 255, 128));
+                            float dp;
+                            dp = -offsetPoint.y;
+                            while(dp<0) {
+                                dp+=10;
+                            }
+                            g2.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[]{5,5}, dp));
+                            GeneralPath p = new GeneralPath();
+                            p.moveTo(axisX, 0);
+                            p.lineTo(axisX, getHeight());
+                            g2.draw(p);
+                            dp = -offsetPoint.x;
+                            while(dp<0) {
+                                dp+=10;
+                            }
+                            g2.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[]{5,5}, dp));                            
+                            p = new GeneralPath();
+                            p.moveTo(0, axisY);
+                            p.lineTo(getWidth(), axisY);
+                            g2.draw(p);
+                            g2.setComposite(AlphaComposite.SrcOver);
+                        }
                     }
                 } finally {
                     if (g2 != null) {
@@ -2267,12 +2300,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (offsetY < 0) {
                 offsetY = -offsetY;
             }
+            viewRect.xMax = Math.max(viewRect.xMin, 0) + (iconPanel.getWidth() * SWF.unitDivisor / zoomDouble);// / zoomDouble);
+            viewRect.yMax = Math.max(viewRect.yMin, 0) + (iconPanel.getHeight() * SWF.unitDivisor / zoomDouble); // / zoomDouble);
+            
             viewRect.xMin -= offsetX;            
             viewRect.yMin -= offsetY;                        
             //viewRect.xMax = viewRect.xMin + (int) (iconPanel.getWidth() * SWF.unitDivisor / zoomDouble);
             //viewRect.yMax = viewRect.yMin + (int) (iconPanel.getHeight() * SWF.unitDivisor / zoomDouble);
-            viewRect.xMax = Math.max(viewRect.xMin, 0) + (int) (iconPanel.getWidth() * SWF.unitDivisor);// / zoomDouble);
-            viewRect.yMax = Math.max(viewRect.yMin, 0) + (int) (iconPanel.getHeight() * SWF.unitDivisor); // / zoomDouble);
             
         }
         return viewRect;
@@ -2423,25 +2457,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                            
                                                         
                             img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, timelined, renderContext, selectedDepth, freeTransformDepth, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2));
-                        }
-                        if (!(timelined instanceof SWF) && freeTransformDepth > -1) {
-                            
-                            int axisX = 0;
-                            int axisY = 0;
-                            
-                            axisX = realRect.x - (int)(rect.Xmin* zoomDouble/ SWF.unitDivisor);
-                            axisY = realRect.y - (int)(rect.Ymin* zoomDouble / SWF.unitDivisor );
-                            
-                            Graphics2D g = (Graphics2D) img.getBufferedImage().getGraphics();
-                            g.setPaint(Color.black);
-                            g.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[]{9}, 0));
-                            GeneralPath p = new GeneralPath();
-                            p.moveTo(axisX, 0);
-                            p.lineTo(axisX, getHeight());
-                            p.moveTo(0, axisY);
-                            p.lineTo(getWidth(), axisY);
-                            g.draw(p);
-                        }
+                        }                        
                         /*if(freeTransformDepth > -1) {
                             Graphics2D gg = (Graphics2D)img.getBufferedImage().getGraphics();
                             gg.setColor(Color.red);
