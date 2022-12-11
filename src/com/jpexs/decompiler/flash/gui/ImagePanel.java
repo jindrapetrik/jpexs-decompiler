@@ -2392,33 +2392,55 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         
                         
 
+                        Rectangle realRect = new Rectangle(rect.Xmin, rect.Ymin, rect.Xmax-rect.Xmin, rect.Ymax-rect.Ymin);
+                        realRect.x *= zoomDouble;
+                        realRect.y *= zoomDouble;
+                        realRect.width *= zoomDouble;
+                        realRect.height *= zoomDouble;
+                        realRect.x /= SWF.unitDivisor;
+                        realRect.y /= SWF.unitDivisor;
+                        realRect.width /= SWF.unitDivisor;
+                        realRect.height /= SWF.unitDivisor;
+
+                        
+                        if (freeTransformDepth > -1) {                                                       
+                            realRect.x = -offsetX;
+                            realRect.y = -offsetY;
+                            if (_rect.x < 0) {
+                                realRect.x += _rect.x;
+                            }
+                            if (_rect.y < 0) {
+                                realRect.y += _rect.y;
+                            }
+                        }
+
+
                         if (!autoPlayed) {
                             img = getImagePlay();                            
                         } else if (_viewRect.getHeight() < 0 || _viewRect.getWidth() < 0) {
                             img = new SerializableImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
                         } else {
-                            Rectangle realRect = new Rectangle(rect.Xmin, rect.Ymin, rect.Xmax-rect.Xmin, rect.Ymax-rect.Ymin);
-                            realRect.x *= zoomDouble;
-                            realRect.y *= zoomDouble;
-                            realRect.width *= zoomDouble;
-                            realRect.height *= zoomDouble;
-                            realRect.x /= SWF.unitDivisor;
-                            realRect.y /= SWF.unitDivisor;
-                            realRect.width /= SWF.unitDivisor;
-                            realRect.height /= SWF.unitDivisor;
-                            
-                            if (freeTransformDepth > -1) {
-                                realRect.x = -offsetX;
-                                realRect.y = -offsetY;
-                                if (_rect.x < 0) {
-                                    realRect.x += _rect.x;
-                                }
-                                if (_rect.y < 0) {
-                                    realRect.y += _rect.y;
-                                }
-                            }
+                           
                                                         
                             img = getFrame(realRect, rect, _viewRect, swf, frame, frozen ? 0 : time, timelined, renderContext, selectedDepth, freeTransformDepth, zoomDouble, registrationPointRef, boundsRef, trans2, tempTrans2 == null ? null : new Matrix(tempTrans2));
+                        }
+                        if (!(timelined instanceof SWF) && freeTransformDepth > -1) {
+                            
+                            int axisX = 0;
+                            int axisY = 0;
+                            
+                            axisX = realRect.x - (int)(rect.Xmin* zoomDouble/ SWF.unitDivisor);
+                            axisY = realRect.y - (int)(rect.Ymin* zoomDouble / SWF.unitDivisor );
+                            
+                            Graphics2D g = (Graphics2D) img.getBufferedImage().getGraphics();
+                            g.setPaint(Color.black);
+                            g.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[]{9}, 0));
+                            GeneralPath p = new GeneralPath();
+                            p.moveTo(axisX, 0);
+                            p.lineTo(axisX, getHeight());
+                            p.moveTo(0, axisY);
+                            p.lineTo(getWidth(), axisY);
+                            g.draw(p);
                         }
                         /*if(freeTransformDepth > -1) {
                             Graphics2D gg = (Graphics2D)img.getBufferedImage().getGraphics();
