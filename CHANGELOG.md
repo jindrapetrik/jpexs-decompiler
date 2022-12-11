@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - Option to disable autoplay of sounds (DefineSound)
 - [#1181] Remembering choice of loading assets via importassets tag
 - [#1900] Free transform whole sprites
+- Show axis as dashed line in Free transform of sprites
 
 ### Fixed
 - [#1897] Close menu button without selecting specific item
