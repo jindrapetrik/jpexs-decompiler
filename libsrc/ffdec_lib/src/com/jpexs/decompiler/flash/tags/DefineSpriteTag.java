@@ -240,6 +240,9 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
                         characterId = chi;
                     }
                 }
+                if (pot.flagMove() && m == null) {
+                    continue;
+                }
             }
             if (characterId == -1) {
                 continue;
