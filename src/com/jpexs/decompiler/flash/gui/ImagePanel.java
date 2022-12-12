@@ -2389,7 +2389,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 synchronized (ImagePanel.this) {
                     synchronized (lock) {
-                        Reference<Point2D> registrationPointRef = new Reference<>(registrationPoint);
                         Reference<Rectangle2D> boundsRef = new Reference<>(null);
 
                         RECT rect = timelined.getRectWithStrokes();
@@ -2448,6 +2447,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                         }
 
+                        
+                        offsetX += _rect.x;
+                        offsetY += _rect.y;
+                        
+                        Point2D rawRegistrationPoint = registrationPoint == null ? null : new Point2D.Double(registrationPoint.getX() - offsetX, registrationPoint.getY() - offsetY);
+                        Reference<Point2D> registrationPointRef = new Reference<>(rawRegistrationPoint);
+                        
 
                         if (!autoPlayed) {
                             img = getImagePlay();                            
@@ -2465,8 +2471,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }*/
                         
                         
-                        offsetX += _rect.x;
-                        offsetY += _rect.y;
                         
                         Rectangle2D newBounds = boundsRef.getVal();
                         if (newBounds!=null) {
