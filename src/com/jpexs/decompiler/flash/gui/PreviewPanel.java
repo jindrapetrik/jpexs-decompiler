@@ -85,6 +85,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -1294,24 +1296,33 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         sprite2.addTag(showFrameTag);
         
         
-        placeTag = new PlaceObject3Tag(fSwf);
-        placeTag.depth = 1;
-        placeTag.characterId = sprite2.getCharacterId();
-        placeTag.placeFlagHasCharacter = true;
+        PlaceObject3Tag placeTag2 = new PlaceObject3Tag(fSwf);
+        placeTag2.depth = 1;
+        placeTag2.characterId = sprite2.getCharacterId();
+        placeTag2.placeFlagHasCharacter = true;
 
-        placeTag.matrix = new MATRIX();        
-        fSwf.addTag(placeTag);
-        placeTag.setTimelined(fSwf);
+        placeTag2.matrix = new MATRIX();        
+        fSwf.addTag(placeTag2);
+        placeTag2.setTimelined(fSwf);
         showFrameTag = new ShowFrameTag(fSwf);
         fSwf.addTag(showFrameTag);
         showFrameTag.setTimelined(fSwf);
 
         imagePanel.setTimelined(sprite2, fSwf, 0, true, true, true, true, true, false);
         imagePanel.selectDepth(-1);
-        imagePanel.freeTransformDepth(placeTag.getDepth());
+        
         imageFreeTransformButton.setVisible(false);
         imageFreeTransformSaveButton.setVisible(true);
         imageFreeTransformCancelButton.setVisible(true);
+        
+        Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                imagePanel.freeTransformDepth(placeTag2.getDepth());
+            }
+        }, 10); //add some delay before controls are hidden
+        
     }
 
     private void cancelPlaceTagButtonActionPerformed(ActionEvent evt) {
