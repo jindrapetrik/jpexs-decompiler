@@ -269,13 +269,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         for (BoundsChangeListener listener:boundsChangeListeners) {
             listener.boundsChanged(bounds);
         }
-    }
-   
-    public Rectangle2D getTransformBounds() {
-        return bounds;
-    }
-    
-    
+    }           
     
     private SerializableImage getImagePlay() {
         if (imgPlay != null) {
@@ -404,6 +398,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     m.scale(zoom);
 
                     transform = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).concatenate(new Matrix(ds.matrix));
+                    
+                    fireBoundsChange(getTransformBounds());
                     /*System.out.println("ds.matrix=" + ds.matrix);
                     System.out.println("transform=" + transform);
                     System.out.println("offset=" + offsetPoint);
@@ -679,6 +675,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 registrationPoint = new Point2D.Double(registrationPointUpdated.getX(), registrationPointUpdated.getY());
                                 transform = new Matrix(transformUpdated);
                                 transformUpdated = null;
+                                fireBoundsChange(getTransformBounds());
                             }
                             repaint();
                         }
@@ -2530,11 +2527,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                         }
                         if (newBounds != null) {
-                            bounds = newBounds;
-                            
-                            RECT timRectNoStrokes = timelined.getRect();
-                            Rectangle2D bounds1 = new Rectangle2D.Double((bounds.getX() - _rect.x)/zoomDouble + timRectNoStrokes.Xmin/SWF.unitDivisor, (bounds.getY() - _rect.y)/zoomDouble + timRectNoStrokes.Ymin/SWF.unitDivisor ,bounds.getWidth() / zoomDouble, bounds.getHeight() / zoomDouble);
-                            fireBoundsChange(bounds1);
+                            bounds = newBounds;                           
                         }
                     }
                 }
@@ -3046,5 +3039,44 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     @Override
     public boolean isMutable() {
         return mutable;
+    }
+    
+    private Rectangle2D getTransformBounds() {
+        int time = frozen ? 0 : this.time;
+        DepthState ds = null;
+        Timeline timeline = timelined.getTimeline();
+        if (freeTransformDepth > -1 && timeline.getFrameCount() > frame) {
+            ds = timeline.getFrame(frame).layers.get(freeTransformDepth);
+        }
+        
+        RenderContext renderContext = new RenderContext();
+        renderContext.displayObjectCache = displayObjectCache;
+        if (cursorPosition != null && freeTransformDepth == -1) {
+            renderContext.cursorPosition = new Point((int) (cursorPosition.x * SWF.unitDivisor), (int) (cursorPosition.y * SWF.unitDivisor));
+        }
+
+        renderContext.mouseButton = mouseButton;
+        renderContext.stateUnderCursor = new ArrayList<>();
+        
+
+        if (ds != null) {
+            CharacterTag cht = ds.getCharacter();
+            if (cht != null) {
+                if (cht instanceof DrawableTag) {
+                    DrawableTag dt = (DrawableTag) cht;
+                    int drawableFrameCount = dt.getNumFrames();
+                    if (drawableFrameCount == 0) {
+                        drawableFrameCount = 1;
+                    }
+
+                    Matrix b = new Matrix(getNewMatrix()).concatenate(new Matrix(ds.matrix).inverse());                    
+                    int dframe = time % drawableFrameCount;
+                    Shape outline = dt.getOutline(dframe, time, ds.ratio, renderContext, b.concatenate(new Matrix(ds.matrix)), true);    
+                    Rectangle bounds = outline.getBounds();
+                    return new Rectangle2D.Double(bounds.x / SWF.unitDivisor, bounds.y / SWF.unitDivisor, bounds.width / SWF.unitDivisor, bounds.height / SWF.unitDivisor);                
+                }
+            }
+        }
+        return null;
     }
 }
