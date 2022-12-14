@@ -352,11 +352,8 @@ public class TransformPanel extends JPanel {
     
     
     private void clearMoveActionPerformed(ActionEvent e) {
-        Rectangle2D bounds = imagePanel.getTransformBounds();
-        if (bounds != null) {
-            moveHorizontalTextField.setText(formatDouble(bounds.getX()));
-            moveVerticalTextField.setText(formatDouble(bounds.getY()));
-        }
+        moveHorizontalTextField.setText(formatDouble(bounds.getX()));
+        moveVerticalTextField.setText(formatDouble(bounds.getY()));
         moveRelativeCheckBox.setSelected(false);
     }
     
@@ -365,9 +362,9 @@ public class TransformPanel extends JPanel {
     }
     
     private void clearScaleActionPerformed(ActionEvent e) {
+        scaleUnitComboBox.setSelectedItem(Unit.PERCENT);
         scaleWidthTextField.setText(formatDouble(100));
         scaleHeightTextField.setText(formatDouble(100));
-        scaleUnitComboBox.setSelectedItem(Unit.PERCENT);
         scaleProportionallyCheckBox.setSelected(true);
     }
     
