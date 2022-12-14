@@ -253,7 +253,30 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private SerializableImage imgPlay = null;
+    
+    private List<BoundsChangeListener> boundsChangeListeners = new ArrayList<>();
 
+    
+    public void addBoundsChangeListener(BoundsChangeListener listener) {
+        boundsChangeListeners.add(listener);
+    }
+    
+    public void removeBoundsChangeListener(BoundsChangeListener listener) {
+        boundsChangeListeners.remove(listener);
+    }
+    
+    private void fireBoundsChange(Rectangle2D bounds) {
+        for (BoundsChangeListener listener:boundsChangeListeners) {
+            listener.boundsChanged(bounds);
+        }
+    }
+   
+    public Rectangle2D getTransformBounds() {
+        return bounds;
+    }
+    
+    
+    
     private SerializableImage getImagePlay() {
         if (imgPlay != null) {
             return imgPlay;
@@ -407,7 +430,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         registrationPoint = null;
         calculateFreeTransform();
-        hideMouseSelection();
+        hideMouseSelection();   
+        redraw();
     }
 
     public void fireMediaDisplayStateChanged() {
@@ -534,7 +558,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         int y = rect.y < 0 ? 0 : rect.y;
 
                         if (freeTransformDepth > -1) {
-                            RECT timRect = timelined.getRectWithStrokes();
+                            RECT timRect = timelined.getRect();
                             double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                             int offsetX = (int) (SWF.unitDivisor * iconPanel.getWidth() / zoomDouble / 2 - timRect.getWidth() / 2);
                             int offsetY = (int) (SWF.unitDivisor * iconPanel.getHeight() / zoomDouble / 2 - timRect.getHeight() / 2);
@@ -561,7 +585,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             int axisX = 0;
                             int axisY = 0;
                             double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
-                            RECT timRect = timelined.getRectWithStrokes();
+                            RECT timRect = timelined.getRect();
                             axisX = rect.x - (int) (timRect.Xmin * zoomDouble / SWF.unitDivisor);
                             axisY = rect.y - (int) (timRect.Ymin * zoomDouble / SWF.unitDivisor);
                             g2.setComposite(BlendComposite.Invert);
@@ -1360,8 +1384,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
                         h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
                     } else {
-                        w1 = (int) (timelined.getRectWithStrokes().getWidth() * zoomDouble / SWF.unitDivisor);
-                        h1 = (int) (timelined.getRectWithStrokes().getHeight() * zoomDouble / SWF.unitDivisor);
+                        w1 = (int) (timelined.getRect().getWidth() * zoomDouble / SWF.unitDivisor);
+                        h1 = (int) (timelined.getRect().getHeight() * zoomDouble / SWF.unitDivisor);
                     }
 
                     //HERE
@@ -1718,7 +1742,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     @Override
     public synchronized double getZoomToFit() {
         if (timelined != null) {
-            RECT bounds = timelined.getRectWithStrokes();
+            RECT bounds = timelined.getRect();
             double w1 = bounds.getWidth() / SWF.unitDivisor;
             double h1 = bounds.getHeight() / SWF.unitDivisor;
 
@@ -1812,6 +1836,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 frame = ButtonTag.FRAME_UP;
             }
 
+            bounds = null;
             displayObjectCache.clear();
             this.timelined = drawable;
             this.swf = swf;
@@ -2266,7 +2291,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         aRect = new ExportRectangle(_rect);
 
         ExportRectangle viewRect = new ExportRectangle(new RECT());
-        RECT timRect = timelined.getRectWithStrokes();
+        RECT timRect = timelined.getRect();
 
         double w = timRect.getWidth() * zoomDouble / SWF.unitDivisor;
 
@@ -2417,7 +2442,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     synchronized (lock) {
                         Reference<Rectangle2D> boundsRef = new Reference<>(null);
 
-                        RECT rect = timelined.getRectWithStrokes();
+                        RECT rect = timelined.getRect();
 
                         _viewRect = getViewRect();
 
@@ -2425,7 +2450,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         AffineTransform tempTrans2 = transformUpdated == null ? null : new AffineTransform(transformUpdated);
 
                         //HERE                       
-                        RECT timRect = timelined.getRectWithStrokes();
+                        RECT timRect = timelined.getRect();
                         int offsetX = (int) (SWF.unitDivisor * iconPanel.getWidth() / zoomDouble / 2 - timRect.getWidth() / 2);
                         int offsetY = (int) (SWF.unitDivisor * iconPanel.getHeight() / zoomDouble / 2 - timRect.getHeight() / 2);
                         offsetX *= zoomDouble;
@@ -2506,6 +2531,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                         if (newBounds != null) {
                             bounds = newBounds;
+                            
+                            RECT timRectNoStrokes = timelined.getRect();
+                            Rectangle2D bounds1 = new Rectangle2D.Double((bounds.getX() - _rect.x)/zoomDouble + timRectNoStrokes.Xmin/SWF.unitDivisor, (bounds.getY() - _rect.y)/zoomDouble + timRectNoStrokes.Ymin/SWF.unitDivisor ,bounds.getWidth() / zoomDouble, bounds.getHeight() / zoomDouble);
+                            fireBoundsChange(bounds1);
                         }
                     }
                 }

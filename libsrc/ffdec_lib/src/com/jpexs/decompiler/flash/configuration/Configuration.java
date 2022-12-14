@@ -839,6 +839,11 @@ public final class Configuration {
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> deobfuscateAs12RemoveInvalidNamesAssignments = null;
     
+    @ConfigurationDefaultDouble(0.6)
+    @ConfigurationName("gui.splitPanePlace.dividerLocationPercent")
+    @ConfigurationInternal
+    public static ConfigurationItem<Double> guiSplitPanePlaceDividerLocationPercent = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
