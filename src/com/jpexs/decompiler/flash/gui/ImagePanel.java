@@ -688,12 +688,30 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         if (freeTransformDepth > -1 && mode != Cursor.DEFAULT_CURSOR && registrationPointUpdated != null && transformUpdated != null) {
                             synchronized (lock) {
-                                registrationPoint = new Point2D.Double(registrationPointUpdated.getX(), registrationPointUpdated.getY());                                
-                                if (mode == Cursor.HAND_CURSOR) {
-                                    registrationPointPosition = null;
-                                }                                
+                                Rectangle2D transBoundsBefore = getTransformBounds();
+                                Point2D transRegPointBefore = getTransformRegistrationPoint();
+                                Point transRegPointBeforeTwip = new Point((int)Math.round(transRegPointBefore.getX() - transBoundsBefore.getX()), (int)Math.round(transRegPointBefore.getY()-transBoundsBefore.getY()));
+                                Point2D transRegPointPercentBefore = new Point2D.Double(transRegPointBeforeTwip.getX() / transBoundsBefore.getWidth(), transRegPointBeforeTwip.getY() / transBoundsBefore.getHeight());
+                                registrationPoint = new Point2D.Double(registrationPointUpdated.getX(), registrationPointUpdated.getY());
+                                //System.out.println("transRegPointPercentBefore = "+transRegPointPercentBefore);
+                                
                                 transform = new Matrix(transformUpdated);
                                 transformUpdated = null;
+                                calcRect();
+                                
+                                Rectangle2D transBoundsAfter = getTransformBounds();                                
+                                Point2D transRegPointAfter = getTransformRegistrationPoint();
+                                Point transRegPointAfterTwip = new Point((int)Math.round(transRegPointAfter.getX() - transBoundsAfter.getX()), (int)Math.round(transRegPointAfter.getY() - transBoundsAfter.getY()));
+                                Point2D transRegPointPercentAfter = new Point2D.Double(transRegPointAfterTwip.getX() / transBoundsAfter.getWidth(), transRegPointAfterTwip.getY() / transBoundsAfter.getHeight());
+                                
+                                //System.out.println("transRegPointPercentAfter = "+transRegPointPercentAfter);
+                                
+                                //TODO: Calculate registrationPoint precisely
+                                if (!transRegPointPercentBefore.equals(transRegPointPercentAfter)) {
+                                    registrationPointPosition = null;
+                                    //System.out.println("set null");
+                                }
+                                
                                 fireBoundsChange(getTransformBounds(), getTransformRegistrationPoint(), registrationPointPosition);
                             }
                             repaint();
