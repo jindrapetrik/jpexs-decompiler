@@ -58,6 +58,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -94,6 +95,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -242,6 +244,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private TransformPanel imageTransformPanel;
     
     private TransformPanel placeTransformPanel;
+    
+    private FasterScrollPane placeTransformScrollPane;
+    
+    private FasterScrollPane imageTransformScrollPane;
     
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
@@ -501,7 +507,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imagePanel.setLoop(Configuration.loopMedia.get());
         
         imageTransformPanel = new TransformPanel(imagePanel);
-        previewCnt.add(imageTransformPanel, BorderLayout.EAST);
+        previewCnt.add(imageTransformScrollPane = new FasterScrollPane(imageTransformPanel), BorderLayout.EAST);
+        imageTransformScrollPane.setVisible(false);
         
         previewCnt.add(imagePanel, BorderLayout.CENTER);
 
@@ -672,7 +679,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         previewCnt.add(placeImagePanel, BorderLayout.CENTER);
         PlayerControls placeImagePlayControls = new PlayerControls(mainPanel, placeImagePanel, null);
         previewCnt.add(placeImagePlayControls, BorderLayout.SOUTH);
-        previewCnt.add(placeTransformPanel, BorderLayout.EAST);
+        previewCnt.add(placeTransformScrollPane = new FasterScrollPane(placeTransformPanel), BorderLayout.EAST);
+        Dimension transDimension = placeTransformPanel.getPreferredSize();
+        placeTransformScrollPane.setPreferredSize(new Dimension(transDimension.width + UIManager.getInt("ScrollBar.width") + 2, transDimension.height));
+        placeTransformScrollPane.setVisible(false);
         placeImagePlayControls.setMedia(placeImagePanel);
         previewPanel.add(previewCnt, BorderLayout.CENTER);
         JLabel prevIntLabel = new HeaderLabel(mainPanel.translate("swfpreview.internal"));
@@ -1183,7 +1193,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             placeImagePanel.selectDepth(placeTag.getDepth());
             placeImagePanel.freeTransformDepth(-1);
             placeTag.getTimelined().resetTimeline();
-            placeTransformPanel.setVisible(false);
+            placeTransformScrollPane.setVisible(false);
             placeGenericPanel.setVisible(true);
         }
         Tag hilightTag = null;
@@ -1225,7 +1235,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeGenericPanel.setVisible(false);
         placeImagePanel.selectDepth(-1);
         
-        placeTransformPanel.setVisible(true);
+        placeTransformScrollPane.setVisible(true);
         placeEditButton.setVisible(false);
         placeTransformButton.setVisible(false);
         placeSaveButton.setVisible(true);
@@ -1244,7 +1254,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private void saveImageTransformButtonActionPerformed(ActionEvent evt) {
         Matrix matrix = imagePanel.getNewMatrix();
         
-        imageTransformPanel.setVisible(false);
+        imageTransformScrollPane.setVisible(false);
         imagePanel.freeTransformDepth(-1);        
         imageTransformButton.setVisible(true);
         imageTransformCancelButton.setVisible(false);
@@ -1267,7 +1277,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     } 
     
     private void cancelImageTransformButtonActionPerformed(ActionEvent evt) {
-        imageTransformPanel.setVisible(false);
+        imageTransformScrollPane.setVisible(false);
         imagePanel.freeTransformDepth(-1);
         imageTransformButton.setVisible(true);
         imageTransformCancelButton.setVisible(false);
@@ -1340,7 +1350,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imageTransformButton.setVisible(false);
         imageTransformSaveButton.setVisible(true);
         imageTransformCancelButton.setVisible(true);
-        imageTransformPanel.setVisible(true);
+        imageTransformScrollPane.setVisible(true);
         
         Timer t = new Timer();
         t.schedule(new TimerTask() {
@@ -1359,7 +1369,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             placeImagePanel.freeTransformDepth(-1);
             placeTag.setMatrix(oldMatrix);
             placeTag.getTimelined().resetTimeline();
-            placeTransformPanel.setVisible(false);
+            placeTransformScrollPane.setVisible(false);
             placeGenericPanel.setVisible(true);
         }
         if (placeEditMode == PLACE_EDIT_RAW) {
