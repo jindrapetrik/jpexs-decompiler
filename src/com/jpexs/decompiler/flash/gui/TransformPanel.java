@@ -374,8 +374,6 @@ public class TransformPanel extends JPanel {
                 }
             }
         });
-
-        setVisible(false);
     }
 
     public void load() {
