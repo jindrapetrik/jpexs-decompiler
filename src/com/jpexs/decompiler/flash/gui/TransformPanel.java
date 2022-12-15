@@ -144,8 +144,8 @@ public class TransformPanel extends JPanel {
 
         imagePanel.addBoundsChangeListener(new BoundsChangeListener() {
             @Override
-            public void boundsChanged(Rectangle2D newBounds, Point2D registraionPoint) {
-                update(newBounds, registraionPoint);
+            public void boundsChanged(Rectangle2D newBounds, Point2D registraionPoint, RegistrationPointPosition registrationPointPosition) {
+                update(newBounds, registraionPoint, registrationPointPosition);
             }
         });
         setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
@@ -384,9 +384,10 @@ public class TransformPanel extends JPanel {
         clearMatrixActionPerformed(null);
     }
 
-    private void update(Rectangle2D bounds, Point2D registraionPoint) {
+    private void update(Rectangle2D bounds, Point2D registraionPoint, RegistrationPointPosition registrationPointPosition) {
         this.bounds = bounds;
         this.registrationPoint = registraionPoint;
+        this.registrationPointPanel.setSelectedPosition(registrationPointPosition);
         if (!moveRelativeCheckBox.isSelected()) {
             moveHorizontalTextField.setText(formatDouble(convertUnit(bounds.getX(), Unit.TWIP, (Unit) moveUnitComboBox.getSelectedItem())));
             moveVerticalTextField.setText(formatDouble(convertUnit(bounds.getY(), Unit.TWIP, (Unit) moveUnitComboBox.getSelectedItem())));
@@ -548,12 +549,7 @@ public class TransformPanel extends JPanel {
     }
     
     private void registrationPointChangedActionPerformed(ActionEvent e) {
-        RegistrationPointPosition position = registrationPointPanel.getSelectedPosition();
-        Point2D newRegistrationPoint = new Point2D.Double(
-                bounds.getX() + bounds.getWidth() * position.getPositionX(),
-                bounds.getY() + bounds.getHeight() * position.getPositionY()
-        );
-        imagePanel.setRegistrationPoint(newRegistrationPoint);
+        imagePanel.setRegistrationPointPosition(registrationPointPanel.getSelectedPosition());
     }
 
     private void addJoinedRow(JPanel panel, int rownum, Component comp, int numCols) {
@@ -665,6 +661,13 @@ class RegistrationPointPanel extends JPanel {
     public RegistrationPointPosition getSelectedPosition() {
         return selectedPosition;
     }        
+
+    public void setSelectedPosition(RegistrationPointPosition selectedPosition) {
+        this.selectedPosition = selectedPosition;
+        repaint();
+    }
+    
+    
     
     public RegistrationPointPanel(ActionListener listener) {
         this.listener = listener;
