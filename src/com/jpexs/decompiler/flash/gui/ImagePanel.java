@@ -3055,6 +3055,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return mutable;
     }
     
+    public void setRegistrationPoint(Point2D registrationPoint) {
+        this.registrationPoint = toImageRegistrationPoint(registrationPoint);        
+        redraw();
+        fireBoundsChange(getTransformBounds(), getTransformRegistrationPoint());
+    }
+    
     public void applyTransformMatrix(Matrix matrix) {
         Matrix prevNewMatrix = getNewMatrix();
         Matrix m = prevNewMatrix;
