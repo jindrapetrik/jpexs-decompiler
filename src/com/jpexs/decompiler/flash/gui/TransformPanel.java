@@ -367,7 +367,18 @@ public class TransformPanel extends JPanel {
     }
 
     private void applyMoveActionPerformed(ActionEvent e) {
-        //TODO
+        Matrix matrix = new Matrix();
+        try {
+            double moveHorizontal = convertUnit(Double.parseDouble(moveHorizontalTextField.getText()), (Unit)moveUnitComboBox.getSelectedItem(), Unit.TWIP);
+            double moveVertical = convertUnit(Double.parseDouble(moveVerticalTextField.getText()), (Unit)moveUnitComboBox.getSelectedItem(), Unit.TWIP);
+            if (!moveRelativeCheckBox.isSelected()) {
+                matrix.translate(-bounds.getX(), -bounds.getY());
+            }
+            matrix.translate(moveHorizontal, moveVertical);
+            imagePanel.applyTransformMatrix(matrix);
+        } catch (NumberFormatException nfe) {
+            
+        }
     }
 
     private void clearScaleActionPerformed(ActionEvent e) {
