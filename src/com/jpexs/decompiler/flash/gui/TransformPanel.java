@@ -18,18 +18,28 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.helpers.Reference;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
@@ -43,6 +53,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
 /**
@@ -82,6 +93,8 @@ public class TransformPanel extends JPanel {
 
     private Rectangle2D bounds = new Rectangle2D.Double(0, 0, 1, 1);
     private Point2D registrationPoint = new Point2D.Double(0, 0);
+    
+    private RegistrationPointPanel registrationPointPanel;
 
     public static enum UnitKind {
         LENGTH,
@@ -142,6 +155,14 @@ public class TransformPanel extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
 
+        add(makeHeader("Registration point", "transformregpoint16"));
+        JPanel registrationPointPanel = new JPanel(new FlowLayout());
+        this.registrationPointPanel = new RegistrationPointPanel(this::registrationPointChangedActionPerformed);
+        registrationPointPanel.add(this.registrationPointPanel);
+        add(registrationPointPanel);
+        
+        
+        
         add(makeHeader("Move", "transformmove16"));
         JPanel movePanel = new JPanel(new GridBagLayout());
         addRow(movePanel, 0, new JLabel("Horizontal:"), moveHorizontalTextField, moveUnitComboBox);
@@ -509,7 +530,7 @@ public class TransformPanel extends JPanel {
         matrixFTextField.setText(formatDouble(0));
         matrixEditCurrentCheckBox.setSelected(false);
     }
-
+    
     private void applyMatrixActionPerformed(ActionEvent e) {
         try {
             Matrix matrix = new Matrix();
@@ -526,6 +547,15 @@ public class TransformPanel extends JPanel {
         } catch (NumberFormatException nfe) {
 
         }
+    }
+    
+    private void registrationPointChangedActionPerformed(ActionEvent e) {
+        RegistrationPointPosition position = registrationPointPanel.getSelectedPosition();
+        Point2D newRegistrationPoint = new Point2D.Double(
+                bounds.getX() + bounds.getWidth() * position.getPositionX(),
+                bounds.getY() + bounds.getHeight() * position.getPositionY()
+        );
+        imagePanel.setRegistrationPoint(newRegistrationPoint);
     }
 
     private void addJoinedRow(JPanel panel, int rownum, Component comp, int numCols) {
@@ -612,4 +642,124 @@ public class TransformPanel extends JPanel {
         System.out.println("1 deg to rad =" + convertUnit(1, Unit.DEG, Unit.RAD));
         System.out.println("1 deg to grad =" + convertUnit(1, Unit.DEG, Unit.GRAD));
     }
+}
+
+
+class RegistrationPointPanel extends JPanel {
+
+    private Rectangle[][] rects = new Rectangle[3][3];
+    private RegistrationPointPosition[][] positions = new RegistrationPointPosition[][] {
+      /*x = LEFT */ {RegistrationPointPosition.TOP_LEFT, RegistrationPointPosition.LEFT, RegistrationPointPosition.BOTTOM_LEFT},
+      /*x = CENTER*/ {RegistrationPointPosition.TOP, RegistrationPointPosition.CENTER, RegistrationPointPosition.BOTTOM},
+      /*x = RIGHT*/ {RegistrationPointPosition.TOP_RIGHT, RegistrationPointPosition.RIGHT, RegistrationPointPosition.BOTTOM_RIGHT},
+    };
+    
+    private RegistrationPointPosition selectedPosition = RegistrationPointPosition.CENTER;
+    
+    final int RECT_SIZE = 10;
+    final int SPACE = 4;
+    
+    private final Cursor DEFAULT_CURSOR = new Cursor(Cursor.DEFAULT_CURSOR);
+    private final Cursor HAND_CURSOR = new Cursor(Cursor.HAND_CURSOR);
+    
+    private ActionListener listener;
+
+    public RegistrationPointPosition getSelectedPosition() {
+        return selectedPosition;
+    }        
+    
+    public RegistrationPointPanel(ActionListener listener) {
+        this.listener = listener;
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {            
+                rects[x][y] = new Rectangle();
+                rects[x][y].x = x * (RECT_SIZE + SPACE);
+                rects[x][y].y = y * (RECT_SIZE + SPACE);
+                rects[x][y].width = RECT_SIZE;
+                rects[x][y].height = RECT_SIZE;
+            }
+        }
+        
+        MouseAdapter adapter = new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    for (int y = 0; y < 3; y++) {
+                        for (int x = 0; x < 3; x++) {     
+                            if (rects[x][y].contains(e.getPoint())) {
+                                selectedPosition = positions[x][y];
+                                repaint();
+                                listener.actionPerformed(new ActionEvent(RegistrationPointPanel.this,0,""));
+                                return;
+                            }
+                        }
+                    }
+                }
+            }                        
+            
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                for (int y = 0; y < 3; y++) {
+                    for (int x = 0; x < 3; x++) {     
+                        if (rects[x][y].contains(e.getPoint())) {
+                            if (getCursor() != HAND_CURSOR) {
+                                setCursor(HAND_CURSOR);                                
+                            }
+                            return;
+                        }
+                    }
+                }
+                if (getCursor() != DEFAULT_CURSOR) {
+                    setCursor(DEFAULT_CURSOR);
+                }
+            }
+            
+        };
+        addMouseListener(adapter);
+        addMouseMotionListener(adapter);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(3 * RECT_SIZE + 2 * SPACE + 1, 3 * RECT_SIZE + 2 * SPACE + 1);
+    }
+
+    @Override
+    public Dimension getMinimumSize() {
+        return getPreferredSize();
+    }
+    
+    
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2d = (Graphics2D)g;
+        g2d.setPaint(getBackground());   
+        g2d.fillRect(0, 0, getWidth(), getHeight());        
+        g2d.setStroke(new BasicStroke(1));
+        g2d.setPaint(getForeground());        
+        GeneralPath path = new GeneralPath();
+        for (int y = 0; y < 3; y++) {
+            path.moveTo(rects[0][y].getCenterX(), rects[0][y].getCenterY());
+            path.lineTo(rects[2][y].getCenterX(), rects[2][y].getCenterY());
+        }
+        for (int x = 0; x < 3; x++) {
+            path.moveTo(rects[x][0].getCenterX(), rects[x][0].getCenterY());
+            path.lineTo(rects[x][2].getCenterX(), rects[x][2].getCenterY());
+        }
+        
+        g2d.draw(path);
+        for (int y = 0; y < 3; y++) {
+            for (int x = 0; x < 3; x++) {      
+                if (positions[x][y] == selectedPosition) {
+                    g2d.setPaint(getForeground());
+                } else {
+                    g2d.setPaint(getBackground());        
+                }
+                g2d.fill(rects[x][y]);
+                g2d.setPaint(getForeground());        
+                g2d.draw(rects[x][y]);
+            }
+        }
+    }            
 }
