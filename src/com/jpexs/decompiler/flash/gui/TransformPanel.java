@@ -81,7 +81,7 @@ public class TransformPanel extends JPanel {
     private ImagePanel imagePanel;
 
     private Rectangle2D bounds = new Rectangle2D.Double(0, 0, 1, 1);
-    private Point2D registraionPoint = new Point2D.Double(0, 0);
+    private Point2D registrationPoint = new Point2D.Double(0, 0);
 
     public static enum UnitKind {
         LENGTH,
@@ -345,7 +345,7 @@ public class TransformPanel extends JPanel {
 
     private void update(Rectangle2D bounds, Point2D registraionPoint) {
         this.bounds = bounds;
-        this.registraionPoint = registraionPoint;
+        this.registrationPoint = registraionPoint;
         if (!moveRelativeCheckBox.isSelected()) {
             moveHorizontalTextField.setText(formatDouble(convertUnit(bounds.getX(), Unit.TWIP, (Unit) moveUnitComboBox.getSelectedItem())));
             moveVerticalTextField.setText(formatDouble(convertUnit(bounds.getY(), Unit.TWIP, (Unit) moveUnitComboBox.getSelectedItem())));
@@ -408,9 +408,9 @@ public class TransformPanel extends JPanel {
             }
 
             Matrix matrix = new Matrix();
-            matrix.translate(registraionPoint.getX(), registraionPoint.getY());
+            matrix.translate(registrationPoint.getX(), registrationPoint.getY());
             matrix.scale(scaleWidthFactor, scaleHeightFactor);
-            matrix.translate(-registraionPoint.getX(), -registraionPoint.getY());
+            matrix.translate(-registrationPoint.getX(), -registrationPoint.getY());
             imagePanel.applyTransformMatrix(matrix);
         } catch (NumberFormatException nfe) {
 
@@ -427,7 +427,7 @@ public class TransformPanel extends JPanel {
         try {
             double rotate = Double.parseDouble(rotateTextField.getText());
             double rotateRad = (rotateAntiClockwiseToggleButton.isSelected() ?  -1.0 : 1.0) * convertUnit(rotate, (Unit)rotateUnitComboBox.getSelectedItem(), Unit.RAD);
-            Matrix matrix = new Matrix(AffineTransform.getRotateInstance(rotateRad, registraionPoint.getX(), registraionPoint.getY()));
+            Matrix matrix = new Matrix(AffineTransform.getRotateInstance(rotateRad, registrationPoint.getX(), registrationPoint.getY()));
             imagePanel.applyTransformMatrix(matrix);
         } catch (NumberFormatException nfe) {
             
@@ -441,7 +441,33 @@ public class TransformPanel extends JPanel {
     }
 
     private void applySkewActionPerformed(ActionEvent e) {
+        try
+        {
+            Unit skewUnit = (Unit) skewUnitComboBox.getSelectedItem();
+            double skewHorizontal = Double.parseDouble(skewHorizontalTextField.getText());
+            double skewVertical = Double.parseDouble(skewVerticalTextField.getText());
+            double skewHorizontalTwip;
+            double skewVerticalTwip;
+            
+            if (skewUnit.getKind() == UnitKind.ANGLE) {
+                double skewHorizontalRad = convertUnit(skewHorizontal, skewUnit, Unit.RAD);
+                skewHorizontalTwip = bounds.getHeight() * Math.tan(skewHorizontalRad);
+                double skewVerticalRad = convertUnit(skewVertical, skewUnit, Unit.RAD);
+                skewVerticalTwip = bounds.getWidth()* Math.tan(skewVerticalRad);
+            } else {
+                skewHorizontalTwip = convertUnit(skewHorizontal, skewUnit, Unit.TWIP);
+                skewVerticalTwip = convertUnit(skewVertical, skewUnit, Unit.TWIP);
+            }
+            AffineTransform trans = new AffineTransform();
+            trans.translate(registrationPoint.getX(), registrationPoint.getY());
+            trans.shear(skewHorizontalTwip / bounds.getWidth(), skewVerticalTwip / bounds.getHeight());
+            trans.translate(-registrationPoint.getX(), -registrationPoint.getY());
 
+            Matrix matrix = new Matrix(trans);
+            imagePanel.applyTransformMatrix(matrix);            
+        } catch (NumberFormatException nfe) {
+            
+        }
     }
 
     private void clearMatrixActionPerformed(ActionEvent e) {
