@@ -3041,6 +3041,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return mutable;
     }
     
+    public void applyTransformMatrix(Matrix matrix) {
+        transform = transform.preConcatenate(matrix);
+        Point2D newRegistrationPoint = new Point2D.Double();
+        matrix.toTransform().transform(registrationPoint, newRegistrationPoint);
+        registrationPoint = newRegistrationPoint;
+    }
+    
     private Rectangle2D getTransformBounds() {
         int time = frozen ? 0 : this.time;
         DepthState ds = null;
@@ -3073,7 +3080,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     int dframe = time % drawableFrameCount;
                     Shape outline = dt.getOutline(dframe, time, ds.ratio, renderContext, b.concatenate(new Matrix(ds.matrix)), true);    
                     Rectangle bounds = outline.getBounds();
-                    return new Rectangle2D.Double(bounds.x / SWF.unitDivisor, bounds.y / SWF.unitDivisor, bounds.width / SWF.unitDivisor, bounds.height / SWF.unitDivisor);                
+                    return new Rectangle2D.Double(bounds.x, bounds.y, bounds.width, bounds.height);                
                 }
             }
         }

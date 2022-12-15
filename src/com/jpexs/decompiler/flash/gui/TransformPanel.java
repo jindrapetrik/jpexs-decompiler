@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.helpers.Reference;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -85,8 +86,8 @@ public class TransformPanel extends JPanel {
     }
 
     public static enum Unit {
-        PX("px", 1.0, UnitKind.LENGTH),
-        TWIP("twip", 20.0, UnitKind.LENGTH),
+        PX("px", 1/20.0, UnitKind.LENGTH),
+        TWIP("twip", 1.0, UnitKind.LENGTH),
         PERCENT("%", 0.0, UnitKind.LENGTH),
         TURN("turn", 1 / 360.0, UnitKind.ANGLE),
         DEG("°", 1, UnitKind.ANGLE),
@@ -187,15 +188,15 @@ public class TransformPanel extends JPanel {
                     double scaleHeight = Double.parseDouble(scaleHeightTextField.getText());
 
                     if (prevUnit == Unit.PERCENT) {
-                        scaleWidthTextField.setText(formatDouble(convertUnit(bounds.getWidth() * scaleWidth / 100, Unit.PX, newUnit)));
-                        scaleHeightTextField.setText(formatDouble(convertUnit(bounds.getHeight() * scaleHeight / 100, Unit.PX, newUnit)));
+                        scaleWidthTextField.setText(formatDouble(convertUnit(bounds.getWidth() * scaleWidth / 100, Unit.TWIP, newUnit)));
+                        scaleHeightTextField.setText(formatDouble(convertUnit(bounds.getHeight() * scaleHeight / 100, Unit.TWIP, newUnit)));
                         return;
                     }
                     if (newUnit == Unit.PERCENT) {
-                        double scaleWidthPx = convertUnit(scaleWidth, prevUnit, Unit.PX);
-                        double scaleHeightPx = convertUnit(scaleHeight, prevUnit, Unit.PX);
-                        scaleWidthTextField.setText(formatDouble((scaleWidthPx * 100 / bounds.getWidth())));
-                        scaleHeightTextField.setText(formatDouble((scaleHeightPx * 100 / bounds.getHeight())));
+                        double scaleWidthTwip = convertUnit(scaleWidth, prevUnit, Unit.TWIP);
+                        double scaleHeightTwip = convertUnit(scaleHeight, prevUnit, Unit.TWIP);
+                        scaleWidthTextField.setText(formatDouble((scaleWidthTwip * 100 / bounds.getWidth())));
+                        scaleHeightTextField.setText(formatDouble((scaleHeightTwip * 100 / bounds.getHeight())));
                         return;
                     }
 
@@ -342,8 +343,8 @@ public class TransformPanel extends JPanel {
     private void update(Rectangle2D bounds) {
         this.bounds = bounds;
         if (!moveRelativeCheckBox.isSelected()) {
-            moveHorizontalTextField.setText(formatDouble(convertUnit(bounds.getX(), Unit.PX, (Unit) moveUnitComboBox.getSelectedItem())));
-            moveVerticalTextField.setText(formatDouble(convertUnit(bounds.getY(), Unit.PX, (Unit) moveUnitComboBox.getSelectedItem())));
+            moveHorizontalTextField.setText(formatDouble(convertUnit(bounds.getX(), Unit.TWIP, (Unit) moveUnitComboBox.getSelectedItem())));
+            moveVerticalTextField.setText(formatDouble(convertUnit(bounds.getY(), Unit.TWIP, (Unit) moveUnitComboBox.getSelectedItem())));
         }
         if (scaleProportionallyCheckBox.isSelected() && scaleUnitComboBox.getSelectedItem() != Unit.PERCENT) {
             try {
@@ -359,8 +360,9 @@ public class TransformPanel extends JPanel {
     }
 
     private void clearMoveActionPerformed(ActionEvent e) {
-        moveHorizontalTextField.setText(formatDouble(bounds.getX()));
-        moveVerticalTextField.setText(formatDouble(bounds.getY()));
+        moveHorizontalTextField.setText(formatDouble(convertUnit(bounds.getX(), Unit.TWIP, Unit.PX)));
+        moveVerticalTextField.setText(formatDouble(convertUnit(bounds.getY(), Unit.TWIP, Unit.PX)));
+        moveUnitComboBox.setSelectedItem(Unit.PX);
         moveRelativeCheckBox.setSelected(false);
     }
 
