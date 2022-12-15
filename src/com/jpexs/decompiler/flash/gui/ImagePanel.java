@@ -328,6 +328,19 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
     }
 
+    private Matrix getNewToImageMatrix(MATRIX newMatrix) {
+        Matrix m = new Matrix();
+        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+        if (lowQuality) {
+            zoomDouble /= LQ_FACTOR;
+        }
+        double zoom = zoomDouble;
+        m.translate(-_viewRect.xMin * zoom, -_viewRect.yMin * zoom);
+        m.scale(zoom);
+
+        return Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).concatenate(new Matrix(newMatrix));
+    }
+    
     public MATRIX getNewMatrix() {
         synchronized (lock) {
             DepthState ds = null;
@@ -3042,10 +3055,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
     
     public void applyTransformMatrix(Matrix matrix) {
-        transform = transform.preConcatenate(matrix);
+        Matrix m = new Matrix(getNewMatrix());
+        m = m.preConcatenate(matrix);
+        transform = getNewToImageMatrix(m.toMATRIX());
+        
         Point2D newRegistrationPoint = new Point2D.Double();
         matrix.toTransform().transform(registrationPoint, newRegistrationPoint);
         registrationPoint = newRegistrationPoint;
+        
+        redraw();
+        fireBoundsChange(getTransformBounds());
     }
     
     private Rectangle2D getTransformBounds() {
