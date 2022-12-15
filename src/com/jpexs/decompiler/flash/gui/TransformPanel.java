@@ -383,6 +383,15 @@ public class TransformPanel extends JPanel {
 
             }
         }
+        if (matrixEditCurrentCheckBox.isSelected()) {
+            Matrix matrix = imagePanel.getNewMatrix();
+            matrixATextField.setText(formatDouble(matrix.scaleX));
+            matrixBTextField.setText(formatDouble(matrix.rotateSkew0));
+            matrixCTextField.setText(formatDouble(matrix.rotateSkew1));
+            matrixDTextField.setText(formatDouble(matrix.scaleY));
+            matrixETextField.setText(formatDouble(matrix.translateX));
+            matrixFTextField.setText(formatDouble(matrix.translateY));
+        }
     }
 
     private void clearMoveActionPerformed(ActionEvent e) {
