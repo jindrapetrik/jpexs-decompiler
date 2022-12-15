@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -23,5 +24,5 @@ import java.awt.geom.Rectangle2D;
  * @author JPEXS
  */
 public interface BoundsChangeListener {
-    public void boundsChanged(Rectangle2D newBounds); 
+    public void boundsChanged(Rectangle2D newBounds, Point2D registraionPoint); 
 }

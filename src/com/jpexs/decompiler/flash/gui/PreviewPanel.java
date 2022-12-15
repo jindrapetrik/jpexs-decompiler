@@ -1176,9 +1176,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private void savePlaceTagButtonActionPerformed(ActionEvent evt) {
         if (placeEditMode == PLACE_EDIT_TRANSFORM) {
-            MATRIX matrix = placeImagePanel.getNewMatrix();
+            Matrix matrix = placeImagePanel.getNewMatrix();
             placeTag.setPlaceFlagHasMatrix(true);
-            placeTag.setMatrix(matrix);
+            placeTag.setMatrix(matrix.toMATRIX());
             placeTag.setModified(true);
             placeImagePanel.selectDepth(placeTag.getDepth());
             placeImagePanel.freeTransformDepth(-1);
@@ -1242,7 +1242,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void saveImageTransformButtonActionPerformed(ActionEvent evt) {
-        Matrix matrix = new Matrix(imagePanel.getNewMatrix());        
+        Matrix matrix = imagePanel.getNewMatrix();
         
         imageTransformPanel.setVisible(false);
         imagePanel.freeTransformDepth(-1);        
