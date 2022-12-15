@@ -24,5 +24,5 @@ import java.awt.geom.Rectangle2D;
  * @author JPEXS
  */
 public interface BoundsChangeListener {
-    public void boundsChanged(Rectangle2D newBounds, Point2D registraionPoint); 
+    public void boundsChanged(Rectangle2D newBounds, Point2D registrationPoint, RegistrationPointPosition registrationPointPosition); 
 }

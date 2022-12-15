@@ -245,6 +245,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private boolean mutable = false;
 
     private boolean alwaysDisplay = false;
+    
+    private RegistrationPointPosition registrationPointPosition = RegistrationPointPosition.CENTER;
 
     private static Cursor loadCursor(String name, int x, int y) throws IOException {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -265,9 +267,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         boundsChangeListeners.remove(listener);
     }
     
-    private void fireBoundsChange(Rectangle2D bounds, Point2D registrationPoint) {
+    private void fireBoundsChange(Rectangle2D bounds, Point2D registrationPoint, RegistrationPointPosition registrationPointPosition) {
         for (BoundsChangeListener listener:boundsChangeListeners) {
-            listener.boundsChanged(bounds, registrationPoint);
+            listener.boundsChanged(bounds, registrationPoint, registrationPointPosition);
         }
     }           
     
@@ -413,7 +415,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     transform = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).concatenate(new Matrix(ds.matrix));
                     
                     Rectangle2D transformBounds = getTransformBounds();
-                    fireBoundsChange(transformBounds, new Point2D.Double(transformBounds.getCenterX(), transformBounds.getCenterY()));
+                    fireBoundsChange(transformBounds, new Point2D.Double(transformBounds.getCenterX(), transformBounds.getCenterY()), registrationPointPosition);
                     /*System.out.println("ds.matrix=" + ds.matrix);
                     System.out.println("transform=" + transform);
                     System.out.println("offset=" + offsetPoint);
@@ -686,10 +688,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         if (freeTransformDepth > -1 && mode != Cursor.DEFAULT_CURSOR && registrationPointUpdated != null && transformUpdated != null) {
                             synchronized (lock) {
-                                registrationPoint = new Point2D.Double(registrationPointUpdated.getX(), registrationPointUpdated.getY());
+                                registrationPoint = new Point2D.Double(registrationPointUpdated.getX(), registrationPointUpdated.getY());                                
+                                if (mode == Cursor.HAND_CURSOR) {
+                                    registrationPointPosition = null;
+                                }                                
                                 transform = new Matrix(transformUpdated);
                                 transformUpdated = null;
-                                fireBoundsChange(getTransformBounds(), getTransformRegistrationPoint());
+                                fireBoundsChange(getTransformBounds(), getTransformRegistrationPoint(), registrationPointPosition);
                             }
                             repaint();
                         }
@@ -1878,6 +1883,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.muted = muted;
             this.mutable = mutable;
             this.showObjectsUnderCursor = showObjectsUnderCursor;
+            this.registrationPointPosition = RegistrationPointPosition.CENTER;
             redraw();
             if (autoPlay) {
                 play();
@@ -3057,8 +3063,21 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     
     public void setRegistrationPoint(Point2D registrationPoint) {
         this.registrationPoint = toImageRegistrationPoint(registrationPoint);        
+        this.registrationPointPosition = null;
         redraw();
-        fireBoundsChange(getTransformBounds(), getTransformRegistrationPoint());
+        fireBoundsChange(getTransformBounds(), getTransformRegistrationPoint(), registrationPointPosition);
+    }
+    
+    public void setRegistrationPointPosition(RegistrationPointPosition position) {
+        Rectangle2D transformBounds = getTransformBounds();
+        Point2D newRegistrationPoint = new Point2D.Double(
+                transformBounds.getX() + transformBounds.getWidth() * position.getPositionX(),
+                transformBounds.getY() + transformBounds.getHeight() * position.getPositionY()
+        );        
+        this.registrationPoint = toImageRegistrationPoint(newRegistrationPoint); 
+        this.registrationPointPosition = position;
+        redraw();
+        fireBoundsChange(getTransformBounds(), getTransformRegistrationPoint(), position);
     }
     
     public void applyTransformMatrix(Matrix matrix) {
@@ -3075,7 +3094,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         registrationPoint = newRegistrationPoint;
         
         redraw();
-        fireBoundsChange(getTransformBounds(), getTransformRegistrationPoint());
+        fireBoundsChange(getTransformBounds(), getTransformRegistrationPoint(), registrationPointPosition);
     }       
     
     private Point2D getTransformRegistrationPoint() {
