@@ -322,7 +322,7 @@ public class TransformPanel extends JPanel {
             }
         });
 
-        add(makeHeader("Matrix", null));
+        add(makeHeader("Matrix", "transformmatrix16"));
 
         JPanel matrixPanel = new JPanel(new GridBagLayout());
         addRow(matrixPanel, 0, new JLabel("A"), matrixATextField, new JLabel("C"), matrixCTextField, new JLabel("E"), matrixETextField);
@@ -331,6 +331,28 @@ public class TransformPanel extends JPanel {
         addJoinedRow(matrixPanel, 3, makeClearApplyPanel(this::applyMatrixActionPerformed, this::clearMatrixActionPerformed), 6);
 
         add(matrixPanel);
+
+        matrixEditCurrentCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (matrixEditCurrentCheckBox.isSelected()) {
+                    Matrix matrix = imagePanel.getNewMatrix();
+                    matrixATextField.setText(formatDouble(matrix.scaleX));
+                    matrixBTextField.setText(formatDouble(matrix.rotateSkew0));
+                    matrixCTextField.setText(formatDouble(matrix.rotateSkew1));
+                    matrixDTextField.setText(formatDouble(matrix.scaleY));
+                    matrixETextField.setText(formatDouble(matrix.translateX));
+                    matrixFTextField.setText(formatDouble(matrix.translateY));
+                } else {
+                    matrixATextField.setText(formatDouble(1));
+                    matrixBTextField.setText(formatDouble(0));
+                    matrixCTextField.setText(formatDouble(0));
+                    matrixDTextField.setText(formatDouble(1));
+                    matrixETextField.setText(formatDouble(0));
+                    matrixFTextField.setText(formatDouble(0));
+                }
+            }
+        });
 
         setVisible(false);
     }
@@ -426,11 +448,11 @@ public class TransformPanel extends JPanel {
     private void applyRotateActionPerformed(ActionEvent e) {
         try {
             double rotate = Double.parseDouble(rotateTextField.getText());
-            double rotateRad = (rotateAntiClockwiseToggleButton.isSelected() ?  -1.0 : 1.0) * convertUnit(rotate, (Unit)rotateUnitComboBox.getSelectedItem(), Unit.RAD);
+            double rotateRad = (rotateAntiClockwiseToggleButton.isSelected() ? -1.0 : 1.0) * convertUnit(rotate, (Unit) rotateUnitComboBox.getSelectedItem(), Unit.RAD);
             Matrix matrix = new Matrix(AffineTransform.getRotateInstance(rotateRad, registrationPoint.getX(), registrationPoint.getY()));
             imagePanel.applyTransformMatrix(matrix);
         } catch (NumberFormatException nfe) {
-            
+
         }
     }
 
@@ -441,19 +463,18 @@ public class TransformPanel extends JPanel {
     }
 
     private void applySkewActionPerformed(ActionEvent e) {
-        try
-        {
+        try {
             Unit skewUnit = (Unit) skewUnitComboBox.getSelectedItem();
             double skewHorizontal = Double.parseDouble(skewHorizontalTextField.getText());
             double skewVertical = Double.parseDouble(skewVerticalTextField.getText());
             double skewHorizontalTwip;
             double skewVerticalTwip;
-            
+
             if (skewUnit.getKind() == UnitKind.ANGLE) {
                 double skewHorizontalRad = convertUnit(skewHorizontal, skewUnit, Unit.RAD);
                 skewHorizontalTwip = bounds.getHeight() * Math.tan(skewHorizontalRad);
                 double skewVerticalRad = convertUnit(skewVertical, skewUnit, Unit.RAD);
-                skewVerticalTwip = bounds.getWidth()* Math.tan(skewVerticalRad);
+                skewVerticalTwip = bounds.getWidth() * Math.tan(skewVerticalRad);
             } else {
                 skewHorizontalTwip = convertUnit(skewHorizontal, skewUnit, Unit.TWIP);
                 skewVerticalTwip = convertUnit(skewVertical, skewUnit, Unit.TWIP);
@@ -464,9 +485,9 @@ public class TransformPanel extends JPanel {
             trans.translate(-registrationPoint.getX(), -registrationPoint.getY());
 
             Matrix matrix = new Matrix(trans);
-            imagePanel.applyTransformMatrix(matrix);            
+            imagePanel.applyTransformMatrix(matrix);
         } catch (NumberFormatException nfe) {
-            
+
         }
     }
 
@@ -481,7 +502,21 @@ public class TransformPanel extends JPanel {
     }
 
     private void applyMatrixActionPerformed(ActionEvent e) {
+        try {
+            Matrix matrix = new Matrix();
+            matrix.scaleX = Double.parseDouble(matrixATextField.getText());
+            matrix.rotateSkew0 = Double.parseDouble(matrixBTextField.getText());
+            matrix.rotateSkew1 = Double.parseDouble(matrixCTextField.getText());
+            matrix.scaleY = Double.parseDouble(matrixDTextField.getText());
+            matrix.translateX = Double.parseDouble(matrixETextField.getText());
+            matrix.translateY = Double.parseDouble(matrixFTextField.getText());
+            if (matrixEditCurrentCheckBox.isSelected()) {
+                matrix = imagePanel.getNewMatrix().inverse().concatenate(matrix);
+            }
+            imagePanel.applyTransformMatrix(matrix);
+        } catch (NumberFormatException nfe) {
 
+        }
     }
 
     private void addJoinedRow(JPanel panel, int rownum, Component comp, int numCols) {
