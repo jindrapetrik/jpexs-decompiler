@@ -29,6 +29,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import javax.swing.BorderFactory;
@@ -79,6 +80,7 @@ public class TransformPanel extends JPanel {
     private ImagePanel imagePanel;
 
     private Rectangle2D bounds = new Rectangle2D.Double(0, 0, 1, 1);
+    private Point2D registraionPoint = new Point2D.Double(0, 0);
 
     public static enum UnitKind {
         LENGTH,
@@ -86,7 +88,7 @@ public class TransformPanel extends JPanel {
     }
 
     public static enum Unit {
-        PX("px", 1/20.0, UnitKind.LENGTH),
+        PX("px", 1 / 20.0, UnitKind.LENGTH),
         TWIP("twip", 1.0, UnitKind.LENGTH),
         PERCENT("%", 0.0, UnitKind.LENGTH),
         TURN("turn", 1 / 360.0, UnitKind.ANGLE),
@@ -128,8 +130,8 @@ public class TransformPanel extends JPanel {
 
         imagePanel.addBoundsChangeListener(new BoundsChangeListener() {
             @Override
-            public void boundsChanged(Rectangle2D newBounds) {
-                update(newBounds);
+            public void boundsChanged(Rectangle2D newBounds, Point2D registraionPoint) {
+                update(newBounds, registraionPoint);
             }
         });
         setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
@@ -212,7 +214,7 @@ public class TransformPanel extends JPanel {
         scaleWidthTextField.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                if (scaleProportionallyCheckBox.isSelected()) {                    
+                if (scaleProportionallyCheckBox.isSelected()) {
                     try {
                         double scaleWidth = Double.parseDouble(scaleWidthTextField.getText());
                         double scaleHeight;
@@ -242,8 +244,8 @@ public class TransformPanel extends JPanel {
                             scaleWidth = scaleHeight;
                         } else {
                             double ratio = bounds.getWidth() / bounds.getHeight();
-                            scaleWidth = ratio * scaleHeight;                            
-                        }                        
+                            scaleWidth = ratio * scaleHeight;
+                        }
                         scaleWidthTextField.setText(formatDouble(scaleWidth));
                         scaleHeightTextField.setText(formatDouble(scaleHeight));
                     } catch (NumberFormatException nfe) {
@@ -340,8 +342,9 @@ public class TransformPanel extends JPanel {
         clearMatrixActionPerformed(null);
     }
 
-    private void update(Rectangle2D bounds) {
+    private void update(Rectangle2D bounds, Point2D registraionPoint) {
         this.bounds = bounds;
+        this.registraionPoint = registraionPoint;
         if (!moveRelativeCheckBox.isSelected()) {
             moveHorizontalTextField.setText(formatDouble(convertUnit(bounds.getX(), Unit.TWIP, (Unit) moveUnitComboBox.getSelectedItem())));
             moveVerticalTextField.setText(formatDouble(convertUnit(bounds.getY(), Unit.TWIP, (Unit) moveUnitComboBox.getSelectedItem())));
@@ -369,15 +372,15 @@ public class TransformPanel extends JPanel {
     private void applyMoveActionPerformed(ActionEvent e) {
         Matrix matrix = new Matrix();
         try {
-            double moveHorizontal = convertUnit(Double.parseDouble(moveHorizontalTextField.getText()), (Unit)moveUnitComboBox.getSelectedItem(), Unit.TWIP);
-            double moveVertical = convertUnit(Double.parseDouble(moveVerticalTextField.getText()), (Unit)moveUnitComboBox.getSelectedItem(), Unit.TWIP);
+            double moveHorizontal = convertUnit(Double.parseDouble(moveHorizontalTextField.getText()), (Unit) moveUnitComboBox.getSelectedItem(), Unit.TWIP);
+            double moveVertical = convertUnit(Double.parseDouble(moveVerticalTextField.getText()), (Unit) moveUnitComboBox.getSelectedItem(), Unit.TWIP);
             if (!moveRelativeCheckBox.isSelected()) {
                 matrix.translate(-bounds.getX(), -bounds.getY());
             }
             matrix.translate(moveHorizontal, moveVertical);
             imagePanel.applyTransformMatrix(matrix);
         } catch (NumberFormatException nfe) {
-            
+
         }
     }
 
@@ -389,7 +392,28 @@ public class TransformPanel extends JPanel {
     }
 
     private void applyScaleActionPerformed(ActionEvent e) {
+        try {
+            double scaleWidth = Double.parseDouble(scaleWidthTextField.getText());
+            double scaleHeight = Double.parseDouble(scaleHeightTextField.getText());
+            Unit scaleUnit = (Unit) scaleUnitComboBox.getSelectedItem();
+            double scaleWidthFactor;
+            double scaleHeightFactor;
+            if (scaleUnit == Unit.PERCENT) {
+                scaleWidthFactor = scaleWidth / 100.0;
+                scaleHeightFactor = scaleHeight / 100.0;
+            } else {
+                scaleWidthFactor = convertUnit(scaleWidth, scaleUnit, Unit.TWIP) / bounds.getWidth();
+                scaleHeightFactor = convertUnit(scaleHeight, scaleUnit, Unit.TWIP) / bounds.getHeight();
+            }
 
+            Matrix matrix = new Matrix();
+            matrix.translate(registraionPoint.getX(), registraionPoint.getY());
+            matrix.scale(scaleWidthFactor, scaleHeightFactor);
+            matrix.translate(-registraionPoint.getX(), -registraionPoint.getY());
+            imagePanel.applyTransformMatrix(matrix);
+        } catch (NumberFormatException nfe) {
+
+        }
     }
 
     private void clearRotateActionPerformed(ActionEvent e) {

@@ -265,9 +265,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         boundsChangeListeners.remove(listener);
     }
     
-    private void fireBoundsChange(Rectangle2D bounds) {
+    private void fireBoundsChange(Rectangle2D bounds, Point2D registrationPoint) {
         for (BoundsChangeListener listener:boundsChangeListeners) {
-            listener.boundsChanged(bounds);
+            listener.boundsChanged(bounds, registrationPoint);
         }
     }           
     
@@ -328,7 +328,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
     }
 
-    private Matrix getNewToImageMatrix(MATRIX newMatrix) {
+    private Matrix getNewToImageMatrix(Matrix newMatrix) {
         Matrix m = new Matrix();
         double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
         if (lowQuality) {
@@ -338,10 +338,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         m.translate(-_viewRect.xMin * zoom, -_viewRect.yMin * zoom);
         m.scale(zoom);
 
-        return Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).concatenate(new Matrix(newMatrix));
+        return Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).concatenate(newMatrix);
     }
     
-    public MATRIX getNewMatrix() {
+    public Matrix getNewMatrix() {
         synchronized (lock) {
             DepthState ds = null;
             Timeline timeline = timelined.getTimeline();
@@ -364,7 +364,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         m2.scale(zoom);
                         Matrix eMatrix = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m2).inverse();
 
-                        return transform.preConcatenate(eMatrix).toMATRIX();
+                        return transform.preConcatenate(eMatrix);
                     }
                 }
             }
@@ -412,7 +412,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                     transform = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).concatenate(new Matrix(ds.matrix));
                     
-                    fireBoundsChange(getTransformBounds());
+                    Rectangle2D transformBounds = getTransformBounds();
+                    fireBoundsChange(transformBounds, new Point2D.Double(transformBounds.getCenterX(), transformBounds.getCenterY()));
                     /*System.out.println("ds.matrix=" + ds.matrix);
                     System.out.println("transform=" + transform);
                     System.out.println("offset=" + offsetPoint);
@@ -688,7 +689,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 registrationPoint = new Point2D.Double(registrationPointUpdated.getX(), registrationPointUpdated.getY());
                                 transform = new Matrix(transformUpdated);
                                 transformUpdated = null;
-                                fireBoundsChange(getTransformBounds());
+                                fireBoundsChange(getTransformBounds(), getTransformRegistrationPoint());
                             }
                             repaint();
                         }
@@ -3055,16 +3056,45 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
     
     public void applyTransformMatrix(Matrix matrix) {
-        Matrix m = new Matrix(getNewMatrix());
+        System.out.println("apply "+matrix);
+        Matrix prevNewMatrix = getNewMatrix();
+        Matrix m = prevNewMatrix;
         m = m.preConcatenate(matrix);
-        transform = getNewToImageMatrix(m.toMATRIX());
+        Matrix prevTransform = transform;
+        Point2D transRegistrationPoint = getTransformRegistrationPoint();
+        transform = getNewToImageMatrix(m);
         
         Point2D newRegistrationPoint = new Point2D.Double();
-        matrix.toTransform().transform(registrationPoint, newRegistrationPoint);
+        matrix.toTransform().transform(transRegistrationPoint, newRegistrationPoint);
+        newRegistrationPoint = toImageRegistrationPoint(newRegistrationPoint);        
         registrationPoint = newRegistrationPoint;
         
         redraw();
-        fireBoundsChange(getTransformBounds());
+        fireBoundsChange(getTransformBounds(), getTransformRegistrationPoint());
+    }       
+    
+    private Point2D getTransformRegistrationPoint() {
+        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+        if (lowQuality) {
+            zoomDouble /= LQ_FACTOR;
+        }
+        double rx = (registrationPoint.getX() - _rect.x) * SWF.unitDivisor / zoomDouble;
+        double ry = (registrationPoint.getY() - _rect.y) * SWF.unitDivisor / zoomDouble;        
+        Point2D ret = new Point2D.Double(rx, ry);
+        return ret;
+    }
+    
+    private Point2D toImageRegistrationPoint(Point2D registrationPoint) {
+        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+        if (lowQuality) {
+            zoomDouble /= LQ_FACTOR;
+        }
+                
+        double rx = registrationPoint.getX() * zoomDouble / SWF.unitDivisor + _rect.x; // + offsetXRef.getVal();
+        double ry = registrationPoint.getY() * zoomDouble / SWF.unitDivisor + _rect.y; // + offsetYRef.getVal();
+        
+        Point2D ret = new Point2D.Double(rx, ry);
+        return ret;
     }
     
     private Rectangle2D getTransformBounds() {
@@ -3095,11 +3125,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         drawableFrameCount = 1;
                     }
 
-                    Matrix b = new Matrix(getNewMatrix()).concatenate(new Matrix(ds.matrix).inverse());                    
+                    Matrix b = getNewMatrix().concatenate(new Matrix(ds.matrix).inverse());                    
                     int dframe = time % drawableFrameCount;
                     Shape outline = dt.getOutline(dframe, time, ds.ratio, renderContext, b.concatenate(new Matrix(ds.matrix)), true);    
-                    Rectangle bounds = outline.getBounds();
-                    return new Rectangle2D.Double(bounds.x, bounds.y, bounds.width, bounds.height);                
+                    return outline.getBounds2D();            
                 }
             }
         }
