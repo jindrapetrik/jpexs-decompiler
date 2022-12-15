@@ -29,6 +29,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
@@ -423,7 +424,14 @@ public class TransformPanel extends JPanel {
     }
 
     private void applyRotateActionPerformed(ActionEvent e) {
-
+        try {
+            double rotate = Double.parseDouble(rotateTextField.getText());
+            double rotateRad = (rotateAntiClockwiseToggleButton.isSelected() ?  -1.0 : 1.0) * convertUnit(rotate, (Unit)rotateUnitComboBox.getSelectedItem(), Unit.RAD);
+            Matrix matrix = new Matrix(AffineTransform.getRotateInstance(rotateRad, registraionPoint.getX(), registraionPoint.getY()));
+            imagePanel.applyTransformMatrix(matrix);
+        } catch (NumberFormatException nfe) {
+            
+        }
     }
 
     private void clearSkewActionPerformed(ActionEvent e) {
