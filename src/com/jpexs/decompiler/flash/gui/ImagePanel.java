@@ -3056,7 +3056,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
     
     public void applyTransformMatrix(Matrix matrix) {
-        System.out.println("apply "+matrix);
         Matrix prevNewMatrix = getNewMatrix();
         Matrix m = prevNewMatrix;
         m = m.preConcatenate(matrix);
