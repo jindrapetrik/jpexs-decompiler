@@ -44,6 +44,11 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -68,12 +73,12 @@ public class TransformPanel extends JPanel {
     private JTextField moveHorizontalTextField = new JTextField(8);
     private JTextField moveVerticalTextField = new JTextField(8);
     private JComboBox<Unit> moveUnitComboBox = new JComboBox<>();
-    private JCheckBox moveRelativeCheckBox = new JCheckBox("Relative move");
+    private JCheckBox moveRelativeCheckBox = new JCheckBox(AppStrings.translate("transform.move.relative"));
 
     private JTextField scaleWidthTextField = new JTextField(formatDouble(100), 8);
     private JTextField scaleHeightTextField = new JTextField(formatDouble(100), 8);
     private JComboBox<Unit> scaleUnitComboBox = new JComboBox<>();
-    private JCheckBox scaleProportionallyCheckBox = new JCheckBox("Scale proportionally");
+    private JCheckBox scaleProportionallyCheckBox = new JCheckBox(AppStrings.translate("transform.scale.proportionally"));
 
     private JTextField rotateTextField = new JTextField(formatDouble(0), 8);
     private JComboBox<Unit> rotateUnitComboBox = new JComboBox<>();
@@ -90,7 +95,7 @@ public class TransformPanel extends JPanel {
     private JTextField matrixDTextField = new JTextField(formatDouble(1), 8);
     private JTextField matrixETextField = new JTextField(formatDouble(0), 8);
     private JTextField matrixFTextField = new JTextField(formatDouble(0), 8);
-    private JCheckBox matrixEditCurrentCheckBox = new JCheckBox("Edit current matrix");
+    private JCheckBox matrixEditCurrentCheckBox = new JCheckBox(AppStrings.translate("transform.matrix.editCurrent"));
 
     private ImagePanel imagePanel;
 
@@ -98,6 +103,8 @@ public class TransformPanel extends JPanel {
     private Point2D registrationPoint = new Point2D.Double(0, 0);
     
     private RegistrationPointPanel registrationPointPanel;
+    
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.000"); 
 
     public static enum UnitKind {
         LENGTH,
@@ -161,37 +168,49 @@ public class TransformPanel extends JPanel {
         JPanel registrationPointPanel = new JPanel(new FlowLayout());
         this.registrationPointPanel = new RegistrationPointPanel(this::registrationPointChangedActionPerformed);
         registrationPointPanel.add(this.registrationPointPanel);
-        add(makeCard("Transformation point", "transformpoint16", registrationPointPanel));
+        add(makeCard(AppStrings.translate("transform.transformPoint"), "transformpoint16", registrationPointPanel));
         
                 
         
-        JPanel basicPanel = new JPanel(new GridBagLayout());
-        JButton flipHorizontallyButton = new JButton("Flip horizontally", View.getIcon("transformflipx16"));
+        JPanel basicPanel = new JPanel();
+        basicPanel.setLayout(new BoxLayout(basicPanel, BoxLayout.Y_AXIS));
+        JButton flipHorizontallyButton = new JButton(AppStrings.translate("transform.basic.flip.horizontally"), View.getIcon("transformflipx16"));
         flipHorizontallyButton.setHorizontalAlignment(SwingConstants.LEFT);
         flipHorizontallyButton.addActionListener(this::flipHorizontallyActionPerformed);
-        JButton flipVerticallyButton = new JButton("Flip vertically", View.getIcon("transformflipy16"));
+        JButton flipVerticallyButton = new JButton(AppStrings.translate("transform.basic.flip.vertically"), View.getIcon("transformflipy16"));
         flipVerticallyButton.setHorizontalAlignment(SwingConstants.LEFT);        
         flipVerticallyButton.addActionListener(this::flipVerticallyActionPerformed);
-        JButton rotate90ClockwiseButton = new JButton("Rotate +90°", View.getIcon("transformrotate90clock16"));
+        JButton rotate90ClockwiseButton = new JButton(AppStrings.translate("transform.basic.rotate90.clockwise"), View.getIcon("transformrotate90clock16"));
         rotate90ClockwiseButton.setHorizontalAlignment(SwingConstants.LEFT);                
         rotate90ClockwiseButton.addActionListener(this::rotate90ClockwiseActionPerformed);
-        JButton rotate90AntiClockwiseButton = new JButton("Rotate -90°", View.getIcon("transformrotate90anticlock16"));
+        JButton rotate90AntiClockwiseButton = new JButton(AppStrings.translate("transform.basic.rotate90.anticlockwise"), View.getIcon("transformrotate90anticlock16"));
         rotate90AntiClockwiseButton.setHorizontalAlignment(SwingConstants.LEFT);                
         rotate90AntiClockwiseButton.addActionListener(this::rotate90AnticlockwiseActionPerformed);
-        JButton rotate180Button = new JButton("Rotate 180°", View.getIcon("transformrotate18016"));
+        JButton rotate180Button = new JButton(AppStrings.translate("transform.basic.rotate180"), View.getIcon("transformrotate18016"));
         rotate180Button.setHorizontalAlignment(SwingConstants.LEFT);                
         rotate180Button.addActionListener(this::rotate180ActionPerformed);
-        addRow(basicPanel, 0, flipHorizontallyButton, rotate90ClockwiseButton);
-        addRow(basicPanel, 1, flipVerticallyButton, rotate90AntiClockwiseButton, rotate180Button);
-        add(makeCard("Basic", "transformbasic16", basicPanel));
+        //addRow(basicPanel, 0, flipHorizontallyButton, rotate90ClockwiseButton);
+        //addRow(basicPanel, 1, flipVerticallyButton, rotate90AntiClockwiseButton, rotate180Button);
+        JPanel basicPanel1 = new JPanel(new FlowLayout());
+        basicPanel1.add(flipHorizontallyButton);
+        basicPanel1.add(flipVerticallyButton);
+        JPanel basicPanel2 = new JPanel(new FlowLayout());        
+        basicPanel2.add(rotate90ClockwiseButton);
+        basicPanel2.add(rotate90AntiClockwiseButton);
+        JPanel basicPanel3 = new JPanel(new FlowLayout());        
+        basicPanel3.add(rotate180Button);
+        basicPanel.add(basicPanel1);
+        basicPanel.add(basicPanel2);
+        basicPanel.add(basicPanel3);
+        add(makeCard(AppStrings.translate("transform.basic"), "transformbasic16", basicPanel));
         
         JPanel movePanel = new JPanel(new GridBagLayout());
-        addRow(movePanel, 0, new JLabel("Horizontal:"), moveHorizontalTextField, moveUnitComboBox);
-        addRow(movePanel, 1, new JLabel("Vertical:"), moveVerticalTextField);
+        addRow(movePanel, 0, new JLabel(AppStrings.translate("transform.move.horizontal")), moveHorizontalTextField, moveUnitComboBox);
+        addRow(movePanel, 1, new JLabel(AppStrings.translate("transform.move.vertical")), moveVerticalTextField);
         addJoinedRow(movePanel, 2, moveRelativeCheckBox, 3);
         addJoinedRow(movePanel, 3, makeClearApplyPanel(this::applyMoveActionPerformed, this::clearMoveActionPerformed), 3);
         finishRow(movePanel, 4);
-        add(makeCard("Move", "transformmove16", movePanel));
+        add(makeCard(AppStrings.translate("transform.move"), "transformmove16", movePanel));
 
         moveUnitComboBox.addItem(Unit.PX);
         moveUnitComboBox.addItem(Unit.TWIP);
@@ -202,8 +221,8 @@ public class TransformPanel extends JPanel {
             @Override
             public void unitChanged(Unit prevUnit, Unit newUnit) {
                 try {
-                    double moveHorizontal = Double.parseDouble(moveHorizontalTextField.getText());
-                    double moveVertical = Double.parseDouble(moveVerticalTextField.getText());
+                    double moveHorizontal = parseDouble(moveHorizontalTextField.getText());
+                    double moveVertical = parseDouble(moveVerticalTextField.getText());
                     moveHorizontalTextField.setText(formatDouble(convertUnit(moveHorizontal, prevUnit, newUnit)));
                     moveVerticalTextField.setText(formatDouble(convertUnit(moveVertical, prevUnit, newUnit)));
                 } catch (NumberFormatException nfe) {
@@ -213,12 +232,12 @@ public class TransformPanel extends JPanel {
         });
 
         JPanel scalePanel = new JPanel(new GridBagLayout());
-        addRow(scalePanel, 0, new JLabel("Width:"), scaleWidthTextField, scaleUnitComboBox);
-        addRow(scalePanel, 1, new JLabel("Height:"), scaleHeightTextField);
+        addRow(scalePanel, 0, new JLabel(AppStrings.translate("transform.scale.width")), scaleWidthTextField, scaleUnitComboBox);
+        addRow(scalePanel, 1, new JLabel(AppStrings.translate("transform.scale.height")), scaleHeightTextField);
         addJoinedRow(scalePanel, 2, scaleProportionallyCheckBox, 3);
         addJoinedRow(scalePanel, 3, makeClearApplyPanel(this::applyScaleActionPerformed, this::clearScaleActionPerformed), 3);
         finishRow(scalePanel, 4);
-        add(makeCard("Scale", "transformscale16", scalePanel));
+        add(makeCard(AppStrings.translate("transform.scale"), "transformscale16", scalePanel));
         scaleUnitComboBox.addItem(Unit.PERCENT);
         scaleUnitComboBox.addItem(Unit.PX);
         scaleUnitComboBox.addItem(Unit.TWIP);
@@ -229,8 +248,8 @@ public class TransformPanel extends JPanel {
             @Override
             public void unitChanged(Unit prevUnit, Unit newUnit) {
                 try {
-                    double scaleWidth = Double.parseDouble(scaleWidthTextField.getText());
-                    double scaleHeight = Double.parseDouble(scaleHeightTextField.getText());
+                    double scaleWidth = parseDouble(scaleWidthTextField.getText());
+                    double scaleHeight = parseDouble(scaleHeightTextField.getText());
 
                     if (prevUnit == Unit.PERCENT) {
                         scaleWidthTextField.setText(formatDouble(convertUnit(bounds.getWidth() * scaleWidth / 100, Unit.TWIP, newUnit)));
@@ -259,7 +278,7 @@ public class TransformPanel extends JPanel {
             public void focusLost(FocusEvent e) {
                 if (scaleProportionallyCheckBox.isSelected()) {
                     try {
-                        double scaleWidth = Double.parseDouble(scaleWidthTextField.getText());
+                        double scaleWidth = parseDouble(scaleWidthTextField.getText());
                         double scaleHeight;
                         if (scaleUnitComboBox.getSelectedItem() == Unit.PERCENT) {
                             scaleHeight = scaleWidth;
@@ -281,7 +300,7 @@ public class TransformPanel extends JPanel {
             public void focusLost(FocusEvent e) {
                 if (scaleProportionallyCheckBox.isSelected()) {
                     try {
-                        double scaleHeight = Double.parseDouble(scaleHeightTextField.getText());
+                        double scaleHeight = parseDouble(scaleHeightTextField.getText());
                         double scaleWidth;
                         if (scaleUnitComboBox.getSelectedItem() == Unit.PERCENT) {
                             scaleWidth = scaleHeight;
@@ -302,10 +321,10 @@ public class TransformPanel extends JPanel {
         clockGroup.add(rotateClockwiseToggleButton);
         clockGroup.add(rotateAntiClockwiseToggleButton);
         JPanel rotatePanel = new JPanel(new GridBagLayout());
-        addRow(rotatePanel, 0, new JLabel("Angle:"), rotateTextField, rotateUnitComboBox, rotateAntiClockwiseToggleButton, rotateClockwiseToggleButton);
+        addRow(rotatePanel, 0, new JLabel(AppStrings.translate("transform.rotate.angle")), rotateTextField, rotateUnitComboBox, rotateAntiClockwiseToggleButton, rotateClockwiseToggleButton);
         addJoinedRow(rotatePanel, 1, makeClearApplyPanel(this::applyRotateActionPerformed, this::clearRotateActionPerformed), 5);
         finishRow(rotatePanel, 2);
-        add(makeCard("Rotate", "transformrotate16", rotatePanel));
+        add(makeCard(AppStrings.translate("transform.rotate"), "transformrotate16", rotatePanel));
 
         rotateUnitComboBox.addItem(Unit.TURN);
         rotateUnitComboBox.addItem(Unit.DEG);
@@ -320,7 +339,7 @@ public class TransformPanel extends JPanel {
             @Override
             public void unitChanged(Unit prevUnit, Unit newUnit) {
                 try {
-                    double rotate = Double.parseDouble(rotateTextField.getText());
+                    double rotate = parseDouble(rotateTextField.getText());
                     rotateTextField.setText(formatDouble(convertUnit(rotate, prevUnit, newUnit)));
 
                 } catch (NumberFormatException nfe) {
@@ -330,12 +349,12 @@ public class TransformPanel extends JPanel {
         });
 
         JPanel skewPanel = new JPanel(new GridBagLayout());
-        addRow(skewPanel, 0, new JLabel("Horizontal:"), skewHorizontalTextField, skewUnitComboBox);
-        addRow(skewPanel, 1, new JLabel("Vertical:"), skewVerticalTextField);
+        addRow(skewPanel, 0, new JLabel(AppStrings.translate("transform.skew.horizontal")), skewHorizontalTextField, skewUnitComboBox);
+        addRow(skewPanel, 1, new JLabel(AppStrings.translate("transform.skew.vertical")), skewVerticalTextField);
         addJoinedRow(skewPanel, 2, makeClearApplyPanel(this::applySkewActionPerformed, this::clearSkewActionPerformed), 3);
         finishRow(skewPanel, 3);
         
-        add(makeCard("Skew", "transformskew16", skewPanel));
+        add(makeCard(AppStrings.translate("transform.skew"), "transformskew16", skewPanel));
 
         skewUnitComboBox.addItem(Unit.PX);
         skewUnitComboBox.addItem(Unit.TWIP);
@@ -350,8 +369,8 @@ public class TransformPanel extends JPanel {
             @Override
             public void unitChanged(Unit prevUnit, Unit newUnit) {
                 try {
-                    double skewHorizontal = Double.parseDouble(skewHorizontalTextField.getText());
-                    double skewVertical = Double.parseDouble(skewVerticalTextField.getText());
+                    double skewHorizontal = parseDouble(skewHorizontalTextField.getText());
+                    double skewVertical = parseDouble(skewVerticalTextField.getText());
                     skewHorizontalTextField.setText(formatDouble(convertUnit(skewHorizontal, prevUnit, newUnit)));
                     skewVerticalTextField.setText(formatDouble(convertUnit(skewVertical, prevUnit, newUnit)));
 
@@ -362,12 +381,16 @@ public class TransformPanel extends JPanel {
         });
 
         JPanel matrixPanel = new JPanel(new GridBagLayout());
-        addRow(matrixPanel, 0, new JLabel("A"), matrixATextField, new JLabel("C"), matrixCTextField, new JLabel("E"), matrixETextField);
-        addRow(matrixPanel, 1, new JLabel("B"), matrixBTextField, new JLabel("D"), matrixDTextField, new JLabel("F"), matrixFTextField);
+        addRow(matrixPanel, 0, new JLabel(AppStrings.translate("transform.matrix.a")), matrixATextField, 
+                                          new JLabel(AppStrings.translate("transform.matrix.c")), matrixCTextField, 
+                                          new JLabel(AppStrings.translate("transform.matrix.e")), matrixETextField);
+        addRow(matrixPanel, 1, new JLabel(AppStrings.translate("transform.matrix.b")), matrixBTextField,
+                                          new JLabel(AppStrings.translate("transform.matrix.d")), matrixDTextField,
+                                          new JLabel(AppStrings.translate("transform.matrix.f")), matrixFTextField);
         addJoinedRow(matrixPanel, 2, matrixEditCurrentCheckBox, 6);
         addJoinedRow(matrixPanel, 3, makeClearApplyPanel(this::applyMatrixActionPerformed, this::clearMatrixActionPerformed), 6);
         finishRow(matrixPanel, 4);       
-        add(makeCard("Matrix", "transformmatrix16", matrixPanel));
+        add(makeCard(AppStrings.translate("transform.matrix"), "transformmatrix16", matrixPanel));
 
         matrixEditCurrentCheckBox.addItemListener(new ItemListener() {
             @Override
@@ -390,7 +413,11 @@ public class TransformPanel extends JPanel {
                 }
             }
         });
-        add(Box.createVerticalGlue());
+        ///add(Box.createVerticalGlue());
+        JPanel finalPanel = new JPanel();
+        finalPanel.setPreferredSize(new Dimension(1, Integer.MAX_VALUE));
+        finalPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        add(finalPanel);
     }
 
     public void load() {
@@ -413,7 +440,7 @@ public class TransformPanel extends JPanel {
             try {
                 double ratio = bounds.getHeight() / bounds.getWidth();
 
-                double scaleWidth = Double.parseDouble(scaleWidthTextField.getText());
+                double scaleWidth = parseDouble(scaleWidthTextField.getText());
                 double scaleHeight = ratio * scaleWidth;
                 scaleHeightTextField.setText(formatDouble(scaleHeight));
             } catch (NumberFormatException nfe) {
@@ -441,8 +468,8 @@ public class TransformPanel extends JPanel {
     private void applyMoveActionPerformed(ActionEvent e) {
         Matrix matrix = new Matrix();
         try {
-            double moveHorizontal = convertUnit(Double.parseDouble(moveHorizontalTextField.getText()), (Unit) moveUnitComboBox.getSelectedItem(), Unit.TWIP);
-            double moveVertical = convertUnit(Double.parseDouble(moveVerticalTextField.getText()), (Unit) moveUnitComboBox.getSelectedItem(), Unit.TWIP);
+            double moveHorizontal = convertUnit(parseDouble(moveHorizontalTextField.getText()), (Unit) moveUnitComboBox.getSelectedItem(), Unit.TWIP);
+            double moveVertical = convertUnit(parseDouble(moveVerticalTextField.getText()), (Unit) moveUnitComboBox.getSelectedItem(), Unit.TWIP);
             if (!moveRelativeCheckBox.isSelected()) {
                 matrix.translate(-bounds.getX(), -bounds.getY());
             }
@@ -462,8 +489,8 @@ public class TransformPanel extends JPanel {
 
     private void applyScaleActionPerformed(ActionEvent e) {
         try {
-            double scaleWidth = Double.parseDouble(scaleWidthTextField.getText());
-            double scaleHeight = Double.parseDouble(scaleHeightTextField.getText());
+            double scaleWidth = parseDouble(scaleWidthTextField.getText());
+            double scaleHeight = parseDouble(scaleHeightTextField.getText());
             Unit scaleUnit = (Unit) scaleUnitComboBox.getSelectedItem();
             double scaleWidthFactor;
             double scaleHeightFactor;
@@ -493,7 +520,7 @@ public class TransformPanel extends JPanel {
 
     private void applyRotateActionPerformed(ActionEvent e) {
         try {
-            double rotate = Double.parseDouble(rotateTextField.getText());
+            double rotate = parseDouble(rotateTextField.getText());
             double rotateRad = (rotateAntiClockwiseToggleButton.isSelected() ? -1.0 : 1.0) * convertUnit(rotate, (Unit) rotateUnitComboBox.getSelectedItem(), Unit.RAD);
             Matrix matrix = new Matrix(AffineTransform.getRotateInstance(rotateRad, registrationPoint.getX(), registrationPoint.getY()));
             imagePanel.applyTransformMatrix(matrix);
@@ -511,8 +538,8 @@ public class TransformPanel extends JPanel {
     private void applySkewActionPerformed(ActionEvent e) {
         try {
             Unit skewUnit = (Unit) skewUnitComboBox.getSelectedItem();
-            double skewHorizontal = Double.parseDouble(skewHorizontalTextField.getText());
-            double skewVertical = Double.parseDouble(skewVerticalTextField.getText());
+            double skewHorizontal = parseDouble(skewHorizontalTextField.getText());
+            double skewVertical = parseDouble(skewVerticalTextField.getText());
             double skewHorizontalTwip;
             double skewVerticalTwip;
 
@@ -550,12 +577,12 @@ public class TransformPanel extends JPanel {
     private void applyMatrixActionPerformed(ActionEvent e) {
         try {
             Matrix matrix = new Matrix();
-            matrix.scaleX = Double.parseDouble(matrixATextField.getText());
-            matrix.rotateSkew0 = Double.parseDouble(matrixBTextField.getText());
-            matrix.rotateSkew1 = Double.parseDouble(matrixCTextField.getText());
-            matrix.scaleY = Double.parseDouble(matrixDTextField.getText());
-            matrix.translateX = Double.parseDouble(matrixETextField.getText());
-            matrix.translateY = Double.parseDouble(matrixFTextField.getText());
+            matrix.scaleX = parseDouble(matrixATextField.getText());
+            matrix.rotateSkew0 = parseDouble(matrixBTextField.getText());
+            matrix.rotateSkew1 = parseDouble(matrixCTextField.getText());
+            matrix.scaleY = parseDouble(matrixDTextField.getText());
+            matrix.translateX = parseDouble(matrixETextField.getText());
+            matrix.translateY = parseDouble(matrixFTextField.getText());
             if (matrixEditCurrentCheckBox.isSelected()) {
                 matrix = imagePanel.getNewMatrix().inverse().concatenate(matrix);
             }
@@ -627,11 +654,11 @@ public class TransformPanel extends JPanel {
     private void finishRow(JPanel panel, int row) {
         /*GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
-        c.weightx = 0;
+        c.weightx = 1;
         c.weighty = 1;
         c.gridx = 0;
         c.gridy = row;
-        panel.add(Box.createVerticalGlue(), c);*/
+        panel.add(new JLabel(" "), c);*/
     }
 
     
@@ -678,7 +705,9 @@ public class TransformPanel extends JPanel {
         cardPanel.add(headerPanel);
         cardPanel.add(contents);   
         contents.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        contents.setMaximumSize(new Dimension(getPreferredSize().width, contents.getPreferredSize().height + 10));
+        //contents.setMaximumSize(new Dimension(getPreferredSize().width, contents.getPreferredSize().height + 10));
+        cardPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        cardPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         return cardPanel;
     }
 
@@ -707,10 +736,10 @@ public class TransformPanel extends JPanel {
         });
     }
 
-    @Override
+    /*@Override
     public Dimension getPreferredSize() {
         return new Dimension(400, super.getPreferredSize().height);
-    }
+    }*/
     
     
 
@@ -730,9 +759,16 @@ public class TransformPanel extends JPanel {
         return (value / sourceUnit.value) * targetUnit.value;
     }
 
-    private static String formatDouble(double value) {
-        DecimalFormat df = new DecimalFormat("0.000");
-        return df.format(value);
+    private static String formatDouble(double value) {                       
+        return DECIMAL_FORMAT.format(value);
+    }
+    
+    private static double parseDouble(String value) {
+        try {
+            return DECIMAL_FORMAT.parse(value).doubleValue();
+        } catch (ParseException ex) {
+            throw new NumberFormatException();
+        }
     }
 
     public static void main(String[] args) {
