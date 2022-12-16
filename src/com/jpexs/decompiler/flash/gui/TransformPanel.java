@@ -70,31 +70,33 @@ import javax.swing.border.BevelBorder;
  */
 public class TransformPanel extends JPanel {
 
-    private JTextField moveHorizontalTextField = new JTextField(8);
-    private JTextField moveVerticalTextField = new JTextField(8);
+    private static final int NUMBER_COLS = 7;
+    
+    private JTextField moveHorizontalTextField = new JTextField(NUMBER_COLS);
+    private JTextField moveVerticalTextField = new JTextField(NUMBER_COLS);
     private JComboBox<Unit> moveUnitComboBox = new JComboBox<>();
     private JCheckBox moveRelativeCheckBox = new JCheckBox(AppStrings.translate("transform.move.relative"));
 
-    private JTextField scaleWidthTextField = new JTextField(formatDouble(100), 8);
-    private JTextField scaleHeightTextField = new JTextField(formatDouble(100), 8);
+    private JTextField scaleWidthTextField = new JTextField(formatDouble(100),NUMBER_COLS);
+    private JTextField scaleHeightTextField = new JTextField(formatDouble(100), NUMBER_COLS);
     private JComboBox<Unit> scaleUnitComboBox = new JComboBox<>();
     private JCheckBox scaleProportionallyCheckBox = new JCheckBox(AppStrings.translate("transform.scale.proportionally"));
 
-    private JTextField rotateTextField = new JTextField(formatDouble(0), 8);
+    private JTextField rotateTextField = new JTextField(formatDouble(0), NUMBER_COLS);
     private JComboBox<Unit> rotateUnitComboBox = new JComboBox<>();
     private JToggleButton rotateAntiClockwiseToggleButton = new JToggleButton(View.getIcon("rotateanticlockwise16"));
     private JToggleButton rotateClockwiseToggleButton = new JToggleButton(View.getIcon("rotateclockwise16"));
 
-    private JTextField skewHorizontalTextField = new JTextField(formatDouble(0), 8);
-    private JTextField skewVerticalTextField = new JTextField(formatDouble(0), 8);
+    private JTextField skewHorizontalTextField = new JTextField(formatDouble(0), NUMBER_COLS);
+    private JTextField skewVerticalTextField = new JTextField(formatDouble(0), NUMBER_COLS);
     private JComboBox<Unit> skewUnitComboBox = new JComboBox<>();
 
-    private JTextField matrixATextField = new JTextField(formatDouble(1), 8);
-    private JTextField matrixBTextField = new JTextField(formatDouble(0), 8);
-    private JTextField matrixCTextField = new JTextField(formatDouble(0), 8);
-    private JTextField matrixDTextField = new JTextField(formatDouble(1), 8);
-    private JTextField matrixETextField = new JTextField(formatDouble(0), 8);
-    private JTextField matrixFTextField = new JTextField(formatDouble(0), 8);
+    private JTextField matrixATextField = new JTextField(formatDouble(1), NUMBER_COLS);
+    private JTextField matrixBTextField = new JTextField(formatDouble(0), NUMBER_COLS);
+    private JTextField matrixCTextField = new JTextField(formatDouble(0), NUMBER_COLS);
+    private JTextField matrixDTextField = new JTextField(formatDouble(1), NUMBER_COLS);
+    private JTextField matrixETextField = new JTextField(formatDouble(0), NUMBER_COLS);
+    private JTextField matrixFTextField = new JTextField(formatDouble(0), NUMBER_COLS);
     private JCheckBox matrixEditCurrentCheckBox = new JCheckBox(AppStrings.translate("transform.matrix.editCurrent"));
 
     private ImagePanel imagePanel;
@@ -713,9 +715,9 @@ public class TransformPanel extends JPanel {
 
     private JPanel makeClearApplyPanel(ActionListener onApply, ActionListener onClear) {
         JPanel buttonsPanel = new JPanel(new FlowLayout());
-        JButton clearButton = new JButton("Clear");
+        JButton clearButton = new JButton(AppStrings.translate("transform.clear"));
         clearButton.addActionListener(onClear);
-        JButton applyButton = new JButton("Apply");
+        JButton applyButton = new JButton(AppStrings.translate("transform.apply"));
         applyButton.addActionListener(onApply);
         buttonsPanel.add(clearButton);
         buttonsPanel.add(applyButton);
