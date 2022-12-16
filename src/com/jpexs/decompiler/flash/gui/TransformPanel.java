@@ -160,7 +160,7 @@ public class TransformPanel extends JPanel {
         JPanel registrationPointPanel = new JPanel(new FlowLayout());
         this.registrationPointPanel = new RegistrationPointPanel(this::registrationPointChangedActionPerformed);
         registrationPointPanel.add(this.registrationPointPanel);
-        add(makeCard("Registration point", "transformregpoint16", registrationPointPanel));
+        add(makeCard("Transformation point", "transformpoint16", registrationPointPanel));
         
                 
         JPanel movePanel = new JPanel(new GridBagLayout());
