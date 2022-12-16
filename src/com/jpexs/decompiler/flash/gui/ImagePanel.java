@@ -76,6 +76,7 @@ import java.awt.Transparency;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -435,6 +436,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         calculateFreeTransform();
         hideMouseSelection();
         redraw();
+        iconPanel.requestFocusInWindow();
     }
 
     private void centerImage() {
@@ -632,6 +634,33 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
                     return false;
                 }
+            });
+            
+            addKeyListener(new KeyAdapter(){
+                
+                private void move(int x, int y) {
+                    Matrix matrix = new Matrix();
+                    matrix.translate(x * SWF.unitDivisor, y * SWF.unitDivisor);
+                    applyTransformMatrix(matrix);
+                }
+                
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (freeTransformDepth > -1) {
+                        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                            move(-1, 0);
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                            move(1, 0);
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_UP) {
+                            move(0, -1);
+                        }
+                        if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                            move(0, 1);
+                        }
+                    }
+                }                
             });
 
             addComponentListener(new ComponentAdapter() {
