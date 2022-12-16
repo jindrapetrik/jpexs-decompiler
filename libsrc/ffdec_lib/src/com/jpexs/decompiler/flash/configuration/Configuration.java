@@ -844,6 +844,16 @@ public final class Configuration {
     @ConfigurationInternal
     public static ConfigurationItem<Double> guiSplitPanePlaceDividerLocationPercent = null;
     
+    @ConfigurationDefaultDouble(0.6)
+    @ConfigurationName("gui.splitPaneTransform1.dividerLocationPercent")
+    @ConfigurationInternal
+    public static ConfigurationItem<Double> guiSplitPaneTransform1DividerLocationPercent = null;
+    
+    @ConfigurationDefaultDouble(0.6)
+    @ConfigurationName("gui.splitPaneTransform2.dividerLocationPercent")
+    @ConfigurationInternal
+    public static ConfigurationItem<Double> guiSplitPaneTransform2DividerLocationPercent = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

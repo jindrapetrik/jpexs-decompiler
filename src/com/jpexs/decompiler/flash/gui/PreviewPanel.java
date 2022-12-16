@@ -506,11 +506,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imagePanel = new ImagePanel();
         imagePanel.setLoop(Configuration.loopMedia.get());
         
-        imageTransformPanel = new TransformPanel(imagePanel);
-        previewCnt.add(imageTransformScrollPane = new FasterScrollPane(imageTransformPanel), BorderLayout.EAST);
-        imageTransformScrollPane.setVisible(false);
-        
-        previewCnt.add(imagePanel, BorderLayout.CENTER);
+        imageTransformPanel = new TransformPanel(imagePanel);        
+        previewCnt.add(new JPersistentSplitPane(JPersistentSplitPane.HORIZONTAL_SPLIT, imagePanel,
+                imageTransformScrollPane = new FasterScrollPane(imageTransformPanel), 
+                Configuration.guiSplitPaneTransform2DividerLocationPercent)
+        );
+        imageTransformScrollPane.setVisible(false);        
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
 
@@ -676,10 +677,13 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         
         placeTransformPanel = new TransformPanel(placeImagePanel);
         //imagePanel.setLoop(Configuration.loopMedia.get());
-        previewCnt.add(placeImagePanel, BorderLayout.CENTER);
+        previewCnt.add(new JPersistentSplitPane(
+                JPersistentSplitPane.HORIZONTAL_SPLIT, 
+                placeImagePanel,
+                       placeTransformScrollPane = new FasterScrollPane(placeTransformPanel),
+                Configuration.guiSplitPaneTransform1DividerLocationPercent));
         PlayerControls placeImagePlayControls = new PlayerControls(mainPanel, placeImagePanel, null);
         previewCnt.add(placeImagePlayControls, BorderLayout.SOUTH);
-        previewCnt.add(placeTransformScrollPane = new FasterScrollPane(placeTransformPanel), BorderLayout.EAST);
         Dimension transDimension = placeTransformPanel.getPreferredSize();
         placeTransformScrollPane.setPreferredSize(new Dimension(transDimension.width + UIManager.getInt("ScrollBar.width") + 2, transDimension.height));
         placeTransformScrollPane.setVisible(false);
