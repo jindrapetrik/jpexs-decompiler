@@ -593,7 +593,7 @@ public class TransformPanel extends JPanel {
         plusMinusLabel.setFont(plusMinusLabel.getFont().deriveFont(plusMinusLabel.getFont().getSize2D() * 1.8f));
         plusMinusLabel.setHorizontalAlignment(JLabel.CENTER);
         plusMinusLabel.setPreferredSize(new Dimension(30, 30));
-        headerPanel.add(plusMinusLabel, BorderLayout.EAST);
+        headerPanel.add(plusMinusLabel, BorderLayout.WEST);
         headerPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,40));
         headerPanel.setMinimumSize(new Dimension(0,40));
