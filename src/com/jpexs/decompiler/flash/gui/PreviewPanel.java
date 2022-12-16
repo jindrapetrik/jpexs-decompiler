@@ -249,6 +249,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     
     private FasterScrollPane imageTransformScrollPane;
     
+    private JPersistentSplitPane placeTransformSplitPane;
+    
+    private JPersistentSplitPane imageTransformSplitPane;
+    
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
         setDividerSize(this.readOnly ? 0 : dividerSize);
@@ -507,7 +511,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imagePanel.setLoop(Configuration.loopMedia.get());
         
         imageTransformPanel = new TransformPanel(imagePanel);        
-        previewCnt.add(new JPersistentSplitPane(JPersistentSplitPane.HORIZONTAL_SPLIT, imagePanel,
+        previewCnt.add(imageTransformSplitPane = new JPersistentSplitPane(JPersistentSplitPane.HORIZONTAL_SPLIT, imagePanel,
                 imageTransformScrollPane = new FasterScrollPane(imageTransformPanel), 
                 Configuration.guiSplitPaneTransform2DividerLocationPercent)
         );
@@ -677,7 +681,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         
         placeTransformPanel = new TransformPanel(placeImagePanel);
         //imagePanel.setLoop(Configuration.loopMedia.get());
-        previewCnt.add(new JPersistentSplitPane(
+        previewCnt.add(placeTransformSplitPane = new JPersistentSplitPane(
                 JPersistentSplitPane.HORIZONTAL_SPLIT, 
                 placeImagePanel,
                        placeTransformScrollPane = new FasterScrollPane(placeTransformPanel),
@@ -1240,19 +1244,26 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeImagePanel.selectDepth(-1);
         
         placeTransformScrollPane.setVisible(true);
+               
         placeEditButton.setVisible(false);
         placeTransformButton.setVisible(false);
         placeSaveButton.setVisible(true);
         placeCancelButton.setVisible(true);        
         
         Timer t = new Timer();
-        t.schedule(new TimerTask() {
+        t.schedule(new TimerTask(){
             @Override
             public void run() {
+                placeTransformSplitPane.setDividerLocation(getWidth() - 450);      
+            }
+        }, 20);
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {            
                 placeImagePanel.freeTransformDepth(placeTag.getDepth());
                 placeTransformPanel.load();
             }
-        }, 10); //add some delay before controls are hidden
+        }, 40); //add some delay before controls are hidden
     }
 
     private void saveImageTransformButtonActionPerformed(ActionEvent evt) {
@@ -1355,15 +1366,22 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imageTransformSaveButton.setVisible(true);
         imageTransformCancelButton.setVisible(true);
         imageTransformScrollPane.setVisible(true);
+             
         
         Timer t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                imageTransformSplitPane.setDividerLocation(getWidth() - 450);
+            }
+        }, 20);
         t.schedule(new TimerTask() {
             @Override
             public void run() {
                 imagePanel.freeTransformDepth(placeTag2.getDepth());
                 imageTransformPanel.load();
             }
-        }, 10); //add some delay before controls are hidden
+        }, 40); //add some delay before controls are hidden
         
     }
 
