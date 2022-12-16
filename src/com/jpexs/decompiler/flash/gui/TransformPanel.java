@@ -55,6 +55,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 
@@ -163,6 +164,27 @@ public class TransformPanel extends JPanel {
         add(makeCard("Transformation point", "transformpoint16", registrationPointPanel));
         
                 
+        
+        JPanel basicPanel = new JPanel(new GridBagLayout());
+        JButton flipHorizontallyButton = new JButton("Flip horizontally", View.getIcon("transformflipx16"));
+        flipHorizontallyButton.setHorizontalAlignment(SwingConstants.LEFT);
+        flipHorizontallyButton.addActionListener(this::flipHorizontallyActionPerformed);
+        JButton flipVerticallyButton = new JButton("Flip vertically", View.getIcon("transformflipy16"));
+        flipVerticallyButton.setHorizontalAlignment(SwingConstants.LEFT);        
+        flipVerticallyButton.addActionListener(this::flipVerticallyActionPerformed);
+        JButton rotate90ClockwiseButton = new JButton("Rotate +90°", View.getIcon("transformrotate90clock16"));
+        rotate90ClockwiseButton.setHorizontalAlignment(SwingConstants.LEFT);                
+        rotate90ClockwiseButton.addActionListener(this::rotate90ClockwiseActionPerformed);
+        JButton rotate90AntiClockwiseButton = new JButton("Rotate -90°", View.getIcon("transformrotate90anticlock16"));
+        rotate90AntiClockwiseButton.setHorizontalAlignment(SwingConstants.LEFT);                
+        rotate90AntiClockwiseButton.addActionListener(this::rotate90AnticlockwiseActionPerformed);
+        JButton rotate180Button = new JButton("Rotate 180°", View.getIcon("transformrotate18016"));
+        rotate180Button.setHorizontalAlignment(SwingConstants.LEFT);                
+        rotate180Button.addActionListener(this::rotate180ActionPerformed);
+        addRow(basicPanel, 0, flipHorizontallyButton, rotate90ClockwiseButton);
+        addRow(basicPanel, 1, flipVerticallyButton, rotate90AntiClockwiseButton, rotate180Button);
+        add(makeCard("Basic", "transformbasic16", basicPanel));
+        
         JPanel movePanel = new JPanel(new GridBagLayout());
         addRow(movePanel, 0, new JLabel("Horizontal:"), moveHorizontalTextField, moveUnitComboBox);
         addRow(movePanel, 1, new JLabel("Vertical:"), moveVerticalTextField);
@@ -543,6 +565,40 @@ public class TransformPanel extends JPanel {
         }
     }
     
+    private void applyRotate(double degree) {
+        double rotateRad = convertUnit(degree, Unit.DEG, Unit.RAD);
+        Matrix matrix = new Matrix(AffineTransform.getRotateInstance(rotateRad, registrationPoint.getX(), registrationPoint.getY()));
+        imagePanel.applyTransformMatrix(matrix);
+    }
+    
+    private void rotate90ClockwiseActionPerformed(ActionEvent e) {
+        applyRotate(90);
+    }
+    
+    private void rotate90AnticlockwiseActionPerformed(ActionEvent e) {
+        applyRotate(-90);
+    }
+    
+    private void rotate180ActionPerformed(ActionEvent e) {
+        applyRotate(180);
+    }
+    
+    private void flipHorizontallyActionPerformed(ActionEvent e) {
+        Matrix matrix = new Matrix();
+        matrix.translate(registrationPoint.getX(), registrationPoint.getY());
+        matrix.scale(-1, 1);
+        matrix.translate(-registrationPoint.getX(), -registrationPoint.getY());
+        imagePanel.applyTransformMatrix(matrix);
+    }
+    
+    private void flipVerticallyActionPerformed(ActionEvent e) {
+        Matrix matrix = new Matrix();
+        matrix.translate(registrationPoint.getX(), registrationPoint.getY());
+        matrix.scale(1, -1);
+        matrix.translate(-registrationPoint.getX(), -registrationPoint.getY());
+        imagePanel.applyTransformMatrix(matrix);
+    }
+    
     private void registrationPointChangedActionPerformed(ActionEvent e) {
         imagePanel.setRegistrationPointPosition(registrationPointPanel.getSelectedPosition());
     }
@@ -811,5 +867,5 @@ class RegistrationPointPanel extends JPanel {
                 g2d.draw(rects[x][y]);
             }
         }
-    }                    
+    }                            
 }
