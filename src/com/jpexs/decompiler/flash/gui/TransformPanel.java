@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.helpers.Reference;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -44,6 +45,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -155,21 +157,19 @@ public class TransformPanel extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        add(makeHeader("Registration point", "transformregpoint16"));
         JPanel registrationPointPanel = new JPanel(new FlowLayout());
         this.registrationPointPanel = new RegistrationPointPanel(this::registrationPointChangedActionPerformed);
         registrationPointPanel.add(this.registrationPointPanel);
-        add(registrationPointPanel);
+        add(makeCard("Registration point", "transformregpoint16", registrationPointPanel));
         
-        
-        
-        add(makeHeader("Move", "transformmove16"));
+                
         JPanel movePanel = new JPanel(new GridBagLayout());
         addRow(movePanel, 0, new JLabel("Horizontal:"), moveHorizontalTextField, moveUnitComboBox);
         addRow(movePanel, 1, new JLabel("Vertical:"), moveVerticalTextField);
         addJoinedRow(movePanel, 2, moveRelativeCheckBox, 3);
         addJoinedRow(movePanel, 3, makeClearApplyPanel(this::applyMoveActionPerformed, this::clearMoveActionPerformed), 3);
-        add(movePanel);
+        finishRow(movePanel, 4);
+        add(makeCard("Move", "transformmove16", movePanel));
 
         moveUnitComboBox.addItem(Unit.PX);
         moveUnitComboBox.addItem(Unit.TWIP);
@@ -190,14 +190,13 @@ public class TransformPanel extends JPanel {
             }
         });
 
-        add(makeHeader("Scale", "transformscale16"));
-
         JPanel scalePanel = new JPanel(new GridBagLayout());
         addRow(scalePanel, 0, new JLabel("Width:"), scaleWidthTextField, scaleUnitComboBox);
         addRow(scalePanel, 1, new JLabel("Height:"), scaleHeightTextField);
         addJoinedRow(scalePanel, 2, scaleProportionallyCheckBox, 3);
         addJoinedRow(scalePanel, 3, makeClearApplyPanel(this::applyScaleActionPerformed, this::clearScaleActionPerformed), 3);
-        add(scalePanel);
+        finishRow(scalePanel, 4);
+        add(makeCard("Scale", "transformscale16", scalePanel));
         scaleUnitComboBox.addItem(Unit.PERCENT);
         scaleUnitComboBox.addItem(Unit.PX);
         scaleUnitComboBox.addItem(Unit.TWIP);
@@ -276,17 +275,15 @@ public class TransformPanel extends JPanel {
                 }
             }
         });
-
-        add(makeHeader("Rotate", "transformrotate16"));
-
+        
         ButtonGroup clockGroup = new ButtonGroup();
         clockGroup.add(rotateClockwiseToggleButton);
         clockGroup.add(rotateAntiClockwiseToggleButton);
         JPanel rotatePanel = new JPanel(new GridBagLayout());
         addRow(rotatePanel, 0, new JLabel("Angle:"), rotateTextField, rotateUnitComboBox, rotateAntiClockwiseToggleButton, rotateClockwiseToggleButton);
         addJoinedRow(rotatePanel, 1, makeClearApplyPanel(this::applyRotateActionPerformed, this::clearRotateActionPerformed), 5);
-
-        add(rotatePanel);
+        finishRow(rotatePanel, 2);
+        add(makeCard("Rotate", "transformrotate16", rotatePanel));
 
         rotateUnitComboBox.addItem(Unit.TURN);
         rotateUnitComboBox.addItem(Unit.DEG);
@@ -310,14 +307,13 @@ public class TransformPanel extends JPanel {
             }
         });
 
-        add(makeHeader("Skew", "transformskew16"));
-
         JPanel skewPanel = new JPanel(new GridBagLayout());
         addRow(skewPanel, 0, new JLabel("Horizontal:"), skewHorizontalTextField, skewUnitComboBox);
         addRow(skewPanel, 1, new JLabel("Vertical:"), skewVerticalTextField);
         addJoinedRow(skewPanel, 2, makeClearApplyPanel(this::applySkewActionPerformed, this::clearSkewActionPerformed), 3);
-
-        add(skewPanel);
+        finishRow(skewPanel, 3);
+        
+        add(makeCard("Skew", "transformskew16", skewPanel));
 
         skewUnitComboBox.addItem(Unit.PX);
         skewUnitComboBox.addItem(Unit.TWIP);
@@ -343,15 +339,13 @@ public class TransformPanel extends JPanel {
             }
         });
 
-        add(makeHeader("Matrix", "transformmatrix16"));
-
         JPanel matrixPanel = new JPanel(new GridBagLayout());
         addRow(matrixPanel, 0, new JLabel("A"), matrixATextField, new JLabel("C"), matrixCTextField, new JLabel("E"), matrixETextField);
         addRow(matrixPanel, 1, new JLabel("B"), matrixBTextField, new JLabel("D"), matrixDTextField, new JLabel("F"), matrixFTextField);
         addJoinedRow(matrixPanel, 2, matrixEditCurrentCheckBox, 6);
         addJoinedRow(matrixPanel, 3, makeClearApplyPanel(this::applyMatrixActionPerformed, this::clearMatrixActionPerformed), 6);
-
-        add(matrixPanel);
+        finishRow(matrixPanel, 4);       
+        add(makeCard("Matrix", "transformmatrix16", matrixPanel));
 
         matrixEditCurrentCheckBox.addItemListener(new ItemListener() {
             @Override
@@ -374,6 +368,7 @@ public class TransformPanel extends JPanel {
                 }
             }
         });
+        add(Box.createVerticalGlue());
     }
 
     public void load() {
@@ -571,17 +566,64 @@ public class TransformPanel extends JPanel {
             c.gridy = rownum;
             panel.add(comp[i], c);
         }
+    }        
+    
+    private void finishRow(JPanel panel, int row) {
+        /*GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.weightx = 0;
+        c.weighty = 1;
+        c.gridx = 0;
+        c.gridy = row;
+        panel.add(Box.createVerticalGlue(), c);*/
     }
 
-    private JPanel makeHeader(String title, String icon) {
-        JPanel headerPanel = new JPanel(new FlowLayout());
+    
+    private JPanel makeCard(String title, String icon, JPanel contents) {
+        JPanel cardPanel = new JPanel();
+        
+        JPanel headerPanel = new JPanel(new BorderLayout());
         JLabel label = new JLabel(title);
         if (icon != null) {
             label.setIcon(View.getIcon(icon));
         }
-        headerPanel.add(label);
+        label.setHorizontalAlignment(JLabel.CENTER);
+        headerPanel.add(label, BorderLayout.CENTER);
+        JLabel plusMinusLabel = new JLabel("+");
+        plusMinusLabel.setFont(plusMinusLabel.getFont().deriveFont(plusMinusLabel.getFont().getSize2D() * 1.8f));
+        plusMinusLabel.setHorizontalAlignment(JLabel.CENTER);
+        plusMinusLabel.setPreferredSize(new Dimension(30, 30));
+        headerPanel.add(plusMinusLabel, BorderLayout.EAST);
         headerPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        return headerPanel;
+        headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,40));
+        headerPanel.setMinimumSize(new Dimension(0,40));
+        headerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        Reference<Boolean> cardOpened = new Reference<>(false);
+        cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS));
+        headerPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    cardOpened.setVal(!cardOpened.getVal());                    
+                    contents.setVisible(cardOpened.getVal());
+                    if (cardOpened.getVal()) {
+                        plusMinusLabel.setText("-");
+                    } else {
+                        plusMinusLabel.setText("+");
+                    }
+                    cardPanel.revalidate();
+                    cardPanel.repaint();
+                }
+            }            
+        });
+        contents.setAlignmentX(Component.LEFT_ALIGNMENT);
+        contents.setVisible(false);
+        cardPanel.add(headerPanel);
+        cardPanel.add(contents);   
+        contents.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        contents.setMaximumSize(new Dimension(getPreferredSize().width, contents.getPreferredSize().height + 10));
+        return cardPanel;
     }
 
     private JPanel makeClearApplyPanel(ActionListener onApply, ActionListener onClear) {
@@ -608,6 +650,13 @@ public class TransformPanel extends JPanel {
             }
         });
     }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(400, super.getPreferredSize().height);
+    }
+    
+    
 
     interface UnitChangedListener {
 
@@ -762,5 +811,5 @@ class RegistrationPointPanel extends JPanel {
                 g2d.draw(rects[x][y]);
             }
         }
-    }            
+    }                    
 }
