@@ -295,7 +295,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     }
 
     @Override
-    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked) {
+    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
         return transformation.toTransform().createTransformedShape(new Rectangle2D.Double(0, 0, width * SWF.unitDivisor, height * SWF.unitDivisor));
     }
 
