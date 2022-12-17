@@ -1165,7 +1165,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             AbstractTagTreeModel ttm = tagTree.getFullModel();
             if (ttm != null) {
                 if (getCurrentSwf() == null) {
-                    tagTree.setSelectionPath(ttm.getTreePath(ttm.getRoot()));
+                    tagTree.clearSelection();
                 }
                 ttm.updateSwfs(e);
                 tagTree.expandRoot();
@@ -1185,7 +1185,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             ttm = tagListTree.getFullModel();
             if (ttm != null) {
                 if (getCurrentSwf() == null) {
-                    tagListTree.setSelectionPath(ttm.getTreePath(ttm.getRoot()));
+                    tagListTree.clearSelection();
                 }
                 ttm.updateSwfs(e);
                 tagListTree.expandRoot();
