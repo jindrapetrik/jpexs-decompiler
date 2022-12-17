@@ -50,6 +50,7 @@ All notable changes to this project will be documented in this file.
 - Classnames in PlaceObject
 - [#1828] AS1/2 deobfuscation removing variable declarations
 - Loaded SWFs using "Open loaded during play" feature have short filenames
+- Exception on closing multiple SWFs
 
 ### Changed
 - Quick search needs minimum of 3 characters
