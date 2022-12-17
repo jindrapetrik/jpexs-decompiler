@@ -49,6 +49,7 @@ All notable changes to this project will be documented in this file.
 - Maintain export name/class on imported tags
 - Classnames in PlaceObject
 - [#1828] AS1/2 deobfuscation removing variable declarations
+- Loaded SWFs using "Open loaded during play" feature have short filenames
 
 ### Changed
 - Quick search needs minimum of 3 characters
