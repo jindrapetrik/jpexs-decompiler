@@ -763,7 +763,7 @@ public class TransformPanel extends JPanel {
         JPanel buttonsPanel = new JPanel(new FlowLayout());
         JButton clearButton = new JButton(AppStrings.translate("transform.clear"));
         clearButton.addActionListener(onClear);
-        JButton applyButton = new JButton(AppStrings.translate("transform.apply"));
+        JButton applyButton = new JButton(AppStrings.translate("transform.apply"), View.getIcon("apply16"));
         applyButton.addActionListener(onApply);
         buttonsPanel.add(clearButton);
         buttonsPanel.add(applyButton);
