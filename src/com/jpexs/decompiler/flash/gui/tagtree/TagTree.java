@@ -239,7 +239,7 @@ public class TagTree extends AbstractTagTree {
     public TagTree(TagTreeModel treeModel, MainPanel mainPanel) {
         super(treeModel, mainPanel);
         setCellRenderer(new TagTreeCellRenderer());
-        setShowsRootHandles(true);
+        setShowsRootHandles(true);        
     }
 
     public static List<Integer> getSwfFolderItemNestedTagIds(String folderName, boolean gfx) {

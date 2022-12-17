@@ -99,9 +99,12 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
     private final JLabel warningLabel = new JLabel();
 
     private SWF swf;
+    
+    private MainPanel mainPanel;
 
-    public HeaderInfoPanel() {
+    public HeaderInfoPanel(MainPanel mainPanel) {
         setLayout(new BorderLayout());
+        this.mainPanel = mainPanel;
 
         TableLayout tl;
         propertiesPanel.setLayout(tl = new TableLayout(new double[][]{
@@ -219,6 +222,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
 
     private void editButtonActionPerformed(ActionEvent evt) {
         setEditMode(true);
+        mainPanel.setEditingStatus();
     }
 
     private void saveButtonActionPerformed(ActionEvent evt) {
@@ -233,13 +237,15 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         swf.setHeaderModified(true);
 
         load(swf);
-        Main.getMainFrame().getPanel().repaintTree();
+        mainPanel.repaintTree();
         setEditMode(false);
+        mainPanel.clearEditingStatus();
     }
 
     private void cancelButtonActionPerformed(ActionEvent evt) {
         load(swf);
         setEditMode(false);
+        mainPanel.clearEditingStatus();
     }
 
     public void load(SWF swf) {
@@ -363,5 +369,12 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
     @Override
     public boolean isEditing() {
         return saveButton.isVisible();
+    }
+    
+    public void startEdit() {
+        if (!editButton.isVisible()) {
+            return;
+        }
+        editButtonActionPerformed(null);
     }
 }

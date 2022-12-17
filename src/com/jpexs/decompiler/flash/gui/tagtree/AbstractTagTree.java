@@ -96,6 +96,8 @@ import com.jpexs.decompiler.flash.types.BUTTONCONDACTION;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.CLIPACTIONRECORD;
 import java.awt.Color;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -106,6 +108,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import javax.swing.Icon;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.tree.TreeModel;
@@ -201,6 +204,25 @@ public abstract class AbstractTagTree extends JTree {
             }
         });
         ToolTipManager.sharedInstance().registerComponent(this);
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (!Configuration.doubleClickNodeToEdit.get()) {
+                    return;
+                }
+                if (!SwingUtilities.isLeftMouseButton(e)) {
+                    return;
+                }
+                if (e.getClickCount() != 2) {
+                    return;
+                }
+                TreeItem item = getCurrentTreeItem();
+                if (!getModel().isLeaf(item)) { //double click also expands the node so editing should work only for leaf nodes
+                    return;
+                }
+                mainPanel.startEdit();                
+            }            
+        });
     }
     
     public static TreeNodeType getTreeNodeType(TreeItem t) {

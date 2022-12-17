@@ -1139,6 +1139,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         if (item instanceof MetadataTag) {
             metadataEditor.setEditable(true);
             updateMetadataButtonsVisibility();
+            mainPanel.setEditingStatus();
         }
     }
 
@@ -1149,6 +1150,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         setMetadataModified(false);
         updateMetadataButtonsVisibility();
         mainPanel.repaintTree();
+        mainPanel.clearEditingStatus();
     }
 
     private void cancelMetadataButtonActionPerformed(ActionEvent evt) {
@@ -1157,6 +1159,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         metadataEditor.setEditable(Configuration.editorMode.get());
         setMetadataModified(false);
         updateMetadataButtonsVisibility();
+        mainPanel.clearEditingStatus();
     }
 
     private void editGenericTagButtonActionPerformed(ActionEvent evt) {
@@ -1174,6 +1177,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             genericSaveButton.setVisible(true);
             genericCancelButton.setVisible(true);
             genericTagPanel.setEditMode(true, (Tag) item);
+            
+            mainPanel.setEditingStatus();
         }
     }
 
@@ -1193,6 +1198,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             genericCancelButton.setVisible(false);
             genericTagPanel.setEditMode(false, null);
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), tag);
+            mainPanel.clearEditingStatus();
         }
     }
 
@@ -1201,6 +1207,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         genericSaveButton.setVisible(false);
         genericCancelButton.setVisible(false);
         genericTagPanel.setEditMode(false, null);
+        mainPanel.clearEditingStatus();
     }
 
     private void savePlaceTagButtonActionPerformed(ActionEvent evt) {
@@ -1224,12 +1231,13 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 mainPanel.refreshTree(swf);
                 hilightTag = tag;
             }
-            placeGenericPanel.setEditMode(false, null);
+            placeGenericPanel.setEditMode(false, null);            
         }
         placeTransformButton.setVisible(true);
         placeEditButton.setVisible(true);
         placeSaveButton.setVisible(false);
         placeCancelButton.setVisible(false);
+        mainPanel.clearEditingStatus();
         mainPanel.repaintTree();
         if (hilightTag != null) {
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), hilightTag);
@@ -1243,6 +1251,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeTransformButton.setVisible(false);
         placeSaveButton.setVisible(true);
         placeCancelButton.setVisible(true);
+        mainPanel.setEditingStatus();
     }
 
     private void transformPlaceTagButtonActionPerformed(ActionEvent evt) {
@@ -1259,7 +1268,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeEditButton.setVisible(false);
         placeTransformButton.setVisible(false);
         placeSaveButton.setVisible(true);
-        placeCancelButton.setVisible(true);        
+        placeCancelButton.setVisible(true);      
+        mainPanel.setEditingStatus();
         
         Timer t = new Timer();
         t.schedule(new TimerTask(){
@@ -1377,6 +1387,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imageTransformSaveButton.setVisible(true);
         imageTransformCancelButton.setVisible(true);
         imageTransformScrollPane.setVisible(true);
+        mainPanel.setEditingStatus();
              
         
         Timer t = new Timer();
@@ -1406,8 +1417,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             placeGenericPanel.setVisible(true);
         }
         if (placeEditMode == PLACE_EDIT_RAW) {
-            placeGenericPanel.setEditMode(false, null);
+            placeGenericPanel.setEditMode(false, null);            
         }
+        mainPanel.clearEditingStatus();
         placeEditButton.setVisible(true);
         placeTransformButton.setVisible(true);
         placeSaveButton.setVisible(false);
@@ -1450,5 +1462,34 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void selectImageDepth(int depth) {
         imagePanel.selectDepth(depth);
+    }
+    
+    public void startEditPlaceTag() {
+        if (!placeEditButton.isVisible()) {
+            return;
+        }
+        editPlaceTagButtonActionPerformed(null);
+    }
+    
+    public void startEditMetaDataTag() {
+        if (!metadataEditButton.isVisible()) {
+            return;
+        }
+        editMetadataButtonActionPerformed(null);
+    }
+    
+    public void startEditGenericTag() {
+        if (!genericEditButton.isVisible()) {
+            return;
+        }
+        editGenericTagButtonActionPerformed(null);
+    }
+    
+    public void startEditFontTag() {
+        fontPanel.startEdit();
+    }
+    
+    public void startEditTextTag() {
+        textPanel.startEdit();
     }
 }
