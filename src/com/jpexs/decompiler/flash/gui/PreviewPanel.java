@@ -498,8 +498,19 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         JPanel previewCnt = new JPanel(new BorderLayout());
         imagePanel = new ImagePanel();
-        imagePanel.setLoop(Configuration.loopMedia.get());
         
+        imagePanel.addPlaceObjectSelectedListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PlaceObjectTypeTag placeObject = imagePanel.getPlaceTagUnderCursor();
+                if (placeObject != null) {
+                    mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), placeObject);
+                }
+            }            
+        });
+        
+        imagePanel.setLoop(Configuration.loopMedia.get());
+                        
         imageTransformPanel = new TransformPanel(imagePanel);        
         previewCnt.add(imageTransformSplitPane = new JPersistentSplitPane(JPersistentSplitPane.HORIZONTAL_SPLIT, imagePanel,
                 imageTransformScrollPane = new FasterScrollPane(imageTransformPanel), 
