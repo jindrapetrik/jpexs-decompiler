@@ -2293,7 +2293,7 @@ public class Main {
                     String hash = md5(data);
                     for (OpenableList sl : Main.getMainFrame().getPanel().getSwfs()) {
                         for (int s = 0; s < sl.size(); s++) {
-                            String t = sl.get(s).getFileTitle();
+                            String t = sl.get(s).getTitleOrShortFileName();
                             if (t == null) {
                                 t = "";
                             }
@@ -2304,7 +2304,7 @@ public class Main {
                     }
                     SWF swf = Main.getMainFrame().getPanel().getCurrentSwf();
 
-                    String title = swf == null ? "?" : swf.getFileTitle();
+                    String title = swf == null ? "?" : swf.getTitleOrShortFileName();
                     final String titleWithHash = title + ":" + hash;
                     try {
                         final String tfile = tempFile(titleWithHash);
