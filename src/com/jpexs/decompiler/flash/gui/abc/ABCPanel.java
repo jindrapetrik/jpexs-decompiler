@@ -1015,15 +1015,23 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         editDecompiledButton.addActionListener(this::editDecompiledButtonActionPerformed);
         cancelDecompiledButton.addActionListener(this::cancelDecompiledButtonActionPerformed);
 
-        saveDecompiledButton.setVisible(false);
-        cancelDecompiledButton.setVisible(false);
+        /*if (Configuration.editorMode.get()) {
+            editDecompiledButton.setVisible(false);
+            saveDecompiledButton.setEnabled(false);
+            cancelDecompiledButton.setEnabled(false);
+        } else 
+        */
+        {
+            saveDecompiledButton.setVisible(false);
+            cancelDecompiledButton.setVisible(false);
+        }
         decButtonsPan.setAlignmentX(0);
 
         JPanel decPanel = new JPanel(new BorderLayout());
         decPanel.add(searchPanel, BorderLayout.NORTH);
         decPanel.add(iconDecPanel, BorderLayout.CENTER);
         decPanel.add(decButtonsPan, BorderLayout.SOUTH);
-        detailPanel = new DetailPanel(this);
+        detailPanel = new DetailPanel(this, mainPanel);
         JPanel panB = new JPanel();
         panB.setLayout(new BorderLayout());
         panB.add(decLabel, BorderLayout.NORTH);
@@ -1512,12 +1520,24 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             decompiledTextArea.setText(lastDecompiled);
         }
 
-        decompiledTextArea.setEditable(val);
-        saveDecompiledButton.setVisible(val);
-        saveDecompiledButton.setEnabled(false);
-        editDecompiledButton.setVisible(!val);
-        experimentalLabel.setVisible(!val);
-        cancelDecompiledButton.setVisible(val);
+        /*if (Configuration.editorMode.get()) {
+            decompiledTextArea.setEditable(true);
+            editDecompiledButton.setVisible(false);
+            saveDecompiledButton.setVisible(true);
+            saveDecompiledButton.setEnabled(false);
+            cancelDecompiledButton.setVisible(true);
+            cancelDecompiledButton.setEnabled(false);
+            experimentalLabel.setVisible(false);
+        } else*/
+        {
+            decompiledTextArea.setEditable(val);
+            saveDecompiledButton.setVisible(val);
+            saveDecompiledButton.setEnabled(false);
+            editDecompiledButton.setVisible(!val);
+            experimentalLabel.setVisible(!val);                
+            cancelDecompiledButton.setVisible(val);
+        }
+        
         decompiledTextArea.getCaret().setVisible(true);
         decLabel.setIcon(val ? View.getIcon("editing16") : null);
         detailPanel.setVisible(!val);
@@ -1538,6 +1558,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         if (ViewMessages.showConfirmDialog(this, AppStrings.translate("message.confirm.experimental.function"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.warningExperimentalAS3Edit, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
             pack = decompiledTextArea.getScriptLeaf();
             setDecompiledEditMode(true);
+            mainPanel.setEditingStatus();
             SwingWorker initReplaceWorker = new SwingWorker() {
                 @Override
                 protected Object doInBackground() throws Exception {
@@ -1554,6 +1575,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         if (scriptReplacer != null) {
             scriptReplacer.deinitReplacement(pack);
         }
+        mainPanel.clearEditingStatus();
     }
 
     public TreeItem getScriptNodeForPack(ScriptPack pack) {
@@ -1586,6 +1608,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 hilightScript(localAbc.getOpenable(), oldSp, scriptNode);
             }
             reload();
+            mainPanel.clearEditingStatus();
             ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
         } catch (As3ScriptReplaceException asre) {
             StringBuilder sb = new StringBuilder();
@@ -1821,7 +1844,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     public boolean isEditing() {
         View.checkAccess();
 
-        return detailPanel.saveButton.isVisible() || saveDecompiledButton.isVisible();
+        return (detailPanel.saveButton.isVisible() && detailPanel.saveButton.isEnabled()) 
+                || (saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled());
     }
 
     public DebugPanel getDebugPanel() {

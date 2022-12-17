@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.DebuggerHandler;
 import com.jpexs.decompiler.flash.gui.HeaderLabel;
 import com.jpexs.decompiler.flash.gui.Main;
+import com.jpexs.decompiler.flash.gui.MainPanel;
 import com.jpexs.decompiler.flash.gui.TagEditorPanel;
 import com.jpexs.decompiler.flash.gui.View;
 import com.jpexs.decompiler.flash.gui.ViewMessages;
@@ -86,9 +87,12 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
     private boolean buttonsShouldBeShown = false;
 
     private final DebuggerHandler.ConnectionListener conListener;
+    
+    private MainPanel mainPanel;
 
-    public DetailPanel(ABCPanel abcPanel) {
+    public DetailPanel(ABCPanel abcPanel, MainPanel mainPanel) {
         this.abcPanel = abcPanel;
+        this.mainPanel = mainPanel;
         innerPanel = new JPanel();
         CardLayout layout = new CardLayout();
         innerPanel.setLayout(layout);
@@ -120,8 +124,15 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
         saveButton.addActionListener(this::saveButtonActionPerformed);
         editButton.addActionListener(this::editButtonActionPerformed);
         cancelButton.addActionListener(this::cancelButtonActionPerformed);
-        saveButton.setVisible(false);
-        cancelButton.setVisible(false);
+        /*if (Configuration.editorMode.get()) {
+            editButton.setVisible(false);
+            saveButton.setEnabled(false);
+            cancelButton.setEnabled(false);
+        } else */
+        {
+            saveButton.setVisible(false);
+            cancelButton.setVisible(false);
+        }
         buttonsPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
         buttonsPanel.add(editButton);
         buttonsPanel.add(saveButton);
@@ -186,13 +197,26 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
     }
 
     public void setEditMode(boolean val) {
-        slotConstTraitPanel.setEditMode(val);
-        methodTraitPanel.setEditMode(val);
-        saveButton.setVisible(val);
-        saveButton.setEnabled(false);
-        editButton.setVisible(!val);
-        cancelButton.setVisible(val);
-        selectedLabel.setIcon(val ? View.getIcon("editing16") : null);
+        /*if (Configuration.editorMode.get()) {
+            slotConstTraitPanel.setEditMode(true);
+            methodTraitPanel.setEditMode(true);
+            editButton.setVisible(false);
+            saveButton.setVisible(true);
+            saveButton.setEnabled(false);
+            cancelButton.setVisible(true);
+            cancelButton.setEnabled(false);
+            selectedLabel.setIcon(View.getIcon("editing16"));            
+        } else 
+*/      
+        {
+            slotConstTraitPanel.setEditMode(val);
+            methodTraitPanel.setEditMode(val);
+            saveButton.setVisible(val);
+            saveButton.setEnabled(false);
+            editButton.setVisible(!val);
+            cancelButton.setVisible(val);
+            selectedLabel.setIcon(val ? View.getIcon("editing16") : null);
+        }
     }
 
     public void showCard(final String name, final Trait trait, int traitIndex, ABC abc) {
@@ -303,6 +327,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
     private void cancelButtonActionPerformed(ActionEvent evt) {
         setEditMode(false);
         abcPanel.decompiledTextArea.resetEditing();
+        mainPanel.clearEditingStatus();
     }
 
     private void saveButtonActionPerformed(ActionEvent evt) {
@@ -321,12 +346,13 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
                             decompiledTextArea.gotoTrait(lastTrait);
                         }
                         setEditMode(false);
+                        mainPanel.clearEditingStatus();
                         ViewMessages.showMessageDialog(DetailPanel.this, AppStrings.translate("message.trait.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showTraitSavedMessage);
                     }
                 };
 
                 decompiledTextArea.addScriptListener(reloadComplete);
-                decompiledTextArea.reloadClass();
+                decompiledTextArea.reloadClass();                
             }
         }
     }
