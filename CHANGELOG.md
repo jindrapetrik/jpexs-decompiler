@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 - Show axis as dashed line in Free transform of sprites
 - [#1900] Transformation panel with flip/move/scale/rotate/skew/matrix options
 - [#1900] Move object around with arrow keys (in transform mode)
+- Alt + click selects PlaceObjectTag under cursor
 
 ### Fixed
 - [#1897] Close menu button without selecting specific item
