@@ -2620,7 +2620,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             if (freeTransformDepth == -1) {
                                 Cursor newCursor;
                                 if (iconPanel.isAltDown()) {
-                                    newCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+                                    if (depthStateUnderCursor == null) {
+                                        newCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+                                    } else {
+                                        newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+                                    }
                                 } else if (handCursor) {
                                     newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
                                 } else if (iconPanel.hasAllowMove()) {
