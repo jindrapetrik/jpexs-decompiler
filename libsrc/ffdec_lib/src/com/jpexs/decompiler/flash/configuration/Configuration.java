@@ -860,7 +860,7 @@ public final class Configuration {
     public static ConfigurationItem<String> guiTransformLastExpandedCards = null;
     
     @ConfigurationDefaultBoolean(false)
-    @ConfigurationCategory("display")
+    @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> doubleClickNodeToEdit = null;
     
     private enum OSId {
