@@ -163,7 +163,7 @@ public class TransformPanel extends JPanel {
         setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
         this.imagePanel = imagePanel;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
+        
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
 
@@ -194,7 +194,7 @@ public class TransformPanel extends JPanel {
         //addRow(basicPanel, 0, flipHorizontallyButton, rotate90ClockwiseButton);
         //addRow(basicPanel, 1, flipVerticallyButton, rotate90AntiClockwiseButton, rotate180Button);
         JPanel basicPanel1 = new JPanel(new FlowLayout());
-        basicPanel1.add(flipHorizontallyButton);
+        basicPanel1.add(flipHorizontallyButton);        
         basicPanel1.add(flipVerticallyButton);
         JPanel basicPanel2 = new JPanel(new FlowLayout());        
         basicPanel2.add(rotate90ClockwiseButton);
@@ -204,6 +204,7 @@ public class TransformPanel extends JPanel {
         basicPanel.add(basicPanel1);
         basicPanel.add(basicPanel2);
         basicPanel.add(basicPanel3);
+        basicPanel.add(Box.createVerticalGlue());
         add(makeCard(AppStrings.translate("transform.basic"), "transformbasic16", basicPanel));
         
         JPanel movePanel = new JPanel(new GridBagLayout());
@@ -415,11 +416,12 @@ public class TransformPanel extends JPanel {
                 }
             }
         });
-        ///add(Box.createVerticalGlue());
-        JPanel finalPanel = new JPanel();
-        finalPanel.setPreferredSize(new Dimension(1, Integer.MAX_VALUE));
+        add(Box.createVerticalGlue());
+        /*JPanel finalPanel = new JPanel();
+        //finalPanel.setPreferredSize(new Dimension(1, Integer.MAX_VALUE));
         finalPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        add(finalPanel);
+        finalPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+        add(finalPanel);*/
     }
 
     public void load() {
@@ -697,6 +699,7 @@ public class TransformPanel extends JPanel {
                     } else {
                         plusMinusLabel.setText("+");
                     }
+                    contents.setMaximumSize(new Dimension(Integer.MAX_VALUE, contents.getPreferredSize().height));
                     cardPanel.revalidate();
                     cardPanel.repaint();
                 }
