@@ -579,6 +579,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private void metadataTextChanged() {
         setMetadataModified(true);
+        mainPanel.setEditingStatus();
     }
 
     private void updateMetadataButtonsVisibility() {
@@ -1454,7 +1455,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     public boolean isEditing() {
         return textPanel.isEditing()
                 || genericSaveButton.isVisible()
-                || metadataSaveButton.isVisible()
+                || (metadataSaveButton.isVisible() && metadataSaveButton.isEnabled())
                 || placeSaveButton.isVisible()
                 || fontPanel.isEditing()
                 || imageTransformSaveButton.isVisible();
