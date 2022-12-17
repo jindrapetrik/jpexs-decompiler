@@ -2371,11 +2371,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
             updatePos(timelined, lastMouseEvent, thisTimer);
 
-            if (cursorPosition != null) {
-                cursorPosition.x /= zoomDouble;
-                cursorPosition.y /= zoomDouble;
-            }
-
             Matrix mat = new Matrix();
             mat.translateX = swf.displayRect.Xmin;
             mat.translateY = swf.displayRect.Ymin;
