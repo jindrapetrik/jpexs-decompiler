@@ -854,6 +854,11 @@ public final class Configuration {
     @ConfigurationInternal
     public static ConfigurationItem<Double> guiSplitPaneTransform2DividerLocationPercent = null;
     
+    @ConfigurationDefaultString("")
+    @ConfigurationName("gui.transform.lastExpandedCards")
+    @ConfigurationInternal
+    public static ConfigurationItem<String> guiTransformLastExpandedCards = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
