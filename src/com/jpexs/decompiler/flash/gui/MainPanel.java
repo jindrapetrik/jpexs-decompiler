@@ -5588,6 +5588,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.startEditFontTag();
         } else if (treeItem instanceof TextTag) {
             previewPanel.startEditTextTag();
+        } else if (treeItem instanceof ASMSource) {
+            //There are two kinds of edit - Script and P-code.
         } else if (treeItem instanceof Tag) {
             Tag tag = (Tag)treeItem;
             previewPanel.showGenericTagPanel(tag);
