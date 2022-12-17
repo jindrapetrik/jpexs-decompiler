@@ -765,14 +765,26 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         saveButton.addActionListener(this::saveActionButtonActionPerformed);
         editButton.addActionListener(this::editActionButtonActionPerformed);
         cancelButton.addActionListener(this::cancelActionButtonActionPerformed);
-        saveButton.setVisible(false);
-        cancelButton.setVisible(false);
+        if (Configuration.editorMode.get()) {
+            editButton.setVisible(false);
+            saveButton.setEnabled(false);
+            cancelButton.setEnabled(false);
+        } else {
+            saveButton.setVisible(false);
+            cancelButton.setVisible(false);
+        }
 
         saveDecompiledButton.addActionListener(this::saveDecompiledButtonActionPerformed);
         editDecompiledButton.addActionListener(this::editDecompiledButtonActionPerformed);
         cancelDecompiledButton.addActionListener(this::cancelDecompiledButtonActionPerformed);
-        saveDecompiledButton.setVisible(false);
-        cancelDecompiledButton.setVisible(false);
+        if (Configuration.editorMode.get()) {
+            editDecompiledButton.setVisible(false);
+            saveDecompiledButton.setEnabled(false);
+            cancelDecompiledButton.setEnabled(false);
+        } else {
+            saveDecompiledButton.setVisible(false);
+            cancelDecompiledButton.setVisible(false);
+        }
 
         JPanel panA = new JPanel(new BorderLayout());
 
@@ -901,9 +913,11 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         return saveButton.isVisible() && saveButton.isEnabled();
     }
 
-    private void setModified(boolean value) {
+    private void setModified(boolean value) {        
         View.checkAccess();
 
+        editMode = true;
+        mainPanel.setEditingStatus();
         saveButton.setEnabled(value);
         cancelButton.setEnabled(value);
     }
@@ -917,6 +931,8 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
     private void setDecompiledModified(boolean value) {
         View.checkAccess();
 
+        editDecompiledMode = true;
+        mainPanel.setEditingStatus();
         saveDecompiledButton.setEnabled(value);
         cancelDecompiledButton.setEnabled(value);
     }
@@ -934,11 +950,20 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             }
         }
 
-        editor.setEditable(val);
-        saveButton.setVisible(val);
-        saveButton.setEnabled(false);
-        editButton.setVisible(!val);
-        cancelButton.setVisible(val);
+        if (Configuration.editorMode.get()) {
+            editor.setEditable(true);
+            editButton.setVisible(false);
+            saveButton.setVisible(true);
+            saveButton.setEnabled(false);            
+            cancelButton.setVisible(true);
+            cancelButton.setEnabled(false);
+        } else {        
+            editor.setEditable(val);                
+            saveButton.setVisible(val);
+            saveButton.setEnabled(false);
+            editButton.setVisible(!val);
+            cancelButton.setVisible(val);
+        }
 
         editor.getCaret().setVisible(true);
         asmLabel.setIcon(val ? View.getIcon("editing16") : null); // this line is not working
@@ -960,12 +985,20 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             }
         }
 
-        decompiledEditor.setEditable(val);
-        saveDecompiledButton.setVisible(val);
-        saveDecompiledButton.setEnabled(false);
-        editDecompiledButton.setVisible(!val);
-        cancelDecompiledButton.setVisible(val);
-
+        if (Configuration.editorMode.get()) {
+            decompiledEditor.setEditable(true);
+            editDecompiledButton.setVisible(false);
+            saveDecompiledButton.setVisible(true);
+            saveDecompiledButton.setEnabled(false);
+            cancelDecompiledButton.setVisible(true);
+            cancelDecompiledButton.setEnabled(false);
+        } else {
+            decompiledEditor.setEditable(val);
+            saveDecompiledButton.setVisible(val);
+            saveDecompiledButton.setEnabled(false);
+            editDecompiledButton.setVisible(!val);
+            cancelDecompiledButton.setVisible(val);
+        }
         decompiledEditor.getCaret().setVisible(true);
         decLabel.setIcon(val ? View.getIcon("editing16") : null);
         editDecompiledMode = val;
@@ -988,6 +1021,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
     private void editActionButtonActionPerformed(ActionEvent evt) {
         setEditMode(true);
+        mainPanel.setEditingStatus();
     }
 
     private void hexButtonActionPerformed(ActionEvent evt) {
@@ -1031,6 +1065,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
     private void cancelActionButtonActionPerformed(ActionEvent evt) {
         setEditMode(false);
         setHex(getExportMode(), src.getScriptName(), lastCode);
+        mainPanel.clearEditingStatus();
     }
 
     private void saveActionButtonActionPerformed(ActionEvent evt) {
@@ -1059,6 +1094,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             editButton.setVisible(true);
             editor.setEditable(false);
             editMode = false;
+            mainPanel.clearEditingStatus();
             mainPanel.refreshTree(src.getSwf());
         } catch (IOException ex) {
         } catch (ActionParseException ex) {
@@ -1072,10 +1108,12 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
     private void editDecompiledButtonActionPerformed(ActionEvent evt) {
         setDecompiledEditMode(true);
+        mainPanel.setEditingStatus();
     }
 
     private void cancelDecompiledButtonActionPerformed(ActionEvent evt) {
         setDecompiledEditMode(false);
+        mainPanel.clearEditingStatus();
     }
 
     private void saveDecompiledButtonActionPerformed(ActionEvent evt) {
@@ -1088,6 +1126,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
             ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
             setDecompiledEditMode(false);
+            mainPanel.clearEditingStatus();
         } catch (ValueTooLargeException ex) {
             ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save.valueTooLarge"), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
         } catch (IOException ex) {
