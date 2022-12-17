@@ -322,6 +322,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
     private void editButtonActionPerformed(ActionEvent evt) {
         setEditMode(true);
         methodTraitPanel.methodCodePanel.focusEditor();
+        mainPanel.setEditingStatus();
     }
 
     private void cancelButtonActionPerformed(ActionEvent evt) {
