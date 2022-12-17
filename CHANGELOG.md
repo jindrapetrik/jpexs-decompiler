@@ -22,6 +22,8 @@ All notable changes to this project will be documented in this file.
 - [#1900] Transformation panel with flip/move/scale/rotate/skew/matrix options
 - [#1900] Move object around with arrow keys (in transform mode)
 - Alt + click selects PlaceObjectTag under cursor
+- [#1901] Double click tree node to start edit
+- Info about editation in status bar
 
 ### Fixed
 - [#1897] Close menu button without selecting specific item
@@ -2735,6 +2737,7 @@ All notable changes to this project will be documented in this file.
 [#1893]: https://www.free-decompiler.com/flash/issues/1893
 [#1181]: https://www.free-decompiler.com/flash/issues/1181
 [#1900]: https://www.free-decompiler.com/flash/issues/1900
+[#1901]: https://www.free-decompiler.com/flash/issues/1901
 [#1897]: https://www.free-decompiler.com/flash/issues/1897
 [#1006]: https://www.free-decompiler.com/flash/issues/1006
 [#1828]: https://www.free-decompiler.com/flash/issues/1828

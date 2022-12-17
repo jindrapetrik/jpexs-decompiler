@@ -111,14 +111,14 @@ public class FontPanel extends JPanel {
     }
 
     public boolean isEditing() {
-        return buttonSave.isVisible();
+        return saveButton.isVisible();
     }
     
     private void setEditable(boolean editable) {
         if (editable) {
-            buttonEdit.setVisible(false);
-            buttonSave.setVisible(true);
-            buttonCancel.setVisible(true);
+            editButton.setVisible(false);
+            saveButton.setVisible(true);
+            cancelButton.setVisible(true);
             if (fontTag.isBoldEditable()) {
                 fontIsBoldCheckBox.setEnabled(true);
             }
@@ -143,9 +143,9 @@ public class FontPanel extends JPanel {
                 fontLeadingLabel.setVisible(false);
             }
         } else {
-            buttonEdit.setVisible(true);
-            buttonSave.setVisible(false);
-            buttonCancel.setVisible(false);
+            editButton.setVisible(true);
+            saveButton.setVisible(false);
+            cancelButton.setVisible(false);
             fontIsBoldCheckBox.setEnabled(false);
             fontIsItalicCheckBox.setEnabled(false);
             fontNameIntagTextField.setVisible(false);
@@ -282,7 +282,7 @@ public class FontPanel extends JPanel {
         boolean readOnly = ((Tag) ft).isReadOnly();
         if (readOnly) {
             addCharsPanel.setVisible(false);
-            buttonEdit.setVisible(false);
+            editButton.setVisible(false);
         }
     }
 
@@ -322,11 +322,11 @@ public class FontPanel extends JPanel {
         fontFamilyNameSelection = new JComboBox<>();
         fontFaceSelection = new JComboBox<>();
         fontEmbedButton = new JButton();
-        buttonEdit = new JButton();
-        buttonSave = new JButton();
-        buttonCancel = new JButton();
-        buttonPreviewFont = new JButton();
-        buttonSetAdvanceValues = new JButton();
+        editButton = new JButton();
+        saveButton = new JButton();
+        cancelButton = new JButton();
+        previewFontButton = new JButton();
+        setAdvanceValuesButton = new JButton();
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent evt) {
@@ -501,23 +501,23 @@ public class FontPanel extends JPanel {
         fontEmbedButton.setText(AppStrings.translate("button.font.embed"));
         fontEmbedButton.addActionListener(this::fontEmbedButtonActionPerformed);
 
-        buttonEdit.setIcon(View.getIcon("edit16"));
-        buttonEdit.setText(AppStrings.translate("button.edit"));
-        buttonEdit.addActionListener(this::buttonEditActionPerformed);
+        editButton.setIcon(View.getIcon("edit16"));
+        editButton.setText(AppStrings.translate("button.edit"));
+        editButton.addActionListener(this::editButtonActionPerformed);
 
-        buttonSave.setIcon(View.getIcon("save16"));
-        buttonSave.setText(AppStrings.translate("button.save"));
-        buttonSave.addActionListener(this::buttonSaveActionPerformed);
+        saveButton.setIcon(View.getIcon("save16"));
+        saveButton.setText(AppStrings.translate("button.save"));
+        saveButton.addActionListener(this::saveButtonActionPerformed);
 
-        buttonCancel.setIcon(View.getIcon("cancel16"));
-        buttonCancel.setText(AppStrings.translate("button.cancel"));
-        buttonCancel.addActionListener(this::buttonCancelActionPerformed);
+        cancelButton.setIcon(View.getIcon("cancel16"));
+        cancelButton.setText(AppStrings.translate("button.cancel"));
+        cancelButton.addActionListener(this::cancelButtonActionPerformed);
 
-        buttonPreviewFont.setText(AppStrings.translate("button.preview"));
-        buttonPreviewFont.addActionListener(this::buttonPreviewFontActionPerformed);
+        previewFontButton.setText(AppStrings.translate("button.preview"));
+        previewFontButton.addActionListener(this::previewButtonFontActionPerformed);
 
-        buttonSetAdvanceValues.setText(AppStrings.translate("button.setAdvanceValues"));
-        buttonSetAdvanceValues.addActionListener(this::buttonSetAdvanceValuesActionPerformed);
+        setAdvanceValuesButton.setText(AppStrings.translate("button.setAdvanceValues"));
+        setAdvanceValuesButton.addActionListener(this::setAdvanceValuesButtonActionPerformed);
 
         TableLayout tlAddCharsPanel;
         addCharsPanel.setLayout(tlAddCharsPanel = new TableLayout(new double[][]{
@@ -535,13 +535,13 @@ public class FontPanel extends JPanel {
         addCharsPanel.add(fontSourceLabel, "0,1,R");
         addCharsPanel.add(fontFamilyNameSelection, "1,1");
         addCharsPanel.add(fontFaceSelection, "2,1");
-        addCharsPanel.add(buttonPreviewFont, "3,1");
-        addCharsPanel.add(buttonSetAdvanceValues, "4,1");
+        addCharsPanel.add(previewFontButton, "3,1");
+        addCharsPanel.add(setAdvanceValuesButton, "4,1");
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
-        buttonsPanel.add(buttonEdit);
-        buttonsPanel.add(buttonSave);
-        buttonsPanel.add(buttonCancel);
+        buttonsPanel.add(editButton);
+        buttonsPanel.add(saveButton);
+        buttonsPanel.add(cancelButton);
 
         TableLayout tlAll;
         contentPanel.setLayout(tlAll = new TableLayout(new double[][]{
@@ -673,11 +673,12 @@ public class FontPanel extends JPanel {
         savePair();
     }
 
-    private void buttonEditActionPerformed(ActionEvent evt) {
+    private void editButtonActionPerformed(ActionEvent evt) {
         setEditable(true);
+        mainPanel.setEditingStatus();
     }
 
-    private void buttonSaveActionPerformed(ActionEvent evt) {
+    private void saveButtonActionPerformed(ActionEvent evt) {
 
         if (!(fontTag instanceof DefineFontTag)) {
             if (fontTag.getCharacterCount() == 0 && !fontTag.hasLayout()) {
@@ -720,18 +721,20 @@ public class FontPanel extends JPanel {
         mainPanel.getCurrentTree().repaint();
         fontTag.setModified(true);
         setEditable(false);
+        mainPanel.clearEditingStatus();
     }
 
-    private void buttonCancelActionPerformed(ActionEvent evt) {
+    private void cancelButtonActionPerformed(ActionEvent evt) {
         showFontTag(fontTag);
         setEditable(false);
+        mainPanel.clearEditingStatus();
     }
 
-    private void buttonPreviewFontActionPerformed(ActionEvent evt) {
+    private void previewButtonFontActionPerformed(ActionEvent evt) {
         new FontPreviewDialog(null, true, ((FontFace) fontFaceSelection.getSelectedItem()).font).setVisible(true);
     }
 
-    private void buttonSetAdvanceValuesActionPerformed(ActionEvent evt) {
+    private void setAdvanceValuesButtonActionPerformed(ActionEvent evt) {
         if (ViewMessages.showConfirmDialog(FontPanel.this, AppStrings.translate("message.font.setadvancevalues"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, Configuration.showSetAdvanceValuesMessage, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
             fontTag.setAdvanceValues(((FontFace) fontFaceSelection.getSelectedItem()).font);
         }
@@ -791,16 +794,23 @@ public class FontPanel extends JPanel {
             }
         }
     }
+    
+    public void startEdit() {
+        if (!editButton.isVisible()) {
+            return;
+        }
+        editButtonActionPerformed(null);
+    }
 
-    private JButton buttonCancel;
+    private JButton cancelButton;
 
-    private JButton buttonEdit;
+    private JButton editButton;
 
-    private JButton buttonPreviewFont;
+    private JButton previewFontButton;
 
-    private JButton buttonSetAdvanceValues;
+    private JButton setAdvanceValuesButton;
 
-    private JButton buttonSave;
+    private JButton saveButton;
 
     private JTextField fontAddCharactersField;
 

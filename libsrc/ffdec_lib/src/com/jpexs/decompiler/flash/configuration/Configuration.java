@@ -859,6 +859,10 @@ public final class Configuration {
     @ConfigurationInternal
     public static ConfigurationItem<String> guiTransformLastExpandedCards = null;
     
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> doubleClickNodeToEdit = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

@@ -834,7 +834,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void setStatus(String s) {
         statusPanel.setStatus(s);
     }
+    
+    public void setEditingStatus() {
+        statusPanel.setStatus(translate("status.editing"));
+    }
 
+    public void clearEditingStatus() {
+        statusPanel.setStatus("");
+    }
+    
     public void setWorkStatus(String s, CancellableWorker worker) {
         statusPanel.setWorkStatus(s, worker);
         mainMenu.updateComponents();
@@ -1051,7 +1059,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         displayPanel.add(createFolderListCard(), CARDFOLDERLISTPANEL);
         displayPanel.add(createDumpPreviewCard(), CARDDUMPVIEW);
 
-        headerPanel = new HeaderInfoPanel();
+        headerPanel = new HeaderInfoPanel(this);
         displayPanel.add(headerPanel, CARDHEADER);
 
         displayPanel.add(new JPanel(), CARDEMPTYPANEL);
@@ -5561,5 +5569,30 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return itemToStr + " [" + index + "]";
         }
         return itemToStr;
+    }
+    
+    public void startEdit() {
+        TreeItem treeItem = getCurrentTree().getCurrentTreeItem();
+        if (treeItem == null) {
+            return;
+        }
+        if (treeItem instanceof HeaderItem) {
+            headerPanel.startEdit();
+        } else if (treeItem instanceof PlaceObjectTypeTag) {
+            previewPanel.startEditPlaceTag();
+        } else if (treeItem instanceof MetadataTag) {
+            previewPanel.startEditMetaDataTag();
+        } else if (treeItem instanceof DefineBinaryDataTag) {
+            //TODO
+        } else if (treeItem instanceof FontTag) {
+            previewPanel.startEditFontTag();
+        } else if (treeItem instanceof TextTag) {
+            previewPanel.startEditTextTag();
+        } else if (treeItem instanceof Tag) {
+            Tag tag = (Tag)treeItem;
+            previewPanel.showGenericTagPanel(tag);
+            previewPanel.startEditGenericTag();
+        }
+        
     }
 }

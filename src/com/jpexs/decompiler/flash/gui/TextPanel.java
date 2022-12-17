@@ -329,11 +329,13 @@ public class TextPanel extends JPanel implements TagEditorPanel {
     private void editText() {
         setEditText(true);
         showTextComparingPreview();
+        mainPanel.setEditingStatus();
     }
 
     private void cancelText() {
         setEditText(false);
         mainPanel.reload(true);
+        mainPanel.clearEditingStatus();
     }
 
     private void saveText(boolean refresh) {
@@ -344,6 +346,7 @@ public class TextPanel extends JPanel implements TagEditorPanel {
             if (refresh) {
                 mainPanel.repaintTree();
             }
+            mainPanel.clearEditingStatus();
         }
     }
 
@@ -424,5 +427,12 @@ public class TextPanel extends JPanel implements TagEditorPanel {
     @Override
     public boolean isEditing() {
         return textSaveButton.isVisible();
+    }
+    
+    public void startEdit() {
+        if (!textEditButton.isVisible()) {
+            return;
+        }
+        editText();
     }
 }
