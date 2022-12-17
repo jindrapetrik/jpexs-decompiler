@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file.
 - [#1900] Transformation panel with flip/move/scale/rotate/skew/matrix options
 - [#1900] Move object around with arrow keys (in transform mode)
 - Alt + click selects PlaceObjectTag under cursor
-- [#1901] Double click tree node to start edit
+- [#1901] Double click tree node to start edit (can be enabled in settings)
 - Info about editation in status bar
 
 ### Fixed
