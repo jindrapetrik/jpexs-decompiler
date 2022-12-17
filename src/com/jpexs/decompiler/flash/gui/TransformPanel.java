@@ -25,6 +25,7 @@ import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
@@ -160,13 +161,15 @@ public class TransformPanel extends JPanel {
                 update(newBounds, registraionPoint, registrationPointPosition);
             }
         });
-        setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        //setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
         this.imagePanel = imagePanel;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-
+        JLabel transformLabel = new JLabel(AppStrings.translate("transform"));
+        transformLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        transformLabel.setFont(transformLabel.getFont().deriveFont(Font.BOLD));
+        add(transformLabel);
+        
         JPanel registrationPointPanel = new JPanel(new FlowLayout());
         this.registrationPointPanel = new RegistrationPointPanel(this::registrationPointChangedActionPerformed);
         registrationPointPanel.add(this.registrationPointPanel);
@@ -711,7 +714,7 @@ public class TransformPanel extends JPanel {
         cardPanel.add(contents);   
         contents.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         //contents.setMaximumSize(new Dimension(getPreferredSize().width, contents.getPreferredSize().height + 10));
-        cardPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        cardPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         cardPanel.setAlignmentY(Component.TOP_ALIGNMENT);
         return cardPanel;
     }
