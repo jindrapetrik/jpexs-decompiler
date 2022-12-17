@@ -477,10 +477,10 @@ public class TransformPanel extends JPanel {
     }
 
     private void clearMoveActionPerformed(ActionEvent e) {
-        moveHorizontalTextField.setText(formatDouble(convertUnit(bounds.getX(), Unit.TWIP, Unit.PX)));
-        moveVerticalTextField.setText(formatDouble(convertUnit(bounds.getY(), Unit.TWIP, Unit.PX)));
         moveUnitComboBox.setSelectedItem(Unit.PX);
         moveRelativeCheckBox.setSelected(false);
+        moveHorizontalTextField.setText(formatDouble(convertUnit(bounds.getX(), Unit.TWIP, Unit.PX)));
+        moveVerticalTextField.setText(formatDouble(convertUnit(bounds.getY(), Unit.TWIP, Unit.PX)));        
     }
 
     private void applyMoveActionPerformed(ActionEvent e) {
