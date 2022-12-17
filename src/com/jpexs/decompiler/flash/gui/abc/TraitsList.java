@@ -75,6 +75,9 @@ public class TraitsList extends JList<Object> implements ListSelectionListener {
     }
 
     public void setClassIndex(int classIndex, int scriptIndex) {
+        if (abc == null) {
+            return;
+        }
         if (classIndex >= abc.instance_info.size()) {
             return;
         }
