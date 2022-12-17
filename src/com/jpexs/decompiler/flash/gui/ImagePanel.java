@@ -654,6 +654,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         
         private boolean altDown = false;
 
+        public boolean isAltDown() {
+            return altDown;
+        }
+        
+        
         public IconPanel() {
 
             KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
@@ -2614,7 +2619,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                             if (freeTransformDepth == -1) {
                                 Cursor newCursor;
-                                if (handCursor) {
+                                if (iconPanel.isAltDown()) {
+                                    newCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+                                } else if (handCursor) {
                                     newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
                                 } else if (iconPanel.hasAllowMove()) {
                                     newCursor = Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR);
