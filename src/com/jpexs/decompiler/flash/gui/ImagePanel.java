@@ -1507,7 +1507,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             VolatileImage ri = this.renderImage;
             if (ri != null) {
-                calcRect();
                 if (ri.validate(View.getDefaultConfiguration()) != VolatileImage.IMAGE_OK) {
                     ri = View.createRenderImage(getWidth(), getHeight(), Transparency.TRANSLUCENT);
                     render();
@@ -1516,15 +1515,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 if (ri != null) {
                     g2d.drawImage(ri, 0, 0, null);
                 }
-            }
-            g2d.setColor(Color.red);
-
-            DecimalFormat df = new DecimalFormat();
-            df.setMaximumFractionDigits(2);
-            df.setMinimumFractionDigits(0);
-            df.setGroupingUsed(false);
+            }            
 
             if (Configuration._debugMode.get()) {
+                g2d.setColor(Color.red);
+                DecimalFormat df = new DecimalFormat();
+                df.setMaximumFractionDigits(2);
+                df.setMinimumFractionDigits(0);
+                df.setGroupingUsed(false);
                 g2d.drawString("frameLoss:" + df.format(getFrameLoss()) + "%", 20, 20);
             }
         }
