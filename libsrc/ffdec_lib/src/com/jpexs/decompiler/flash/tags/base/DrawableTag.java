@@ -44,7 +44,7 @@ public abstract class DrawableTag extends CharacterTag implements BoundedTag {
 
     public abstract int getUsedParameters();
 
-    public abstract Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked);
+    public abstract Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom);
 
     public abstract void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode);
 

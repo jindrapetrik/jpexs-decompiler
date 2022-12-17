@@ -116,7 +116,7 @@ public class DefineScalingGridTag extends Tag implements CharacterIdTag {
     }
 
     public RECT getRect() {
-        Shape s = getOutline(0, 0, 0, new RenderContext(), new Matrix(), new Matrix(), true);
+        Shape s = getOutline(0, 0, 0, new RenderContext(), new Matrix(), new Matrix(), true, new ExportRectangle(0, 0, 1, 1)/*?*/, 1);
         if (s == null) {
             return null;
         }
@@ -124,7 +124,7 @@ public class DefineScalingGridTag extends Tag implements CharacterIdTag {
         return new RECT(r.x, r.x + r.width, r.y, r.y + r.height);
     }
 
-    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, Matrix prevTransform, boolean stroked) {
+    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, Matrix prevTransform, boolean stroked, ExportRectangle viewRect, double unzoom) {
         CharacterTag ct = swf.getCharacter(characterId);
         if (ct == null) {
             return null;
@@ -135,7 +135,7 @@ public class DefineScalingGridTag extends Tag implements CharacterIdTag {
         double[] coords = new double[6];
 
         DrawableTag dt = (DrawableTag) ct;
-        Shape path = dt.getOutline(frame, time, ratio, renderContext, transformation, stroked);
+        Shape path = dt.getOutline(frame, time, ratio, renderContext, transformation, stroked, viewRect, unzoom);
         PathIterator iterator = path.getPathIterator(new AffineTransform());
         GeneralPath gp = new GeneralPath(GeneralPath.WIND_EVEN_ODD);
         ExportRectangle boundsRect = new ExportRectangle(dt.getRect());

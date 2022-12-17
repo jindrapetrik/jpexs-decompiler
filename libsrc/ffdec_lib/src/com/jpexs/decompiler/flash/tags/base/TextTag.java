@@ -783,7 +783,7 @@ public abstract class TextTag extends DrawableTag {
     }
 
     @Override
-    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked) {
+    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
         RECT r = getBounds();
         Shape shp = new Rectangle.Double(r.Xmin, r.Ymin, r.getWidth(), r.getHeight());
         return transformation.toTransform().createTransformedShape(shp); //TODO: match character shapes (?)

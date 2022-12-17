@@ -229,7 +229,7 @@ public abstract class ImageTag extends DrawableTag {
     }
 
     @Override
-    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked) {
+    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
         return transformation.toTransform().createTransformedShape(getShape(1).getOutline(1, swf, stroked));
     }
 

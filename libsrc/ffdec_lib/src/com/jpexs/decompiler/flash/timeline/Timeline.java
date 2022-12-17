@@ -795,9 +795,9 @@ public class Timeline {
                 if (renderContext.cursorPosition != null) {
                     int dx = (int) (viewRect.xMin * unzoom);
                     int dy = (int) (viewRect.yMin * unzoom);
-                    Point cursorPositionInView = new Point(renderContext.cursorPosition.x - dx, renderContext.cursorPosition.y - dy);
+                    Point cursorPositionInView = new Point((int)Math.round(renderContext.cursorPosition.x * unzoom) - dx, (int)Math.round(renderContext.cursorPosition.y * unzoom) - dy);
 
-                    Shape buttonShape = drawable.getOutline(ButtonTag.FRAME_HITTEST, time, ratio, renderContext, absMat, true);
+                    Shape buttonShape = drawable.getOutline(ButtonTag.FRAME_HITTEST, time, ratio, renderContext, absMat, true, viewRect, unzoom);
                     if (buttonShape.contains(cursorPositionInView)) {
                         renderContext.mouseOverButton = (ButtonTag) drawable;
                         if (renderContext.mouseButton > 0) {
@@ -950,15 +950,15 @@ public class Timeline {
             clips.add(clip);
         } else {
             if (renderContext.cursorPosition != null) {
-                int dx = (int) (viewRect.xMin * unzoom);
-                int dy = (int) (viewRect.yMin * unzoom);
-                Point cursorPositionInView = new Point(renderContext.cursorPosition.x - dx, renderContext.cursorPosition.y - dy);
+                int dx = (int) Math.round(viewRect.xMin * unzoom);
+                int dy = (int) Math.round(viewRect.yMin * unzoom);
+                Point cursorPositionInView = new Point((int) Math.round(renderContext.cursorPosition.x * unzoom) - dx, (int) Math.round(renderContext.cursorPosition.y * unzoom) - dy);
                 if (drawable instanceof DefineSpriteTag) {
                     if (renderContext.stateUnderCursor.size() > stateCount) {
                         renderContext.stateUnderCursor.add(layer);
                     }
                 } else if (absMat.transform(new ExportRectangle(boundRect)).contains(cursorPositionInView)) {
-                    Shape shape = drawable.getOutline(dframe, time, layer.ratio, renderContext, absMat, true);
+                    Shape shape = drawable.getOutline(dframe, time, layer.ratio, renderContext, absMat, true, viewRect, unzoom);
                     if (shape.contains(cursorPositionInView)) {
                         renderContext.stateUnderCursor.add(layer);
                     }
@@ -969,7 +969,7 @@ public class Timeline {
                 Graphics2D g2 = (Graphics2D) renderContext.borderImage.getGraphics();
                 g2.setPaint(Color.red);
                 g2.setStroke(new BasicStroke(2));
-                Shape shape = drawable.getOutline(dframe, time, layer.ratio, renderContext, absMat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)), true);
+                Shape shape = drawable.getOutline(dframe, time, layer.ratio, renderContext, absMat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)), true, viewRect, unzoom);
                 g2.draw(shape);
             }
             if (!(sameImage && canUseSameImage)) {
@@ -1319,7 +1319,7 @@ public class Timeline {
         }
     }
 
-    public Shape getOutline(int frame, int time, RenderContext renderContext, Matrix transformation, boolean stroked) {
+    public Shape getOutline(int frame, int time, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
         Frame fr = getFrame(frame);
         Area area = new Area();
         Stack<Clip> clips = new Stack<>();
@@ -1356,8 +1356,11 @@ public class Timeline {
                     dframe = ButtonTag.FRAME_UP;
                     if (renderContext.cursorPosition != null) {
                         ButtonTag buttonTag = (ButtonTag) character;
-                        Shape buttonShape = buttonTag.getOutline(ButtonTag.FRAME_HITTEST, time, layer.ratio, renderContext, m, stroked);
-                        if (buttonShape.contains(renderContext.cursorPosition)) {
+                        Shape buttonShape = buttonTag.getOutline(ButtonTag.FRAME_HITTEST, time, layer.ratio, renderContext, m, stroked, viewRect, unzoom);                        
+                        int dx = (int) Math.round(viewRect.xMin * unzoom);
+                        int dy = (int) Math.round(viewRect.yMin * unzoom);
+                        Point cursorPositionInView = new Point((int) Math.round(renderContext.cursorPosition.x * unzoom) - dx, (int) Math.round(renderContext.cursorPosition.y * unzoom) - dy);
+                        if (buttonShape.contains(cursorPositionInView)) {
                             if (renderContext.mouseButton > 0) {
                                 dframe = ButtonTag.FRAME_DOWN;
                             } else {
@@ -1367,7 +1370,7 @@ public class Timeline {
                     }
                 }
 
-                Shape cshape = ((DrawableTag) character).getOutline(dframe, time, layer.ratio, renderContext, m, stroked);
+                Shape cshape = ((DrawableTag) character).getOutline(dframe, time, layer.ratio, renderContext, m, stroked, viewRect, unzoom);
                 Area addArea = new Area(cshape);
                 if (currentClip != null) {
                     Area a = new Area(new Rectangle(displayRect.Xmin, displayRect.Ymin, displayRect.getWidth(), displayRect.getHeight()));
