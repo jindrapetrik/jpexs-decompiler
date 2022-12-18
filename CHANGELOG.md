@@ -50,7 +50,7 @@ All notable changes to this project will be documented in this file.
 - Classnames in PlaceObject
 - [#1828] AS1/2 deobfuscation removing variable declarations
 - Loaded SWFs using "Open loaded during play" feature have short filenames
-- Exception on closing multiple SWFs
+- [#1796] Exception on closing multiple SWFs
 
 ### Changed
 - Quick search needs minimum of 3 characters
@@ -2743,6 +2743,7 @@ All notable changes to this project will be documented in this file.
 [#1897]: https://www.free-decompiler.com/flash/issues/1897
 [#1006]: https://www.free-decompiler.com/flash/issues/1006
 [#1828]: https://www.free-decompiler.com/flash/issues/1828
+[#1796]: https://www.free-decompiler.com/flash/issues/1796
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1895]: https://www.free-decompiler.com/flash/issues/1895
 [#1896]: https://www.free-decompiler.com/flash/issues/1896
