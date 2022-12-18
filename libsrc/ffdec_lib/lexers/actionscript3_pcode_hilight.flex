@@ -163,6 +163,7 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "MultinameL"                 |
   "MultinameLA"                |
   "TypeName"                   |
+  "Unknown"                    |
   "null"                       {  return token(TokenType.KEYWORD2);}
   "("                          {  return token(TokenType.OPERATOR,PARAN); }
   ")"                          {  return token(TokenType.OPERATOR,-PARAN); }

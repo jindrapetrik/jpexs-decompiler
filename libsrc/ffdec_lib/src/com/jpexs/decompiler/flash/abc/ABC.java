@@ -1154,7 +1154,7 @@ public class ABC implements Openable {
                 for (int o = 0; o < ins.definition.operands.length; o++) {
                     if (ins.definition.operands[o] == AVM2Code.DAT_MULTINAME_INDEX) {
                         int mi = ins.operands[o];
-                        if (!foundMultinames[mi]) {
+                        if (mi < foundMultinames.length && !foundMultinames[mi]) {
                             ret.get(mi).add(new MethodBodyMultinameUsage(this, mi, scriptIndex, classIndex, traitIndex, traitsType, isInitializer, traits, parentTraitIndex));
                             foundMultinames[mi] = true;
                         }

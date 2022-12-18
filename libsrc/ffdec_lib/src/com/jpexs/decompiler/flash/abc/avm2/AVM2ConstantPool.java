@@ -282,33 +282,18 @@ public class AVM2ConstantPool implements Cloneable {
     }
 
     public int getInt(int index) {
-        try {
-            if (index == 0) {
-                return 0;
-            }
-            return constant_int.get(index);
-        } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "Int not found. Index: " + index, ex);
+        if (index == 0) {
+            return 0;
         }
-        return 0;
+        return constant_int.get(index);
     }
 
     public Namespace getNamespace(int index) {
-        try {
-            return constant_namespace.get(index);
-        } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "Namespace not found. Index: " + index, ex);
-        }
-        return null;
+        return constant_namespace.get(index);
     }
 
     public NamespaceSet getNamespaceSet(int index) {
-        try {
-            return constant_namespace_set.get(index);
-        } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "NamespaceSet not found. Index: " + index, ex);
-        }
-        return null;
+        return constant_namespace_set.get(index);
     }
 
     /**
@@ -336,45 +321,25 @@ public class AVM2ConstantPool implements Cloneable {
     }
 
     public Multiname getMultiname(int index) {
-        try {
-            return constant_multiname.get(index);
-        } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "Multiname not found. Index: " + index, ex);
-        }
-        return null;
+        return constant_multiname.get(index);
     }
 
     public long getUInt(int index) {
-        try {
-            if (index == 0) {
-                return 0;
-            }
-            return constant_uint.get(index);
-        } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "UInt not found. Index: " + index, ex);
+        if (index == 0) {
+            return 0;
         }
-        return 0;
+        return constant_uint.get(index);
     }
 
     public double getDouble(int index) {
-        try {
-            if (index == 0) {
-                return 0;
-            }
-            return constant_double.get(index);
-        } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "Double not found. Index: " + index, ex);
+        if (index == 0) {
+            return 0;
         }
-        return 0;
+        return constant_double.get(index);
     }
 
     public Decimal getDecimal(int index) {
-        try {
-            return constant_decimal.get(index);
-        } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "Decimal not found. Index: " + index, ex);
-        }
-        return null;
+        return constant_decimal.get(index);
     }
 
     public int getDecimalId(Decimal val, boolean add) {
@@ -386,30 +351,15 @@ public class AVM2ConstantPool implements Cloneable {
     }
 
     public Float getFloat(int index) {
-        try {
-            return constant_float.get(index);
-        } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "Float not found. Index: " + index, ex);
-        }
-        return null;
+        return constant_float.get(index);
     }
 
     public Float4 getFloat4(int index) {
-        try {
-            return constant_float4.get(index);
-        } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "Float4 not found. Index: " + index, ex);
-        }
-        return null;
+        return constant_float4.get(index);
     }
 
     public String getString(int index) {
-        try {
-            return constant_string.get(index);
-        } catch (IndexOutOfBoundsException ex) {
-            logger.log(Level.SEVERE, "String not found. Index: " + index, ex);
-        }
-        return null;
+        return constant_string.get(index);
     }
 
     public int getIntCount() {

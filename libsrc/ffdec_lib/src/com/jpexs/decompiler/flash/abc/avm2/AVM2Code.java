@@ -886,7 +886,8 @@ public class AVM2Code implements Cloneable {
      * @param constants
      */
     public void removeWrongIndices(AVM2ConstantPool constants) {
-        for (AVM2Instruction ins : code) {
+        //This is DANGEROUS as it may alter instruction size which may lead to incorrect jump offsets!!!
+        /*for (AVM2Instruction ins : code) {
             for (int i = 0; i < ins.definition.operands.length; i++) {
                 if (ins.definition.operands[i] == DAT_MULTINAME_INDEX && ins.operands[i] >= constants.getMultinameCount()) {
                     ins.operands[i] = 0;
@@ -904,7 +905,7 @@ public class AVM2Code implements Cloneable {
                     ins.operands[i] = 0;
                 }
             }
-        }
+        }*/
     }
 
     public AVM2Code(ABCInputStream ais, MethodBody body) throws IOException {

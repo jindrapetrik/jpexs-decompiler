@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - Alt + click selects PlaceObjectTag under cursor
 - [#1901] Double click tree node to start edit (can be enabled in settings)
 - Info about editation in status bar
+- AS3 P-code keyword "Unknown(N)", where N is index. For constants out of bounds. (mostly in dead code)
 
 ### Fixed
 - [#1897] Close menu button without selecting specific item
@@ -51,6 +52,7 @@ All notable changes to this project will be documented in this file.
 - [#1828] AS1/2 deobfuscation removing variable declarations
 - Loaded SWFs using "Open loaded during play" feature have short filenames
 - [#1796] Exception on closing multiple SWFs
+- AS3 Deobfuscation causing invalid jump offsets for files with constant indices out of bounds
 
 ### Changed
 - Quick search needs minimum of 3 characters

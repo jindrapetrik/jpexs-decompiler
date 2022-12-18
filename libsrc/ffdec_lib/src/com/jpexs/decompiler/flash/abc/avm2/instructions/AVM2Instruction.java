@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.ABCOutputStream;
 import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.JumpIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.jumps.LookupSwitchIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.ReturnValueIns;
@@ -251,7 +252,11 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                         s.append(" null");
                     } else {
                         s.append(" ");
-                        s.append(Multiname.namespaceToString(constants, operands[i]));
+                        try {
+                            s.append(Multiname.namespaceToString(constants, operands[i]));
+                        } catch (IndexOutOfBoundsException iob) {
+                            s.append("Unknown(").append(operands[i]).append(")");
+                        }
                     }
                     break;
                 case AVM2Code.DAT_MULTINAME_INDEX:
@@ -259,11 +264,13 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                         s.append(" null");
                     } else {
                         s.append(" ");
-                        Multiname multiname = constants.getMultiname(operands[i]);
-                        if (multiname != null) {
-                            s.append(multiname.toString(constants, fullyQualifiedNames));
-                        } else {
-                            s.append("Multiname not found.");
+                        try {
+                            Multiname multiname = constants.getMultiname(operands[i]);
+                            if (multiname != null) {
+                                s.append(multiname.toString(constants, fullyQualifiedNames));
+                            }
+                        } catch (IndexOutOfBoundsException iob) {
+                            s.append("Unknown(").append(operands[i]).append(")");
                         }
                     }
                     /*s.append(" m[");
@@ -278,12 +285,16 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                     break;
                 case AVM2Code.DAT_STRING_INDEX:
                     String str;
-                    if (operands[i] == 0 || (str = constants.getString(operands[i])) == null) {
-                        s.append(" null");
-                    } else {
-                        s.append(" \"");
-                        s.append(Helper.escapePCodeString(str));
-                        s.append("\"");
+                    try {
+                        if (operands[i] == 0 || (str = constants.getString(operands[i])) == null) {
+                            s.append(" null");
+                        } else {
+                            s.append(" \"");
+                            s.append(Helper.escapePCodeString(str));
+                            s.append("\"");
+                        }
+                    } catch (IndexOutOfBoundsException iob) {
+                        s.append(" Unknown(").append(operands[i]).append(")");
                     }
                     break;
                 case AVM2Code.DAT_INT_INDEX:
@@ -291,7 +302,11 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                         s.append(" null");
                     } else {
                         s.append(" ");
-                        s.append(constants.getInt(operands[i]));
+                        try {
+                            s.append(constants.getInt(operands[i]));
+                        } catch (IndexOutOfBoundsException iob) {
+                            s.append("Unknown(").append(operands[i]).append(")");
+                        }
                     }
                     break;
                 case AVM2Code.DAT_UINT_INDEX:
@@ -299,7 +314,11 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                         s.append(" null");
                     } else {
                         s.append(" ");
-                        s.append(constants.getUInt(operands[i]));
+                        try {
+                            s.append(constants.getUInt(operands[i]));
+                        } catch (IndexOutOfBoundsException iob) {
+                            s.append("Unknown(").append(operands[i]).append(")");
+                        }
                     }
                     break;
                 case AVM2Code.DAT_DOUBLE_INDEX:
@@ -307,7 +326,11 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                         s.append(" null");
                     } else {
                         s.append(" ");
-                        s.append(constants.getDouble(operands[i]));
+                        try {
+                            s.append(constants.getDouble(operands[i]));
+                        } catch (IndexOutOfBoundsException iob) {
+                            s.append("Unknown(").append(operands[i]).append(")");
+                        }  
                     }
                     break;
                 case AVM2Code.DAT_FLOAT_INDEX:
@@ -315,18 +338,26 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                         s.append(" null");
                     } else {
                         s.append(" ");
-                        s.append(constants.getFloat(operands[i]));
+                        try {
+                            s.append(constants.getFloat(operands[i]));
+                        } catch (IndexOutOfBoundsException iob) {
+                            s.append("Unknown(").append(operands[i]).append(")");
+                        }  
                     }
                     break;
                 case AVM2Code.DAT_FLOAT4_INDEX:
                     if (operands[i] == 0) {
                         s.append(" null");
                     } else {
-                        Float4 f4 = constants.getFloat4(operands[i]);
-                        s.append(" ").append(f4.values[0]);
-                        s.append(" ").append(f4.values[1]);
-                        s.append(" ").append(f4.values[2]);
-                        s.append(" ").append(f4.values[3]);
+                        try {
+                            Float4 f4 = constants.getFloat4(operands[i]);
+                            s.append(" ").append(f4.values[0]);
+                            s.append(" ").append(f4.values[1]);
+                            s.append(" ").append(f4.values[2]);
+                            s.append(" ").append(f4.values[3]);
+                        } catch (IndexOutOfBoundsException iob) {
+                            s.append(" Unknown(").append(operands[i]).append(")");
+                        }  
                     }
                     break;
                 case AVM2Code.DAT_DECIMAL_INDEX:
@@ -334,7 +365,11 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                         s.append(" null");
                     } else {
                         s.append(" ");
-                        s.append(constants.getDecimal(operands[i]));
+                        try {
+                            s.append(constants.getDecimal(operands[i]));
+                        } catch (IndexOutOfBoundsException iob) {
+                            s.append("Unknown(").append(operands[i]).append(")");
+                        }  
                     }
                     break;
                 case AVM2Code.DAT_OFFSET:

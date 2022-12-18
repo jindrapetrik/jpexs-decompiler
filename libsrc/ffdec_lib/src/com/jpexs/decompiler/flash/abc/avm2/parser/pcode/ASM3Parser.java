@@ -244,6 +244,15 @@ public class ASM3Parser {
     private static int parseNamespaceSet(AVM2ConstantPool constants, Flasm3Lexer lexer) throws AVM2ParseException, IOException {
         List<Integer> namespaceList = new ArrayList<>();
         ParsedSymbol s = lexer.lex();
+
+        if (s.type == ParsedSymbol.TYPE_KEYWORD_UNKNOWN) {
+            expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+            s = lexer.lex();
+            expected(s, ParsedSymbol.TYPE_INTEGER, "integer");
+            expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+            return (int) (Integer) s.value;
+        }
+
         if (s.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
             return 0;
         }
@@ -282,6 +291,12 @@ public class ASM3Parser {
         ParsedSymbol type = lexer.lex();
         int kind = 0;
         switch (type.type) {
+            case ParsedSymbol.TYPE_KEYWORD_UNKNOWN:
+                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+                ParsedSymbol s = lexer.lex();
+                expected(s, ParsedSymbol.TYPE_INTEGER, "integer");
+                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                return (int) (Integer) s.value;
             case ParsedSymbol.TYPE_KEYWORD_NULL:
                 return 0;
             case ParsedSymbol.TYPE_KEYWORD_NAMESPACE:
@@ -341,6 +356,12 @@ public class ASM3Parser {
         int kind = 0;
 
         switch (s.type) {
+            case ParsedSymbol.TYPE_KEYWORD_UNKNOWN:
+                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+                s = lexer.lex();
+                expected(s, ParsedSymbol.TYPE_INTEGER, "integer");
+                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                return (int) (Integer) s.value;
             case ParsedSymbol.TYPE_KEYWORD_NULL:
                 return 0;
             case ParsedSymbol.TYPE_KEYWORD_QNAME:
@@ -906,6 +927,25 @@ public class ASM3Parser {
                             }
                             switch (def.operands[i]) {
                                 case AVM2Code.DAT_MULTINAME_INDEX:
+                                case AVM2Code.DAT_NAMESPACE_INDEX:
+                                case AVM2Code.DAT_STRING_INDEX:
+                                case AVM2Code.DAT_INT_INDEX:
+                                case AVM2Code.DAT_UINT_INDEX:
+                                case AVM2Code.DAT_DOUBLE_INDEX:
+                                case AVM2Code.DAT_FLOAT_INDEX:
+                                case AVM2Code.DAT_FLOAT4_INDEX:
+                                    if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_UNKNOWN) {
+                                        expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
+                                        ParsedSymbol indexSymb = lexer.lex();
+                                        expected(indexSymb, ParsedSymbol.TYPE_INTEGER, "integer");
+                                        expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
+                                        operandsList.add((int) (Integer) indexSymb.value);
+                                        continue;
+                                    }
+                                    break;
+                            }
+                            switch (def.operands[i]) {
+                                case AVM2Code.DAT_MULTINAME_INDEX:
                                     lexer.pushback(parsedOperand);
                                     operandsList.add(parseMultiName(constants, lexer));
                                     break;
@@ -913,7 +953,7 @@ public class ASM3Parser {
                                     lexer.pushback(parsedOperand);
                                     operandsList.add(parseNamespace(constants, lexer));
                                     break;
-                                case AVM2Code.DAT_STRING_INDEX:
+                                case AVM2Code.DAT_STRING_INDEX:                                    
                                     if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                                         operandsList.add(0);
                                     } else if (parsedOperand.type == ParsedSymbol.TYPE_STRING) {
