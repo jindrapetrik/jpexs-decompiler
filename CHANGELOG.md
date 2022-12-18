@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [18.0.0] - 2022-12-18
 ### Added
 - [#1898] Keyboard shortcut to remove tags (DEL, SHIFT+DEL)
 - [#1511], [#1765] Quick search tree (Ctrl+F) for everything, not just AS3 classes
