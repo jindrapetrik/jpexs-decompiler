@@ -3668,6 +3668,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                             SWF swf = abcPanel.getSwf();
                             swf.deobfuscate(level);
                         } else {
+                            int mi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getMethodIndex();
                             int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
                             DecompiledEditorPane decompiledTextArea = abcPanel.decompiledTextArea;
                             Trait t = abcPanel.decompiledTextArea.getCurrentTrait();
@@ -3678,7 +3679,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                 boolean isStatic = decompiledTextArea.getIsStatic();
                                 abc.bodies.get(bi).deobfuscate(level, t, scriptIndex, classIndex, isStatic, ""/*FIXME*/);
                             }
-                            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setBodyIndex(decompiledTextArea.getScriptLeaf().getPathScriptName(), bi, abc, t, abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
+                            abcPanel.detailPanel.methodTraitPanel.methodCodePanel.setMethod(decompiledTextArea.getScriptLeaf().getPathScriptName(), mi, bi, abc, t, abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getScriptIndex());
                         }
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, "Deobfuscation error", ex);

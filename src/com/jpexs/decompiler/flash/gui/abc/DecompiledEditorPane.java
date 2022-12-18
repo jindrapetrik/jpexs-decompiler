@@ -205,9 +205,11 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             return false;
         }
         int bi = abc.findBodyIndex(methodIndex);
-        if (bi == -1) {
+        
+        //in interfaces, there is no body
+        /*if (bi == -1) {
             return false;
-        }
+        }*/
 
         //fix for inner functions:
         if (trait instanceof TraitMethodGetterSetter) {
@@ -224,8 +226,8 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         }
         abcPanel.detailPanel.showCard(DetailPanel.METHOD_GETTER_SETTER_TRAIT_CARD, trait, traitIndex, abc);
         MethodCodePanel methodCodePanel = abcPanel.detailPanel.methodTraitPanel.methodCodePanel;
-        if (reset || (methodCodePanel.getBodyIndex() != bi)) {
-            methodCodePanel.setBodyIndex(scriptName, bi, abc, name, trait, script.scriptIndex);
+        if (reset || (methodCodePanel.getMethodIndex()!= methodIndex)) {
+            methodCodePanel.setMethod(scriptName, methodIndex, bi, abc, name, trait, script.scriptIndex);
             abcPanel.detailPanel.setEditMode(false);
             this.isStatic = isStatic;
         }

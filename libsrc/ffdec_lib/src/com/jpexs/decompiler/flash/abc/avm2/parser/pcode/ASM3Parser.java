@@ -666,10 +666,15 @@ public class ASM3Parser {
         List<Integer> paramNames = new ArrayList<>();
         List<ValueKind> optional = new ArrayList<>();
         Stack<Integer> blockStack = new Stack<>();
-        body.traits = new Traits();
+        if (body != null) {
+            body.traits = new Traits();
+        }
         do {
             symb = lexer.lex();
             if (Arrays.asList(ParsedSymbol.TYPE_KEYWORD_BODY, ParsedSymbol.TYPE_KEYWORD_CODE, ParsedSymbol.TYPE_KEYWORD_METHOD).contains(symb.type)) {
+                if (body == null && symb.type == ParsedSymbol.TYPE_KEYWORD_BODY) {
+                    throw new AVM2ParseException("This method cannot have a body.", lexer.yyline());
+                }
                 blockStack.push(symb.type);
                 continue;
             }
@@ -1248,9 +1253,11 @@ public class ASM3Parser {
             }
             ins.operands[oi.insOperandIndex] = relOffset;
         }
-        body.exceptions = new ABCException[exceptions.size()];
-        for (int e = 0; e < exceptions.size(); e++) {
-            body.exceptions[e] = exceptions.get(e);
+        if (body != null) {
+            body.exceptions = new ABCException[exceptions.size()];
+            for (int e = 0; e < exceptions.size(); e++) {
+                body.exceptions[e] = exceptions.get(e);
+            }
         }
 
         info.param_types = new int[paramTypes.size()];

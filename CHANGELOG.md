@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - [#1901] Double click tree node to start edit (can be enabled in settings)
 - Info about editation in status bar
 - AS3 P-code keyword "Unknown(N)", where N is index. For constants out of bounds. (mostly in dead code)
+- AS3 P-code - Editing interface methods
 
 ### Fixed
 - [#1897] Close menu button without selecting specific item
