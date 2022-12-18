@@ -205,6 +205,7 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "MultinameL"                 {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_MULTINAMEL, yytext());}
   "MultinameLA"                {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_MULTINAMELA, yytext());}
   "TypeName"                   {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_TYPENAME, yytext());}
+  "Unknown"                    {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_UNKNOWN, yytext()); }
   "null"                       {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NULL, yytext());}
   "("                          {  return new ParsedSymbol(ParsedSymbol.TYPE_PARENT_OPEN, yytext());}
   ")"                          {  return new ParsedSymbol(ParsedSymbol.TYPE_PARENT_CLOSE, yytext());}
