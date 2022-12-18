@@ -54,10 +54,13 @@ All notable changes to this project will be documented in this file.
 - Loaded SWFs using "Open loaded during play" feature have short filenames
 - [#1796] Exception on closing multiple SWFs
 - AS3 Deobfuscation causing invalid jump offsets for files with constant indices out of bounds
+- AS3 - "native" modifier only for methods with EXPLICIT flag
+- AS3 - AS3 builtin namespace visibility
 
 ### Changed
 - Quick search needs minimum of 3 characters
 - AS1/2 deobfuscation - removing obfuscated declarations is now optional (default: off)
+- AS3 - order of modifiers: final, override, access, static, native
 
 ## [17.0.4] - 2022-12-02
 ### Fixed

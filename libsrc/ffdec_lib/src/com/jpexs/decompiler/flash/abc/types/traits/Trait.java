@@ -331,6 +331,11 @@ public abstract class Trait implements Cloneable, Serializable {
     }
 
     public final GraphTextWriter getModifiers(ABC abc, boolean isStatic, GraphTextWriter writer) {
+        if ((kindFlags & ATTR_Final) > 0) {
+            if (!isStatic) {
+                writer.appendNoHilight("final ");
+            }
+        }
         if ((kindFlags & ATTR_Override) > 0) {
             writer.appendNoHilight("override ");
         }
@@ -360,12 +365,7 @@ public abstract class Trait implements Cloneable, Serializable {
             } else {
                 writer.appendNoHilight("static ");
             }
-        }
-        if ((kindFlags & ATTR_Final) > 0) {
-            if (!isStatic) {
-                writer.appendNoHilight("final ");
-            }
-        }
+        }        
         return writer;
     }
 

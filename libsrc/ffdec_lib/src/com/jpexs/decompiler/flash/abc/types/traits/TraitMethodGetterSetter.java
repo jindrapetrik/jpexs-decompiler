@@ -91,12 +91,13 @@ public class TraitMethodGetterSetter extends Trait {
             addKind = "set ";
         }
         MethodBody body = abc.findBody(method_info);
-
-        if (((classIndex == -1) || (!abc.instance_info.get(classIndex).isInterface())) && (body == null)) {
+        
+        getModifiers(abc, isStatic, writer);
+        
+        if (abc.method_info.get(method_info).flagExplicit()) {
             writer.appendNoHilight("native ");
         }
 
-        getModifiers(abc, isStatic, writer);
         writer.hilightSpecial("function " + addKind, HighlightSpecialType.TRAIT_TYPE);
         writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TRAIT_NAME);
         writer.appendNoHilight("(");
