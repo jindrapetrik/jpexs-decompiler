@@ -73,6 +73,9 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
     public ABC abc;
 
     public int bodyIndex = -1;
+    
+    
+    public int methodIndex = -1;
 
     private int scriptIndex = -1;
 
@@ -125,8 +128,23 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         if (trait != null && exportMode != ScriptExportMode.AS && exportMode != ScriptExportMode.AS_METHOD_STUBS) {
             trait.convertTraitHeader(abc, writer);
         }
-        MethodBody body = abc.bodies.get(bodyIndex);
-        abc.bodies.get(bodyIndex).getCode().toASMSource(abc, abc.constants, abc.method_info.get(body.method_info), body, exportMode, writer);
+        if (bodyIndex > -1) {
+            MethodBody body = abc.bodies.get(bodyIndex);        
+            abc.bodies.get(bodyIndex).getCode().toASMSource(abc, abc.constants, abc.method_info.get(body.method_info), body, exportMode, writer);
+        } else {
+            writer.appendNoHilight("method");
+            if (Configuration.indentAs3PCode.get()) {
+                writer.indent();
+            }
+            writer.newLine();
+            
+            abc.method_info.get(methodIndex).toASMSource(abc.constants, writer);
+            
+            if (Configuration.indentAs3PCode.get()) {
+                writer.unindent();
+            }
+            writer.appendNoHilight("end ; method").newLine();
+        }
         if (trait != null && exportMode != ScriptExportMode.AS && exportMode != ScriptExportMode.AS_METHOD_STUBS) {
             if (Configuration.indentAs3PCode.get()) {
                 writer.unindent();
@@ -158,7 +176,9 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
             changeContentType("text/plain");
             if (textHexOnly == null) {
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
-                Helper.byteArrayToHexWithHeader(writer, abc.bodies.get(bodyIndex).getCodeBytes());
+                if (bodyIndex > -1) {
+                    Helper.byteArrayToHexWithHeader(writer, abc.bodies.get(bodyIndex).getCodeBytes());
+                }
                 textHexOnly = new HighlightedText(writer);
             }
             setText(textHexOnly);
@@ -220,15 +240,13 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         return super.getName();
     }
 
-    public void setBodyIndex(String scriptPathName, int bodyIndex, ABC abc, String name, Trait trait, int scriptIndex) {
+    public void setMethod(String scriptPathName, int methodIndex, int bodyIndex, ABC abc, String name, Trait trait, int scriptIndex) {
+        this.methodIndex = methodIndex;
         this.bodyIndex = bodyIndex;
         this.abc = abc;
         this.name = name;
         this.trait = trait;
-        this.scriptIndex = scriptIndex;
-        if (bodyIndex == -1) {
-            return;
-        }
+        this.scriptIndex = scriptIndex;        
         textWithHex = null;
         textNoHex = null;
         textHexOnly = null;
@@ -270,9 +288,11 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
         try {
             String text = getText();
             if (text.trim().startsWith(Helper.hexData)) {
-                byte[] data = Helper.getBytesFromHexaText(text);
-                MethodBody mb = abc.bodies.get(bodyIndex);
-                mb.setCodeBytes(data);
+                if (bodyIndex > -1) {
+                    byte[] data = Helper.getBytesFromHexaText(text);
+                    MethodBody mb = abc.bodies.get(bodyIndex);
+                    mb.setCodeBytes(data);
+                }
             } else {
                 AVM2Code acode = ASM3Parser.parse(abc, new StringReader(text), trait, new MissingSymbolHandler() {
                     //no longer ask for adding new constants
@@ -310,9 +330,10 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
                     public boolean missingFloat4(Float4 value) {
                         return true;
                     }
-                }, abc.bodies.get(bodyIndex), abc.method_info.get(abc.bodies.get(bodyIndex).method_info));
-                //acode.getBytes(abc.bodies.get(bodyIndex).getCodeBytes());
-                abc.bodies.get(bodyIndex).setCode(acode);
+                }, bodyIndex == -1 ? null : abc.bodies.get(bodyIndex), abc.method_info.get(methodIndex));
+                if (bodyIndex > -1) {
+                    abc.bodies.get(bodyIndex).setCode(acode);
+                }
             }
 
             ((Tag) abc.parentTag).setModified(true);

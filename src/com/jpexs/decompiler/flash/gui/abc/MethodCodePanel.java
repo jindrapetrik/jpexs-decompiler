@@ -91,16 +91,20 @@ public class MethodCodePanel extends JPanel {
         sourceTextArea.hilighSpecial(type, specialValue);
     }
 
-    public void setBodyIndex(String scriptPathName, int bodyIndex, ABC abc, Trait trait, int scriptIndex) {
-        sourceTextArea.setBodyIndex(scriptPathName, bodyIndex, abc, sourceTextArea.getName(), trait, scriptIndex);
+    public void setMethod(String scriptPathName, int methodIndex, int bodyIndex, ABC abc, Trait trait, int scriptIndex) {
+        sourceTextArea.setMethod(scriptPathName, methodIndex, bodyIndex, abc, sourceTextArea.getName(), trait, scriptIndex);
     }
 
-    public void setBodyIndex(String scriptPathName, int bodyIndex, ABC abc, String name, Trait trait, int scriptIndex) {
-        sourceTextArea.setBodyIndex(scriptPathName, bodyIndex, abc, name, trait, scriptIndex);
+    public void setMethod(String scriptPathName, int methodIndex, int bodyIndex, ABC abc, String name, Trait trait, int scriptIndex) {
+        sourceTextArea.setMethod(scriptPathName, methodIndex, bodyIndex, abc, name, trait, scriptIndex);
     }
 
     public int getBodyIndex() {
         return sourceTextArea.bodyIndex;
+    }
+    
+    public int getMethodIndex() {
+        return sourceTextArea.methodIndex;
     }
 
     public void clear() {

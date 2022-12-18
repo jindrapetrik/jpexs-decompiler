@@ -399,4 +399,79 @@ public class MethodInfo {
         }
         return rname;
     }
+    
+    public void toASMSource(AVM2ConstantPool constants, GraphTextWriter writer) {
+        writer.appendNoHilight("name ");
+        writer.hilightSpecial(name_index == 0 ? "null" : "\"" + Helper.escapeActionScriptString(getName(constants)) + "\"", HighlightSpecialType.METHOD_NAME);
+        writer.newLine();
+        if (flagExplicit()) {
+            writer.appendNoHilight("flag ");
+            writer.hilightSpecial("EXPLICIT", HighlightSpecialType.FLAG_EXPLICIT);
+            writer.newLine();
+        }
+        if (flagHas_optional()) {
+            writer.appendNoHilight("flag ");
+            writer.hilightSpecial("HAS_OPTIONAL", HighlightSpecialType.FLAG_HAS_OPTIONAL);
+            writer.newLine();
+        }
+        if (flagHas_paramnames()) {
+            writer.appendNoHilight("flag ");
+            writer.hilightSpecial("HAS_PARAM_NAMES", HighlightSpecialType.FLAG_HAS_PARAM_NAMES);
+            writer.newLine();
+        }
+        if (flagIgnore_rest()) {
+            writer.appendNoHilight("flag ");
+            writer.hilightSpecial("EXPLICIT", HighlightSpecialType.FLAG_IGNORE_REST);
+            writer.newLine();
+        }
+        if (flagNeed_activation()) {
+            writer.appendNoHilight("flag ");
+            writer.hilightSpecial("NEED_ACTIVATION", HighlightSpecialType.FLAG_NEED_ACTIVATION);
+            writer.newLine();
+        }
+        if (flagNeed_arguments()) {
+            writer.appendNoHilight("flag ");
+            writer.hilightSpecial("NEED_ARGUMENTS", HighlightSpecialType.FLAG_NEED_ARGUMENTS);
+            writer.newLine();
+        }
+        if (flagNeed_rest()) {
+            writer.appendNoHilight("flag ");
+            writer.hilightSpecial("NEED_REST", HighlightSpecialType.FLAG_NEED_REST);
+            writer.newLine();
+        }
+        if (flagSetsdxns()) {
+            writer.appendNoHilight("flag ");
+            writer.hilightSpecial("SET_DXNS", HighlightSpecialType.FLAG_SET_DXNS);
+            writer.newLine();
+        }
+        for (int p = 0; p < param_types.length; p++) {
+            writer.appendNoHilight("param ");
+            writer.hilightSpecial(constants.multinameToString(param_types[p]), HighlightSpecialType.PARAM, p);
+            writer.newLine();
+        }
+        if (flagHas_paramnames()) {
+            for (int n : paramNames) {
+                writer.appendNoHilight("paramname ");
+                if (n == 0) {
+                    writer.appendNoHilight("null");
+                } else {
+                    writer.appendNoHilight("\"");
+                    writer.appendNoHilight(constants.getString(n));
+                    writer.appendNoHilight("\"");
+                }
+                writer.newLine();
+            }
+        }
+        if (flagHas_optional()) {
+            for (int i = 0; i < optional.length; i++) {
+                ValueKind vk = optional[i];
+                writer.appendNoHilight("optional ");
+                writer.hilightSpecial(vk.toASMString(constants), HighlightSpecialType.OPTIONAL, i);
+                writer.newLine();
+            }
+        }
+        writer.appendNoHilight("returns ");
+        writer.hilightSpecial(constants.multinameToString(ret_type), HighlightSpecialType.RETURNS);
+        writer.newLine();
+    }
 }

@@ -1192,85 +1192,15 @@ public class AVM2Code implements Cloneable {
     }
 
     public GraphTextWriter toASMSource(ABC abc, AVM2ConstantPool constants, MethodInfo info, MethodBody body, List<Integer> outputMap, ScriptExportMode exportMode, GraphTextWriter writer) {
-
+        
         if (info != null) {
             writer.appendNoHilight("method");
             if (Configuration.indentAs3PCode.get()) {
                 writer.indent();
             }
             writer.newLine();
-            writer.appendNoHilight("name ");
-            writer.hilightSpecial(info.name_index == 0 ? "null" : "\"" + Helper.escapeActionScriptString(info.getName(constants)) + "\"", HighlightSpecialType.METHOD_NAME);
-            writer.newLine();
-            if (info.flagExplicit()) {
-                writer.appendNoHilight("flag ");
-                writer.hilightSpecial("EXPLICIT", HighlightSpecialType.FLAG_EXPLICIT);
-                writer.newLine();
-            }
-            if (info.flagHas_optional()) {
-                writer.appendNoHilight("flag ");
-                writer.hilightSpecial("HAS_OPTIONAL", HighlightSpecialType.FLAG_HAS_OPTIONAL);
-                writer.newLine();
-            }
-            if (info.flagHas_paramnames()) {
-                writer.appendNoHilight("flag ");
-                writer.hilightSpecial("HAS_PARAM_NAMES", HighlightSpecialType.FLAG_HAS_PARAM_NAMES);
-                writer.newLine();
-            }
-            if (info.flagIgnore_rest()) {
-                writer.appendNoHilight("flag ");
-                writer.hilightSpecial("EXPLICIT", HighlightSpecialType.FLAG_IGNORE_REST);
-                writer.newLine();
-            }
-            if (info.flagNeed_activation()) {
-                writer.appendNoHilight("flag ");
-                writer.hilightSpecial("NEED_ACTIVATION", HighlightSpecialType.FLAG_NEED_ACTIVATION);
-                writer.newLine();
-            }
-            if (info.flagNeed_arguments()) {
-                writer.appendNoHilight("flag ");
-                writer.hilightSpecial("NEED_ARGUMENTS", HighlightSpecialType.FLAG_NEED_ARGUMENTS);
-                writer.newLine();
-            }
-            if (info.flagNeed_rest()) {
-                writer.appendNoHilight("flag ");
-                writer.hilightSpecial("NEED_REST", HighlightSpecialType.FLAG_NEED_REST);
-                writer.newLine();
-            }
-            if (info.flagSetsdxns()) {
-                writer.appendNoHilight("flag ");
-                writer.hilightSpecial("SET_DXNS", HighlightSpecialType.FLAG_SET_DXNS);
-                writer.newLine();
-            }
-            for (int p = 0; p < info.param_types.length; p++) {
-                writer.appendNoHilight("param ");
-                writer.hilightSpecial(constants.multinameToString(info.param_types[p]), HighlightSpecialType.PARAM, p);
-                writer.newLine();
-            }
-            if (info.flagHas_paramnames()) {
-                for (int n : info.paramNames) {
-                    writer.appendNoHilight("paramname ");
-                    if (n == 0) {
-                        writer.appendNoHilight("null");
-                    } else {
-                        writer.appendNoHilight("\"");
-                        writer.appendNoHilight(constants.getString(n));
-                        writer.appendNoHilight("\"");
-                    }
-                    writer.newLine();
-                }
-            }
-            if (info.flagHas_optional()) {
-                for (int i = 0; i < info.optional.length; i++) {
-                    ValueKind vk = info.optional[i];
-                    writer.appendNoHilight("optional ");
-                    writer.hilightSpecial(vk.toASMString(constants), HighlightSpecialType.OPTIONAL, i);
-                    writer.newLine();
-                }
-            }
-            writer.appendNoHilight("returns ");
-            writer.hilightSpecial(constants.multinameToString(info.ret_type), HighlightSpecialType.RETURNS);
-            writer.newLine();
+        
+            info.toASMSource(constants, writer);
         }
         writer.newLine();
 
