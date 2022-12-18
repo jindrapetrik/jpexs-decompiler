@@ -367,8 +367,8 @@ public class Multiname {
             if (nskind == Namespace.KIND_NAMESPACE || nskind == Namespace.KIND_PACKAGE_INTERNAL) {
                 DottedChain dc = abc.findCustomNs(namespace_index);
                 String nsname = dc != null ? dc.getLast() : null;
-
-                if (nsname != null) {
+                
+                if (nsname != null && !"AS3".equals(nsname)) {
                     String identifier = dontDeobfuscate ? nsname : IdentifiersDeobfuscation.printIdentifier(true, nsname);
                     if (identifier != null && !identifier.isEmpty()) {
                         return nsname + "::" + name;

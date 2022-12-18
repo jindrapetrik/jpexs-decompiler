@@ -2132,8 +2132,8 @@ public class ABC implements Openable {
             return null;
         }
         String name = constants.getString(ns.name_index);
-        if (name.equals("http://adobe.com/AS3/2006/builtin")) {
-            return null;
+        if (name.equals("http://adobe.com/AS3/2006/builtin")) { //TODO: This should really be resolved using ABC indexing, not hardcoded constant
+            return DottedChain.parseNoSuffix("AS3");
         }
         for (ABCContainerTag abcTag : getAbcTags()) {
             DottedChain dc = abcTag.getABC().nsValueToName(name);
