@@ -1587,6 +1587,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void updateClassesList() {
+        String selectionPath = getCurrentTree().getSelectionPathString();
         List<TreeItem> nodes = getASTreeNodes(tagTree);
         boolean updateNeeded = false;
         for (TreeItem n : nodes) {
@@ -1600,6 +1601,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         if (updateNeeded) {
             tagTree.updateUI();
+        }
+        TreePath tp = getCurrentTree().getTreePathFromString(selectionPath);
+        if (tp != null)
+        {
+            getCurrentTree().setSelectionPath(tp);
         }
     }
 

@@ -85,9 +85,11 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
@@ -802,8 +804,32 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         panelWithHint.add(new FasterScrollPane(decompiledEditor), BorderLayout.CENTER);
 
         brokenHintPanel.setVisible(false);
+        
+        JPanel iconsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JToggleButton deobfuscateButton = new JToggleButton(View.getIcon("deobfuscate16"));
+        deobfuscateButton.setMargin(new Insets(5, 5, 5, 5));
+        deobfuscateButton.addActionListener(this::deobfuscateButtonActionPerformed);
+        deobfuscateButton.setToolTipText(AppStrings.translate("button.deobfuscate"));
+        deobfuscateButton.setSelected(Configuration.autoDeobfuscate.get());
+        
+        
+        JButton deobfuscateOptionsButton = new JButton(View.getIcon("deobfuscateoptions16"));
+        deobfuscateOptionsButton.addActionListener(this::deobfuscateOptionsButtonActionPerformed);
+        deobfuscateOptionsButton.setToolTipText(AppStrings.translate("button.deobfuscate_options"));
+        deobfuscateOptionsButton.setMargin(new Insets(0,0,0,0));        
+        deobfuscateOptionsButton.setPreferredSize(new Dimension(30, deobfuscateButton.getPreferredSize().height));
+        iconsPanel.add(deobfuscateButton);
+        iconsPanel.add(deobfuscateOptionsButton);
+        
+        iconsPanel.add(deobfuscateButton);
+        iconsPanel.add(deobfuscateOptionsButton);  
+        
+        JPanel panelWithToolbar = new JPanel(new BorderLayout());
+        panelWithToolbar.add(iconsPanel, BorderLayout.NORTH);
+        panelWithToolbar.add(panelWithHint, BorderLayout.CENTER);
+        
 
-        panA.add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, panelWithHint, debugPanel, Configuration.guiActionVarsSplitPaneDividerLocationPercent), BorderLayout.CENTER);
+        panA.add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, panelWithToolbar, debugPanel, Configuration.guiActionVarsSplitPaneDividerLocationPercent), BorderLayout.CENTER);
         panA.add(decButtonsPan, BorderLayout.SOUTH);
 
         //decPanel.add(searchPanel, BorderLayout.NORTH);
@@ -898,7 +924,47 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         editor.addTextChangedListener(this::editorTextChanged);
         decompiledEditor.addTextChangedListener(this::decompiledEditorTextChanged);
     }
+    
+    private void deobfuscateButtonActionPerformed(ActionEvent evt) {
+        JToggleButton toggleButton = (JToggleButton)evt.getSource();
+        boolean selected = toggleButton.isSelected();
 
+        if (ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("message.confirm.autodeobfuscate") + "\r\n" + (selected ? AppStrings.translate("message.confirm.on") : AppStrings.translate("message.confirm.off")), AppStrings.translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION, Configuration.warningDeobfuscation, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
+            Configuration.autoDeobfuscate.set(selected);
+            mainPanel.autoDeobfuscateChanged();
+        } else {
+            toggleButton.setSelected(Configuration.autoDeobfuscate.get());
+        }
+    }
+    
+    private void deobfuscateOptionsButtonActionPerformed(ActionEvent evt) {
+        JPopupMenu popupMenu = new JPopupMenu();
+        JCheckBoxMenuItem simplifyExpressionsMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.simplify_expressions"));
+        simplifyExpressionsMenuItem.setSelected(Configuration.simplifyExpressions.get());
+        simplifyExpressionsMenuItem.addActionListener(this::simplifyExpressionsMenuItemActionPerformed);
+        JCheckBoxMenuItem removeObfuscatedDeclarationsMenuItem = new JCheckBoxMenuItem(AppStrings.translate("deobfuscate_options.remove_obfuscated_declarations"));
+        removeObfuscatedDeclarationsMenuItem.setSelected(Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.get());
+        removeObfuscatedDeclarationsMenuItem.addActionListener(this::removeObfuscatedDeclarationsMenuItemActionPerformed);
+        
+        popupMenu.add(simplifyExpressionsMenuItem);
+        popupMenu.add(removeObfuscatedDeclarationsMenuItem);
+        
+        JButton sourceButton = (JButton) evt.getSource();
+        popupMenu.show(sourceButton, 0, sourceButton.getHeight());
+    }
+
+    private void simplifyExpressionsMenuItemActionPerformed(ActionEvent evt) {
+        JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
+        Configuration.simplifyExpressions.set(menuItem.isSelected());
+        mainPanel.autoDeobfuscateChanged();
+    }
+    
+    private void removeObfuscatedDeclarationsMenuItemActionPerformed(ActionEvent evt) {
+        JCheckBoxMenuItem menuItem = (JCheckBoxMenuItem) evt.getSource();
+        Configuration.deobfuscateAs12RemoveInvalidNamesAssignments.set(menuItem.isSelected());
+        mainPanel.autoDeobfuscateChanged();
+    }
+    
     private void editorTextChanged() {
         setModified(true);
     }
