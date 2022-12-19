@@ -863,6 +863,10 @@ public final class Configuration {
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> doubleClickNodeToEdit = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> warningDeobfuscation = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

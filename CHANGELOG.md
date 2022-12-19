@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Deobfuscation and its options as icons on script panel toolbar
 
 ## [18.0.0] - 2022-12-18
 ### Added

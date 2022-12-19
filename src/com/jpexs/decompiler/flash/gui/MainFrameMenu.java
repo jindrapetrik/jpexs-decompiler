@@ -881,7 +881,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         AbstractButton button = (AbstractButton) evt.getSource();
         boolean selected = button.isSelected();
 
-        if (ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.autodeobfuscate") + "\r\n" + (selected ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+        if (ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.autodeobfuscate") + "\r\n" + (selected ? translate("message.confirm.on") : translate("message.confirm.off")), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION, Configuration.warningDeobfuscation, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
             Configuration.autoDeobfuscate.set(selected);
             mainFrame.getPanel().autoDeobfuscateChanged();
         } else {
