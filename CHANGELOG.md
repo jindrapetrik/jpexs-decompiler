@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - Deobfuscation and its options as icons on script panel toolbar
+- Warning before switching auto rename identifiers on
 
 ### Fixed
 - [#1904] NullpointerException when renaming invalid identifiers in AS1/2 files caused by missing charset
+
+### Changed
+- Warning before switching deobfuscation is now optional
 
 ## [18.0.0] - 2022-12-18
 ### Added

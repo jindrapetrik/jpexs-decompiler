@@ -792,8 +792,13 @@ public abstract class MainFrameMenu implements MenuBuilder {
     protected void autoRenameIdentifiersActionPerformed(ActionEvent evt) {
         AbstractButton button = (AbstractButton) evt.getSource();
         boolean selected = button.isSelected();
-
-        Configuration.autoRenameIdentifiers.set(selected);
+                
+        if (!selected || ViewMessages.showConfirmDialog(Main.getDefaultMessagesComponent(), translate("message.confirm.autoRenameIdentifiers") + "\r\n" + translate("message.confirm.on"), translate("message.confirm"), JOptionPane.OK_CANCEL_OPTION, Configuration.warningRenameIdentifiers, JOptionPane.OK_OPTION) == JOptionPane.OK_OPTION) {
+            Configuration.autoRenameIdentifiers.set(selected);
+            mainFrame.getPanel().autoDeobfuscateChanged();
+        } else {
+            button.setSelected(Configuration.autoRenameIdentifiers.get());
+        }        
     }
 
     /*protected void cacheOnDiskActionPerformed(ActionEvent evt) {
