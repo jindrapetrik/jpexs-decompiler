@@ -562,23 +562,23 @@ public final class AbcIndexing {
         AbcIndexing.ClassIndex ci = findClass(prop.parent, prop.abc, null);
         if (ci != null && ci.parent != null && (prop.abc == null || prop.propNsIndex == 0)) {
             AbcIndexing.ClassIndex ciParent = ci.parent;
-            DottedChain parentClass = ciParent.abc.instance_info.get(ciParent.index).getName(ciParent.abc.constants).getNameWithNamespace(ciParent.abc.constants, true);
+            DottedChain parentClass = ciParent.abc.instance_info.get(ciParent.index).getName(ciParent.abc.constants).getNameWithNamespace(ciParent.abc.constants, true);            
             TraitIndex pti = findProperty(new PropertyDef(prop.propName, new TypeItem(parentClass), prop.getPropNsString()), findStatic, findInstance, findProtected);
             if (pti != null) {
                 return pti;
             }
         }
 
-        /*if (findProtected && prop.propNsIndex == 0) {
+        if (findProtected && prop.propNsIndex == 0) {
             if (ci != null) {
                 int protNs = ci.abc.instance_info.get(ci.index).protectedNS;
-                PropertyDef prop2 = new PropertyDef(prop.propName, prop.parent, prop.abc, protNs);                
+                PropertyDef prop2 = new PropertyDef(prop.propName, prop.parent, ci.abc, protNs);
                 TraitIndex pti = findProperty(prop2, findStatic, findInstance, false);
                 if (pti != null) {
                     return pti;
                 }
             }
-        }*/
+        }
         if (parent != null) {
             TraitIndex pti = parent.findProperty(prop, findStatic, findInstance, findProtected);
             if (pti != null) {
