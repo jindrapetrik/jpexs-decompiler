@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.tags.ProductInfoTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
@@ -1301,7 +1302,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imageTransformCancelButton.setVisible(false);
         imageTransformSaveButton.setVisible(false);
 
-        CharacterTag character = (CharacterTag) mainPanel.getCurrentTree().getCurrentTreeItem();
+        TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
+        if (item instanceof TagScript) {
+            item = ((TagScript) item).getTag();
+        }
+        
+        CharacterTag character = (CharacterTag) item;
         if (character instanceof ButtonTag) {
             ButtonTag button = (ButtonTag) character;
             for (BUTTONRECORD rec : button.getRecords()) {
@@ -1312,8 +1318,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             button.setModified(true);
             button.resetTimeline();            
         } else if (character instanceof DefineSpriteTag) {
-            DefineSpriteTag item = (DefineSpriteTag) character;
-            for (Tag t : item.getTags()) {
+            DefineSpriteTag sprite = (DefineSpriteTag) character;
+            for (Tag t : sprite.getTags()) {
                 if (t instanceof PlaceObjectTypeTag) {
                     PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
                     MATRIX placeMatrix = pt.getMatrix();
@@ -1323,7 +1329,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     }
                 }
             }
-            item.resetTimeline();
+            sprite.resetTimeline();
         }
 
         mainPanel.clearEditingStatus();
@@ -1344,6 +1350,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
         if (item == null) {
             return;
+        }
+        if (item instanceof TagScript) {
+            item = ((TagScript) item).getTag();
         }
 
         //previewPanel.showImagePanel(fn.timeline.timelined, swf, fn.frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false);
