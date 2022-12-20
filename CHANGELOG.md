@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
 - [#1904] NullPointerException when renaming invalid identifiers in AS1/2 files caused by missing charset
 - [#1904] NullPointerException when fast switching items
 - [#1904] NullPointerException on ErrorLog frame
+- [#1904] NullPointerException on decompiler pool
+- [#1904] AS1/2 Simplify expressions breaks registers, functions
 
 ### Changed
 - Warning before switching deobfuscation is now optional

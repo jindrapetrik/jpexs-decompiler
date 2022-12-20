@@ -206,7 +206,7 @@ public class DirectValueActionItem extends ActionItem implements SimpleValue {
             }
             dependencies.add(computedRegValue);
         }
-        return (value instanceof Double) || (value instanceof Float) || (value instanceof Boolean) || (value instanceof Long) || (value == Null.INSTANCE) || (computedRegValue != null && computedRegValue.isCompileTime(dependencies)) || (value instanceof String) || (value instanceof ConstantIndex);
+        return (value instanceof Double) || (value instanceof Float) || (value instanceof Boolean) || (value instanceof Long) || (value == Null.INSTANCE) || (value instanceof String) || (value instanceof ConstantIndex);
     }
 
     @Override

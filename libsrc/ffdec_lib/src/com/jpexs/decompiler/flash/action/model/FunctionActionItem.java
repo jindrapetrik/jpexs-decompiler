@@ -225,6 +225,8 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
         return false;
     }
 
+    /*
+    NOT COMPILE TIME! This causes problems in simplifyExpressions, etc.
     @Override
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         for (GraphTargetItem a : actions) {
@@ -237,7 +239,7 @@ public class FunctionActionItem extends ActionItem implements BranchStackResista
             }
         }
         return true;
-    }
+    }*/
 
     @Override
     public Object getResult() {
