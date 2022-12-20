@@ -1399,8 +1399,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     p.setTimelined(sprite);
                 }
             }
-            ShowFrameTag showFrameTag = new ShowFrameTag(fSwf);
-            sprite.addTag(showFrameTag);
+            ShowFrameTag showFrameTag = new ShowFrameTag(fSwf);            
+            sprite.addTag(showFrameTag);            
+            showFrameTag.setTimelined(sprite);
             fSwf.addTag(sprite);
             sprite.setTimelined(fSwf);
         } 
@@ -1417,6 +1418,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         sprite2.addTag(placeTag);
         ShowFrameTag showFrameTag = new ShowFrameTag(fSwf);
         sprite2.addTag(showFrameTag);
+        showFrameTag.setTimelined(sprite2);
 
         
         PlaceObject3Tag placeTag2 = new PlaceObject3Tag(fSwf);
