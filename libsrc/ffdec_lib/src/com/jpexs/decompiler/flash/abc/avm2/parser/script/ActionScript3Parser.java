@@ -2605,21 +2605,16 @@ public class ActionScript3Parser {
         addScriptFromTree(allOpenedNamespaces, traits, classPos);
     }
 
-    public ActionScript3Parser(ABC abc, List<ABC> otherAbcs, boolean air) throws IOException, InterruptedException {
+    public ActionScript3Parser(AbcIndexing abcIndex) throws IOException, InterruptedException {
         SWF.initPlayer();
 
-        abcIndex = new AbcIndexing(air ? SWF.getAirGlobalAbcIndex() : SWF.getPlayerGlobalAbcIndex());
-        for (ABC a : otherAbcs) {
-            abcIndex.addAbc(a);
-        }
-
-        abcIndex.addAbc(abc);
+        this.abcIndex = abcIndex;
     }
 
-    public static void compile(String src, ABC abc, List<ABC> otherABCs, String fileName, int classPos, int scriptIndex, boolean air) throws AVM2ParseException, IOException, InterruptedException, CompilationException {
+    public static void compile(String src, ABC abc, AbcIndexing abcIndex, String fileName, int classPos, int scriptIndex, boolean air) throws AVM2ParseException, IOException, InterruptedException, CompilationException {
         //List<ABC> parABCs = new ArrayList<>();
         SWF.initPlayer();
-        ActionScript3Parser parser = new ActionScript3Parser(abc, otherABCs, air);
+        ActionScript3Parser parser = new ActionScript3Parser(abcIndex);
         boolean success = false;
         ABC originalAbc = ((ABCContainerTag) ((Tag) abc.parentTag).cloneTag()).getABC();
         try {
@@ -2640,12 +2635,12 @@ public class ActionScript3Parser {
         }
     }
 
-    public static void compile(SWF swf, String src, String dst, int classPos, int scriptIndex, boolean air) {
+    public static void compile(SWF swf, String src, String dst, int classPos, int scriptIndex) {
         System.err.println("WARNING: AS3 compiler is not finished yet. This is only used for debuggging!");
         try {
             SWF.initPlayer();
             ABC abc = new ABC(null);
-            ActionScript3Parser parser = new ActionScript3Parser(abc, new ArrayList<>(), air);
+            ActionScript3Parser parser = new ActionScript3Parser(swf.getAbcIndex());
             parser.addScript(new String(Helper.readFile(src), Utf8Helper.charset), src, classPos, scriptIndex);
             try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(dst)))) {
                 abc.saveToStream(fos);

@@ -142,7 +142,7 @@ public final class AbcIndexing {
 
         public String getPropNsString() {
             return propNsString;
-        }                
+        }
 
         /**
          * Creates key to property.
@@ -178,7 +178,7 @@ public final class AbcIndexing {
                 }
             }
         }
-        
+
         public PropertyDef(String propName, GraphTargetItem parent, String propNsString) {
             this.propName = propName;
             this.parent = parent;
@@ -316,11 +316,11 @@ public final class AbcIndexing {
             this.objType = objType;
         }
     }
-    
+
     private static class ClassDef {
         public GraphTargetItem type;
-        public DottedChain pkg;       
-        
+        public DottedChain pkg;
+
         public ClassDef(GraphTargetItem type, ABC abc, Integer scriptIndex) {
             this.type = type;
             if (scriptIndex != null) {
@@ -358,9 +358,7 @@ public final class AbcIndexing {
             }
             return Objects.equals(this.pkg, other.pkg);
         }
-        
-        
-                      
+
     }
 
     public static class ClassIndex {
@@ -370,7 +368,7 @@ public final class AbcIndexing {
         public ABC abc;
 
         public ClassIndex parent;
-        
+
         public Integer scriptIndex;
 
         @Override
@@ -417,7 +415,7 @@ public final class AbcIndexing {
                 return false;
             }
             return Objects.equals(this.scriptIndex, other.scriptIndex);
-        }               
+        }
     }
 
     private final Map<ClassDef, ClassIndex> classes = new HashMap<>();
@@ -430,23 +428,23 @@ public final class AbcIndexing {
 
     private final Map<PropertyNsDef, TraitIndex> classNsProperties = new HashMap<>();
 
-    private final Map<PropertyNsDef, TraitIndex> scriptProperties = new HashMap<>();   
-    
+    private final Map<PropertyNsDef, TraitIndex> scriptProperties = new HashMap<>();
+
     public ClassIndex findClass(GraphTargetItem cls, ABC abc, Integer scriptIndex) {
         ClassDef keyWithScriptIndex = new ClassDef(cls, abc, scriptIndex);
         if (classes.containsKey(keyWithScriptIndex)) {
             return classes.get(keyWithScriptIndex);
         }
-        
+
         ClassDef keyWithNoScriptIndex = new ClassDef(cls, abc, null);
         if (classes.containsKey(keyWithNoScriptIndex)) {
             return classes.get(keyWithNoScriptIndex);
         }
-        
+
         if (parent == null) {
             return null;
         }
-        return parent.findClass(cls, abc, scriptIndex);                
+        return parent.findClass(cls, abc, scriptIndex);
     }
 
     public void findPropertyTypeOrCallType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance, boolean findProtected, Reference<GraphTargetItem> type, Reference<GraphTargetItem> callType) {
@@ -459,8 +457,7 @@ public final class AbcIndexing {
             callType.setVal(traitIndex.callReturnType);
         }
     }
-    
-    
+
     public GraphTargetItem findPropertyType(ABC abc, GraphTargetItem cls, String propName, int ns, boolean findStatic, boolean findInstance, boolean findProtected) {
         TraitIndex traitIndex = findProperty(new PropertyDef(propName, cls, abc, ns), findStatic, findInstance, findProtected);
         if (traitIndex == null) {
@@ -529,7 +526,7 @@ public final class AbcIndexing {
             }
         }
         System.out.println("-----------");
-*/
+         */
         //search all static first
         if (findStatic && classProperties.containsKey(prop)) {
             if (!classProperties.containsKey(prop)) {
@@ -562,7 +559,7 @@ public final class AbcIndexing {
         AbcIndexing.ClassIndex ci = findClass(prop.parent, prop.abc, null);
         if (ci != null && ci.parent != null && (prop.abc == null || prop.propNsIndex == 0)) {
             AbcIndexing.ClassIndex ciParent = ci.parent;
-            DottedChain parentClass = ciParent.abc.instance_info.get(ciParent.index).getName(ciParent.abc.constants).getNameWithNamespace(ciParent.abc.constants, true);            
+            DottedChain parentClass = ciParent.abc.instance_info.get(ciParent.index).getName(ciParent.abc.constants).getNameWithNamespace(ciParent.abc.constants, true);
             TraitIndex pti = findProperty(new PropertyDef(prop.propName, new TypeItem(parentClass), prop.getPropNsString()), findStatic, findInstance, findProtected);
             if (pti != null) {
                 return pti;
@@ -618,7 +615,7 @@ public final class AbcIndexing {
             return new ApplyTypeAVM2Item(null, null, obj, params);
         } else {
             if (m.namespace_index != 0 && m.getNamespace(constants).kind == Namespace.KIND_PRIVATE) {
-                return new TypeItem(m.getName(constants, new ArrayList<>(), true, true), "ns:"+m.namespace_index);
+                return new TypeItem(m.getName(constants, new ArrayList<>(), true, true), "ns:" + m.namespace_index);
             }
             return new TypeItem(m.getNameWithNamespace(constants, true));
         }
@@ -626,7 +623,7 @@ public final class AbcIndexing {
 
     public static GraphTargetItem multinameToType(int m_index, AVM2ConstantPool constants) {
         return multinameToType(new HashSet<>(), m_index, constants);
-    }    
+    }
 
     private static GraphTargetItem getTraitCallReturnType(ABC abc, Trait t) {
         if (t instanceof TraitSlotConst) {
@@ -766,16 +763,13 @@ public final class AbcIndexing {
             return;
         }
         List<ClassIndex> addedClasses = new ArrayList<>();
-        
-        for (int i = 0; i < abc.instance_info.size(); i++) {
-            
-        }
-        for (int i = 0; i < abc.script_info.size(); i++) {            
+
+        for (int i = 0; i < abc.script_info.size(); i++) {
             indexTraits(abc, 0, abc.script_info.get(i).traits, null, scriptProperties);
-            for (int t = 0; t <  abc.script_info.get(i).traits.traits.size(); t++) {
+            for (int t = 0; t < abc.script_info.get(i).traits.traits.size(); t++) {
                 Trait tr = abc.script_info.get(i).traits.traits.get(t);
                 if (tr instanceof TraitClass) {
-                    TraitClass tc = (TraitClass)tr;                    
+                    TraitClass tc = (TraitClass) tr;
                     InstanceInfo ii = abc.instance_info.get(tc.class_info);
                     if (ii.deleted) {
                         continue;
