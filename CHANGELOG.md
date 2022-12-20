@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - BUTTONRECORD display does not use its Matrix
 - Editation status not cleared after Sprite transforming
 - Image flickering
+- Show Hex dump for AS1/2 script tags
 
 ### Changed
 - Warning before switching deobfuscation is now optional
