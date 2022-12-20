@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#1904] NullPointerException on decompiler pool
 - [#1904] AS1/2 Simplify expressions breaks registers, functions
 - [#1904] AS1/2 Throw is an ExitItem to properly handle continues vs ifs
-- AS3 direct editation - protected property resolving
+- [#595] AS3 direct editation - protected property resolving
 - AS3 direct editation and decompiler share same AbcIndex
 
 ### Changed
@@ -2755,6 +2755,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1904]: https://www.free-decompiler.com/flash/issues/1904
+[#595]: https://www.free-decompiler.com/flash/issues/595
 [#1898]: https://www.free-decompiler.com/flash/issues/1898
 [#1511]: https://www.free-decompiler.com/flash/issues/1511
 [#1765]: https://www.free-decompiler.com/flash/issues/1765
@@ -3265,7 +3266,6 @@ All notable changes to this project will be documented in this file.
 [#624]: https://www.free-decompiler.com/flash/issues/624
 [#627]: https://www.free-decompiler.com/flash/issues/627
 [#640]: https://www.free-decompiler.com/flash/issues/640
-[#595]: https://www.free-decompiler.com/flash/issues/595
 [#592]: https://www.free-decompiler.com/flash/issues/592
 [#585]: https://www.free-decompiler.com/flash/issues/585
 [#578]: https://www.free-decompiler.com/flash/issues/578
