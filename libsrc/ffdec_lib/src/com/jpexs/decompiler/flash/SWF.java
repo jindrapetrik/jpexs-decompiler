@@ -2968,7 +2968,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
         for (ASMSource src : actionsMap.keySet()) {
             actionsMap.get(src).removeNops();
-            src.setActions(actionsMap.get(src));
+            try {
+                src.setActions(actionsMap.get(src));
+            } catch (ValueTooLargeException vtle) {
+                Logger.getLogger(SWF.class.getName()).log(Level.WARNING, "renaming AS2 identifiers failed for an action source with error: {0}", vtle.getMessage());
+            }
             src.setModified();
         }
 

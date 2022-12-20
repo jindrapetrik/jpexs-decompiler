@@ -139,7 +139,7 @@ public class ActionListReader {
             nextOffsets.put(endAddress, endAddress + 1);
         }
 
-        ActionList actions = fixActionList(new ActionList(actionMap.values()), nextOffsets);
+        ActionList actions = fixActionList(new ActionList(actionMap.values(), sis.getCharset()), nextOffsets);
 
         // jump to the entry action when it is diffrent from the first action in the map
         if (entryAction != actions.get(0)) {

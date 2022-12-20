@@ -597,7 +597,7 @@ public class FastActionList implements Collection<ActionItem> {
         List<Action> resultList = new ArrayList<>(size);
         ActionItem item = firstItem;
         if (item == null) {
-            return new ActionList(resultList);
+            return new ActionList(resultList, charset);
         }
 
         do {
@@ -605,7 +605,7 @@ public class FastActionList implements Collection<ActionItem> {
             item = item.next;
         } while (item != firstItem);
 
-        ActionList result = new ActionList(resultList);
+        ActionList result = new ActionList(resultList, charset);
         updateActionAddressesAndLengths();
         updateJumps();
         updateActionStores();

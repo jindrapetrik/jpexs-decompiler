@@ -63,8 +63,9 @@ public class ActionList extends ArrayList<Action> {
     }    
     
 
-    public ActionList(Collection<Action> actions) {
+    public ActionList(Collection<Action> actions, String charset) {
         super(actions);
+        this.charset = charset;
     }
 
     public void setActions(List<Action> list) {
