@@ -1095,7 +1095,8 @@ public class TagTreeContextMenu extends JPopupMenu {
             if ((firstItem instanceof Tag)
                     || (firstItem instanceof CLIPACTIONRECORD)
                     || (firstItem instanceof BUTTONRECORD)
-                    || (firstItem instanceof BUTTONCONDACTION)) {
+                    || (firstItem instanceof BUTTONCONDACTION)
+                    || (firstItem instanceof TagScript)) {
                 showInHexDumpViewTagMenuItem.setVisible(true);
             }
 
@@ -2740,6 +2741,9 @@ public class TagTreeContextMenu extends JPopupMenu {
             ViewMessages.showMessageDialog(Main.getDefaultMessagesComponent(), AppStrings.translate("message.warning.hexViewNotUpToDate"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningHexViewNotUpToDate);
         }
         TreeItem item = getCurrentItem();
+        if (item instanceof TagScript) {
+            item = ((TagScript) item).getTag();
+        }
         mainPanel.showView(MainPanel.VIEW_DUMP);
         mainPanel.dumpTree.setSelectedItem(item);
         mainPanel.updateMenu();
