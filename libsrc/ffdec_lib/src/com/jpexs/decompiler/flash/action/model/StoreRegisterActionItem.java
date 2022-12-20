@@ -136,6 +136,8 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
         return true;
     }
 
+    /*
+    NOT COMPILE TIME! This causes problems in simplifyExpressions, etc.
     @Override
     public boolean isCompileTime(Set<GraphTargetItem> dependencies) {
         if (dependencies.contains(value)) {
@@ -144,6 +146,7 @@ public class StoreRegisterActionItem extends ActionItem implements SetTypeAction
         dependencies.add(value);
         return value.isCompileTime(dependencies);
     }
+    */
 
     @Override
     public Object getResult() {

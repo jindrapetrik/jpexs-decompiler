@@ -109,7 +109,7 @@ public class DecompilerPool {
 
                 HighlightedText result = new HighlightedText(writer);
                 Openable openable = pack.getOpenable();
-                SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC)openable).getSwf();
+                SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
                 if (swf != null) {
                     swf.as3Cache.put(pack, result);
                 }
@@ -210,13 +210,15 @@ public class DecompilerPool {
         if (!executor.awaitTermination(100, TimeUnit.SECONDS)) {
         }
     }
-    
-    public void destroySwf(SWF swf){
+
+    public void destroySwf(SWF swf) {
         List<Future<HighlightedText>> futures = openableToFutures.get(swf);
-        if(futures!=null){
-           for(Future<HighlightedText> future:futures){
-               future.cancel(true);
-           }
+        if (futures != null) {
+            for (Future<HighlightedText> future : futures) {
+                if (future != null) {
+                    future.cancel(true);
+                }
+            }
         }
     }
 }
