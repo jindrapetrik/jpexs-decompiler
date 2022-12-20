@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - [#1904] NullpointerException when renaming invalid identifiers in AS1/2 files caused by missing charset
+- [#1904] NullpointerException when fast switching items
 
 ### Changed
 - Warning before switching deobfuscation is now optional
