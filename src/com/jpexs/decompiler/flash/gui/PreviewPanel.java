@@ -1336,6 +1336,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imageTransformButton.setVisible(true);
         imageTransformCancelButton.setVisible(false);
         imageTransformSaveButton.setVisible(false);
+        mainPanel.clearEditingStatus();
         mainPanel.reload(true);
     }
 
