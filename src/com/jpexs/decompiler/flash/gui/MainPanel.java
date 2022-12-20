@@ -4711,7 +4711,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (treeItem instanceof ShapeTag) {
                 previewPanel.setImageReplaceButtonVisible(false, false, !((Tag) treeItem).isReadOnly(), false);
             }
-            previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), treeItem instanceof ShapeTag, !Configuration.playFrameSounds.get(), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag), treeItem instanceof DefineSpriteTag);
+            previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), treeItem instanceof ShapeTag, !Configuration.playFrameSounds.get(), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag), (treeItem instanceof DefineSpriteTag)||(treeItem instanceof ButtonTag));
         } else if (treeItem instanceof Frame && internalViewer) {
             Frame fn = (Frame) treeItem;
             SWF swf = (SWF) fn.getOpenable();
@@ -4781,34 +4781,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 swf.addTag(neededCharacter);
             }
 
-            PlaceObject3Tag placeTag = new PlaceObject3Tag(swf);
-            placeTag.depth = 1;
-            placeTag.characterId = buttonRecord.characterId;
-            placeTag.placeFlagHasCharacter = true;
-            if (buttonRecord.colorTransform != null) {
-                placeTag.colorTransform = buttonRecord.colorTransform;
-                placeTag.placeFlagHasColorTransform = true;
-            }
-
-            ButtonTag buttonTag = buttonRecord.getTag();
-            if (buttonTag instanceof DefineButtonTag) {
-                DefineButtonTag button1Tag = (DefineButtonTag) buttonTag;
-                DefineButtonCxformTag cxformTag = (DefineButtonCxformTag) button1Tag.getSwf().getCharacterIdTag(button1Tag.getCharacterId(), DefineButtonCxformTag.ID);
-                if (cxformTag != null) {
-                    placeTag.colorTransform = new CXFORMWITHALPHA(cxformTag.buttonColorTransform);
-                    placeTag.placeFlagHasColorTransform = true;
-                }
-            }
-
-            placeTag.matrix = buttonRecord.placeMatrix;
-            if (buttonRecord.buttonHasBlendMode) {
-                placeTag.blendMode = buttonRecord.blendMode;
-                placeTag.placeFlagHasBlendMode = true;
-            }
-            if (buttonRecord.buttonHasFilterList) {
-                placeTag.surfaceFilterList = buttonRecord.filterList;
-                placeTag.placeFlagHasFilterList = true;
-            }
+            PlaceObject3Tag placeTag = buttonRecord.toPlaceObject();
+            placeTag.setSwf(swf);
 
             swf.addTag(placeTag);
             placeTag.setTimelined(swf);
