@@ -314,7 +314,9 @@ public class ErrorLogFrame extends AppFrame {
                     scrollPane.setVisible(false);
                 }
                 pan.setAlignmentX(0f);
-                logViewInner.add(pan);
+                if (logViewInner != null) { //may be disposed or what? #1904
+                    logViewInner.add(pan);
+                }
                 revalidate();
                 repaint();
             });

@@ -7,8 +7,9 @@ All notable changes to this project will be documented in this file.
 - Warning before switching auto rename identifiers on
 
 ### Fixed
-- [#1904] NullpointerException when renaming invalid identifiers in AS1/2 files caused by missing charset
-- [#1904] NullpointerException when fast switching items
+- [#1904] NullPointerException when renaming invalid identifiers in AS1/2 files caused by missing charset
+- [#1904] NullPointerException when fast switching items
+- [#1904] NullPointerException on ErrorLog frame
 
 ### Changed
 - Warning before switching deobfuscation is now optional
