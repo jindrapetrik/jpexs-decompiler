@@ -473,7 +473,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         tim.schedule(new TimerTask() {
             @Override
             public void run() {
-                RECT rect = timelined.getRect();
+                Timelined tim = timelined;
+                if (tim == null) {
+                    return;
+                }
+                RECT rect = tim.getRect();
                 double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                 double w = rect.getWidth() / SWF.unitDivisor * zoomDouble;
                 double h = rect.getHeight() / SWF.unitDivisor * zoomDouble;
