@@ -93,6 +93,11 @@ public class ActionGraph extends Graph {
         this.insideDoInitAction = insideDoInitAction;
         this.insideFunction = insideFunction;
     }
+    
+    @Override
+    public ActionGraphSource getGraphCode() {
+        return (ActionGraphSource) code;
+    }
 
     @Override
     public LinkedHashMap<String, Graph> getSubGraphs() {
@@ -110,7 +115,7 @@ public class ActionGraph extends Graph {
                         outs.add(new ActionList(((ActionGraphSource) code).getCharset()));
                         continue;
                     }
-                    outs.add(new ActionList(alist.subList(adr2ip(alist, endAddr), adr2ip(alist, endAddr + size))));
+                    outs.add(new ActionList(alist.subList(adr2ip(alist, endAddr), adr2ip(alist, endAddr + size)), getGraphCode().getCharset()));
                     endAddr += size;
                 }
 

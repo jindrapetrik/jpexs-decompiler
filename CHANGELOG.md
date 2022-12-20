@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Deobfuscation and its options as icons on script panel toolbar
 
+### Fixed
+- [#1904] NullpointerException when renaming invalid identifiers in AS1/2 files caused by missing charset
+
 ## [18.0.0] - 2022-12-18
 ### Added
 - [#1898] Keyboard shortcut to remove tags (DEL, SHIFT+DEL)
@@ -2604,7 +2607,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.4...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.0.0...dev
+[18.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.4...version18.0.0
 [17.0.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.3...version17.0.4
 [17.0.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.2...version17.0.3
 [17.0.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.1...version17.0.2
@@ -2739,6 +2743,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1904]: https://www.free-decompiler.com/flash/issues/1904
 [#1898]: https://www.free-decompiler.com/flash/issues/1898
 [#1511]: https://www.free-decompiler.com/flash/issues/1511
 [#1765]: https://www.free-decompiler.com/flash/issues/1765
