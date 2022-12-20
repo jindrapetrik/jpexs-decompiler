@@ -127,7 +127,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
             public void setABC(ABC abc) {
             }
         });
-        ActionScript3Parser par = new ActionScript3Parser(abc, new ArrayList<>(), false);
+        ActionScript3Parser par = new ActionScript3Parser(swf.getAbcIndex());
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         par.addScript(str, "Test.as", 0, 0);
 

@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - [#1904] AS1/2 Simplify expressions breaks registers, functions
 - [#1904] AS1/2 Throw is an ExitItem to properly handle continues vs ifs
 - AS3 direct editation - protected property resolving
+- AS3 direct editation and decompiler share same AbcIndex
 
 ### Changed
 - Warning before switching deobfuscation is now optional

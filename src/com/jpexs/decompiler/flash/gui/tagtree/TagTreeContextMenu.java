@@ -1864,7 +1864,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     }
                 }
                 try {
-                    ActionScript3Parser parser = new ActionScript3Parser(doAbc.getABC(), abcs, false);
+                    ActionScript3Parser parser = new ActionScript3Parser(swf.getAbcIndex());
 
                     DottedChain dc = new DottedChain(pkgParts);
                     String script = "package " + dc.toPrintableString(true) + " {"
