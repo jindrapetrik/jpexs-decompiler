@@ -1721,6 +1721,7 @@ public class ABC implements Openable {
         getSwf().clearAbcListCache();
         getSwf().clearScriptCache();
         getMethodIndexing();
+        getSwf().getAbcIndex().refreshAbc(this);
     }
 
     /**

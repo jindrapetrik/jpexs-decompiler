@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorGroupPa
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AVM2DeobfuscatorJumps;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.pcode.ASM3Parser;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
@@ -127,7 +128,9 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
             public void setABC(ABC abc) {
             }
         });
-        ActionScript3Parser par = new ActionScript3Parser(swf.getAbcIndex());
+        AbcIndexing index = swf.getAbcIndex();
+        index.addAbc(abc);
+        ActionScript3Parser par = new ActionScript3Parser(index);
         HighlightedTextWriter writer = new HighlightedTextWriter(new CodeFormatting(), false);
         par.addScript(str, "Test.as", 0, 0);
 

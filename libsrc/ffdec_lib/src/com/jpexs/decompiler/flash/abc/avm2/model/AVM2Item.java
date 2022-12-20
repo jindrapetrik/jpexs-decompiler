@@ -85,6 +85,8 @@ public abstract class AVM2Item extends GraphTargetItem {
         }
 
         if (object.getThroughDuplicate() instanceof FindPropertyAVM2Item) {
+            //TODO: this might not be a good idea - #595,
+            //but removing this fails testNames test
             FindPropertyAVM2Item fp = (FindPropertyAVM2Item) object.getThroughDuplicate();
             if (fp.propertyName instanceof FullMultinameAVM2Item) {
                 propertyName = fp.propertyName;
