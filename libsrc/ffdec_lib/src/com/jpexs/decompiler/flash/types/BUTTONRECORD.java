@@ -18,6 +18,9 @@ package com.jpexs.decompiler.flash.types;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
+import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
+import com.jpexs.decompiler.flash.tags.DefineButtonTag;
+import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.treeitems.Openable;
@@ -188,5 +191,39 @@ public class BUTTONRECORD implements Serializable, TreeItem, HasSwfAndTag, HasCh
     @Override
     public void setCharacterId(int characterId) {
         this.characterId = characterId;
+    }
+    
+    public PlaceObject3Tag toPlaceObject() {
+        PlaceObject3Tag placeTag = new PlaceObject3Tag(swf);
+        placeTag.depth = placeDepth;
+        placeTag.characterId = characterId;
+        placeTag.placeFlagHasCharacter = true;
+        if (colorTransform != null) {
+            placeTag.colorTransform = colorTransform;
+            placeTag.placeFlagHasColorTransform = true;
+        }
+
+        ButtonTag buttonTag = getTag();
+        if (buttonTag instanceof DefineButtonTag) {
+            DefineButtonTag button1Tag = (DefineButtonTag) buttonTag;
+            DefineButtonCxformTag cxformTag = (DefineButtonCxformTag) button1Tag.getSwf().getCharacterIdTag(button1Tag.getCharacterId(), DefineButtonCxformTag.ID);
+            if (cxformTag != null) {
+                placeTag.colorTransform = new CXFORMWITHALPHA(cxformTag.buttonColorTransform);
+                placeTag.placeFlagHasColorTransform = true;
+            }
+        }
+
+        placeTag.matrix = new MATRIX(placeMatrix);
+        placeTag.placeFlagHasMatrix = true;
+        
+        if (buttonHasBlendMode) {
+            placeTag.blendMode = blendMode;
+            placeTag.placeFlagHasBlendMode = true;
+        }
+        if (buttonHasFilterList) {
+            placeTag.surfaceFilterList = filterList;
+            placeTag.placeFlagHasFilterList = true;
+        }
+        return placeTag;
     }
 }

@@ -38,6 +38,7 @@ import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
+import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
@@ -46,6 +47,7 @@ import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.TagScript;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
+import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.SerializableImage;
@@ -72,8 +74,10 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Timer;
@@ -232,17 +236,17 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private JButton imageTransformCancelButton;
 
     private TransformPanel imageTransformPanel;
-    
+
     private TransformPanel placeTransformPanel;
-    
+
     private FasterScrollPane placeTransformScrollPane;
-    
+
     private FasterScrollPane imageTransformScrollPane;
-    
+
     private JPersistentSplitPane placeTransformSplitPane;
-    
+
     private JPersistentSplitPane imageTransformSplitPane;
-    
+
     public void setReadOnly(boolean readOnly) {
         this.readOnly = readOnly;
         setDividerSize(this.readOnly ? 0 : dividerSize);
@@ -498,7 +502,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         JPanel previewCnt = new JPanel(new BorderLayout());
         imagePanel = new ImagePanel();
-        
+
         imagePanel.addPlaceObjectSelectedListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -506,24 +510,24 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 if (placeObject != null) {
                     mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), placeObject);
                 }
-            }            
+            }
         });
-        
+
         imagePanel.setLoop(Configuration.loopMedia.get());
-                        
-        imageTransformPanel = new TransformPanel(imagePanel);        
+
+        imageTransformPanel = new TransformPanel(imagePanel);
         previewCnt.add(imageTransformSplitPane = new JPersistentSplitPane(JPersistentSplitPane.HORIZONTAL_SPLIT, imagePanel,
-                imageTransformScrollPane = new FasterScrollPane(imageTransformPanel), 
+                imageTransformScrollPane = new FasterScrollPane(imageTransformPanel),
                 Configuration.guiSplitPaneTransform2DividerLocationPercent)
         );
-        imageTransformScrollPane.setVisible(false);        
+        imageTransformScrollPane.setVisible(false);
 
         JPanel buttonsPanel = new JPanel(new FlowLayout());
 
         imageTransformButton = new JButton(mainPanel.translate("button.transform"), View.getIcon("freetransform16"));
         imageTransformButton.setMargin(new Insets(3, 3, 3, 10));
         imageTransformButton.addActionListener(this::transformImageButtonActionPerformed);
-        
+
         imageTransformSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
         imageTransformSaveButton.setMargin(new Insets(3, 3, 3, 10));
         imageTransformSaveButton.addActionListener(this::saveImageTransformButtonActionPerformed);
@@ -531,11 +535,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imageTransformCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
         imageTransformCancelButton.setMargin(new Insets(3, 3, 3, 10));
         imageTransformCancelButton.addActionListener(this::cancelImageTransformButtonActionPerformed);
-        
+
         buttonsPanel.add(imageTransformButton);
         buttonsPanel.add(imageTransformSaveButton);
         buttonsPanel.add(imageTransformCancelButton);
-        
+
         imageTransformSaveButton.setVisible(false);
         imageTransformCancelButton.setVisible(false);
 
@@ -680,7 +684,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         JPanel previewCnt = new JPanel(new BorderLayout());
         placeImagePanel = new ImagePanel();
-        
+
         placeImagePanel.addPlaceObjectSelectedListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -688,15 +692,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 if (placeObject != null) {
                     mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), placeObject);
                 }
-            }            
+            }
         });
-        
+
         placeTransformPanel = new TransformPanel(placeImagePanel);
         //imagePanel.setLoop(Configuration.loopMedia.get());
         previewCnt.add(placeTransformSplitPane = new JPersistentSplitPane(
-                JPersistentSplitPane.HORIZONTAL_SPLIT, 
+                JPersistentSplitPane.HORIZONTAL_SPLIT,
                 placeImagePanel,
-                       placeTransformScrollPane = new FasterScrollPane(placeTransformPanel),
+                placeTransformScrollPane = new FasterScrollPane(placeTransformPanel),
                 Configuration.guiSplitPaneTransform1DividerLocationPercent));
         PlayerControls placeImagePlayControls = new PlayerControls(mainPanel, placeImagePanel, null);
         previewCnt.add(placeImagePlayControls, BorderLayout.SOUTH);
@@ -1014,7 +1018,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
             if (treeItem instanceof SWF) {
                 SWF swf = (SWF) treeItem;
-                try ( FileOutputStream fos = new FileOutputStream(extTempFile)) {
+                try (FileOutputStream fos = new FileOutputStream(extTempFile)) {
                     swf.saveTo(fos);
                 }
             } else {
@@ -1037,7 +1041,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 }
 
                 SWFHeader header;
-                try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(extTempFile))) {
+                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(extTempFile))) {
                     header = new PreviewExporter().exportSwf(fos, treeItem, backgroundColor, fontPageNum, true);
                 }
             }
@@ -1075,7 +1079,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
 
             SWFHeader header;
-            try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
                 header = new PreviewExporter().exportSwf(fos, treeItem, backgroundColor, fontPageNum, false);
             }
 
@@ -1107,19 +1111,19 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
         try {
             tempFile = File.createTempFile("ffdec_view_", ".swf");
-            try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
                 swf.saveTo(fos, false);
             }
             //Inject Loader
             if (swf.isAS3() && Configuration.autoOpenLoadedSWFs.get() && Configuration.useAdobeFlashPlayerForPreviews.get() && !DebuggerTools.hasDebugger(swf)) {
                 SWF instrSWF;
-                try ( InputStream fis = new BufferedInputStream(new FileInputStream(tempFile))) {
+                try (InputStream fis = new BufferedInputStream(new FileInputStream(tempFile))) {
                     instrSWF = new SWF(fis, false, false);
                 }
 
                 DebuggerTools.switchDebugger(instrSWF);
                 DebuggerTools.injectDebugLoader(instrSWF);
-                try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
+                try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
                     instrSWF.saveTo(fos);
                 }
             }
@@ -1178,7 +1182,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             genericSaveButton.setVisible(true);
             genericCancelButton.setVisible(true);
             genericTagPanel.setEditMode(true, (Tag) item);
-            
+
             mainPanel.setEditingStatus();
         }
     }
@@ -1232,7 +1236,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 mainPanel.refreshTree(swf);
                 hilightTag = tag;
             }
-            placeGenericPanel.setEditMode(false, null);            
+            placeGenericPanel.setEditMode(false, null);
         }
         placeTransformButton.setVisible(true);
         placeEditButton.setVisible(true);
@@ -1263,25 +1267,25 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeEditMode = PLACE_EDIT_TRANSFORM;
         placeGenericPanel.setVisible(false);
         placeImagePanel.selectDepth(-1);
-        
+
         placeTransformScrollPane.setVisible(true);
-               
+
         placeEditButton.setVisible(false);
         placeTransformButton.setVisible(false);
         placeSaveButton.setVisible(true);
-        placeCancelButton.setVisible(true);      
+        placeCancelButton.setVisible(true);
         mainPanel.setEditingStatus();
-        
+
         Timer t = new Timer();
-        t.schedule(new TimerTask(){
+        t.schedule(new TimerTask() {
             @Override
             public void run() {
-                placeTransformSplitPane.setDividerLocation(getWidth() - 450);      
+                placeTransformSplitPane.setDividerLocation(getWidth() - 450);
             }
         }, 20);
         t.schedule(new TimerTask() {
             @Override
-            public void run() {            
+            public void run() {
                 placeImagePanel.freeTransformDepth(placeTag.getDepth());
                 placeTransformPanel.load();
             }
@@ -1289,39 +1293,52 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void saveImageTransformButtonActionPerformed(ActionEvent evt) {
-        Matrix matrix = imagePanel.getNewMatrix();
-        
+        Matrix matrix = imagePanel.getNewMatrix();        
+
         imageTransformScrollPane.setVisible(false);
-        imagePanel.freeTransformDepth(-1);        
+        imagePanel.freeTransformDepth(-1);
         imageTransformButton.setVisible(true);
         imageTransformCancelButton.setVisible(false);
         imageTransformSaveButton.setVisible(false);
-        
-        DefineSpriteTag item = (DefineSpriteTag)mainPanel.getCurrentTree().getCurrentTreeItem();
-        for (Tag t:item.getTags()) {
-            if (t instanceof PlaceObjectTypeTag) {
-                PlaceObjectTypeTag pt = (PlaceObjectTypeTag)t;
-                MATRIX placeMatrix = pt.getMatrix();
-                if (placeMatrix != null) {
-                    pt.setMatrix(new Matrix(placeMatrix).preConcatenate(matrix).toMATRIX());
-                    pt.setModified(true);                    
+
+        CharacterTag character = (CharacterTag) mainPanel.getCurrentTree().getCurrentTreeItem();
+        if (character instanceof ButtonTag) {
+            ButtonTag button = (ButtonTag) character;
+            for (BUTTONRECORD rec : button.getRecords()) {
+                MATRIX placeMatrix = rec.placeMatrix;
+                rec.placeMatrix = new Matrix(placeMatrix).preConcatenate(matrix).toMATRIX();
+                rec.setModified(true);
+            }
+            button.setModified(true);
+            button.resetTimeline();            
+        } else if (character instanceof DefineSpriteTag) {
+            DefineSpriteTag item = (DefineSpriteTag) character;
+            for (Tag t : item.getTags()) {
+                if (t instanceof PlaceObjectTypeTag) {
+                    PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
+                    MATRIX placeMatrix = pt.getMatrix();
+                    if (placeMatrix != null) {
+                        pt.setMatrix(new Matrix(placeMatrix).preConcatenate(matrix).toMATRIX());
+                        pt.setModified(true);
+                    }
                 }
             }
+            item.resetTimeline();
         }
-        item.resetTimeline();
-                
-        mainPanel.reload(true);        
-    } 
-    
+
+        mainPanel.clearEditingStatus();
+        mainPanel.reload(true);
+    }
+
     private void cancelImageTransformButtonActionPerformed(ActionEvent evt) {
         imageTransformScrollPane.setVisible(false);
         imagePanel.freeTransformDepth(-1);
         imageTransformButton.setVisible(true);
         imageTransformCancelButton.setVisible(false);
         imageTransformSaveButton.setVisible(false);
-        mainPanel.reload(true);        
-    } 
-    
+        mainPanel.reload(true);
+    }
+
     private void transformImageButtonActionPerformed(ActionEvent evt) {
         TreeItem item = mainPanel.getCurrentTree().getCurrentTreeItem();
         if (item == null) {
@@ -1329,22 +1346,37 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
 
         //previewPanel.showImagePanel(fn.timeline.timelined, swf, fn.frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false);
-        DefineSpriteTag sprite = (DefineSpriteTag) item;
+        CharacterTag displayedCharacter = (CharacterTag) item;
 
-        SWF fSwf = new SWF(sprite.getSwf().getCharset());
+        SWF fSwf = new SWF(displayedCharacter.getSwf().getCharset());
         fSwf.frameCount = 1;
-        fSwf.frameRate = sprite.getSwf().frameRate;
-        fSwf.displayRect = sprite.getSwf().getRect();//sprite.getRect();
-        CharacterTag character = sprite;
+        fSwf.frameRate = displayedCharacter.getSwf().frameRate;
+        fSwf.displayRect = displayedCharacter.getSwf().getRect();//sprite.getRect();
+        CharacterTag character = displayedCharacter;
         Set<Integer> needed = new LinkedHashSet<>();
-        character.getNeededCharactersDeep(needed);
-        needed.remove(sprite.getCharacterId());
-        needed.add(sprite.getCharacterId());
+        DefineSpriteTag sprite = null;
+        if (displayedCharacter instanceof ButtonTag) {
+            ButtonTag buttonTag = (ButtonTag) displayedCharacter;
+            List<BUTTONRECORD> records = buttonTag.getRecords();
+            for (BUTTONRECORD rec : records) {
+                if (rec.buttonStateUp) {
+                    displayedCharacter.getSwf().getCharacter(rec.characterId).getNeededCharactersDeep(needed);
+                    needed.add(rec.characterId);                    
+                }
+            }            
+        } else {
+            sprite = (DefineSpriteTag) character;      
+            sprite.getNeededCharactersDeep(needed);
+            needed.remove(sprite.getCharacterId());
+            needed.add(sprite.getCharacterId());
+        }
+        
+        
 
         for (int n : needed) {
             CharacterTag neededCharacter;
             try {
-                neededCharacter = (CharacterTag) sprite.getSwf().getCharacter(n).cloneTag();
+                neededCharacter = (CharacterTag) displayedCharacter.getSwf().getCharacter(n).cloneTag();
             } catch (InterruptedException | IOException ex) {
                 Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
                 return;
@@ -1354,6 +1386,24 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             fSwf.addTag(neededCharacter);
         }
 
+        if (displayedCharacter instanceof ButtonTag) {
+            sprite = new DefineSpriteTag(fSwf);
+            sprite.frameCount = 1;
+            ButtonTag buttonTag = (ButtonTag) displayedCharacter;
+            List<BUTTONRECORD> records = buttonTag.getRecords();
+            for (BUTTONRECORD rec : records) {
+                if (rec.buttonStateUp) {
+                    PlaceObject3Tag p = rec.toPlaceObject();
+                    p.setSwf(fSwf);
+                    sprite.addTag(p);
+                    p.setTimelined(sprite);
+                }
+            }
+            ShowFrameTag showFrameTag = new ShowFrameTag(fSwf);
+            sprite.addTag(showFrameTag);
+            fSwf.addTag(sprite);
+            sprite.setTimelined(fSwf);
+        } 
         
         DefineSpriteTag sprite2 = new DefineSpriteTag(fSwf);
         sprite2.frameCount = 1;
@@ -1367,14 +1417,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         sprite2.addTag(placeTag);
         ShowFrameTag showFrameTag = new ShowFrameTag(fSwf);
         sprite2.addTag(showFrameTag);
-        
+
         
         PlaceObject3Tag placeTag2 = new PlaceObject3Tag(fSwf);
         placeTag2.depth = 1;
         placeTag2.characterId = sprite2.getCharacterId();
         placeTag2.placeFlagHasCharacter = true;
 
-        placeTag2.matrix = new MATRIX();        
+        placeTag2.matrix = new MATRIX();
         fSwf.addTag(placeTag2);
         placeTag2.setTimelined(fSwf);
         showFrameTag = new ShowFrameTag(fSwf);
@@ -1383,13 +1433,13 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         imagePanel.setTimelined(sprite2, fSwf, 0, true, true, true, true, true, false);
         imagePanel.selectDepth(-1);
-        
+
         imageTransformButton.setVisible(false);
         imageTransformSaveButton.setVisible(true);
         imageTransformCancelButton.setVisible(true);
         imageTransformScrollPane.setVisible(true);
         mainPanel.setEditingStatus();
-             
+
         
         Timer t = new Timer();
         t.schedule(new TimerTask() {
@@ -1405,7 +1455,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 imageTransformPanel.load();
             }
         }, 40); //add some delay before controls are hidden
-        
+
     }
 
     private void cancelPlaceTagButtonActionPerformed(ActionEvent evt) {
@@ -1418,7 +1468,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             placeGenericPanel.setVisible(true);
         }
         if (placeEditMode == PLACE_EDIT_RAW) {
-            placeGenericPanel.setEditMode(false, null);            
+            placeGenericPanel.setEditMode(false, null);
         }
         mainPanel.clearEditingStatus();
         placeEditButton.setVisible(true);
@@ -1464,32 +1514,32 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     public void selectImageDepth(int depth) {
         imagePanel.selectDepth(depth);
     }
-    
+
     public void startEditPlaceTag() {
         if (!placeEditButton.isVisible()) {
             return;
         }
         editPlaceTagButtonActionPerformed(null);
     }
-    
+
     public void startEditMetaDataTag() {
         if (!metadataEditButton.isVisible()) {
             return;
         }
         editMetadataButtonActionPerformed(null);
     }
-    
+
     public void startEditGenericTag() {
         if (!genericEditButton.isVisible()) {
             return;
         }
         editGenericTagButtonActionPerformed(null);
     }
-    
+
     public void startEditFontTag() {
         fontPanel.startEdit();
     }
-    
+
     public void startEditTextTag() {
         textPanel.startEdit();
     }
