@@ -252,7 +252,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private RegistrationPointPosition registrationPointPosition = RegistrationPointPosition.CENTER;
 
     private DepthState depthStateUnderCursor = null;
-    
+
     private List<ActionListener> placeObjectSelectedListeners = new ArrayList<>();
 
     private static Cursor loadCursor(String name, int x, int y) throws IOException {
@@ -268,22 +268,22 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     public void addBoundsChangeListener(BoundsChangeListener listener) {
         boundsChangeListeners.add(listener);
     }
-    
+
     public void addPlaceObjectSelectedListener(ActionListener listener) {
         placeObjectSelectedListeners.add(listener);
     }
-    
+
     public void removePlaceObjectSelectedListener(ActionListener listener) {
         placeObjectSelectedListeners.remove(listener);
     }
-    
+
     private void firePlaceObjectSelected() {
         ActionEvent e = new ActionEvent(this, 0, "");
-        for (ActionListener listener:placeObjectSelectedListeners) {
+        for (ActionListener listener : placeObjectSelectedListeners) {
             listener.actionPerformed(e);
         }
     }
-    
+
     public PlaceObjectTypeTag getPlaceTagUnderCursor() {
         if (depthStateUnderCursor == null) {
             return null;
@@ -655,14 +655,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         private boolean ctrlDown = false;
-        
+
         private boolean altDown = false;
 
         public boolean isAltDown() {
             return altDown;
         }
-        
-        
+
         public IconPanel() {
 
             KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
@@ -1427,15 +1426,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         public synchronized void setImg(SerializableImage img) {
             this._img = img;
             calcRect();
-            render();
-            repaint();
+            View.execInEventDispatchLater(new Runnable() {
+                @Override
+                public void run() {
+                    render();
+                    repaint();
+                }
+            });
+
         }
 
         private void setAllowMove(boolean allowMove) {
-            this.allowMove = allowMove;
-            /*if (!allowMove) {
-                offsetPoint = new Point();
-            }*/
+            this.allowMove = allowMove;            
         }
 
         private void calcRect() {
@@ -1519,7 +1521,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 if (ri != null) {
                     g2d.drawImage(ri, 0, 0, null);
                 }
-            }            
+            }
 
             if (Configuration._debugMode.get()) {
                 g2d.setColor(Color.red);
@@ -2391,10 +2393,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return;
         }
 
-        synchronized (ImagePanel.this) {
+        /*synchronized (ImagePanel.this) {
             iconPanel.calcRect();
-        }
-
+        }*/
         RenderContext renderContext = new RenderContext();
         renderContext.displayObjectCache = displayObjectCache;
         if (cursorPosition != null && freeTransformDepth == -1) {

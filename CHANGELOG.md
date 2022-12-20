@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - AS3 direct editation and decompiler share same AbcIndex
 - BUTTONRECORD display does not use its Matrix
 - Editation status not cleared after Sprite transforming
+- Image flickering
 
 ### Changed
 - Warning before switching deobfuscation is now optional
