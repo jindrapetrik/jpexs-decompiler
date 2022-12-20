@@ -867,6 +867,10 @@ public final class Configuration {
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> warningDeobfuscation = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> warningRenameIdentifiers = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
