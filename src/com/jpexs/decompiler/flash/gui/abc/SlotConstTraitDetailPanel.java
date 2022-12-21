@@ -101,6 +101,9 @@ public class SlotConstTraitDetailPanel extends JPanel implements TraitDetail {
         this.trait = trait;
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), true);
         trait.convertTraitHeader(abc, writer);
+        if (Configuration.indentAs3PCode.get()) {
+            writer.unindent();
+        }
         writer.appendNoHilight("end ; trait");
         String s = writer.toString();
         specialHilights = writer.specialHilights;
