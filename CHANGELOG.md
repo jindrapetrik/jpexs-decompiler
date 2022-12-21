@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - Image flickering
 - Show Hex dump for AS1/2 script tags
 - Speaker image when sound selected not in the center
+- [#1908] Slow commandline opening SWF
 
 ### Changed
 - Warning before switching deobfuscation is now optional
@@ -2771,6 +2772,7 @@ All notable changes to this project will be documented in this file.
 [#1460]: https://www.free-decompiler.com/flash/issues/1460
 [#1904]: https://www.free-decompiler.com/flash/issues/1904
 [#595]: https://www.free-decompiler.com/flash/issues/595
+[#1908]: https://www.free-decompiler.com/flash/issues/1908
 [#1898]: https://www.free-decompiler.com/flash/issues/1898
 [#1511]: https://www.free-decompiler.com/flash/issues/1511
 [#1765]: https://www.free-decompiler.com/flash/issues/1765
