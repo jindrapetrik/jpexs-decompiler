@@ -83,6 +83,14 @@ public class ImageExporter {
 
                 ImageFormat fileFormat = imageTag.getOriginalImageFormat();
                 ImageFormat originalFormat = fileFormat;
+                boolean hasSeparateAlpha = false;
+                if (imageTag instanceof HasSeparateAlphaChannel) {
+                    HasSeparateAlphaChannel hsac = (HasSeparateAlphaChannel)imageTag;
+                    hasSeparateAlpha = hsac.hasAlphaChannel();
+                }
+                if (settings.mode == ImageExportMode.PNG_GIF_JPEG && hasSeparateAlpha) {
+                    fileFormat = ImageFormat.PNG;
+                }
                 if (settings.mode == ImageExportMode.PNG) {
                     fileFormat = ImageFormat.PNG;
                 }

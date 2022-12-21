@@ -166,7 +166,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag, HasSeparat
         clearCache();
         setModified(true);
     }
-    
+
     @Override
     public boolean hasAlphaChannel() {
         return bitmapAlphaData.getLength() > 0;
@@ -188,19 +188,19 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag, HasSeparat
 
     @Override
     public InputStream getOriginalImageData() {
-        if (bitmapAlphaData.getLength() == 0) { // No alpha
+        //if (bitmapAlphaData.getLength() == 0) { // No alpha
 
-            JpegFixer jpegFixer = new JpegFixer();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try {
-                jpegFixer.fixJpeg(new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength()), baos);
-            } catch (IOException ex) {
-                Logger.getLogger(DefineBitsJPEG4Tag.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return new ByteArrayInputStream(baos.toByteArray());
+        JpegFixer jpegFixer = new JpegFixer();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            jpegFixer.fixJpeg(new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength()), baos);
+        } catch (IOException ex) {
+            Logger.getLogger(DefineBitsJPEG4Tag.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return new ByteArrayInputStream(baos.toByteArray());
+        //}
 
-        return null;
+        //return null;
     }
 
     @Override
@@ -259,7 +259,7 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag, HasSeparat
         } catch (IOException ex) {
             Logger.getLogger(DefineBitsJPEG4Tag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
         }
-        
+
         SerializableImage img = new SerializableImage(1, 1, BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics g = img.getGraphics();
         g.setColor(SWF.ERROR_COLOR);
