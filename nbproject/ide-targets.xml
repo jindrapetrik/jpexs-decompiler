@@ -28,6 +28,7 @@
                     <fileset dir="${lib.dir}" includes="**/*.jar"/>
                 </classpath>
                 <jvmarg line="${agent.jvmargs}" />
+                <arg line="${run.params}" />
             </java>
     </target>
 </project>
