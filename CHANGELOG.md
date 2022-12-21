@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - Warning before switching auto rename identifiers on
 - [#1231] Button transforming
 - [#1690] Deobfuscation tool dialog for script level (not just current method / all classes)
+- [#1460] Commandline import of text, images, shapes, symbol-class
 
 ### Fixed
 - [#1904] NullPointerException when renaming invalid identifiers in AS1/2 files caused by missing charset
@@ -2765,9 +2766,10 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1231]: https://www.free-decompiler.com/flash/issues/1231
+[#1690]: https://www.free-decompiler.com/flash/issues/1690
+[#1460]: https://www.free-decompiler.com/flash/issues/1460
 [#1904]: https://www.free-decompiler.com/flash/issues/1904
 [#595]: https://www.free-decompiler.com/flash/issues/595
-[#1690]: https://www.free-decompiler.com/flash/issues/1690
 [#1898]: https://www.free-decompiler.com/flash/issues/1898
 [#1511]: https://www.free-decompiler.com/flash/issues/1511
 [#1765]: https://www.free-decompiler.com/flash/issues/1765
@@ -2825,7 +2827,6 @@ All notable changes to this project will be documented in this file.
 [#1678]: https://www.free-decompiler.com/flash/issues/1678
 [#1414]: https://www.free-decompiler.com/flash/issues/1414
 [#1755]: https://www.free-decompiler.com/flash/issues/1755
-[#1460]: https://www.free-decompiler.com/flash/issues/1460
 [#1465]: https://www.free-decompiler.com/flash/issues/1465
 [#1862]: https://www.free-decompiler.com/flash/issues/1862
 [#1735]: https://www.free-decompiler.com/flash/issues/1735
