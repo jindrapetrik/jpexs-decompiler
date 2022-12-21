@@ -3704,29 +3704,29 @@ public class CommandLineArgumentParser {
             Map<Integer, CharacterTag> characters = swf.getCharacters();
             int shapeCount = 0;
             List<String> extensions = Arrays.asList("svg", "png", "jpg", "jpeg", "gif", "bmp");
-            File allFiles[] = shapesDir.listFiles(new FilenameFilter(){
+            File allFiles[] = shapesDir.listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
                     String nameLower = name.toLowerCase();
-                    for(String ext:extensions) {
+                    for (String ext : extensions) {
                         if (nameLower.endsWith("." + ext)) {
                             return true;
                         }
                     }
                     return false;
-                }                
+                }
             });
             for (int characterId : characters.keySet()) {
                 CharacterTag tag = characters.get(characterId);
                 if (tag instanceof ShapeTag) {
                     ShapeTag shapeTag = (ShapeTag) tag;
                     List<File> existingFilesForShapeTag = new ArrayList<>();
-                    for (File f:allFiles) {
-                        if (f.getName().startsWith(""+characterId+".") || f.getName().startsWith(""+characterId+"_")) {
+                    for (File f : allFiles) {
+                        if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
                             existingFilesForShapeTag.add(f);
                         }
                     }
-                    existingFilesForShapeTag.sort(new Comparator<File>(){
+                    existingFilesForShapeTag.sort(new Comparator<File>() {
                         @Override
                         public int compare(File o1, File o2) {
                             String ext1 = o1.getName().substring(o1.getName().lastIndexOf(".") + 1);
@@ -3736,7 +3736,7 @@ public class CommandLineArgumentParser {
                                 return o1.getName().compareTo(o2.getName());
                             }
                             return ret;
-                        }                    
+                        }
                     });
 
                     if (existingFilesForShapeTag.isEmpty()) {
@@ -3799,17 +3799,17 @@ public class CommandLineArgumentParser {
             int imageCount = 0;
             Map<Integer, CharacterTag> characters = swf.getCharacters();
             final List<String> extensions = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp");
-            File allFiles[] = imagesDir.listFiles(new FilenameFilter(){
+            File allFiles[] = imagesDir.listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
                     String nameLower = name.toLowerCase();
-                    for(String ext:extensions) {
+                    for (String ext : extensions) {
                         if (nameLower.endsWith("." + ext)) {
                             return true;
                         }
                     }
                     return false;
-                }                
+                }
             });
             for (int characterId : characters.keySet()) {
                 CharacterTag tag = characters.get(characterId);
@@ -3819,12 +3819,12 @@ public class CommandLineArgumentParser {
                         continue;
                     }
                     List<File> existingFilesForImageTag = new ArrayList<>();
-                    for (File f:allFiles) {
-                        if (f.getName().startsWith(""+characterId+".") || f.getName().startsWith(""+characterId+"_")) {
+                    for (File f : allFiles) {
+                        if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
                             existingFilesForImageTag.add(f);
                         }
                     }
-                    existingFilesForImageTag.sort(new Comparator<File>(){
+                    existingFilesForImageTag.sort(new Comparator<File>() {
                         @Override
                         public int compare(File o1, File o2) {
                             String ext1 = o1.getName().substring(o1.getName().lastIndexOf(".") + 1);
@@ -3834,9 +3834,9 @@ public class CommandLineArgumentParser {
                                 return o1.getName().compareTo(o2.getName());
                             }
                             return ret;
-                        }                    
+                        }
                     });
-                    
+
                     if (existingFilesForImageTag.isEmpty()) {
                         continue;
                     }
@@ -3879,7 +3879,9 @@ public class CommandLineArgumentParser {
             String selFile = args.pop();
             boolean textsFolderExists = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME)).exists();
             File textsFile = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
-            if (!textsFolderExists) {
+            if (textsFolderExists) {
+                System.out.println("Using the directory: " + new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME)).getAbsolutePath());
+            } else {
                 textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
             }
             TextImporter textImporter = new TextImporter(new MissingCharacterHandler() {
@@ -3973,7 +3975,9 @@ public class CommandLineArgumentParser {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
                 String baseFolder = args.pop();
                 String scriptsFolder = Path.combine(baseFolder, ScriptExportSettings.EXPORT_FOLDER_NAME);
-                if (!new File(scriptsFolder).exists()) {
+                if (new File(scriptsFolder).exists()) {
+                    System.out.println("Using the directory: " + new File(scriptsFolder).getAbsolutePath());
+                } else {
                     scriptsFolder = baseFolder;
                 }
                 new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
