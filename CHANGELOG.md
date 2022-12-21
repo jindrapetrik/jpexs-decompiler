@@ -24,10 +24,12 @@ All notable changes to this project will be documented in this file.
 - Show Hex dump for AS1/2 script tags
 - Speaker image when sound selected not in the center
 - [#1908] Slow commandline opening SWF
+- [#1908] Shape/image import must accept also filenames in the form "CHARID_xxx.ext" instead of just "CHARID.ext"
 
 ### Changed
 - Warning before switching deobfuscation is now optional
 - [#1690] Redesigned Deobfuscation tool dialog.
+- Shape/image/script/text import does not require specific folder name inside (but still preffers it when exists)
 
 ### Removed
 - "Restore control flow" deobfuscation level as it was the same as "Remove traps"

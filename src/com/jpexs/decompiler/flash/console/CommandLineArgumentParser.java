@@ -219,6 +219,7 @@ import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.gui.translator.Translator;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import java.awt.Font;
+import java.util.Comparator;
 
 /**
  *
@@ -2267,7 +2268,7 @@ public class CommandLineArgumentParser {
                 OpenableSourceInfo sourceInfo = new OpenableSourceInfo(null, inFile.getAbsolutePath(), inFile.getName());
                 SWF swf;
                 try {
-                    swf = new SWF(new BufferedInputStream(new StdInAwareFileInputStream(inFile)), sourceInfo.getFile(), sourceInfo.getFileTitle(),null, Configuration.parallelSpeedUp.get(), false, true, charset);                    
+                    swf = new SWF(new BufferedInputStream(new StdInAwareFileInputStream(inFile)), sourceInfo.getFile(), sourceInfo.getFileTitle(), null, Configuration.parallelSpeedUp.get(), false, true, charset);
                 } catch (FileNotFoundException | SwfOpenException ex) {
                     // FileNotFoundException when anti virus software blocks to open the file
                     logger.log(Level.SEVERE, "Failed to open swf: " + inFile.getName(), ex);
@@ -3688,32 +3689,64 @@ public class CommandLineArgumentParser {
             String selFile = args.pop();
 
             File shapesDir = new File(Path.combine(selFile, ShapeExportSettings.EXPORT_FOLDER_NAME));
+            if (shapesDir.exists()) {
+                System.out.println("Using the directory: " + shapesDir.getAbsolutePath());
+            } else {
+                shapesDir = new File(selFile);
+            }
+            if (!shapesDir.exists()) {
+                System.err.println("Shapes directory does not exist: " + shapesDir.getAbsolutePath());
+                System.exit(1);
+            }
             ShapeImporter shapeImporter = new ShapeImporter();
             SvgImporter svgImporter = new SvgImporter();
 
             Map<Integer, CharacterTag> characters = swf.getCharacters();
             int shapeCount = 0;
             List<String> extensions = Arrays.asList("svg", "png", "jpg", "jpeg", "gif", "bmp");
+            File allFiles[] = shapesDir.listFiles(new FilenameFilter(){
+                @Override
+                public boolean accept(File dir, String name) {
+                    String nameLower = name.toLowerCase();
+                    for(String ext:extensions) {
+                        if (nameLower.endsWith("." + ext)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }                
+            });
             for (int characterId : characters.keySet()) {
                 CharacterTag tag = characters.get(characterId);
                 if (tag instanceof ShapeTag) {
                     ShapeTag shapeTag = (ShapeTag) tag;
-                    List<File> existingFilesForImageTag = new ArrayList<>();
-                    for (String ext : extensions) {
-                        File sourceFile = new File(Path.combine(shapesDir.getPath(), "" + characterId + "." + ext));
-                        if (sourceFile.exists()) {
-                            existingFilesForImageTag.add(sourceFile);
+                    List<File> existingFilesForShapeTag = new ArrayList<>();
+                    for (File f:allFiles) {
+                        if (f.getName().startsWith(""+characterId+".") || f.getName().startsWith(""+characterId+"_")) {
+                            existingFilesForShapeTag.add(f);
                         }
                     }
+                    existingFilesForShapeTag.sort(new Comparator<File>(){
+                        @Override
+                        public int compare(File o1, File o2) {
+                            String ext1 = o1.getName().substring(o1.getName().lastIndexOf(".") + 1);
+                            String ext2 = o2.getName().substring(o2.getName().lastIndexOf(".") + 1);
+                            int ret = extensions.indexOf(ext1) - extensions.indexOf(ext2);
+                            if (ret == 0) {
+                                return o1.getName().compareTo(o2.getName());
+                            }
+                            return ret;
+                        }                    
+                    });
 
-                    if (existingFilesForImageTag.isEmpty()) {
+                    if (existingFilesForShapeTag.isEmpty()) {
                         continue;
                     }
 
-                    if (existingFilesForImageTag.size() > 1) {
-                        logger.log(Level.WARNING, "Multiple matching files for shape tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForImageTag.get(0).getName()});
+                    if (existingFilesForShapeTag.size() > 1) {
+                        logger.log(Level.WARNING, "Multiple matching files for shape tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForShapeTag.get(0).getName()});
                     }
-                    File sourceFile = existingFilesForImageTag.get(0);
+                    File sourceFile = existingFilesForShapeTag.get(0);
 
                     try {
                         System.out.println("Importing character " + characterId + " from file " + sourceFile.getName());
@@ -3753,6 +3786,11 @@ public class CommandLineArgumentParser {
             String selFile = args.pop();
 
             File imagesDir = new File(Path.combine(selFile, ImageExportSettings.EXPORT_FOLDER_NAME));
+            if (imagesDir.exists()) {
+                System.out.println("Using the directory: " + imagesDir.getAbsolutePath());
+            } else {
+                imagesDir = new File(selFile);
+            }
             if (!imagesDir.exists()) {
                 System.err.println("Images directory does not exist: " + imagesDir.getAbsolutePath());
                 System.exit(1);
@@ -3760,7 +3798,19 @@ public class CommandLineArgumentParser {
             ImageImporter imageImporter = new ImageImporter();
             int imageCount = 0;
             Map<Integer, CharacterTag> characters = swf.getCharacters();
-            List<String> extensions = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp");
+            final List<String> extensions = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp");
+            File allFiles[] = imagesDir.listFiles(new FilenameFilter(){
+                @Override
+                public boolean accept(File dir, String name) {
+                    String nameLower = name.toLowerCase();
+                    for(String ext:extensions) {
+                        if (nameLower.endsWith("." + ext)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }                
+            });
             for (int characterId : characters.keySet()) {
                 CharacterTag tag = characters.get(characterId);
                 if (tag instanceof ImageTag) {
@@ -3769,13 +3819,24 @@ public class CommandLineArgumentParser {
                         continue;
                     }
                     List<File> existingFilesForImageTag = new ArrayList<>();
-                    for (String ext : extensions) {
-                        File sourceFile = new File(Path.combine(imagesDir.getPath(), "" + characterId + "." + ext));
-                        if (sourceFile.exists()) {
-                            existingFilesForImageTag.add(sourceFile);
+                    for (File f:allFiles) {
+                        if (f.getName().startsWith(""+characterId+".") || f.getName().startsWith(""+characterId+"_")) {
+                            existingFilesForImageTag.add(f);
                         }
                     }
-
+                    existingFilesForImageTag.sort(new Comparator<File>(){
+                        @Override
+                        public int compare(File o1, File o2) {
+                            String ext1 = o1.getName().substring(o1.getName().lastIndexOf(".") + 1);
+                            String ext2 = o2.getName().substring(o2.getName().lastIndexOf(".") + 1);
+                            int ret = extensions.indexOf(ext1) - extensions.indexOf(ext2);
+                            if (ret == 0) {
+                                return o1.getName().compareTo(o2.getName());
+                            }
+                            return ret;
+                        }                    
+                    });
+                    
                     if (existingFilesForImageTag.isEmpty()) {
                         continue;
                     }
@@ -3816,7 +3877,11 @@ public class CommandLineArgumentParser {
             SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
 
             String selFile = args.pop();
+            boolean textsFolderExists = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME)).exists();
             File textsFile = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
+            if (!textsFolderExists) {
+                textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
+            }
             TextImporter textImporter = new TextImporter(new MissingCharacterHandler() {
                 @Override
                 public boolean getIgnoreMissingCharacters() {
@@ -3866,10 +3931,13 @@ public class CommandLineArgumentParser {
             });
 
             // try to import formatted texts
-            if (textsFile.exists()) {                
+            if (textsFile.exists()) {
                 textImporter.importTextsSingleFileFormatted(textsFile, swf);
             } else {
                 textsFile = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME, TextExporter.TEXT_EXPORT_FILENAME_PLAIN));
+                if (!textsFolderExists) {
+                    textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FILENAME_PLAIN));
+                }
                 // try to import plain texts
                 if (textsFile.exists()) {
                     textImporter.importTextsSingleFile(textsFile, swf);
@@ -3903,7 +3971,11 @@ public class CommandLineArgumentParser {
         try {
             try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
                 SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
-                String scriptsFolder = Path.combine(args.pop(), ScriptExportSettings.EXPORT_FOLDER_NAME);
+                String baseFolder = args.pop();
+                String scriptsFolder = Path.combine(baseFolder, ScriptExportSettings.EXPORT_FOLDER_NAME);
+                if (!new File(scriptsFolder).exists()) {
+                    scriptsFolder = baseFolder;
+                }
                 new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true));
                 new AS3ScriptImporter().importScripts(As3ScriptReplacerFactory.createByConfig(air), scriptsFolder, swf.getAS3Packs());
 
