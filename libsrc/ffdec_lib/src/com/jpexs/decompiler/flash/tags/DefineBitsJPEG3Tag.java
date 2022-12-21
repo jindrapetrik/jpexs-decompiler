@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
+import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -46,7 +47,7 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 @SWFVersion(from = 3) //Note: GIF and PNG since version
-public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
+public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag, HasSeparateAlphaChannel {
 
     public static final int ID = 35;
 
@@ -139,10 +140,12 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         setModified(true);
     }
 
+    @Override
     public byte[] getImageAlpha() throws IOException {
         return SWFInputStream.uncompressByteArray(bitmapAlphaData.getRangeData());
     }
 
+    @Override
     public void setImageAlpha(byte[] data) throws IOException {
         ImageFormat fmt = ImageTag.getImageFormat(imageData);
         if (fmt != ImageFormat.JPEG) {
@@ -160,6 +163,11 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
     }
 
     @Override
+    public boolean hasAlphaChannel() {
+        return bitmapAlphaData.getLength() > 0;
+    }
+    
+    @Override
     public ImageFormat getImageFormat() {
         ImageFormat fmt = getOriginalImageFormat();
         if (fmt == ImageFormat.JPEG && bitmapAlphaData.getLength() > 0) {
@@ -175,18 +183,18 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
 
     @Override
     public InputStream getOriginalImageData() {
-        if (bitmapAlphaData.getLength() == 0) { // No alpha
-            JpegFixer jpegFixer = new JpegFixer();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try {
-                jpegFixer.fixJpeg(new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength()), baos);
-            } catch (IOException ex) {
-                Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            return new ByteArrayInputStream(baos.toByteArray());
+        //if (bitmapAlphaData.getLength() == 0) { // No alpha
+        JpegFixer jpegFixer = new JpegFixer();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            jpegFixer.fixJpeg(new ByteArrayInputStream(imageData.getArray(), imageData.getPos(), imageData.getLength()), baos);
+        } catch (IOException ex) {
+            Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return new ByteArrayInputStream(baos.toByteArray());
+        //}
 
-        return null;
+        //return null;
     }
 
     @Override
@@ -245,7 +253,7 @@ public class DefineBitsJPEG3Tag extends ImageTag implements AloneTag {
         } catch (IOException ex) {
             Logger.getLogger(DefineBitsJPEG3Tag.class.getName()).log(Level.SEVERE, "Failed to get image", ex);
         }
-        
+
         SerializableImage img = new SerializableImage(1, 1, BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics g = img.getGraphics();
         g.setColor(SWF.ERROR_COLOR);

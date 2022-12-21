@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.base.AloneTag;
+import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -46,7 +47,7 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 @SWFVersion(from = 10)
-public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
+public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag, HasSeparateAlphaChannel {
 
     public static final int ID = 90;
 
@@ -144,10 +145,12 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
         setModified(true);
     }
 
+    @Override
     public byte[] getImageAlpha() throws IOException {
         return SWFInputStream.uncompressByteArray(bitmapAlphaData.getRangeData());
     }
 
+    @Override
     public void setImageAlpha(byte[] data) throws IOException {
         ImageFormat fmt = ImageTag.getImageFormat(imageData);
         if (fmt != ImageFormat.JPEG) {
@@ -162,6 +165,11 @@ public class DefineBitsJPEG4Tag extends ImageTag implements AloneTag {
         bitmapAlphaData = new ByteArrayRange(SWFOutputStream.compressByteArray(data));
         clearCache();
         setModified(true);
+    }
+    
+    @Override
+    public boolean hasAlphaChannel() {
+        return bitmapAlphaData.getLength() > 0;
     }
 
     @Override
