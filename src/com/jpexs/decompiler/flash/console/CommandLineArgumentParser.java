@@ -3750,7 +3750,7 @@ public class CommandLineArgumentParser {
 
             File imagesDir = new File(Path.combine(selFile, ImageExportSettings.EXPORT_FOLDER_NAME));
             if (!imagesDir.exists()) {
-                System.err.println("Images directory does not exists: "+imagesDir.getAbsolutePath());
+                System.err.println("Images directory does not exist: "+imagesDir.getAbsolutePath());
                 System.exit(1);
             }
             ImageImporter imageImporter = new ImageImporter();
