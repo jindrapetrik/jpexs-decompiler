@@ -3745,12 +3745,16 @@ public class CommandLineArgumentParser {
 
         try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
             SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
-
+            System.out.println("Source file opened");
             String selFile = args.pop();
 
             File imagesDir = new File(Path.combine(selFile, ImageExportSettings.EXPORT_FOLDER_NAME));
+            if (!imagesDir.exists()) {
+                System.err.println("Images directory does not exists: "+imagesDir.getAbsolutePath());
+                System.exit(1);
+            }
             ImageImporter imageImporter = new ImageImporter();
-
+            int imageCount = 0;
             Map<Integer, CharacterTag> characters = swf.getCharacters();
             List<String> extensions = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp");
             for (int characterId : characters.keySet()) {
@@ -3760,7 +3764,7 @@ public class CommandLineArgumentParser {
                     if (!imageTag.importSupported()) {
                         continue;
                     }
-                    List<File> existingFilesForImageTag = new ArrayList<>();
+                    List<File> existingFilesForImageTag = new ArrayList<>();                    
                     for (String ext : extensions) {
                         File sourceFile = new File(Path.combine(imagesDir.getPath(), "" + characterId + "." + ext));
                         if (sourceFile.exists()) {
@@ -3777,15 +3781,19 @@ public class CommandLineArgumentParser {
                     }
                     File sourceFile = existingFilesForImageTag.get(0);
                     try {
+                        System.out.println("Importing character "+characterId+" from file "+sourceFile.getName());
                         imageImporter.importImage(imageTag, Helper.readFile(sourceFile.getPath()));
+                        imageCount++;
                     } catch (IOException ex) {
                         logger.log(Level.WARNING, "Cannot import image " + characterId + " from file " + sourceFile.getName(), ex);
                     }
                 }
             }
+            System.out.println("Writing outfile");
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
                 swf.saveTo(fos);
             }
+            System.out.println(""+imageCount+" images sucessfully imported");
         } catch (IOException | InterruptedException e) {
             System.err.println("I/O error during writing");
             System.exit(2);
