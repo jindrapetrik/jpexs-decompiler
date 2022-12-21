@@ -3684,7 +3684,7 @@ public class CommandLineArgumentParser {
         }
         try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
             SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
-
+            System.out.println("Source file opened");
             String selFile = args.pop();
 
             File shapesDir = new File(Path.combine(selFile, ShapeExportSettings.EXPORT_FOLDER_NAME));
@@ -3692,6 +3692,7 @@ public class CommandLineArgumentParser {
             SvgImporter svgImporter = new SvgImporter();
 
             Map<Integer, CharacterTag> characters = swf.getCharacters();
+            int shapeCount = 0;
             List<String> extensions = Arrays.asList("svg", "png", "jpg", "jpeg", "gif", "bmp");
             for (int characterId : characters.keySet()) {
                 CharacterTag tag = characters.get(characterId);
@@ -3715,20 +3716,23 @@ public class CommandLineArgumentParser {
                     File sourceFile = existingFilesForImageTag.get(0);
 
                     try {
+                        System.out.println("Importing character " + characterId + " from file " + sourceFile.getName());
                         if (sourceFile.getAbsolutePath().toLowerCase().endsWith(".svg")) {
                             svgImporter.importSvg(shapeTag, Helper.readTextFile(sourceFile.getAbsolutePath()), !noFill);
                         } else {
                             shapeImporter.importImage(shapeTag, Helper.readFile(sourceFile.getAbsolutePath()), 0, !noFill);
                         }
+                        shapeCount++;
                     } catch (IOException ex) {
                         logger.log(Level.WARNING, "Cannot import shape " + characterId + " from file " + sourceFile.getName(), ex);
                     }
                 }
             }
-
+            System.out.println("Writing outfile");
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
                 swf.saveTo(fos);
             }
+            System.out.println("" + shapeCount + " shapes successfully imported");
         } catch (IOException | InterruptedException e) {
             System.err.println("I/O error during writing");
             System.exit(2);
@@ -3793,7 +3797,7 @@ public class CommandLineArgumentParser {
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
                 swf.saveTo(fos);
             }
-            System.out.println("" + imageCount + " images sucessfully imported");
+            System.out.println("" + imageCount + " images successfully imported");
         } catch (IOException | InterruptedException e) {
             System.err.println("I/O error during writing");
             System.exit(2);
@@ -3862,7 +3866,7 @@ public class CommandLineArgumentParser {
             });
 
             // try to import formatted texts
-            if (textsFile.exists()) {
+            if (textsFile.exists()) {                
                 textImporter.importTextsSingleFileFormatted(textsFile, swf);
             } else {
                 textsFile = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME, TextExporter.TEXT_EXPORT_FILENAME_PLAIN));
