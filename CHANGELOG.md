@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - Deobfuscation and its options as icons on script panel toolbar
 - Warning before switching auto rename identifiers on
 - [#1231] Button transforming
+- [#1690] Deobfuscation tool dialog for script level (not just current method / all classes)
 
 ### Fixed
 - [#1904] NullPointerException when renaming invalid identifiers in AS1/2 files caused by missing charset
@@ -23,6 +24,10 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - Warning before switching deobfuscation is now optional
+- [#1690] Redesigned Deobfuscation tool dialog.
+
+### Removed
+- "Restore control flow" deobfuscation level as it was the same as "Remove traps"
 
 ## [18.0.0] - 2022-12-18
 ### Added
@@ -2762,6 +2767,7 @@ All notable changes to this project will be documented in this file.
 [#1231]: https://www.free-decompiler.com/flash/issues/1231
 [#1904]: https://www.free-decompiler.com/flash/issues/1904
 [#595]: https://www.free-decompiler.com/flash/issues/595
+[#1690]: https://www.free-decompiler.com/flash/issues/1690
 [#1898]: https://www.free-decompiler.com/flash/issues/1898
 [#1511]: https://www.free-decompiler.com/flash/issues/1511
 [#1765]: https://www.free-decompiler.com/flash/issues/1765

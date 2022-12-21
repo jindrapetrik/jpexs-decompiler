@@ -192,8 +192,6 @@ public final class MethodBody implements Cloneable {
             removeDeadCode(abc.constants, trait, abc.method_info.get(method_info));
         } else if (level == DeobfuscationLevel.LEVEL_REMOVE_TRAPS) {
             removeTraps(abc, trait, scriptIndex, classIndex, isStatic, path);
-        } else if (level == DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW) {
-            removeTraps(abc, trait, scriptIndex, classIndex, isStatic, path);
         }
 
         ((Tag) abc.parentTag).setModified(true);

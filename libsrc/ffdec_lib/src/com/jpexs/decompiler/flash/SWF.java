@@ -3761,8 +3761,6 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 tag.getABC().removeDeadCode(deoListener);
             } else if (level == DeobfuscationLevel.LEVEL_REMOVE_TRAPS) {
                 tag.getABC().removeTraps(deoListener);
-            } else if (level == DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW) {
-                tag.getABC().removeTraps(deoListener);
             }
 
             ((Tag) tag).setModified(true);

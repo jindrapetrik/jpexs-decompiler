@@ -17,21 +17,21 @@
 package com.jpexs.decompiler.flash.gui.abc;
 
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationScope;
 import com.jpexs.decompiler.flash.gui.AppDialog;
 import com.jpexs.decompiler.flash.gui.View;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.util.Hashtable;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
+import javax.swing.JRadioButton;
 
 /**
  *
@@ -39,9 +39,12 @@ import javax.swing.JSlider;
  */
 public class DeobfuscationDialog extends AppDialog {
 
-    public JCheckBox processAllCheckbox = new JCheckBox(translate("processallclasses"));
+    private final JRadioButton removeDeadCodeRadioButton = new JRadioButton(translate("deobfuscation.removedeadcode"));
+    private final JRadioButton removeTrapsRadioButton = new JRadioButton(translate("deobfuscation.removetraps"));
 
-    public JSlider codeProcessingLevel;
+    private final JRadioButton methodScopeRadioButton = new JRadioButton(translate("deobfuscation.scope.method"));
+    private final JRadioButton scriptScopeRadioButton = new JRadioButton(translate("deobfuscation.scope.script"));
+    private final JRadioButton swfScopeRadioButton = new JRadioButton(translate("deobfuscation.scope.swf"));
 
     private int result = ERROR_OPTION;
 
@@ -49,39 +52,45 @@ public class DeobfuscationDialog extends AppDialog {
     public DeobfuscationDialog(Window owner) {
         super(owner);
         setDefaultCloseOperation(HIDE_ON_CLOSE);
-        setSize(new Dimension(330, 270));
         setTitle(translate("dialog.title"));
-        Container cp = getContentPane();
-        cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
-        codeProcessingLevel = new JSlider(JSlider.VERTICAL, 1, 3, 3);
-        codeProcessingLevel.setMajorTickSpacing(1);
-        codeProcessingLevel.setPaintTicks(true);
-        codeProcessingLevel.setMinorTickSpacing(1);
-        codeProcessingLevel.setSnapToTicks(true);
-        JLabel lab1 = new JLabel(translate("deobfuscation.level"));
-        //lab1.setBounds(30, 0, getWidth() - 60, 25);
-        lab1.setAlignmentX(0.5f);
-        cp.add(lab1);
-        Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
-        //labelTable.put(LEVEL_NONE, new JLabel("None"));
+        Container contentPane = getContentPane();
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+        JLabel processingLevelLabel = new JLabel(translate("deobfuscation.level"));
+        processingLevelLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        contentPane.add(processingLevelLabel);
 
-        labelTable.put(DeobfuscationLevel.LEVEL_REMOVE_DEAD_CODE.getLevel(), new JLabel(translate("deobfuscation.removedeadcode")));
-        labelTable.put(DeobfuscationLevel.LEVEL_REMOVE_TRAPS.getLevel(), new JLabel(translate("deobfuscation.removetraps")));
-        labelTable.put(DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW.getLevel(), new JLabel(translate("deobfuscation.restorecontrolflow")));
-        codeProcessingLevel.setLabelTable(labelTable);
+        JPanel processingLevelPanel = new JPanel(new FlowLayout());
+        ButtonGroup levelGroup = new ButtonGroup();
+        levelGroup.add(removeDeadCodeRadioButton);
+        levelGroup.add(removeTrapsRadioButton);
+        removeTrapsRadioButton.setSelected(true);
 
-        codeProcessingLevel.setPaintLabels(true);
-        codeProcessingLevel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        //codeProcessingLevel.setSize(300, 200);
+        processingLevelPanel.add(removeDeadCodeRadioButton);
+        processingLevelPanel.add(removeTrapsRadioButton);
+        processingLevelPanel.setAlignmentX(JPanel.CENTER_ALIGNMENT);
+        removeTrapsRadioButton.setSelected(true);
+        contentPane.add(processingLevelPanel);
 
-        //codeProcessingLevel.setBounds(30, 25, getWidth() - 60, 125);
-        codeProcessingLevel.setAlignmentX(0.5f);
-        add(codeProcessingLevel);
-        //processAllCheckbox.setBounds(50, 150, getWidth() - 100, 25);
-        processAllCheckbox.setAlignmentX(0.5f);
-        add(processAllCheckbox);
+        JLabel scopeLabel = new JLabel(translate("deobfuscation.scope"));
+        scopeLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        contentPane.add(scopeLabel);
 
-        processAllCheckbox.setSelected(true);
+        ButtonGroup scopeGroup = new ButtonGroup();
+        scopeGroup.add(methodScopeRadioButton);
+        scopeGroup.add(scriptScopeRadioButton);
+        scopeGroup.add(swfScopeRadioButton);
+        JPanel scopePanel = new JPanel(new FlowLayout());
+        scopePanel.add(methodScopeRadioButton);
+        scopePanel.add(scriptScopeRadioButton);
+        scopePanel.add(swfScopeRadioButton);
+        swfScopeRadioButton.setSelected(true);
+        scopePanel.setAlignmentX(JPanel.CENTER_ALIGNMENT);
+        contentPane.add(scopePanel);
+
+        JLabel warningLabel = new JLabel("<html><center>" + translate("warning.modify").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\r\n", "<br/>") + "</center></html>");
+        warningLabel.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+        warningLabel.setFont(warningLabel.getFont().deriveFont(Font.BOLD));
+        contentPane.add(warningLabel);
 
         JButton cancelButton = new JButton(translate("button.cancel"));
         cancelButton.addActionListener(this::cancelButtonActionPerformed);
@@ -92,11 +101,29 @@ public class DeobfuscationDialog extends AppDialog {
         buttonsPanel.add(okButton);
         buttonsPanel.add(cancelButton);
         buttonsPanel.setAlignmentX(0.5f);
-        cp.add(buttonsPanel);
+        contentPane.add(buttonsPanel);
 
         setModal(true);
+        pack();
         View.centerScreen(this);
         setIconImage(View.loadImage("deobfuscate16"));
+    }
+
+    public DeobfuscationLevel getDeobfuscationLevel() {
+        if (removeTrapsRadioButton.isSelected()) {
+            return DeobfuscationLevel.LEVEL_REMOVE_TRAPS;
+        }
+        return DeobfuscationLevel.LEVEL_REMOVE_DEAD_CODE;
+    }
+
+    public DeobfuscationScope getDeobfuscationScope() {
+        if (methodScopeRadioButton.isSelected()) {
+            return DeobfuscationScope.METHOD;
+        }
+        if (scriptScopeRadioButton.isSelected()) {
+            return DeobfuscationScope.CLASS;
+        }
+        return DeobfuscationScope.SWF;
     }
 
     @Override
