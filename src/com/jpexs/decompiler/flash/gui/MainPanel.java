@@ -237,6 +237,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
@@ -244,6 +245,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -3052,7 +3054,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void importShape(final SWF swf, boolean noFill) {
-        ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importShapes"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportShapeInfo);
+        ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importShapes2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportShapeInfo);
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
@@ -3061,6 +3063,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
             File shapesDir = new File(Path.combine(selFile, ShapeExportSettings.EXPORT_FOLDER_NAME));
+            if (!shapesDir.exists()) {
+                shapesDir = new File(selFile);
+            }
+            final File fShapesDir = shapesDir;
             ShapeImporter shapeImporter = new ShapeImporter();
             SvgImporter svgImporter = new SvgImporter();
 
@@ -3074,26 +3080,49 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     try {
                         Map<Integer, CharacterTag> characters = swf.getCharacters();
                         List<String> extensions = Arrays.asList("svg", "png", "jpg", "jpeg", "gif", "bmp");
+                        File allFiles[] = fShapesDir.listFiles(new FilenameFilter() {
+                            @Override
+                            public boolean accept(File dir, String name) {
+                                String nameLower = name.toLowerCase();
+                                for (String ext : extensions) {
+                                    if (nameLower.endsWith("." + ext)) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
+                        });
                         for (int characterId : characters.keySet()) {
                             CharacterTag tag = characters.get(characterId);
                             if (tag instanceof ShapeTag) {
                                 ShapeTag shapeTag = (ShapeTag) tag;
-                                List<File> existingFilesForImageTag = new ArrayList<>();
-                                for (String ext : extensions) {
-                                    File sourceFile = new File(Path.combine(shapesDir.getPath(), "" + characterId + "." + ext));
-                                    if (sourceFile.exists()) {
-                                        existingFilesForImageTag.add(sourceFile);
+                                List<File> existingFilesForShapeTag = new ArrayList<>();
+                                for (File f : allFiles) {
+                                    if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
+                                        existingFilesForShapeTag.add(f);
                                     }
                                 }
+                                existingFilesForShapeTag.sort(new Comparator<File>() {
+                                    @Override
+                                    public int compare(File o1, File o2) {
+                                        String ext1 = o1.getName().substring(o1.getName().lastIndexOf(".") + 1);
+                                        String ext2 = o2.getName().substring(o2.getName().lastIndexOf(".") + 1);
+                                        int ret = extensions.indexOf(ext1) - extensions.indexOf(ext2);
+                                        if (ret == 0) {
+                                            return o1.getName().compareTo(o2.getName());
+                                        }
+                                        return ret;
+                                    }
+                                });
 
-                                if (existingFilesForImageTag.isEmpty()) {
+                                if (existingFilesForShapeTag.isEmpty()) {
                                     continue;
                                 }
 
-                                if (existingFilesForImageTag.size() > 1) {
-                                    Logger.getLogger(MainPanel.class.getName()).log(Level.WARNING, "Multiple matching files for shape tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForImageTag.get(0).getName()});
+                                if (existingFilesForShapeTag.size() > 1) {
+                                    Logger.getLogger(MainPanel.class.getName()).log(Level.WARNING, "Multiple matching files for shape tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForShapeTag.get(0).getName()});
                                 }
-                                File sourceFile = existingFilesForImageTag.get(0);
+                                File sourceFile = existingFilesForShapeTag.get(0);
 
                                 try {
                                     if (sourceFile.getAbsolutePath().toLowerCase().endsWith(".svg")) {
@@ -3145,7 +3174,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void importImage(final SWF swf) {
-        ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importImages"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportImageInfo);
+        ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importImages2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportImageInfo);
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
@@ -3154,6 +3183,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
             File imagesDir = new File(Path.combine(selFile, ImageExportSettings.EXPORT_FOLDER_NAME));
+            if (!imagesDir.exists()) {
+                imagesDir = new File(selFile);
+            }
+            final File fImagesDir = imagesDir;
             ImageImporter imageImporter = new ImageImporter();
 
             final long timeBefore = System.currentTimeMillis();
@@ -3166,6 +3199,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     try {
                         Map<Integer, CharacterTag> characters = swf.getCharacters();
                         List<String> extensions = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp");
+                        File allFiles[] = fImagesDir.listFiles(new FilenameFilter() {
+                            @Override
+                            public boolean accept(File dir, String name) {
+                                String nameLower = name.toLowerCase();
+                                for (String ext : extensions) {
+                                    if (nameLower.endsWith("." + ext)) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
+                        });
                         for (int characterId : characters.keySet()) {
                             CharacterTag tag = characters.get(characterId);
                             if (tag instanceof ImageTag) {
@@ -3174,12 +3219,23 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                                     continue;
                                 }
                                 List<File> existingFilesForImageTag = new ArrayList<>();
-                                for (String ext : extensions) {
-                                    File sourceFile = new File(Path.combine(imagesDir.getPath(), "" + characterId + "." + ext));
-                                    if (sourceFile.exists()) {
-                                        existingFilesForImageTag.add(sourceFile);
+                                for (File f : allFiles) {
+                                    if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
+                                        existingFilesForImageTag.add(f);
                                     }
                                 }
+                                existingFilesForImageTag.sort(new Comparator<File>() {
+                                    @Override
+                                    public int compare(File o1, File o2) {
+                                        String ext1 = o1.getName().substring(o1.getName().lastIndexOf(".") + 1);
+                                        String ext2 = o2.getName().substring(o2.getName().lastIndexOf(".") + 1);
+                                        int ret = extensions.indexOf(ext1) - extensions.indexOf(ext2);
+                                        if (ret == 0) {
+                                            return o1.getName().compareTo(o2.getName());
+                                        }
+                                        return ret;
+                                    }
+                                });
 
                                 if (existingFilesForImageTag.isEmpty()) {
                                     continue;
@@ -3234,7 +3290,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void importText(final SWF swf) {
-        ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importTexts"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportTextInfo);
+        ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importTexts2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportTextInfo);
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
         chooser.setDialogTitle(translate("import.select.directory"));
@@ -3242,7 +3298,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         chooser.setAcceptAllFileFilterUsed(false);
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
+            boolean textsFolderExists = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME)).exists();            
             File textsFile = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
+            if (!textsFolderExists) {
+                textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
+            }
             TextImporter textImporter = new TextImporter(getMissingCharacterHandler(), new TextImportErrorHandler() {
                 // "configuration items" for the current replace only
                 private final ConfigurationItem<Boolean> showAgainImportError = new ConfigurationItem<>("showAgainImportError", true, true);
@@ -3278,6 +3338,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 textImporter.importTextsSingleFileFormatted(textsFile, swf);
             } else {
                 textsFile = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME, TextExporter.TEXT_EXPORT_FILENAME_PLAIN));
+                if (!textsFolderExists) {
+                    textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FILENAME_PLAIN));
+                }
                 // try to import plain texts
                 if (textsFile.exists()) {
                     textImporter.importTextsSingleFile(textsFile, swf);
@@ -3324,7 +3387,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (as3ScriptReplacer == null) {
             return;
         }
-        ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importScripts"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportScriptsInfo);
+        ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importScripts2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportScriptsInfo);
 
         JFileChooser chooser = new JFileChooser();
         chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
@@ -3334,6 +3397,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
             String scriptsFolder = Path.combine(selFile, ScriptExportSettings.EXPORT_FOLDER_NAME);
+            if (!new File(scriptsFolder).exists()) {
+                scriptsFolder = selFile;
+            }
+            final String fScriptsFolder = scriptsFolder;
             final long timeBefore = System.currentTimeMillis();
             new CancellableWorker<Void>() {
                 private int countAs2 = 0;
@@ -3344,7 +3411,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                     SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
 
-                    new AS2ScriptImporter().importScripts(scriptsFolder, swf.getASMs(true), new ScriptImporterProgressListener() {
+                    new AS2ScriptImporter().importScripts(fScriptsFolder, swf.getASMs(true), new ScriptImporterProgressListener() {
                         @Override
                         public void scriptImported() {
                             countAs2++;
@@ -3361,7 +3428,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         packs = abc.getScriptPacks(null, allAbcs);
                     }
 
-                    new AS3ScriptImporter().importScripts(as3ScriptReplacer, scriptsFolder, packs, new ScriptImporterProgressListener() {
+                    new AS3ScriptImporter().importScripts(as3ScriptReplacer, fScriptsFolder, packs, new ScriptImporterProgressListener() {
                         @Override
                         public void scriptImported() {
                             countAs3++;
@@ -3673,7 +3740,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             body.deobfuscate(level, t, scriptIndex, methodIndex, isStatic, "");
         }
     }
-    
+
     private void deobfuscateTraits(int scriptIndex, DeobfuscationLevel level, List<Trait> traits, ABC abc, boolean isStatic) throws InterruptedException {
         for (Trait t : traits) {
             int methodIndex = -1;
@@ -3687,13 +3754,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 deobfuscateMethod(t, scriptIndex, level, isStatic, methodIndex, abc);
             }
             if (t instanceof TraitClass) {
-                TraitClass tc = (TraitClass)t;
+                TraitClass tc = (TraitClass) t;
                 ClassInfo ci = abc.class_info.get(tc.class_info);
                 deobfuscateMethod(t, scriptIndex, level, true, ci.cinit_index, abc);
                 deobfuscateTraits(scriptIndex, level, ci.static_traits.traits, abc, true);
                 InstanceInfo ii = abc.instance_info.get(tc.class_info);
                 deobfuscateMethod(t, scriptIndex, level, false, ii.iinit_index, abc);
-                deobfuscateTraits(scriptIndex, level, ii.instance_traits.traits, abc, false);                
+                deobfuscateTraits(scriptIndex, level, ii.instance_traits.traits, abc, false);
             }
         }
     }
@@ -3737,7 +3804,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         }
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, "Deobfuscation error", ex);
-                        ViewMessages.showMessageDialog(MainPanel.this, translate("error.deobfuscation"),translate ("error"), JOptionPane.ERROR_MESSAGE);
+                        ViewMessages.showMessageDialog(MainPanel.this, translate("error.deobfuscation"), translate("error"), JOptionPane.ERROR_MESSAGE);
                     }
 
                     return null;
