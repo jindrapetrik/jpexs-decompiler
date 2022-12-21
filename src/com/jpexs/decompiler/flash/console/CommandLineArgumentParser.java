@@ -574,12 +574,12 @@ public class CommandLineArgumentParser {
             out.println(" " + (cnt++) + ") -importSymbolClass <infile> <outfile> <symbolclassfile>");
             out.println(" ...imports Symbol-Class mapping to <infile> and saves the result to <outfile>");
         }
-        
+
         if (filter == null || filter.equals("importshapes")) {
             out.println(" " + (cnt++) + ") -importShapes <infile> <outfile> [nofill] <shapesfolder>");
             out.println(" ...imports shapes to <infile> and saves the result to <outfile>");
         }
-        
+
         if (filter == null || filter.equals("importimages")) {
             out.println(" " + (cnt++) + ") -importImages <infile> <outfile> <imagesfolder>");
             out.println(" ...imports images to <infile> and saves the result to <outfile>");
@@ -3644,16 +3644,16 @@ public class CommandLineArgumentParser {
 
         File inFile = new File(args.pop());
         File outFile = new File(args.pop());
-        
+
         try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
             SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
 
             String selFile = args.pop();
             File importFile = new File(Path.combine(selFile, SymbolClassExporter.SYMBOL_CLASS_EXPORT_FILENAME));
             SymbolClassImporter importer = new SymbolClassImporter();
-            
+
             if (!importFile.exists()) {
-                System.err.println("Symbol class file "+ importFile + " does not exist.");
+                System.err.println("Symbol class file " + importFile + " does not exist.");
                 System.exit(1);
             }
             importer.importSymbolClasses(importFile, swf);
@@ -3664,9 +3664,9 @@ public class CommandLineArgumentParser {
             System.err.println("I/O error during writing");
             System.exit(2);
         }
-        
+
     }
-    
+
     private static void parseImportShapes(Stack<String> args, String charset) {
         if (args.size() < 3) {
             badArguments("importshapes");
@@ -3722,13 +3722,13 @@ public class CommandLineArgumentParser {
                         }
                     } catch (IOException ex) {
                         logger.log(Level.WARNING, "Cannot import shape " + characterId + " from file " + sourceFile.getName(), ex);
-                    }                    
+                    }
                 }
             }
 
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
                 swf.saveTo(fos);
-            }           
+            }
         } catch (IOException | InterruptedException e) {
             System.err.println("I/O error during writing");
             System.exit(2);
@@ -3750,7 +3750,7 @@ public class CommandLineArgumentParser {
 
             File imagesDir = new File(Path.combine(selFile, ImageExportSettings.EXPORT_FOLDER_NAME));
             if (!imagesDir.exists()) {
-                System.err.println("Images directory does not exist: "+imagesDir.getAbsolutePath());
+                System.err.println("Images directory does not exist: " + imagesDir.getAbsolutePath());
                 System.exit(1);
             }
             ImageImporter imageImporter = new ImageImporter();
@@ -3764,7 +3764,7 @@ public class CommandLineArgumentParser {
                     if (!imageTag.importSupported()) {
                         continue;
                     }
-                    List<File> existingFilesForImageTag = new ArrayList<>();                    
+                    List<File> existingFilesForImageTag = new ArrayList<>();
                     for (String ext : extensions) {
                         File sourceFile = new File(Path.combine(imagesDir.getPath(), "" + characterId + "." + ext));
                         if (sourceFile.exists()) {
@@ -3781,7 +3781,7 @@ public class CommandLineArgumentParser {
                     }
                     File sourceFile = existingFilesForImageTag.get(0);
                     try {
-                        System.out.println("Importing character "+characterId+" from file "+sourceFile.getName());
+                        System.out.println("Importing character " + characterId + " from file " + sourceFile.getName());
                         imageImporter.importImage(imageTag, Helper.readFile(sourceFile.getPath()));
                         imageCount++;
                     } catch (IOException ex) {
@@ -3793,7 +3793,7 @@ public class CommandLineArgumentParser {
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
                 swf.saveTo(fos);
             }
-            System.out.println(""+imageCount+" images sucessfully imported");
+            System.out.println("" + imageCount + " images sucessfully imported");
         } catch (IOException | InterruptedException e) {
             System.err.println("I/O error during writing");
             System.exit(2);
