@@ -30,7 +30,14 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.AbcMultiNameCollisionFixer;
 import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationLevel;
+import com.jpexs.decompiler.flash.abc.avm2.deobfuscation.DeobfuscationScope;
+import com.jpexs.decompiler.flash.abc.types.ClassInfo;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
+import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItem;
 import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
@@ -469,14 +476,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 return;
             }
             TreeItem item = (TreeItem) paths[0].getLastPathComponent();
-            
+
             if (item instanceof Tag) {
-                if (((Tag)item).isReadOnly()) {
+                if (((Tag) item).isReadOnly()) {
                     return;
-                }                
+                }
             }
-            
-            
+
             if (e.getKeyCode() == KeyEvent.VK_UP) {
                 contextPopupMenu.moveUpDown(item, true);
             }
@@ -573,13 +579,13 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
             }
             boolean allWritable = true;
-            for (TreeItem item:tagItems) {
-                if (((Tag)item).isReadOnly()) {
+            for (TreeItem item : tagItems) {
+                if (((Tag) item).isReadOnly()) {
                     allWritable = false;
                     break;
                 }
             }
-            
+
             if (e.getKeyCode() == 'C') {
                 if (e.isShiftDown()) {
                     contextPopupMenu.copyTagToClipboardWithDependenciesActionPerformed(null, tagItems);
@@ -834,7 +840,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void setStatus(String s) {
         statusPanel.setStatus(s);
     }
-    
+
     public void setEditingStatus() {
         statusPanel.setStatus(translate("status.editing"));
     }
@@ -842,7 +848,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void clearEditingStatus() {
         statusPanel.setStatus("");
     }
-    
+
     public void setWorkStatus(String s, CancellableWorker worker) {
         statusPanel.setWorkStatus(s, worker);
         mainMenu.updateComponents();
@@ -1603,8 +1609,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             tagTree.updateUI();
         }
         TreePath tp = getCurrentTree().getTreePathFromString(selectionPath);
-        if (tp != null)
-        {
+        if (tp != null) {
             getCurrentTree().setSelectionPath(tp);
         }
     }
@@ -1960,7 +1965,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                     ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), singleScriptFile, false);
                     String singleFileName = Path.combine(scriptsFolder, openable.getShortFileName() + scriptExportSettings.getFileExtension());
-                    try ( FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
+                    try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                         scriptExportSettings.singleFileWriter = writer;
                         if (swf.isAS3()) {
                             ret.addAll(new AS3ScriptExporter().exportActionScript3(swf, handler, scriptsFolder, as3scripts, scriptExportSettings, parallel, evl));
@@ -2067,7 +2072,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             ScriptExportSettings scriptExportSettings = new ScriptExportSettings(export.getValue(ScriptExportMode.class), singleScriptFile, false);
             String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
-            try ( FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
+            try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                 scriptExportSettings.singleFileWriter = writer;
                 swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl);
             }
@@ -2184,7 +2189,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
                 ScriptExportSettings scriptExportSettings = new ScriptExportSettings(exportMode, singleScriptFile, false);
                 String singleFileName = Path.combine(scriptsFolder, swf.getShortFileName() + scriptExportSettings.getFileExtension());
-                try ( FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
+                try (FileTextWriter writer = scriptExportSettings.singleFile ? new FileTextWriter(Configuration.getCodeFormatting(), new FileOutputStream(singleFileName)) : null) {
                     scriptExportSettings.singleFileWriter = writer;
                     swf.exportActionScript(handler, scriptsFolder, scriptExportSettings, parallel, evl);
                 }
@@ -3588,7 +3593,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (selectedFile != null) {
                 File selfile = Helper.fixDialogFile(selectedFile);
                 try {
-                    try ( FileInputStream fis = new FileInputStream(selfile)) {
+                    try (FileInputStream fis = new FileInputStream(selfile)) {
                         new SwfXmlImporter().importSwf(swf, fis);
                     }
                     swf.clearAllCache();
@@ -3659,20 +3664,63 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
+    private void deobfuscateMethod(Trait t, int scriptIndex, DeobfuscationLevel level, boolean isStatic, int methodIndex, ABC abc) throws InterruptedException {
+        if (methodIndex == -1) {
+            return;
+        }
+        MethodBody body = abc.findBody(methodIndex);
+        if (body != null) {
+            body.deobfuscate(level, t, scriptIndex, methodIndex, isStatic, "");
+        }
+    }
+    
+    private void deobfuscateTraits(int scriptIndex, DeobfuscationLevel level, List<Trait> traits, ABC abc, boolean isStatic) throws InterruptedException {
+        for (Trait t : traits) {
+            int methodIndex = -1;
+            if (t instanceof TraitMethodGetterSetter) {
+                methodIndex = ((TraitMethodGetterSetter) t).method_info;
+            }
+            if (t instanceof TraitFunction) {
+                methodIndex = ((TraitFunction) t).method_info;
+            }
+            if (methodIndex != -1) {
+                deobfuscateMethod(t, scriptIndex, level, isStatic, methodIndex, abc);
+            }
+            if (t instanceof TraitClass) {
+                TraitClass tc = (TraitClass)t;
+                ClassInfo ci = abc.class_info.get(tc.class_info);
+                deobfuscateMethod(t, scriptIndex, level, true, ci.cinit_index, abc);
+                deobfuscateTraits(scriptIndex, level, ci.static_traits.traits, abc, true);
+                InstanceInfo ii = abc.instance_info.get(tc.class_info);
+                deobfuscateMethod(t, scriptIndex, level, false, ii.iinit_index, abc);
+                deobfuscateTraits(scriptIndex, level, ii.instance_traits.traits, abc, false);                
+            }
+        }
+    }
+
     public void deobfuscate() {
         View.checkAccess();
 
         DeobfuscationDialog deobfuscationDialog = new DeobfuscationDialog(Main.getDefaultDialogsOwner());
         if (deobfuscationDialog.showDialog() == AppDialog.OK_OPTION) {
-            DeobfuscationLevel level = DeobfuscationLevel.getByLevel(deobfuscationDialog.codeProcessingLevel.getValue());
+            DeobfuscationLevel level = deobfuscationDialog.getDeobfuscationLevel();
             new CancellableWorker() {
                 @Override
                 protected Void doInBackground() throws Exception {
                     try {
                         ABCPanel abcPanel = getABCPanel();
-                        if (deobfuscationDialog.processAllCheckbox.isSelected()) {
+                        DeobfuscationScope scope = deobfuscationDialog.getDeobfuscationScope();
+                        if (scope == DeobfuscationScope.SWF) {
                             SWF swf = abcPanel.getSwf();
                             swf.deobfuscate(level);
+                        } else if (scope == DeobfuscationScope.CLASS) {
+                            ScriptPack pack = abcPanel.getPack();
+                            if (pack == null) {
+                                return null;
+                            }
+                            List<Trait> traits = pack.abc.script_info.get(pack.scriptIndex).traits.traits;
+                            deobfuscateMethod(null, pack.scriptIndex, level, true, pack.abc.script_info.get(pack.scriptIndex).init_index, pack.abc);
+                            deobfuscateTraits(pack.scriptIndex, level, traits, pack.abc, true);
                         } else {
                             int mi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getMethodIndex();
                             int bi = abcPanel.detailPanel.methodTraitPanel.methodCodePanel.getBodyIndex();
@@ -3689,6 +3737,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                         }
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, "Deobfuscation error", ex);
+                        ViewMessages.showMessageDialog(MainPanel.this, translate("error.deobfuscation"),translate ("error"), JOptionPane.ERROR_MESSAGE);
                     }
 
                     return null;
@@ -4711,7 +4760,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (treeItem instanceof ShapeTag) {
                 previewPanel.setImageReplaceButtonVisible(false, false, !((Tag) treeItem).isReadOnly(), false);
             }
-            previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), treeItem instanceof ShapeTag, !Configuration.playFrameSounds.get(), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag), (treeItem instanceof DefineSpriteTag)||(treeItem instanceof ButtonTag));
+            previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), treeItem instanceof ShapeTag, !Configuration.playFrameSounds.get(), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag));
         } else if (treeItem instanceof Frame && internalViewer) {
             Frame fn = (Frame) treeItem;
             SWF swf = (SWF) fn.getOpenable();
@@ -5551,7 +5600,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
         return itemToStr;
     }
-    
+
     public void startEdit() {
         TreeItem treeItem = getCurrentTree().getCurrentTreeItem();
         if (treeItem == null) {
@@ -5572,10 +5621,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof ASMSource) {
             //There are two kinds of edit - Script and P-code.
         } else if (treeItem instanceof Tag) {
-            Tag tag = (Tag)treeItem;
+            Tag tag = (Tag) treeItem;
             previewPanel.showGenericTagPanel(tag);
             previewPanel.startEditGenericTag();
         }
-        
+
     }
 }

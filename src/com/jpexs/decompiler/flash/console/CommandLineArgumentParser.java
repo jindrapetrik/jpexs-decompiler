@@ -576,7 +576,7 @@ public class CommandLineArgumentParser {
         if (filter == null || filter.equals("deobfuscate")) {
             out.println(" " + (cnt++) + ") -deobfuscate <level> <infile> <outfile>");
             out.println("  ...Deobfuscates AS3 P-code in <infile> and saves result to <outfile>");
-            out.println("  ...<level> can be one of: controlflow/3/max, traps/2, deadcode/1");
+            out.println("  ...<level> can be one of: traps/2/max, deadcode/1");
             out.println("  ...WARNING: The deobfuscation result is still probably far enough to be openable by other decompilers.");
         }
 
@@ -2504,11 +2504,12 @@ public class CommandLineArgumentParser {
         DeobfuscationLevel lev;
         switch (mode) {
             case "controlflow":
-            case "max":
             case "3":
-                lev = DeobfuscationLevel.LEVEL_RESTORE_CONTROL_FLOW;
+                System.err.println("WARNING: Control flow level(3) is not implemented - it is the same as remove traps (2) level.");
+                lev = DeobfuscationLevel.LEVEL_REMOVE_TRAPS;                
                 break;
             case "traps":
+            case "max":
             case "2":
                 lev = DeobfuscationLevel.LEVEL_REMOVE_TRAPS;
                 break;
