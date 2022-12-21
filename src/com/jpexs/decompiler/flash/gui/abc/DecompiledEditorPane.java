@@ -634,6 +634,10 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                     if (currentTrait != null) {
                         name += ":" + currentTrait.getName(abc).getName(abc.constants, null, false, true);
                     }
+                    
+                    if (currentTrait instanceof TraitSlotConst) {
+                        currentTrait = null;
+                    }
                 }
 
                 displayMethod(pos, (int) tm.getProperties().index, name, currentTrait, lastTraitIndex, isStatic);

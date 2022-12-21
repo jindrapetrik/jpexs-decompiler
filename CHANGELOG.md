@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
 - [#1908] Slow commandline opening SWF
 - [#1908] Shape/image import must accept also filenames in the form "CHARID_xxx.ext" instead of just "CHARID.ext"
 - Exporting DefineJPEG3/4 with alpha channel to PNG produced JPEG instead
+- AS3 package level const with function value - separate P-code for trait and method
 
 ### Changed
 - Warning before switching deobfuscation is now optional
