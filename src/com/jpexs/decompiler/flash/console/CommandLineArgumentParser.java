@@ -218,6 +218,7 @@ import java.util.logging.Logger;
 import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.gui.translator.Translator;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
+import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
 import java.awt.Font;
 import java.util.Comparator;
 
@@ -389,6 +390,7 @@ public class CommandLineArgumentParser {
             out.println("         image:png - PNG format for Images");
             out.println("         image:jpeg - JPEG format for Images");
             out.println("         image:bmp - BMP format for Images");
+            out.println("         image:png_gif_jpeg_alpha - PNG/GIF/JPEG+ALPHA format for Images");
             out.println("         text:plain - Plain text format for Texts");
             out.println("         text:formatted - Formatted text format for Texts");
             out.println("         text:svg - SVG format for Texts");
@@ -3246,7 +3248,7 @@ public class CommandLineArgumentParser {
                     CharacterTag characterTag = swf.getCharacter(imageId);
                     String repFile = args.pop();
                     byte[] data = Helper.readFile(repFile);
-                    if (characterTag instanceof DefineBitsJPEG3Tag || characterTag instanceof DefineBitsJPEG4Tag) {
+                    if (characterTag instanceof HasSeparateAlphaChannel) {
                         ImageTag imageTag = (ImageTag) characterTag;
                         new ImageImporter().importImageAlpha(imageTag, data);
                     } else {
@@ -3699,68 +3701,8 @@ public class CommandLineArgumentParser {
                 System.exit(1);
             }
             ShapeImporter shapeImporter = new ShapeImporter();
-            SvgImporter svgImporter = new SvgImporter();
-
-            Map<Integer, CharacterTag> characters = swf.getCharacters();
-            int shapeCount = 0;
-            List<String> extensions = Arrays.asList("svg", "png", "jpg", "jpeg", "gif", "bmp");
-            File allFiles[] = shapesDir.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    String nameLower = name.toLowerCase();
-                    for (String ext : extensions) {
-                        if (nameLower.endsWith("." + ext)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            });
-            for (int characterId : characters.keySet()) {
-                CharacterTag tag = characters.get(characterId);
-                if (tag instanceof ShapeTag) {
-                    ShapeTag shapeTag = (ShapeTag) tag;
-                    List<File> existingFilesForShapeTag = new ArrayList<>();
-                    for (File f : allFiles) {
-                        if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
-                            existingFilesForShapeTag.add(f);
-                        }
-                    }
-                    existingFilesForShapeTag.sort(new Comparator<File>() {
-                        @Override
-                        public int compare(File o1, File o2) {
-                            String ext1 = o1.getName().substring(o1.getName().lastIndexOf(".") + 1);
-                            String ext2 = o2.getName().substring(o2.getName().lastIndexOf(".") + 1);
-                            int ret = extensions.indexOf(ext1) - extensions.indexOf(ext2);
-                            if (ret == 0) {
-                                return o1.getName().compareTo(o2.getName());
-                            }
-                            return ret;
-                        }
-                    });
-
-                    if (existingFilesForShapeTag.isEmpty()) {
-                        continue;
-                    }
-
-                    if (existingFilesForShapeTag.size() > 1) {
-                        logger.log(Level.WARNING, "Multiple matching files for shape tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForShapeTag.get(0).getName()});
-                    }
-                    File sourceFile = existingFilesForShapeTag.get(0);
-
-                    try {
-                        System.out.println("Importing character " + characterId + " from file " + sourceFile.getName());
-                        if (sourceFile.getAbsolutePath().toLowerCase().endsWith(".svg")) {
-                            svgImporter.importSvg(shapeTag, Helper.readTextFile(sourceFile.getAbsolutePath()), !noFill);
-                        } else {
-                            shapeImporter.importImage(shapeTag, Helper.readFile(sourceFile.getAbsolutePath()), 0, !noFill);
-                        }
-                        shapeCount++;
-                    } catch (IOException ex) {
-                        logger.log(Level.WARNING, "Cannot import shape " + characterId + " from file " + sourceFile.getName(), ex);
-                    }
-                }
-            }
+            int shapeCount = shapeImporter.bulkImport(shapesDir, swf, noFill, true);
+            
             System.out.println("Writing outfile");
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
                 swf.saveTo(fos);
@@ -3796,64 +3738,7 @@ public class CommandLineArgumentParser {
                 System.exit(1);
             }
             ImageImporter imageImporter = new ImageImporter();
-            int imageCount = 0;
-            Map<Integer, CharacterTag> characters = swf.getCharacters();
-            final List<String> extensions = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp");
-            File allFiles[] = imagesDir.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    String nameLower = name.toLowerCase();
-                    for (String ext : extensions) {
-                        if (nameLower.endsWith("." + ext)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            });
-            for (int characterId : characters.keySet()) {
-                CharacterTag tag = characters.get(characterId);
-                if (tag instanceof ImageTag) {
-                    ImageTag imageTag = (ImageTag) tag;
-                    if (!imageTag.importSupported()) {
-                        continue;
-                    }
-                    List<File> existingFilesForImageTag = new ArrayList<>();
-                    for (File f : allFiles) {
-                        if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
-                            existingFilesForImageTag.add(f);
-                        }
-                    }
-                    existingFilesForImageTag.sort(new Comparator<File>() {
-                        @Override
-                        public int compare(File o1, File o2) {
-                            String ext1 = o1.getName().substring(o1.getName().lastIndexOf(".") + 1);
-                            String ext2 = o2.getName().substring(o2.getName().lastIndexOf(".") + 1);
-                            int ret = extensions.indexOf(ext1) - extensions.indexOf(ext2);
-                            if (ret == 0) {
-                                return o1.getName().compareTo(o2.getName());
-                            }
-                            return ret;
-                        }
-                    });
-
-                    if (existingFilesForImageTag.isEmpty()) {
-                        continue;
-                    }
-
-                    if (existingFilesForImageTag.size() > 1) {
-                        logger.log(Level.WARNING, "Multiple matching files for image tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForImageTag.get(0).getName()});
-                    }
-                    File sourceFile = existingFilesForImageTag.get(0);
-                    try {
-                        System.out.println("Importing character " + characterId + " from file " + sourceFile.getName());
-                        imageImporter.importImage(imageTag, Helper.readFile(sourceFile.getPath()));
-                        imageCount++;
-                    } catch (IOException ex) {
-                        logger.log(Level.WARNING, "Cannot import image " + characterId + " from file " + sourceFile.getName(), ex);
-                    }
-                }
-            }
+            int imageCount = imageImporter.bulkImport(imagesDir, swf, true);                       
             System.out.println("Writing outfile");
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
                 swf.saveTo(fos);

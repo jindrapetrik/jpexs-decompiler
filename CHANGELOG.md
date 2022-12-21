@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 - [#1231] Button transforming
 - [#1690] Deobfuscation tool dialog for script level (not just current method / all classes)
 - [#1460] Commandline import of text, images, shapes, symbol-class
+- [#1909] Export/import DefineBitsJPEG3/4s alpha channel to/from separate file
+ ("PNG/GIF/JPEG+alpha" option in GUI, "-format image:png_gif_jpeg_alpha" for commandline)
 
 ### Fixed
 - [#1904] NullPointerException when renaming invalid identifiers in AS1/2 files caused by missing charset
@@ -25,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - Speaker image when sound selected not in the center
 - [#1908] Slow commandline opening SWF
 - [#1908] Shape/image import must accept also filenames in the form "CHARID_xxx.ext" instead of just "CHARID.ext"
+- Exporting DefineJPEG3/4 with alpha channel to PNG produced JPEG instead
 
 ### Changed
 - Warning before switching deobfuscation is now optional
@@ -2772,6 +2775,7 @@ All notable changes to this project will be documented in this file.
 [#1231]: https://www.free-decompiler.com/flash/issues/1231
 [#1690]: https://www.free-decompiler.com/flash/issues/1690
 [#1460]: https://www.free-decompiler.com/flash/issues/1460
+[#1909]: https://www.free-decompiler.com/flash/issues/1909
 [#1904]: https://www.free-decompiler.com/flash/issues/1904
 [#595]: https://www.free-decompiler.com/flash/issues/595
 [#1908]: https://www.free-decompiler.com/flash/issues/1908

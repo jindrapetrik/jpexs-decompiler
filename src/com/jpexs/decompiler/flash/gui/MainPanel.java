@@ -233,6 +233,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -262,6 +263,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.imageio.ImageIO;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.Box;
@@ -3078,67 +3080,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 @Override
                 public Void doInBackground() throws Exception {
                     try {
-                        Map<Integer, CharacterTag> characters = swf.getCharacters();
-                        List<String> extensions = Arrays.asList("svg", "png", "jpg", "jpeg", "gif", "bmp");
-                        File allFiles[] = fShapesDir.listFiles(new FilenameFilter() {
-                            @Override
-                            public boolean accept(File dir, String name) {
-                                String nameLower = name.toLowerCase();
-                                for (String ext : extensions) {
-                                    if (nameLower.endsWith("." + ext)) {
-                                        return true;
-                                    }
-                                }
-                                return false;
-                            }
-                        });
-                        for (int characterId : characters.keySet()) {
-                            CharacterTag tag = characters.get(characterId);
-                            if (tag instanceof ShapeTag) {
-                                ShapeTag shapeTag = (ShapeTag) tag;
-                                List<File> existingFilesForShapeTag = new ArrayList<>();
-                                for (File f : allFiles) {
-                                    if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
-                                        existingFilesForShapeTag.add(f);
-                                    }
-                                }
-                                existingFilesForShapeTag.sort(new Comparator<File>() {
-                                    @Override
-                                    public int compare(File o1, File o2) {
-                                        String ext1 = o1.getName().substring(o1.getName().lastIndexOf(".") + 1);
-                                        String ext2 = o2.getName().substring(o2.getName().lastIndexOf(".") + 1);
-                                        int ret = extensions.indexOf(ext1) - extensions.indexOf(ext2);
-                                        if (ret == 0) {
-                                            return o1.getName().compareTo(o2.getName());
-                                        }
-                                        return ret;
-                                    }
-                                });
-
-                                if (existingFilesForShapeTag.isEmpty()) {
-                                    continue;
-                                }
-
-                                if (existingFilesForShapeTag.size() > 1) {
-                                    Logger.getLogger(MainPanel.class.getName()).log(Level.WARNING, "Multiple matching files for shape tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForShapeTag.get(0).getName()});
-                                }
-                                File sourceFile = existingFilesForShapeTag.get(0);
-
-                                try {
-                                    if (sourceFile.getAbsolutePath().toLowerCase().endsWith(".svg")) {
-                                        svgImporter.importSvg(shapeTag, Helper.readTextFile(sourceFile.getAbsolutePath()), !noFill);
-                                    } else {
-                                        shapeImporter.importImage(shapeTag, Helper.readFile(sourceFile.getAbsolutePath()), 0, !noFill);
-                                    }
-                                    count++;
-                                } catch (IOException ex) {
-                                    Logger.getLogger(MainPanel.class.getName()).log(Level.WARNING, "Cannot import shape " + characterId + " from file " + sourceFile.getName(), ex);
-                                }
-                                if (Thread.currentThread().isInterrupted()) {
-                                    break;
-                                }
-                            }
-                        }
+                        count = shapeImporter.bulkImport(fShapesDir, swf, noFill, false);                        
                         swf.clearImageCache();
                         swf.clearShapeCache();
                     } catch (Exception ex) {
@@ -3197,65 +3139,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 @Override
                 public Void doInBackground() throws Exception {
                     try {
-                        Map<Integer, CharacterTag> characters = swf.getCharacters();
-                        List<String> extensions = Arrays.asList("png", "jpg", "jpeg", "gif", "bmp");
-                        File allFiles[] = fImagesDir.listFiles(new FilenameFilter() {
-                            @Override
-                            public boolean accept(File dir, String name) {
-                                String nameLower = name.toLowerCase();
-                                for (String ext : extensions) {
-                                    if (nameLower.endsWith("." + ext)) {
-                                        return true;
-                                    }
-                                }
-                                return false;
-                            }
-                        });
-                        for (int characterId : characters.keySet()) {
-                            CharacterTag tag = characters.get(characterId);
-                            if (tag instanceof ImageTag) {
-                                ImageTag imageTag = (ImageTag) tag;
-                                if (!imageTag.importSupported()) {
-                                    continue;
-                                }
-                                List<File> existingFilesForImageTag = new ArrayList<>();
-                                for (File f : allFiles) {
-                                    if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
-                                        existingFilesForImageTag.add(f);
-                                    }
-                                }
-                                existingFilesForImageTag.sort(new Comparator<File>() {
-                                    @Override
-                                    public int compare(File o1, File o2) {
-                                        String ext1 = o1.getName().substring(o1.getName().lastIndexOf(".") + 1);
-                                        String ext2 = o2.getName().substring(o2.getName().lastIndexOf(".") + 1);
-                                        int ret = extensions.indexOf(ext1) - extensions.indexOf(ext2);
-                                        if (ret == 0) {
-                                            return o1.getName().compareTo(o2.getName());
-                                        }
-                                        return ret;
-                                    }
-                                });
-
-                                if (existingFilesForImageTag.isEmpty()) {
-                                    continue;
-                                }
-
-                                if (existingFilesForImageTag.size() > 1) {
-                                    Logger.getLogger(MainPanel.class.getName()).log(Level.WARNING, "Multiple matching files for image tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForImageTag.get(0).getName()});
-                                }
-                                File sourceFile = existingFilesForImageTag.get(0);
-                                try {
-                                    imageImporter.importImage(imageTag, Helper.readFile(sourceFile.getPath()));
-                                    count++;
-                                } catch (IOException ex) {
-                                    Logger.getLogger(MainPanel.class.getName()).log(Level.WARNING, "Cannot import image " + characterId + " from file " + sourceFile.getName(), ex);
-                                }
-                                if (Thread.currentThread().isInterrupted()) {
-                                    break;
-                                }
-                            }
-                        }
+                        count = imageImporter.bulkImport(fImagesDir, swf, false);
                         swf.clearImageCache();
                     } catch (Exception ex) {
                         logger.log(Level.SEVERE, "Error during import", ex);
@@ -3298,7 +3182,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         chooser.setAcceptAllFileFilterUsed(false);
         if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
-            boolean textsFolderExists = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME)).exists();            
+            boolean textsFolderExists = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME)).exists();
             File textsFile = new File(Path.combine(selFile, TextExportSettings.EXPORT_FOLDER_NAME, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));
             if (!textsFolderExists) {
                 textsFile = new File(Path.combine(selFile, TextExporter.TEXT_EXPORT_FILENAME_FORMATTED));

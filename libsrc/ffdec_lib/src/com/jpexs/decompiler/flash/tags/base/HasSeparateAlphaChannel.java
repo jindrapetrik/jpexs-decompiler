@@ -14,17 +14,19 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
-package com.jpexs.decompiler.flash.exporters.modes;
+package com.jpexs.decompiler.flash.tags.base;
+
+import java.io.IOException;
 
 /**
  *
  * @author JPEXS
  */
-public enum ImageExportMode {    
+public interface HasSeparateAlphaChannel {
     
-    PNG_GIF_JPEG, 
-    PNG,
-    JPEG,
-    BMP,
-    PNG_GIF_JPEG_ALPHA
+    public boolean hasAlphaChannel();
+    
+    public byte[] getImageAlpha() throws IOException;
+    
+    public void setImageAlpha(byte[] data) throws IOException;
 }

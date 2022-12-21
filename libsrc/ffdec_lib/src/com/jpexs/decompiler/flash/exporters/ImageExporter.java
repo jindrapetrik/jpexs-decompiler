@@ -25,10 +25,14 @@ import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
 import com.jpexs.decompiler.flash.helpers.BMPFile;
 import com.jpexs.decompiler.flash.helpers.ImageHelper;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,6 +40,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -48,7 +53,7 @@ public class ImageExporter {
         if (Thread.currentThread().isInterrupted()) {
             return ret;
         }
-        
+
         if (tags.isEmpty()) {
             return ret;
         }
@@ -76,7 +81,7 @@ public class ImageExporter {
 
                 final ImageTag imageTag = (ImageTag) t;
 
-                ImageFormat fileFormat = imageTag.getImageFormat();
+                ImageFormat fileFormat = imageTag.getOriginalImageFormat();
                 ImageFormat originalFormat = fileFormat;
                 if (settings.mode == ImageExportMode.PNG) {
                     fileFormat = ImageFormat.PNG;
@@ -92,6 +97,7 @@ public class ImageExporter {
 
                 {
                     final File file = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + "." + ImageHelper.getImageFormatString(fileFormat)));
+
                     final ImageFormat ffileFormat = fileFormat;
 
                     new RetryTask(() -> {
@@ -105,9 +111,37 @@ public class ImageExporter {
                             ImageHelper.write(imageTag.getImageCached().getBufferedImage(), ffileFormat, file);
                         }
                     }, handler).run();
+
+                    final File alphaBinFile = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + ".alpha.bin"));
+                    final File alphaPngFile = new File(outdir + File.separator + Helper.makeFileName(imageTag.getCharacterExportFileName() + ".alpha.png"));
+
+                    if ((imageTag instanceof HasSeparateAlphaChannel)
+                            && (settings.mode == ImageExportMode.PNG_GIF_JPEG_ALPHA)) {
+
+                        HasSeparateAlphaChannel hsac = (HasSeparateAlphaChannel) imageTag;
+                        if (hsac.hasAlphaChannel()) {
+                            new RetryTask(() -> {
+                                byte[] alphaChannel = hsac.getImageAlpha();
+                                Dimension dim = imageTag.getImageDimension();
+                                BufferedImage img = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_ARGB);
+                                int[] pixels = ((DataBufferInt) img.getRaster().getDataBuffer()).getData();
+                                for (int i = 0; i < pixels.length; i++) {
+                                    int a = alphaChannel[i] & 0xff;
+                                    int v = 0;
+                                    int r = v;
+                                    int g = v;
+                                    int b = v;
+
+                                    pixels[i] = (a << 24) | (b << 16) | (g << 8) | r;
+                                }
+                                ImageIO.write(img, "PNG", alphaPngFile);
+
+                            }, handler).run();
+                        }
+                    }
                     ret.add(file);
                 }
-                
+
                 if (Thread.currentThread().isInterrupted()) {
                     break;
                 }
