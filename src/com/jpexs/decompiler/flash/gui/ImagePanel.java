@@ -610,6 +610,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (img != null) {
                         int x = 0;
                         int y = 0;
+                        if (timelined == null) {
+                            x = (int) offsetPoint.getX();
+                            y = (int) offsetPoint.getY();
+                        }
 
                         g2.drawImage(img.getBufferedImage(), x, y, x + img.getWidth(), y + img.getHeight(), 0, 0, img.getWidth(), img.getHeight(), null);
 
@@ -1437,7 +1441,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
 
         private void setAllowMove(boolean allowMove) {
-            this.allowMove = allowMove;            
+            this.allowMove = allowMove;
         }
 
         private void calcRect() {

@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - Editation status not cleared after Sprite transforming
 - Image flickering
 - Show Hex dump for AS1/2 script tags
+- Speaker image when sound selected not in the center
 
 ### Changed
 - Warning before switching deobfuscation is now optional
