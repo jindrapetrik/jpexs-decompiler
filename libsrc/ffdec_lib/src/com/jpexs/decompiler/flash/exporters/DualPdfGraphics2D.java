@@ -598,7 +598,6 @@ public class DualPdfGraphics2D extends Graphics2D implements BlendModeSetable, G
 
             StringBuilder text = new StringBuilder();
             int deltaX = 0;
-            setColor(Color.green);
             for (int i = 0; i < rec.glyphEntries.size(); i++) {
                 GLYPHENTRY entry = rec.glyphEntries.get(i);
                 GLYPHENTRY nextEntry = i < rec.glyphEntries.size() - 1 ? rec.glyphEntries.get(i + 1) : null;
