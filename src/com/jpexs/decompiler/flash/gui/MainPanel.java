@@ -1639,7 +1639,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             return;
         }
 
-        tree.setModel(new FilteredTreeModel(newFilter, tree.getFullModel()));
+        TreePath selectionPaths[] = tree.getSelectionPaths();
+        tree.setModel(new FilteredTreeModel(newFilter, tree.getFullModel(), tree));
         if (!isFilterEmpty(newFilter)) {
             for (int i = 0; i < tree.getRowCount(); i++) {
                 tree.expandRow(i);
@@ -1648,6 +1649,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             tree.setModel(tree.getFullModel());
             View.expandTreeNodes(tree, unfilteredExpandedNodes);
         }
+        tree.setSelectionPaths(selectionPaths);
     }
 
     public void doFilter() {
