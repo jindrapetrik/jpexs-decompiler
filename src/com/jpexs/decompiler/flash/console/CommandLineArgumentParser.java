@@ -216,10 +216,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.jpexs.decompiler.flash.Bundle;
+import com.jpexs.decompiler.flash.exporters.DualPdfGraphics2D;
+import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.gui.translator.Translator;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
+import com.jpexs.decompiler.flash.tags.base.RenderContext;
+import com.jpexs.decompiler.flash.timeline.Timeline;
+import com.jpexs.helpers.SerializableImage;
+import gnu.jpdf.PDFGraphics;
+import java.awt.AlphaComposite;
 import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.Comparator;
 
 /**
@@ -2968,14 +2978,19 @@ public class CommandLineArgumentParser {
             for (Tag t : swf.getTags()) {
                 if (t instanceof DefineSpriteTag) {
                     DefineSpriteTag ds = (DefineSpriteTag) t;
-                    if ("page1".equals(ds.getExportName())) {
-                        totalPages = 1;
-                    } else if (totalPages > 0) {
-                        totalPages++;
+                    String exportName = ds.getExportName();
+                    if (exportName != null && exportName.matches("^page[0-9]+$")) {
+                        int pageNum = Integer.parseInt(exportName.substring(4));
+                        if (pageNum > totalPages) {
+                            totalPages = pageNum;
+                        }
                     }
                 }
             }
 
+            PageFormat pf = new PageFormat();
+            pf.setOrientation(PageFormat.PORTRAIT);
+            Paper p = new Paper();
             int page = 0;
 
             for (Tag t : swf.getTags()) {
@@ -2992,18 +3007,61 @@ public class CommandLineArgumentParser {
                             continue;
                         }
                         System.out.print("Page " + page + "/" + totalPages + "...");
-                        RECT displayRect = new RECT(ds.getTimeline().displayRect);
-                        BufferedImage img = SWF.frameToImageGet(ds.getTimeline(), 0, 0, null, 0, displayRect, new Matrix(), null, Color.white, zoom).getBufferedImage();
-                        PageFormat pf = new PageFormat();
-                        pf.setOrientation(PageFormat.PORTRAIT);
-                        Paper p = new Paper();
-                        p.setSize(img.getWidth(), img.getHeight());
+                        Timeline tim = ds.getTimeline();
+                        RECT rect = tim.displayRect;
+
+                        double w = (rect.getWidth() * zoom / SWF.unitDivisor);
+                        double h = (rect.getHeight() * zoom / SWF.unitDivisor);
+                        p.setSize(w, h);
                         pf.setPaper(p);
-                        if (job != null) {
-                            Graphics g = job.getGraphics(pf);
-                            g.drawImage(img, 0, 0, img.getWidth(), img.getHeight(), null);
-                            g.dispose();
+                        Matrix m = new Matrix();
+                        m.translate(-rect.Xmin * zoom, -rect.Ymin * zoom);
+                        m.scale(zoom);
+                        Matrix transformation = m;
+                        Map<Integer, Font> existingFonts = new HashMap<>();
+
+                        int fframe = 0;
+                        final Graphics2D g = (Graphics2D) job.getGraphics(pf);
+                        
+                        SerializableImage image = new SerializableImage((int) w + 1, (int) h + 1, SerializableImage.TYPE_INT_ARGB_PRE) {
+
+                            private Graphics2D compositeGraphics;
+
+                            @Override
+                            public Graphics getGraphics() {
+                                if (compositeGraphics != null) {
+                                    return compositeGraphics;
+                                }
+                                final Graphics2D parentGraphics = (Graphics2D) super.getGraphics();
+                                compositeGraphics = new DualPdfGraphics2D(parentGraphics, (PDFGraphics) g, existingFonts);
+                                return compositeGraphics;
+                            }
+
+                            @Override
+                            public void fillTransparent() {
+
+                            }
+
+                        };
+                        int imgWidth = (int) (rect.getWidth() * zoom / SWF.unitDivisor) + 1;
+                        int imgHeight = (int) (rect.getHeight() * zoom / SWF.unitDivisor) + 1;
+
+                        RenderContext renderContext = new RenderContext();
+                        renderContext.cursorPosition = new Point(-1, -1);
+                        renderContext.mouseButton = 0;
+                        renderContext.stateUnderCursor = new ArrayList<>();
+
+                        try {
+                            tim.toImage(fframe, fframe, renderContext, image, image, false, m, new Matrix(), m, null, zoom, true, new ExportRectangle(rect), m, true, Timeline.DRAW_MODE_ALL, 0);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
                         }
+                        g.dispose();
+
+                        if (Thread.currentThread().isInterrupted()) {
+                            return;
+                        }                        
+
                         System.out.println("OK");
 
                     }
