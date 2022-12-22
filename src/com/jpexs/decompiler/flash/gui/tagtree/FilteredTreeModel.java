@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
+import javax.swing.JTree;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -36,14 +37,17 @@ public class FilteredTreeModel  implements TreeModel {
     private TreeItem root;
     private Map<TreeItem, List<TreeItem>> subItems = new WeakHashMap<>();
     
-    private final List<TreeModelListener> listeners = new ArrayList<>();   
+    private final List<TreeModelListener> listeners = new ArrayList<>();  
+    
+    private final JTree tree;
 
     public String getFilter() {
         return filter;
     }        
 
-    public FilteredTreeModel(String filter, AbstractTagTreeModel fullModel) {
+    public FilteredTreeModel(String filter, AbstractTagTreeModel fullModel, JTree tree) {
         this.filter = filter;
+        this.tree = tree;
         
         fullModel.addTreeModelListener(new TreeModelListener() {                                   
             @Override
@@ -72,11 +76,22 @@ public class FilteredTreeModel  implements TreeModel {
     private void rebuildTree(AbstractTagTreeModel fullModel) {
         subItems.clear();
         this.root = fullModel.getRoot();
-        buildTree(fullModel, this.root, "root");
+        List<String> selectionPathsList = new ArrayList<>();
+        TreePath selectionPaths[] = tree.getSelectionPaths();
+        if (selectionPaths != null) {
+            List<String> currentPathItems = new ArrayList<>();
+            for (TreePath tp:selectionPaths) {
+                for (int i = 0; i < tp.getPathCount(); i++) {
+                    currentPathItems.add(tp.getPathComponent(i).toString());
+                }
+            }
+            selectionPathsList.add(String.join(".", currentPathItems));
+        }
+        buildTree(fullModel, this.root, "root", selectionPathsList);
         fireTreeStructureChanged(new TreeModelEvent(this, new Object[]{root}));
     }
     
-    private void buildTree(AbstractTagTreeModel fullModel, TreeItem item, String path) {
+    private void buildTree(AbstractTagTreeModel fullModel, TreeItem item, String path, List<String> selectionPaths) {
         List<? extends TreeItem> items = fullModel.getAllChildren(item);
         List<TreeItem> newSubItems = new ArrayList<>();
         if (filter.trim().isEmpty()) {
@@ -86,7 +101,7 @@ public class FilteredTreeModel  implements TreeModel {
                 String subPath = path + "." + ti.toString();
                 boolean matches = subPath.toLowerCase().contains(filter.toLowerCase());
                 if (fullModel.isLeaf(ti)) {
-                  if (matches) {
+                  if (matches || selectionPaths.contains(subPath)) {
                       newSubItems.add(ti);
                   }
                 } else {
@@ -98,8 +113,8 @@ public class FilteredTreeModel  implements TreeModel {
         for (int i = 0; i < newSubItems.size(); i++) {
             TreeItem ti = newSubItems.get(i);
             String subPath = path + "." + ti.toString();
-            buildTree(fullModel, ti, subPath);
-            if (!fullModel.isLeaf(ti) && (!this.subItems.containsKey(ti) || this.subItems.get(ti).isEmpty())) {
+            buildTree(fullModel, ti, subPath, selectionPaths);
+            if (!selectionPaths.contains(subPath) && !fullModel.isLeaf(ti) && (!this.subItems.containsKey(ti) || this.subItems.get(ti).isEmpty())) {
                 newSubItems.remove(i);
                 i--;
             }
