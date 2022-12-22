@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
 - Exporting DefineJPEG3/4 with alpha channel to PNG produced JPEG instead
 - AS3 package level const with function value - separate P-code for trait and method
 - Slot/const trait proper p-code indentation
+- [#1858] Adding same ExtGState multiple times
 
 ### Changed
 - Warning before switching deobfuscation is now optional

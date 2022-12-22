@@ -454,7 +454,9 @@ public class PDFPage extends PDFObject implements Serializable {
     }
 
     public void addExtGStateResource(String resource) {
-        extGStateResources.add(resource);
+        if (!extGStateResources.contains(resource)) {
+            extGStateResources.add(resource);
+        }
     }
 
     /**
