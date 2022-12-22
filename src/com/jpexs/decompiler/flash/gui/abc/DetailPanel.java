@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui.abc;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
@@ -331,10 +332,16 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
         mainPanel.clearEditingStatus();
     }
 
-    private void saveButtonActionPerformed(ActionEvent evt) {
+    private void save(boolean refreshTree) {
         if (cardMap.get(selectedCard) instanceof TraitDetail) {
             if (((TraitDetail) cardMap.get(selectedCard)).save()) {
+                
                 DecompiledEditorPane decompiledTextArea = abcPanel.decompiledTextArea;
+                if (!refreshTree) {
+                    decompiledTextArea.reloadClass();
+                    setEditMode(false);
+                    return;
+                }
                 int lastTrait = decompiledTextArea.lastTraitIndex;
 
                 Runnable reloadComplete = new Runnable() {
@@ -347,8 +354,8 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
                             decompiledTextArea.gotoTrait(lastTrait);
                         }
                         setEditMode(false);
-                        mainPanel.clearEditingStatus();
-                        ViewMessages.showMessageDialog(DetailPanel.this, AppStrings.translate("message.trait.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showTraitSavedMessage);
+                        mainPanel.clearEditingStatus();                        
+                        ViewMessages.showMessageDialog(DetailPanel.this, AppStrings.translate("message.trait.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showTraitSavedMessage);                        
                     }
                 };
 
@@ -357,10 +364,17 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
             }
         }
     }
+    
+    private void saveButtonActionPerformed(ActionEvent evt) {
+        save(true);
+    }
 
     @Override
     public boolean tryAutoSave() {
-        // todo: implement
+        if (saveButton.isVisible() && saveButton.isEnabled() && Configuration.autoSaveTagModifications.get()) {
+            save(false);
+            return !(saveButton.isVisible() && saveButton.isEnabled());
+        }
         return false;
     }
 

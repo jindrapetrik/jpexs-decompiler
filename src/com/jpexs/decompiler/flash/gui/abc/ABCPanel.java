@@ -1612,7 +1612,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         return (TreeItem) scriptsPath.getLastPathComponent();
     }
 
-    private void saveDecompiledButtonActionPerformed(ActionEvent evt) {
+    private void saveDecompiled(boolean refreshTree) {
         final ABC localAbc = abc;
         int oldIndex = pack.scriptIndex;
         SWF.uncache(pack);
@@ -1633,7 +1633,9 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
             }
             reload();
             mainPanel.clearEditingStatus();
-            ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
+            if (refreshTree) {
+                ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);       
+            }
         } catch (As3ScriptReplaceException asre) {
             StringBuilder sb = new StringBuilder();
             int firstErrorLine = As3ScriptReplaceExceptionItem.LINE_UNKNOWN;
@@ -1667,12 +1669,16 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 ViewMessages.showMessageDialog(this, AppStrings.translate("error.action.save").replace("%error%", firstErrorText).replace("%line%", Long.toString(firstErrorLine)), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
             } else {
                 ViewMessages.showMessageDialog(this, sb.toString(), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
-            }
+            }            
             decompiledTextArea.requestFocus();
 
         } catch (Throwable ex) {
             Logger.getLogger(ABCPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private void saveDecompiledButtonActionPerformed(ActionEvent evt) {
+        saveDecompiled(true);
     }
 
     private void deobfuscateButtonActionPerformed(ActionEvent evt) {
@@ -1901,8 +1907,15 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     public boolean tryAutoSave() {
         View.checkAccess();
 
-        // todo: implement
-        return false;
+        boolean ok = true;
+        if (saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled() && Configuration.autoSaveTagModifications.get()) {
+            saveDecompiled(false);
+            ok = ok && !(saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled());
+        }
+        
+        ok = ok && detailPanel.tryAutoSave();
+        
+        return ok;
     }
 
     @Override
