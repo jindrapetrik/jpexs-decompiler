@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
  ("PNG/GIF/JPEG+alpha" option in GUI, "-format image:png_gif_jpeg_alpha" for commandline)
 - [#1910] Copy/paste transform matrix to/from the clipboard
 - [#1912] Persist selected item in the tree upon quick search (Ctrl+F)
-- [#1901] Editor mode for raw edit
+- [#1901] Editor mode and autosave feature for header, raw editor, transform
 
 ### Fixed
 - [#1904] NullPointerException when renaming invalid identifiers in AS1/2 files caused by missing charset

@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.Objects;
 import javax.swing.JButton;
 
 /**
@@ -99,12 +100,18 @@ public class BinaryDataEditor extends JButton implements GenericTagEditor {
     }
 
     @Override
-    public void save() {
+    public boolean save() {
         try {
-            ReflectionTools.setValue(obj, field, index, value);
+            Object oldValue = ReflectionTools.getValue(obj, field, index);
+            Object newValue = value;
+            if (Objects.equals(oldValue, newValue)) {
+                return false;
+            }
+            ReflectionTools.setValue(obj, field, index, newValue);
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
+        return true;
     }
 
     @Override

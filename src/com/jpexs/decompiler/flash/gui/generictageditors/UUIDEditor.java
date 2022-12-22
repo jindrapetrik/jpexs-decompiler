@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
+import java.util.Objects;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -65,7 +66,7 @@ public class UUIDEditor extends JTextField implements GenericTagEditor {
     }
 
     public UUIDEditor(String fieldName, Object obj, Field field, int index, Class<?> type) {
-        super(32+4);
+        super(32 + 4);
         this.obj = obj;
         this.field = field;
         this.index = index;
@@ -79,7 +80,7 @@ public class UUIDEditor extends JTextField implements GenericTagEditor {
         try {
             byte[] val = (byte[]) ReflectionTools.getValue(obj, field, index);
             StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < val.length; i++) {
+            for (int i = 0; i < val.length; i++) {
                 String h = Integer.toHexString(val[i] & 0xff);
                 if (h.length() == 1) {
                     h = "0" + h;
@@ -96,22 +97,28 @@ public class UUIDEditor extends JTextField implements GenericTagEditor {
     }
 
     @Override
-    public void save() {
+    public boolean save() {
         try {
+            byte[] oldValue = (byte[]) ReflectionTools.getValue(obj, field, index);
+
             String text = getText();
             text = text.replace("-", "").trim();
             if (!text.matches("[a-fA-F0-9]{32}")) {
-                return;
+                return false;
             }
-            byte[] val = new byte[16];
+            byte[] newValue = new byte[16];
             for (int i = 0; i < 16; i++) {
                 String ch = text.substring(i * 2, i * 2 + 2);
-                val[i] = (byte) Integer.parseInt(ch, 16);
+                newValue[i] = (byte) Integer.parseInt(ch, 16);
             }
-            ReflectionTools.setValue(obj, field, index, val);
-        } catch (IllegalAccessException ex) {
+            if (Objects.equals(oldValue, newValue)) {
+                return false;
+            }
+            ReflectionTools.setValue(obj, field, index, newValue);
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
+        return true;
     }
 
     @Override

@@ -38,6 +38,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Objects;
 import java.util.Timer;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -175,14 +176,19 @@ public class Amf3ValueEditor extends JPanel implements GenericTagEditor, FullSiz
     }
 
     @Override
-    public void save() {
+    public boolean save() {
         try {
-            Object val = getChangedValue();
-            ReflectionTools.setValue(obj, field, index, val);
-            value = (Amf3Value) val;
+            Object oldValue = (Amf3Value) ReflectionTools.getValue(obj, field, index);
+            Object newValue = getChangedValue();
+            if (Objects.equals(oldValue, newValue)) {
+                return false;
+            }
+            ReflectionTools.setValue(obj, field, index, newValue);
+            value = (Amf3Value) newValue;
         } catch (IllegalAccessException ex) {
             //ignore
         }
+        return true;
     }
 
     @Override

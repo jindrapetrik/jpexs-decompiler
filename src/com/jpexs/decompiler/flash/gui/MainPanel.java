@@ -846,7 +846,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void setEditingStatus() {
-        statusPanel.setStatus(translate("status.editing"));
+        statusPanel.setStatus(translate(Configuration.autoSaveTagModifications.get() ? "status.editing.autosave" : "status.editing"));
     }
 
     public void clearEditingStatus() {

@@ -63,6 +63,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -422,7 +424,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             genericSaveButton.setVisible(true);
             genericSaveButton.setEnabled(false);
             genericCancelButton.setVisible(true);
-            genericSaveButton.setEnabled(false);
+            genericCancelButton.setEnabled(false);
         } else {
             genericEditButton.setVisible(true);
             genericSaveButton.setVisible(false);
@@ -524,7 +526,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), placeObject);
                 }
             }
-        });
+        });                
 
         imagePanel.setLoop(Configuration.loopMedia.get());
 
@@ -687,6 +689,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         genericTagPanel = new GenericTagTreePanel(mainPanel);
         genericTagCard.add(genericTagPanel, BorderLayout.CENTER);
         genericTagCard.add(createGenericTagButtonsPanel(), BorderLayout.SOUTH);
+        addGenericListener();        
         return genericTagCard;
     }
 
@@ -708,6 +711,16 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
         });
 
+        if (Configuration.editorMode.get()) {
+            placeImagePanel.addBoundsChangeListener(new BoundsChangeListener() {
+                @Override
+                public void boundsChanged(Rectangle2D newBounds, Point2D registrationPoint, RegistrationPointPosition registrationPointPosition) {
+                    if (placeSaveButton.isVisible()) {
+                        placeSaveButton.setEnabled(true);
+                    }
+                }
+            });
+        }
         placeTransformPanel = new TransformPanel(placeImagePanel);
         //imagePanel.setLoop(Configuration.loopMedia.get());
         previewCnt.add(placeTransformSplitPane = new JPersistentSplitPane(
@@ -727,6 +740,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         previewPanel.add(prevIntLabel, BorderLayout.NORTH);
 
         placeGenericPanel = new GenericTagTreePanel(mainPanel);
+        addPlaceGenericListener();
         placeSplitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, previewPanel, placeGenericPanel, Configuration.guiSplitPanePlaceDividerLocationPercent);
 
         placeTagCard.add(placeSplitPane, BorderLayout.CENTER);
@@ -1058,7 +1072,6 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         genericEditButton.setEnabled(true);
         if (Configuration.editorMode.get()) {
             genericTagPanel.setEditMode(!tag.isReadOnly(), tag);
-            addGenericListener();
             genericSaveButton.setVisible(!tag.isReadOnly());
             genericCancelButton.setVisible(!tag.isReadOnly());
         } else {
@@ -1079,7 +1092,6 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         if (Configuration.editorMode.get()) {
             placeGenericPanel.setEditMode(!tag.isReadOnly(), tag);
-            addPlaceGenericListener();
             placeEditButton.setVisible(false);
             placeSaveButton.setVisible(!tag.isReadOnly());
             placeCancelButton.setVisible(!tag.isReadOnly());
@@ -1292,7 +1304,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
     }
 
-    private void saveGenericTagButtonActionPerformed(ActionEvent evt) {
+    private void saveGenericTag(boolean refreshTree) {
         if (genericTagPanel.save()) {
             Tag tag = genericTagPanel.getTag();
             SWF swf = tag.getSwf();
@@ -1302,7 +1314,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             tag.getTimelined().resetTimeline();
             swf.assignClassesToSymbols();
             swf.assignExportNamesToSymbols();
-            mainPanel.refreshTree(swf);
+            if (refreshTree) {
+                mainPanel.refreshTree(swf);
+            }
             if (Configuration.editorMode.get()) {
                 genericEditButton.setVisible(false);
                 genericSaveButton.setVisible(true);
@@ -1319,26 +1333,29 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             mainPanel.clearEditingStatus();
         }
     }
+    
+    private void saveGenericTagButtonActionPerformed(ActionEvent evt) {
+        saveGenericTag(true);
+    }
 
     private void cancelGenericTagButtonActionPerformed(ActionEvent evt) {
         if (Configuration.editorMode.get()) {
+            genericTagPanel.setEditMode(true, null);
             genericEditButton.setVisible(false);
             genericSaveButton.setVisible(true);
             genericSaveButton.setEnabled(false);
             genericCancelButton.setVisible(true);
-            genericCancelButton.setEnabled(false);
-            genericTagPanel.setEditMode(true, null);
-            addGenericListener();
+            genericCancelButton.setEnabled(false);                      
         } else {
+            genericTagPanel.setEditMode(false, null);
             genericEditButton.setVisible(true);
             genericSaveButton.setVisible(false);
-            genericCancelButton.setVisible(false);
-            genericTagPanel.setEditMode(false, null);
+            genericCancelButton.setVisible(false);            
         }
         mainPanel.clearEditingStatus();
     }
 
-    private void savePlaceTagButtonActionPerformed(ActionEvent evt) {
+    private void savePlaceTag(boolean refreshTree) {
         if (placeEditMode == PLACE_EDIT_TRANSFORM) {
             Matrix matrix = placeImagePanel.getNewMatrix();
             placeTag.setPlaceFlagHasMatrix(true);
@@ -1348,7 +1365,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             placeImagePanel.freeTransformDepth(-1);
             placeTag.getTimelined().resetTimeline();
             placeTransformScrollPane.setVisible(false);
-            placeGenericPanel.setVisible(true);            
+            placeGenericPanel.setVisible(true);
         }
         Tag hilightTag = null;
         if (placeEditMode == PLACE_EDIT_RAW) {
@@ -1356,7 +1373,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 Tag tag = placeGenericPanel.getTag();
                 SWF swf = tag.getSwf();
                 tag.getTimelined().resetTimeline();
-                mainPanel.refreshTree(swf);
+                if (refreshTree) {
+                    mainPanel.refreshTree(swf);
+                }
                 hilightTag = tag;
             }
             placeGenericPanel.setEditMode(false, null);
@@ -1385,6 +1404,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
     }
 
+    private void savePlaceTagButtonActionPerformed(ActionEvent evt) {
+        savePlaceTag(true);
+    }
+
     private void editPlaceTagButtonActionPerformed(ActionEvent evt) {
         placeEditMode = PLACE_EDIT_RAW;
         placeGenericPanel.setEditMode(true, placeTag);
@@ -1410,7 +1433,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeTransformButton.setVisible(false);
         placeSaveButton.setVisible(true);
         placeCancelButton.setVisible(true);
-        placeSaveButton.setEnabled(true);
+
+        if (Configuration.editorMode.get()) {
+            placeSaveButton.setEnabled(false);        
+        } else {
+            placeSaveButton.setEnabled(true);            
+        }
         placeCancelButton.setEnabled(true);
         mainPanel.setEditingStatus();
 
@@ -1430,7 +1458,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }, 40); //add some delay before controls are hidden
     }
 
-    private void saveImageTransformButtonActionPerformed(ActionEvent evt) {
+    private void saveImageTransform(boolean refreshTree) {
         Matrix matrix = imagePanel.getNewMatrix();
 
         imageTransformScrollPane.setVisible(false);
@@ -1470,7 +1498,13 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
 
         mainPanel.clearEditingStatus();
-        mainPanel.reload(true);
+        if (refreshTree) {
+            mainPanel.reload(true);
+        }
+    }
+    
+    private void saveImageTransformButtonActionPerformed(ActionEvent evt) {
+        saveImageTransform(true);
     }
 
     private void cancelImageTransformButtonActionPerformed(ActionEvent evt) {
@@ -1615,8 +1649,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         if (Configuration.editorMode.get()) {
             if (placeEditMode == PLACE_EDIT_RAW) {
-                placeGenericPanel.setEditMode(true, null);
-                addPlaceGenericListener();
+                placeGenericPanel.setEditMode(true, null);                
             }
             placeEditButton.setVisible(false);
             placeSaveButton.setVisible(true);
@@ -1634,7 +1667,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         mainPanel.clearEditingStatus();
         placeTransformButton.setVisible(true);
-        
+
         if (placeEditMode == PLACE_EDIT_TRANSFORM) {
             placeEditMode = PLACE_EDIT_RAW;
         }
@@ -1660,8 +1693,31 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     @Override
     public boolean tryAutoSave() {
-        // todo: implement
-        return textPanel.tryAutoSave() && false;
+        boolean ok = true;
+
+        if (imageTransformSaveButton.isVisible() && imageTransformSaveButton.isEnabled() && Configuration.autoSaveTagModifications.get()) {
+            saveImageTransform(false);
+            ok = ok && !(imageTransformSaveButton.isVisible() && imageTransformSaveButton.isEnabled());
+        }
+        
+        if (placeSaveButton.isVisible() && placeSaveButton.isEnabled() && Configuration.autoSaveTagModifications.get()) {
+            savePlaceTag(false);
+            ok = ok && !(placeSaveButton.isVisible() && placeSaveButton.isEnabled());
+        }
+        if (genericSaveButton.isVisible() && genericSaveButton.isEnabled()) {
+            saveGenericTag(false);
+            ok = ok && !(genericSaveButton.isVisible() && genericSaveButton.isEnabled());
+        }
+        if (metadataSaveButton.isVisible() && metadataSaveButton.isEnabled() && Configuration.autoSaveTagModifications.get()) {
+            saveMetadataButtonActionPerformed(null);
+            ok = ok && !(metadataSaveButton.isVisible() && metadataSaveButton.isEnabled());
+        }
+        if (fontPanel.isEditing() && Configuration.autoSaveTagModifications.get()) {
+            ok = ok && fontPanel.tryAutoSave();
+        }
+        ok = ok && textPanel.tryAutoSave();
+
+        return ok;
     }
 
     @Override

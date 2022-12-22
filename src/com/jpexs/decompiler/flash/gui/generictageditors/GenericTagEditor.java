@@ -28,7 +28,7 @@ public interface GenericTagEditor {
 
     public void reset();
 
-    public void save();
+    public boolean save();
 
     public void addChangeListener(ChangeListener l);
 
