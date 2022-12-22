@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.exporters;
 
+import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.enums.ImageFormat;
 import com.jpexs.helpers.Helper;
@@ -35,7 +36,10 @@ import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.awt.image.TileObserver;
 import java.awt.image.WritableRaster;
+import java.io.IOException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * BufferedImage that has link to ImageTag. This is mainly used for PDF export coupling.
@@ -56,8 +60,19 @@ public class ImageTagBufferedImage extends BufferedImage {
         return tag.getCharacterId();
     }
 
-    public boolean isJpeg () {
-        return tag.getImageFormat() == ImageFormat.JPEG;
+    public boolean isJpeg() {
+        return tag.getOriginalImageFormat()== ImageFormat.JPEG;
+    }       
+    public byte[] getAlphaChannel() {
+        if (tag instanceof HasSeparateAlphaChannel) {
+            HasSeparateAlphaChannel hsac = (HasSeparateAlphaChannel)tag;
+            try {
+                return hsac.getImageAlpha();
+            } catch (IOException ex) {
+                return null;
+            }
+        }
+        return null;
     }
     
     public byte[] getImageData() {
