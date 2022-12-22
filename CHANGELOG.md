@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - [#1912] Persist selected item in the tree upon quick search (Ctrl+F)
 - [#1901] Editor mode and autosave feature for header, raw editor, transform
 - [#583] FlashPaper SWF to PDF with selectable text (commandline)
+- [#1858] PDF export - JPEG with alpha channel exported as is
 
 ### Fixed
 - [#1904] NullPointerException when renaming invalid identifiers in AS1/2 files caused by missing charset
