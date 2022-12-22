@@ -18,12 +18,15 @@ package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFCompression;
+import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.helpers.TableLayoutHelper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -34,6 +37,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import layout.TableLayout;
 
 /**
@@ -190,14 +194,24 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
 
         add(propertiesPanel, BorderLayout.CENTER);
 
-        editButton.setVisible(false);
         editButton.addActionListener(this::editButtonActionPerformed);
 
-        saveButton.setVisible(false);
         saveButton.addActionListener(this::saveButtonActionPerformed);
 
-        cancelButton.setVisible(false);
         cancelButton.addActionListener(this::cancelButtonActionPerformed);
+        
+        if (Configuration.editorMode.get()) {
+            editButton.setVisible(false);
+            saveButton.setVisible(false);        
+            saveButton.setEnabled(false);
+            cancelButton.setVisible(false);
+            cancelButton.setEnabled(false);
+        } else {
+            editButton.setVisible(false);
+            saveButton.setVisible(false);        
+            cancelButton.setVisible(false);
+        }
+        
 
         buttonsPanel.setLayout(new FlowLayout());
         buttonsPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
@@ -294,7 +308,27 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         yMinEditor.setModel(new SpinnerNumberModel(swf.displayRect.Ymin, -0x80000000, 0x7fffffff, 1));
         yMaxEditor.setModel(new SpinnerNumberModel(swf.displayRect.Ymax, -0x80000000, 0x7fffffff, 1));
 
-        setEditMode(false);
+        compressionComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                setModified();
+            }        
+        });
+        versionEditor.addChangeListener((ChangeEvent e) -> {setModified();});
+        gfxCheckBox.addChangeListener((ChangeEvent e) -> {setModified();});
+        frameRateEditor.addChangeListener((ChangeEvent e) -> {setModified();});
+        xMinEditor.addChangeListener((ChangeEvent e) -> {setModified();});
+        xMaxEditor.addChangeListener((ChangeEvent e) -> {setModified();});
+        yMinEditor.addChangeListener((ChangeEvent e) -> {setModified();});
+        yMaxEditor.addChangeListener((ChangeEvent e) -> {setModified();});
+               
+        setEditMode(Configuration.editorMode.get());
+    }
+    
+    private void setModified() {
+        saveButton.setEnabled(true);
+        cancelButton.setEnabled(true);
+        mainPanel.setEditingStatus();
     }
 
     public void clear() {
@@ -311,6 +345,10 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
     }
 
     private void setEditMode(boolean edit) {
+        
+        if (Configuration.editorMode.get()) {
+            edit = true;
+        }
         compressionLabel.setVisible(!edit);
         compressionEditorPanel.setVisible(edit);
         versionLabel.setVisible(!edit);
@@ -326,9 +364,17 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
 
         warningPanel.setVisible(false);
 
-        editButton.setVisible(!edit);
-        saveButton.setVisible(edit);
-        cancelButton.setVisible(edit);
+        if (Configuration.editorMode.get()) {
+            editButton.setVisible(false);
+            saveButton.setVisible(true);
+            saveButton.setEnabled(false);
+            cancelButton.setVisible(true);
+            cancelButton.setEnabled(false);
+        } else {
+            editButton.setVisible(!edit);
+            saveButton.setVisible(edit);
+            cancelButton.setVisible(edit);
+        }
     }
 
     private boolean validateHeader() {
@@ -362,13 +408,15 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
 
     @Override
     public boolean tryAutoSave() {
-        // todo: implement
-        return false;
+        if (saveButton.isVisible() && saveButton.isEnabled()) {
+            saveButtonActionPerformed(null);
+        }
+        return !(saveButton.isVisible() && saveButton.isEnabled());
     }
 
     @Override
     public boolean isEditing() {
-        return saveButton.isVisible();
+        return saveButton.isVisible() && saveButton.isEnabled();
     }
     
     public void startEdit() {

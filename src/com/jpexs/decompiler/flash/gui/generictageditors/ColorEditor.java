@@ -35,6 +35,7 @@ import java.awt.event.FocusEvent;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Objects;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -145,13 +146,19 @@ public class ColorEditor extends JPanel implements GenericTagEditor, ActionListe
     }
 
     @Override
-    public void save() {
-        Object val = getChangedValue();
+    public boolean save() {
         try {
-            ReflectionTools.setValue(obj, field, index, val);
-        } catch (IllegalAccessException ex) {
+            Object oldValue = ReflectionTools.getValue(obj, field, index);
+            Object newValue = getChangedValue();
+            if (Objects.equals(oldValue, newValue)) {
+                return false;
+            }
+        
+            ReflectionTools.setValue(obj, field, index, newValue);
+        } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
+        return true;
     }
 
     @Override

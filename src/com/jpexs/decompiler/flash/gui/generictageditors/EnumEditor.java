@@ -26,6 +26,7 @@ import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.JComboBox;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
@@ -103,104 +104,22 @@ public class EnumEditor extends JComboBox<ComboBoxItem<Integer>> implements Gene
     }
 
     @Override
-    public void save() {
+    public boolean save() {
         try {
-            Object value = getChangedValue();
-            if (value != null) {
-                ReflectionTools.setValue(obj, field, index, value);
+            Integer oldValue = (Integer) ReflectionTools.getValue(obj, field, index);
+            Integer newValue = (Integer)getChangedValue();
+            if (newValue == null) {
+                return false;
             }
+            if (Objects.equals(oldValue, newValue)) {
+                return false;
+            }
+            ReflectionTools.setValue(obj, field, index, newValue);            
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
-    }
-
-    private SpinnerModel getModel(SWFType swfType, Object value) {
-        SpinnerNumberModel m = null;
-        BasicType basicType = swfType == null ? BasicType.NONE : swfType.value();
-        switch (basicType) {
-            case UI8:
-                m = new SpinnerNumberModel(toInt(value), 0, 0xff, 1);
-                break;
-            case UI16:
-                m = new SpinnerNumberModel(toInt(value), 0, 0xffff, 1);
-                break;
-            case UB: {
-                long max = 1;
-                if (swfType.count() > 0) {
-                    max <<= swfType.count();
-                } else {
-                    max <<= 31;
-                }
-                m = new SpinnerNumberModel((Number) toLong(value), 0L, (long) max - 1, 1L);
-            }
-            break;
-            case UI32:
-            case EncodedU32:
-            case NONE:
-                m = new SpinnerNumberModel((Number) toLong(value), 0L, 0xffffffffL, 1L);
-                break;
-            case SI8:
-                m = new SpinnerNumberModel(toInt(value), -0x80, 0x7f, 1);
-                break;
-            case SI16:
-            case FLOAT16:
-                m = new SpinnerNumberModel(toInt(value), -0x8000, 0x7fff, 1);
-                break;
-            case FB:
-            case SB: {
-                long max = 1;
-                if (swfType.count() > 0) {
-                    max <<= (swfType.count() - 1);
-                } else {
-                    max <<= 30;
-                }
-                m = new SpinnerNumberModel((Number) toLong(value), (long) (-max), (long) max - 1, 1L);
-            }
-            break;
-            case SI32:
-                m = new SpinnerNumberModel(toDouble(value), -0x80000000, 0x7fffffff, 1);
-                break;
-            case FLOAT:
-            case FIXED:
-            case FIXED8:
-                m = new SpinnerNumberModel(toDouble(value), -0x80000000, 0x7fffffff, 0.01);
-                break;
-        }
-        return m;
-    }
-
-    private double toDouble(Object value) {
-        if (value instanceof Float) {
-            return (double) (Float) value;
-        }
-        if (value instanceof Double) {
-            return (double) (Double) value;
-        }
-        return 0;
-    }
-
-    private int toInt(Object value) {
-        if (value instanceof Short) {
-            return (int) (Short) value;
-        }
-        if (value instanceof Integer) {
-            return (int) (Integer) value;
-        }
-        return 0;
-    }
-
-    private long toLong(Object value) {
-        if (value instanceof Short) {
-            return (long) (Short) value;
-        }
-        if (value instanceof Integer) {
-            return (long) (Integer) value;
-        }
-        if (value instanceof Long) {
-            return (long) (Long) value;
-        }
-        return 0;
-    }
+        return true;
+    }      
 
     @Override
     public void addChangeListener(final ChangeListener l) {

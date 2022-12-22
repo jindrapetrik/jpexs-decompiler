@@ -67,12 +67,20 @@ public class BooleanEditor extends JCheckBox implements GenericTagEditor {
     }
 
     @Override
-    public void save() {
+    public boolean save() {        
         try {
+            boolean oldValue = (boolean) ReflectionTools.getValue(obj, field, index);
+            boolean newValue = isSelected();
+            
+            if (oldValue == newValue) {
+                return false;
+            }
+            
             ReflectionTools.setValue(obj, field, index, isSelected());
         } catch (IllegalArgumentException | IllegalAccessException ex) {
             // ignore
         }
+        return true;
     }
 
     @Override

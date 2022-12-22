@@ -67,7 +67,7 @@ import layout.TableLayout;
  *
  * @author JPEXS
  */
-public class FontPanel extends JPanel {
+public class FontPanel extends JPanel implements TagEditorPanel {
 
     private final MainPanel mainPanel;
 
@@ -110,6 +110,7 @@ public class FontPanel extends JPanel {
         return new DefaultComboBoxModel<>(new Vector<>(faceSet));
     }
 
+    @Override
     public boolean isEditing() {
         return saveButton.isVisible();
     }
@@ -861,4 +862,13 @@ public class FontPanel extends JPanel {
     private JPanel contentPanel;
 
     private JScrollPane contentScrollPane;
+
+    @Override
+    public boolean tryAutoSave() {
+        if (Configuration.autoSaveTagModifications.get()) {
+            saveButtonActionPerformed(null);
+            return !(saveButton.isVisible() && saveButton.isEnabled());
+        }
+        return false;
+    }
 }
