@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#1910] Copy/paste transform matrix to/from the clipboard
 - [#1912] Persist selected item in the tree upon quick search (Ctrl+F)
 - [#1901] Editor mode and autosave feature for header, raw editor, transform
+- [#583] FlashPaper SWF to PDF with selectable text (commandline)
 
 ### Fixed
 - [#1904] NullPointerException when renaming invalid identifiers in AS1/2 files caused by missing charset
@@ -2782,10 +2783,12 @@ All notable changes to this project will be documented in this file.
 [#1460]: https://www.free-decompiler.com/flash/issues/1460
 [#1909]: https://www.free-decompiler.com/flash/issues/1909
 [#1910]: https://www.free-decompiler.com/flash/issues/1910
+[#1912]: https://www.free-decompiler.com/flash/issues/1912
+[#1901]: https://www.free-decompiler.com/flash/issues/1901
+[#583]: https://www.free-decompiler.com/flash/issues/583
 [#1904]: https://www.free-decompiler.com/flash/issues/1904
 [#595]: https://www.free-decompiler.com/flash/issues/595
 [#1908]: https://www.free-decompiler.com/flash/issues/1908
-[#1912]: https://www.free-decompiler.com/flash/issues/1912
 [#1898]: https://www.free-decompiler.com/flash/issues/1898
 [#1511]: https://www.free-decompiler.com/flash/issues/1511
 [#1765]: https://www.free-decompiler.com/flash/issues/1765
@@ -2796,7 +2799,6 @@ All notable changes to this project will be documented in this file.
 [#1893]: https://www.free-decompiler.com/flash/issues/1893
 [#1181]: https://www.free-decompiler.com/flash/issues/1181
 [#1900]: https://www.free-decompiler.com/flash/issues/1900
-[#1901]: https://www.free-decompiler.com/flash/issues/1901
 [#1897]: https://www.free-decompiler.com/flash/issues/1897
 [#1006]: https://www.free-decompiler.com/flash/issues/1006
 [#1828]: https://www.free-decompiler.com/flash/issues/1828
@@ -2979,7 +2981,6 @@ All notable changes to this project will be documented in this file.
 [#1573]: https://www.free-decompiler.com/flash/issues/1573
 [#1598]: https://www.free-decompiler.com/flash/issues/1598
 [#428]: https://www.free-decompiler.com/flash/issues/428
-[#583]: https://www.free-decompiler.com/flash/issues/583
 [#1373]: https://www.free-decompiler.com/flash/issues/1373
 [#1595]: https://www.free-decompiler.com/flash/issues/1595
 [#1611]: https://www.free-decompiler.com/flash/issues/1611
