@@ -21,7 +21,6 @@ import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.helpers.Reference;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -33,6 +32,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.FlavorEvent;
+import java.awt.datatransfer.FlavorListener;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -45,20 +52,16 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -108,6 +111,11 @@ public class TransformPanel extends JPanel {
     private JTextField matrixETextField = new JTextField(formatDouble(0), NUMBER_COLS);
     private JTextField matrixFTextField = new JTextField(formatDouble(0), NUMBER_COLS);
     private JCheckBox matrixEditCurrentCheckBox = new JCheckBox(AppStrings.translate("transform.matrix.editCurrent"));
+
+    private JButton pasteClipboardButton;
+
+    private static final String doublePatternString = "[-+]?([0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?|[0-9]+)";
+    private static final Pattern matrixPattern = Pattern.compile("^MATRIX\\[(?<scaleX>" + doublePatternString + "),(?<rotateSkew0>" + doublePatternString + "),(?<rotateSkew1>" + doublePatternString + "),(?<scaleY>" + doublePatternString + "),(?<translateX>" + doublePatternString + "),(?<translateY>" + doublePatternString + ")\\]$");
 
     private ImagePanel imagePanel;
 
@@ -429,6 +437,18 @@ public class TransformPanel extends JPanel {
                 }
             }
         });
+
+        JPanel clipboardPanel = new JPanel(new FlowLayout());
+        JButton copyClipboardButton = new JButton(AppStrings.translate("transform.clipboard.copy"), View.getIcon("copy16"));
+        copyClipboardButton.addActionListener(this::copyClipboardActionPerformed);
+        pasteClipboardButton = new JButton(AppStrings.translate("transform.clipboard.paste"), View.getIcon("paste16"));
+        pasteClipboardButton.addActionListener(this::pasteClipboardActionPerformed);
+        clipboardPanel.add(copyClipboardButton);
+        clipboardPanel.add(pasteClipboardButton);
+        Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(this::clipBoardflavorsChanged);
+
+        add(makeCard("clipboard", "clipboard16", clipboardPanel));
+
         add(Box.createVerticalGlue());
         /*JPanel finalPanel = new JPanel();
         //finalPanel.setPreferredSize(new Dimension(1, Integer.MAX_VALUE));
@@ -476,11 +496,77 @@ public class TransformPanel extends JPanel {
         }
     }
 
+    public void clipBoardflavorsChanged(FlavorEvent e) {
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        Transferable contents = clipboard.getContents(null);
+        boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+        if (hasTransferableText) {
+            try {
+                String result = (String) contents.getTransferData(DataFlavor.stringFlavor);
+                if (result != null) {
+                    Matcher matcher = matrixPattern.matcher(result);
+                    if (matcher.matches()) {
+                        pasteClipboardButton.setEnabled(true);
+                    } else {
+                        pasteClipboardButton.setEnabled(false);
+                    }
+                } else {
+                    pasteClipboardButton.setEnabled(false);
+                }
+
+            } catch (UnsupportedFlavorException | IOException ex) {
+                pasteClipboardButton.setEnabled(false);
+            }
+        } else {
+            pasteClipboardButton.setEnabled(false);
+        }
+    }
+
+    private void copyClipboardActionPerformed(ActionEvent e) {
+        Matrix matrix = imagePanel.getNewMatrix();
+        String copyString = "MATRIX[" + matrix.scaleX + "," + matrix.rotateSkew0 + "," + matrix.rotateSkew1 + "," + matrix.scaleY + "," + matrix.translateX + "," + matrix.translateY + "]";
+        StringSelection stringSelection = new StringSelection(copyString);
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, null);
+    }
+
+    private void pasteClipboardActionPerformed(ActionEvent e) {
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        Transferable contents = clipboard.getContents(null);
+        boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+        if (hasTransferableText) {
+            try {
+                String result = (String) contents.getTransferData(DataFlavor.stringFlavor);
+                if (result != null) {
+                    Matcher matcher = matrixPattern.matcher(result);
+                    if (matcher.matches()) {
+                        Matrix matrix = new Matrix();
+                        try {
+                            matrix.scaleX = Double.parseDouble(matcher.group("scaleX"));
+                            matrix.rotateSkew0 = Double.parseDouble(matcher.group("rotateSkew0"));
+                            matrix.rotateSkew1 = Double.parseDouble(matcher.group("rotateSkew1"));
+                            matrix.scaleY = Double.parseDouble(matcher.group("scaleY"));
+                            matrix.translateX = Double.parseDouble(matcher.group("translateX"));
+                            matrix.translateY = Double.parseDouble(matcher.group("translateY"));
+
+                            matrix = imagePanel.getNewMatrix().inverse().concatenate(matrix);
+                            imagePanel.applyTransformMatrix(matrix);
+                        } catch (NumberFormatException nfe) {
+                            //ignore
+                        }
+                    }
+                }
+            } catch (UnsupportedFlavorException | IOException ex) {
+                //ignore
+            }
+        }
+    }
+
     private void clearMoveActionPerformed(ActionEvent e) {
         moveUnitComboBox.setSelectedItem(Unit.PX);
         moveRelativeCheckBox.setSelected(false);
         moveHorizontalTextField.setText(formatDouble(convertUnit(bounds.getX(), Unit.TWIP, Unit.PX)));
-        moveVerticalTextField.setText(formatDouble(convertUnit(bounds.getY(), Unit.TWIP, Unit.PX)));        
+        moveVerticalTextField.setText(formatDouble(convertUnit(bounds.getY(), Unit.TWIP, Unit.PX)));
     }
 
     private void applyMoveActionPerformed(ActionEvent e) {
