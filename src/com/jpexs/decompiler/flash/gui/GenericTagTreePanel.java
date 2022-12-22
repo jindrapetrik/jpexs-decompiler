@@ -92,6 +92,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.plaf.basic.BasicLabelUI;
 import javax.swing.plaf.basic.BasicTreeUI;
@@ -118,6 +119,14 @@ public class GenericTagTreePanel extends GenericTagPanel {
 
     private static final int FIELD_INDEX = 0;
 
+    public void addTreeModelListener(TreeModelListener listener) {
+        ((MyTreeModel)tree.getModel()).addTreeModelListener(listener);
+    }
+    
+    public void removeTreeModelListener(TreeModelListener listener) {
+        ((MyTreeModel)tree.getModel()).removeTreeModelListener(listener);
+    }
+    
     private class MyTree extends JTree {
                 
         public MyTree() {
@@ -1175,7 +1184,7 @@ public class GenericTagTreePanel extends GenericTagPanel {
         }
         if (!edit && tree.isEditing()) {
             tree.stopEditing();
-        }
+        }        
         tree.setEditable(edit);
         refreshTree();
     }
