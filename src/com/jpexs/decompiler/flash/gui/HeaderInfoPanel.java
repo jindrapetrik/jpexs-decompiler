@@ -408,7 +408,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
 
     @Override
     public boolean tryAutoSave() {
-        if (saveButton.isVisible() && saveButton.isEnabled()) {
+        if (saveButton.isVisible() && saveButton.isEnabled() && Configuration.autoSaveTagModifications.get()) {
             saveButtonActionPerformed(null);
         }
         return !(saveButton.isVisible() && saveButton.isEnabled());
