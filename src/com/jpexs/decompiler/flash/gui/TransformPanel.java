@@ -497,11 +497,11 @@ public class TransformPanel extends JPanel {
     }
 
     public void clipBoardflavorsChanged(FlavorEvent e) {
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        Transferable contents = clipboard.getContents(null);
-        boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
-        if (hasTransferableText) {
-            try {
+        try {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            Transferable contents = clipboard.getContents(null);
+            boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+            if (hasTransferableText) {
                 String result = (String) contents.getTransferData(DataFlavor.stringFlavor);
                 if (result != null) {
                     Matcher matcher = matrixPattern.matcher(result);
@@ -512,12 +512,11 @@ public class TransformPanel extends JPanel {
                     }
                 } else {
                     pasteClipboardButton.setEnabled(false);
-                }
-
-            } catch (UnsupportedFlavorException | IOException ex) {
+                }                
+            } else {
                 pasteClipboardButton.setEnabled(false);
             }
-        } else {
+        } catch (Exception ex) {
             pasteClipboardButton.setEnabled(false);
         }
     }
@@ -531,34 +530,30 @@ public class TransformPanel extends JPanel {
     }
 
     private void pasteClipboardActionPerformed(ActionEvent e) {
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        Transferable contents = clipboard.getContents(null);
-        boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
-        if (hasTransferableText) {
-            try {
+        try {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            Transferable contents = clipboard.getContents(null);
+            boolean hasTransferableText = (contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+            if (hasTransferableText) {
                 String result = (String) contents.getTransferData(DataFlavor.stringFlavor);
                 if (result != null) {
                     Matcher matcher = matrixPattern.matcher(result);
                     if (matcher.matches()) {
-                        Matrix matrix = new Matrix();
-                        try {
-                            matrix.scaleX = Double.parseDouble(matcher.group("scaleX"));
-                            matrix.rotateSkew0 = Double.parseDouble(matcher.group("rotateSkew0"));
-                            matrix.rotateSkew1 = Double.parseDouble(matcher.group("rotateSkew1"));
-                            matrix.scaleY = Double.parseDouble(matcher.group("scaleY"));
-                            matrix.translateX = Double.parseDouble(matcher.group("translateX"));
-                            matrix.translateY = Double.parseDouble(matcher.group("translateY"));
+                        Matrix matrix = new Matrix();                        
+                        matrix.scaleX = Double.parseDouble(matcher.group("scaleX"));
+                        matrix.rotateSkew0 = Double.parseDouble(matcher.group("rotateSkew0"));
+                        matrix.rotateSkew1 = Double.parseDouble(matcher.group("rotateSkew1"));
+                        matrix.scaleY = Double.parseDouble(matcher.group("scaleY"));
+                        matrix.translateX = Double.parseDouble(matcher.group("translateX"));
+                        matrix.translateY = Double.parseDouble(matcher.group("translateY"));
 
-                            matrix = imagePanel.getNewMatrix().inverse().concatenate(matrix);
-                            imagePanel.applyTransformMatrix(matrix);
-                        } catch (NumberFormatException nfe) {
-                            //ignore
-                        }
+                        matrix = imagePanel.getNewMatrix().inverse().concatenate(matrix);
+                        imagePanel.applyTransformMatrix(matrix);                        
                     }
                 }
-            } catch (UnsupportedFlavorException | IOException ex) {
-                //ignore
             }
+        } catch (Exception ex) {
+            //ignore
         }
     }
 
