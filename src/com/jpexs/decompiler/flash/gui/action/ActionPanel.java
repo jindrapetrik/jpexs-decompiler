@@ -1134,7 +1134,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         mainPanel.clearEditingStatus();
     }
 
-    private void saveActionButtonActionPerformed(ActionEvent evt) {
+    private void saveAction(boolean refreshTree) {
         try {
             String text = editor.getText();
             String trimmed = text.trim();
@@ -1154,14 +1154,18 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             SWF.uncache(src);
             src.setModified();
             setSource(this.src, false);
-            ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
+            if (refreshTree) {
+                ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
+            }
             saveButton.setVisible(false);
             cancelButton.setVisible(false);
             editButton.setVisible(true);
             editor.setEditable(false);
             editMode = false;
             mainPanel.clearEditingStatus();
-            mainPanel.refreshTree(src.getSwf());
+            if (refreshTree) {
+                mainPanel.refreshTree(src.getSwf());
+            }
         } catch (IOException ex) {
         } catch (ActionParseException ex) {
             editor.gotoLine((int) ex.line);
@@ -1170,6 +1174,9 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         } catch (Throwable ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+    }
+    private void saveActionButtonActionPerformed(ActionEvent evt) {
+        saveAction(true);
     }
 
     private void editDecompiledButtonActionPerformed(ActionEvent evt) {
@@ -1182,7 +1189,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         mainPanel.clearEditingStatus();
     }
 
-    private void saveDecompiledButtonActionPerformed(ActionEvent evt) {
+    private void saveDecompiled(boolean refreshTree) {
         try {
             ActionScript2Parser par = new ActionScript2Parser(mainPanel.getCurrentSwf(), src);
             src.setActions(par.actionsFromString(decompiledEditor.getText(), src.getSwf().getCharset()));
@@ -1190,7 +1197,9 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
             src.setModified();
             setSource(src, false);
 
-            ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
+            if (refreshTree) {
+                ViewMessages.showMessageDialog(this, AppStrings.translate("message.action.saved"), AppStrings.translate("dialog.message.title"), JOptionPane.INFORMATION_MESSAGE, Configuration.showCodeSavedMessage);
+            }
             setDecompiledEditMode(false);
             mainPanel.clearEditingStatus();
         } catch (ValueTooLargeException ex) {
@@ -1208,6 +1217,9 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         } catch (Throwable ex) {
             logger.log(Level.SEVERE, null, ex);
         }
+    }
+    private void saveDecompiledButtonActionPerformed(ActionEvent evt) {
+        saveDecompiled(true);
     }
 
     private ScriptExportMode getExportMode() {
@@ -1256,8 +1268,16 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
     public boolean tryAutoSave() {
         View.checkAccess();
 
-        // todo: implement
-        return false;
+        boolean ok = true;
+        if (saveButton.isVisible() && saveButton.isEnabled() && Configuration.autoSaveTagModifications.get()) {
+            saveAction(false);
+            ok = ok && !(saveButton.isVisible() && saveButton.isEnabled());
+        }
+        if (saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled() && Configuration.autoSaveTagModifications.get()) {
+            saveDecompiled(false);
+            ok = ok && !(saveDecompiledButton.isVisible() && saveDecompiledButton.isEnabled());
+        }
+        return ok;
     }
 
     @Override
