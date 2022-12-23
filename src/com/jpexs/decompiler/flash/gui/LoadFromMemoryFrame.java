@@ -40,7 +40,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -90,6 +92,8 @@ public class LoadFromMemoryFrame extends AppFrame {
     private DefaultTableModel resTableModel;
     
     private List<Object[]> results = new ArrayList<>();
+    
+    private Map<Integer, Integer> modelToResultMap = new LinkedHashMap<>();
 
     private final JTable tableRes;
 
@@ -165,11 +169,17 @@ public class LoadFromMemoryFrame extends AppFrame {
         }
             
         resTableModel.setRowCount(0);
+        modelToResultMap.clear();
+        int rowNum = 0;
+        int resultNum = 0;
         for (Object[] rowData:results) {
             long address = (long) rowData[4];
             if (align == 0 || (address % align) == 0) {
+                modelToResultMap.put(rowNum, resultNum);
                 resTableModel.addRow(rowData);
+                rowNum++;
             }
+            resultNum++;
         }
     }
 
@@ -193,6 +203,7 @@ public class LoadFromMemoryFrame extends AppFrame {
         }
         int index = tableRes.getRowSorter().convertRowIndexToModel(tableRes.getSelectedRow());
         if (index > -1) {
+            index = modelToResultMap.get(index);
             SwfInMemory swf = foundIs.get(index);
             ReReadableInputStream str = swf.is;
             try {
