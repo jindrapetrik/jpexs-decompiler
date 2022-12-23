@@ -58,9 +58,7 @@ import java.util.logging.Logger;
 public class Win32ProcessTools extends ProcessTools {
 
     private static long pointerToAddress(Pointer p) {
-        String s = p.toString();
-        s = s.replace("native@0x", "");
-        return Long.parseLong(s, 16);
+        return Pointer.nativeValue(p);
     }
 
     public static List<MEMORY_BASIC_INFORMATION> getPageRanges(WinNT.HANDLE hOtherProcess) {
