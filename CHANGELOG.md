@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [18.1.0] - 2022-12-23
 ### Added
 - Deobfuscation and its options as icons on script panel toolbar
 - Warning before switching auto rename identifiers on
