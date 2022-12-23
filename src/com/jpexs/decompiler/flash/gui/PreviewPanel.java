@@ -1313,10 +1313,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             swf.updateCharacters();
             tag.getTimelined().resetTimeline();
             swf.assignClassesToSymbols();
-            swf.assignExportNamesToSymbols();
-            if (refreshTree) {
-                mainPanel.refreshTree(swf);
-            }
+            swf.assignExportNamesToSymbols();            
             if (Configuration.editorMode.get()) {
                 genericEditButton.setVisible(false);
                 genericSaveButton.setVisible(true);
@@ -1329,6 +1326,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 genericCancelButton.setVisible(false);
             }
             genericTagPanel.setEditMode(false, null);
+            if (refreshTree) {
+                mainPanel.refreshTree(swf);
+            }
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), tag);
             mainPanel.clearEditingStatus();
         }
@@ -1368,14 +1368,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             placeGenericPanel.setVisible(true);
         }
         Tag hilightTag = null;
+        SWF swf = null;
         if (placeEditMode == PLACE_EDIT_RAW) {
             if (placeGenericPanel.save()) {
                 Tag tag = placeGenericPanel.getTag();
-                SWF swf = tag.getSwf();
+                swf = tag.getSwf();
                 tag.getTimelined().resetTimeline();
-                if (refreshTree) {
-                    mainPanel.refreshTree(swf);
-                }
                 hilightTag = tag;
             }
             placeGenericPanel.setEditMode(false, null);
@@ -1394,6 +1392,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             placeCancelButton.setVisible(false);
         }
 
+        if (placeEditMode == PLACE_EDIT_RAW && refreshTree && swf != null) {
+            mainPanel.refreshTree(swf);
+        }
         mainPanel.clearEditingStatus();
         mainPanel.repaintTree();
         if (hilightTag != null) {

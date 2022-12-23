@@ -3818,13 +3818,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         refreshTree(new Openable[]{openable});
     }
 
-    public void refreshTree(Openable[] openables) {
-        clear();
-        showCard(CARDEMPTYPANEL);
+    public void refreshTree(Openable[] openables) {        
         TreeItem treeItem = null;
         if (currentView == VIEW_RESOURCES || currentView == VIEW_TAGLIST) {
             treeItem = getCurrentTree().getCurrentTreeItem();
         }
+        
+        clear();
+        showCard(CARDEMPTYPANEL);       
 
         tagTree.updateSwfs(openables);
         tagListTree.updateSwfs(openables);
