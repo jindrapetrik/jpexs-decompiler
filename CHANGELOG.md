@@ -38,6 +38,7 @@ All notable changes to this project will be documented in this file.
 - [#1858] PDF export - Adding same ExtGState multiple times,
 - [#1858] PDF export - Applying same alpha/blendmode multiple times
 - [#1858] PDF export - Applying same color multiple times
+- [#1907] Crashing on memory search
 
 ### Changed
 - Warning before switching deobfuscation is now optional
@@ -2790,9 +2791,11 @@ All notable changes to this project will be documented in this file.
 [#1912]: https://www.free-decompiler.com/flash/issues/1912
 [#1901]: https://www.free-decompiler.com/flash/issues/1901
 [#583]: https://www.free-decompiler.com/flash/issues/583
+[#1858]: https://www.free-decompiler.com/flash/issues/1858
 [#1904]: https://www.free-decompiler.com/flash/issues/1904
 [#595]: https://www.free-decompiler.com/flash/issues/595
 [#1908]: https://www.free-decompiler.com/flash/issues/1908
+[#1907]: https://www.free-decompiler.com/flash/issues/1907
 [#1898]: https://www.free-decompiler.com/flash/issues/1898
 [#1511]: https://www.free-decompiler.com/flash/issues/1511
 [#1765]: https://www.free-decompiler.com/flash/issues/1765
