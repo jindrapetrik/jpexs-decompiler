@@ -132,11 +132,11 @@ public class GRADIENTBEVELFILTER extends FILTER {
 
     @Override
     public double getDeltaX() {
-        return blurX + (distance * Math.cos(angle));
+        return blurX + Math.abs(distance * Math.cos(angle));
     }
 
     @Override
     public double getDeltaY() {
-        return blurY + (distance * Math.sin(angle));
+        return blurY + Math.abs(distance * Math.sin(angle));        
     }
 }

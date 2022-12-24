@@ -752,36 +752,20 @@ public class Timeline {
             // calculate size after applying the filters
             double deltaXMax = 0;
             double deltaYMax = 0;
-            double deltaXMin = Integer.MAX_VALUE;
-            double deltaYMin = Integer.MAX_VALUE;
             for (FILTER filter : filters) {
                 double x = filter.getDeltaX();
                 double y = filter.getDeltaY();
                 deltaXMax = Math.max(x, deltaXMax);
-                deltaYMax = Math.max(y, deltaYMax);
-                deltaXMin = Math.min(x, deltaXMin);
-                deltaYMin = Math.min(y, deltaYMin);
+                deltaYMax = Math.max(y, deltaYMax);             
             }
-            if (deltaXMin > 0) {
-                deltaXMin = 0;
-            }
-            if (deltaYMin > 0) {
-                deltaYMin = 0;
-            }
-            if (deltaXMax < 0) {
-                deltaXMax = 0;
-            }
-            if (deltaYMax < 0) {
-                deltaYMax = 0;
-            }
-            rect.xMin += deltaXMin * unzoom * SWF.unitDivisor;
+            rect.xMin -= deltaXMax * unzoom * SWF.unitDivisor;
             rect.xMax += deltaXMax * unzoom * SWF.unitDivisor;
-            rect.yMin += deltaYMin * unzoom * SWF.unitDivisor;
+            rect.yMin -= deltaXMax * unzoom * SWF.unitDivisor;
             rect.yMax += deltaYMax * unzoom * SWF.unitDivisor;
             viewRect2.xMin -= deltaXMax * SWF.unitDivisor;
             viewRect2.xMax += deltaXMax * SWF.unitDivisor;
-            viewRect2.yMin -= deltaXMax * SWF.unitDivisor;
-            viewRect2.yMax += deltaXMax * SWF.unitDivisor;
+            viewRect2.yMin -= deltaYMax * SWF.unitDivisor;
+            viewRect2.yMax += deltaYMax * SWF.unitDivisor;
         }
 
         rect.xMin -= SWF.unitDivisor;
