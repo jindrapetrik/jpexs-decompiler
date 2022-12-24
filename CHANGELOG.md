@@ -42,6 +42,7 @@ All notable changes to this project will be documented in this file.
 - [#1858] PDF export - Applying same color multiple times
 - [#1907] Crashing on memory search
 - [#1906] Memory search - byte align opens wrong SWFs
+- [#1914] DropShadow filter
 
 ### Changed
 - Warning before switching deobfuscation is now optional
@@ -2650,7 +2651,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.0.0...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.1.0...dev
+[18.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.0.0...version18.1.0
 [18.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.4...version18.0.0
 [17.0.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.3...version17.0.4
 [17.0.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.2...version17.0.3
@@ -2800,6 +2802,7 @@ All notable changes to this project will be documented in this file.
 [#1908]: https://www.free-decompiler.com/flash/issues/1908
 [#1907]: https://www.free-decompiler.com/flash/issues/1907
 [#1906]: https://www.free-decompiler.com/flash/issues/1906
+[#1914]: https://www.free-decompiler.com/flash/issues/1914
 [#1898]: https://www.free-decompiler.com/flash/issues/1898
 [#1511]: https://www.free-decompiler.com/flash/issues/1511
 [#1765]: https://www.free-decompiler.com/flash/issues/1765
