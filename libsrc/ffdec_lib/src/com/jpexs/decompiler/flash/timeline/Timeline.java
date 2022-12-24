@@ -75,6 +75,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,6 +85,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import org.w3c.dom.Element;
 
 /**
@@ -748,15 +752,31 @@ public class Timeline {
             // calculate size after applying the filters
             double deltaXMax = 0;
             double deltaYMax = 0;
+            double deltaXMin = Integer.MAX_VALUE;
+            double deltaYMin = Integer.MAX_VALUE;
             for (FILTER filter : filters) {
                 double x = filter.getDeltaX();
                 double y = filter.getDeltaY();
                 deltaXMax = Math.max(x, deltaXMax);
                 deltaYMax = Math.max(y, deltaYMax);
+                deltaXMin = Math.min(x, deltaXMin);
+                deltaYMin = Math.min(y, deltaYMin);
             }
-            rect.xMin -= deltaXMax * unzoom * SWF.unitDivisor;
+            if (deltaXMin > 0) {
+                deltaXMin = 0;
+            }
+            if (deltaYMin > 0) {
+                deltaYMin = 0;
+            }
+            if (deltaXMax < 0) {
+                deltaXMax = 0;
+            }
+            if (deltaYMax < 0) {
+                deltaYMax = 0;
+            }
+            rect.xMin += deltaXMin * unzoom * SWF.unitDivisor;
             rect.xMax += deltaXMax * unzoom * SWF.unitDivisor;
-            rect.yMin -= deltaYMax * unzoom * SWF.unitDivisor;
+            rect.yMin += deltaYMin * unzoom * SWF.unitDivisor;
             rect.yMax += deltaYMax * unzoom * SWF.unitDivisor;
             viewRect2.xMin -= deltaXMax * SWF.unitDivisor;
             viewRect2.xMax += deltaXMax * SWF.unitDivisor;
@@ -865,6 +885,12 @@ public class Timeline {
             }
 
             if (filters != null) {
+                /*try {
+                    ImageIO.write(img.getBufferedImage(), "PNG", new File("c:\\FlashRelated\\gwint\\out.png"));
+                } catch (IOException ex) {
+                    Logger.getLogger(Timeline.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                System.exit(0);*/
                 for (FILTER filter : filters) {
                     img = filter.apply(img, unzoom);
                 }
