@@ -140,6 +140,9 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     
     private static final List<SimpleMediaPlayer> players = new ArrayList<>();
     private static List<File> tempFiles = new ArrayList<>();
+    
+    @Internal
+    private boolean renderingPaused = false;
 
     public static final int CODEC_JPEG = 1;    
     public static final int CODEC_SORENSON_H263 = 2;
@@ -148,12 +151,30 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     public static final int CODEC_VP6_ALPHA = 5;
     public static final int CODEC_SCREEN_VIDEO_V2 = 6;
     public static final int CODEC_AVC = 7; //Is this FLV only, or SWF too?
-
+    
+    /**
+     * use VIDEOPACKET value
+     */
     public static final int DEBLOCKING_USE_VIDEOPACKET_VALUE = 0;
+    /**
+     * off
+     */
     public static final int DEBLOCKING_OFF = 1;
+    /**
+     * Level 1 (Fast deblocking filter)
+     */
     public static final int DEBLOCKING_LEVEL1 = 2;
+    /**
+     * Level 2 (VP6 only, better deblocking filter)
+     */
     public static final int DEBLOCKING_LEVEL2 = 3;
+    /**
+     * Level 3 (VP6 only, better deblocking plus fast deringing filter)
+     */
     public static final int DEBLOCKING_LEVEL3 = 4;
+    /**
+     * Level 4 (VP6 only, better deblocking plus better deringing filter)
+     */
     public static final int DEBLOCKING_LEVEL4 = 5;
     public static final int DEBLOCKING_RESERVED1 = 6;
     public static final int DEBLOCKING_RESERVED2 = 7;
@@ -298,11 +319,21 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
     public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
         return transformation.toTransform().createTransformedShape(new Rectangle2D.Double(0, 0, width * SWF.unitDivisor, height * SWF.unitDivisor));
     }
+    
+    public synchronized void resetPlayer() {
+        mediaPlayer.stop();
+        mediaPlayer = null;
+    }
 
+    public synchronized void setPauseRendering(boolean value) {
+        this.renderingPaused = value;
+        activeFrame = null;
+    }
+    
     @Override
     public synchronized void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix prevTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode) {
-
-        if (!SimpleMediaPlayer.isAvailable()) {
+       
+        if (renderingPaused || !SimpleMediaPlayer.isAvailable()) {
             Graphics2D g = (Graphics2D) image.getBufferedImage().getGraphics();
             Matrix mat = transformation;
             AffineTransform trans = mat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)).toTransform();
@@ -338,7 +369,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
             {
                 initPlayer();
                                                 
-                float oneFr  = 1f / (getNumFrames() + 2);
+                float oneFr  = 0; //1f / (getNumFrames() + 2);
                 
                 synchronized (getFrameLock) {
                     activeFrame = null;
@@ -362,6 +393,9 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
             lastFrame = f;
             synchronized (getFrameLock) {
                 if (activeFrame != null) {
+                    if (renderingPaused) {
+                        return;
+                    }
                     //System.out.println("drawed");
                     Graphics2D graphics = (Graphics2D) image.getBufferedImage().getGraphics();
                     AffineTransform at = transformation.toTransform();
