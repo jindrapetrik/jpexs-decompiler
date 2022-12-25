@@ -220,6 +220,7 @@ import com.jpexs.decompiler.flash.exporters.DualPdfGraphics2D;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.gui.translator.Translator;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
+import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.SoundImportException;
@@ -1007,12 +1008,16 @@ public class CommandLineArgumentParser {
             parseFlashPaperToPdf(selection, zoom, args, charset);
         } else if (command.equals("replace")) {
             parseReplace(args, charset, air);
+            System.exit(0);
         } else if (command.equals("replacealpha")) {
             parseReplaceAlpha(args, charset);
+            System.exit(0);
         } else if (command.equals("replacecharacter")) {
             parseReplaceCharacter(args, charset);
+            System.exit(0);
         } else if (command.equals("replacecharacterid")) {
             parseReplaceCharacterId(args, charset);
+            System.exit(0);
         } else if (command.equals("convert")) {
             parseConvert(args, charset);
         } else if (command.equals("remove")) {
@@ -3206,6 +3211,14 @@ public class CommandLineArgumentParser {
                                 System.err.println("Import FAILED. Maybe unsuppoted media type? Only MP3 and uncompressed WAV are available.");
                                 System.exit(1);
                             }
+                        } else if (characterTag instanceof DefineVideoStreamTag) {
+                            DefineVideoStreamTag movie = (DefineVideoStreamTag)characterTag;
+                            try {
+                                movie.replace(new ByteArrayInputStream(data));                               
+                            } catch (IOException iex) {
+                                System.err.println("Import FAILED: "+iex.getMessage());
+                                System.exit(1);
+                            }
                         } else {
                             System.err.println("The specified tag type is not supported for import");
                             System.exit(1);
@@ -3273,7 +3286,7 @@ public class CommandLineArgumentParser {
                 try {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
                         swf.saveTo(fos);
-                    }
+                    }                    
                 } catch (IOException e) {
                     System.err.println("I/O error during writing");
                     System.exit(2);
