@@ -167,6 +167,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private JButton replaceImageButton;
 
     private JButton replaceImageAlphaButton;
+    
+    private JButton replaceMovieButton;
 
     private JButton prevFontsButton;
 
@@ -356,6 +358,16 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceImageAlphaButton.setMargin(new Insets(3, 3, 3, 10));
         replaceImageAlphaButton.addActionListener(mainPanel::replaceAlphaButtonActionPerformed);
         replaceImageAlphaButton.setVisible(false);
+        
+        replaceMovieButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replacemovie16"));
+        replaceMovieButton.setMargin(new Insets(3, 3, 3, 10));
+        replaceMovieButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainPanel.replaceButtonActionPerformed(mainPanel.getCurrentTree().getSelected());
+            }
+        });
+        replaceMovieButton.setVisible(false);
 
         prevFontsButton = new JButton(mainPanel.translate("button.prev"), View.getIcon("prev16"));
         prevFontsButton.setMargin(new Insets(3, 3, 3, 10));
@@ -373,6 +385,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         imageButtonsPanel.add(replaceShapeUpdateBoundsButton);
         imageButtonsPanel.add(replaceImageButton);
         imageButtonsPanel.add(replaceImageAlphaButton);
+        imageButtonsPanel.add(replaceMovieButton);
         imageButtonsPanel.add(prevFontsButton);
         imageButtonsPanel.add(nextFontsButton);
         return imageButtonsPanel;
@@ -1112,18 +1125,20 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeTransformButton.setVisible(!tag.isReadOnly() && !readOnly);
     }
 
-    public void setImageReplaceButtonVisible(boolean showImage, boolean showAlpha, boolean showShape, boolean showSound) {
+    public void setImageReplaceButtonVisible(boolean showImage, boolean showAlpha, boolean showShape, boolean showSound, boolean showMovie) {
         if (readOnly) {
             showImage = false;
             showAlpha = false;
             showShape = false;
             showSound = false;
+            showMovie = false;
         }
         replaceImageButton.setVisible(showImage);
         replaceImageAlphaButton.setVisible(showAlpha);
         replaceShapeButton.setVisible(showShape);
         replaceShapeUpdateBoundsButton.setVisible(showShape);
         replaceSoundButton.setVisible(showSound);
+        replaceMovieButton.setVisible(showMovie);
         prevFontsButton.setVisible(false);
         nextFontsButton.setVisible(false);
     }

@@ -3974,6 +3974,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (ti0 instanceof ShapeTag) {
             file = showImportFileChooser("filter.images|*.jpg;*.jpeg;*.gif;*.png;*.bmp;*.svg", true);
         }
+        if (ti0 instanceof DefineVideoStreamTag) {
+            file = showImportFileChooser("filter.movies|*.flv", false);
+        }
         if (ti0 instanceof DefineBinaryDataTag) {
             file = showImportFileChooser("", false);
         }
@@ -4085,6 +4088,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             ut.setModified(true);
             refreshTree(ut.getSwf());
             reload(true);
+        }
+        
+        if (item instanceof DefineVideoStreamTag) {
+            
         }
     }
 
@@ -4705,7 +4712,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showUnknownPanel(unknownTag);
         } else if (treeItem instanceof ImageTag) {
             ImageTag imageTag = (ImageTag) treeItem;
-            previewPanel.setImageReplaceButtonVisible(!((Tag) imageTag).isReadOnly() && imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag, false, false);
+            previewPanel.setImageReplaceButtonVisible(!((Tag) imageTag).isReadOnly() && imageTag.importSupported(), imageTag instanceof DefineBitsJPEG3Tag || imageTag instanceof DefineBitsJPEG4Tag, false, false, false);
             SWF imageSWF = makeTimelinedImage(imageTag);
             previewPanel.showImagePanel(imageSWF, imageSWF, 0, false, true, true, true, true, false, false);
 
@@ -4721,7 +4728,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             previewPanel.setParametersPanelVisible(false);
             if (treeItem instanceof ShapeTag) {
-                previewPanel.setImageReplaceButtonVisible(false, false, !((Tag) treeItem).isReadOnly(), false);
+                previewPanel.setImageReplaceButtonVisible(false, false, !((Tag) treeItem).isReadOnly(), false, false);
+            }
+            if (treeItem instanceof DefineVideoStreamTag) {
+                previewPanel.setImageReplaceButtonVisible(false, false, false, false, !((Tag) treeItem).isReadOnly());
             }
             previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), treeItem instanceof ShapeTag, !Configuration.playFrameSounds.get(), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag));
         } else if (treeItem instanceof Frame && internalViewer) {
@@ -4738,7 +4748,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showImagePanel(timelinedContainer, swf, frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false);
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
-            previewPanel.setImageReplaceButtonVisible(false, false, false, !((Tag) treeItem).isReadOnly() && (treeItem instanceof DefineSoundTag));
+            previewPanel.setImageReplaceButtonVisible(false, false, false, !((Tag) treeItem).isReadOnly() && (treeItem instanceof DefineSoundTag), false);
             try {
                 SoundTagPlayer soundThread = new SoundTagPlayer(null, (SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
                 if (!Configuration.autoPlaySounds.get()) {
@@ -4869,7 +4879,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         previewPanel.clear();
         stopFlashPlayer();
 
-        previewPanel.setImageReplaceButtonVisible(false, false, false, false);
+        previewPanel.setImageReplaceButtonVisible(false, false, false, false, false);
 
         boolean internalViewer = !isAdobeFlashPlayerEnabled();
 
