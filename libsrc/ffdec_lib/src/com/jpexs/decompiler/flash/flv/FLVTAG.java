@@ -38,6 +38,11 @@ public class FLVTAG {
         tagType = DATATYPE_SCRIPT_DATA;
         this.data = data;
     }
+    
+    public FLVTAG(long timeStamp, UnparsedDATA data) {
+        tagType = data.getDataType();
+        this.data = data;
+    }
 
     public FLVTAG(long timeStamp, VIDEODATA data) {
         this.tagType = DATATYPE_VIDEO;

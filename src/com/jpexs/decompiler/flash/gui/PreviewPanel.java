@@ -1778,4 +1778,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     public void startEditTextTag() {
         textPanel.startEdit();
     }
+    
+    public void pauseImage() {
+        imagePanel.pause();
+    }
 }
