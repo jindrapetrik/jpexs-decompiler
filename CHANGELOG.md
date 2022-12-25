@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#1917] Better error message for sound import on unsupported sampling rate
+
 ### Fixed
 - [#1914] DropShadow filter
 - [#1916] Translation tool did not load up
@@ -2790,6 +2793,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1917]: https://www.free-decompiler.com/flash/issues/1917
 [#1914]: https://www.free-decompiler.com/flash/issues/1914
 [#1916]: https://www.free-decompiler.com/flash/issues/1916
 [#1231]: https://www.free-decompiler.com/flash/issues/1231
