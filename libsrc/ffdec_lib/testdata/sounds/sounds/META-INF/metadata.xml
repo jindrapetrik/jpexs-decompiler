@@ -5,8 +5,8 @@
             xmlns:xmp="http://ns.adobe.com/xap/1.0/">
          <xmp:CreatorTool>Adobe Flash Professional CS6 - build 481</xmp:CreatorTool>
          <xmp:CreateDate>2021-03-14T08:29:20+01:00</xmp:CreateDate>
-         <xmp:MetadataDate>2022-12-25T06:21:28-08:00</xmp:MetadataDate>
-         <xmp:ModifyDate>2022-12-25T06:21:28-08:00</xmp:ModifyDate>
+         <xmp:MetadataDate>2022-12-25T06:15:04-08:00</xmp:MetadataDate>
+         <xmp:ModifyDate>2022-12-25T06:15:04-08:00</xmp:ModifyDate>
       </rdf:Description>
       <rdf:Description rdf:about=""
             xmlns:dc="http://purl.org/dc/elements/1.1/">
@@ -14,9 +14,10 @@
       </rdf:Description>
       <rdf:Description rdf:about=""
             xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/"
-            xmlns:stEvt="http://ns.adobe.com/xap/1.0/sType/ResourceEvent#">
-         <xmpMM:InstanceID>xmp.iid:23E4449F4B7EED119DEE8735AA8CEAC4</xmpMM:InstanceID>
-         <xmpMM:DocumentID>xmp.did:D6D3FE199784EB1187FEAE6972EC5115</xmpMM:DocumentID>
+            xmlns:stEvt="http://ns.adobe.com/xap/1.0/sType/ResourceEvent#"
+            xmlns:stRef="http://ns.adobe.com/xap/1.0/sType/ResourceRef#">
+         <xmpMM:InstanceID>xmp.iid:21E4449F4B7EED119DEE8735AA8CEAC4</xmpMM:InstanceID>
+         <xmpMM:DocumentID>xmp.did:21E4449F4B7EED119DEE8735AA8CEAC4</xmpMM:DocumentID>
          <xmpMM:OriginalDocumentID>xmp.did:D6D3FE199784EB1187FEAE6972EC5115</xmpMM:OriginalDocumentID>
          <xmpMM:History>
             <rdf:Seq>
@@ -142,12 +143,17 @@
                </rdf:li>
                <rdf:li rdf:parseType="Resource">
                   <stEvt:action>created</stEvt:action>
-                  <stEvt:instanceID>xmp.iid:23E4449F4B7EED119DEE8735AA8CEAC4</stEvt:instanceID>
+                  <stEvt:instanceID>xmp.iid:21E4449F4B7EED119DEE8735AA8CEAC4</stEvt:instanceID>
                   <stEvt:when>2021-03-14T08:29:20+01:00</stEvt:when>
                   <stEvt:softwareAgent>Adobe Flash Professional CS6 - build 481</stEvt:softwareAgent>
                </rdf:li>
             </rdf:Seq>
          </xmpMM:History>
+         <xmpMM:DerivedFrom rdf:parseType="Resource">
+            <stRef:instanceID>xmp.iid:82AB95DE5F63ED11A1EABFD787B806F4</stRef:instanceID>
+            <stRef:documentID>xmp.did:D6D3FE199784EB1187FEAE6972EC5115</stRef:documentID>
+            <stRef:originalDocumentID>xmp.did:D6D3FE199784EB1187FEAE6972EC5115</stRef:originalDocumentID>
+         </xmpMM:DerivedFrom>
       </rdf:Description>
    </rdf:RDF>
 </x:xmpmeta>
