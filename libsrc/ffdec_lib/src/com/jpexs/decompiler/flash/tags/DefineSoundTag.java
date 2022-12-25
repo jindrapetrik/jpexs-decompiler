@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.tags.base.UnsupportedSamplingRateException;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
@@ -213,7 +214,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
     }
 
     @Override
-    public boolean setSound(InputStream is, int newSoundFormat) {
+    public boolean setSound(InputStream is, int newSoundFormat) throws UnsupportedSamplingRateException {
         int newSoundRate = -1;
         boolean newSoundSize = false;
         boolean newSoundType = false;
@@ -242,7 +243,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
                             newSoundRate = 3;
                             break;
                         default:
-                            return false;
+                            throw new UnsupportedSamplingRateException(newSoundRate, new int[]{5512,11025,22050,44100});
                     }
                 } catch (UnsupportedAudioFileException | IOException ex) {
                     return false;
@@ -284,7 +285,7 @@ public class DefineSoundTag extends CharacterTag implements SoundTag {
                                 newSoundRate = 3;
                                 break;
                             default:
-                                return false;
+                                throw new UnsupportedSamplingRateException(newSoundRate, new int[]{11025,22050,44100});
                         }
 
                         newSoundSize = true;

@@ -33,7 +33,7 @@ public interface SoundTag extends TreeItem {
 
     public boolean importSupported();
 
-    public boolean setSound(InputStream is, int newSoundFormat);
+    public boolean setSound(InputStream is, int newSoundFormat) throws SoundImportException;
 
     public int getSoundRate();
 

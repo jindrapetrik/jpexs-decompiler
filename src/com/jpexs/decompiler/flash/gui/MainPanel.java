@@ -171,6 +171,7 @@ import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.base.UnsupportedSamplingRateException;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
@@ -4002,6 +4003,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 ds.getSwf().clearSoundCache();
             } catch (IOException ex) {
                 //ignore
+            } catch (UnsupportedSamplingRateException ex) {
+                String samplingRateKhz = "" + (ex.getSoundRate() / 1000.0) + " kHz";
+                List<String> supportedRatesKhz = new ArrayList<>();
+                for (int rate:ex.getSupportedRates()) {
+                    supportedRatesKhz.add("" + (rate / 1000.0) + " kHz");
+                }
+                ViewMessages.showMessageDialog(this, translate("error.sound.rate").replace("%saplingRate%", samplingRateKhz).replace("%supportedRates%", String.join(", ", supportedRatesKhz)), translate("error"), JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
             if (!ok) {

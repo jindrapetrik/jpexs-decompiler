@@ -222,6 +222,8 @@ import com.jpexs.decompiler.flash.gui.translator.Translator;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
+import com.jpexs.decompiler.flash.tags.base.SoundImportException;
+import com.jpexs.decompiler.flash.tags.base.UnsupportedSamplingRateException;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.helpers.SerializableImage;
 import gnu.jpdf.PDFGraphics;
@@ -3185,7 +3187,21 @@ public class CommandLineArgumentParser {
                             if (repFile.toLowerCase(Locale.ENGLISH).endsWith(".mp3")) {
                                 soundFormat = SoundFormat.FORMAT_MP3;
                             }
-                            boolean ok = st.setSound(new ByteArrayInputStream(data), soundFormat);
+                            
+                            boolean ok = false;
+                            
+                            try {
+                                ok = st.setSound(new ByteArrayInputStream(data), soundFormat);
+                            } catch (UnsupportedSamplingRateException usre) {
+                                List<String> supportedRatesStr = new ArrayList<>();
+                                for (int i : usre.getSupportedRates()) {
+                                    supportedRatesStr.add("" + i);
+                                }
+                                System.err.println("Import FAILED. Input file has unsupported sampling rate ("+usre.getSoundRate()+"). Supported rates for this sound format: "+String.join(", ", supportedRatesStr)+".");
+                                System.exit(2);
+                            } catch (SoundImportException sie) {
+                                ok = false;
+                            }
                             if (!ok) {
                                 System.err.println("Import FAILED. Maybe unsuppoted media type? Only MP3 and uncompressed WAV are available.");
                                 System.exit(1);
