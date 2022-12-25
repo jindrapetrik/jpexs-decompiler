@@ -976,6 +976,7 @@ public class CommandLineArgumentParser {
             parseProxy(args);
         } else if (command.equals("export")) {
             parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset);
+            System.exit(0);
         } else if (command.equals("compress")) {
             parseCompress(args);
         } else if (command.equals("decompress")) {
@@ -1026,10 +1027,13 @@ public class CommandLineArgumentParser {
             parseImportShapes(args, charset);
         } else if (command.equals("importimages")) {
             parseImportImages(args, charset);
+            System.exit(0);
         } else if (command.equals("importtext")) {
             parseImportText(args, charset);
+            System.exit(0);
         } else if (command.equals("importscript")) {
             parseImportScript(args, charset, air);
+            System.exit(0);
         } else if (command.equals("as3compiler")) {
             ActionScript3Parser.compile(null /*?*/, args.pop(), args.pop(), 0, 0);
         } else if (nextParam.equals("--debugtool")) {

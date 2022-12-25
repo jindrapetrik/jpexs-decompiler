@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- [#1914] DropShadow filter
+- [#1916] Translation tool did not load up
 
 ## [18.1.0] - 2022-12-23
 ### Added
@@ -42,7 +45,6 @@ All notable changes to this project will be documented in this file.
 - [#1858] PDF export - Applying same color multiple times
 - [#1907] Crashing on memory search
 - [#1906] Memory search - byte align opens wrong SWFs
-- [#1914] DropShadow filter
 
 ### Changed
 - Warning before switching deobfuscation is now optional
@@ -2788,6 +2790,8 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1914]: https://www.free-decompiler.com/flash/issues/1914
+[#1916]: https://www.free-decompiler.com/flash/issues/1916
 [#1231]: https://www.free-decompiler.com/flash/issues/1231
 [#1690]: https://www.free-decompiler.com/flash/issues/1690
 [#1460]: https://www.free-decompiler.com/flash/issues/1460
@@ -2802,7 +2806,6 @@ All notable changes to this project will be documented in this file.
 [#1908]: https://www.free-decompiler.com/flash/issues/1908
 [#1907]: https://www.free-decompiler.com/flash/issues/1907
 [#1906]: https://www.free-decompiler.com/flash/issues/1906
-[#1914]: https://www.free-decompiler.com/flash/issues/1914
 [#1898]: https://www.free-decompiler.com/flash/issues/1898
 [#1511]: https://www.free-decompiler.com/flash/issues/1511
 [#1765]: https://www.free-decompiler.com/flash/issues/1765

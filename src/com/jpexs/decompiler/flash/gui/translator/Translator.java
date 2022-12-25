@@ -201,7 +201,7 @@ public class Translator extends JFrame implements ItemListener {
                                 if (s.type == SymbolType.COMMENT) {
                                     if (((String) s.value).trim().equals(DO_NOT_EDIT)) {
                                         hidden = true;
-                                    } 
+                                    }
                                     if (comment.isEmpty()) {
                                         comment = (String) s.value;
                                     } else {
@@ -309,10 +309,10 @@ public class Translator extends JFrame implements ItemListener {
     public Translator() throws IOException, FileNotFoundException, URISyntaxException {
 
         loadItems();
-
+        
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         Container cnt = getContentPane();
-
+        
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -740,16 +740,8 @@ public class Translator extends JFrame implements ItemListener {
         updateRowHeights(table);
         View.centerScreen(this);
 
-        /*List<Image> images = new ArrayList<>();
-        images.add(View.loadImage("icon16"));
-        images.add(View.loadImage("icon32"));
-        images.add(View.loadImage("icon48"));
-        images.add(View.loadImage("icon256"));
-        setIconImages(images);*/
         load();
-        loadWindow();
-
-        //saveAll();
+        loadWindow();                       
     }
 
     private void updateCounts() {
@@ -916,87 +908,91 @@ public class Translator extends JFrame implements ItemListener {
 
     private void load() throws IOException {
         newValues.clear();
-        ZipInputStream zis = new ZipInputStream(new FileInputStream(getStorageFile()));
-        ZipEntry zipEntry = zis.getNextEntry();
-        Pattern pat = Pattern.compile("(?<resource>(.*/)?[^/_]+)(_(?<locale>[^/\\.]+))?\\.properties");
 
-        while (zipEntry != null) {
-            if (!zipEntry.isDirectory()) {
-                String name = zipEntry.getName();
-                Matcher m = pat.matcher(name);
-                if (m.matches()) {
-                    String resource = m.group("resource");
-                    resource = resource.replace(".jar/", ".jar: ");
-                    String locale = m.group("locale");
-                    if (locale == null) {
-                        locale = "en";
-                    }
-                    locales.add(locale);
-                    if (!newValues.containsKey(resource)) {
-                        newValues.put(resource, new LinkedHashMap<>());
-                    }
-                    if (!newValues.get(resource).containsKey(locale)) {
-                        newValues.get(resource).put(locale, new LinkedHashMap<>());
-                    }
-                    resourceLocales.get(resource).add(locale);
-                    locales.add(locale);
-                    String propertiesData = readStreamAsString(zis);
-                    PropertiesLexer lexer = new PropertiesLexer(propertiesData);
-                    try {
-                        ParsedSymbol s = lexer.lex();
-                        boolean hidden = false;
-                        while (s.type != SymbolType.EOF) {
-                            if (s.type == SymbolType.COMMENT) {
-                                if (((String) s.value).trim().equals(DO_NOT_EDIT)) {
-                                    hidden = true;
-                                }
-                                s = lexer.lex();
-                                continue;
-                            }
-                            if (s.type == SymbolType.EMPTY_LINE) {
-                                s = lexer.lex();
-                                continue;
-                            }
-                            //System.out.println(s);
-                            if (s.type == SymbolType.EOF) {
-                                break;
-                            }
-                            if (s.type != SymbolType.KEY) {
-                                throw new RuntimeException("KEY EXPECTED");
-                                //break;
-                            }
-                            String key = (String) s.value;
-                            s = lexer.lex();
+        File storageFile = new File(getStorageFile());
+        if (storageFile.exists()) {
+            ZipInputStream zis = new ZipInputStream(new FileInputStream(storageFile));
+            ZipEntry zipEntry = zis.getNextEntry();
+            Pattern pat = Pattern.compile("(?<resource>(.*/)?[^/_]+)(_(?<locale>[^/\\.]+))?\\.properties");
 
-                            if (s.type != SymbolType.VALUE) {
-                                throw new RuntimeException("VALUE EXPECTED");
-                                //break;
-                            }
-                            String value = (String) s.value;
-                            if (!hidden) {
-                                if (resourceValues.containsKey(resource)
-                                        && resourceValues.get(resource).containsKey(locale)
-                                        && resourceValues.get(resource).get(locale).containsKey(key)
-                                        && Objects.equals(resourceValues.get(resource).get(locale).get(key), value)) {
-                                    //same, ignore
-                                } else {
-                                    newValues.get(resource).get(locale).put(key, value);
-                                }
-                            }
-                            //System.out.println(resource+": locale="+locale+" key="+key+" value="+value);
-                            s = lexer.lex();
+            while (zipEntry != null) {
+                if (!zipEntry.isDirectory()) {
+                    String name = zipEntry.getName();
+                    Matcher m = pat.matcher(name);
+                    if (m.matches()) {
+                        String resource = m.group("resource");
+                        resource = resource.replace(".jar/", ".jar: ");
+                        String locale = m.group("locale");
+                        if (locale == null) {
+                            locale = "en";
                         }
-                        //System.exit(0);
-                    } catch (PropertiesParseException ex) {
-                        Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                        locales.add(locale);
+                        if (!newValues.containsKey(resource)) {
+                            newValues.put(resource, new LinkedHashMap<>());
+                        }
+                        if (!newValues.get(resource).containsKey(locale)) {
+                            newValues.get(resource).put(locale, new LinkedHashMap<>());
+                        }
+                        resourceLocales.get(resource).add(locale);
+                        locales.add(locale);
+                        String propertiesData = readStreamAsString(zis);
+                        PropertiesLexer lexer = new PropertiesLexer(propertiesData);
+                        try {
+                            ParsedSymbol s = lexer.lex();
+                            boolean hidden = false;
+                            while (s.type != SymbolType.EOF) {
+                                if (s.type == SymbolType.COMMENT) {
+                                    if (((String) s.value).trim().equals(DO_NOT_EDIT)) {
+                                        hidden = true;
+                                    }
+                                    s = lexer.lex();
+                                    continue;
+                                }
+                                if (s.type == SymbolType.EMPTY_LINE) {
+                                    s = lexer.lex();
+                                    continue;
+                                }
+                                //System.out.println(s);
+                                if (s.type == SymbolType.EOF) {
+                                    break;
+                                }
+                                if (s.type != SymbolType.KEY) {
+                                    throw new RuntimeException("KEY EXPECTED");
+                                    //break;
+                                }
+                                String key = (String) s.value;
+                                s = lexer.lex();
 
+                                if (s.type != SymbolType.VALUE) {
+                                    throw new RuntimeException("VALUE EXPECTED");
+                                    //break;
+                                }
+                                String value = (String) s.value;
+                                if (!hidden) {
+                                    if (resourceValues.containsKey(resource)
+                                            && resourceValues.get(resource).containsKey(locale)
+                                            && resourceValues.get(resource).get(locale).containsKey(key)
+                                            && Objects.equals(resourceValues.get(resource).get(locale).get(key), value)) {
+                                        //same, ignore
+                                    } else {
+                                        newValues.get(resource).get(locale).put(key, value);
+                                    }
+                                }
+                                //System.out.println(resource+": locale="+locale+" key="+key+" value="+value);
+                                s = lexer.lex();
+                            }
+                            //System.exit(0);
+                        } catch (PropertiesParseException ex) {
+                            Logger.getLogger(Translator.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+
+                    }
                 }
+                zipEntry = zis.getNextEntry();
             }
-            zipEntry = zis.getNextEntry();
+            zis.closeEntry();
+            zis.close();
         }
-        zis.closeEntry();
-        zis.close();
 
         List<LocaleItem> localeItems = new ArrayList<LocaleItem>();
         for (String locale : locales) {
