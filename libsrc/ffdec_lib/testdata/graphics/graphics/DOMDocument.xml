@@ -1,21 +1,18 @@
 <DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" viewAngle3D="50.6510299754819" nextSceneIdentifier="83" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveEnabled="true" autoSaveHasPrompted="true">
      <fonts>
-          <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
           <DOMFontItem name="Font 2" itemID="604e7a9e-00000444" font="TimesNewRomanPS-BoldMT" size="30" id="2" sourceLastImported="1615755934" embedRanges="1|2"/>
+          <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
      </fonts>
      <media>
           <DOMBitmapItem name="bitmapfill.png" itemID="604dcb84-00000229" sourceLastImported="1615711005" externalFileSize="1931" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill.png" bitmapDataHRef="M 2 1615711026.dat" frameRight="640" frameBottom="1280"/>
           <DOMBitmapItem name="bitmapfill_smooth.png" itemID="60608683-0000020b" sourceExternalFilepath="./LIBRARY/bitmapfill_smooth.png" sourceLastImported="1616938546" externalFileSize="1931" allowSmoothing="true" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill_smooth.png" bitmapDataHRef="M 5 1616938529.dat" frameRight="640" frameBottom="1280"/>
           <DOMVideoItem name="Cute Cat - 3092.flv" itemID="60671758-000001ff" sourceExternalFilepath="C:/Dropbox/Programovani/JavaSE/FFDec/libsrc/ffdec_lib/testdata/graphics/Cute Cat - 3092.flv" sourceLastImported="1617368859" videoDataHRef="M 6 1617368920.dat" videoType="h263 media" fps="24" channels="0" width="640" height="360" length="29.25"/>
           <DOMBitmapItem name="pony.jpg" itemID="604de7c7-000002d8" sourceLastImported="1615718230" externalFileSize="222138" quality="50" href="pony.jpg" bitmapDataHRef="M 4 1615718240.dat" frameRight="16000" frameBottom="10680" isJPEG="true"/>
-          <DOMSoundItem name="POOL-Pool_Shot-709343898.wav" itemID="605a2676-00000203" sourceExternalFilepath="./LIBRARY/POOL-Pool_Shot-709343898.wav" sourceLastImported="1515341955" externalFileSize="207370" href="POOL-Pool_Shot-709343898.wav" soundDataHRef="M 5 1616520759.dat" format="44kHz 16bit Stereo" sampleCount="51311"/>
-          <DOMSoundItem name="Yung Raf - Nothing To Lose.mp3" itemID="605a5e7d-00000258" sourceExternalFilepath="./LIBRARY/Yung Raf - Nothing To Lose.mp3" sourceLastImported="1616534842" externalFileSize="2233572" href="Yung Raf - Nothing To Lose.mp3" soundDataHRef="M 6 1616534947.dat" format="44kHz 16bit Stereo" sampleCount="6156288" exportFormat="1" exportBits="7" dataLength="2233572" exportNative="true" cacheFormat="5kHz 8bit Stereo" cachedSampleCount="769536"/>
      </media>
      <symbols>
           <Include href="BlueSquare.xml" itemIcon="1" loadImmediate="false" itemID="604e0a22-000002e1" lastModified="1615730090"/>
           <Include href="btnNext.xml" itemIcon="0" loadImmediate="false" itemID="604e2284-000003f0" lastModified="1615733380"/>
           <Include href="btnPrev.xml" itemIcon="0" loadImmediate="false" itemID="604e2299-000003f6" lastModified="1615733401"/>
-          <Include href="btnShowPrevNext.xml" itemIcon="0" loadImmediate="false" itemID="604dfbcd-0000026f" lastModified="1615733183"/>
           <Include href="Button 1.xml" itemIcon="0" loadImmediate="false" itemID="604dd518-0000025c" lastModified="1615714121"/>
           <Include href="Circle.xml" itemIcon="1" loadImmediate="false" itemID="604e0e10-00000336" lastModified="1615729107"/>
           <Include href="GreenRect.xml" loadImmediate="false" itemID="604e1797-0000037a" lastModified="1615730583"/>
@@ -39,19 +36,13 @@
           <Include href="VideoSprite.xml" loadImmediate="false" itemID="60672f60-00000201" lastModified="1617375202"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1" currentFrame="49">
+          <DOMTimeline name="Scene 1">
                <layers>
                     <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
-                              <DOMFrame index="0" duration="60" keyMode="9728">
+                              <DOMFrame index="0" keyMode="9728">
                                    <Actionscript>
                                         <script><![CDATA[stop();]]></script>
-                                   </Actionscript>
-                                   <elements/>
-                              </DOMFrame>
-                              <DOMFrame index="60" keyMode="9728">
-                                   <Actionscript>
-                                        <script><![CDATA[stopAllSounds();]]></script>
                                    </Actionscript>
                                    <elements/>
                               </DOMFrame>
@@ -59,7 +50,7 @@
                     </DOMLayer>
                     <DOMLayer name="Prev next buttons" color="#4FFF4F" locked="true" autoNamed="false">
                          <frames>
-                              <DOMFrame index="0" duration="66" keyMode="9728">
+                              <DOMFrame index="0" duration="61" keyMode="9728">
                                    <elements>
                                         <DOMSymbolInstance libraryItemName="btnNext" symbolType="button">
                                              <matrix>
@@ -787,10 +778,10 @@
 !3980 1990|2980 1990!2980 1990|2980 990!2980 990|3980 990!3980 990|3980 1990"/>
                                                   <Edge strokeStyle="5" edges="
 !1960 990|1960 1990!1960 1990|960 1990!960 1990|960 990!960 990|1960 990"/>
-                                                  <Edge strokeStyle="7" edges="
-!1980 4990|980 4990!980 4990|980 3990!980 3990|1980 3990!1980 3990|1980 4990"/>
                                                   <Edge strokeStyle="6" edges="
 !2980 3990|3980 3990!3980 3990|3980 4990!3980 4990|2980 4990!2980 4990|2980 3990"/>
+                                                  <Edge strokeStyle="7" edges="
+!1980 4990|980 4990!980 4990|980 3990!980 3990|1980 3990!1980 3990|1980 4990"/>
                                                   <Edge strokeStyle="8" edges="
 !5980 3990|5980 4990!5980 4990|4980 4990!4980 4990|4980 3990!4980 3990|5980 3990"/>
                                                   <Edge cubics="!1960 990(;1960,990 1960,1990 1960,1990q1960 990 1960 1990);"/>
@@ -1389,18 +1380,18 @@
                                                   </StrokeStyle>
                                              </strokes>
                                              <edges>
-                                                  <Edge strokeStyle="2" edges="
-!3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
                                                   <Edge strokeStyle="5" edges="
 !5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
+                                                  <Edge strokeStyle="2" edges="
+!3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
                                                   <Edge strokeStyle="1" edges="
 !2000 1000|2000 2000!2000 2000|1000 2000!1000 2000|1000 1000"/>
-                                                  <Edge strokeStyle="6" edges="
-!4647 3660/4942 4670!4942 4670/5019 3660"/>
-                                                  <Edge strokeStyle="3" edges="
-!2553 3660/2848 4670!2848 4670/2925 3660"/>
                                                   <Edge strokeStyle="4" edges="
 !1000 3660/1295 4670!1295 4670/1372 3660"/>
+                                                  <Edge strokeStyle="3" edges="
+!2553 3660/2848 4670!2848 4670/2925 3660"/>
+                                                  <Edge strokeStyle="6" edges="
+!4647 3660/4942 4670!4942 4670/5019 3660"/>
                                                   <Edge cubics="!5000 2000(;5000,2000 4000,2000 4000,2000q5000 2000 4000 2000);"/>
                                                   <Edge cubics="!4000 2000(4000,2000;4000,2000 4000,1000 4000,1000q4000 2000 4000 1000);"/>
                                                   <Edge cubics="!5000 1000(;5000,1000 5000,2000 5000,2000q5000 1000 5000 2000);"/>
@@ -2149,38 +2140,7 @@
                                         </DOMSymbolInstance>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="55" keyMode="9728" soundName="POOL-Pool_Shot-709343898.wav">
-                                   <SoundEnvelope>
-                                        <SoundEnvelopePoint level0="32768" level1="32768"/>
-                                   </SoundEnvelope>
-                                   <elements/>
-                              </DOMFrame>
-                              <DOMFrame index="56" keyMode="9728" soundName="POOL-Pool_Shot-709343898.wav" soundLoop="2">
-                                   <SoundEnvelope>
-                                        <SoundEnvelopePoint level0="32768" level1="32768"/>
-                                   </SoundEnvelope>
-                                   <elements/>
-                              </DOMFrame>
-                              <DOMFrame index="57" keyMode="9728" soundName="Yung Raf - Nothing To Lose.mp3" inPoint44="268780" outPoint44="358136" soundZoomLevel="5">
-                                   <SoundEnvelope>
-                                        <SoundEnvelopePoint level0="32768" level1="32768"/>
-                                   </SoundEnvelope>
-                                   <elements/>
-                              </DOMFrame>
-                              <DOMFrame index="58" keyMode="9728" soundEffect="custom" soundName="Yung Raf - Nothing To Lose.mp3" inPoint44="274640" outPoint44="494975" soundZoomLevel="5">
-                                   <SoundEnvelope>
-                                        <SoundEnvelopePoint/>
-                                        <SoundEnvelopePoint mark44="221341" level0="32768" level1="32768"/>
-                                   </SoundEnvelope>
-                                   <elements/>
-                              </DOMFrame>
-                              <DOMFrame index="59" keyMode="9728" soundName="Yung Raf - Nothing To Lose.mp3">
-                                   <SoundEnvelope>
-                                        <SoundEnvelopePoint level0="32768" level1="32768"/>
-                                   </SoundEnvelope>
-                                   <elements/>
-                              </DOMFrame>
-                              <DOMFrame index="60" keyMode="9728">
+                              <DOMFrame index="55" keyMode="9728">
                                    <elements>
                                         <DOMBitmapInstance libraryItemName="bitmapfill.png">
                                              <matrix>
@@ -2194,7 +2154,7 @@
                                         </DOMBitmapInstance>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="61" keyMode="9728">
+                              <DOMFrame index="56" keyMode="9728">
                                    <elements>
                                         <DOMSymbolInstance libraryItemName="VideoSprite" centerPoint3DX="250" centerPoint3DY="175">
                                              <matrix>
@@ -2206,7 +2166,7 @@
                                         </DOMSymbolInstance>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="62" keyMode="9728">
+                              <DOMFrame index="57" keyMode="9728">
                                    <elements>
                                         <DOMShape>
                                              <fills>
@@ -2242,7 +2202,7 @@
                                         </DOMDynamicText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="63" keyMode="9728">
+                              <DOMFrame index="58" keyMode="9728">
                                    <elements>
                                         <DOMSymbolInstance libraryItemName="Stroke 1" symbolType="graphic" loop="loop">
                                              <matrix>
@@ -2286,7 +2246,7 @@
                                         </DOMSymbolInstance>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="64" keyMode="9728">
+                              <DOMFrame index="59" keyMode="9728">
                                    <elements>
                                         <DOMSymbolInstance libraryItemName="Stroke 4" symbolType="graphic" loop="loop">
                                              <matrix>
@@ -2364,7 +2324,7 @@
                                         </DOMSymbolInstance>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="65" keyMode="9728">
+                              <DOMFrame index="60" keyMode="9728">
                                    <elements>
                                         <DOMShape>
                                              <fills>
@@ -3668,7 +3628,7 @@
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>056 Sound</characters>
+                                                       <characters>061 Bitmap smoothing</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
@@ -3685,7 +3645,7 @@
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>057 Sound loop 2</characters>
+                                                       <characters>062 Video</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
@@ -3702,7 +3662,7 @@
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>058 Sound in/outpoint</characters>
+                                                       <characters>063 Multiline text</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
@@ -3719,7 +3679,7 @@
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>059 Sound envelope</characters>
+                                                       <characters>064 Rotated stroke normal scaling</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
@@ -3736,91 +3696,6 @@
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>060 Full song</characters>
-                                                       <textAttrs>
-                                                            <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
-                                                       </textAttrs>
-                                                  </DOMTextRun>
-                                             </textRuns>
-                                        </DOMStaticText>
-                                   </elements>
-                              </DOMFrame>
-                              <DOMFrame index="60" keyMode="9728">
-                                   <elements>
-                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
-                                             <matrix>
-                                                  <Matrix tx="22" ty="342"/>
-                                             </matrix>
-                                             <textRuns>
-                                                  <DOMTextRun>
-                                                       <characters>061 Bitmap smoothing</characters>
-                                                       <textAttrs>
-                                                            <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
-                                                       </textAttrs>
-                                                  </DOMTextRun>
-                                             </textRuns>
-                                        </DOMStaticText>
-                                   </elements>
-                              </DOMFrame>
-                              <DOMFrame index="61" keyMode="9728">
-                                   <elements>
-                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
-                                             <matrix>
-                                                  <Matrix tx="22" ty="342"/>
-                                             </matrix>
-                                             <textRuns>
-                                                  <DOMTextRun>
-                                                       <characters>062 Video</characters>
-                                                       <textAttrs>
-                                                            <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
-                                                       </textAttrs>
-                                                  </DOMTextRun>
-                                             </textRuns>
-                                        </DOMStaticText>
-                                   </elements>
-                              </DOMFrame>
-                              <DOMFrame index="62" keyMode="9728">
-                                   <elements>
-                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
-                                             <matrix>
-                                                  <Matrix tx="22" ty="342"/>
-                                             </matrix>
-                                             <textRuns>
-                                                  <DOMTextRun>
-                                                       <characters>063 Multiline text</characters>
-                                                       <textAttrs>
-                                                            <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
-                                                       </textAttrs>
-                                                  </DOMTextRun>
-                                             </textRuns>
-                                        </DOMStaticText>
-                                   </elements>
-                              </DOMFrame>
-                              <DOMFrame index="63" keyMode="9728">
-                                   <elements>
-                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
-                                             <matrix>
-                                                  <Matrix tx="22" ty="342"/>
-                                             </matrix>
-                                             <textRuns>
-                                                  <DOMTextRun>
-                                                       <characters>064 Rotated stroke normal scaling</characters>
-                                                       <textAttrs>
-                                                            <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
-                                                       </textAttrs>
-                                                  </DOMTextRun>
-                                             </textRuns>
-                                        </DOMStaticText>
-                                   </elements>
-                              </DOMFrame>
-                              <DOMFrame index="64" keyMode="9728">
-                                   <elements>
-                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
-                                             <matrix>
-                                                  <Matrix tx="22" ty="342"/>
-                                             </matrix>
-                                             <textRuns>
-                                                  <DOMTextRun>
                                                        <characters>065 Rotated vertical/horiz. scaling</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
@@ -3830,7 +3705,7 @@
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="65" keyMode="9728">
+                              <DOMFrame index="60" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
@@ -3854,6 +3729,7 @@
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="1431142" publishTime="1671978132" publishDebug="true"/>
           <PublishItem publishSize="3657857" publishTime="1668349897"/>
           <PublishItem publishSize="3657883" publishTime="1666634735"/>
           <PublishItem publishSize="3657878" publishTime="1666634687"/>
@@ -3873,6 +3749,5 @@
           <PublishItem publishSize="1586" publishTime="1637176556"/>
           <PublishItem publishSize="1586" publishTime="1637176556"/>
           <PublishItem publishSize="3655062" publishTime="1617375217"/>
-          <PublishItem publishSize="2351995" publishTime="1617369003"/>
      </publishHistory>
 </DOMDocument>
