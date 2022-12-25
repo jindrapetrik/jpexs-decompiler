@@ -47,6 +47,7 @@ import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.DoABC2Tag;
 import com.jpexs.decompiler.flash.tags.DoActionTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
@@ -969,6 +970,10 @@ public class TagTreeContextMenu extends JPopupMenu {
         }
 
         if (canReplace.test(it -> it instanceof UnknownTag)) {
+            replaceMenuItem.setVisible(true);
+        }
+        
+        if (canReplace.test(it -> it instanceof DefineVideoStreamTag)) {
             replaceMenuItem.setVisible(true);
         }
 
