@@ -26,30 +26,101 @@ import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author JPEXS
  */
 public class MovieImporter {
-    public void importMovie(DefineVideoStreamTag movie, InputStream fis) throws IOException {
+    
+    public int bulkImport(File moviesDir, SWF swf, boolean printOut) {        
+        Map<Integer, CharacterTag> characters = swf.getCharacters();
+        int movieCount = 0;
+        List<String> extensions = Arrays.asList("flv");
+        File allFiles[] = moviesDir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                String nameLower = name.toLowerCase();
+                for (String ext : extensions) {
+                    if (nameLower.endsWith("." + ext)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+        for (int characterId : characters.keySet()) {
+            CharacterTag tag = characters.get(characterId);
+            if (tag instanceof DefineVideoStreamTag) {
+                DefineVideoStreamTag movieTag = (DefineVideoStreamTag) tag;
+                List<File> existingFilesForMovieTag = new ArrayList<>();
+                for (File f : allFiles) {
+                    if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
+                        existingFilesForMovieTag.add(f);
+                    }
+                }
+                existingFilesForMovieTag.sort(new Comparator<File>() {
+                    @Override
+                    public int compare(File o1, File o2) {
+                        String ext1 = o1.getName().substring(o1.getName().lastIndexOf(".") + 1);
+                        String ext2 = o2.getName().substring(o2.getName().lastIndexOf(".") + 1);
+                        int ret = extensions.indexOf(ext1) - extensions.indexOf(ext2);
+                        if (ret == 0) {
+                            return o1.getName().compareTo(o2.getName());
+                        }
+                        return ret;
+                    }
+                });
+
+                if (existingFilesForMovieTag.isEmpty()) {
+                    continue;
+                }
+
+                if (existingFilesForMovieTag.size() > 1) {
+                    Logger.getLogger(MovieImporter.class.getName()).log(Level.WARNING, "Multiple matching files for movie tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForMovieTag.get(0).getName()});
+                }
+                File sourceFile = existingFilesForMovieTag.get(0);
+
+                try {
+                    if (printOut) {
+                        System.out.println("Importing character " + characterId + " from file " + sourceFile.getName());
+                    }
+                    importMovie(movieTag, Helper.readFile(sourceFile.getAbsolutePath()));
+                    movieCount++;
+                } catch (IOException ex) {
+                    Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Cannot import movie " + characterId + " from file " + sourceFile.getName(), ex);
+                }
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
+            }
+        }
+        return movieCount;
+    }
+    
+    public void importMovie(DefineVideoStreamTag movie, byte[] data) throws IOException {
         List<FLVTAG> videoTags = new ArrayList<>();
 
-        FLVInputStream flvIs = new FLVInputStream(fis);
+        FLVInputStream flvIs = new FLVInputStream(new ByteArrayInputStream(data));
         Reference<Boolean> audioPresent = new Reference<>(false);
         Reference<Boolean> videoPresent = new Reference<>(false);
         flvIs.readHeader(audioPresent, videoPresent);

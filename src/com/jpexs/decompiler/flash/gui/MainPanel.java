@@ -3067,7 +3067,60 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void importMovie(final SWF swf) {
-        
+        ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importMovies2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportShapeInfo);
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new File(Configuration.lastExportDir.get()));
+        chooser.setDialogTitle(translate("import.select.directory"));
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            String selFile = Helper.fixDialogFile(chooser.getSelectedFile()).getAbsolutePath();
+            File moviesDir = new File(Path.combine(selFile, MovieExportSettings.EXPORT_FOLDER_NAME));
+            if (!moviesDir.exists()) {
+                moviesDir = new File(selFile);
+            }
+            final File fMoviesDir = moviesDir;
+            MovieImporter movieImporter = new MovieImporter();
+            
+            final long timeBefore = System.currentTimeMillis();
+            new CancellableWorker<Void>() {
+
+                private int count = 0;
+
+                @Override
+                public Void doInBackground() throws Exception {
+                    try {
+                        count = movieImporter.bulkImport(fMoviesDir, swf, false);
+                    } catch (Exception ex) {
+                        logger.log(Level.SEVERE, "Error during import", ex);
+                        ViewMessages.showMessageDialog(null, translate("error.import") + ": " + ex.getClass().getName() + " " + ex.getLocalizedMessage());
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void onStart() {
+                    Main.startWork(translate("work.importing") + "...", this);
+                }
+
+                @Override
+                protected void done() {
+                    Main.stopWork();
+                    long timeAfter = System.currentTimeMillis();
+                    final long timeMs = timeAfter - timeBefore;
+
+                    View.execInEventDispatch(() -> {
+                        refreshTree(swf);
+                        setStatus(translate("import.finishedin").replace("%time%", Helper.formatTimeSec(timeMs)));
+
+                        ViewMessages.showMessageDialog(MainPanel.this, translate("import.movie.result").replace("%count%", Integer.toString(count)));
+                        if (count != 0) {
+                            reload(true);
+                        }
+                    });
+                }
+            }.execute();
+        }
     }
     public void importShape(final SWF swf, boolean noFill) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importShapes2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportShapeInfo);
@@ -4105,8 +4158,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.clear();
             DefineVideoStreamTag movie = (DefineVideoStreamTag) item;
             File selfile = Helper.fixDialogFile(selectedFile);
-            try (FileInputStream fis = new FileInputStream(selfile)) {                
-                new MovieImporter().importMovie(movie, fis);          
+            try {             
+                new MovieImporter().importMovie(movie, Helper.readFile(selfile.getAbsolutePath()));          
                 refreshTree();                                    
             } catch (IOException ex) {
                 ViewMessages.showMessageDialog(MainPanel.this, translate("error.movie.invalid") + ": "+ex.getMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
