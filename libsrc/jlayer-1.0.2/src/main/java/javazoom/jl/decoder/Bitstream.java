@@ -146,7 +146,24 @@ public final class Bitstream implements BitstreamErrors {
 
         closeFrame();
     }
+    
+    //JPEXS
+    public Bitstream(MarkingBufferedInputStream in) {
+        if (in == null)
+            throw new NullPointerException("in");
+        loadID3v2(in);
+        in.setFixed(true);
+        firstframe = true;
+        source = new MarkingPushbackInputStream(in, BUFFER_INT_SIZE * 4);
+        
+        closeFrame();
+    }
 
+    //JPEXS
+    public MarkingPushbackInputStream getSource() {
+        return (MarkingPushbackInputStream) source;
+    }
+        
     /**
      * Return position of the first audio header.
      *

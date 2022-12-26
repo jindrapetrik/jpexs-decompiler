@@ -20,9 +20,12 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javazoom.jl.decoder.Bitstream;
 import javazoom.jl.decoder.Decoder;
+import javazoom.jl.decoder.MarkingBufferedInputStream;
+import javazoom.jl.decoder.MarkingPushbackInputStream;
 
 /**
  *
@@ -41,10 +44,23 @@ public class MP3SOUNDDATA {
         frames = new ArrayList<>();
         MP3FRAME f;
         Decoder decoder = new Decoder();
-        Bitstream bitstream = new Bitstream(new ByteArrayInputStream(sis.readBytesEx(sis.available(), "soundStream")));
-        while ((f = MP3FRAME.readFrame(bitstream, decoder)) != null) {
-            frames.add(f);
-        }
+        
+        byte data[] = sis.readBytesEx(sis.available(), "soundStream");
+        MarkingBufferedInputStream mis = new MarkingBufferedInputStream(new ByteArrayInputStream(data));
+        Bitstream bitstream = new Bitstream(mis); //new ByteArrayInputStream(data)
+        long initLen = mis.getPosition();
+        MarkingPushbackInputStream mpis = bitstream.getSource();
+        while (true) {
+            //System.err.println("initLen = "+initLen);
+            long posBefore = initLen+mpis.getPosition();
+            MP3FRAME frame = MP3FRAME.readFrame(bitstream, decoder);
+            if (frame == null) {
+                break;
+            }
+            long posAfter = initLen+mpis.getPosition();
+            frame.setFullData(Arrays.copyOfRange(data, (int)posBefore, (int)posAfter));
+            frames.add(frame);
+        }        
     }
 
     public int sampleCount() {

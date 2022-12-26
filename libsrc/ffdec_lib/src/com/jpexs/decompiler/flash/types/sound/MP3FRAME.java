@@ -35,10 +35,21 @@ public class MP3FRAME {
     private Header h;
 
     private SampleBuffer samples;
+    
+    private byte[] fullData;
 
     private MP3FRAME() {
 
     }
+
+    public void setFullData(byte[] fullData) {
+        this.fullData = fullData;
+    }
+   
+    public byte[] getBytes() {
+        return fullData;
+    }
+    
 
     public static MP3FRAME readFrame(Bitstream bitstream, Decoder decoder) throws IOException {
         MP3FRAME ret = new MP3FRAME();
@@ -60,24 +71,24 @@ public class MP3FRAME {
     }
     
     public int getSampleCount() {
-       if (h.version() == 3) {
+       if (h.version() == Header.MPEG1) {
            switch(h.layer()) {
                case 1:
-                   return 1152;
+                   return 384;
                case 2:
                    return 1152;
                case 3:
-                   return 384;
+                   return 1152;
            }
        }
-       if (h.version() == 2 || h.version() == 0) {
+       if (h.version() == Header.MPEG2_LSF || h.version() == Header.MPEG25_LSF) {
            switch(h.layer()) {
                case 1:
-                   return 576;
+                   return 384;
                case 2:
                    return 1152;
                case 3:
-                   return 384;
+                   return 576;
            }
        }
        return 0;
