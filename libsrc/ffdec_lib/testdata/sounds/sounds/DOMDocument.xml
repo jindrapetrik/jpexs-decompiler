@@ -3,25 +3,60 @@
           <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
      </fonts>
      <media>
+          <DOMSoundItem name="514508_gis-sweden_background-techno-loop131bpm_part.mp3" itemID="63a9b533-000001ee" sourceExternalFilepath="./LIBRARY/514508_gis-sweden_background-techno-loop131bpm_part.mp3" sourceLastImported="1672066220" externalFileSize="964275" href="514508_gis-sweden_background-techno-loop131bpm_part.mp3" soundDataHRef="M 3 1672066332.dat" format="44kHz 16bit Stereo" sampleCount="2626560" exportFormat="1" exportBits="7" dataLength="952947" exportNative="true" cacheFormat="5kHz 8bit Stereo" cachedSampleCount="328320"/>
           <DOMSoundItem name="POOL-Pool_Shot-709343898.wav" itemID="605a2676-00000203" sourceExternalFilepath="../../graphics/graphics/LIBRARY/POOL-Pool_Shot-709343898.wav" sourceLastImported="1515341955" externalFileSize="207370" href="POOL-Pool_Shot-709343898.wav" soundDataHRef="M 5 1616520759.dat" format="44kHz 16bit Stereo" sampleCount="51311"/>
           <DOMSoundItem name="Yung Raf - Nothing To Lose.mp3" itemID="605a5e7d-00000258" sourceExternalFilepath="../../graphics/graphics/LIBRARY/Yung Raf - Nothing To Lose.mp3" sourceLastImported="1616534842" externalFileSize="2233572" href="Yung Raf - Nothing To Lose.mp3" soundDataHRef="M 6 1616534947.dat" format="44kHz 16bit Stereo" sampleCount="6156288" exportFormat="1" exportBits="7" dataLength="2233572" exportNative="true" cacheFormat="5kHz 8bit Stereo" cachedSampleCount="769536"/>
      </media>
      <symbols>
           <Include href="btnNext.xml" itemIcon="0" loadImmediate="false" itemID="604e2284-000003f0" lastModified="1615733380"/>
           <Include href="btnPrev.xml" itemIcon="0" loadImmediate="false" itemID="604e2299-000003f6" lastModified="1615733401"/>
+          <Include href="Symbol 1.xml" loadImmediate="false" itemID="63a9b1e8-000001df" lastModified="1672066786"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1">
+          <DOMTimeline name="Scene 1" currentFrame="11">
                <layers>
                     <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
-                              <DOMFrame index="0" duration="5" keyMode="9728">
+                              <DOMFrame index="0" keyMode="9728">
                                    <Actionscript>
                                         <script><![CDATA[stop();]]></script>
                                    </Actionscript>
                                    <elements/>
                               </DOMFrame>
-                              <DOMFrame index="5" keyMode="9728">
+                              <DOMFrame index="1" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[stopAllSounds();]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="2" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="3" duration="2" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[stopAllSounds();]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="5" duration="2" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[stopAllSounds();]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="7" duration="2" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[stopAllSounds();]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="9" duration="2" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[stopAllSounds();]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="11" keyMode="9728">
                                    <Actionscript>
                                         <script><![CDATA[stopAllSounds();]]></script>
                                    </Actionscript>
@@ -29,9 +64,9 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Prev next buttons" color="#4FFF4F" autoNamed="false">
+                    <DOMLayer name="Prev next buttons" color="#4FFF4F" locked="true" current="true" isSelected="true" autoNamed="false">
                          <frames>
-                              <DOMFrame index="0" duration="6" keyMode="9728">
+                              <DOMFrame index="0" duration="12" keyMode="9728">
                                    <elements>
                                         <DOMSymbolInstance libraryItemName="btnNext" symbolType="button">
                                              <matrix>
@@ -68,26 +103,19 @@
                                    </SoundEnvelope>
                                    <elements/>
                               </DOMFrame>
-                              <DOMFrame index="1" keyMode="9728" soundName="POOL-Pool_Shot-709343898.wav" soundLoop="2">
+                              <DOMFrame index="1" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="2" keyMode="9728" soundName="POOL-Pool_Shot-709343898.wav" soundLoop="2">
                                    <SoundEnvelope>
                                         <SoundEnvelopePoint level0="32768" level1="32768"/>
                                    </SoundEnvelope>
                                    <elements/>
                               </DOMFrame>
-                              <DOMFrame index="2" keyMode="9728" soundName="Yung Raf - Nothing To Lose.mp3" inPoint44="268780" outPoint44="358136" soundZoomLevel="5">
-                                   <SoundEnvelope>
-                                        <SoundEnvelopePoint level0="32768" level1="32768"/>
-                                   </SoundEnvelope>
+                              <DOMFrame index="3" keyMode="9728">
                                    <elements/>
                               </DOMFrame>
-                              <DOMFrame index="3" keyMode="9728" soundEffect="custom" soundName="Yung Raf - Nothing To Lose.mp3" inPoint44="274640" outPoint44="494975" soundZoomLevel="5">
-                                   <SoundEnvelope>
-                                        <SoundEnvelopePoint/>
-                                        <SoundEnvelopePoint mark44="221341" level0="32768" level1="32768"/>
-                                   </SoundEnvelope>
-                                   <elements/>
-                              </DOMFrame>
-                              <DOMFrame index="4" keyMode="9728" soundName="Yung Raf - Nothing To Lose.mp3">
+                              <DOMFrame index="4" keyMode="9728" soundName="Yung Raf - Nothing To Lose.mp3" inPoint44="268780" outPoint44="358136" soundZoomLevel="5">
                                    <SoundEnvelope>
                                         <SoundEnvelopePoint level0="32768" level1="32768"/>
                                    </SoundEnvelope>
@@ -96,12 +124,28 @@
                               <DOMFrame index="5" keyMode="9728">
                                    <elements/>
                               </DOMFrame>
+                              <DOMFrame index="6" keyMode="9728" soundEffect="custom" soundName="Yung Raf - Nothing To Lose.mp3" inPoint44="274640" outPoint44="494975" soundZoomLevel="5">
+                                   <SoundEnvelope>
+                                        <SoundEnvelopePoint/>
+                                        <SoundEnvelopePoint mark44="221341" level0="32768" level1="32768"/>
+                                   </SoundEnvelope>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="7" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="8" keyMode="9728" soundName="Yung Raf - Nothing To Lose.mp3">
+                                   <SoundEnvelope>
+                                        <SoundEnvelopePoint level0="32768" level1="32768"/>
+                                   </SoundEnvelope>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="9" duration="3" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
                          </frames>
                     </DOMLayer>
-                    <DOMLayer name="Texts inside layer" color="#FF800A" autoNamed="false">
-                         <frames/>
-                    </DOMLayer>
-                    <DOMLayer name="Frame description layer" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+                    <DOMLayer name="Frame description layer" color="#9933CC" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" keyMode="9728">
                                    <elements>
@@ -121,6 +165,9 @@
                                    </elements>
                               </DOMFrame>
                               <DOMFrame index="1" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="2" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
@@ -137,9 +184,12 @@
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="2" keyMode="9728">
+                              <DOMFrame index="3" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="4" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText selected="true" width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -154,7 +204,10 @@
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="3" keyMode="9728">
+                              <DOMFrame index="5" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="6" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
@@ -171,9 +224,12 @@
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="4" keyMode="9728">
+                              <DOMFrame index="7" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="8" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
@@ -188,7 +244,10 @@
                                         </DOMStaticText>
                                    </elements>
                               </DOMFrame>
-                              <DOMFrame index="5" keyMode="9728">
+                              <DOMFrame index="9" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="10" keyMode="9728">
                                    <elements>
                                         <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
@@ -196,7 +255,32 @@
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>006 Stop</characters>
+                                                       <characters>006 SoundStream</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMSymbolInstance libraryItemName="Symbol 1" centerPoint3DX="218.5" centerPoint3DY="167.5">
+                                             <matrix>
+                                                  <Matrix tx="132" ty="104"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="86.5" y="63.5"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="11" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="22" ty="342"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>007 Stop</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
@@ -212,6 +296,12 @@
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="2275383" publishTime="1672066791"/>
+          <PublishItem publishSize="2275382" publishTime="1672066741"/>
+          <PublishItem publishSize="2279372" publishTime="1672066366"/>
+          <PublishItem publishSize="2237594" publishTime="1672065661"/>
+          <PublishItem publishSize="2279405" publishTime="1672065634"/>
+          <PublishItem publishSize="2237595" publishTime="1672065568"/>
           <PublishItem publishSize="3657857" publishTime="1668349897"/>
           <PublishItem publishSize="3657883" publishTime="1666634735"/>
           <PublishItem publishSize="3657878" publishTime="1666634687"/>
@@ -226,11 +316,5 @@
           <PublishItem publishSize="1609" publishTime="1666586837"/>
           <PublishItem publishSize="1609" publishTime="1666586837"/>
           <PublishItem publishSize="1609" publishTime="1666586837"/>
-          <PublishItem publishSize="1592" publishTime="1637176557"/>
-          <PublishItem publishSize="1586" publishTime="1637176556"/>
-          <PublishItem publishSize="1586" publishTime="1637176556"/>
-          <PublishItem publishSize="1586" publishTime="1637176556"/>
-          <PublishItem publishSize="3655062" publishTime="1617375217"/>
-          <PublishItem publishSize="2351995" publishTime="1617369003"/>
      </publishHistory>
 </DOMDocument>
