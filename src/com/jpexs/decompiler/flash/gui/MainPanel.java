@@ -3065,6 +3065,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
     }
 
+    public void importMovie(final SWF swf) {
+        
+    }
     public void importShape(final SWF swf, boolean noFill) {
         ViewMessages.showMessageDialog(MainPanel.this, translate("message.info.importShapes2"), translate("message.info"), JOptionPane.INFORMATION_MESSAGE, Configuration.showImportShapeInfo);
         JFileChooser chooser = new JFileChooser();
