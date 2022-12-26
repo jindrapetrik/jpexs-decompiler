@@ -871,6 +871,10 @@ public final class Configuration {
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> warningRenameIdentifiers = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> showImportMovieInfo = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
