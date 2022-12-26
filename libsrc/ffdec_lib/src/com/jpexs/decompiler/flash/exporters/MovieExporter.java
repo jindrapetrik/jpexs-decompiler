@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.exporters.modes.MovieExportMode;
 import com.jpexs.decompiler.flash.exporters.settings.MovieExportSettings;
 import com.jpexs.decompiler.flash.flv.FLVOutputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
+import com.jpexs.decompiler.flash.flv.SCRIPTDATA;
 import com.jpexs.decompiler.flash.flv.VIDEODATA;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.Tag;
@@ -114,20 +115,24 @@ public class MovieExporter {
             return SWFInputStream.BYTE_ARRAY_EMPTY;
         }
 
-        //double ms = 1000.0f / ((float) frameRate);
         ByteArrayOutputStream fos = new ByteArrayOutputStream();
-        //CopyOutputStream cos = new CopyOutputStream(fos, new FileInputStream("f:\\trunk\\testdata\\xfl\\xfl\\_obj\\streamvideo 7.flv"));
         OutputStream tos = fos;
         FLVOutputStream flv = new FLVOutputStream(tos);
         flv.writeHeader(false, true);
-        //flv.writeTag(new FLVTAG(0, SCRIPTDATA.onMetaData(ms * frames.size() / 1000.0, videoStream.width, videoStream.height, 0, frameRate, videoStream.codecID, 0, 0, false, 0, fileSize)));
+        int numFrames = videoStream.numFrames;
+        if (ffdecInternal) {
+            numFrames += 2;
+        }
+        int internalFrameDelaySec = 5;
+        flv.writeTag(new FLVTAG(0, SCRIPTDATA.simpleVideOnMetadata(ffdecInternal ? numFrames * internalFrameDelaySec : numFrames / swf.frameRate, videoStream.width, videoStream.height,ffdecInternal? internalFrameDelaySec : swf.frameRate ,videoStream.codecID)));
         int horizontalAdjustment = 0;
         int verticalAdjustment = 0;
         int[] frameNumArray = Helper.toIntArray(frames.keySet());
         Arrays.sort(frameNumArray);
         FLVTAG lastTag = null;
         int frameNum = 0;
-        int internalFrameDelay = 5 * 1000;
+        int internalFrameDelay = internalFrameDelaySec * 1000;
+                
         for (int i = 0; i < frameNumArray.length; i++) {
             VideoFrameTag tag = frames.get(frameNumArray[i]);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();

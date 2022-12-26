@@ -29,28 +29,39 @@ import java.util.logging.Logger;
  */
 public class SCRIPTDATA extends DATA {
 
-    public List<SCRIPTDATAOBJECT> data;
-
-    public SCRIPTDATA(List<SCRIPTDATAOBJECT> data) {
-        this.data = data;
+    public SCRIPTDATAVALUE name;
+    public SCRIPTDATAVALUE value;
+        
+    public SCRIPTDATA(SCRIPTDATAVALUE name, SCRIPTDATAVALUE value) {
+        this.name = name;
+        this.value = value;
     }
 
     @Override
     public byte[] getBytes() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (FLVOutputStream fos = new FLVOutputStream(baos)) {
-            for (SCRIPTDATAOBJECT d : data) {
-                fos.writeSCRIPTDATAOBJECT(d);
-            }
-            fos.writeUI24(9); //SCRIPTDATAOBJECTEND
+            fos.writeSCRIPTDATAVALUE(name);
+            fos.writeSCRIPTDATAVALUE(value);
         } catch (IOException ex) {
             Logger.getLogger(SCRIPTDATA.class.getName()).log(Level.SEVERE, "i/o error", ex);
         }
         return baos.toByteArray();
     }
 
+    public static SCRIPTDATA simpleVideOnMetadata(double duration, double width, double height, double framerate, double videocodecid) {
+        List<SCRIPTDATAVARIABLE> values = new ArrayList<>();
+        values.add(new SCRIPTDATAVARIABLE("duration", new SCRIPTDATAVALUE(duration)));
+        values.add(new SCRIPTDATAVARIABLE("width", new SCRIPTDATAVALUE(width)));
+        values.add(new SCRIPTDATAVARIABLE("height", new SCRIPTDATAVALUE(height)));
+        values.add(new SCRIPTDATAVARIABLE("framerate", new SCRIPTDATAVALUE(framerate)));        
+        values.add(new SCRIPTDATAVARIABLE("videocodecid", new SCRIPTDATAVALUE(videocodecid)));
+        SCRIPTDATAVALUE valuesList = new SCRIPTDATAVALUE(8, values);
+        SCRIPTDATAVALUE onMetadataKey = new SCRIPTDATAVALUE(2,"onMetaData");
+        return new SCRIPTDATA(onMetadataKey, valuesList);
+    }
+    
     public static SCRIPTDATA onMetaData(double duration, double width, double height, double videodatarate, double framerate, double videocodecid, double audiosamplerate, double audiosamplesize, boolean stereo, double audiocodecid, double filesize) {
-        List<SCRIPTDATAOBJECT> list = new ArrayList<>();
         List<SCRIPTDATAVARIABLE> values = new ArrayList<>();
         values.add(new SCRIPTDATAVARIABLE("duration", new SCRIPTDATAVALUE(duration)));
         values.add(new SCRIPTDATAVARIABLE("width", new SCRIPTDATAVALUE(width)));
@@ -64,9 +75,7 @@ public class SCRIPTDATA extends DATA {
         values.add(new SCRIPTDATAVARIABLE("audiocodecid", new SCRIPTDATAVALUE(audiocodecid)));
         values.add(new SCRIPTDATAVARIABLE("filesize", new SCRIPTDATAVALUE(filesize)));
         SCRIPTDATAVALUE valuesList = new SCRIPTDATAVALUE(8, values);
-        SCRIPTDATAOBJECT metaData = new SCRIPTDATAOBJECT("onMetaData", valuesList);
-        list.add(metaData);
-        SCRIPTDATA ret = new SCRIPTDATA(list);
-        return ret;
+        SCRIPTDATAVALUE onMetadataKey = new SCRIPTDATAVALUE(2,"onMetaData");
+        return new SCRIPTDATA(onMetadataKey, valuesList);
     }
 }

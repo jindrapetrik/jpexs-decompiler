@@ -17,9 +17,14 @@
 package com.jpexs.decompiler.flash.flv;
 
 import com.jpexs.decompiler.flash.EndOfStreamException;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
+import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -30,52 +35,53 @@ import java.util.List;
  * @author JPEXS
  */
 public class FLVInputStream {
+
     private final DataInputStream is;
-    
+
     private int bitPos = 0;
 
     private int tempByte = 0;
-    
+
     private long pos = 0;
-    
+
     public FLVInputStream(InputStream is) {
         this.is = new DataInputStream(is);
     }
-    
+
     public void readHeader(Reference<Boolean> audioPresent, Reference<Boolean> videoPresent) throws IOException {
         byte signature[] = new byte[3];
         is.readFully(signature);
         if (signature[0] != 'F' || signature[1] != 'L' || signature[2] != 'V') {
             throw new IOException("Invalid FLV file - invalid signature");
         }
-        pos+=3;
+        pos += 3;
         int version = read();
         if (version != 1) {
-            throw new IOException("Unsupported FLV version: "+version+", only 1 is supported");
-        }        
-        int reserved = (int)readUB(5);
-        audioPresent.setVal(readUB(1)==1L);
+            throw new IOException("Unsupported FLV version: " + version + ", only 1 is supported");
+        }
+        int reserved = (int) readUB(5);
+        audioPresent.setVal(readUB(1) == 1L);
         readUB(1);
         videoPresent.setVal(readUB(1) == 1L);
         long headerSize = readUI32();
         if (headerSize != 9) {
-            throw new IOException("Invalid header size: "+headerSize);
+            throw new IOException("Invalid header size: " + headerSize);
         }
         readUI32(); //should be 0                
     }
-    
+
     public List<FLVTAG> readTags() throws IOException {
         List<FLVTAG> ret = new ArrayList<>();
-        while(available() > 0) {
+        while (available() > 0) {
             ret.add(readTag());
         }
         return ret;
     }
-    
+
     private long readUI32() throws IOException {
         return ((readEx() << 24) + (readEx() << 16) + (readEx() << 8) + (readEx())) & 0xffffffffL;
     }
-    
+
     /**
      * Reads one byte from the stream
      *
@@ -86,7 +92,7 @@ public class FLVInputStream {
         bitPos = 0;
         return readNoBitReset();
     }
-    
+
     /**
      * Reads UB[nBits] (Unsigned-bit value) value from the stream
      *
@@ -101,7 +107,7 @@ public class FLVInputStream {
         long ret = readUBInternal(nBits);
         return ret;
     }
-    
+
     private int readNoBitReset() throws IOException, EndOfStreamException {
         int r = is.read();
         if (r == -1) {
@@ -140,65 +146,60 @@ public class FLVInputStream {
         }
         return ret;
     }
-    
+
     private void alignByte() {
         bitPos = 0;
     }
-    
+
     public int read() throws IOException {
         alignByte();
         pos++;
         return is.read();
     }
-    
+
     public int readUI8() throws IOException {
         return read();
     }
-    
+
     public int readUI24() throws IOException {
         int ret = (readEx() << 16) + (readEx() << 8) + (readEx());
         return ret;
     }
-    
+
     public byte[] readBytes(int len) throws IOException {
         byte[] data = new byte[len];
         is.readFully(data);
         pos += len;
         return data;
     }
-    
+
     public int available() throws IOException {
         return is.available();
     }
-    
-    public FLVTAG readTag() throws IOException {       
-        long posBefore = pos;
+
+    public FLVTAG readTag() throws IOException {
         int tagType = readUI8();
         int dataLen = readUI24();
-        //System.out.println("reading tag of type "+ tagType+" datalen="+dataLen);
         int timeStamp = readUI24();
         int timeStampExtended = readUI8();
         int timeStampFull = (timeStampExtended << 24) + timeStamp;
-        //System.out.println("reding timestamp "+timeStampFull);
         readUI24(); //streamId, always 0
-        byte data[] = new byte[dataLen];
-        is.readFully(data);
+        byte data[] = readBytes(dataLen);
         readUI32(); //tag size
-        
-        switch(tagType) {
+
+        FLVInputStream subStream = new FLVInputStream(new ByteArrayInputStream(data));
+        switch (tagType) {
             case FLVTAG.DATATYPE_VIDEO:
-                FLVInputStream subStream = new FLVInputStream(new ByteArrayInputStream(data));
-                int frameType = (int)subStream.readUB(4);
-                int codecId = (int)subStream.readUB(4);
-                byte[] videoData = subStream.readBytes(subStream.available());                
-                return new FLVTAG(timeStampFull, new VIDEODATA(frameType, codecId, videoData));                
-            case FLVTAG.DATATYPE_AUDIO:
+                return new FLVTAG(timeStampFull, subStream.readVIDEODATA());
             case FLVTAG.DATATYPE_SCRIPT_DATA:
+                return new FLVTAG(timeStampFull, subStream.readSCRIPTDATA());
+            case FLVTAG.DATATYPE_AUDIO:
+                return new FLVTAG(timeStampFull, subStream.readAUDIODATA());
             default:
                 return new FLVTAG(timeStampFull, new UnparsedDATA(tagType, data));
-        }       
+        }
     }
-    
+
     /**
      * Reads one UI16 (Unsigned 16bit integer) value from the stream
      *
@@ -208,4 +209,170 @@ public class FLVInputStream {
     public int readUI16() throws IOException {
         return (readEx() << 8) + readEx();
     }
+
+    public SCRIPTDATA readSCRIPTDATA() throws IOException {
+        SCRIPTDATAVALUE name = readSCRIPTDATAVALUE();
+        SCRIPTDATAVALUE value = readSCRIPTDATAVALUE();
+        return new SCRIPTDATA(name, value);
+    }
+    
+    /**
+     * Reads one DOUBLE (double precision floating point value) value from the
+     * stream
+     *
+     * @return DOUBLE value
+     * @throws IOException
+     */
+    public double readDOUBLE() throws IOException {
+        long el = readLong();
+        double ret = Double.longBitsToDouble(el);
+        return ret;
+    }
+
+    private long readLong() throws IOException {
+        byte[] readBuffer = readBytes(8);
+        return (((long) readBuffer[0] << 56)
+                + ((long) (readBuffer[1] & 0xff) << 48)
+                + ((long) (readBuffer[2] & 0xff) << 40)
+                + ((long) (readBuffer[3] & 0xff) << 32)
+                + ((long) (readBuffer[4] & 0xff) << 24)
+                + ((readBuffer[5] & 0xff) << 16)
+                + ((readBuffer[6] & 0xff) << 8)
+                + ((readBuffer[7] & 0xff)));
+    }
+
+    public AUDIODATA readAUDIODATA() throws IOException {
+        int soundFormat = (int) readUB(4);
+        int soundRate = (int) readUB(2);
+        boolean soundSize = (int) readUB(1) == 1;
+        boolean soundType = (int) readUB(1) == 1;
+        byte[] soundData = readBytes(available());
+        return new AUDIODATA(soundFormat, soundRate, soundSize, soundType, soundData);
+
+    }
+
+    public SCRIPTDATAOBJECT readSCRIPTDATAOBJECT() throws IOException {
+        System.out.println("reading obj");
+        String objectName = readSCRIPTDATASTRING();
+        System.out.println("objectName "+objectName);
+        if (objectName.length() == 0) {
+            int endMarker = readUI8();
+            if (endMarker != 9) {
+                throw new IOException("Invalid SCRIPTOBJECT end marker - 9 expected but " + endMarker + " found");
+            }
+            return null;
+        }
+        SCRIPTDATAVALUE objectData = readSCRIPTDATAVALUE();
+        return new SCRIPTDATAOBJECT(objectName, objectData);
+    }
+
+    public VIDEODATA readVIDEODATA() throws IOException {
+        int frameType = (int) readUB(4);
+        int codecId = (int) readUB(4);
+        byte[] videoData = readBytes(available());
+        return new VIDEODATA(frameType, codecId, videoData);
+    }
+  
+
+    public SCRIPTDATAVALUE readSCRIPTDATAVALUE() throws IOException {
+        int type = readUI8();
+        switch (type) {
+            //Number type
+            case 0:
+                return new SCRIPTDATAVALUE(readDOUBLE());
+            //Boolean type
+            case 1:
+                return new SCRIPTDATAVALUE(type, readUI8() == 1 ? Boolean.TRUE : Boolean.FALSE);
+            //String type
+            case 2:
+                return new SCRIPTDATAVALUE(type, readSCRIPTDATASTRING());
+            //Object type
+            case 3:
+                List<SCRIPTDATAOBJECT> objects = new ArrayList<>();
+                SCRIPTDATAOBJECT object;
+                while ((object = readSCRIPTDATAOBJECT()) != null) {
+                    objects.add(object);
+                }
+                return new SCRIPTDATAVALUE(type, objects);
+            //MovieClip type
+            case 4:
+                return new SCRIPTDATAVALUE(type, readSCRIPTDATASTRING());
+            //Null type
+            case 5:
+            //Undefined type
+            case 6:
+                return new SCRIPTDATAVALUE(type, null);
+            //Reference type
+            case 7:
+                return new SCRIPTDATAVALUE(type, readUI16());
+            //ECMA array type
+            case 8:
+                int ecmaArrayLength = (int) readUI32();
+                List<SCRIPTDATAVARIABLE> variables2 = new ArrayList<>();
+                SCRIPTDATAVARIABLE variable2;
+                while ((variable2 = readSCRIPTDATAVARIABLE()) != null) {
+                    variables2.add(variable2);
+                }
+                return new SCRIPTDATAVALUE(type, variables2);
+            //Strict array type
+            case 10:
+                int arrayLength = (int) readUI32();
+                List<SCRIPTDATAVARIABLE> variables = new ArrayList<>();
+                for (int i = 0; i < arrayLength; i++) {
+                    variables.add(readSCRIPTDATAVARIABLE());
+                }
+                return new SCRIPTDATAVALUE(type, variables);
+            //Date type
+            case 11:
+                return new SCRIPTDATAVALUE(type, readSCRIPTDATADATE());
+            //Long string type             
+            case 12:
+                return new SCRIPTDATAVALUE(type, readSCRIPTDATALONGSTRING());
+            default:
+                return null;
+        }
+    }
+
+    public String readSCRIPTDATALONGSTRING() throws IOException {
+        int len = (int) readUI32(); //? should be unsinged
+        return new String(readBytes(len), Utf8Helper.charset);
+    }
+
+    public SCRIPTDATADATE readSCRIPTDATADATE() throws IOException {
+        double time = readDOUBLE();
+        int localDateTimeOffset = readSI16();
+        return new SCRIPTDATADATE(time, localDateTimeOffset);
+    }
+
+    /**
+     * Reads one SI16 (Signed 16bit integer) value from the stream
+     *
+     * @return SI16 value
+     * @throws IOException
+     */
+    public int readSI16() throws IOException {
+        int uval = (readEx() << 8) + readEx();
+        if (uval >= 0x8000) {
+            uval = -(((~uval) & 0xffff) + 1);
+        }
+        return uval;
+    }
+
+    public SCRIPTDATAVARIABLE readSCRIPTDATAVARIABLE() throws IOException {
+        String variableName = readSCRIPTDATASTRING();
+        if (variableName.length() == 0) {
+            int endMarker = readUI8();
+            if (endMarker != 9) {
+                throw new IOException("Invalid SCRIPTDATAVARIABLE end marker - 9 expected but " + endMarker + " found");
+            }
+            return null;
+        }
+        SCRIPTDATAVALUE variableValue = readSCRIPTDATAVALUE();
+        return new SCRIPTDATAVARIABLE(variableName, variableValue);
+    }
+
+    public String readSCRIPTDATASTRING() throws IOException {
+        int len = readUI16();
+        return new String(readBytes(len), Utf8Helper.charset);
+    }   
 }

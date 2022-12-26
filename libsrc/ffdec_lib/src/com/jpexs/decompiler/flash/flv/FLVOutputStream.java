@@ -170,14 +170,14 @@ public class FLVOutputStream extends OutputStream {
 
     private void writeLong(long value) throws IOException {
         byte[] writeBuffer = new byte[8];
-        writeBuffer[3] = (byte) (value >>> 56);
-        writeBuffer[2] = (byte) (value >>> 48);
-        writeBuffer[1] = (byte) (value >>> 40);
-        writeBuffer[0] = (byte) (value >>> 32);
-        writeBuffer[7] = (byte) (value >>> 24);
-        writeBuffer[6] = (byte) (value >>> 16);
-        writeBuffer[5] = (byte) (value >>> 8);
-        writeBuffer[4] = (byte) (value);
+        writeBuffer[0] = (byte) (value >>> 56);
+        writeBuffer[1] = (byte) (value >>> 48);
+        writeBuffer[2] = (byte) (value >>> 40);
+        writeBuffer[3] = (byte) (value >>> 32);
+        writeBuffer[4] = (byte) (value >>> 24);
+        writeBuffer[5] = (byte) (value >>> 16);
+        writeBuffer[6] = (byte) (value >>> 8);
+        writeBuffer[7] = (byte) (value);
         write(writeBuffer);
     }
 
@@ -198,15 +198,19 @@ public class FLVOutputStream extends OutputStream {
     public void writeSCRIPTDATAVALUE(SCRIPTDATAVALUE v) throws IOException {
         writeUI8(v.type);
         switch (v.type) {
+            //Number type
             case 0:
                 writeDOUBLE((double) (Double) v.value);
                 break;
+            //Boolean type
             case 1:
                 writeUI8((boolean) (Boolean) v.value ? 1 : 0);
                 break;
+            //String type
             case 2:
                 writeSCRIPTDATASTRING((String) v.value);
                 break;
+            //Object type
             case 3:
                 @SuppressWarnings("unchecked") List<SCRIPTDATAOBJECT> objects = (List<SCRIPTDATAOBJECT>) v.value;
                 for (SCRIPTDATAOBJECT o : objects) {
@@ -214,18 +218,21 @@ public class FLVOutputStream extends OutputStream {
                 }
                 writeUI24(9);//SCRIPTDATAOBJECTEND
                 break;
+            //MovieClip type
             case 4:
                 writeSCRIPTDATASTRING((String) v.value);
                 break;
+            //Null type
             case 5:
-                //null
                 break;
+            //Undefined type
             case 6:
-                //undefined
                 break;
+            //Reference type    
             case 7:
                 writeUI16((int) (Integer) v.value);
                 break;
+            //ECMA array type
             case 8:
                 @SuppressWarnings("unchecked") List<SCRIPTDATAVARIABLE> variables = (List<SCRIPTDATAVARIABLE>) v.value;
                 writeUI32(variables.size());
@@ -234,9 +241,10 @@ public class FLVOutputStream extends OutputStream {
                 }
                 writeUI24(9);//SCRIPTDATAVARIABLEEND
                 break;
+            //Reserved
             case 9:
-                //reserved
                 break;
+            //Strict array type
             case 10:
                 @SuppressWarnings("unchecked") List<SCRIPTDATAVARIABLE> stvariables = (List<SCRIPTDATAVARIABLE>) v.value;
                 writeUI32(stvariables.size());
@@ -244,9 +252,11 @@ public class FLVOutputStream extends OutputStream {
                     writeSCRIPTDATAVARIABLE(var);
                 }
                 break;
+            //Date type
             case 11:
                 writeSCRIPTDATADATE((SCRIPTDATADATE) v.value);
                 break;
+            //Long string type
             case 12:
                 writeSCRIPTDATALONGSTRING((String) v.value);
                 break;
