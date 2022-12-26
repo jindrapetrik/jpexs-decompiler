@@ -916,6 +916,7 @@ public class CommandLineArgumentParser {
                     break;
                 case "-info":
                     parseInfo(args, charset);
+                    System.exit(0);
                     break;
                 case "-stdout":
                     parseStdOut(args);
@@ -958,18 +959,25 @@ public class CommandLineArgumentParser {
             Translator.main(new String[]{});
         } else if (command.equals("swf2exe")) {
             parseSwf2Exe(args, charset);
+            System.exit(0);
         } else if (command.equals("abcmerge")) {
             parseAbcMerge(args, charset);
+            System.exit(0);
         } else if (command.equals("swf2swc")) {
             parseSwf2Swc(args, charset);
+            System.exit(0);
         } else if (command.equals("linkreport")) {
             parseLinkReport(selectionClasses, args, charset);
+            System.exit(0);
         } else if (command.equals("getinstancemetadata")) {
             parseGetInstanceMetadata(args, charset);
+            System.exit(0);
         } else if (command.equals("setinstancemetadata")) {
             parseSetInstanceMetadata(args, charset);
+            System.exit(0);
         } else if (command.equals("removeinstancemetadata")) {
             parseRemoveInstanceMetadata(args, charset);
+            System.exit(0);
         } else if (command.equals("removefromcontextmenu")) {
             if (!args.isEmpty()) {
                 badArguments(command);
@@ -989,30 +997,43 @@ public class CommandLineArgumentParser {
             System.exit(0);
         } else if (command.equals("compress")) {
             parseCompress(args);
+            System.exit(0);
         } else if (command.equals("decompress")) {
             parseDecompress(args);
+            System.exit(0);
         } else if (command.equals("swf2xml")) {
             parseSwf2Xml(args, charset);
+            System.exit(0);
         } else if (command.equals("xml2swf")) {
             parseXml2Swf(args, charset);
+            System.exit(0);
         } else if (command.equals("extract")) {
             parseExtract(args);
+            System.exit(0);
         } else if (command.equals("memorysearch")) {
             parseMemorySearch(args);
+            System.exit(0);
         } else if (command.equals("deobfuscate")) {
             parseDeobfuscate(args, charset);
+            System.exit(0);
         } else if (command.equals("renameinvalididentifiers")) {
             parseRenameInvalidIdentifiers(args);
+            System.exit(0);
         } else if (command.equals("dumpswf")) {
             parseDumpSwf(args);
+            System.exit(0);
         } else if (command.equals("dumpas2")) {
             parseDumpAS2(args, charset);
+            System.exit(0);
         } else if (command.equals("dumpas3")) {
             parseDumpAS3(args, charset);
+            System.exit(0);
         } else if (command.equals("enabledebugging")) {
             parseEnableDebugging(args, charset);
+            System.exit(0);
         } else if (command.equals("flashpaper2pdf")) {
             parseFlashPaperToPdf(selection, zoom, args, charset);
+            System.exit(0);
         } else if (command.equals("replace")) {
             parseReplace(args, charset, air);
             System.exit(0);
@@ -1027,20 +1048,27 @@ public class CommandLineArgumentParser {
             System.exit(0);
         } else if (command.equals("convert")) {
             parseConvert(args, charset);
+            System.exit(0);
         } else if (command.equals("remove")) {
             parseRemove(args, charset);
+            System.exit(0);
         } else if (command.equals("removecharacter")) {
             parseRemoveCharacter(args, false, charset);
+            System.exit(0);
         } else if (command.equals("removecharacterwithdependencies")) {
             parseRemoveCharacter(args, true, charset);
+            System.exit(0);
         } else if (command.equals("doc")) {
             parseDoc(args);
         } else if (command.equals("importsymbolclass")) {
             parseImportSymbolClass(args, charset);
+            System.exit(0);
         } else if (command.equals("importmovies")) {
             parseImportMovies(args, charset);
+            System.exit(0);
         } else if (command.equals("importshapes")) {
             parseImportShapes(args, charset);
+            System.exit(0);
         } else if (command.equals("importimages")) {
             parseImportImages(args, charset);
             System.exit(0);
@@ -1056,8 +1084,10 @@ public class CommandLineArgumentParser {
             parseDebugTool(args, charset);
         } else if (nextParam.equals("--compareresources")) {
             parseCompareResources(args);
+            System.exit(0);
         } else if (nextParam.equals("--resourcedates")) {
             parseResourceDates(args);
+            System.exit(0);
         } else if (nextParam.equals("-listconfigs")) {
             printHeader();
             printConfigurationSettings();
@@ -1072,6 +1102,7 @@ public class CommandLineArgumentParser {
             String wh = new String(whbaos.toByteArray());
             wh = wh.replace("<", "&lt;").replace(">", "&gt;");
             System.out.println(wh);
+            System.exit(0);
         } else {
             args.push(nextParamOriginal); // file names should be the original one
             List<String> fileNames = new ArrayList<>();
@@ -1451,8 +1482,7 @@ public class CommandLineArgumentParser {
                 }
                 return false;
             }
-        }, charset);
-        System.exit(0);
+        }, charset);        
     }
 
     private static void parseSetInstanceMetadata(Stack<String> args, String charset) {
@@ -1661,8 +1691,7 @@ public class CommandLineArgumentParser {
                 }
                 return false;
             }
-        }, charset);
-        System.exit(0);
+        }, charset);       
     }
 
     private static void parseRemoveInstanceMetadata(Stack<String> args, String charset) {
@@ -1790,9 +1819,7 @@ public class CommandLineArgumentParser {
                 }
                 return false;
             }
-        }, charset);
-        System.exit(0);
-
+        }, charset);        
     }
 
     private static class Range {
@@ -2704,9 +2731,7 @@ public class CommandLineArgumentParser {
             }
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
-        }
-
-        System.exit(0);
+        }       
     }
 
     private static void parseXml2Swf(Stack<String> args, String charset) {
@@ -2725,8 +2750,7 @@ public class CommandLineArgumentParser {
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-
-        System.exit(0);
+        
     }
 
     private static void parseExtract(Stack<String> args) {
@@ -2811,8 +2835,7 @@ public class CommandLineArgumentParser {
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-
-        System.exit(0);
+       
     }
 
     private static void parseMemorySearch(Stack<String> args) {
@@ -2897,8 +2920,7 @@ public class CommandLineArgumentParser {
         } else {
             System.err.println("Memory search is only available on Windows platform.");
         }
-
-        System.exit(0);
+        
     }
 
     private static void parseRenameInvalidIdentifiers(Stack<String> args) {
@@ -3101,7 +3123,6 @@ public class CommandLineArgumentParser {
             System.err.println("I/O error during reading");
             System.exit(2);
         }
-        System.exit(0);
     }
 
     private static void parseReplace(Stack<String> args, String charset, boolean air) {
@@ -4274,8 +4295,7 @@ public class CommandLineArgumentParser {
         }
         if (!found) {
             System.exit(1);
-        }
-        System.exit(0);
+        }       
     }
 
     private static String doubleToString(double d) {
@@ -4362,8 +4382,7 @@ public class CommandLineArgumentParser {
         } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
             System.exit(1);
-        }
-        System.exit(0);
+        }       
     }
 
     private static void parseDumpAS2(Stack<String> args, String charset) {
@@ -4463,8 +4482,7 @@ public class CommandLineArgumentParser {
             System.exit(3);
         }
 
-        System.out.println("Finished");
-        System.exit(0);
+        System.out.println("Finished");        
     }
 
     private static void parseDumpAS3(Stack<String> args, String charset) {
