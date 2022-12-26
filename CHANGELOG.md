@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#1914] DropShadow filter
 - [#1916] Translation tool did not load up
+- PlaceObject preview not cleared causing sound to repeat
 
 ## [18.1.0] - 2022-12-23
 ### Added

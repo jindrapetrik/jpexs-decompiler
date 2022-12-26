@@ -906,6 +906,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     public void clear() {
         imagePanel.clearAll();
+        placeImagePanel.clearAll();
         if (media != null) {
             try {
                 media.close();
@@ -916,7 +917,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         binaryPanel.setBinaryData(null);
         genericTagPanel.clear();
-        fontPanel.clear();
+        fontPanel.clear();        
     }
 
     public void closeTag() {
