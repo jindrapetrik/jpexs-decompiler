@@ -222,7 +222,6 @@ public class MovieImporter {
             movie.height = newHeight;
             movie.videoFlagsDeblocking = DefineVideoStreamTag.DEBLOCKING_OFF;
             movie.videoFlagsSmoothing = true;
-            movie.numFrames = videoTags.size();
             movie.setPauseRendering(true);
 
             videoTags.sort(new Comparator<FLVTAG>() {
@@ -351,6 +350,8 @@ public class MovieImporter {
                     importLastFrame = idealFrame;
                 }
             }
+            
+            movie.numFrames = importLastFrame - startFrame + 1;
 
             List<Tag> tagsToRemove = new ArrayList<>();
             for (Tag t : timelined.getTags()) {
