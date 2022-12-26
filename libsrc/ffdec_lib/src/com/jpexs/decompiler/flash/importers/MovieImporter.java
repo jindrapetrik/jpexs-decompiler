@@ -20,6 +20,8 @@ import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.flv.FLVInputStream;
 import com.jpexs.decompiler.flash.flv.FLVTAG;
+import com.jpexs.decompiler.flash.flv.SCRIPTDATA;
+import com.jpexs.decompiler.flash.flv.SCRIPTDATAVARIABLE;
 import com.jpexs.decompiler.flash.flv.VIDEODATA;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
@@ -51,8 +53,8 @@ import java.util.logging.Logger;
  * @author JPEXS
  */
 public class MovieImporter {
-    
-    public int bulkImport(File moviesDir, SWF swf, boolean printOut) {        
+
+    public int bulkImport(File moviesDir, SWF swf, boolean printOut) {
         Map<Integer, CharacterTag> characters = swf.getCharacters();
         int movieCount = 0;
         List<String> extensions = Arrays.asList("flv");
@@ -116,7 +118,7 @@ public class MovieImporter {
         }
         return movieCount;
     }
-    
+
     public void importMovie(DefineVideoStreamTag movie, byte[] data) throws IOException {
         List<FLVTAG> videoTags = new ArrayList<>();
 
@@ -126,7 +128,20 @@ public class MovieImporter {
         flvIs.readHeader(audioPresent, videoPresent);
         List<FLVTAG> flvTags = flvIs.readTags();
 
+        Double duration = null;
         for (FLVTAG tag : flvTags) {
+            if (tag.tagType == FLVTAG.DATATYPE_SCRIPT_DATA) {
+                SCRIPTDATA scriptData = (SCRIPTDATA) tag.data;
+                if (scriptData.name.type == 2 && "onMetaData".equals(scriptData.name.value)) {
+                    @SuppressWarnings("unchecked")
+                    List<SCRIPTDATAVARIABLE> values = (List<SCRIPTDATAVARIABLE>) scriptData.value.value;
+                    for (SCRIPTDATAVARIABLE v : values) {
+                        if ("duration".equals(v.variableName)) {
+                            duration = (Double) v.variableData.value;
+                        }
+                    }
+                }
+            }
             if (tag.tagType == FLVTAG.DATATYPE_VIDEO) {
                 videoTags.add(tag);
             }
@@ -230,7 +245,7 @@ public class MovieImporter {
                     return Long.compare(o1.timeStamp, o2.tagType);
                 }
             });
-            
+
             SWF swf = movie.getSwf();
 
             //remove old VideoFrame tags
@@ -241,19 +256,23 @@ public class MovieImporter {
                 t.getTimelined().removeTag(t);
                 timelined = t.getTimelined();
             }
-            timelined.resetTimeline();
+            if (timelined != null) {
+                timelined.resetTimeline();
+            }
 
             int startFrame = 0;
             int placeDepth = -1;
-            for (Tag t : timelined.getTags()) {
-                if (t instanceof ShowFrameTag) {
-                    startFrame++;
-                }
-                if (t instanceof PlaceObjectTypeTag) {
-                    PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
-                    if (pt.getCharacterId() == movie.characterID) {
-                        placeDepth = pt.getDepth();
-                        break;
+            if (timelined != null) {
+                for (Tag t : timelined.getTags()) {
+                    if (t instanceof ShowFrameTag) {
+                        startFrame++;
+                    }
+                    if (t instanceof PlaceObjectTypeTag) {
+                        PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
+                        if (pt.getCharacterId() == movie.characterID) {
+                            placeDepth = pt.getDepth();
+                            break;
+                        }
                     }
                 }
             }
@@ -350,27 +369,70 @@ public class MovieImporter {
                     importLastFrame = idealFrame;
                 }
             }
-            
+
+            if (duration != null && timelined != null) {
+                int idealFrame = startFrame + (int) Math.floor(swf.frameRate * duration);
+                if (idealFrame > importLastFrame) {
+                    ReadOnlyTagList tagList = timelined.getTags();
+                    boolean found = false;
+                    int swfFrameNum = -1;
+                    for (int p = 0; p < tagList.size(); p++) {
+                        Tag t = tagList.get(p);
+                        if (t instanceof ShowFrameTag) {
+                            swfFrameNum++;
+                            if (swfFrameNum == idealFrame) {
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    //add frames when necessary
+                    if (!found) {
+                        swfFrameNum++;
+                        for (; swfFrameNum <= idealFrame; swfFrameNum++) {
+                            PlaceObject2Tag placeObject = new PlaceObject2Tag(swf);
+                            placeObject.setTimelined(timelined);
+                            placeObject.depth = placeDepth;
+                            placeObject.placeFlagMove = true;
+                            placeObject.placeFlagHasRatio = true;
+                            placeObject.ratio = swfFrameNum - startFrame;
+                            timelined.addTag(placeObject);
+                            ShowFrameTag sft = new ShowFrameTag(swf);
+                            sft.setTimelined(timelined);
+                            timelined.addTag(sft);
+                        }
+                        swfFrameNum--;
+                    }
+
+                    importLastFrame = idealFrame;
+                }
+            }
+
             movie.numFrames = importLastFrame - startFrame + 1;
 
             List<Tag> tagsToRemove = new ArrayList<>();
-            for (Tag t : timelined.getTags()) {
-                if (t instanceof PlaceObjectTypeTag) {
-                    PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
-                    if (pt.getDepth() == placeDepth) {
-                        int ratio = pt.getRatio();
-                        if (ratio > importLastFrame - startFrame) {
-                            tagsToRemove.add(t);
+            if (timelined != null) {
+                for (Tag t : timelined.getTags()) {
+                    if (t instanceof PlaceObjectTypeTag) {
+                        PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
+                        if (pt.getDepth() == placeDepth) {
+                            int ratio = pt.getRatio();
+                            if (ratio > importLastFrame - startFrame) {
+                                tagsToRemove.add(t);
+                            }
                         }
                     }
                 }
-            }
-            for (Tag t : tagsToRemove) {
-                timelined.removeTag(t);
+                for (Tag t : tagsToRemove) {
+                    timelined.removeTag(t);
+                }
             }
 
             movie.setModified(true);
-            timelined.resetTimeline();
+            if (timelined != null) {
+                timelined.resetTimeline();
+            }
             movie.resetTimeline();
             movie.resetPlayer();
             movie.setPauseRendering(false);
