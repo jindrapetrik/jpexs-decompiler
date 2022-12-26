@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -156,6 +157,7 @@ import com.jpexs.decompiler.flash.tags.PlaceObjectTag;
 import com.jpexs.decompiler.flash.tags.ProductInfoTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
@@ -4752,7 +4754,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         previewPanel.closeTag();
     }
 
-    public static void showPreview(TreeItem treeItem, PreviewPanel previewPanel, int frame, Timelined timelinedContainer) {
+    public static void showPreview(TreeItem treeItem, PreviewPanel previewPanel, int frame, Timelined timelinedContainer) {        
         previewPanel.clear();
         if (treeItem == null) {
             previewPanel.showEmpty();
@@ -5034,6 +5036,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showDetail(DETAILCARDEMPTYPANEL);
         }
 
+        if (treeItem instanceof SoundStreamBlockTag) {
+            SoundStreamBlockTag block = (SoundStreamBlockTag)treeItem;
+            byte[] data = block.streamSoundData.getRangeData();
+            try{
+            SWFInputStream sis = new SWFInputStream(block.getSwf(), data);
+            int sampleCount = sis.readUI16("sampleCount");
+            int seekSamples = sis.readSI16("seekSamples");
+            System.out.println("sampleCount = "+sampleCount);
+            System.out.println("seekSamples = "+seekSamples);
+            System.out.println("============");
+            }catch(Exception ex){
+                
+            }
+        }
         if (treeItem instanceof HeaderItem) {
             headerPanel.load((SWF) ((HeaderItem) treeItem).getOpenable());
             showCard(CARDHEADER);

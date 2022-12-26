@@ -163,12 +163,13 @@ public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdT
 
                         newSoundSize = true;
                         newSoundType = fr.isStereo();
-                        int len = snd.sampleCount();
+                        /*int len = snd.sampleCount();
                         if (fr.isStereo()) {
                             len = len / 2;
-                        }
+                        }*/
 
-                        newSoundSampleCount = len;
+                        newSoundSampleCount = (int) Math.ceil(soundRateHz / swf.frameRate);
+                        //newSoundSampleCount = len;
                     }
 
                     mp3Frames = snd.frames;
@@ -237,7 +238,7 @@ public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdT
         }
         if (mp3Frames != null) {
             
-            /*int frame = 0;
+            int frame = 0;
 
             int mp3FrameNum = 0;
             long lastNumSamplesLong = 0;
@@ -252,21 +253,28 @@ public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdT
                 
                 List<MP3FRAME> blockMp3Frames = new ArrayList<>();
                 int blockSamples = 0;
-                while(lastNumSamplesLong < numSamplesAfterFrame) {
+                while(lastNumSamplesLong < numSamplesAfterFrame && mp3FrameNum < mp3Frames.size()) {
                     MP3FRAME mp3Frame = mp3Frames.get(mp3FrameNum);
                     lastNumSamplesLong += mp3Frame.getSampleCount();
                     blockSamples += mp3Frame.getSampleCount();
                     blockMp3Frames.add(mp3Frame);
+                    mp3FrameNum++;
                 }                                    
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, null);
                 try {
                     sos.writeUI16(blockSamples);  
                     sos.writeSI16(seekSamples);
+                    for (MP3FRAME mp3Frame:blockMp3Frames) {
+                        sos.write(mp3Frame.getBytes());
+                    }
                 } catch (IOException ex) {
                     Logger.getLogger(SoundStreamHeadTypeTag.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } */
+                block.streamSoundData = new ByteArrayRange(baos.toByteArray());
+                blocks.add(block);
+                frame++;
+            }
         }
 
         ReadOnlyTagList tags = timelined.getTags();
