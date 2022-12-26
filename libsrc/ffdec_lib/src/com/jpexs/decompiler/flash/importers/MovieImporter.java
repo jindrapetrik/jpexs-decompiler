@@ -278,6 +278,7 @@ public class MovieImporter {
                     }
                 }
             }
+            int numTimelineFrames = timelined == null ? 0 : timelined.getFrameCount();
 
             int importLastFrame = -1;
             if (timelined != null) {
@@ -347,6 +348,7 @@ public class MovieImporter {
                             ShowFrameTag sft = new ShowFrameTag(swf);
                             sft.setTimelined(timelined);
                             timelined.addTag(sft);
+                            numTimelineFrames++;
                             p++;
                         }
                         swfFrameNum--;
@@ -401,8 +403,9 @@ public class MovieImporter {
                             placeObject.ratio = swfFrameNum - startFrame;
                             timelined.addTag(placeObject);
                             ShowFrameTag sft = new ShowFrameTag(swf);
-                            sft.setTimelined(timelined);
+                            sft.setTimelined(timelined);                           
                             timelined.addTag(sft);
+                            numTimelineFrames++;
                         }
                         swfFrameNum--;
                     }
@@ -411,6 +414,10 @@ public class MovieImporter {
                 }
             }
 
+            if (timelined != null) {
+                timelined.setFrameCount(numTimelineFrames);
+            }
+            
             movie.numFrames = importLastFrame - startFrame + 1;
 
             List<Tag> tagsToRemove = new ArrayList<>();
