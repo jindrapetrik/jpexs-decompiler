@@ -292,6 +292,19 @@ public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdT
                 }
             }
         }
+        
+        int framesBefore = timelined.getFrameCount();
+        //enlarge timeline when necessary
+        while (!blocks.isEmpty()) {
+            SoundStreamBlockTag block = blocks.remove(0);
+            block.setTimelined(timelined);
+            timelined.addTag(block);
+            ShowFrameTag sft = new ShowFrameTag(swf);
+            sft.setTimelined(timelined);
+            timelined.addTag(sft);  
+            framesBefore++;
+        }
+        timelined.setFrameCount(framesBefore);
         setSoundCompression(newSoundFormat);
         setSoundSampleCount((int) newSoundSampleCount);
         setSoundSize(newSoundSize);

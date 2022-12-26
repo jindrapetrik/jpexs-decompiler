@@ -4091,6 +4091,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (!ok) {
                 ViewMessages.showMessageDialog(this, translate("error.sound.invalid"), translate("error"), JOptionPane.ERROR_MESSAGE);
             } else {
+                refreshTree(((Tag)st).getSwf());                
                 reload(true);
             }
         }
