@@ -592,6 +592,12 @@ public class CommandLineArgumentParser {
             out.println(" ...imports Symbol-Class mapping to <infile> and saves the result to <outfile>");
         }
 
+        if (filter == null || filter.equals("importmovies")) {
+            out.println(" " + (cnt++) + ") -importMovies <infile> <outfile> <moviesfolder>");
+            out.println(" ...imports movies to <infile> and saves the result to <outfile>");
+        }
+
+        
         if (filter == null || filter.equals("importshapes")) {
             out.println(" " + (cnt++) + ") -importShapes <infile> <outfile> [nofill] <shapesfolder>");
             out.println(" ...imports shapes to <infile> and saves the result to <outfile>");
@@ -1031,6 +1037,8 @@ public class CommandLineArgumentParser {
             parseDoc(args);
         } else if (command.equals("importsymbolclass")) {
             parseImportSymbolClass(args, charset);
+        } else if (command.equals("importmovies")) {
+            parseImportMovies(args, charset);
         } else if (command.equals("importshapes")) {
             parseImportShapes(args, charset);
         } else if (command.equals("importimages")) {
@@ -3215,7 +3223,7 @@ public class CommandLineArgumentParser {
                         } else if (characterTag instanceof DefineVideoStreamTag) {
                             DefineVideoStreamTag movie = (DefineVideoStreamTag)characterTag;
                             try {
-                                new MovieImporter().importMovie(movie, new ByteArrayInputStream(data));              
+                                new MovieImporter().importMovie(movie, data);              
                             } catch (IOException iex) {
                                 System.err.println("Import FAILED: "+iex.getMessage());
                                 System.exit(1);
@@ -3800,6 +3808,42 @@ public class CommandLineArgumentParser {
                 swf.saveTo(fos);
             }
             System.out.println("" + shapeCount + " shapes successfully imported");
+        } catch (IOException | InterruptedException e) {
+            System.err.println("I/O error during writing");
+            System.exit(2);
+        }
+    }
+    
+    private static void parseImportMovies(Stack<String> args, String charset) {
+        if (args.size() < 3) {
+            badArguments("importmovies");
+        }
+
+        File inFile = new File(args.pop());
+        File outFile = new File(args.pop());
+
+        try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
+            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+            System.out.println("Source file opened");
+            String selFile = args.pop();
+
+            File moviesDir = new File(Path.combine(selFile, MovieExportSettings.EXPORT_FOLDER_NAME));
+            if (moviesDir.exists()) {
+                System.out.println("Using the directory: " + moviesDir.getAbsolutePath());
+            } else {
+                moviesDir = new File(selFile);
+            }
+            if (!moviesDir.exists()) {
+                System.err.println("Movies directory does not exist: " + moviesDir.getAbsolutePath());
+                System.exit(1);
+            }
+            MovieImporter movieImporter = new MovieImporter();
+            int movieCount = movieImporter.bulkImport(moviesDir, swf, true);                       
+            System.out.println("Writing outfile");
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
+                swf.saveTo(fos);
+            }
+            System.out.println("" + movieCount + " movies successfully imported");
         } catch (IOException | InterruptedException e) {
             System.err.println("I/O error during writing");
             System.exit(2);
