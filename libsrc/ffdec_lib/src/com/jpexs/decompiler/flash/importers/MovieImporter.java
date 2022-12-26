@@ -313,8 +313,8 @@ public class MovieImporter {
                     }
 
                     int idealFrame = startFrame + (int) Math.floor(swf.frameRate * ftag.timeStamp / 1000.0);
-                    if (idealFrame == importLastFrame) {
-                        idealFrame++;
+                    if (idealFrame <= importLastFrame) {
+                        idealFrame = importLastFrame + 1;
                     }
                     int swfFrameNum = -1;
                     ReadOnlyTagList tagList = timelined.getTags();
