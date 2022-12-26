@@ -123,6 +123,7 @@ import com.jpexs.decompiler.flash.importers.As3ScriptReplacerInterface;
 import com.jpexs.decompiler.flash.importers.BinaryDataImporter;
 import com.jpexs.decompiler.flash.importers.FFDecAs3ScriptReplacer;
 import com.jpexs.decompiler.flash.importers.ImageImporter;
+import com.jpexs.decompiler.flash.importers.MovieImporter;
 import com.jpexs.decompiler.flash.importers.ScriptImporterProgressListener;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
@@ -4105,7 +4106,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             DefineVideoStreamTag movie = (DefineVideoStreamTag) item;
             File selfile = Helper.fixDialogFile(selectedFile);
             try (FileInputStream fis = new FileInputStream(selfile)) {                
-                movie.replace(fis);                                   
+                new MovieImporter().importMovie(movie, fis);          
                 refreshTree();                                    
             } catch (IOException ex) {
                 ViewMessages.showMessageDialog(MainPanel.this, translate("error.movie.invalid") + ": "+ex.getMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);

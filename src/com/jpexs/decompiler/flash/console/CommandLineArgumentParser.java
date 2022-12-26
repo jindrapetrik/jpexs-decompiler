@@ -219,6 +219,7 @@ import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.exporters.DualPdfGraphics2D;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.gui.translator.Translator;
+import com.jpexs.decompiler.flash.importers.MovieImporter;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
@@ -3214,7 +3215,7 @@ public class CommandLineArgumentParser {
                         } else if (characterTag instanceof DefineVideoStreamTag) {
                             DefineVideoStreamTag movie = (DefineVideoStreamTag)characterTag;
                             try {
-                                movie.replace(new ByteArrayInputStream(data));                               
+                                new MovieImporter().importMovie(movie, new ByteArrayInputStream(data));              
                             } catch (IOException iex) {
                                 System.err.println("Import FAILED: "+iex.getMessage());
                                 System.exit(1);
