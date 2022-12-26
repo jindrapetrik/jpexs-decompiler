@@ -86,6 +86,8 @@ public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdT
         byte[] uncompressedSoundData = null;
         int bytesPerSwfFrame = -1;
         SWF swf = getSwf();
+        int sampleLen = 0;
+        int soundRateHz = 0;
         switch (newSoundFormat) {
             case SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN:
                 try (AudioInputStream audioIs = AudioSystem.getAudioInputStream(new BufferedInputStream(is))) {
@@ -94,12 +96,12 @@ public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdT
                 newSoundSize = fmt.getSampleSizeInBits() == 16;
                 //newSoundSampleCount = audioIs.getFrameLength();
                 uncompressedSoundData = Helper.readStream(audioIs);
-                int sampleLen = (newSoundType ? 2 : 1) * (newSoundSize ? 2 : 1);
-                newSoundRate = (int) Math.round(fmt.getSampleRate());
-                newSoundSampleCount = (int) Math.ceil(newSoundRate / swf.frameRate);
+                sampleLen = (newSoundType ? 2 : 1) * (newSoundSize ? 2 : 1);
+                soundRateHz = (int) Math.round(fmt.getSampleRate());
+                newSoundSampleCount = (int) Math.ceil(soundRateHz / swf.frameRate);
                 
-                bytesPerSwfFrame = (int) Math.ceil(newSoundRate / swf.frameRate) * sampleLen;
-                switch (newSoundRate) {
+                bytesPerSwfFrame = (int) Math.ceil(soundRateHz / swf.frameRate) * sampleLen;
+                switch (soundRateHz) {
                     case 5512:
                         newSoundRate = 0;
                         break;
@@ -144,8 +146,8 @@ public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdT
                     MP3SOUNDDATA snd = new MP3SOUNDDATA(new SWFInputStream(swf, mp3data), true);
                     if (!snd.frames.isEmpty()) {
                         MP3FRAME fr = snd.frames.get(0);
-                        newSoundRate = fr.getSamplingRate();
-                        switch (newSoundRate) {
+                        soundRateHz = fr.getSamplingRate();
+                        switch (soundRateHz) {
                             case 11025:
                                 newSoundRate = 1;
                                 break;
@@ -199,16 +201,36 @@ public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdT
         }
 
         List<SoundStreamBlockTag> blocks = new ArrayList<>();
-        if (bais != null) {
+        if (bais != null) { //Uncompressed
             DataInputStream dais = new DataInputStream(bais);
+            long pos = 0;
+            int frame = 0;
+            long lastNumSamplesLong = 0;
             try {
-                while (dais.available() > 0) {
-                    byte buf[] = new byte[bytesPerSwfFrame];
-
-                    dais.readFully(buf);
-                    SoundStreamBlockTag block = new SoundStreamBlockTag(swf);
-                    block.streamSoundData = new ByteArrayRange(buf);
-                    blocks.add(block);
+                while (dais.available() > 0) {                    
+                    
+                    float timeAfterFrame = (frame + 1) / swf.frameRate;
+                    float numSamplesAfterFrame = (frame + 1) * soundRateHz / swf.frameRate;
+                    
+                    long numSamplesAfterFrameLong = (long) Math.ceil(numSamplesAfterFrame);
+                    
+                    long deltaNumSamples  = numSamplesAfterFrameLong - lastNumSamplesLong;
+                    
+                    
+                    lastNumSamplesLong = numSamplesAfterFrameLong;
+                    
+                    if (deltaNumSamples > 0) {
+                        byte buf[] = new byte[(int)deltaNumSamples * sampleLen];
+                        dais.readFully(buf);
+                        SoundStreamBlockTag block = new SoundStreamBlockTag(swf);
+                        block.streamSoundData = new ByteArrayRange(buf);
+                        blocks.add(block);
+                    } else {
+                        SoundStreamBlockTag block = new SoundStreamBlockTag(swf);
+                        block.streamSoundData = new ByteArrayRange(new byte[0]);                        
+                        blocks.add(block);
+                    }
+                    frame++;
                 }
             } catch (IOException ex) {
                 //ignore
@@ -223,6 +245,7 @@ public abstract class SoundStreamHeadTypeTag extends Tag implements CharacterIdT
                 frame++;
                 if (frame >= startFrame && !blocks.isEmpty()) {
                     SoundStreamBlockTag block = blocks.remove(0);
+                    block.setTimelined(timelined);
                     timelined.addTag(i, block);                    
                     tags = timelined.getTags();
                     i++;
