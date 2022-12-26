@@ -5036,7 +5036,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             showDetail(DETAILCARDEMPTYPANEL);
         }
 
-        if (treeItem instanceof SoundStreamBlockTag) {
+        /*if (treeItem instanceof SoundStreamBlockTag) {
             SoundStreamBlockTag block = (SoundStreamBlockTag)treeItem;
             byte[] data = block.streamSoundData.getRangeData();
             try{
@@ -5049,7 +5049,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }catch(Exception ex){
                 
             }
-        }
+        }*/
         if (treeItem instanceof HeaderItem) {
             headerPanel.load((SWF) ((HeaderItem) treeItem).getOpenable());
             showCard(CARDHEADER);
