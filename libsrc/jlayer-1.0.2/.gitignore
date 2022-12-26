@@ -1,0 +1,8 @@
+/bin/
+jl1.0.1.jar
+build-unix.sh
+build-win32.bat
+playerapplet.html
+setEnvAnt.bat
+doc
+tmp/

@@ -55,8 +55,32 @@ public class MP3FRAME {
         } catch (DecoderException ex) {
             Logger.getLogger(MP3FRAME.class.getName()).log(Level.SEVERE, null, ex);
         }
-        bitstream.closeFrame();
+        bitstream.closeFrame();        
         return ret;
+    }
+    
+    public int getSampleCount() {
+       if (h.version() == 3) {
+           switch(h.layer()) {
+               case 1:
+                   return 1152;
+               case 2:
+                   return 1152;
+               case 3:
+                   return 384;
+           }
+       }
+       if (h.version() == 2 || h.version() == 0) {
+           switch(h.layer()) {
+               case 1:
+                   return 576;
+               case 2:
+                   return 1152;
+               case 3:
+                   return 384;
+           }
+       }
+       return 0;
     }
 
     public boolean isStereo() {

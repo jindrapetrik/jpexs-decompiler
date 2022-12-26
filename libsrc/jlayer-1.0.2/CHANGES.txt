@@ -1,0 +1,122 @@
+ JLayer 1.0.1
+ JavaZOOM 1999-2008
+
+ Project Homepage :
+   http://www.javazoom.net/javalayer/javalayer.html 
+
+ JAVA and MP3 online Forums :
+   http://www.javazoom.net/services/forums/index.jsp
+-----------------------------------------------------
+
+11/16/2008: JLayer 1.0.1
+------------------------
+- Subband allocation bug fix.
+
+
+11/28/2004: JLayer 1.0
+----------------------
+- VBRI frame header (Fraunhofer VBR) support added in Header.java.
+- Frame controls improved. It fixes the following bugs :
+    + ArrayIndexOutOfBound Exception in t_43[] array.
+    + ArrayIndexOutOfBound Exception in huffman_decode() method.
+- Licensing moved from GPL to LGPL : It means that you can use JLayer in
+  your own application without being restricted by GPL license issues.
+  It's more business friendly.
+- JavaLayer renamed into JLayer to be compliant to SUN trademark rules.
+- Tested under JRE 1.5.0. CPU usage < 1%, RAM usage < 12MB under P4/2Ghz.
+
+
+01/02/2004: JavaLayer 0.4
+-------------------------
+- XING VBR header frame support improved in Header.java :
+    + public boolean vbr() added.
+    + public int vbr_scale() added.
+    + public byte[] vbr_toc() added.
+    total_ms(), ms_per_frame(), min_number_of_frames(int), max_number_of_frames(int),
+    bitrate_string(), bitrate() methods check for VBR status.
+
+- ID3v2 frames support improved :
+    + public InputStream getRawID3v2() added in Bitstream.java
+
+- Misc : 
+    Bug fixed in the decoder for some +320kbps stream.
+    Bug fixed : SYNC conflict with some ID3v2 frames.
+    + public int bitrate() added.
+    + public int bitrate_instant() added.
+    jUnit tests added (see srctest/ folder)
+
+
+08/04/2003: JavaLayer 0.3.0
+---------------------------
+- Advanced threaded player classes added.
+
+
+04/01/2002: JavaLayer 0.2.0
+---------------------------
+ - MPEG 2.5 support added.
+   Encoded files with LAME are supported.
+ - Bug fixes for ms time computation with free format.
+ + Bench notes :
+    + Heap use range : 1380KB to 1900KB - 370 classes loaded. 
+    + Footprint : ~8MB under WinNT4 + J2SE 1.3 (Hotspot).
+    + CPU usage : ~12% under PIII 800Mhz/WinNT4+J2SE 1.3 (Hotspot).
+    + CPU usage : ~11% under PIII 1Ghz/Win2K+J2SE 1.4 (Hotspot).
+
+
+03/04/2002: JavaLayer 0.1.2
+---------------------------
+ - API improved to let developers get MP3 bitrate, framelength and total time features.
+ - Additionnal files added (CHANGES.txt and LICENSE.txt).
+
+
+10/01/2001: JavaLayer 0.1.1
+---------------------------
+ - Bugs fixes in the decoder (Layer III).
+
+
+07/02/2001: JavaLayer 0.1.0
+---------------------------
+ - Streaming support added to the simple player (jlp). 
+ - Bugs fixes in the simple player (too fast playback for low rate files).
+
+
+06/04/2001: JavaLayer 0.0.9
+---------------------------
+ - Bugs fixes in Layer I and Layer II decoder. 
+ - ANT build script added.
+ - HTML page added to play MP3 through PlayerApplet in a JavaSound 1.0 (JDK 1.3) 
+   compliant browser.
+
+
+04/16/2000: JavaLayer 0.0.8 
+---------------------------
+A simple player have been added and you can now play MP3 in real time with JVM 
+that supports JavaSound 1.0 (i.e JDK 1.3). 
+
+ - Bug fixes. 
+ - Decoder improvements. 
+ - Build Scripts have been added for Win32 and Unix platforms. 
+
+
+12/16/1999: JavaLayer 0.0.7 
+---------------------------
+JavaLayer 0.0.7 contains significant improvements over version 0.0 :
+
+ - API and documentation added.
+ - The decoder is much more faster. Fast enough for real-time decoding.
+ - Huffman/Layer3 tables serialization added. 
+ - New buffers management. 
+ - Exceptions + Utils added. 
+ - Bugs fixes.
+
+
+02/28/1999: JavaLayer 0.0
+-------------------------
+JavaLayer V0.0 does not play any MP3 but it allows the MP3toWAV conversion.
+This is the first step in this project. We do it thanks to free mp3 ressources 
+available on the net:
+
+ - MAPlay for the OO MP3 decoder (C++).
+ - WAV format description from Microsoft. 
+
+The MP3 decoder works now but it is too slow to allow real time implementation. 
