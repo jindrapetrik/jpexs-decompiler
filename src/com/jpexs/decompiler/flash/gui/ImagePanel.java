@@ -3112,6 +3112,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private Rectangle2D getTransformBounds() {
+        if (timelined == null) {
+            return null;
+        }
         int time = frozen ? 0 : this.time;
         DepthState ds = null;
         Timeline timeline = timelined.getTimeline();
