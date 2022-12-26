@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#1917] Better error message for sound import on unsupported sampling rate
 - [#1827] Replacing and bulk import of DefineVideoStream
+- Movie FLV export - writing simple onMetadata tag
 
 ### Fixed
 - [#1914] DropShadow filter
