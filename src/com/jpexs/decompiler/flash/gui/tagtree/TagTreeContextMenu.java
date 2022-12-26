@@ -898,6 +898,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         importImagesMenuItem.setVisible(false);
         importShapesMenuItem.setVisible(false);
         importShapesNoFillMenuItem.setVisible(false);
+        importMoviesMenuItem.setVisible(false);
         importScriptsMenuItem.setVisible(false);
         importSymbolClassMenuItem.setVisible(false);
         importTextsMenuItem.setVisible(false);
@@ -1116,6 +1117,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 importImagesMenuItem.setVisible(true);
                 importShapesMenuItem.setVisible(true);
                 importShapesNoFillMenuItem.setVisible(true);
+                importMoviesMenuItem.setVisible(true);
                 importScriptsMenuItem.setVisible(true);
                 importSymbolClassMenuItem.setVisible(true);
                 importTextsMenuItem.setVisible(true);
