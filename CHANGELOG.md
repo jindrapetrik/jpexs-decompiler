@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#1917] Better error message for sound import on unsupported sampling rate
 - [#1827] Replacing and bulk import of DefineVideoStream
 - Movie FLV export - writing simple onMetadata tag
+- [#1424], [#1473], [#1473], [#1852] Replacing sound streams (SoundStreamHead, SoundStreamBlock)
 
 ### Fixed
 - [#1914] DropShadow filter
@@ -2798,6 +2799,9 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1917]: https://www.free-decompiler.com/flash/issues/1917
 [#1827]: https://www.free-decompiler.com/flash/issues/1827
+[#1424]: https://www.free-decompiler.com/flash/issues/1424
+[#1473]: https://www.free-decompiler.com/flash/issues/1473
+[#1852]: https://www.free-decompiler.com/flash/issues/1852
 [#1914]: https://www.free-decompiler.com/flash/issues/1914
 [#1916]: https://www.free-decompiler.com/flash/issues/1916
 [#1231]: https://www.free-decompiler.com/flash/issues/1231
