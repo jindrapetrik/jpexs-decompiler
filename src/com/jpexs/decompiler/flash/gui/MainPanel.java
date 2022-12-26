@@ -172,6 +172,7 @@ import com.jpexs.decompiler.flash.tags.base.MissingCharacterHandler;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
+import com.jpexs.decompiler.flash.tags.base.SoundImportException;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
@@ -4032,7 +4033,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         TreeItem ti0 = items.get(0);
         File file = null;
-        if (ti0 instanceof DefineSoundTag) {
+        if (ti0 instanceof SoundTag) {
             file = showImportFileChooser("filter.sounds|*.mp3;*.wav|filter.sounds.mp3|*.mp3|filter.sounds.wav|*.wav", false);
         }
         if (ti0 instanceof ImageTag) {
@@ -4059,9 +4060,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (selectedFile == null) {
             return;
         }
-        if (item instanceof DefineSoundTag) {
+        if (item instanceof SoundTag) {
             File selfile = Helper.fixDialogFile(selectedFile);
-            DefineSoundTag ds = (DefineSoundTag) item;
+            SoundTag st = (SoundTag) item;
             int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
             if (selfile.getName().toLowerCase(Locale.ENGLISH).endsWith(".mp3")) {
                 soundFormat = SoundFormat.FORMAT_MP3;
@@ -4069,8 +4070,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
             boolean ok = false;
             try {
-                ok = ds.setSound(new FileInputStream(selfile), soundFormat);
-                ds.getSwf().clearSoundCache();
+                ok = st.setSound(new FileInputStream(selfile), soundFormat);
+                ((Tag)st).getSwf().clearSoundCache();
             } catch (IOException ex) {
                 //ignore
             } catch (UnsupportedSamplingRateException ex) {
@@ -4081,6 +4082,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 }
                 ViewMessages.showMessageDialog(this, translate("error.sound.rate").replace("%saplingRate%", samplingRateKhz).replace("%supportedRates%", String.join(", ", supportedRatesKhz)), translate("error"), JOptionPane.ERROR_MESSAGE);
                 return;
+            } catch (SoundImportException ex) {
+                //ignore
             }
 
             if (!ok) {
@@ -4823,7 +4826,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showImagePanel(timelinedContainer, swf, frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false);
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
-            previewPanel.setImageReplaceButtonVisible(false, false, false, !((Tag) treeItem).isReadOnly() && (treeItem instanceof DefineSoundTag), false);
+            previewPanel.setImageReplaceButtonVisible(false, false, false, !((Tag) treeItem).isReadOnly() && (treeItem instanceof SoundTag), false);
             try {
                 SoundTagPlayer soundThread = new SoundTagPlayer(null, (SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
                 if (!Configuration.autoPlaySounds.get()) {

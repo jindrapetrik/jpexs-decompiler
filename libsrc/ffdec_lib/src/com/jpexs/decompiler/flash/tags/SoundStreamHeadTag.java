@@ -41,7 +41,7 @@ import java.util.List;
  * @author JPEXS
  */
 @SWFVersion(from = 1)
-public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
+public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
 
     public static final int ID = 18;
 
@@ -217,12 +217,7 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
     @Override
     public boolean importSupported() {
         return false;
-    }
-
-    @Override
-    public boolean setSound(InputStream is, int newSoundFormat) {
-        return false;
-    }
+    }   
 
     @Override
     public List<ByteArrayRange> getRawSoundData() {
@@ -275,4 +270,29 @@ public class SoundStreamHeadTag extends Tag implements SoundStreamHeadTypeTag {
     }
         
     //getNeededCharacters intentionally not defined
+
+    @Override
+    protected void setSoundSize(boolean soundSize) {
+        this.streamSoundSize = soundSize;
+    }
+
+    @Override
+    protected void setSoundType(boolean soundType) {
+        this.streamSoundType = soundType;
+    }
+
+    @Override
+    protected void setSoundSampleCount(int soundSampleCount) {
+        this.streamSoundSampleCount = soundSampleCount;
+    }
+
+    @Override
+    protected void setSoundCompression(int soundCompression) {
+        this.streamSoundCompression = soundCompression;
+    }
+
+    @Override
+    protected void setSoundRate(int soundRate) {
+        this.streamSoundRate = soundRate;
+    }        
 }

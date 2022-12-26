@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.gui.player.Zoom;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.types.SOUNDINFO;
+import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -197,7 +198,9 @@ public class SoundTagPlayer implements MediaDisplay {
         }
 
         long soundLength44 = 0;
-        int sampleLen = 2 * (tag.getSoundFormat().stereo ? 2 : 1);
+        boolean isUnCompressed = tag.getSoundFormatId() == SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN ||
+                tag.getSoundFormatId() == SoundFormat.FORMAT_UNCOMPRESSED_NATIVE_ENDIAN;
+        int sampleLen = (isUnCompressed ? (tag.getSoundSize() ? 2 : 1) : 2) * (tag.getSoundFormat().stereo ? 2 : 1);
         switch (tag.getSoundRate()) {
             case 0: //5.5kHz
                 soundLength44 = 8 * tag.getTotalSoundSampleCount();

@@ -1766,9 +1766,10 @@ public class XFLConverter {
         for (int ch : characters.keySet()) {
             CharacterTag symbol = characters.get(ch);
             if (symbol instanceof ImageTag
-                    || symbol instanceof SoundStreamHeadTypeTag || symbol instanceof DefineSoundTag
+                    || symbol instanceof DefineSoundTag
                     || symbol instanceof DefineVideoStreamTag) {
-                hasMedia = true;
+                //symbol instanceof SoundStreamHeadTypeTag  FIXME
+                hasMedia = true;                
             }
         }
 
@@ -1854,7 +1855,7 @@ public class XFLConverter {
                 writer.writeAttribute("frameBottom", image.getHeight());
                 writer.writeEndElement();
                 mediaCount++;
-            } else if ((symbol instanceof SoundStreamHeadTypeTag) || (symbol instanceof DefineSoundTag)) {
+            } else if (/*(symbol instanceof SoundStreamHeadTypeTag) || FIXME */(symbol instanceof DefineSoundTag)) {
                 int soundFormat = 0;
                 int soundRate = 0;
                 boolean soundType = false;
@@ -1863,8 +1864,8 @@ public class XFLConverter {
                 byte[] soundData = SWFInputStream.BYTE_ARRAY_EMPTY;
                 int[] rateMap = {5, 11, 22, 44};
                 String exportFormat = "flv";
-                if (symbol instanceof SoundStreamHeadTypeTag) {
-                    SoundStreamHeadTypeTag sstream = (SoundStreamHeadTypeTag) symbol;
+                if (false) { //FIXME symbol instanceof SoundStreamHeadTypeTag) {
+                    SoundStreamHeadTypeTag sstream = null; //(SoundStreamHeadTypeTag) symbol;
                     soundFormat = sstream.getSoundFormatId();
                     soundRate = sstream.getSoundRate();
                     soundType = sstream.getSoundType();

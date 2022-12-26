@@ -35,7 +35,6 @@ public class SoundStreamBlockTag extends Tag {
 
     public static final String NAME = "SoundStreamBlock";
 
-    @HideInRawEdit
     public ByteArrayRange streamSoundData;
 
     /**
