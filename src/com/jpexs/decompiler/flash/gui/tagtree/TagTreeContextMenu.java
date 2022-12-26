@@ -169,6 +169,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     private JMenuItem importShapesMenuItem;
 
     private JMenuItem importShapesNoFillMenuItem;
+    
+    private JMenuItem importMoviesMenuItem;
 
     private JMenuItem importSymbolClassMenuItem;
 
@@ -409,6 +411,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         importShapesNoFillMenuItem.addActionListener(this::importShapesNoFillActionPerformed);
         importShapesNoFillMenuItem.setIcon(View.getIcon("importshape16"));
         add(importShapesNoFillMenuItem);
+        
+        importMoviesMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.movie"));
+        importMoviesMenuItem.addActionListener(this::importMoviesActionPerformed);
+        importMoviesMenuItem.setIcon(View.getIcon("importmovie16"));
+        add(importMoviesMenuItem);
 
         importSymbolClassMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.symbolClass"));
         importSymbolClassMenuItem.addActionListener(this::importSymbolClassActionPerformed);
@@ -3255,6 +3262,11 @@ public class TagTreeContextMenu extends JPopupMenu {
     public void importShapesNoFillActionPerformed(ActionEvent evt) {
         SWF swf = (SWF) getCurrentItem().getOpenable();
         mainPanel.importShape(swf, true);
+    }
+    
+    public void importMoviesActionPerformed(ActionEvent evt) {
+        SWF swf = (SWF) getCurrentItem().getOpenable();
+        mainPanel.importMovie(swf);
     }
 
     public void importSymbolClassActionPerformed(ActionEvent evt) {
