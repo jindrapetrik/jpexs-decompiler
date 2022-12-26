@@ -25,11 +25,13 @@ import com.jpexs.decompiler.flash.flv.SCRIPTDATAVARIABLE;
 import com.jpexs.decompiler.flash.flv.VIDEODATA;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
+import com.jpexs.decompiler.flash.tags.RemoveObject2Tag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.VideoFrameTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
@@ -413,9 +415,13 @@ public class MovieImporter {
 
             List<Tag> tagsToRemove = new ArrayList<>();
             if (timelined != null) {
+                boolean placed = false;
                 for (Tag t : timelined.getTags()) {
                     if (t instanceof PlaceObjectTypeTag) {
                         PlaceObjectTypeTag pt = (PlaceObjectTypeTag) t;
+                        if (pt.getCharacterId() == movie.characterID) {
+                            placed = true;
+                        }
                         if (pt.getDepth() == placeDepth) {
                             int ratio = pt.getRatio();
                             if (ratio > importLastFrame - startFrame) {
@@ -423,9 +429,36 @@ public class MovieImporter {
                             }
                         }
                     }
+                    if (t instanceof RemoveTag) {
+                        RemoveTag rt = (RemoveTag)t;
+                        if(placed && rt.getDepth() == placeDepth) {
+                            tagsToRemove.add(t);
+                            placed = false;
+                        }
+                    }
                 }
                 for (Tag t : tagsToRemove) {
                     timelined.removeTag(t);
+                }
+            }
+            
+            if (timelined != null) {
+                int f = -1;
+                ReadOnlyTagList tags = timelined.getTags();
+                for (int i = 0; i < tags.size(); i++) {
+                    Tag t = tags.get(i);
+                    if (t instanceof ShowFrameTag) {
+                        f++;
+                        if (f == importLastFrame) {
+                            if (i < tags.size() - 1) {
+                                RemoveObject2Tag rt = new RemoveObject2Tag(swf);
+                                rt.depth = placeDepth;
+                                rt.setTimelined(timelined);
+                                timelined.addTag(i + 1, rt);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
