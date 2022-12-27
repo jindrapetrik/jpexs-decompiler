@@ -21,9 +21,11 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.SoundImportException;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
@@ -38,11 +40,17 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.AudioFormat;
@@ -459,5 +467,97 @@ public class SoundImporter {
             return importSoundStream((SoundStreamHeadTypeTag)soundTag, is, newSoundFormat);
         }
         return false;
+    }
+    
+    public int bulkImport(File soundDir, SWF swf, boolean printOut) {
+        
+        Map<Integer, CharacterTag> characters = swf.getCharacters();
+        int soundCount = 0;
+        List<String> extensions = Arrays.asList("mp3", "wav");
+        File allFiles[] = soundDir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                String nameLower = name.toLowerCase();
+                for (String ext : extensions) {
+                    if (nameLower.endsWith("." + ext)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+        
+        
+        List<SoundTag> soundTags = new ArrayList<>();
+        for (int characterId : characters.keySet()) {
+            CharacterTag tag = characters.get(characterId);
+            if (tag instanceof DefineSoundTag) {
+                soundTags.add((DefineSoundTag) tag);
+            }
+            if (tag instanceof DefineSpriteTag) {
+                DefineSpriteTag sprite = (DefineSpriteTag) tag;
+                for (Tag subTag : sprite.getTags()) {
+                    if (subTag instanceof SoundStreamHeadTypeTag) {
+                        soundTags.add((SoundStreamHeadTypeTag)subTag);
+                    }
+                }
+            }
+        }
+        for (Tag tag:swf.getTags()) {
+            if (tag instanceof SoundStreamHeadTypeTag) {
+                soundTags.add((SoundStreamHeadTypeTag) tag);
+            }
+        }
+        
+        for (SoundTag tag : soundTags) {
+            int characterId = tag.getCharacterId();
+                List<File> existingFilesForSoundTag = new ArrayList<>();
+                for (File f : allFiles) {
+                    if (f.getName().startsWith("" + characterId + ".") || f.getName().startsWith("" + characterId + "_")) {
+                        existingFilesForSoundTag.add(f);
+                    }
+                }
+                existingFilesForSoundTag.sort(new Comparator<File>() {
+                    @Override
+                    public int compare(File o1, File o2) {
+                        String ext1 = o1.getName().substring(o1.getName().lastIndexOf(".") + 1);
+                        String ext2 = o2.getName().substring(o2.getName().lastIndexOf(".") + 1);
+                        int ret = extensions.indexOf(ext1) - extensions.indexOf(ext2);
+                        if (ret == 0) {
+                            return o1.getName().compareTo(o2.getName());
+                        }
+                        return ret;
+                    }
+                });
+
+                if (existingFilesForSoundTag.isEmpty()) {
+                    continue;
+                }
+
+                if (existingFilesForSoundTag.size() > 1) {
+                    Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Multiple matching files for sound tag {0} exists, {1} selected", new Object[]{characterId, existingFilesForSoundTag.get(0).getName()});
+                }
+                File sourceFile = existingFilesForSoundTag.get(0);
+
+                try {
+                    if (printOut) {
+                        System.out.println("Importing character " + characterId + " from file " + sourceFile.getName());
+                    }
+                    int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
+                    if (sourceFile.getAbsolutePath().toLowerCase(Locale.ENGLISH).endsWith(".mp3")) {
+                        soundFormat = SoundFormat.FORMAT_MP3;
+                    }
+                    try (FileInputStream fis = new FileInputStream(sourceFile)){
+                        importSound(tag,fis, soundFormat);
+                        soundCount++;
+                    }                    
+                } catch (IOException|SoundImportException ex) {
+                    Logger.getLogger(ShapeImporter.class.getName()).log(Level.WARNING, "Cannot import sound " + characterId + " from file " + sourceFile.getName(), ex);
+                }
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }            
+        }
+        return soundCount;
     }
 }

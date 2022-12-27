@@ -58,4 +58,6 @@ public interface SoundTag extends TreeItem {
     public void setSoundCompression(int soundCompression);
 
     public void setSoundRate(int soundRate);
+    
+    public int getCharacterId();
 }

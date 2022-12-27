@@ -173,6 +173,8 @@ public class TagTreeContextMenu extends JPopupMenu {
     
     private JMenuItem importMoviesMenuItem;
 
+    private JMenuItem importSoundsMenuItem;
+
     private JMenuItem importSymbolClassMenuItem;
 
     private JMenuItem closeMenuItem;
@@ -417,6 +419,11 @@ public class TagTreeContextMenu extends JPopupMenu {
         importMoviesMenuItem.addActionListener(this::importMoviesActionPerformed);
         importMoviesMenuItem.setIcon(View.getIcon("importmovie16"));
         add(importMoviesMenuItem);
+        
+        importSoundsMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.sound"));
+        importSoundsMenuItem.addActionListener(this::importSoundsActionPerformed);
+        importSoundsMenuItem.setIcon(View.getIcon("importsound16"));
+        add(importSoundsMenuItem);
 
         importSymbolClassMenuItem = new JMenuItem(mainPanel.translate("menu.file.import.symbolClass"));
         importSymbolClassMenuItem.addActionListener(this::importSymbolClassActionPerformed);
@@ -900,6 +907,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         importShapesMenuItem.setVisible(false);
         importShapesNoFillMenuItem.setVisible(false);
         importMoviesMenuItem.setVisible(false);
+        importSoundsMenuItem.setVisible(false);
         importScriptsMenuItem.setVisible(false);
         importSymbolClassMenuItem.setVisible(false);
         importTextsMenuItem.setVisible(false);
@@ -1119,6 +1127,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 importShapesMenuItem.setVisible(true);
                 importShapesNoFillMenuItem.setVisible(true);
                 importMoviesMenuItem.setVisible(true);
+                importSoundsMenuItem.setVisible(true);
                 importScriptsMenuItem.setVisible(true);
                 importSymbolClassMenuItem.setVisible(true);
                 importTextsMenuItem.setVisible(true);
@@ -3270,6 +3279,11 @@ public class TagTreeContextMenu extends JPopupMenu {
     public void importMoviesActionPerformed(ActionEvent evt) {
         SWF swf = (SWF) getCurrentItem().getOpenable();
         mainPanel.importMovie(swf);
+    }
+    
+    public void importSoundsActionPerformed(ActionEvent evt) {
+        SWF swf = (SWF) getCurrentItem().getOpenable();
+        mainPanel.importSound(swf);
     }
 
     public void importSymbolClassActionPerformed(ActionEvent evt) {
