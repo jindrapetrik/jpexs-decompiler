@@ -2664,7 +2664,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.1.0...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.2.0...dev
+[18.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.1.0...version18.2.0
 [18.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.0.0...version18.1.0
 [18.0.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.4...version18.0.0
 [17.0.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version17.0.3...version17.0.4
@@ -2805,6 +2806,7 @@ All notable changes to this project will be documented in this file.
 [#1827]: https://www.free-decompiler.com/flash/issues/1827
 [#1424]: https://www.free-decompiler.com/flash/issues/1424
 [#1473]: https://www.free-decompiler.com/flash/issues/1473
+[#1835]: https://www.free-decompiler.com/flash/issues/1835
 [#1852]: https://www.free-decompiler.com/flash/issues/1852
 [#1914]: https://www.free-decompiler.com/flash/issues/1914
 [#1916]: https://www.free-decompiler.com/flash/issues/1916
