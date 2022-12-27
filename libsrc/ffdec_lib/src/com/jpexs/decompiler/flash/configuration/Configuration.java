@@ -875,6 +875,10 @@ public final class Configuration {
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> showImportMovieInfo = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> showImportSoundInfo = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

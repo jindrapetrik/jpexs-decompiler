@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - [#1827] Replacing and bulk import of DefineVideoStream
 - Movie FLV export - writing simple onMetadata tag
 - [#1424], [#1473], [#1473], [#1852] Replacing sound streams (SoundStreamHead, SoundStreamBlock)
+- Bulk import sounds and sound streams
 
 ### Fixed
 - [#1914] DropShadow filter

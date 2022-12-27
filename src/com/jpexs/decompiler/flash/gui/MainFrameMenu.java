@@ -383,6 +383,16 @@ public abstract class MainFrameMenu implements MenuBuilder {
         mainFrame.getPanel().importMovie((SWF) openable);
     }
     
+    protected void importSoundsActionPerformed(ActionEvent evt) {
+        if (Main.isWorking()) {
+            return;
+        }
+        if (mainFrame.getPanel().checkEdited()) {
+            return;
+        }
+        mainFrame.getPanel().importSound((SWF) openable);
+    }
+    
     protected void importSymbolClassActionPerformed(ActionEvent evt) {
         if (Main.isWorking()) {
             return;
@@ -1129,6 +1139,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         addMenuItem("/file/import/importOther/importShapes", translate("menu.file.import.shape"), "importshape32", this::importShapesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/import/importOther/importShapesNoFill", translate("menu.file.import.shapeNoFill"), "importshape32", this::importShapesNoFillActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         addMenuItem("/file/import/importOther/importMovies", translate("menu.file.import.movie"), "importmovie32", this::importMoviesActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
+        addMenuItem("/file/import/importOther/importSounds", translate("menu.file.import.sound"), "importsound32", this::importSoundsActionPerformed, PRIORITY_MEDIUM, null, true, null, false);        
         addMenuItem("/file/import/importOther/importSymbolClass", translate("menu.file.import.symbolClass"), "importsymbolclass32", this::importSymbolClassActionPerformed, PRIORITY_MEDIUM, null, true, null, false);
         finishMenu("/file/import/importOther");
         finishMenu("/file/import");

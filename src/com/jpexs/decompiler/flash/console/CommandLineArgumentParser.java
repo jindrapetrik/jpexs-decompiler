@@ -226,6 +226,7 @@ import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.SoundImportException;
+import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.UnsupportedSamplingRateException;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.helpers.SerializableImage;
@@ -598,7 +599,11 @@ public class CommandLineArgumentParser {
             out.println(" ...imports movies to <infile> and saves the result to <outfile>");
         }
 
-        
+        if (filter == null || filter.equals("importsounds")) {
+            out.println(" " + (cnt++) + ") -importSounds <infile> <outfile> <soundsfolder>");
+            out.println(" ...imports sounds to <infile> and saves the result to <outfile>");
+        }
+
         if (filter == null || filter.equals("importshapes")) {
             out.println(" " + (cnt++) + ") -importShapes <infile> <outfile> [nofill] <shapesfolder>");
             out.println(" ...imports shapes to <infile> and saves the result to <outfile>");
@@ -1067,6 +1072,9 @@ public class CommandLineArgumentParser {
         } else if (command.equals("importmovies")) {
             parseImportMovies(args, charset);
             System.exit(0);
+        } else if (command.equals("importsounds")) {
+            parseImportSounds(args, charset);
+            System.exit(0);
         } else if (command.equals("importshapes")) {
             parseImportShapes(args, charset);
             System.exit(0);
@@ -1483,7 +1491,7 @@ public class CommandLineArgumentParser {
                 }
                 return false;
             }
-        }, charset);        
+        }, charset);
     }
 
     private static void parseSetInstanceMetadata(Stack<String> args, String charset) {
@@ -1692,7 +1700,7 @@ public class CommandLineArgumentParser {
                 }
                 return false;
             }
-        }, charset);       
+        }, charset);
     }
 
     private static void parseRemoveInstanceMetadata(Stack<String> args, String charset) {
@@ -1820,7 +1828,7 @@ public class CommandLineArgumentParser {
                 }
                 return false;
             }
-        }, charset);        
+        }, charset);
     }
 
     private static class Range {
@@ -2732,7 +2740,7 @@ public class CommandLineArgumentParser {
             }
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
-        }       
+        }
     }
 
     private static void parseXml2Swf(Stack<String> args, String charset) {
@@ -2751,7 +2759,7 @@ public class CommandLineArgumentParser {
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-        
+
     }
 
     private static void parseExtract(Stack<String> args) {
@@ -2836,7 +2844,7 @@ public class CommandLineArgumentParser {
         } catch (IOException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
-       
+
     }
 
     private static void parseMemorySearch(Stack<String> args) {
@@ -2921,7 +2929,7 @@ public class CommandLineArgumentParser {
         } else {
             System.err.println("Memory search is only available on Windows platform.");
         }
-        
+
     }
 
     private static void parseRenameInvalidIdentifiers(Stack<String> args) {
@@ -3065,7 +3073,7 @@ public class CommandLineArgumentParser {
 
                         int fframe = 0;
                         final Graphics2D g = (Graphics2D) job.getGraphics(pf);
-                        
+
                         SerializableImage image = new SerializableImage((int) w + 1, (int) h + 1, SerializableImage.TYPE_INT_ARGB_PRE) {
 
                             private Graphics2D compositeGraphics;
@@ -3103,7 +3111,7 @@ public class CommandLineArgumentParser {
 
                         if (Thread.currentThread().isInterrupted()) {
                             return;
-                        }                        
+                        }
 
                         System.out.println("OK");
 
@@ -3169,16 +3177,56 @@ public class CommandLineArgumentParser {
                             System.err.println("CharacterId should be integer");
                             badArguments("replace");
                         }
-                        if (!swf.getCharacters().containsKey(characterId)) {
+
+                        SoundStreamHeadTypeTag soundStreamHead = null;
+                        CharacterTag characterTag = null;
+                        if (characterId == 0) {
+                            //replacing soundstreamhead on main timeline
+                        } else if (swf.getCharacters().containsKey(characterId)) {
+                            characterTag = swf.getCharacter(characterId);
+                        } else {
                             System.err.println("CharacterId does not exist");
                             System.exit(1);
                         }
 
-                        CharacterTag characterTag = swf.getCharacter(characterId);
                         String repFile = args.pop();
+
                         byte[] data = Helper.readFile(repFile);
                         String ext = Path.getExtension(repFile);
-                        if (characterTag instanceof DefineBinaryDataTag) {
+
+                        int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
+                        if (".mp3".equals(ext)) {
+                            soundFormat = SoundFormat.FORMAT_MP3;
+                        }
+
+                        if ((characterTag == null || (characterTag instanceof DefineSpriteTag)) && (".wav".equals(ext) || ".mp3".equals(ext))) {
+                            ReadOnlyTagList tags = (characterTag == null) ? swf.getTags() : ((DefineSpriteTag) characterTag).getTags();
+                            for (Tag t : tags) {
+                                if (t instanceof SoundStreamHeadTypeTag) {
+                                    soundStreamHead = (SoundStreamHeadTypeTag) t;
+                                    break;
+                                }
+                            }
+                            if (soundStreamHead == null) {
+                                System.err.println((characterTag == null ? "Main timeline " : "DefineSprite(" + characterId + ")") + " does not contain any SoundStreamHead");
+                                System.exit(1);
+                            }
+                            boolean ok = false;
+                            try {
+                                ok = new SoundImporter().importSoundStream(soundStreamHead, new ByteArrayInputStream(data), soundFormat);
+                            } catch (UnsupportedSamplingRateException usre) {
+                                List<String> supportedRatesStr = new ArrayList<>();
+                                for (int i : usre.getSupportedRates()) {
+                                    supportedRatesStr.add("" + i);
+                                }
+                                System.err.println("Import FAILED. Input file has unsupported sampling rate (" + usre.getSoundRate() + "). Supported rates for this sound format: " + String.join(", ", supportedRatesStr) + ".");
+                                System.exit(2);
+                            }
+                            if (!ok) {
+                                System.err.println("Import FAILED. Maybe unsuppoted media type? Only MP3 and uncompressed WAV are available.");
+                                System.exit(1);
+                            }
+                        } else if (characterTag instanceof DefineBinaryDataTag) {
                             DefineBinaryDataTag defineBinaryData = (DefineBinaryDataTag) characterTag;
                             new BinaryDataImporter().importData(defineBinaryData, data);
                         } else if (characterTag instanceof ImageTag) {
@@ -3218,12 +3266,7 @@ public class CommandLineArgumentParser {
                                 }
                             }).importText(textTag, new String(data, Utf8Helper.charset));
                         } else if (characterTag instanceof SoundTag) {
-                            SoundTag st = (SoundTag) characterTag;
-                            int soundFormat = SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
-                            if (repFile.toLowerCase(Locale.ENGLISH).endsWith(".mp3")) {
-                                soundFormat = SoundFormat.FORMAT_MP3;
-                            }
-                            
+                            SoundTag st = (SoundTag) characterTag;                            
                             boolean ok = false;
                             SoundImporter soundImporter = new SoundImporter();
                             try {
@@ -3233,7 +3276,7 @@ public class CommandLineArgumentParser {
                                 for (int i : usre.getSupportedRates()) {
                                     supportedRatesStr.add("" + i);
                                 }
-                                System.err.println("Import FAILED. Input file has unsupported sampling rate ("+usre.getSoundRate()+"). Supported rates for this sound format: "+String.join(", ", supportedRatesStr)+".");
+                                System.err.println("Import FAILED. Input file has unsupported sampling rate (" + usre.getSoundRate() + "). Supported rates for this sound format: " + String.join(", ", supportedRatesStr) + ".");
                                 System.exit(2);
                             } catch (SoundImportException sie) {
                                 ok = false;
@@ -3243,11 +3286,11 @@ public class CommandLineArgumentParser {
                                 System.exit(1);
                             }
                         } else if (characterTag instanceof DefineVideoStreamTag) {
-                            DefineVideoStreamTag movie = (DefineVideoStreamTag)characterTag;
+                            DefineVideoStreamTag movie = (DefineVideoStreamTag) characterTag;
                             try {
-                                new MovieImporter().importMovie(movie, data);              
+                                new MovieImporter().importMovie(movie, data);
                             } catch (IOException iex) {
-                                System.err.println("Import FAILED: "+iex.getMessage());
+                                System.err.println("Import FAILED: " + iex.getMessage());
                                 System.exit(1);
                             }
                         } else {
@@ -3317,7 +3360,7 @@ public class CommandLineArgumentParser {
                 try {
                     try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
                         swf.saveTo(fos);
-                    }                    
+                    }
                 } catch (IOException e) {
                     System.err.println("I/O error during writing");
                     System.exit(2);
@@ -3824,7 +3867,7 @@ public class CommandLineArgumentParser {
             }
             ShapeImporter shapeImporter = new ShapeImporter();
             int shapeCount = shapeImporter.bulkImport(shapesDir, swf, noFill, true);
-            
+
             System.out.println("Writing outfile");
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
                 swf.saveTo(fos);
@@ -3835,7 +3878,7 @@ public class CommandLineArgumentParser {
             System.exit(2);
         }
     }
-    
+
     private static void parseImportMovies(Stack<String> args, String charset) {
         if (args.size() < 3) {
             badArguments("importmovies");
@@ -3860,12 +3903,48 @@ public class CommandLineArgumentParser {
                 System.exit(1);
             }
             MovieImporter movieImporter = new MovieImporter();
-            int movieCount = movieImporter.bulkImport(moviesDir, swf, true);                       
+            int movieCount = movieImporter.bulkImport(moviesDir, swf, true);
             System.out.println("Writing outfile");
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
                 swf.saveTo(fos);
             }
             System.out.println("" + movieCount + " movies successfully imported");
+        } catch (IOException | InterruptedException e) {
+            System.err.println("I/O error during writing");
+            System.exit(2);
+        }
+    }
+
+    private static void parseImportSounds(Stack<String> args, String charset) {
+        if (args.size() < 3) {
+            badArguments("importsounds");
+        }
+
+        File inFile = new File(args.pop());
+        File outFile = new File(args.pop());
+
+        try (StdInAwareFileInputStream is = new StdInAwareFileInputStream(inFile)) {
+            SWF swf = new SWF(is, Configuration.parallelSpeedUp.get(), charset);
+            System.out.println("Source file opened");
+            String selFile = args.pop();
+
+            File soundsDir = new File(Path.combine(selFile, SoundExportSettings.EXPORT_FOLDER_NAME));
+            if (soundsDir.exists()) {
+                System.out.println("Using the directory: " + soundsDir.getAbsolutePath());
+            } else {
+                soundsDir = new File(selFile);
+            }
+            if (!soundsDir.exists()) {
+                System.err.println("Sounds directory does not exist: " + soundsDir.getAbsolutePath());
+                System.exit(1);
+            }
+            SoundImporter soundImporter = new SoundImporter();
+            int soundCount = soundImporter.bulkImport(soundsDir, swf, true);
+            System.out.println("Writing outfile");
+            try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
+                swf.saveTo(fos);
+            }
+            System.out.println("" + soundCount + " sounds successfully imported");
         } catch (IOException | InterruptedException e) {
             System.err.println("I/O error during writing");
             System.exit(2);
@@ -3896,7 +3975,7 @@ public class CommandLineArgumentParser {
                 System.exit(1);
             }
             ImageImporter imageImporter = new ImageImporter();
-            int imageCount = imageImporter.bulkImport(imagesDir, swf, true);                       
+            int imageCount = imageImporter.bulkImport(imagesDir, swf, true);
             System.out.println("Writing outfile");
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(outFile))) {
                 swf.saveTo(fos);
@@ -4296,7 +4375,7 @@ public class CommandLineArgumentParser {
         }
         if (!found) {
             System.exit(1);
-        }       
+        }
     }
 
     private static String doubleToString(double d) {
@@ -4383,7 +4462,7 @@ public class CommandLineArgumentParser {
         } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
             System.exit(1);
-        }       
+        }
     }
 
     private static void parseDumpAS2(Stack<String> args, String charset) {
@@ -4483,7 +4562,7 @@ public class CommandLineArgumentParser {
             System.exit(3);
         }
 
-        System.out.println("Finished");        
+        System.out.println("Finished");
     }
 
     private static void parseDumpAS3(Stack<String> args, String charset) {
