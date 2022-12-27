@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 - [#1917] Better error message for sound import on unsupported sampling rate
 - [#1827] Replacing and bulk import of DefineVideoStream
 - Movie FLV export - writing simple onMetadata tag
-- [#1424], [#1473], [#1473], [#1852] Replacing sound streams (SoundStreamHead, SoundStreamBlock)
+- [#1424], [#1473], [#1835], [#1852] Replacing sound streams (SoundStreamHead, SoundStreamBlock)
 - Bulk import sounds and sound streams
 
 ### Fixed
