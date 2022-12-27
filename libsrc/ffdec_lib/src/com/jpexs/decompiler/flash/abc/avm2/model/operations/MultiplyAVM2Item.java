@@ -77,13 +77,15 @@ public class MultiplyAVM2Item extends BinaryOpItem implements CompoundableBinary
 
     @Override
     public GraphTargetItem returnType() {
-        if (leftSide.returnType().equals(TypeItem.INT) && rightSide.returnType().equals(TypeItem.INT)) {
+        GraphTargetItem leftType = leftSide.returnType();
+        GraphTargetItem rightType = rightSide.returnType();
+        if (leftType.equals(TypeItem.INT) && rightType.equals(TypeItem.INT)) {
             return TypeItem.INT;
         }
-        if (leftSide.returnType().equals(TypeItem.UINT) && rightSide.returnType().equals(TypeItem.UINT)) {
+        if (leftType.equals(TypeItem.UINT) && rightType.equals(TypeItem.UINT)) {
             return TypeItem.UINT;
         }
-        if (leftSide.returnType().equals(TypeItem.NUMBER) || rightSide.returnType().equals(TypeItem.NUMBER)) {
+        if (leftType.equals(TypeItem.NUMBER) || rightType.equals(TypeItem.NUMBER)) {
             return TypeItem.NUMBER;
         }
         
