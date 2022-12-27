@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- Copy/Move/Cut with dependencies did not handle original tag when not charactertag
 
 ## [18.2.0] - 2022-12-27
 ### Added

@@ -3036,6 +3036,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                     }
                 }
             }
+            if (!(tag instanceof CharacterTag)) {
+                newItems.add(tag);
+            }
         }
         return newItems;
     }
