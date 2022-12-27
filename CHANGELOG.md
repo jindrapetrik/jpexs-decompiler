@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [18.2.0] - 2022-12-27
 ### Added
 - [#1917] Better error message for sound import on unsupported sampling rate
