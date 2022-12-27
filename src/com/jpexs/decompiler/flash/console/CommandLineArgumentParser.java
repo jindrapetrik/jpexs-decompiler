@@ -220,6 +220,7 @@ import com.jpexs.decompiler.flash.exporters.DualPdfGraphics2D;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.gui.translator.Translator;
 import com.jpexs.decompiler.flash.importers.MovieImporter;
+import com.jpexs.decompiler.flash.importers.SoundImporter;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.base.HasSeparateAlphaChannel;
@@ -3224,9 +3225,9 @@ public class CommandLineArgumentParser {
                             }
                             
                             boolean ok = false;
-                            
+                            SoundImporter soundImporter = new SoundImporter();
                             try {
-                                ok = st.setSound(new ByteArrayInputStream(data), soundFormat);
+                                ok = soundImporter.importSound(st, new ByteArrayInputStream(data), soundFormat);
                             } catch (UnsupportedSamplingRateException usre) {
                                 List<String> supportedRatesStr = new ArrayList<>();
                                 for (int i : usre.getSupportedRates()) {
