@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#1914] DropShadow filter
 - [#1916] Translation tool did not load up
 - PlaceObject preview not cleared causing sound to repeat
-- [#1920] Slower decompilation (returnType method optimization)
+- [#1920] AS3 - Slower decompilation (returnType method optimization)
 
 ## [18.1.0] - 2022-12-23
 ### Added
