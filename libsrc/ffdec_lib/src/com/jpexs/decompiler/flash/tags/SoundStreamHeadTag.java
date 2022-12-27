@@ -272,27 +272,27 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
     //getNeededCharacters intentionally not defined
 
     @Override
-    protected void setSoundSize(boolean soundSize) {
+    public void setSoundSize(boolean soundSize) {
         this.streamSoundSize = soundSize;
     }
 
     @Override
-    protected void setSoundType(boolean soundType) {
+    public void setSoundType(boolean soundType) {
         this.streamSoundType = soundType;
     }
 
     @Override
-    protected void setSoundSampleCount(int soundSampleCount) {
-        this.streamSoundSampleCount = soundSampleCount;
+    public void setSoundSampleCount(long soundSampleCount) {
+        this.streamSoundSampleCount = (int) soundSampleCount;
     }
 
     @Override
-    protected void setSoundCompression(int soundCompression) {
+    public void setSoundCompression(int soundCompression) {
         this.streamSoundCompression = soundCompression;
     }
 
     @Override
-    protected void setSoundRate(int soundRate) {
+    public void setSoundRate(int soundRate) {
         this.streamSoundRate = soundRate;
     }        
 }

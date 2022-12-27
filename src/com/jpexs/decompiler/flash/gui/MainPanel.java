@@ -127,6 +127,7 @@ import com.jpexs.decompiler.flash.importers.ImageImporter;
 import com.jpexs.decompiler.flash.importers.MovieImporter;
 import com.jpexs.decompiler.flash.importers.ScriptImporterProgressListener;
 import com.jpexs.decompiler.flash.importers.ShapeImporter;
+import com.jpexs.decompiler.flash.importers.SoundImporter;
 import com.jpexs.decompiler.flash.importers.SwfXmlImporter;
 import com.jpexs.decompiler.flash.importers.SymbolClassImporter;
 import com.jpexs.decompiler.flash.importers.TextImporter;
@@ -4069,10 +4070,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (selfile.getName().toLowerCase(Locale.ENGLISH).endsWith(".mp3")) {
                 soundFormat = SoundFormat.FORMAT_MP3;
             }
+            
+            SoundImporter soundImporter = new SoundImporter();
 
             boolean ok = false;
             try {
-                ok = st.setSound(new FileInputStream(selfile), soundFormat);
+                ok = soundImporter.importSound(st, new FileInputStream(selfile), soundFormat);
                 ((Tag)st).getSwf().clearSoundCache();
             } catch (IOException ex) {
                 //ignore

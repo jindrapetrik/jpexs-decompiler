@@ -32,9 +32,7 @@ public interface SoundTag extends TreeItem {
     public SoundExportFormat getExportFormat();
 
     public boolean importSupported();
-
-    public boolean setSound(InputStream is, int newSoundFormat) throws SoundImportException;
-
+    
     public int getSoundRate();
 
     public boolean getSoundType();
@@ -50,4 +48,14 @@ public interface SoundTag extends TreeItem {
     public String getCharacterExportFileName();
 
     public SoundFormat getSoundFormat();
+    
+    public void setSoundSize(boolean soundSize);
+
+    public void setSoundType(boolean soundType);
+
+    public void setSoundSampleCount(long soundSampleCount);
+
+    public void setSoundCompression(int soundCompression);
+
+    public void setSoundRate(int soundRate);
 }
