@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - [#1915] SVG import - gradient when it has two final stops
 - Native sound export format for ADPCM compression is FLV
 - [#1923] Wrong cyclic tag detection causing hidden sprites
+- Ctrl + G shortcut for tag list view
 
 ### Changed
 - [#1913] SVG export/import of shapes - shape exact position (bounds) is retained
