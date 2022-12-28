@@ -146,6 +146,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -3557,16 +3558,25 @@ public class XFLConverter {
 
         if (!useAS3 && flaVersion.minASVersion() > 2) {
             throw new IllegalArgumentException("FLA version " + flaVersion + " does not support AS1/2");
-        }
-        File file = new File(outfile);
-        File outDir = file.getParentFile();
-        Path.createDirectorySafe(outDir);
+        }        
+        File file = new File(outfile);                        
         String baseName = swfFileName;
         File f = new File(baseName);
         baseName = f.getName();
         if (baseName.contains(".")) {
             baseName = baseName.substring(0, baseName.lastIndexOf('.'));
+        }        
+        
+        File outDir = file.getParentFile();
+        if (!settings.compressed) {
+            outDir = new File(Path.combine(outDir.getAbsolutePath(), baseName));
+            outfile = Path.combine(outDir.getAbsolutePath(), baseName + ".xfl");
+            file = new File(outfile);
         }
+        
+        Path.createDirectorySafe(outDir);
+        
+        
         final HashMap<String, byte[]> files = new HashMap<>();
         final HashMap<String, byte[]> datfiles = new HashMap<>();
         HashMap<Integer, CharacterTag> characters = getCharacters(swf.getTags());
