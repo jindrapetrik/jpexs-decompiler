@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- [#1915] SVG import - gradient when it has two final stops
 
 ## [18.2.1] - 2022-12-28
 ### Fixed
@@ -2809,6 +2811,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1915]: https://www.free-decompiler.com/flash/issues/1915
 [#1922]: https://www.free-decompiler.com/flash/issues/1922
 [#1921]: https://www.free-decompiler.com/flash/issues/1921
 [#1917]: https://www.free-decompiler.com/flash/issues/1917
