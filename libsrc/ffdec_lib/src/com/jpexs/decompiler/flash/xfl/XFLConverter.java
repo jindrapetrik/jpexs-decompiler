@@ -43,6 +43,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.exporters.ImageExporter;
 import com.jpexs.decompiler.flash.exporters.MovieExporter;
 import com.jpexs.decompiler.flash.exporters.SoundExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
@@ -1819,7 +1820,7 @@ public class XFLConverter {
                     }
                 }
 
-                byte[] imageBytes = Helper.readStream(imageTag.getImageData());
+                byte[] imageBytes = Helper.readStream(imageTag.getConvertedImageData());
                 SerializableImage image = imageTag.getImageCached();
                 ImageFormat format = imageTag.getImageFormat();
                 String symbolFile = "bitmap" + symbol.getCharacterId() + imageTag.getImageFormat().getExtension();

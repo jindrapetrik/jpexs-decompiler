@@ -146,7 +146,7 @@ public class ImageImporter extends TagImporter {
     }
 
     public void convertImage(ImageTag it, int tagType) throws IOException {
-        importImage(it, Helper.readStream(it.getImageData()), tagType);
+        importImage(it, Helper.readStream(it.getConvertedImageData()), tagType);
     }
 
     public static int getImageTagType(String format) {

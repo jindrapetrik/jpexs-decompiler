@@ -120,7 +120,7 @@ public class SVGShapeExporter extends DefaultSVGShapeExporter {
                 lastPatternId++;
                 String patternId = "PatternID_" + id + "_" + lastPatternId;
                 ImageFormat format = image.getImageFormat();
-                byte[] imageData = Helper.readStream(image.getImageData());
+                byte[] imageData = Helper.readStream(image.getConvertedImageData());
                 String base64ImgData = Helper.byteArrayToBase64String(imageData);
 
                 Element pattern = exporter.createElement("pattern");
