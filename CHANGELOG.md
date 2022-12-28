@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Copy/Move/Cut with dependencies did not handle original tag when not charactertag
 - [#1922] FLA/XFL/Canvas/SVG export - exporting DefineBitsJPEG3/4 with alpha as JPEG with PNG extension
+- [#1921] AS3 direct editation - exception on code save - wrong selected ABC
 
 ## [18.2.0] - 2022-12-27
 ### Added
@@ -2806,6 +2807,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1922]: https://www.free-decompiler.com/flash/issues/1922
+[#1921]: https://www.free-decompiler.com/flash/issues/1921
 [#1917]: https://www.free-decompiler.com/flash/issues/1917
 [#1827]: https://www.free-decompiler.com/flash/issues/1827
 [#1424]: https://www.free-decompiler.com/flash/issues/1424

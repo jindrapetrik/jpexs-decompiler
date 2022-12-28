@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
@@ -70,8 +71,10 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
 
             otherAbcs.remove(abc);
             abc.script_info.get(oldIndex).delete(abc, true);
-
-            ActionScript3Parser.compile(text, abc, swf.getAbcIndex(), scriptName, newClassIndex, oldIndex, air);
+            AbcIndexing abcIndex = swf.getAbcIndex();
+            abcIndex.selectAbc(abc);
+            
+            ActionScript3Parser.compile(text, abc, abcIndex, scriptName, newClassIndex, oldIndex, air);           
             if (pack.isSimple) {
                 // Move newly added script to its position
                 abc.script_info.set(oldIndex, abc.script_info.get(newIndex));
@@ -80,7 +83,7 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
                 //???
             }
             abc.script_info.get(oldIndex).setModified(true);
-            abc.pack();//remove old deleted items            
+            abc.pack();//remove old deleted items
             ((Tag) abc.parentTag).setModified(true);
         } catch (AVM2ParseException ex) {
             abc.script_info.get(oldIndex).delete(abc, false);

@@ -2640,15 +2640,15 @@ public class ActionScript3Parser {
         try {
             SWF.initPlayer();
             ABC abc = new ABC(null);
-            ActionScript3Parser parser = new ActionScript3Parser(swf.getAbcIndex());
+            AbcIndexing abcIndex = swf.getAbcIndex();
+            abcIndex.selectAbc(abc);
+            ActionScript3Parser parser = new ActionScript3Parser(abcIndex);
             parser.addScript(new String(Helper.readFile(src), Utf8Helper.charset), src, classPos, scriptIndex);
             try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(new File(dst)))) {
                 abc.saveToStream(fos);
-
             }
         } catch (Exception ex) {
-            Logger.getLogger(ActionScript3Parser.class
-                    .getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ActionScript3Parser.class.getName()).log(Level.SEVERE, null, ex);
         }
         System.exit(0);
     }
