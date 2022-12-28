@@ -67,10 +67,10 @@ public class SoundFormat {
         switch (formatId) {
             case FORMAT_UNCOMPRESSED_NATIVE_ENDIAN:
             case FORMAT_UNCOMPRESSED_LITTLE_ENDIAN:
-            case FORMAT_ADPCM:
                 return SoundExportFormat.WAV;
             case FORMAT_MP3:
                 return SoundExportFormat.MP3;
+            case FORMAT_ADPCM:
             case FORMAT_NELLYMOSER16KHZ:
             case FORMAT_NELLYMOSER8KHZ:
             case FORMAT_NELLYMOSER:
