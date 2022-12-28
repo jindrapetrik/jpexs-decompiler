@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#1915] SVG import - gradient when it has two final stops
 - Native sound export format for ADPCM compression is FLV
+- [#1923] Wrong cyclic tag detection causing hidden sprites
 
 ### Changed
 - [#1913] SVG export/import of shapes - shape exact position (bounds) is retained
@@ -2818,8 +2819,9 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
-[#1915]: https://www.free-decompiler.com/flash/issues/1915
 [#1913]: https://www.free-decompiler.com/flash/issues/1913
+[#1915]: https://www.free-decompiler.com/flash/issues/1915
+[#1923]: https://www.free-decompiler.com/flash/issues/1923
 [#1922]: https://www.free-decompiler.com/flash/issues/1922
 [#1921]: https://www.free-decompiler.com/flash/issues/1921
 [#1917]: https://www.free-decompiler.com/flash/issues/1917

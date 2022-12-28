@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
+import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.decompiler.flash.timeline.Timelined;
 import com.jpexs.decompiler.flash.types.BasicType;
@@ -347,7 +348,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     @Override
     public void getNeededCharacters(Set<Integer> needed) {
         for (Tag t : getTags()) {
-            if (t instanceof CharacterIdTag) {
+            if ((t instanceof CharacterIdTag) && !(t instanceof SoundStreamHeadTypeTag)) {
                 needed.add(((CharacterIdTag) t).getCharacterId());
             }
         }
