@@ -80,7 +80,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
 
     public abstract void flip();
 
-    public static RECT getBounds(List<SHAPERECORD> records, LINESTYLEARRAY lineStyles, int shapeNum) {
+    public static RECT getBounds(List<SHAPERECORD> records, LINESTYLEARRAY lineStyles, int shapeNum, boolean edgeBounds) {
         int x = 0;
         int y = 0;
         int max_x = 0;
@@ -92,7 +92,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         int lineWidth = 0;
         int lineWidthHalf = 0;
         for (SHAPERECORD r : records) {
-            if (r instanceof StyleChangeRecord) {
+            if (!edgeBounds && (r instanceof StyleChangeRecord)) {
                 StyleChangeRecord style = (StyleChangeRecord) r;
                 if (style.stateNewStyles) {
                     lineStyles = style.lineStyles;
@@ -121,11 +121,13 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 if (y2 > max_y) {
                     max_y = y2;
                 }
-                if (x2 + lineWidthHalf > max_x) {
-                    max_x = x2 + lineWidthHalf;
-                }
-                if (y2 + lineWidthHalf > max_y) {
-                    max_y = y2 + lineWidthHalf;
+                if (!edgeBounds) {
+                    if (x2 + lineWidthHalf > max_x) {
+                        max_x = x2 + lineWidthHalf;
+                    }
+                    if (y2 + lineWidthHalf > max_y) {
+                        max_y = y2 + lineWidthHalf;
+                    }
                 }
                 if (started) {
                     if (y2 < min_y) {
@@ -135,12 +137,13 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                         min_x = x2;
                     }
 
-                    if (y2 - lineWidthHalf < min_y) {
-                        min_y = y2 - lineWidthHalf;
-                    }
-
-                    if (x2 - lineWidthHalf < min_x) {
-                        min_x = x2 - lineWidthHalf;
+                    if (!edgeBounds) {
+                        if (y2 - lineWidthHalf < min_y) {
+                            min_y = y2 - lineWidthHalf;
+                        }
+                        if (x2 - lineWidthHalf < min_x) {
+                            min_x = x2 - lineWidthHalf;
+                        }
                     }
                 }
             }
@@ -153,11 +156,13 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
             if (y > max_y) {
                 max_y = y;
             }
-            if (x + lineWidthHalf > max_x) {
-                max_x = x + lineWidthHalf;
-            }
-            if (y + lineWidthHalf > max_y) {
-                max_y = y + lineWidthHalf;
+            if (!edgeBounds) {
+                if (x + lineWidthHalf > max_x) {
+                    max_x = x + lineWidthHalf;
+                }
+                if (y + lineWidthHalf > max_y) {
+                    max_y = y + lineWidthHalf;
+                }
             }
             if (r.isMove()) {
                 started = true;
@@ -170,11 +175,13 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                     min_x = x;
                 }
 
-                if (y - lineWidthHalf < min_y) {
-                    min_y = y - lineWidthHalf;
-                }
-                if (x - lineWidthHalf < min_x) {
-                    min_x = x - lineWidthHalf;
+                if (!edgeBounds) {
+                    if (y - lineWidthHalf < min_y) {
+                        min_y = y - lineWidthHalf;
+                    }
+                    if (x - lineWidthHalf < min_x) {
+                        min_x = x - lineWidthHalf;
+                    }
                 }
             }
         }
@@ -206,7 +213,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
         lsa.lineStyles = new LINESTYLE[0];
         lsa.lineStyles2 = new LINESTYLE2[0];
         for (SHAPE s : shapes) {
-            RECT r = SHAPERECORD.getBounds(s.shapeRecords, lsa, shapeNum);
+            RECT r = SHAPERECORD.getBounds(s.shapeRecords, lsa, shapeNum, false);
             if (r.Xmax < r.Xmin || r.Ymax < r.Ymin) {
                 continue;
             }
@@ -262,7 +269,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
                 // shapeNum: 1
                 SHAPE shape = shapes.get(pos);
                 List<SHAPERECORD> records = shape.shapeRecords;
-                RECT bounds = SHAPERECORD.getBounds(records, lsa, shapeNum);
+                RECT bounds = SHAPERECORD.getBounds(records, lsa, shapeNum, false);
 
                 int w1 = bounds.getWidth();
                 int h1 = bounds.getHeight();

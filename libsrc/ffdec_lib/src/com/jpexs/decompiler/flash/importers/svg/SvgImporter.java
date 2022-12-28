@@ -196,6 +196,9 @@ public class SvgImporter {
         st.shapes = shapes;        
         if (!fill) {
             st.shapeBounds = shapes.getBounds(st.getShapeNum());
+            if (st instanceof DefineShape4Tag) {
+                ((DefineShape4Tag)st).edgeBounds = shapes.getEdgeBounds();
+            }
         }
         st.setModified(true);
 
@@ -516,7 +519,7 @@ public class SvgImporter {
             x0 = x;
             y0 = y;
         }
-        applyStyleGradients(SHAPERECORD.getBounds(newRecords, shapes.lineStyles, shapeNum), scrStyle, transform2, shapeNum, style);
+        applyStyleGradients(SHAPERECORD.getBounds(newRecords, shapes.lineStyles, shapeNum, false), scrStyle, transform2, shapeNum, style);
         shapes.shapeRecords.addAll(newRecords);
     }
 

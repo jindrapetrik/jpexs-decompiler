@@ -52,7 +52,7 @@ public class GlyphType implements Serializable {
         LINESTYLEARRAY lsa = new LINESTYLEARRAY();
         lsa.lineStyles = new LINESTYLE[0];
         lsa.lineStyles2 = new LINESTYLE2[0];
-        RECT bounds = SHAPERECORD.getBounds(records, lsa, 1);
+        RECT bounds = SHAPERECORD.getBounds(records, lsa, 1, false);
         boundingBox = new int[4];
         boundingBox[0] = bounds.Xmin;
         boundingBox[1] = bounds.Ymin;

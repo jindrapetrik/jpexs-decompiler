@@ -334,7 +334,7 @@ public abstract class TextTag extends DrawableTag {
                 LINESTYLEARRAY lsa = new LINESTYLEARRAY();
                 lsa.lineStyles = new LINESTYLE[0];
                 lsa.lineStyles2 = new LINESTYLE2[0];
-                RECT rect = SHAPERECORD.getBounds(glyphs.get(entry.glyphIndex).shapeRecords, lsa, 1);
+                RECT rect = SHAPERECORD.getBounds(glyphs.get(entry.glyphIndex).shapeRecords, lsa, 1, false);
                 rect.Xmax = (int) Math.round(((double) rect.Xmax * textHeight) / (font.getDivider() * 1024));
                 rect.Xmin = (int) Math.round(((double) rect.Xmin * textHeight) / (font.getDivider() * 1024));
                 rect.Ymax = (int) Math.round(((double) rect.Ymax * textHeight) / (font.getDivider() * 1024));
