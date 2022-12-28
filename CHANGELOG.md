@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Native sound export format for ADPCM compression is FLV
 - [#1923] Wrong cyclic tag detection causing hidden sprites
 - Ctrl + G shortcut for tag list view
+- Uncompressed FLA (XFL) export creates a directory
 
 ### Changed
 - [#1913] SVG export/import of shapes - shape exact position (bounds) is retained
