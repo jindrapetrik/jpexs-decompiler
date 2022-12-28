@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#1913] Shape transforming
+
 ### Fixed
 - [#1915] SVG import - gradient when it has two final stops
 - Native sound export format for ADPCM compression is FLV

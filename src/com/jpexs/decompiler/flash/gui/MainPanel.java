@@ -24,7 +24,6 @@ import com.jpexs.decompiler.flash.EventListener;
 import com.jpexs.decompiler.flash.OpenableSourceInfo;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.SWF;
-import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.RenameType;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
@@ -4877,7 +4876,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (treeItem instanceof DefineVideoStreamTag) {
                 previewPanel.setImageReplaceButtonVisible(false, false, false, false, !((Tag) treeItem).isReadOnly());
             }
-            previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), treeItem instanceof ShapeTag, !Configuration.playFrameSounds.get(), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag));
+            previewPanel.showImagePanel(timelined, tag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), treeItem instanceof ShapeTag, !Configuration.playFrameSounds.get(), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag), (treeItem instanceof DefineSpriteTag) || (treeItem instanceof ButtonTag) || (treeItem instanceof ShapeTag));
         } else if (treeItem instanceof Frame && internalViewer) {
             Frame fn = (Frame) treeItem;
             SWF swf = (SWF) fn.getOpenable();
