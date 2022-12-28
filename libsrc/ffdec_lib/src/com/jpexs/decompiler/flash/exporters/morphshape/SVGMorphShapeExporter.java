@@ -119,7 +119,7 @@ public class SVGMorphShapeExporter extends DefaultSVGMorphShapeExporter {
                 lastPatternId++;
                 String patternId = "PatternID_" + id + "_" + lastPatternId;
                 ImageFormat format = image.getImageFormat();
-                byte[] imageData = Helper.readStream(image.getImageData());
+                byte[] imageData = Helper.readStream(image.getConvertedImageData());
                 String base64ImgData = Helper.byteArrayToBase64String(imageData);
                 path.setAttribute("style", "fill:url(#" + patternId + ")");
                 Element pattern = exporter.createElement("pattern");

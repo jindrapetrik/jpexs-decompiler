@@ -120,6 +120,26 @@ public abstract class ImageTag extends DrawableTag {
         return image;
     }
 
+    /**
+     * Gets converted image data. Converted means for example DefineBitsJPEG3 including alpha channel - PNG images
+     * @return 
+     */
+    public InputStream getConvertedImageData() {
+        if (getImageFormat() == getOriginalImageFormat()) { //no need to convert
+            InputStream is = getOriginalImageData();
+            if (is != null) {
+                return is;
+            }
+        }
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageHelper.write(getImage().getBufferedImage(), getImageFormat(), baos);
+        return new ByteArrayInputStream(baos.toByteArray());
+    }
+    
+    /**
+     * Gets original image data if available, if not, then converted. Original image data can be for example DefineBitsJPEG3 without transparency.
+     * @return 
+     */
     public InputStream getImageData() {
         InputStream is = getOriginalImageData();
         if (is != null) {

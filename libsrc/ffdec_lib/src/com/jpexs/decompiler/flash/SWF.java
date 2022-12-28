@@ -2425,7 +2425,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 if (ch instanceof ImageTag) {
                     ImageTag image = (ImageTag) ch;
                     ImageFormat format = image.getImageFormat();
-                    byte[] imageData = Helper.readStream(image.getImageData());
+                    byte[] imageData = Helper.readStream(image.getConvertedImageData());
                     String base64ImgData = Helper.byteArrayToBase64String(imageData);
                     fos.write(Utf8Helper.getBytes("var imageObj" + c + " = document.createElement(\"img\");\r\nimageObj" + c + ".src=\"data:image/" + format + ";base64," + base64ImgData + "\";\r\n"));
                 }
