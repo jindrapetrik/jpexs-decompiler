@@ -489,6 +489,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         List<TreeItem> items = new ArrayList<>();
         if (source == folderPreviewPanel) {
             items.addAll(folderPreviewPanel.selectedItems.values());
+        } else if (source == folderListPanel) {
+            items.addAll(folderListPanel.selectedItems.values());
         } else {
             AbstractTagTree tree = (AbstractTagTree) e.getSource();
             TreePath[] paths = tree.getSelectionPaths();
@@ -574,6 +576,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         List<TreeItem> items = new ArrayList<>();
         if (source == folderPreviewPanel) {
             items.addAll(folderPreviewPanel.selectedItems.values());
+        } else if (source == folderListPanel) {
+            items.addAll(folderListPanel.selectedItems.values());
         } else {
             AbstractTagTree tree = (AbstractTagTree) e.getSource();
             TreePath[] paths = tree.getSelectionPaths();
@@ -950,6 +954,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         folderListPanel = new FolderListPanel(this, new ArrayList<>());
         folderListCard.add(new FasterScrollPane(folderListPanel), BorderLayout.CENTER);
 
+        folderListPanel.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                handleKeyReleased(e);
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                handleKeyPressed(e);
+            }
+        });
+        
         return folderListCard;
     }
 

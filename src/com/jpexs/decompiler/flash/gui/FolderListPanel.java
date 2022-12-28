@@ -122,6 +122,7 @@ public class FolderListPanel extends JPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
+                requestFocusInWindow();
                 int width = getWidth();
 
                 int cols = width / CELL_WIDTH;
@@ -165,6 +166,7 @@ public class FolderListPanel extends JPanel {
                 repaint();
             }
         });
+        setFocusable(true);
     }
 
     public synchronized void setItems(TreePath parentPath, List<TreeItem> items) {
@@ -174,7 +176,7 @@ public class FolderListPanel extends JPanel {
         repaint();
         selectedItems.clear();
         selectedIndex = -1;
-        ((JScrollPane)getParent().getParent()).getVerticalScrollBar().setValue(0);
+        ((JScrollPane)getParent().getParent()).getVerticalScrollBar().setValue(0);        
     }
 
     public void clear() {
