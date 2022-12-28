@@ -2547,7 +2547,7 @@ All notable changes to this project will be documented in this file.
 - Edittext & Button displaying
 
 ## [1.2.0 update 1] - 2013-01-19
-## Fixed
+### Fixed
 - [#27] Problems on loading DefineSceneAndFrameLabel
 - CSMTextSettings tag writing fix
 
