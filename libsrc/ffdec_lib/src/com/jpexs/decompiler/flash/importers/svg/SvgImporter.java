@@ -1553,9 +1553,30 @@ public class SvgImporter {
                     break;
             }
 
-            fillStyle.gradient.gradientRecords = new GRADRECORD[gfill.stops.size()];
-            int prevRatio = -1;
+            int prevRatio = -1;                        
+            
+            int recCount = 0;
             for (int i = 0; i < gfill.stops.size(); i++) {
+                SvgStop stop = gfill.stops.get(i);
+                
+                int ratio = Math.max((int) Math.round(stop.offset * 255), prevRatio + 1);
+                recCount++;
+                //two finish stops
+                if (ratio == 255 && i + 1 < gfill.stops.size()) {
+                    if (prevRatio == 254) {
+                        break;
+                    }
+                    ratio = 254;
+                }
+                prevRatio = ratio;                
+                if (prevRatio == 255) {
+                    break;
+                }
+            }
+            
+            prevRatio = -1;
+            fillStyle.gradient.gradientRecords = new GRADRECORD[recCount];
+            for (int i = 0; i < recCount; i++) {
                 SvgStop stop = gfill.stops.get(i);
                 Color color = stop.color;
                 color = new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) Math.round(color.getAlpha() * style.getOpacity()));
@@ -1563,11 +1584,11 @@ public class SvgImporter {
                 fillStyle.gradient.gradientRecords[i].inShape3 = shapeNum >= 3;
                 fillStyle.gradient.gradientRecords[i].color = getRGB(shapeNum, color);
                 int ratio = Math.max((int) Math.round(stop.offset * 255), prevRatio + 1);
-                fillStyle.gradient.gradientRecords[i].ratio = ratio;
-                prevRatio = ratio;
-                if (prevRatio == 255) {
-                    break;
+                if (ratio == 255 && i + 1 < recCount) {
+                    ratio = 254;
                 }
+                fillStyle.gradient.gradientRecords[i].ratio = ratio;
+                prevRatio = ratio;                
             }
         } else if (fill instanceof SvgBitmapFill) {
             SvgBitmapFill bfill = (SvgBitmapFill) fill;
