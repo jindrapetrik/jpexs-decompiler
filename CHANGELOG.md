@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [18.2.1] - 2022-12-28
 ### Fixed
 - Copy/Move/Cut with dependencies did not handle original tag when not charactertag
 - [#1922] FLA/XFL/Canvas/SVG export - exporting DefineBitsJPEG3/4 with alpha as JPEG with PNG extension
