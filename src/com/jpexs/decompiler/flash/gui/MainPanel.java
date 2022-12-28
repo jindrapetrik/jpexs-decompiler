@@ -287,6 +287,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
@@ -479,19 +481,32 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         pinsPanel.replaceItem(oldItem, newItem);
     }
 
-    private void handleTreeKeyReleased(KeyEvent e) {
+    private void handleKeyReleased(KeyEvent e) {
         if (checkEdited()) {
             return;
         }
-        AbstractTagTree tree = (AbstractTagTree) e.getSource();
+        Object source = e.getSource();
+        List<TreeItem> items = new ArrayList<>();
+        if (source == folderPreviewPanel) {
+            items.addAll(folderPreviewPanel.selectedItems.values());
+        } else {
+            AbstractTagTree tree = (AbstractTagTree) e.getSource();
+            TreePath[] paths = tree.getSelectionPaths();
+            if (paths != null) {
+                for (TreePath treePath : paths) {
+                    TreeItem item = (TreeItem) treePath.getLastPathComponent();
+                    items.add(item);
+                }
+            }
+        }
+        if (items.isEmpty()) {
+            return;
+        }
+                
         if ((e.getKeyCode() == KeyEvent.VK_UP
                 || e.getKeyCode() == KeyEvent.VK_DOWN)
                 && e.isAltDown() && !e.isControlDown() && !e.isShiftDown()) {
-            TreePath paths[] = tree.getSelectionPaths();
-            if (paths == null || paths.length != 1) {
-                return;
-            }
-            TreeItem item = (TreeItem) paths[0].getLastPathComponent();
+            TreeItem item = items.get(0);
 
             if (item instanceof Tag) {
                 if (((Tag) item).isReadOnly()) {
@@ -551,12 +566,31 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         quickTagListFindPanel.setVisible(false);
     }
 
-    private void handleTreeKeyPressed(KeyEvent e) {
+    private void handleKeyPressed(KeyEvent e) {
         if (checkEdited()) {
             return;
         }
-        AbstractTagTree tree = (AbstractTagTree) e.getSource();
+        Object source = e.getSource();
+        List<TreeItem> items = new ArrayList<>();
+        if (source == folderPreviewPanel) {
+            items.addAll(folderPreviewPanel.selectedItems.values());
+        } else {
+            AbstractTagTree tree = (AbstractTagTree) e.getSource();
+            TreePath[] paths = tree.getSelectionPaths();
+            if (paths != null) {
+                for (TreePath treePath : paths) {
+                    TreeItem item = (TreeItem) treePath.getLastPathComponent();
+                    items.add(item);
+                }
+            }
+        }
+        
+        if (items.isEmpty()) {
+            return;
+        }
+        
         if ((e.getKeyCode() == 'F') && (e.isControlDown())) {
+            AbstractTagTree tree = getCurrentTree();
             if (tree == tagTree) {
                 quickTreeFindPanel.setVisible(true);
             }
@@ -564,30 +598,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 quickTagListFindPanel.setVisible(true);
             }
         }
-        if ((e.getKeyCode() == KeyEvent.VK_DELETE) && !e.isControlDown() && !e.isAltDown()) {
-            TreePath[] paths = tree.getSelectionPaths();
-            if (paths == null || paths.length == 0) {
-                return;
-            }
-            List<TreeItem> items = new ArrayList<>();
-            for (TreePath treePath : paths) {
-                TreeItem item = (TreeItem) treePath.getLastPathComponent();
-                items.add(item);
-            }
+        if ((e.getKeyCode() == KeyEvent.VK_DELETE) && !e.isControlDown() && !e.isAltDown()) {            
             if (contextPopupMenu.canRemove(items)) {
                 contextPopupMenu.update(items);
-                contextPopupMenu.removeItemActionPerformed(null, e.isShiftDown());
+                contextPopupMenu.removeItemActionPerformed(null, e.isShiftDown());                
             }
         }
-        if ((e.getKeyCode() == 'C' || e.getKeyCode() == 'X') && (e.isControlDown())) {
-            TreePath[] paths = tree.getSelectionPaths();
-            if (paths == null || paths.length == 0) {
-                return;
-            }
-
+        if ((e.getKeyCode() == 'C' || e.getKeyCode() == 'X') && (e.isControlDown())) {            
             List<TreeItem> tagItems = new ArrayList<>();
-            for (TreePath treePath : paths) {
-                TreeItem item = (TreeItem) treePath.getLastPathComponent();
+            for (TreeItem item:items) {                
                 if (item instanceof TagScript) {
                     tagItems.add(((TagScript) item).getTag());
                 } else if (item instanceof Tag) {
@@ -619,17 +638,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             }
             repaintTree();
         }
-        if (e.getKeyCode() == 'V' && e.isControlDown()) {
-            TreePath[] paths = tree.getSelectionPaths();
-            if (paths == null || paths.length == 0) {
-                return;
-            }
-
-            List<TreeItem> items = new ArrayList<>();
-            for (TreePath treePath : paths) {
-                TreeItem item = (TreeItem) treePath.getLastPathComponent();
-                items.add(item);
-            }
+        if (e.getKeyCode() == 'V' && e.isControlDown()) {           
             if (items.size() > 1) {
                 return;
             }
@@ -665,7 +674,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         copyToClipboard(new ArrayList<>());
     }
 
-    public void copyToClipboard(Collection<TreeItem> items) {
+    public void copyToClipboard(Collection<TreeItem> items) {                    
+        
         orderedClipboard.clear();
         clipboard.clear();
         for (TreeItem item : items) {
@@ -676,7 +686,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         resourcesClipboardPanel.update();
         tagListClipboardPanel.update();
         resourcesClipboardPanel.flash();
-        tagListClipboardPanel.flash();
+        tagListClipboardPanel.flash();                           
+        folderPreviewPanel.repaint();
+        
     }
 
     public void cutToClipboard(Collection<TreeItem> items) {
@@ -915,7 +927,20 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private JPanel createFolderPreviewCard() {
         JPanel folderPreviewCard = new JPanel(new BorderLayout());
         folderPreviewPanel = new FolderPreviewPanel(this, new ArrayList<>());
-        folderPreviewCard.add(new FasterScrollPane(folderPreviewPanel), BorderLayout.CENTER);
+        FasterScrollPane folderPreviewScrollPane = new FasterScrollPane(folderPreviewPanel);
+        folderPreviewCard.add(folderPreviewScrollPane, BorderLayout.CENTER);
+        
+        folderPreviewPanel.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                handleKeyReleased(e);
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                handleKeyPressed(e);
+            }
+        });
 
         return folderPreviewCard;
     }
@@ -1129,12 +1154,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         tagTree.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                handleTreeKeyReleased(e);
+                handleKeyReleased(e);
             }
 
             @Override
             public void keyPressed(KeyEvent e) {
-                handleTreeKeyPressed(e);
+                handleKeyPressed(e);
                 if ((e.getKeyCode() == 'G') && (e.isControlDown())) {
                     SWF swf = getCurrentSwf();
                     if (swf != null) {
@@ -1171,12 +1196,12 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         tagListTree.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                handleTreeKeyReleased(e);
+                handleKeyReleased(e);
             }
 
             @Override
             public void keyPressed(KeyEvent e) {
-                handleTreeKeyPressed(e);
+                handleKeyPressed(e);
             }
         });
         detailPanel.setVisible(false);
@@ -4967,6 +4992,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     public void reload(boolean forceReload) {
         View.checkAccess();
+        
+        JScrollBar folderPreviewScrollBar = ((JScrollPane)folderPreviewPanel.getParent().getParent()).getVerticalScrollBar();
+        int scrollValue = folderPreviewScrollBar.getValue();        
+        Map<Integer, TreeItem> folderItems = new HashMap<>(folderPreviewPanel.selectedItems);   
+        
 
         tagTree.scrollPathToVisible(tagTree.getSelectionPath());
         if (currentView == VIEW_DUMP) {
@@ -5181,12 +5211,16 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else {
             pinsPanel.setCurrent(oldItem);
         }
+        
+        folderPreviewPanel.selectedItems = folderItems;
+        folderPreviewScrollBar.setValue(scrollValue);     
+        
     }
 
-    public void repaintTree() {
+    public void repaintTree() {        
         tagTree.repaint();
         tagListTree.repaint();
-        reload(true);
+        reload(true);        
     }
 
     public void showGenericTag(Tag tag) {

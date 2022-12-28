@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - [#1913] Shape transforming
+- [#1905] Key strokes on folder preview panel
 
 ### Fixed
 - [#1915] SVG import - gradient when it has two final stops
@@ -2820,6 +2821,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1913]: https://www.free-decompiler.com/flash/issues/1913
+[#1905]: https://www.free-decompiler.com/flash/issues/1905
 [#1915]: https://www.free-decompiler.com/flash/issues/1915
 [#1923]: https://www.free-decompiler.com/flash/issues/1923
 [#1922]: https://www.free-decompiler.com/flash/issues/1922

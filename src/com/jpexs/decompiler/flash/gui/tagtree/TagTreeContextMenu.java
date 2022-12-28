@@ -117,6 +117,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.TreePath;
@@ -2367,7 +2369,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     }
 
     public void removeItemActionPerformed(ActionEvent evt, boolean removeDependencies) {
-
+        
         List<TreePath> tps = new ArrayList<>();
 
         List<TreeItem> sel = getSelectedItems();

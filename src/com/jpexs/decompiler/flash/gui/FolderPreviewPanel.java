@@ -45,12 +45,14 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
@@ -76,7 +78,7 @@ public class FolderPreviewPanel extends JPanel {
 
     private int lastHeight;
 
-    public Map<Integer, TreeItem> selectedItems = new HashMap<>();
+    public Map<Integer, TreeItem> selectedItems = new LinkedHashMap<>();
 
     private Cache<Integer, SerializableImage> cachedPreviews;
     
@@ -116,6 +118,7 @@ public class FolderPreviewPanel extends JPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
+                requestFocusInWindow();
                 int width = getWidth();
 
                 int cols = width / CELL_WIDTH;
@@ -159,6 +162,7 @@ public class FolderPreviewPanel extends JPanel {
                 repaint();
             }
         });
+        setFocusable(true);
     }
 
     public synchronized void setItems(List<TreeItem> items) {
@@ -170,6 +174,7 @@ public class FolderPreviewPanel extends JPanel {
         repaint();
         selectedItems.clear();
         selectedIndex = -1;
+        ((JScrollPane)getParent().getParent()).getVerticalScrollBar().setValue(0);
     }
 
     public void clear() {

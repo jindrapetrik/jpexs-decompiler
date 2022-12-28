@@ -338,15 +338,6 @@ public class TagTree extends AbstractTagTree {
     }
 
     @Override
-    public TreeItem getCurrentTreeItem() {
-        if (!mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
-            return mainPanel.folderPreviewPanel.selectedItems.entrySet().iterator().next().getValue();
-        }
-
-        return super.getCurrentTreeItem();
-    }
-
-    @Override
     public TagTreeModel getFullModel() {
         return (TagTreeModel) super.getFullModel();
     }
