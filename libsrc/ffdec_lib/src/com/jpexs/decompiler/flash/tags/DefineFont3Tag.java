@@ -308,7 +308,7 @@ public class DefineFont3Tag extends FontTag {
 
     @Override
     public int getGlyphWidth(int glyphIndex) {
-        return glyphShapeTable.get(glyphIndex).getBounds().getWidth();
+        return glyphShapeTable.get(glyphIndex).getBounds(1).getWidth();
     }
 
     @Override
@@ -470,10 +470,10 @@ public class DefineFont3Tag extends FontTag {
 
             Font advanceFont = font.deriveFont(fontStyle, 1024); // Not multiplied with divider as it causes problems to create font with height around 20k
             if (!exists) {
-                fontBoundsTable.add(pos, shp.getBounds());
+                fontBoundsTable.add(pos, shp.getBounds(1));
                 fontAdvanceTable.add(pos, (int) getDivider() * Math.round(FontHelper.getFontAdvance(advanceFont, character)));
             } else {
-                fontBoundsTable.set(pos, shp.getBounds());
+                fontBoundsTable.set(pos, shp.getBounds(1));
                 fontAdvanceTable.set(pos, (int) getDivider() * Math.round(FontHelper.getFontAdvance(advanceFont, character)));
             }
 
@@ -578,7 +578,7 @@ public class DefineFont3Tag extends FontTag {
                 continue;
             }
             SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, (int) Math.round(getDivider() * 1024), ch);
-            newFontBoundsTable.add(shp.getBounds());
+            newFontBoundsTable.add(shp.getBounds(1));
             int fontStyle = getFontStyle();
             Font advanceFont = font.deriveFont(fontStyle, 1024); // Not multiplied with divider as it causes problems to create font with height around 20k
             newFontAdvanceTable.add((int) getDivider() * Math.round(FontHelper.getFontAdvance(advanceFont, ch)));

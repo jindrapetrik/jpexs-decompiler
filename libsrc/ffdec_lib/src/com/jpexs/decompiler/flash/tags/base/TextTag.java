@@ -38,6 +38,7 @@ import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
 import com.jpexs.decompiler.flash.types.GLYPHENTRY;
 import com.jpexs.decompiler.flash.types.LINESTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
@@ -330,7 +331,10 @@ public abstract class TextTag extends DrawableTag {
                 if (e < rec.glyphEntries.size() - 1) {
                     nextEntry = rec.glyphEntries.get(e + 1);
                 }
-                RECT rect = SHAPERECORD.getBounds(glyphs.get(entry.glyphIndex).shapeRecords);
+                LINESTYLEARRAY lsa = new LINESTYLEARRAY();
+                lsa.lineStyles = new LINESTYLE[0];
+                lsa.lineStyles2 = new LINESTYLE2[0];
+                RECT rect = SHAPERECORD.getBounds(glyphs.get(entry.glyphIndex).shapeRecords, lsa, 1);
                 rect.Xmax = (int) Math.round(((double) rect.Xmax * textHeight) / (font.getDivider() * 1024));
                 rect.Xmin = (int) Math.round(((double) rect.Xmin * textHeight) / (font.getDivider() * 1024));
                 rect.Ymax = (int) Math.round(((double) rect.Ymax * textHeight) / (font.getDivider() * 1024));
@@ -516,7 +520,7 @@ public abstract class TextTag extends DrawableTag {
                     if (SHAPERECORD.DRAW_BOUNDING_BOX) {
                         RGB borderColor = new RGBA(Color.black);
                         RGB fillColor = new RGBA(new Color(255, 255, 255, 0));
-                        RECT bounds = shape.getBounds();
+                        RECT bounds = shape.getBounds(1);
                         mat = Matrix.getTranslateInstance(bounds.Xmin, bounds.Ymin).preConcatenate(mat);
                         TextTag.drawBorder(swf, image, borderColor, fillColor, bounds, new MATRIX(), mat, colorTransform);
                     }
@@ -558,7 +562,7 @@ public abstract class TextTag extends DrawableTag {
                 if (entry.glyphIndex != -1 && glyphs != null) {
                     // shapeNum: 1
                     SHAPE shape = glyphs.get(entry.glyphIndex);
-                    RECT glyphBounds = shape.getBounds();
+                    RECT glyphBounds = shape.getBounds(1);
                     int glyphWidth = glyphBounds.getWidth();
                     int glyphHeight = glyphBounds.getHeight();
                     glyphBounds.Xmin -= glyphWidth / 2;

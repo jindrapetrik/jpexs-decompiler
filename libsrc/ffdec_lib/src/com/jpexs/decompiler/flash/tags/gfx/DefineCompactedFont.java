@@ -303,7 +303,7 @@ public final class DefineCompactedFont extends FontTag {
 
     @Override
     public int getGlyphWidth(int glyphIndex) {
-        return resize(getGlyphShapeTable().get(glyphIndex).getBounds().getWidth());
+        return resize(getGlyphShapeTable().get(glyphIndex).getBounds(1).getWidth());
     }
 
     @Override

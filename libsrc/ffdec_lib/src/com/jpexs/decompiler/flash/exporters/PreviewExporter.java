@@ -461,7 +461,7 @@ public class PreviewExporter {
                     List<SHAPE> shapes = ft.getGlyphShapeTable();
                     int maxw = 0;
                     for (int f = firstGlyphIndex; f < firstGlyphIndex + countGlyphs; f++) {
-                        RECT b = shapes.get(f).getBounds();
+                        RECT b = shapes.get(f).getBounds(1);
                         if (b.Xmin == Integer.MAX_VALUE) {
                             continue;
                         }
@@ -494,7 +494,7 @@ public class PreviewExporter {
                         List<TEXTRECORD> rec = new ArrayList<>();
                         TEXTRECORD tr = new TEXTRECORD();
 
-                        RECT b = shapes.get(f).getBounds();
+                        RECT b = shapes.get(f).getBounds(1);
                         int xmin = b.Xmin == Integer.MAX_VALUE ? 0 : (int) (b.Xmin / ft.getDivider());
                         xmin *= textHeight / 1024.0;
                         int ymin = b.Ymin == Integer.MAX_VALUE ? 0 : (int) (b.Ymin / ft.getDivider());

@@ -179,16 +179,7 @@ public class SvgImporter {
             SvgStyle style = new SvgStyle(this, idMap, rootElement);
             Matrix transform = new Matrix();
 
-            if (!fill) {
-                rect.Xmin -= origXmin;
-                rect.Xmax -= origXmin;
-                rect.Ymin -= origYmin;
-                rect.Ymax -= origYmin;
-                rect.Xmin = (int) Math.round(viewBox.x * SWF.unitDivisor);
-                rect.Ymin = (int) Math.round(viewBox.y * SWF.unitDivisor);
-                rect.Xmax = (int) Math.round((viewBox.x + viewBox.width) * SWF.unitDivisor);
-                rect.Ymax = (int) Math.round((viewBox.y + viewBox.height) * SWF.unitDivisor);
-            } else {
+            if (fill) {                               
                 double ratioX = rect.getWidth() / width / SWF.unitDivisor;
                 double ratioY = rect.getHeight() / height / SWF.unitDivisor;
                 transform = Matrix.getScaleInstance(ratioX, ratioY);
@@ -202,7 +193,10 @@ public class SvgImporter {
 
         shapes.shapeRecords.add(new EndShapeRecord());
 
-        st.shapes = shapes;
+        st.shapes = shapes;        
+        if (!fill) {
+            st.shapeBounds = shapes.getBounds(st.getShapeNum());
+        }
         st.setModified(true);
 
         return (Tag) st;
@@ -522,7 +516,7 @@ public class SvgImporter {
             x0 = x;
             y0 = y;
         }
-        applyStyleGradients(SHAPERECORD.getBounds(newRecords), scrStyle, transform2, shapeNum, style);
+        applyStyleGradients(SHAPERECORD.getBounds(newRecords, shapes.lineStyles, shapeNum), scrStyle, transform2, shapeNum, style);
         shapes.shapeRecords.addAll(newRecords);
     }
 

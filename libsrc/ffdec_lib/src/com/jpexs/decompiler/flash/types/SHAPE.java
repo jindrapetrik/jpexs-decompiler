@@ -73,8 +73,11 @@ public class SHAPE implements NeedsCharacters, Serializable {
         return modified;
     }
 
-    public RECT getBounds() {
-        return SHAPERECORD.getBounds(shapeRecords);
+    public RECT getBounds(int shapeNum) {
+        LINESTYLEARRAY lsa = new LINESTYLEARRAY();
+        lsa.lineStyles = new LINESTYLE[0];
+        lsa.lineStyles2 = new LINESTYLE2[0];
+        return SHAPERECORD.getBounds(shapeRecords, lsa, shapeNum);
     }
 
     public Shape getOutline(int shapeNum, SWF swf, boolean stroked) {

@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.types.gfx;
 
+import com.jpexs.decompiler.flash.types.LINESTYLE;
+import com.jpexs.decompiler.flash.types.LINESTYLE2;
+import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
@@ -46,7 +49,10 @@ public class GlyphType implements Serializable {
     
 
     public GlyphType(List<SHAPERECORD> records) {
-        RECT bounds = SHAPERECORD.getBounds(records);
+        LINESTYLEARRAY lsa = new LINESTYLEARRAY();
+        lsa.lineStyles = new LINESTYLE[0];
+        lsa.lineStyles2 = new LINESTYLE2[0];
+        RECT bounds = SHAPERECORD.getBounds(records, lsa, 1);
         boundingBox = new int[4];
         boundingBox[0] = bounds.Xmin;
         boundingBox[1] = bounds.Ymin;

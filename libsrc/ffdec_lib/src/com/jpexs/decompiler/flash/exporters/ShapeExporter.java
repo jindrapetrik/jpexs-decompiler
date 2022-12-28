@@ -137,8 +137,8 @@ public class ShapeExporter {
                         case CANVAS:
                             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(file))) {
                             SHAPE shp = st.getShapes();
-                            int deltaX = -shp.getBounds().Xmin;
-                            int deltaY = -shp.getBounds().Ymin;
+                            int deltaX = -shp.getBounds(1).Xmin;
+                            int deltaY = -shp.getBounds(1).Ymin;
                             CanvasShapeExporter cse = new CanvasShapeExporter(st.getShapeNum(), null, SWF.unitDivisor / settings.zoom, ((Tag) st).getSwf(), shp, new CXFORMWITHALPHA(), deltaX, deltaY);
                             cse.export();
                             Set<Integer> needed = new HashSet<>();

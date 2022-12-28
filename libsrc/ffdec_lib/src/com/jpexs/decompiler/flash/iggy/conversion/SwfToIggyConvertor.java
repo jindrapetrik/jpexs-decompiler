@@ -126,7 +126,7 @@ public class SwfToIggyConvertor {
         List<IggyShape> glyphs = new ArrayList<>();
 
         for (SHAPE s : fontTag.glyphShapeTable) {
-            glyphs.add(SwfShapeToIggyConvertor.convertShape(s));
+            glyphs.add(SwfShapeToIggyConvertor.convertShape(1, s));
         }
 
         List<Character> chars = new ArrayList<>();

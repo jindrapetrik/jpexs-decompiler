@@ -134,7 +134,7 @@ public class DefineFontTag extends FontTag {
 
     @Override
     public int getGlyphWidth(int glyphIndex) {
-        return glyphShapeTable.get(glyphIndex).getBounds().getWidth();
+        return glyphShapeTable.get(glyphIndex).getBounds(1).getWidth();
     }
 
     private void ensureFontInfo() {
