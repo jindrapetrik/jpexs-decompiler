@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 - [#1915] SVG import - gradient when it has two final stops
 - Native sound export format for ADPCM compression is FLV
 
+### Changed
+- [#1913] SVG export/import of shapes - shape exact position (bounds) is retained
+
 ## [18.2.1] - 2022-12-28
 ### Fixed
 - Copy/Move/Cut with dependencies did not handle original tag when not charactertag
@@ -2813,6 +2816,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1915]: https://www.free-decompiler.com/flash/issues/1915
+[#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1922]: https://www.free-decompiler.com/flash/issues/1922
 [#1921]: https://www.free-decompiler.com/flash/issues/1921
 [#1917]: https://www.free-decompiler.com/flash/issues/1917

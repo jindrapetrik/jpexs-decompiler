@@ -517,7 +517,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     public RECT getGlyphBounds(int glyphIndex) {
-        return getGlyphShapeTable().get(glyphIndex).getBounds();
+        return getGlyphShapeTable().get(glyphIndex).getBounds(1);
     }
 
     public FontTag toClassicFont() {

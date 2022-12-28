@@ -96,8 +96,8 @@ public class SVGExporter {
             Element svgRoot = _svg.getDocumentElement();
             svgRoot.setAttribute("xmlns:xlink", xlinkNamespace);
             if (bounds != null) {
-                svgRoot.setAttribute("width", (bounds.getWidth() / SWF.unitDivisor) + "px");
-                svgRoot.setAttribute("height", (bounds.getHeight() / SWF.unitDivisor) + "px");
+                svgRoot.setAttribute("width", (bounds.xMax / SWF.unitDivisor) + "px");
+                svgRoot.setAttribute("height", (bounds.yMax / SWF.unitDivisor) + "px");
                 createDefGroup(bounds, null, zoom);
             }
         } catch (ParserConfigurationException ex) {
@@ -131,7 +131,7 @@ public class SVGExporter {
     public final void createDefGroup(ExportRectangle bounds, String id, double zoom) {
         Element g = _svg.createElement("g");
         if (bounds != null) {
-            Matrix mat = Matrix.getTranslateInstance(-bounds.xMin, -bounds.yMin);
+            Matrix mat = new Matrix(); //Matrix.getTranslateInstance(-bounds.xMin, -bounds.yMin);
             mat.scale(zoom);
             g.setAttribute("transform", mat.getSvgTransformationString(SWF.unitDivisor, 1));
         }

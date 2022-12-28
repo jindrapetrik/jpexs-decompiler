@@ -97,4 +97,11 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
 
         return ret;
     }
+
+    @Override
+    public RECT getBounds(int shapeNum) {
+        return SHAPERECORD.getBounds(shapeRecords, lineStyles, shapeNum);
+    }
+    
+    
 }

@@ -168,7 +168,7 @@ public class BitmapExporter extends ShapeExporterBase {
 
     public static void export(int shapeNum, SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform, boolean scaleStrokes) {
         BitmapExporter exporter = new BitmapExporter(shapeNum, swf, shape, defaultColor, colorTransform);
-        exporter.exportTo(image, unzoom, transformation, strokeTransformation, scaleStrokes);
+        exporter.exportTo(shapeNum, image, unzoom, transformation, strokeTransformation, scaleStrokes);
     }
 
     private BitmapExporter(int shapeNum, SWF swf, SHAPE shape, Color defaultColor, ColorTransform colorTransform) {
@@ -177,10 +177,10 @@ public class BitmapExporter extends ShapeExporterBase {
         this.defaultColor = defaultColor;
     }
 
-    private void exportTo(SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, boolean scaleStrokes) {
+    private void exportTo(int shapeNum, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, boolean scaleStrokes) {
         this.image = image;
         this.scaleStrokes = scaleStrokes;
-        ExportRectangle bounds = new ExportRectangle(shape.getBounds());
+        ExportRectangle bounds = new ExportRectangle(shape.getBounds(shapeNum));
         this.strokeTransformation = strokeTransformation;
         calculateThicknessScale(bounds, transformation);
 

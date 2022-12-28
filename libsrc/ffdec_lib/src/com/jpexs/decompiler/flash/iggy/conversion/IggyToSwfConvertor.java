@@ -154,7 +154,7 @@ public class IggyToSwfConvertor {
                 SHAPE shp;
                 if (glyph != null) {
                     shp = IggyShapeToSwfConvertor.convertCharToShape(glyph);
-                    fontTag.fontBoundsTable.add(shp.getBounds());
+                    fontTag.fontBoundsTable.add(shp.getBounds(1));
                 } else {
                     shp = new SHAPE();
                     shp.shapeRecords = new ArrayList<>();
