@@ -100,7 +100,7 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
 
     @Override
     public RECT getBounds(int shapeNum) {
-        return SHAPERECORD.getBounds(shapeRecords, lineStyles, shapeNum);
+        return SHAPERECORD.getBounds(shapeRecords, lineStyles, shapeNum, false);
     }
     
     
