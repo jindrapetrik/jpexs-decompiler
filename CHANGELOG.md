@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - [#1923] Wrong cyclic tag detection causing hidden sprites
 - Ctrl + G shortcut for tag list view
 - Uncompressed FLA (XFL) export creates a directory
+- [#1827] Video replacing VP6 reading
 
 ### Changed
 - [#1913] SVG export/import of shapes - shape exact position (bounds) is retained

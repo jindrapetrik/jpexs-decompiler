@@ -4276,6 +4276,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 new MovieImporter().importMovie(movie, Helper.readFile(selfile.getAbsolutePath()));          
                 refreshTree();                                    
             } catch (IOException ex) {
+                logger.log(Level.SEVERE, "Invalid movie", ex);
                 ViewMessages.showMessageDialog(MainPanel.this, translate("error.movie.invalid") + ": "+ex.getMessage(), translate("error"), JOptionPane.ERROR_MESSAGE);
             }
         }

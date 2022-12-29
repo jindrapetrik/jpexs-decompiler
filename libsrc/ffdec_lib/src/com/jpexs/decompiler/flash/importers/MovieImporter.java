@@ -286,6 +286,7 @@ public class MovieImporter {
                 for (FLVTAG ftag : videoTags) {
                     videoData = ((VIDEODATA) ftag.data);
                     if (videoData.codecId == VIDEODATA.CODEC_VP6 || videoData.codecId == VIDEODATA.CODEC_VP6_ALPHA) {
+                        dis = new FLVInputStream(new ByteArrayInputStream(videoData.videoData));                    
                         int horizontalAdjustment = (int) dis.readUB(4);
                         int verticalAdjustment = (int) dis.readUB(4);
                         if (videoData.codecId == VIDEODATA.CODEC_VP6_ALPHA) {
