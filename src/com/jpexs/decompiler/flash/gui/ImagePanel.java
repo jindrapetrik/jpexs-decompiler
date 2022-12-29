@@ -70,6 +70,7 @@ import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.SystemColor;
@@ -819,24 +820,33 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                             List<DisplayPoint> points = hilightedPoints;
                             if (points != null) {
+                                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                                
                                 g2.setStroke(new BasicStroke((float) (SWF.unitDivisor * 1 / zoomDouble)));
                                 double pointSize = SWF.unitDivisor * 4 / zoomDouble;
                                 //selectedPoints
                                 for (int i = 0; i < points.size(); i++) {
                                     DisplayPoint p = points.get(i);
-                                    Rectangle2D pointRect = new Rectangle2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
+                                    Shape pointShape;
+                                    if (p.onPath) {
+                                        pointShape = new Rectangle2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
+                                    } else {
+                                        pointShape = new Ellipse2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
+                                    }
                                     if (selectedPoints.contains(i)) {
                                         g2.setPaint(Color.black);
                                     } else {
                                         g2.setPaint(Color.white);
                                     }
-                                    g2.fill(pointRect);
+                                    g2.fill(pointShape);
                                     if (selectedPoints.contains(i)) {
                                         g2.setPaint(Color.white);
                                     } else {
                                         g2.setPaint(Color.black);
                                     }
-                                    g2.draw(pointRect);
+                                    g2.draw(pointShape);
                                 }
                             }
                             g2.setTransform(oldTransform);
