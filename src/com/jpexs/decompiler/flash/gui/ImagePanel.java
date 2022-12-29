@@ -613,6 +613,24 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
         private Point2D dragStart = null;
 
+        private Point2D selectionEnd = null;
+
+        private Rectangle2D getSelectionRect() {
+            Point2D selectStart = dragStart;
+            Point2D selectEnd = selectionEnd;
+
+            if (selectStart == null || selectEnd == null) {
+                return null;
+            }
+            double startX = Math.min(selectStart.getX(), selectEnd.getX());
+            double startY = Math.min(selectStart.getY(), selectEnd.getY());
+
+            double endX = Math.max(selectStart.getX(), selectEnd.getX());
+            double endY = Math.max(selectStart.getY(), selectEnd.getY());
+
+            return new Rectangle2D.Double(startX, startY, endX - startX, endY - startY);
+        }
+
         private synchronized Point2D getDragStart() {
             return dragStart;
         }
@@ -774,6 +792,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             g2.draw(p);
                             g2.setComposite(AlphaComposite.SrcOver);
                         }
+
+                        Rectangle2D selectionRect = getSelectionRect();              
+                        if (selectionRect != null) {
+                            g2.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_ROUND, 0, new float[]{2, 2}, 0f));
+                            g2.setComposite(BlendComposite.Invert);
+                            g2.draw(new Rectangle2D.Double(selectionRect.getX(), selectionRect.getY(), selectionRect.getWidth(), selectionRect.getHeight()));
+                            g2.setComposite(AlphaComposite.SrcOver);
+                        }
                     }
                 } finally {
                     if (g2 != null) {
@@ -787,7 +813,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         private boolean ctrlDown = false;
 
         private boolean altDown = false;
-        
+
         private boolean shiftDown = false;
 
         public boolean isAltDown() {
@@ -862,7 +888,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             if (!newSelectedPoints.contains(i)) {
                                 newSelectedPoints.add(i);
                             } else {
-                                newSelectedPoints.remove((Integer)i);
+                                newSelectedPoints.remove((Integer) i);
                             }
                         }
                         selectedPoints = newSelectedPoints;
@@ -915,7 +941,24 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     if (SwingUtilities.isLeftMouseButton(e)) {
+                        
+                        if (hilightedPoints != null) {
+                            Rectangle2D selectionRect = getSelectionRect();
+                            if (selectionRect != null) {
+                                List<Integer> newSelectedPoints = new ArrayList<>();
+                                for (int i = 0; i < hilightedPoints.size(); i++) {
+                                    DisplayPoint p = hilightedPoints.get(i);
+                                    Point2D ip = toImagePoint(new Point2D.Double(p.x, p.y));
+                                    if (selectionRect.contains(ip)) {
+                                        newSelectedPoints.add(i);
+                                    }
+                                }
+                                selectedPoints = newSelectedPoints;
+                            }
+                        }
+                        
                         dragStart = null;
+                        selectionEnd = null;                                                
 
                         if (freeTransformDepth > -1 && mode != Cursor.DEFAULT_CURSOR && registrationPointUpdated != null && transformUpdated != null) {
                             synchronized (lock) {
@@ -962,6 +1005,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 public void mouseDragged(MouseEvent e) {
                     List<DisplayPoint> points = hilightedPoints;
                     if (dragStart != null && points != null) {
+                        if (pointsUnderCursor.isEmpty()) {
+                            selectionEnd = e.getPoint();
+                            redraw();
+                        }
                         if (!selectedPoints.isEmpty() && !pointsUnderCursor.isEmpty()) {
                             boolean selectedUnderCursor = false;
                             for (int p : pointsUnderCursor) {
