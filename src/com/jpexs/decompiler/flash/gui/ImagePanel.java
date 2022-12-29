@@ -480,6 +480,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         if (depth != freeTransformDepth) {
             this.freeTransformDepth = depth;
         }
+        hilightedEdge = null;
         registrationPoint = null;
         calculateFreeTransform();
         hideMouseSelection();
