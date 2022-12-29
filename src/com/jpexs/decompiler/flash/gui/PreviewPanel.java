@@ -148,7 +148,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private static final String CARDFONTPANEL = "Font card";
 
-    private static final String PLACE_TAG_CARD = "PLACETAG";
+    private static final String DISPLAYEDIT_TAG_CARD = "PLACETAG";
 
     private final MainPanel mainPanel;
 
@@ -294,7 +294,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         viewerCards.add(createUnknownCard(), UNKNOWN_TAG_CARD);
         viewerCards.add(createMetadataCard(), METADATA_TAG_CARD);
         viewerCards.add(createGenericTagCard(), GENERIC_TAG_CARD);
-        viewerCards.add(createPlaceTagCard(), PLACE_TAG_CARD);
+        viewerCards.add(createDisplayEditTagCard(), DISPLAYEDIT_TAG_CARD);
         viewerCards.add(createEmptyCard(), EMPTY_CARD);
         setLeftComponent(viewerCards);
 
@@ -330,27 +330,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         setRightComponent(parametersPanel);
     }
 
-    private JPanel createImageButtonsPanel() {
-        replaceShapeButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replaceshape16"));
-        replaceShapeButton.setMargin(new Insets(3, 3, 3, 10));
-        replaceShapeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                mainPanel.replaceButtonActionPerformed(mainPanel.getCurrentTree().getSelected());
-            }
-        });
-        replaceShapeButton.setVisible(false);
-
-        replaceShapeUpdateBoundsButton = new JButton(mainPanel.translate("button.replaceNoFill"), View.getIcon("replaceshape16"));
-        replaceShapeUpdateBoundsButton.setMargin(new Insets(3, 3, 3, 10));
-        replaceShapeUpdateBoundsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                mainPanel.replaceNoFillButtonActionPerformed(mainPanel.getCurrentTree().getCurrentTreeItem());
-            }
-        });
-        replaceShapeUpdateBoundsButton.setVisible(false);
-
+    private JPanel createImageButtonsPanel() {        
         replaceSoundButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replacesound16"));
         replaceSoundButton.setMargin(new Insets(3, 3, 3, 10));
         replaceSoundButton.addActionListener(new ActionListener() {
@@ -398,8 +378,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         ButtonsPanel imageButtonsPanel = new ButtonsPanel();
         imageButtonsPanel.add(replaceSoundButton);
-        imageButtonsPanel.add(replaceShapeButton);
-        imageButtonsPanel.add(replaceShapeUpdateBoundsButton);
+        //imageButtonsPanel.add(replaceShapeButton);
+        //imageButtonsPanel.add(replaceShapeUpdateBoundsButton);
         imageButtonsPanel.add(replaceImageButton);
         imageButtonsPanel.add(replaceImageAlphaButton);
         imageButtonsPanel.add(replaceMovieButton);
@@ -723,12 +703,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         return genericTagCard;
     }
 
-    private JPanel createPlaceTagCard() {
-        JPanel placeTagCard = new JPanel(new BorderLayout());
+    private JPanel createDisplayEditTagCard() {
+        JPanel displayEditTagCard = new JPanel(new BorderLayout());
 
         JPanel previewPanel = new JPanel(new BorderLayout());
 
-        JPanel previewCnt = new JPanel(new BorderLayout());
+        JPanel previewCnt = new JPanel(new BorderLayout());                                
         displayEditImagePanel = new ImagePanel();
 
         displayEditImagePanel.addPlaceObjectSelectedListener(new ActionListener() {
@@ -773,9 +753,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         addPlaceGenericListener();
         displayEditSplitPane = new JPersistentSplitPane(JSplitPane.HORIZONTAL_SPLIT, previewPanel, displayEditGenericPanel, Configuration.guiSplitPanePlaceDividerLocationPercent);
 
-        placeTagCard.add(displayEditSplitPane, BorderLayout.CENTER);
+        displayEditTagCard.add(displayEditSplitPane, BorderLayout.CENTER);
         //placeSplitPane.setDividerLocation(800);
-        placeTagCard.add(createPlaceTagButtonsPanel(), BorderLayout.SOUTH);
+        displayEditTagCard.add(createDisplayEditTagButtonsPanel(), BorderLayout.SOUTH);
 
         ((GenericTagTreePanel) displayEditGenericPanel).addTreeSelectionListener(new TreeSelectionListener() {
             @Override
@@ -838,10 +818,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
         });
 
-        return placeTagCard;
+        return displayEditTagCard;
     }
 
-    private JPanel createPlaceTagButtonsPanel() {
+    private JPanel createDisplayEditTagButtonsPanel() {
+        
+        
         displayEditTransformButton = new JButton(mainPanel.translate("button.transform"), View.getIcon("freetransform16"));
         displayEditTransformButton.setMargin(new Insets(3, 3, 3, 10));
         displayEditTransformButton.addActionListener(this::transformDisplayEditTagButtonActionPerformed);
@@ -850,10 +832,30 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditEditButton.addActionListener(this::editDisplayEditTagButtonActionPerformed);
         displayEditSaveButton = new JButton(mainPanel.translate("button.save"), View.getIcon("save16"));
         displayEditSaveButton.setMargin(new Insets(3, 3, 3, 10));
-        displayEditSaveButton.addActionListener(this::savePlaceTagButtonActionPerformed);
+        displayEditSaveButton.addActionListener(this::saveDisplayEditTagButtonActionPerformed);
         displayEditCancelButton = new JButton(mainPanel.translate("button.cancel"), View.getIcon("cancel16"));
         displayEditCancelButton.setMargin(new Insets(3, 3, 3, 10));
-        displayEditCancelButton.addActionListener(this::cancelPlaceTagButtonActionPerformed);
+        displayEditCancelButton.addActionListener(this::cancelDisplayEditTagButtonActionPerformed);
+        
+        replaceShapeButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replaceshape16"));
+        replaceShapeButton.setMargin(new Insets(3, 3, 3, 10));
+        replaceShapeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainPanel.replaceButtonActionPerformed(mainPanel.getCurrentTree().getSelected());
+            }
+        });
+        replaceShapeButton.setVisible(false);
+
+        replaceShapeUpdateBoundsButton = new JButton(mainPanel.translate("button.replaceNoFill"), View.getIcon("replaceshape16"));
+        replaceShapeUpdateBoundsButton.setMargin(new Insets(3, 3, 3, 10));
+        replaceShapeUpdateBoundsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainPanel.replaceNoFillButtonActionPerformed(mainPanel.getCurrentTree().getCurrentTreeItem());
+            }
+        });
+        replaceShapeUpdateBoundsButton.setVisible(false);
 
         if (Configuration.editorMode.get()) {
             displayEditEditButton.setVisible(false);
@@ -872,6 +874,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeTagButtonsPanel.add(displayEditEditButton);
         placeTagButtonsPanel.add(displayEditSaveButton);
         placeTagButtonsPanel.add(displayEditCancelButton);
+        placeTagButtonsPanel.add(replaceShapeButton);
+        placeTagButtonsPanel.add(replaceShapeUpdateBoundsButton);
         return placeTagButtonsPanel;
     }
 
@@ -1176,7 +1180,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     public void showDisplayEditTagPanel(Tag tag, int frame) {
-        showCardLeft(PLACE_TAG_CARD);
+        showCardLeft(DISPLAYEDIT_TAG_CARD);
         displayEditTag = tag;
         displayEditSplitPane.setDividerLocation((int) (0.6 * this.getWidth()));
         displayEditGenericPanel.setVisible(!readOnly);
@@ -1455,7 +1459,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         mainPanel.clearEditingStatus();
     }
 
-    private void savePlaceTag(boolean refreshTree) {
+    private void saveDisplayEditTag(boolean refreshTree) {
         if (placeEditMode == PLACE_EDIT_TRANSFORM) {
             Matrix matrix = displayEditImagePanel.getNewMatrix();
             if (displayEditTag instanceof PlaceObjectTypeTag) {
@@ -1557,6 +1561,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
             displayEditGenericPanel.setEditMode(false, null);
         }
+        
+        if (displayEditTag instanceof ShapeTag) {
+            replaceShapeButton.setVisible(true);
+            replaceShapeUpdateBoundsButton.setVisible(true);        
+        }        
+        
         displayEditTransformButton.setVisible(true);
         if (Configuration.editorMode.get()) {
             displayEditEditButton.setVisible(false);
@@ -1584,8 +1594,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
     }
 
-    private void savePlaceTagButtonActionPerformed(ActionEvent evt) {
-        savePlaceTag(true);
+    private void saveDisplayEditTagButtonActionPerformed(ActionEvent evt) {
+        saveDisplayEditTag(true);
     }
 
     private void editDisplayEditTagButtonActionPerformed(ActionEvent evt) {
@@ -1595,6 +1605,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditTransformButton.setVisible(false);
         displayEditSaveButton.setVisible(true);
         displayEditCancelButton.setVisible(true);
+        replaceShapeButton.setVisible(false);
+        replaceShapeUpdateBoundsButton.setVisible(false);
         mainPanel.setEditingStatus();
     }
 
@@ -1613,6 +1625,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditTransformButton.setVisible(false);
         displayEditSaveButton.setVisible(true);
         displayEditCancelButton.setVisible(true);
+        
+        replaceShapeButton.setVisible(false);
+        replaceShapeUpdateBoundsButton.setVisible(false);
 
         if (Configuration.editorMode.get()) {
             displayEditSaveButton.setEnabled(false);
@@ -1853,7 +1868,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     }
 
-    private void cancelPlaceTagButtonActionPerformed(ActionEvent evt) {
+    private void cancelDisplayEditTagButtonActionPerformed(ActionEvent evt) {
         if (placeEditMode == PLACE_EDIT_TRANSFORM) {
             if (displayEditTag instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag place = (PlaceObjectTypeTag) displayEditTag;
@@ -1883,6 +1898,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditCancelButton.setVisible(false);
         }
 
+        if (displayEditTag instanceof ShapeTag) {
+            replaceShapeButton.setVisible(true);
+            replaceShapeUpdateBoundsButton.setVisible(true);        
+        }
+        
         mainPanel.clearEditingStatus();
         displayEditTransformButton.setVisible(true);
 
@@ -1919,7 +1939,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
 
         if (displayEditSaveButton.isVisible() && displayEditSaveButton.isEnabled() && Configuration.autoSaveTagModifications.get()) {
-            savePlaceTag(false);
+            saveDisplayEditTag(false);
             ok = ok && !(displayEditSaveButton.isVisible() && displayEditSaveButton.isEnabled());
         }
         if (genericSaveButton.isVisible() && genericSaveButton.isEnabled()) {
