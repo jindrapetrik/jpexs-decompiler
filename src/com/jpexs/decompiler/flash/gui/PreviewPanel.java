@@ -105,10 +105,15 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -771,6 +776,67 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeTagCard.add(displayEditSplitPane, BorderLayout.CENTER);
         //placeSplitPane.setDividerLocation(800);
         placeTagCard.add(createPlaceTagButtonsPanel(), BorderLayout.SOUTH);
+
+        ((GenericTagTreePanel) displayEditGenericPanel).addTreeSelectionListener(new TreeSelectionListener() {
+            @Override
+            public void valueChanged(TreeSelectionEvent e) {
+                JTree tree = (JTree) e.getSource();
+                Object obj = e.getPath().getLastPathComponent();
+                if (obj instanceof GenericTagTreePanel.FieldNode) {
+                    GenericTagTreePanel.FieldNode fieldNode = (GenericTagTreePanel.FieldNode) obj;
+                    Object val = fieldNode.getValue(0);
+                    if (val instanceof SHAPERECORD) {
+                        Object parent = fieldNode.getParentObject();
+                        if (parent == null) {
+                            return;
+                        }
+                        int x = 0;
+                        int y = 0;
+                        TreeModel model = tree.getModel();
+                        for (int i = 0; i < model.getChildCount(parent); i++) {
+                            Object child = model.getChild(parent, i);
+                            GenericTagTreePanel.FieldNode childFN = (GenericTagTreePanel.FieldNode) child;
+                            SHAPERECORD rec = (SHAPERECORD) childFN.getValue(0);
+                            if (rec == val) {
+                                if (rec instanceof StraightEdgeRecord) {
+                                    StraightEdgeRecord ser = (StraightEdgeRecord) rec;
+                                    Point point1 = new Point(x, y);
+                                    Point point2 = new Point(x + ser.deltaX, y + ser.deltaY);
+                                    Point[] hilightedPoint = new Point[]{point1, point2};
+                                    displayEditImagePanel.setHilightedEdge(hilightedPoint);
+                                } else if (rec instanceof CurvedEdgeRecord) {
+                                    CurvedEdgeRecord cer = (CurvedEdgeRecord) rec;
+                                    Point point1 = new Point(x, y);
+                                    Point point2 = new Point(x + cer.controlDeltaX, y + cer.controlDeltaY);
+                                    Point point3 = new Point(x + cer.controlDeltaX + cer.anchorDeltaX, y + cer.controlDeltaY + cer.anchorDeltaY);
+                                    Point[] hilightedPoint = new Point[]{point1, point2, point3};
+                                    displayEditImagePanel.setHilightedEdge(hilightedPoint);
+                                } else if (rec instanceof StyleChangeRecord) {
+                                    StyleChangeRecord scr = (StyleChangeRecord) rec;
+                                    if (scr.stateMoveTo) {
+                                        Point point1 = new Point(scr.moveDeltaX, scr.moveDeltaY);
+                                        Point[] hilightedPoint = new Point[]{point1};
+                                        displayEditImagePanel.setHilightedEdge(hilightedPoint);
+                                    } else {
+                                        displayEditImagePanel.setHilightedEdge(null);
+                                    }
+                                } else {
+                                    displayEditImagePanel.setHilightedEdge(null);
+                                }
+                                break;
+                            }
+                            x = rec.changeX(x);
+                            y = rec.changeY(y);
+                        }
+                    } else {
+                        displayEditImagePanel.setHilightedEdge(null);
+                    }
+
+                } else {
+                    displayEditImagePanel.setHilightedEdge(null);
+                }
+            }
+        });
 
         return placeTagCard;
     }
@@ -1468,7 +1534,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             (int) Math.round(edgeRect.yMax)
                     );
                 }
-                shape.getSwf().clearShapeCache();                
+                shape.getSwf().clearShapeCache();
             }
             displayEditTag.setModified(true);
             if (displayEditTag instanceof PlaceObjectTypeTag) {
