@@ -61,6 +61,7 @@ import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MATRIX;
 import com.jpexs.decompiler.flash.types.RECT;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
+import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
@@ -856,8 +857,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                         Point[] hilightedPoint = new Point[]{point1};
                                         displayEditImagePanel.setHilightedEdge(hilightedPoint);
                                     } else {
-                                        displayEditImagePanel.setHilightedEdge(null);
+                                        Point point1 = new Point(x, y);
+                                        Point[] hilightedPoint = new Point[]{point1};
+                                        displayEditImagePanel.setHilightedEdge(hilightedPoint);
                                     }
+                                } else if (rec instanceof EndShapeRecord) {
+                                    Point point1 = new Point(x, y);
+                                    Point[] hilightedPoint = new Point[]{point1};
+                                    displayEditImagePanel.setHilightedEdge(hilightedPoint);
                                 } else {
                                     displayEditImagePanel.setHilightedEdge(null);
                                 }
