@@ -25,7 +25,7 @@ import java.util.List;
 public interface PointUpdateListener {
     public void pointsUpdated(List<DisplayPoint> points);
     
-    public void pointAdded(int position, DisplayPoint point);
+    public boolean pointAdded(List<DisplayPoint> points, int position, DisplayPoint point);
     
-    public void pointRemoved(int position);
+    public boolean pointRemoved(List<DisplayPoint> points, int position);
 }
