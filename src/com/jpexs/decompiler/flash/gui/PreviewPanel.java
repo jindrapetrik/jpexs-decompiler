@@ -1617,6 +1617,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         if (displayEditMode == EDIT_POINTS) {
             displayEditImagePanel.setHilightedPoints(null);
             displayEditTag.setModified(true);
+            ShapeTag shape = (ShapeTag) displayEditTag;
+            shape.updateBounds();
             oldShapeRecords = null;
         }
         Tag hilightTag = null;

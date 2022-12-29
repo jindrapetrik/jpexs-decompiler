@@ -195,10 +195,7 @@ public class SvgImporter {
 
         st.shapes = shapes;        
         if (!fill) {
-            st.shapeBounds = shapes.getBounds(st.getShapeNum());
-            if (st instanceof DefineShape4Tag) {
-                ((DefineShape4Tag)st).edgeBounds = shapes.getEdgeBounds();
-            }
+            st.updateBounds();
         }
         st.setModified(true);
 

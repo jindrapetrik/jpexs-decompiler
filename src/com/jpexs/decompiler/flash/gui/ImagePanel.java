@@ -384,6 +384,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     public void setHilightedPoints(List<DisplayPoint> hilightedPoints) {
+        hilightedEdge = null;
         selectedPoints = new ArrayList<>();
         calculatePointsXY();
         this.hilightedPoints = hilightedPoints;
@@ -393,7 +394,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     public void setHilightedEdge(Point[] hilightedEdge) {
         this.hilightedEdge = hilightedEdge;
+        hilightedPoints = null;
         hilightEdgeColor = 255;
+        pointEditPanel.setVisible(false);
         redraw();
     }
 
@@ -1627,7 +1630,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 public void mouseMoved(MouseEvent e) {
                     List<DisplayPoint> points = hilightedPoints;
                     if (points != null) {
-                        Cursor cursor = defaultCursor;
+                        Cursor cursor = selectCursor;
                         int maxDistance = 5;
                         List<Integer> newPointsUnderCursor = new ArrayList<>();
                         for (int i = 0; i < points.size(); i++) {
