@@ -931,14 +931,23 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             addKeyListener(new KeyAdapter() {
 
                 private void move(int x, int y) {
-                    Matrix matrix = new Matrix();
-                    matrix.translate(x * SWF.unitDivisor, y * SWF.unitDivisor);
-                    applyTransformMatrix(matrix);
+                    if (hilightedPoints != null) {
+                        java.awt.Point minPoint = getMinSelectedPoint();
+                        if (minPoint != null) {
+                            pointXTextField.setText(formatDouble(minPoint.x / SWF.unitDivisor + x));
+                            pointYTextField.setText(formatDouble(minPoint.y / SWF.unitDivisor + y));
+                            applyPointsXY();
+                        }
+                    } else {
+                        Matrix matrix = new Matrix();
+                        matrix.translate(x * SWF.unitDivisor, y * SWF.unitDivisor);
+                        applyTransformMatrix(matrix);
+                    }
                 }
 
                 @Override
                 public void keyPressed(KeyEvent e) {
-                    if (freeTransformDepth > -1) {
+                    if (freeTransformDepth > -1 || hilightedPoints != null) {
                         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                             move(-1, 0);
                         }
