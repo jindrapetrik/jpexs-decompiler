@@ -1035,6 +1035,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         newSelectedPoints.add(i);
                                     }
                                 }
+                                if (shiftDown) {
+                                    for (int p: selectedPoints) {
+                                        if (!newSelectedPoints.contains(p)) {
+                                            newSelectedPoints.add(p);
+                                        }
+                                    }
+                                }
                                 selectedPoints = newSelectedPoints;
                                 calculatePointsXY();
                             }
