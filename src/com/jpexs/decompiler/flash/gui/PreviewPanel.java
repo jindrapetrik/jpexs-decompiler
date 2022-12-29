@@ -64,6 +64,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -220,6 +221,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private JButton displayEditSaveButton;
 
     private JButton displayEditCancelButton;
+    
+    private JButton displayEditEditPointsButton;
 
     private JPanel parametersPanel;
 
@@ -241,9 +244,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private HexView unknownHexView;
 
-    private final int PLACE_EDIT_TRANSFORM = 1;
-    private final int PLACE_EDIT_RAW = 2;
-    private int placeEditMode = PLACE_EDIT_RAW;
+    private final int EDIT_TRANSFORM = 1;
+    private final int EDIT_RAW = 2;
+    private final int EDIT_POINTS = 3;
+    private int displayEditMode = EDIT_RAW;
+    
+    private List<SHAPERECORD> oldShapeRecords;
 
     //used only for flash player
     private TreeItem currentItem;
@@ -731,6 +737,58 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 }
             });
         }
+        
+        displayEditImagePanel.addPointUpdateListener(new PointUpdateListener() {
+            @Override
+            public void pointsUpdated(List<DisplayPoint> points) {
+                ShapeTag shape = (ShapeTag) displayEditTag;
+                int pointsPos = 0;
+                int x = 0;
+                int y = 0;
+                for(int i = 0; i < shape.shapes.shapeRecords.size(); i++) {
+                    SHAPERECORD rec = shape.shapes.shapeRecords.get(i);
+                    if (rec instanceof StyleChangeRecord) {
+                        StyleChangeRecord scr = (StyleChangeRecord) rec;
+                        if (scr.stateMoveTo) {
+                            scr.moveDeltaX = points.get(pointsPos).x;
+                            scr.moveDeltaY = points.get(pointsPos).y;
+                            pointsPos++;
+                        }
+                    }
+                    if (rec instanceof StraightEdgeRecord) {
+                        StraightEdgeRecord ser = (StraightEdgeRecord) rec;
+                        ser.generalLineFlag = true;
+                        ser.deltaX = points.get(pointsPos).x - x;
+                        ser.deltaY = points.get(pointsPos).y - y;
+                        pointsPos += 1;
+                        ser.simplify();
+                    }
+                    if (rec instanceof CurvedEdgeRecord) {
+                        CurvedEdgeRecord cer = (CurvedEdgeRecord) rec;
+                        cer.controlDeltaX = points.get(pointsPos).x - x;
+                        cer.controlDeltaY = points.get(pointsPos).y - y;
+                        cer.anchorDeltaX = points.get(pointsPos + 1).x - points.get(pointsPos).x;
+                        cer.anchorDeltaY = points.get(pointsPos + 1).y - points.get(pointsPos).y;
+                        pointsPos += 2;                        
+                    }     
+                    x = rec.changeX(x);
+                    y = rec.changeY(y);
+                }
+                shape.getSwf().clearShapeCache();
+                displayEditImagePanel.repaint();
+            }
+
+            @Override
+            public void pointAdded(int position, DisplayPoint point) {
+            }
+
+            @Override
+            public void pointRemoved(int position) {
+                
+            }
+            
+        });
+        
         displayEditTransformPanel = new TransformPanel(displayEditImagePanel);
         //imagePanel.setLoop(Configuration.loopMedia.get());
         previewCnt.add(displayEditTransformSplitPane = new JPersistentSplitPane(
@@ -837,6 +895,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditCancelButton.setMargin(new Insets(3, 3, 3, 10));
         displayEditCancelButton.addActionListener(this::cancelDisplayEditTagButtonActionPerformed);
         
+        displayEditEditPointsButton = new JButton(mainPanel.translate("button.edit.points"), View.getIcon("edit16"));
+        displayEditEditPointsButton.setMargin(new Insets(3, 3, 3, 10));
+        displayEditEditPointsButton.addActionListener(this::editPointsDisplayEditTagButtonActionPerformed);        
+        
         replaceShapeButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replaceshape16"));
         replaceShapeButton.setMargin(new Insets(3, 3, 3, 10));
         replaceShapeButton.addActionListener(new ActionListener() {
@@ -874,6 +936,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         placeTagButtonsPanel.add(displayEditEditButton);
         placeTagButtonsPanel.add(displayEditSaveButton);
         placeTagButtonsPanel.add(displayEditCancelButton);
+        placeTagButtonsPanel.add(displayEditEditPointsButton);
         placeTagButtonsPanel.add(replaceShapeButton);
         placeTagButtonsPanel.add(replaceShapeUpdateBoundsButton);
         return placeTagButtonsPanel;
@@ -1225,6 +1288,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceImageButton.setVisible(showImage);
         replaceImageAlphaButton.setVisible(showAlpha);
         replaceShapeButton.setVisible(showShape);
+        displayEditEditPointsButton.setVisible(showShape);
         replaceShapeUpdateBoundsButton.setVisible(showShape);
         replaceSoundButton.setVisible(showSound);
         replaceMovieButton.setVisible(showMovie);
@@ -1460,7 +1524,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void saveDisplayEditTag(boolean refreshTree) {
-        if (placeEditMode == PLACE_EDIT_TRANSFORM) {
+        if (displayEditMode == EDIT_TRANSFORM) {
             Matrix matrix = displayEditImagePanel.getNewMatrix();
             if (displayEditTag instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag placeTag = (PlaceObjectTypeTag) displayEditTag;
@@ -1550,9 +1614,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditTransformScrollPane.setVisible(false);
             displayEditGenericPanel.setVisible(true);
         }
+        if (displayEditMode == EDIT_POINTS) {
+            displayEditImagePanel.setHilightedPoints(null);
+            displayEditTag.setModified(true);
+            oldShapeRecords = null;
+        }
         Tag hilightTag = null;
         SWF swf = null;
-        if (placeEditMode == PLACE_EDIT_RAW) {
+        if (displayEditMode == EDIT_RAW) {
             if (displayEditGenericPanel.save()) {
                 Tag tag = displayEditGenericPanel.getTag();
                 swf = tag.getSwf();
@@ -1565,6 +1634,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         if (displayEditTag instanceof ShapeTag) {
             replaceShapeButton.setVisible(true);
             replaceShapeUpdateBoundsButton.setVisible(true);        
+            displayEditEditPointsButton.setVisible(true);
         }        
         
         displayEditTransformButton.setVisible(true);
@@ -1581,7 +1651,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditCancelButton.setVisible(false);
         }
 
-        if (placeEditMode == PLACE_EDIT_RAW && refreshTree && swf != null) {
+        if (displayEditMode == EDIT_RAW && refreshTree && swf != null) {
             mainPanel.refreshTree(swf);
         }
         mainPanel.clearEditingStatus();
@@ -1589,8 +1659,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         if (hilightTag != null) {
             mainPanel.setTagTreeSelectedNode(mainPanel.getCurrentTree(), hilightTag);
         }
-        if (placeEditMode == PLACE_EDIT_TRANSFORM) {
-            placeEditMode = PLACE_EDIT_RAW;
+        if (displayEditMode == EDIT_TRANSFORM) {
+            displayEditMode = EDIT_RAW;
         }
     }
 
@@ -1599,7 +1669,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void editDisplayEditTagButtonActionPerformed(ActionEvent evt) {
-        placeEditMode = PLACE_EDIT_RAW;
+        displayEditMode = EDIT_RAW;
         displayEditGenericPanel.setEditMode(true, displayEditTag);
         displayEditEditButton.setVisible(false);
         displayEditTransformButton.setVisible(false);
@@ -1607,6 +1677,55 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditCancelButton.setVisible(true);
         replaceShapeButton.setVisible(false);
         replaceShapeUpdateBoundsButton.setVisible(false);
+        displayEditEditPointsButton.setVisible(false);
+        mainPanel.setEditingStatus();
+    }
+    
+    private void editPointsDisplayEditTagButtonActionPerformed(ActionEvent evt) {
+        displayEditMode = EDIT_POINTS;
+        displayEditGenericPanel.setVisible(false);
+        displayEditEditButton.setVisible(false);
+        displayEditTransformButton.setVisible(false);
+        displayEditSaveButton.setVisible(true);
+        displayEditCancelButton.setVisible(true);
+        replaceShapeButton.setVisible(false);
+        replaceShapeUpdateBoundsButton.setVisible(false);
+        displayEditEditPointsButton.setVisible(false);
+        
+        
+        ShapeTag shape = (ShapeTag) displayEditTag;
+        
+        oldShapeRecords = Helper.deepCopy(shape.shapes.shapeRecords);
+        int x = 0;
+        int y = 0;
+        
+        List<DisplayPoint> points = new ArrayList<>();
+        for (SHAPERECORD rec:shape.shapes.shapeRecords) {
+            if (rec instanceof StraightEdgeRecord) {                
+                StraightEdgeRecord ser = (StraightEdgeRecord) rec;
+                DisplayPoint point = new DisplayPoint(x + ser.deltaX, y + ser.deltaY);
+                points.add(point);
+            }
+            if (rec instanceof CurvedEdgeRecord) {
+                CurvedEdgeRecord cer = (CurvedEdgeRecord) rec;
+                DisplayPoint controlPoint = new DisplayPoint(x + cer.controlDeltaX, y + cer.controlDeltaY, false);
+                DisplayPoint anchorPoint = new DisplayPoint(x + cer.controlDeltaX + cer.anchorDeltaX, y + cer.controlDeltaY + cer.anchorDeltaY);
+                points.add(controlPoint);
+                points.add(anchorPoint);
+            }
+            if (rec instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) rec;
+                if (scr.stateMoveTo) {
+                    DisplayPoint point = new DisplayPoint(scr.moveDeltaX, scr.moveDeltaY);
+                    points.add(point);
+                }
+            }
+            
+            x = rec.changeX(x);
+            y = rec.changeY(y);
+        }
+        displayEditImagePanel.setHilightedPoints(points);
+        
         mainPanel.setEditingStatus();
     }
 
@@ -1615,7 +1734,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         if (item == null) {
             return;
         }
-        placeEditMode = PLACE_EDIT_TRANSFORM;
+        displayEditMode = EDIT_TRANSFORM;
         displayEditGenericPanel.setVisible(false);
         displayEditImagePanel.selectDepth(-1);
 
@@ -1628,6 +1747,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         
         replaceShapeButton.setVisible(false);
         replaceShapeUpdateBoundsButton.setVisible(false);
+        displayEditEditPointsButton.setVisible(false);
 
         if (Configuration.editorMode.get()) {
             displayEditSaveButton.setEnabled(false);
@@ -1869,7 +1989,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void cancelDisplayEditTagButtonActionPerformed(ActionEvent evt) {
-        if (placeEditMode == PLACE_EDIT_TRANSFORM) {
+        if (displayEditMode == EDIT_TRANSFORM) {
             if (displayEditTag instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag place = (PlaceObjectTypeTag) displayEditTag;
                 displayEditImagePanel.selectDepth(place.getDepth());
@@ -1879,9 +1999,18 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditTransformScrollPane.setVisible(false);
             displayEditGenericPanel.setVisible(true);
         }
+        
+        if (displayEditMode == EDIT_POINTS) {
+            displayEditImagePanel.setHilightedPoints(null);
+            ShapeTag shape = (ShapeTag) displayEditTag;
+            shape.shapes.shapeRecords = oldShapeRecords;
+            shape.getSwf().clearShapeCache();    
+            displayEditImagePanel.repaint();
+            displayEditGenericPanel.setVisible(true);
+        }
 
         if (Configuration.editorMode.get()) {
-            if (placeEditMode == PLACE_EDIT_RAW) {
+            if (displayEditMode == EDIT_RAW) {
                 displayEditGenericPanel.setEditMode(true, null);
             }
             displayEditEditButton.setVisible(false);
@@ -1890,7 +2019,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditCancelButton.setVisible(true);
             displayEditCancelButton.setEnabled(false);
         } else {
-            if (placeEditMode == PLACE_EDIT_RAW) {
+            if (displayEditMode == EDIT_RAW) {
                 displayEditGenericPanel.setEditMode(false, null);
             }
             displayEditEditButton.setVisible(true);
@@ -1900,14 +2029,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         if (displayEditTag instanceof ShapeTag) {
             replaceShapeButton.setVisible(true);
-            replaceShapeUpdateBoundsButton.setVisible(true);        
+            replaceShapeUpdateBoundsButton.setVisible(true); 
+            displayEditEditPointsButton.setVisible(true);
         }
         
         mainPanel.clearEditingStatus();
         displayEditTransformButton.setVisible(true);
 
-        if (placeEditMode == PLACE_EDIT_TRANSFORM) {
-            placeEditMode = PLACE_EDIT_RAW;
+        if (displayEditMode == EDIT_TRANSFORM) {
+            displayEditMode = EDIT_RAW;
         }
     }
 

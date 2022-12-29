@@ -231,6 +231,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static Cursor selectCursor;
     private static Cursor shearXCursor;
     private static Cursor shearYCursor;
+    private static Cursor movePointCursor;
+    private static Cursor defaultCursor;
 
     private Point2D offsetPoint = new Point2D.Double(0, 0);
 
@@ -253,9 +255,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private DepthState depthStateUnderCursor = null;
 
     private List<ActionListener> placeObjectSelectedListeners = new ArrayList<>();
-    
+
     private Point[] hilightedEdge = null;
+
+    private List<DisplayPoint> hilightedPoints = null;
     
+    private List<Integer> pointsUnderCursor = new ArrayList<>();
+    private List<DisplayPoint> pointsUnderCursorValues = new ArrayList<>();
+
     private int hilightEdgeColorStep = 10;
     private int hilightEdgeColor = 0;
 
@@ -268,21 +275,44 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private SerializableImage imgPlay = null;
 
     private List<BoundsChangeListener> boundsChangeListeners = new ArrayList<>();
+    
+    private List<PointUpdateListener> pointUpdateListeners = new ArrayList<>();
+
+    public void addPointUpdateListener(PointUpdateListener listener) {
+        pointUpdateListeners.add(listener);
+    }
+    public void removePointUpdateListener(PointUpdateListener listener) {
+        pointUpdateListeners.remove(listener);
+    }
+    
+    private void firePointsUpdated(List<DisplayPoint> points) {
+        for(PointUpdateListener listener:pointUpdateListeners) {
+            listener.pointsUpdated(points);
+        }
+    }
+    
+    private void firePointAdded(int position, DisplayPoint point) {
+        for(PointUpdateListener listener:pointUpdateListeners) {
+            listener.pointAdded(position, point);
+        }
+    }
+    
+    private void firePointRemoved(int position) {
+        for(PointUpdateListener listener:pointUpdateListeners) {
+            listener.pointRemoved(position);
+        }
+    }
+    
+    public void setHilightedPoints(List<DisplayPoint> hilightedPoints) {
+        this.hilightedPoints = hilightedPoints;
+        redraw();
+    }
 
     public void setHilightedEdge(Point[] hilightedEdge) {
         this.hilightedEdge = hilightedEdge;
         hilightEdgeColor = 255;
-        /*if (hilightedEdge == null) {
-            System.out.println("set no hilight edge");
-        } else {
-            String s = "";
-            for(Point p:hilightedEdge) {
-                s+="["+p.x+","+p.y+"]";
-            }
-            System.out.println("set hilight edge " + s);
-        }*/
         redraw();
-    }        
+    }
 
     public void addBoundsChangeListener(BoundsChangeListener listener) {
         boundsChangeListeners.add(listener);
@@ -371,7 +401,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             selectCursor = loadCursor("select", 0, 0);
             shearXCursor = loadCursor("shear_x", 9, 5);
             shearYCursor = loadCursor("shear_y", 5, 9);
-
+            movePointCursor = loadCursor("move_point", 0, 0);
+            defaultCursor = loadCursor("default", 0, 0);
+            
         } catch (IOException ex) {
             Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -481,6 +513,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.freeTransformDepth = depth;
         }
         hilightedEdge = null;
+        hilightedPoints = null;
         registrationPoint = null;
         calculateFreeTransform();
         hideMouseSelection();
@@ -637,7 +670,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         g2.drawImage(img.getBufferedImage(), x, y, x + img.getWidth(), y + img.getHeight(), 0, 0, img.getWidth(), img.getHeight(), null);
 
-                        if (hilightedEdge != null) {
+                        if (hilightedEdge != null || hilightedPoints != null) {
                             hilightEdgeColor += hilightEdgeColorStep;
                             if (hilightEdgeColor < 100 || hilightEdgeColor > 255) {
                                 hilightEdgeColorStep = -hilightEdgeColorStep;
@@ -645,43 +678,59 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                             RECT timRect = timelined.getRect();
                             double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
-                            AffineTransform t = new AffineTransform();                            
-                            t.translate(offsetPoint.getX() - (int) (timRect.Xmin * zoomDouble / SWF.unitDivisor)
-                                    , offsetPoint.getY() - (int) (timRect.Ymin * zoomDouble / SWF.unitDivisor));
-                            t.scale(1/SWF.unitDivisor, 1/SWF.unitDivisor);                            
+                            AffineTransform t = new AffineTransform();
+                            t.translate(offsetPoint.getX() - (int) (timRect.Xmin * zoomDouble / SWF.unitDivisor),
+                                     offsetPoint.getY() - (int) (timRect.Ymin * zoomDouble / SWF.unitDivisor));
+                            t.scale(1 / SWF.unitDivisor, 1 / SWF.unitDivisor);
                             t.scale(zoomDouble, zoomDouble);
                             AffineTransform oldTransform = g2.getTransform();
                             g2.setTransform(t);
-                            g2.setStroke(new BasicStroke((float) (SWF.unitDivisor * 6 / zoomDouble)));
-                            g2.setPaint(new Color(hilightEdgeColor, hilightEdgeColor, hilightEdgeColor));
-                            Point[] edge = hilightedEdge;
-                            GeneralPath path = new GeneralPath();
-                            if (edge.length == 2) {
-                                path.moveTo(edge[0].x, edge[0].y);                            
-                                path.lineTo(edge[1].x, edge[1].y);
+
+                            if (hilightedEdge != null) {
+                                g2.setStroke(new BasicStroke((float) (SWF.unitDivisor * 6 / zoomDouble)));
+                                g2.setPaint(new Color(hilightEdgeColor, hilightEdgeColor, hilightEdgeColor));
+                                Point[] edge = hilightedEdge;
+                                GeneralPath path = new GeneralPath();
+                                if (edge.length == 2) {
+                                    path.moveTo(edge[0].x, edge[0].y);
+                                    path.lineTo(edge[1].x, edge[1].y);
+                                }
+                                if (edge.length == 3) {
+                                    path.moveTo(edge[0].x, edge[0].y);
+                                    path.quadTo(edge[1].x, edge[1].y, edge[2].x, edge[2].y);
+                                }
+                                if (edge.length == 1) {
+                                    double crossSize = (SWF.unitDivisor * 10 / zoomDouble);
+                                    path.moveTo(edge[0].x - crossSize, edge[0].y);
+                                    path.lineTo(edge[0].x + crossSize, edge[0].y);
+                                    path.moveTo(edge[0].x, edge[0].y - crossSize);
+                                    path.lineTo(edge[0].x, edge[0].y + crossSize);
+                                }
+                                g2.draw(path);
+
+                                double pointSize = SWF.unitDivisor * 4 / zoomDouble;
+
+                                g2.setPaint(Color.red);
+                                g2.fill(new Ellipse2D.Double(edge[edge.length - 1].x - pointSize, edge[edge.length - 1].y - pointSize, pointSize * 2, pointSize * 2));
+                                g2.setPaint(Color.green);
+                                g2.fill(new Ellipse2D.Double(edge[0].x - pointSize, edge[0].y - pointSize, pointSize * 2, pointSize * 2));
                             }
-                            if (edge.length == 3) {
-                                path.moveTo(edge[0].x, edge[0].y);                            
-                                path.quadTo(edge[1].x, edge[1].y, edge[2].x, edge[2].y);
-                            }
-                            if (edge.length == 1) {
-                                double crossSize = (SWF.unitDivisor * 10 / zoomDouble);
-                                path.moveTo(edge[0].x - crossSize, edge[0].y);
-                                path.lineTo(edge[0].x + crossSize, edge[0].y);
-                                path.moveTo(edge[0].x, edge[0].y - crossSize);
-                                path.lineTo(edge[0].x, edge[0].y + crossSize);
-                            }
-                            g2.draw(path);
                             
-                            double pointSize = SWF.unitDivisor * 4 / zoomDouble;
-                            
-                            g2.setPaint(Color.red);
-                            g2.fill(new Ellipse2D.Double(edge[edge.length - 1].x - pointSize, edge[edge.length - 1].y - pointSize, pointSize * 2, pointSize * 2));
-                            g2.setPaint(Color.green);
-                            g2.fill(new Ellipse2D.Double(edge[0].x - pointSize, edge[0].y - pointSize, pointSize * 2, pointSize * 2));
+                            List<DisplayPoint> points = hilightedPoints;
+                            if (points != null) {
+                                g2.setStroke(new BasicStroke((float) (SWF.unitDivisor * 1 / zoomDouble)));                               
+                                double pointSize = SWF.unitDivisor * 4 / zoomDouble;
+                                for (DisplayPoint p:points) {
+                                    Rectangle2D pointRect = new Rectangle2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
+                                    g2.setPaint(Color.white);
+                                    g2.fill(pointRect);
+                                    g2.setPaint(Color.black);
+                                    g2.draw(pointRect);                                   
+                                }
+                            }
                             g2.setTransform(oldTransform);
                         }
-                        if (!(timelined instanceof SWF) && freeTransformDepth > -1) {
+                        if (!(timelined instanceof SWF) && (freeTransformDepth > -1 || hilightedPoints != null)) {
 
                             int axisX = 0;
                             int axisY = 0;
@@ -800,6 +849,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                         mouseMoved(e); //to correctly calculate mode, because moseMoved event is not called during dragging
                         setDragStart(e.getPoint());
+                        
+                        List<DisplayPoint> newPointsUnderCursorValues = new ArrayList<>();
+                        for (int i:pointsUnderCursor) {
+                            newPointsUnderCursorValues.add(new DisplayPoint(hilightedPoints.get(i)));
+                        }
+                        
+                        pointsUnderCursorValues = newPointsUnderCursorValues;
+                        
 
                         if (!autoPlayed) {
                             Configuration.autoPlayPreviews.set(true);
@@ -858,6 +915,26 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseDragged(MouseEvent e) {
+                    List<DisplayPoint> points = hilightedPoints;
+                    if (dragStart != null && points != null) {
+                        if (!pointsUnderCursor.isEmpty()) {
+                            
+                            for (int i = 0; i < pointsUnderCursor.size(); i++) {
+                                int pointIndex = pointsUnderCursor.get(i);
+                                DisplayPoint pointStart = pointsUnderCursorValues.get(i);
+                                Point2D dragEnd = e.getPoint();
+                                Point2D startTransformPoint = toTransformPoint(dragStart);                            
+                                Point2D endTransformPoint = toTransformPoint(dragEnd);
+                                Point2D delta = new Point2D.Double(endTransformPoint.getX() - startTransformPoint.getX(), endTransformPoint.getY() - startTransformPoint.getY());
+                                //System.out.println("delta = "+delta);
+                                DisplayPoint newPoint = new DisplayPoint((int)Math.round(pointStart.x + delta.getX()), (int)Math.round(pointStart.y + delta.getY()), pointStart.onPath);
+                                points.set(pointIndex, newPoint);
+                            }
+                            firePointsUpdated(points);
+                            repaint();
+                            return;
+                        }
+                    }
                     if (dragStart != null && allowMove && mode == Cursor.DEFAULT_CURSOR) {
                         Point2D dragEnd = e.getPoint();
                         Point2D delta = new Point2D.Double(dragEnd.getX() - dragStart.getX(), dragEnd.getY() - dragStart.getY());
@@ -1347,6 +1424,32 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void mouseMoved(MouseEvent e) {
+                    List<DisplayPoint> points = hilightedPoints;
+                    if (points != null) {
+                        Cursor cursor = defaultCursor;
+                        int maxDistance = 5;
+                        List<Integer> newPointsUnderCursor = new ArrayList<>();
+                        for (int i = 0; i < points.size(); i++) {
+                            DisplayPoint p = points.get(i);
+                            Point2D ip = toImagePoint(new Point2D.Double(p.x,p.y));
+                            int ex = e.getX();
+                            int ey = e.getY();                                                        
+                            if (ex > ip.getX() - maxDistance && ex < ip.getX() + maxDistance) {
+                                if (ey > ip.getY() - maxDistance && ey < ip.getY() + maxDistance) {
+                                    cursor = movePointCursor;
+                                    newPointsUnderCursor.add(i);
+                                }
+                            }
+                        }
+                        if (dragStart == null) {
+                            pointsUnderCursor = newPointsUnderCursor;
+                        }
+                        
+                        if (getCursor() != cursor) {
+                            setCursor(cursor);
+                        }
+                        return;
+                    }
                     if (freeTransformDepth > -1) {
                         if (bounds == null) {
                             return;
@@ -1983,6 +2086,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.mutable = mutable;
             depthStateUnderCursor = null;
             hilightedEdge = null;
+            hilightedPoints = null;
             this.showObjectsUnderCursor = showObjectsUnderCursor;
             this.registrationPointPosition = RegistrationPointPosition.CENTER;
             centerImage();
@@ -2019,6 +2123,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         stillFrame = true;
         zoomAvailable = false;
         hilightedEdge = null;
+        hilightedPoints = null;
         iconPanel.setImg(image);
         drawReady = true;
 
@@ -2690,7 +2795,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             } else {
                                 debugLabel.setText(ret.toString());
                             }
-                            if (freeTransformDepth == -1) {
+                            if (freeTransformDepth == -1 && hilightedPoints == null) {
                                 Cursor newCursor;
                                 if (iconPanel.isAltDown()) {
                                     if (depthStateUnderCursor == null) {
