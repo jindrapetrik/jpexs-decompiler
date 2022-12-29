@@ -62,6 +62,7 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -97,6 +98,7 @@ import java.awt.image.VolatileImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -107,9 +109,13 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.MouseInputAdapter;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
@@ -151,6 +157,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static final String DEFAULT_DEBUG_LABEL_TEXT = " - ";
 
     private final JLabel debugLabel = new JLabel(DEFAULT_DEBUG_LABEL_TEXT);
+
+    private JPanel pointEditPanel;
+    private JTextField pointXTextField;
+
+    private JTextField pointYTextField;
 
     private Point cursorPosition = null;
 
@@ -268,6 +279,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private int hilightEdgeColorStep = 10;
     private int hilightEdgeColor = 0;
 
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
+
+    private static String formatDouble(double value) {
+        return DECIMAL_FORMAT.format(value);
+    }
+
+    private static double parseDouble(String value) {
+        try {
+            return DECIMAL_FORMAT.parse(value).doubleValue();
+        } catch (ParseException ex) {
+            throw new NumberFormatException();
+        }
+    }
+
     private static Cursor loadCursor(String name, int x, int y) throws IOException {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Image image = ImageIO.read(MainPanel.class.getResource("/com/jpexs/decompiler/flash/gui/graphics/cursors/" + name + ".png"));
@@ -306,8 +331,62 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
     }
 
+    private void applyPointsXY() {
+        try {
+            int x = (int)Math.round(parseDouble(pointXTextField.getText()) * SWF.unitDivisor);
+            int y = (int)Math.round(parseDouble(pointYTextField.getText()) * SWF.unitDivisor);
+            
+            java.awt.Point minSelectedPoint = getMinSelectedPoint();
+            if (minSelectedPoint == null) {
+                return;
+            }
+            for (int index : selectedPoints) {
+                DisplayPoint point = hilightedPoints.get(index);
+                point.x = point.x - minSelectedPoint.x + x;
+                point.y = point.y - minSelectedPoint.y + y;
+            }
+            
+            firePointsUpdated(hilightedPoints);            
+        } catch (NumberFormatException nfe) {
+            //ignore
+        }        
+    }
+    
+    private java.awt.Point getMinSelectedPoint() {
+        if (selectedPoints.isEmpty()) {            
+            return null;
+        }
+        int minX = Integer.MAX_VALUE;
+        int minY = Integer.MAX_VALUE;
+        for (int index : selectedPoints) {
+            DisplayPoint point = hilightedPoints.get(index);
+            if (point.x < minX) {
+                minX = point.x;
+            }
+            if (point.y < minY) {
+                minY = point.y;
+            }
+        }
+        return new java.awt.Point(minX, minY);
+    }
+    
+    private void calculatePointsXY() {
+        Point2D minPoint = getMinSelectedPoint();
+        if (minPoint == null) {
+            pointXTextField.setText("");
+            pointYTextField.setText("");
+            return;
+        }
+        
+        pointXTextField.setText(formatDouble(minPoint.getX() / SWF.unitDivisor));
+        pointYTextField.setText(formatDouble(minPoint.getY() / SWF.unitDivisor));
+    }
+
     public void setHilightedPoints(List<DisplayPoint> hilightedPoints) {
+        selectedPoints = new ArrayList<>();
+        calculatePointsXY();
         this.hilightedPoints = hilightedPoints;
+        pointEditPanel.setVisible(hilightedPoints != null);
         redraw();
     }
 
@@ -517,6 +596,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         hilightedEdge = null;
         hilightedPoints = null;
+        pointEditPanel.setVisible(false);
         registrationPoint = null;
         calculateFreeTransform();
         hideMouseSelection();
@@ -793,7 +873,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             g2.setComposite(AlphaComposite.SrcOver);
                         }
 
-                        Rectangle2D selectionRect = getSelectionRect();              
+                        Rectangle2D selectionRect = getSelectionRect();
                         if (selectionRect != null) {
                             g2.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_ROUND, 0, new float[]{2, 2}, 0f));
                             g2.setComposite(BlendComposite.Invert);
@@ -895,6 +975,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     } else {
                         selectedPoints = new ArrayList<>(pointsUnderCursor);
                     }
+                    calculatePointsXY();
                 }
 
                 @Override
@@ -919,6 +1000,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                             if (!selectedUnderCursor) {
                                 selectedPoints = new ArrayList<>(pointsUnderCursor);
+                                calculatePointsXY();
                             }
                         }
 
@@ -941,7 +1023,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     if (SwingUtilities.isLeftMouseButton(e)) {
-                        
+
                         if (hilightedPoints != null) {
                             Rectangle2D selectionRect = getSelectionRect();
                             if (selectionRect != null) {
@@ -954,11 +1036,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     }
                                 }
                                 selectedPoints = newSelectedPoints;
+                                calculatePointsXY();
                             }
                         }
-                        
+
                         dragStart = null;
-                        selectionEnd = null;                                                
+                        selectionEnd = null;
 
                         if (freeTransformDepth > -1 && mode != Cursor.DEFAULT_CURSOR && registrationPointUpdated != null && transformUpdated != null) {
                             synchronized (lock) {
@@ -1031,6 +1114,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 points.set(pointIndex, newPoint);
                             }
                             firePointsUpdated(points);
+                            calculatePointsXY();
                             repaint();
                             return;
                         }
@@ -1890,7 +1974,44 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         iconPanel = new IconPanel();
         //labelPan.add(label, new GridBagConstraints());
         add(iconPanel, BorderLayout.CENTER);
-        add(debugLabel, BorderLayout.NORTH);
+
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        debugLabel.setAlignmentX(JLabel.LEFT_ALIGNMENT);
+        topPanel.add(debugLabel);
+
+        DocumentListener documentListener = new DocumentListener(){            
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                applyPointsXY();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                applyPointsXY();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                applyPointsXY();
+            }            
+        };
+        
+        pointEditPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        pointEditPanel.add(new JLabel(AppStrings.translate("edit.points.x")));
+        pointXTextField = new JTextField(6);                
+        pointXTextField.getDocument().addDocumentListener(documentListener);
+        pointEditPanel.add(pointXTextField);
+        pointEditPanel.add(new JLabel(AppStrings.translate("edit.points.y")));
+        pointYTextField = new JTextField(6);
+        pointYTextField.getDocument().addDocumentListener(documentListener);
+        pointEditPanel.add(pointYTextField);
+                
+        pointEditPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+        
+        topPanel.add(pointEditPanel);
+        pointEditPanel.setVisible(false);
+        add(topPanel, BorderLayout.NORTH);
         iconPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -2187,6 +2308,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             depthStateUnderCursor = null;
             hilightedEdge = null;
             hilightedPoints = null;
+            pointEditPanel.setVisible(false);
             this.showObjectsUnderCursor = showObjectsUnderCursor;
             this.registrationPointPosition = RegistrationPointPosition.CENTER;
             centerImage();
@@ -2224,6 +2346,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         zoomAvailable = false;
         hilightedEdge = null;
         hilightedPoints = null;
+        pointEditPanel.setVisible(false);
         iconPanel.setImg(image);
         drawReady = true;
 
