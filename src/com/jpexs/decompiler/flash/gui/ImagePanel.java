@@ -259,9 +259,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private Point[] hilightedEdge = null;
 
     private List<DisplayPoint> hilightedPoints = null;
-    
+
     private List<Integer> pointsUnderCursor = new ArrayList<>();
-    private List<DisplayPoint> pointsUnderCursorValues = new ArrayList<>();
+    private List<Integer> selectedPoints = new ArrayList<>();
+
+    private List<DisplayPoint> selectedPointsOriginalValues = new ArrayList<>();
 
     private int hilightEdgeColorStep = 10;
     private int hilightEdgeColor = 0;
@@ -275,34 +277,35 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private SerializableImage imgPlay = null;
 
     private List<BoundsChangeListener> boundsChangeListeners = new ArrayList<>();
-    
+
     private List<PointUpdateListener> pointUpdateListeners = new ArrayList<>();
 
     public void addPointUpdateListener(PointUpdateListener listener) {
         pointUpdateListeners.add(listener);
     }
+
     public void removePointUpdateListener(PointUpdateListener listener) {
         pointUpdateListeners.remove(listener);
     }
-    
+
     private void firePointsUpdated(List<DisplayPoint> points) {
-        for(PointUpdateListener listener:pointUpdateListeners) {
+        for (PointUpdateListener listener : pointUpdateListeners) {
             listener.pointsUpdated(points);
         }
     }
-    
+
     private void firePointAdded(int position, DisplayPoint point) {
-        for(PointUpdateListener listener:pointUpdateListeners) {
+        for (PointUpdateListener listener : pointUpdateListeners) {
             listener.pointAdded(position, point);
         }
     }
-    
+
     private void firePointRemoved(int position) {
-        for(PointUpdateListener listener:pointUpdateListeners) {
+        for (PointUpdateListener listener : pointUpdateListeners) {
             listener.pointRemoved(position);
         }
     }
-    
+
     public void setHilightedPoints(List<DisplayPoint> hilightedPoints) {
         this.hilightedPoints = hilightedPoints;
         redraw();
@@ -403,7 +406,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             shearYCursor = loadCursor("shear_y", 5, 9);
             movePointCursor = loadCursor("move_point", 0, 0);
             defaultCursor = loadCursor("default", 0, 0);
-            
+
         } catch (IOException ex) {
             Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -680,7 +683,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                             AffineTransform t = new AffineTransform();
                             t.translate(offsetPoint.getX() - (int) (timRect.Xmin * zoomDouble / SWF.unitDivisor),
-                                     offsetPoint.getY() - (int) (timRect.Ymin * zoomDouble / SWF.unitDivisor));
+                                    offsetPoint.getY() - (int) (timRect.Ymin * zoomDouble / SWF.unitDivisor));
                             t.scale(1 / SWF.unitDivisor, 1 / SWF.unitDivisor);
                             t.scale(zoomDouble, zoomDouble);
                             AffineTransform oldTransform = g2.getTransform();
@@ -715,17 +718,27 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 g2.setPaint(Color.green);
                                 g2.fill(new Ellipse2D.Double(edge[0].x - pointSize, edge[0].y - pointSize, pointSize * 2, pointSize * 2));
                             }
-                            
+
                             List<DisplayPoint> points = hilightedPoints;
                             if (points != null) {
-                                g2.setStroke(new BasicStroke((float) (SWF.unitDivisor * 1 / zoomDouble)));                               
+                                g2.setStroke(new BasicStroke((float) (SWF.unitDivisor * 1 / zoomDouble)));
                                 double pointSize = SWF.unitDivisor * 4 / zoomDouble;
-                                for (DisplayPoint p:points) {
+                                //selectedPoints
+                                for (int i = 0; i < points.size(); i++) {
+                                    DisplayPoint p = points.get(i);
                                     Rectangle2D pointRect = new Rectangle2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
-                                    g2.setPaint(Color.white);
+                                    if (selectedPoints.contains(i)) {
+                                        g2.setPaint(Color.black);
+                                    } else {
+                                        g2.setPaint(Color.white);
+                                    }
                                     g2.fill(pointRect);
-                                    g2.setPaint(Color.black);
-                                    g2.draw(pointRect);                                   
+                                    if (selectedPoints.contains(i)) {
+                                        g2.setPaint(Color.white);
+                                    } else {
+                                        g2.setPaint(Color.black);
+                                    }
+                                    g2.draw(pointRect);
                                 }
                             }
                             g2.setTransform(oldTransform);
@@ -774,6 +787,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         private boolean ctrlDown = false;
 
         private boolean altDown = false;
+        
+        private boolean shiftDown = false;
 
         public boolean isAltDown() {
             return altDown;
@@ -788,6 +803,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if ((e.getID() == KeyEvent.KEY_PRESSED) || (e.getID() == KeyEvent.KEY_RELEASED)) {
                         ctrlDown = ((e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) == InputEvent.CTRL_DOWN_MASK);
                         altDown = ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) == InputEvent.ALT_DOWN_MASK);
+                        shiftDown = ((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) == InputEvent.SHIFT_DOWN_MASK);
                     }
                     return false;
                 }
@@ -839,6 +855,23 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             MouseInputAdapter mouseInputAdapter = new MouseInputAdapter() {
                 @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (shiftDown) {
+                        List<Integer> newSelectedPoints = new ArrayList<>(pointsUnderCursor);
+                        for (int i : selectedPoints) {
+                            if (!newSelectedPoints.contains(i)) {
+                                newSelectedPoints.add(i);
+                            } else {
+                                newSelectedPoints.remove((Integer)i);
+                            }
+                        }
+                        selectedPoints = newSelectedPoints;
+                    } else {
+                        selectedPoints = new ArrayList<>(pointsUnderCursor);
+                    }
+                }
+
+                @Override
                 public void mousePressed(MouseEvent e) {
                     if (SwingUtilities.isLeftMouseButton(e)) {
                         if (altDown) {
@@ -849,14 +882,26 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                         mouseMoved(e); //to correctly calculate mode, because moseMoved event is not called during dragging
                         setDragStart(e.getPoint());
-                        
+
+                        if (!shiftDown) {
+                            boolean selectedUnderCursor = false;
+                            for (int p : pointsUnderCursor) {
+                                if (selectedPoints.contains(p)) {
+                                    selectedUnderCursor = true;
+                                    break;
+                                }
+                            }
+                            if (!selectedUnderCursor) {
+                                selectedPoints = new ArrayList<>(pointsUnderCursor);
+                            }
+                        }
+
                         List<DisplayPoint> newPointsUnderCursorValues = new ArrayList<>();
-                        for (int i:pointsUnderCursor) {
+                        for (int i : selectedPoints) {
                             newPointsUnderCursorValues.add(new DisplayPoint(hilightedPoints.get(i)));
                         }
-                        
-                        pointsUnderCursorValues = newPointsUnderCursorValues;
-                        
+
+                        selectedPointsOriginalValues = newPointsUnderCursorValues;
 
                         if (!autoPlayed) {
                             Configuration.autoPlayPreviews.set(true);
@@ -917,17 +962,25 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 public void mouseDragged(MouseEvent e) {
                     List<DisplayPoint> points = hilightedPoints;
                     if (dragStart != null && points != null) {
-                        if (!pointsUnderCursor.isEmpty()) {
-                            
-                            for (int i = 0; i < pointsUnderCursor.size(); i++) {
-                                int pointIndex = pointsUnderCursor.get(i);
-                                DisplayPoint pointStart = pointsUnderCursorValues.get(i);
+                        if (!selectedPoints.isEmpty() && !pointsUnderCursor.isEmpty()) {
+                            boolean selectedUnderCursor = false;
+                            for (int p : pointsUnderCursor) {
+                                if (selectedPoints.contains(p)) {
+                                    selectedUnderCursor = true;
+                                    break;
+                                }
+                            }
+                            if (!selectedUnderCursor) {
+                                return;
+                            }
+                            for (int i = 0; i < selectedPoints.size(); i++) {
+                                int pointIndex = selectedPoints.get(i);
+                                DisplayPoint pointStart = selectedPointsOriginalValues.get(i);
                                 Point2D dragEnd = e.getPoint();
-                                Point2D startTransformPoint = toTransformPoint(dragStart);                            
+                                Point2D startTransformPoint = toTransformPoint(dragStart);
                                 Point2D endTransformPoint = toTransformPoint(dragEnd);
                                 Point2D delta = new Point2D.Double(endTransformPoint.getX() - startTransformPoint.getX(), endTransformPoint.getY() - startTransformPoint.getY());
-                                //System.out.println("delta = "+delta);
-                                DisplayPoint newPoint = new DisplayPoint((int)Math.round(pointStart.x + delta.getX()), (int)Math.round(pointStart.y + delta.getY()), pointStart.onPath);
+                                DisplayPoint newPoint = new DisplayPoint((int) Math.round(pointStart.x + delta.getX()), (int) Math.round(pointStart.y + delta.getY()), pointStart.onPath);
                                 points.set(pointIndex, newPoint);
                             }
                             firePointsUpdated(points);
@@ -1431,9 +1484,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         List<Integer> newPointsUnderCursor = new ArrayList<>();
                         for (int i = 0; i < points.size(); i++) {
                             DisplayPoint p = points.get(i);
-                            Point2D ip = toImagePoint(new Point2D.Double(p.x,p.y));
+                            Point2D ip = toImagePoint(new Point2D.Double(p.x, p.y));
                             int ex = e.getX();
-                            int ey = e.getY();                                                        
+                            int ey = e.getY();
                             if (ex > ip.getX() - maxDistance && ex < ip.getX() + maxDistance) {
                                 if (ey > ip.getY() - maxDistance && ey < ip.getY() + maxDistance) {
                                     cursor = movePointCursor;
@@ -1444,7 +1497,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         if (dragStart == null) {
                             pointsUnderCursor = newPointsUnderCursor;
                         }
-                        
+
                         if (getCursor() != cursor) {
                             setCursor(cursor);
                         }
