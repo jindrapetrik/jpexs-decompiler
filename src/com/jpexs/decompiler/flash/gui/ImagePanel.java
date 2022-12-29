@@ -101,6 +101,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -320,16 +321,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
     }
 
-    private void firePointAdded(int position, DisplayPoint point) {
+    private boolean firePointAdded(List<DisplayPoint> points, int position, DisplayPoint point) {
+        boolean result = true;
         for (PointUpdateListener listener : pointUpdateListeners) {
-            listener.pointAdded(position, point);
+            result = result && listener.pointAdded(points, position, point);
         }
+        return result;
     }
 
-    private void firePointRemoved(int position) {
+    private boolean firePointRemoved(List<DisplayPoint> points, int position) {
+        boolean result = true;
         for (PointUpdateListener listener : pointUpdateListeners) {
-            listener.pointRemoved(position);
+            result = result && listener.pointRemoved(points, position);
         }
+        return result;
     }
 
     private void applyPointsXY() {
@@ -947,6 +952,22 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                 @Override
                 public void keyPressed(KeyEvent e) {
+                    if (hilightedPoints != null) {
+                        if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+                            List<Integer> selectedPointsDesc = new ArrayList<>(selectedPoints);
+                            selectedPointsDesc.sort(new Comparator<Integer>() {
+                                @Override
+                                public int compare(Integer o1, Integer o2) {
+                                    return o2 - o1;
+                                }
+                            });
+                            for (int i:selectedPoints) {
+                                firePointRemoved(hilightedPoints, i);
+                            }
+                            selectedPoints.clear();
+                            repaint();
+                        }
+                    }
                     if (freeTransformDepth > -1 || hilightedPoints != null) {
                         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                             move(-1, 0);
