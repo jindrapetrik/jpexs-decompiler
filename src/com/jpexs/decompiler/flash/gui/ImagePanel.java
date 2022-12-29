@@ -961,7 +961,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     return o2 - o1;
                                 }
                             });
-                            for (int i:selectedPoints) {
+                            for (int i:selectedPointsDesc) {
                                 firePointRemoved(hilightedPoints, i);
                             }
                             selectedPoints.clear();
