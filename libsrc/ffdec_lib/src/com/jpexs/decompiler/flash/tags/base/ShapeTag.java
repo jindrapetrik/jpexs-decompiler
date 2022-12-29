@@ -263,4 +263,8 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
     public void setCharacterId(int characterId) {
         this.shapeId = characterId;
     }
+    
+    public void updateBounds() {
+        shapeBounds = SHAPERECORD.getBounds(shapes.shapeRecords, shapes.lineStyles, getShapeNum(), false);
+    }
 }
