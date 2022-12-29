@@ -111,7 +111,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
-import jsyntaxpane.util.SwingUtils;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
@@ -254,6 +253,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private DepthState depthStateUnderCursor = null;
 
     private List<ActionListener> placeObjectSelectedListeners = new ArrayList<>();
+    
+    private Point[] hilightedEdge = null;
+    
+    private int hilightEdgeColorStep = 10;
+    private int hilightEdgeColor = 0;
 
     private static Cursor loadCursor(String name, int x, int y) throws IOException {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -264,6 +268,21 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private SerializableImage imgPlay = null;
 
     private List<BoundsChangeListener> boundsChangeListeners = new ArrayList<>();
+
+    public void setHilightedEdge(Point[] hilightedEdge) {
+        this.hilightedEdge = hilightedEdge;
+        hilightEdgeColor = 255;
+        /*if (hilightedEdge == null) {
+            System.out.println("set no hilight edge");
+        } else {
+            String s = "";
+            for(Point p:hilightedEdge) {
+                s+="["+p.x+","+p.y+"]";
+            }
+            System.out.println("set hilight edge " + s);
+        }*/
+        redraw();
+    }        
 
     public void addBoundsChangeListener(BoundsChangeListener listener) {
         boundsChangeListeners.add(listener);
@@ -617,6 +636,50 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                         g2.drawImage(img.getBufferedImage(), x, y, x + img.getWidth(), y + img.getHeight(), 0, 0, img.getWidth(), img.getHeight(), null);
 
+                        if (hilightedEdge != null) {
+                            hilightEdgeColor += hilightEdgeColorStep;
+                            if (hilightEdgeColor < 100 || hilightEdgeColor > 255) {
+                                hilightEdgeColorStep = -hilightEdgeColorStep;
+                                hilightEdgeColor += hilightEdgeColorStep * 2;
+                            }
+                            RECT timRect = timelined.getRect();
+                            double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+                            AffineTransform t = new AffineTransform();                            
+                            t.translate(offsetPoint.getX() - (int) (timRect.Xmin * zoomDouble / SWF.unitDivisor)
+                                    , offsetPoint.getY() - (int) (timRect.Ymin * zoomDouble / SWF.unitDivisor));
+                            t.scale(1/SWF.unitDivisor, 1/SWF.unitDivisor);                            
+                            t.scale(zoomDouble, zoomDouble);
+                            AffineTransform oldTransform = g2.getTransform();
+                            g2.setTransform(t);
+                            g2.setStroke(new BasicStroke((float) (SWF.unitDivisor * 6 / zoomDouble)));
+                            g2.setPaint(new Color(hilightEdgeColor, hilightEdgeColor, hilightEdgeColor));
+                            Point[] edge = hilightedEdge;
+                            GeneralPath path = new GeneralPath();
+                            if (edge.length == 2) {
+                                path.moveTo(edge[0].x, edge[0].y);                            
+                                path.lineTo(edge[1].x, edge[1].y);
+                            }
+                            if (edge.length == 3) {
+                                path.moveTo(edge[0].x, edge[0].y);                            
+                                path.quadTo(edge[1].x, edge[1].y, edge[2].x, edge[2].y);
+                            }
+                            if (edge.length == 1) {
+                                double crossSize = (SWF.unitDivisor * 10 / zoomDouble);
+                                path.moveTo(edge[0].x - crossSize, edge[0].y);
+                                path.lineTo(edge[0].x + crossSize, edge[0].y);
+                                path.moveTo(edge[0].x, edge[0].y - crossSize);
+                                path.lineTo(edge[0].x, edge[0].y + crossSize);
+                            }
+                            g2.draw(path);
+                            
+                            double pointSize = SWF.unitDivisor * 4 / zoomDouble;
+                            
+                            g2.setPaint(Color.red);
+                            g2.fill(new Ellipse2D.Double(edge[edge.length - 1].x - pointSize, edge[edge.length - 1].y - pointSize, pointSize * 2, pointSize * 2));
+                            g2.setPaint(Color.green);
+                            g2.fill(new Ellipse2D.Double(edge[0].x - pointSize, edge[0].y - pointSize, pointSize * 2, pointSize * 2));
+                            g2.setTransform(oldTransform);
+                        }
                         if (!(timelined instanceof SWF) && freeTransformDepth > -1) {
 
                             int axisX = 0;
@@ -1918,6 +1981,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             this.muted = muted;
             this.mutable = mutable;
             depthStateUnderCursor = null;
+            hilightedEdge = null;
             this.showObjectsUnderCursor = showObjectsUnderCursor;
             this.registrationPointPosition = RegistrationPointPosition.CENTER;
             centerImage();
@@ -1953,6 +2017,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         loaded = true;
         stillFrame = true;
         zoomAvailable = false;
+        hilightedEdge = null;
         iconPanel.setImg(image);
         drawReady = true;
 
