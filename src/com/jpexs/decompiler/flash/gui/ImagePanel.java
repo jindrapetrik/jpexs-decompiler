@@ -629,25 +629,28 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private void centerImage() {
-        Timer tim = new Timer();
+        Timelined tim = timelined;
+        if (tim == null) {
+            return;
+        }
+        RECT rect = tim.getRect();
+        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+        double w = rect.getWidth() / SWF.unitDivisor * zoomDouble;
+        double h = rect.getHeight() / SWF.unitDivisor * zoomDouble;
+        double dw = rect.Xmin * zoomDouble / SWF.unitDivisor;
+        double dh = rect.Ymin * zoomDouble / SWF.unitDivisor;
+        offsetPoint.setLocation(
+                iconPanel.getWidth() / 2 - w / 2 + dw,
+                iconPanel.getHeight() / 2 - h / 2 + dh);
+        /*Timer tim = new Timer();
         tim.schedule(new TimerTask() {
             @Override
-            public void run() {
-                Timelined tim = timelined;
-                if (tim == null) {
-                    return;
-                }
-                RECT rect = tim.getRect();
-                double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
-                double w = rect.getWidth() / SWF.unitDivisor * zoomDouble;
-                double h = rect.getHeight() / SWF.unitDivisor * zoomDouble;
-                offsetPoint.setLocation(iconPanel.getWidth() / 2 - w / 2,
-                        iconPanel.getHeight() / 2 - h / 2);
+            public void run() {                
                 updateScrollBars();
                 redraw();
             }
 
-        }, 100);
+        }, 100);*/
 
     }
 
@@ -2025,12 +2028,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     double zoomDouble = z.fit ? getZoomToFit() : z.value;
                     int w1;
                     int h1;
+                    int dx;
+                    int dy;
                     if (timelined == null || (!autoPlayed && _img != null)) {
                         w1 = (int) (_img.getWidth() * (lowQuality ? LQ_FACTOR : 1));
                         h1 = (int) (_img.getHeight() * (lowQuality ? LQ_FACTOR : 1));
+                        dx = 0;
+                        dy = 0;
                     } else {
                         w1 = (int) (timelined.getRect().getWidth() * zoomDouble / SWF.unitDivisor);
                         h1 = (int) (timelined.getRect().getHeight() * zoomDouble / SWF.unitDivisor);
+                        dx = (int)(timelined.getRect().Xmin * zoomDouble / SWF.unitDivisor);
+                        dy = (int)(timelined.getRect().Ymin * zoomDouble / SWF.unitDivisor);
                     }
 
                     //HERE
@@ -2072,7 +2081,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         boolean doMove = h > h2 || w > w2;
                         setAllowMove(doMove);
                         if (!doMove) {
-                            offsetPoint.setLocation(iconPanel.getWidth() / 2 - w / 2, iconPanel.getHeight() / 2 - h / 2);
+                            offsetPoint.setLocation(iconPanel.getWidth() / 2 - w / 2 - dx, iconPanel.getHeight() / 2 - h / 2 - dy);
                             updateScrollBars();
                         }
                     }
@@ -2523,6 +2532,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     updateScrollBars();
                 }*/
                 updatingScrollBars = false;
+                if (zoom.fit) {
+                    verticalScrollBar.setVisible(false);
+                    horizontalScrollBar.setVisible(false);
+                }
             }
         });
     }
@@ -2677,6 +2690,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             bounds = null;
             displayObjectCache.clear();
             this.timelined = drawable;
+            centerImage();            
             this.swf = swf;
             zoomAvailable = true;
             timer = null;
@@ -2721,8 +2735,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             hilightedPoints = null;
             pointEditPanel.setVisible(false);
             this.showObjectsUnderCursor = showObjectsUnderCursor;
-            this.registrationPointPosition = RegistrationPointPosition.CENTER;
-            centerImage();
+            this.registrationPointPosition = RegistrationPointPosition.CENTER;            
             redraw();
             if (autoPlay) {
                 play();
