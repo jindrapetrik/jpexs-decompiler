@@ -84,6 +84,10 @@ public class SHAPE implements NeedsCharacters, Serializable {
         return SHAPERECORD.getBounds(shapeRecords, null, 1, true);
     }
 
+    public void clearCachedOutline() {
+        cachedOutline = null;
+    }
+    
     public Shape getOutline(int shapeNum, SWF swf, boolean stroked) {
         if (cachedOutline != null) {
             return cachedOutline;

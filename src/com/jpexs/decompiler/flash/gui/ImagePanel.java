@@ -78,6 +78,8 @@ import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
@@ -114,6 +116,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -289,6 +292,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private int hilightEdgeColor = 0;
 
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
+
+    private JScrollBar horizontalScrollBar;
+    private JScrollBar verticalScrollBar;
+    private boolean updatingScrollBars = false;
+    private final int SCROLL_SPACE_BEFORE = (int) SWF.unitDivisor * 500;
 
     private static String formatDouble(double value) {
         return DECIMAL_FORMAT.format(value);
@@ -635,6 +643,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 double h = rect.getHeight() / SWF.unitDivisor * zoomDouble;
                 offsetPoint.setLocation(iconPanel.getWidth() / 2 - w / 2,
                         iconPanel.getHeight() / 2 - h / 2);
+                updateScrollBars();
                 redraw();
             }
 
@@ -796,8 +805,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             RECT timRect = timelined.getRect();
                             double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                             AffineTransform trans = new AffineTransform();
-                            trans.translate(offsetPoint.getX() - (int) (timRect.Xmin * zoomDouble / SWF.unitDivisor),
-                                    offsetPoint.getY() - (int) (timRect.Ymin * zoomDouble / SWF.unitDivisor));
+                            trans.translate(offsetPoint.getX(),offsetPoint.getY());
                             trans.scale(1 / SWF.unitDivisor, 1 / SWF.unitDivisor);
                             trans.scale(zoomDouble, zoomDouble);
                             AffineTransform oldTransform = g2.getTransform();
@@ -888,7 +896,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     }
 
                                 }*/
-                                /*for (int i = 0; i < points.size(); i++) {
+ /*for (int i = 0; i < points.size(); i++) {
                                     DisplayPoint p = points.get(i);
                                     if (!p.onPath) {
                                         DisplayPoint p0 = points.get(i - 1);
@@ -912,13 +920,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             g2.setTransform(oldTransform);
                         }
                         if (!(timelined instanceof SWF) && (freeTransformDepth > -1 || hilightedPoints != null)) {
-
                             int axisX = 0;
                             int axisY = 0;
                             double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                             RECT timRect = timelined.getRect();
-                            axisX = (int) Math.round(offsetPoint.getX()) - (int) (timRect.Xmin * zoomDouble / SWF.unitDivisor);
-                            axisY = (int) Math.round(offsetPoint.getY()) - (int) (timRect.Ymin * zoomDouble / SWF.unitDivisor);
+                            axisX = (int) Math.round(offsetPoint.getX());
+                            axisY = (int) Math.round(offsetPoint.getY());
                             g2.setComposite(BlendComposite.Invert);
                             g2.setPaint(new Color(255, 255, 255, 128));
                             float dp;
@@ -1053,6 +1060,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
 
                     calcRect();
+                    updateScrollBars();
                     render();
                     repaint();
                 }
@@ -1152,7 +1160,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 pathPointUnderCursor = null;
                                 pathPointPosition = 0.0;
                                 repaint();
-                            }
+                            }                            
+                            updateScrollBarMinMax();
                         }
 
                         dragStart = null;
@@ -1239,6 +1248,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         Point2D delta = new Point2D.Double(dragEnd.getX() - dragStart.getX(), dragEnd.getY() - dragStart.getY());
                         Point2D regPointImage = registrationPoint == null ? null : toImagePoint(registrationPoint);
                         offsetPoint.setLocation(offsetPoint.getX() + delta.getX(), offsetPoint.getY() + delta.getY());
+                        updateScrollBars();
 
                         ExportRectangle oldViewRect = new ExportRectangle(_viewRect);
                         dragStart = dragEnd;
@@ -1786,13 +1796,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     closestPoint = new Point2D.Double(x, y);
                                     lineDistance = p.distance(closestPoint);
                                 }
-                                
+
                                 double minX = Math.min(p0.x, p1.x) - maxDistance * SWF.unitDivisor / zoomDouble;
                                 double minY = Math.min(p0.y, p1.y) - maxDistance * SWF.unitDivisor / zoomDouble;
 
                                 double maxX = Math.max(p0.x, p1.x) + maxDistance * SWF.unitDivisor / zoomDouble;
                                 double maxY = Math.max(p0.y, p1.y) + maxDistance * SWF.unitDivisor / zoomDouble;
-                                
+
                                 if (p.getX() >= minX && p.getX() <= maxX && p.getY() >= minY && p.getY() <= maxY) {
                                     double t = p0.toPoint2D().distance(closestPoint) / p0.toPoint2D().distance(p1.toPoint2D());
                                     if (lineDistance <= maxDistance * SWF.unitDivisor / zoomDouble) {
@@ -1800,7 +1810,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     }
                                 }
 
-                                
                             }
                             if (i < points.size() - 2 && !points.get(i + 1).onPath) {
                                 DisplayPoint p0 = points.get(i);
@@ -2054,13 +2063,17 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         h = h1;
                     }
 
-                    if (freeTransformDepth > -1) {
+                    if (hilightedPoints != null) {
+                        setAllowMove(false);
+                        //updateScrollBars();
+                    } else if (freeTransformDepth > -1) {
                         setAllowMove(true);
                     } else {
                         boolean doMove = h > h2 || w > w2;
                         setAllowMove(doMove);
                         if (!doMove) {
                             offsetPoint.setLocation(iconPanel.getWidth() / 2 - w / 2, iconPanel.getHeight() / 2 - h / 2);
+                            updateScrollBars();
                         }
                     }
                 }
@@ -2168,7 +2181,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             debugLabel.setText(DEFAULT_DEBUG_LABEL_TEXT);
         }
     }
-
+        
     public ImagePanel() {
         super(new BorderLayout());
         //iconPanel.setHorizontalAlignment(JLabel.CENTER);
@@ -2217,6 +2230,54 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         topPanel.add(pointEditPanel);
         pointEditPanel.setVisible(false);
         add(topPanel, BorderLayout.NORTH);
+
+        horizontalScrollBar = new JScrollBar(JScrollBar.HORIZONTAL);
+        verticalScrollBar = new JScrollBar(JScrollBar.VERTICAL);
+
+        horizontalScrollBar.addAdjustmentListener(new AdjustmentListener() {
+            @Override
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                if (updatingScrollBars) {
+                    return;
+                }
+                updatingScrollBars = true;
+                double zoomDouble = ImagePanel.this.zoom.fit ? getZoomToFit() : ImagePanel.this.zoom.value;
+                RECT timRect = timelined.getRect();
+                updateScrollBarMinMax();
+                //horizontalScrollBar.setVisible(horizontalScrollBar.getVisibleAmount() < horizontalScrollBar.getMaximum() - horizontalScrollBar.getMinimum());
+                //verticalScrollBar.setVisible(verticalScrollBar.getVisibleAmount() < verticalScrollBar.getMaximum() - verticalScrollBar.getMinimum());
+
+                offsetPoint.setLocation(-(horizontalScrollBar.getValue()) * zoomDouble / SWF.unitDivisor, offsetPoint.getY());
+                iconPanel.calcRect();
+                _viewRect = getViewRect();
+                updatingScrollBars = false;
+                redraw();                
+            }
+        });
+
+        verticalScrollBar.addAdjustmentListener(new AdjustmentListener() {
+            @Override
+            public void adjustmentValueChanged(AdjustmentEvent e) {
+                if (updatingScrollBars) {
+                    return;
+                }
+                updatingScrollBars = true;
+                RECT timRect = timelined.getRect();
+                double zoomDouble = ImagePanel.this.zoom.fit ? getZoomToFit() : ImagePanel.this.zoom.value;
+                updateScrollBarMinMax();
+                //horizontalScrollBar.setVisible(horizontalScrollBar.getVisibleAmount() < horizontalScrollBar.getMaximum() - horizontalScrollBar.getMinimum());
+                //verticalScrollBar.setVisible(verticalScrollBar.getVisibleAmount() < verticalScrollBar.getMaximum() - verticalScrollBar.getMinimum());
+                offsetPoint.setLocation(offsetPoint.getX(), -(verticalScrollBar.getValue()) * zoomDouble / SWF.unitDivisor);
+                iconPanel.calcRect();
+                _viewRect = getViewRect();
+                redraw();
+                updatingScrollBars = false;
+            }
+        });
+
+        add(horizontalScrollBar, BorderLayout.SOUTH);
+        add(verticalScrollBar, BorderLayout.EAST);
+
         iconPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -2334,6 +2395,138 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         zoom(zoom, false);
     }
 
+    public Timelined getTimelined() {
+        return timelined;
+    }
+    
+    
+
+    private void updateScrollBarMinMax() {
+
+        RECT timRect = timelined.getRect();
+
+        int w = iconPanel.getWidth();
+        int h = iconPanel.getHeight();
+        
+        
+        Point2D topLeft = toTransformPoint(new Point2D.Double(0, 0));
+        Point2D rightBottom = toTransformPoint(new Point2D.Double(iconPanel.getWidth(), iconPanel.getHeight()));
+
+
+        int h_value = horizontalScrollBar.getValue();
+        int h_visibleAmount = horizontalScrollBar.getVisibleAmount();
+
+        int h_maximum = timRect.Xmax;
+
+        if (hilightedPoints != null) {
+            h_maximum += SCROLL_SPACE_BEFORE;
+            /*if (rightBottom.getX() < h_maximum + SCROLL_SPACE_BEFORE) {
+                h_maximum += SCROLL_SPACE_BEFORE;
+            }*/
+        }
+
+        /*if (h_value + h_visibleAmount > h_maximum) {
+            h_maximum = h_value + h_visibleAmount;
+        }*/
+        int h_minimum = timRect.Xmin > 0 ? 0 : timRect.Xmin;
+        if (hilightedPoints != null) {
+            h_minimum -= SCROLL_SPACE_BEFORE;
+            /*if (timRect.Xmin > -SCROLL_SPACE_BEFORE) {
+                h_minimum = -SCROLL_SPACE_BEFORE;
+            }*/
+            //h_minimum = Math.min(h_minimum, 0);
+            //h_minimum = Math.min(h_minimum, (int) Math.round(topLeft.getX()));
+        }
+        horizontalScrollBar.setMinimum(h_minimum);
+        horizontalScrollBar.setMaximum(h_maximum);
+
+        int v_value = verticalScrollBar.getValue();
+        int v_visibleAmount = verticalScrollBar.getVisibleAmount();
+
+        int v_maximum = timRect.Ymax;
+        if (hilightedPoints != null) {            
+            v_maximum += SCROLL_SPACE_BEFORE;
+            /*if (rightBottom.getY() < v_maximum + SCROLL_SPACE_BEFORE) {
+                v_maximum += SCROLL_SPACE_BEFORE;
+            }*/
+        }
+        /*if (v_value + v_visibleAmount > v_maximum) {
+            v_maximum = v_value + v_visibleAmount;
+        }*/
+
+        int v_minimum = timRect.Xmin > 0 ? 0 : timRect.Xmin;
+        if (hilightedPoints != null) {
+            /*if (timRect.Ymin > -SCROLL_SPACE_BEFORE) {
+                v_minimum = -SCROLL_SPACE_BEFORE;
+            }*/
+            v_minimum -= SCROLL_SPACE_BEFORE;
+            //v_minimum = Math.min(v_minimum, 0);
+            //v_minimum = Math.min(v_minimum, (int) Math.round(topLeft.getY()));           
+        }
+
+        verticalScrollBar.setMinimum(v_minimum);
+        verticalScrollBar.setMaximum(v_maximum);
+        
+        
+        horizontalScrollBar.setVisible(horizontalScrollBar.getVisibleAmount() < horizontalScrollBar.getMaximum() - horizontalScrollBar.getMinimum());
+        verticalScrollBar.setVisible(verticalScrollBar.getVisibleAmount() < verticalScrollBar.getMaximum() - verticalScrollBar.getMinimum());                
+    }
+
+    private synchronized void updateScrollBars() {
+        View.execInEventDispatchLater(new Runnable() {
+            @Override
+            public void run() {
+                if (timelined == null) {
+                    return;
+                }
+
+                updatingScrollBars = true;
+                double zoomDouble = ImagePanel.this.zoom.fit ? getZoomToFit() : ImagePanel.this.zoom.value;
+
+                RECT timRect = timelined.getRect();
+
+                int w = iconPanel.getWidth();
+                int h = iconPanel.getHeight();
+
+                
+                int h_visibleAmount = (int) Math.round(w * SWF.unitDivisor / zoomDouble);
+                
+                Point2D leftTop = toTransformPoint(new Point2D.Double(0, 0));
+                
+                Point2D rightBottom = toTransformPoint(new Point2D.Double(w, h));
+                /*if (rightBottom.getX() > timRect.Xmax) {
+                    h_visibleAmount = timRect.Xmax - (int)leftTop.getX();
+                }*/
+                
+                int h_value = (int)Math.round(leftTop.getX());//timRect.Xmin + (int) Math.round(-offsetPoint.getX() / zoomDouble * SWF.unitDivisor);
+                horizontalScrollBar.setVisibleAmount(h_visibleAmount);
+                horizontalScrollBar.setValue(h_value);
+
+                int v_visibleAmount = (int) Math.round(h * SWF.unitDivisor / zoomDouble);
+                int v_value = (int)Math.round(leftTop.getY()); //timRect.Ymin + (int) Math.round(-offsetPoint.getY() / zoomDouble * SWF.unitDivisor);
+
+                verticalScrollBar.setVisibleAmount(v_visibleAmount);
+                verticalScrollBar.setValue(v_value);
+
+                updateScrollBarMinMax();
+                
+                /*boolean hVisibleBefore = horizontalScrollBar.isVisible();
+                horizontalScrollBar.setVisible(horizontalScrollBar.getVisibleAmount() < horizontalScrollBar.getMaximum() - horizontalScrollBar.getMinimum());
+                boolean hVisibleAfter = horizontalScrollBar.isVisible();
+
+                boolean vVisibleBefore = verticalScrollBar.isVisible();
+                verticalScrollBar.setVisible(verticalScrollBar.getVisibleAmount() < verticalScrollBar.getMaximum() - verticalScrollBar.getMinimum());
+                boolean vVisibleAfter = verticalScrollBar.isVisible();
+
+                
+                if (hVisibleAfter != hVisibleBefore || vVisibleAfter != vVisibleBefore) {
+                    updateScrollBars();
+                }*/
+                updatingScrollBars = false;
+            }
+        });
+    }
+
     private synchronized void zoom(Zoom zoom, boolean useCursor) {
         double zoomDoubleBefore = this.zoom.fit ? getZoomToFit() : this.zoom.value;
 
@@ -2360,6 +2553,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             offsetPoint.setLocation(offsetPoint.getX() + dx, offsetPoint.getY() + dy);
 
+            updateScrollBars();
+
             iconPanel.calcRect();
             _viewRect = getViewRect();
 
@@ -2373,7 +2568,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             if (textTag != null) {
                 setText(textTag, newTextTag);
             }
-
             fireMediaDisplayStateChanged();
         }
     }
@@ -2494,6 +2688,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 this.stillFrame = false;
             }
             this.prevFrame = -1;
+
+            RECT timRect = drawable.getRect();
+
+            double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
+
+            horizontalScrollBar.setMaximum(timRect.Xmax);
+            horizontalScrollBar.setMinimum(timRect.Xmin);
+
+            verticalScrollBar.setMaximum(timRect.Ymax);
+            verticalScrollBar.setMinimum(timRect.Ymin);
+
+            updateScrollBars();
 
             loaded = true;
 
@@ -2944,10 +3150,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         viewRect.yMin /= zoomDouble;
         viewRect.yMax /= zoomDouble;
 
-        viewRect.xMin += timRect.Xmin;
+        /*viewRect.xMin += timRect.Xmin;
         viewRect.yMin += timRect.Ymin;
         viewRect.xMax += timRect.Xmin;
-        viewRect.yMax += timRect.Ymin;
+        viewRect.yMax += timRect.Ymin;*/
 
         viewRect.xMax = viewRect.xMin + (int) (iconPanel.getWidth() * SWF.unitDivisor / zoomDouble);
         viewRect.yMax = viewRect.yMin + (int) (iconPanel.getHeight() * SWF.unitDivisor / zoomDouble);
@@ -3688,8 +3894,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             zoomDouble /= LQ_FACTOR;
         }
         RECT timRect = timelined.getRect();
-        double rx = (point.getX() - offsetPoint.getX()) * SWF.unitDivisor / zoomDouble + timRect.Xmin;
-        double ry = (point.getY() - offsetPoint.getY()) * SWF.unitDivisor / zoomDouble + timRect.Ymin;
+        double rx = (point.getX() - offsetPoint.getX()) * SWF.unitDivisor / zoomDouble; // + timRect.Xmin;
+        double ry = (point.getY() - offsetPoint.getY()) * SWF.unitDivisor / zoomDouble; // + timRect.Ymin;
         Point2D ret = new Point2D.Double(rx, ry);
         return ret;
     }
@@ -3714,8 +3920,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         RECT timRect = timelined.getRect();
 
-        double rx = (point.getX() - timRect.Xmin) * zoomDouble / SWF.unitDivisor + offsetPoint.getX(); // + offsetXRef.getVal();
-        double ry = (point.getY() - timRect.Ymin) * zoomDouble / SWF.unitDivisor + offsetPoint.getY(); // + offsetYRef.getVal();
+        double rx = point.getX() * zoomDouble / SWF.unitDivisor + offsetPoint.getX(); // + offsetXRef.getVal();
+        double ry = point.getY() * zoomDouble / SWF.unitDivisor + offsetPoint.getY(); // + offsetYRef.getVal();
 
         Point2D ret = new Point2D.Double(rx, ry);
         return ret;

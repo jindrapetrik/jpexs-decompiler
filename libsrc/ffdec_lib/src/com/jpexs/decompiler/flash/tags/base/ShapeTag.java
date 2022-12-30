@@ -265,6 +265,7 @@ public abstract class ShapeTag extends DrawableTag implements LazyObject {
     }
     
     public void updateBounds() {
+        shapes.clearCachedOutline();
         shapeBounds = SHAPERECORD.getBounds(shapes.shapeRecords, shapes.lineStyles, getShapeNum(), false);
     }
 }

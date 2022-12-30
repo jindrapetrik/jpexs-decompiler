@@ -251,6 +251,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private int displayEditMode = EDIT_RAW;
 
     private List<SHAPERECORD> oldShapeRecords;
+    private RECT oldShapeBounds;
+    private RECT oldShapeEdgeBounds;
 
     //used only for flash player
     private TreeItem currentItem;
@@ -775,6 +777,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     x = rec.changeX(x);
                     y = rec.changeY(y);
                 }
+                shape.updateBounds();
                 shape.getSwf().clearShapeCache();
                 displayEditImagePanel.repaint();
             }
@@ -807,6 +810,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             ser.simplify();                            
                             shape.shapes.shapeRecords.add(i + 1, newSer);
                             points.add(position, new DisplayPoint(new Point2D.Double(x + ser.deltaX, y + ser.deltaY))); 
+                            shape.shapes.clearCachedOutline();         
                             shape.getSwf().clearShapeCache();
                             displayEditImagePanel.repaint();
                             return true;
@@ -843,6 +847,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             points.add(position, new DisplayPoint(new Point2D.Double(left.get(1).getX(), left.get(1).getY()), false));
                             points.add(position + 1, new DisplayPoint(new Point2D.Double(left.get(2).getX(), left.get(2).getY())));
                             points.add(position + 2, new DisplayPoint(new Point2D.Double(right.get(1).getX(), right.get(1).getY()), false));
+                            shape.shapes.clearCachedOutline();          
                             shape.getSwf().clearShapeCache();
                             displayEditImagePanel.repaint();
                             return true;
@@ -884,6 +889,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                 shape.shapes.shapeRecords.remove(i);
 
                                 points.remove(position);
+                                shape.shapes.clearCachedOutline();            
                                 shape.getSwf().clearShapeCache();
                                 displayEditImagePanel.repaint();
                                 return true;
@@ -896,6 +902,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                 points.remove(position + 1);
                                 points.remove(position);                                
                                 shape.shapes.shapeRecords.remove(i + 1);
+                                shape.shapes.clearCachedOutline();            
                                 shape.getSwf().clearShapeCache();
                                 displayEditImagePanel.repaint();
                                 return true;
@@ -915,6 +922,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             ser.simplify();
                             shape.shapes.shapeRecords.set(i, ser);
                             points.remove(position);
+                            shape.shapes.clearCachedOutline();            
                             shape.getSwf().clearShapeCache();
                             displayEditImagePanel.repaint();
                             return true;
@@ -932,6 +940,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                 points.remove(pointsPos + 2);
                                 points.remove(pointsPos + 1);
                                 points.remove(pointsPos);
+                                shape.shapes.clearCachedOutline();            
                                 shape.getSwf().clearShapeCache();
                                 displayEditImagePanel.repaint();
                                 return true;
@@ -945,6 +954,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                 shape.shapes.shapeRecords.remove(i);
                                 points.remove(pointsPos + 1);
                                 points.remove(pointsPos);
+                                shape.shapes.clearCachedOutline();            
                                 shape.getSwf().clearShapeCache();
                                 displayEditImagePanel.repaint();
                                 return true;
@@ -1653,6 +1663,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             Tag tag = genericTagPanel.getTag();
             SWF swf = tag.getSwf();
             swf.clearImageCache();
+            if (tag instanceof ShapeTag) {
+                ShapeTag shape = (ShapeTag) tag;
+                shape.shapes.clearCachedOutline();            
+            }
             swf.clearShapeCache();
             swf.updateCharacters();
             tag.getTimelined().resetTimeline();
@@ -1777,7 +1791,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             (int) Math.round(edgeRect.yMin),
                             (int) Math.round(edgeRect.yMax)
                     );
-                }
+                }      
+                //shape.getSwf().getRectCache().cl
+                //DefineSprite sprite = 
+                        //((DefineSpriteTag)displayEditImagePanel.getTimelined());
+                shape.shapes.clearCachedOutline();            
                 shape.getSwf().clearShapeCache();
             }
             displayEditTag.setModified(true);
@@ -1796,6 +1814,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             ShapeTag shape = (ShapeTag) displayEditTag;
             shape.updateBounds();
             oldShapeRecords = null;
+            oldShapeBounds = null;
+            oldShapeEdgeBounds = null;
         }
         Tag hilightTag = null;
         SWF swf = null;
@@ -1873,6 +1893,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         ShapeTag shape = (ShapeTag) displayEditTag;
 
         oldShapeRecords = Helper.deepCopy(shape.shapes.shapeRecords);
+        oldShapeBounds = shape.shapeBounds;
+        if (shape instanceof DefineShape4Tag) {
+            DefineShape4Tag shape4 = (DefineShape4Tag)shape;
+            oldShapeEdgeBounds = shape4.edgeBounds;                    
+        }
         int x = 0;
         int y = 0;
 
@@ -2181,6 +2206,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditImagePanel.setHilightedPoints(null);
             ShapeTag shape = (ShapeTag) displayEditTag;
             shape.shapes.shapeRecords = oldShapeRecords;
+            shape.shapeBounds = oldShapeBounds;
+            if (shape instanceof DefineShape4Tag) {
+                DefineShape4Tag shape4 = (DefineShape4Tag)shape;
+                shape4.edgeBounds = oldShapeEdgeBounds;
+            }
+            shape.shapes.clearCachedOutline();
             shape.getSwf().clearShapeCache();
             displayEditImagePanel.repaint();
             displayEditGenericPanel.setVisible(true);
