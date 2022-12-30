@@ -338,7 +338,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private JPanel createImageButtonsPanel() {
-        replaceSoundButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replacesound16"));
+        replaceSoundButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("importsound16"));
         replaceSoundButton.setMargin(new Insets(3, 3, 3, 10));
         replaceSoundButton.addActionListener(new ActionListener() {
             @Override
@@ -363,7 +363,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceImageAlphaButton.addActionListener(mainPanel::replaceAlphaButtonActionPerformed);
         replaceImageAlphaButton.setVisible(false);
 
-        replaceMovieButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replacemovie16"));
+        replaceMovieButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("importmovie16"));
         replaceMovieButton.setMargin(new Insets(3, 3, 3, 10));
         replaceMovieButton.addActionListener(new ActionListener() {
             @Override
@@ -1071,11 +1071,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditCancelButton.setMargin(new Insets(3, 3, 3, 10));
         displayEditCancelButton.addActionListener(this::cancelDisplayEditTagButtonActionPerformed);
 
-        displayEditEditPointsButton = new JButton(mainPanel.translate("button.edit.points"), View.getIcon("edit16"));
+        displayEditEditPointsButton = new JButton(mainPanel.translate("button.edit.points"), View.getIcon("pointsedit16"));
         displayEditEditPointsButton.setMargin(new Insets(3, 3, 3, 10));
         displayEditEditPointsButton.addActionListener(this::editPointsDisplayEditTagButtonActionPerformed);
 
-        replaceShapeButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("replaceshape16"));
+        replaceShapeButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("importshape16"));
         replaceShapeButton.setMargin(new Insets(3, 3, 3, 10));
         replaceShapeButton.addActionListener(new ActionListener() {
             @Override
@@ -1085,7 +1085,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         });
         replaceShapeButton.setVisible(false);
 
-        replaceShapeUpdateBoundsButton = new JButton(mainPanel.translate("button.replaceNoFill"), View.getIcon("replaceshape16"));
+        replaceShapeUpdateBoundsButton = new JButton(mainPanel.translate("button.replaceNoFill"), View.getIcon("importshape16"));
         replaceShapeUpdateBoundsButton.setMargin(new Insets(3, 3, 3, 10));
         replaceShapeUpdateBoundsButton.addActionListener(new ActionListener() {
             @Override
