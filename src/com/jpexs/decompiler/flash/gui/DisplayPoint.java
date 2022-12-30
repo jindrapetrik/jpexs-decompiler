@@ -16,6 +16,8 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import java.awt.geom.Point2D;
+
 /**
  *
  * @author JPEXS
@@ -25,6 +27,14 @@ public class DisplayPoint {
     public int y;
     public boolean onPath;
 
+    public DisplayPoint(Point2D point) {
+        this(point, true);
+    }
+    public DisplayPoint(Point2D point, boolean onPath) {
+        x = (int)Math.round(point.getX());
+        y = (int)Math.round(point.getY());
+        this.onPath = onPath;
+    }
     public DisplayPoint(DisplayPoint src) {
         this(src.x, src.y, src.onPath);
     }
@@ -43,4 +53,7 @@ public class DisplayPoint {
         return "["+x+","+y+"]";
     }
     
+    public Point2D toPoint2D(){
+        return new Point2D.Double(x, y);
+    }
 }
