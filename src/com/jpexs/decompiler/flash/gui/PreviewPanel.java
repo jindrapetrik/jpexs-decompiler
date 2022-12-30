@@ -780,9 +780,80 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
 
             @Override
-            public boolean pointAdded(List<DisplayPoint> points, int position, DisplayPoint point) {
-                return true;
-            }
+            public boolean edgeSplit(List<DisplayPoint> points, int position, double splitPoint) {
+                ShapeTag shape = (ShapeTag) displayEditTag;
+                int pointsPos = 0;
+                int x = 0;
+                int y = 0;
+                for (int i = 0; i < shape.shapes.shapeRecords.size(); i++) {
+                    SHAPERECORD rec = shape.shapes.shapeRecords.get(i);
+                    if (rec instanceof StyleChangeRecord) {
+                        StyleChangeRecord scr = (StyleChangeRecord) rec;
+                        if (scr.stateMoveTo) {
+                            pointsPos++;
+                        }
+                    }
+                    if (rec instanceof StraightEdgeRecord) {
+                        StraightEdgeRecord ser = (StraightEdgeRecord) rec;
+                        if (pointsPos == position) {
+                            StraightEdgeRecord newSer = new StraightEdgeRecord();
+                            newSer.generalLineFlag = true;
+                            newSer.deltaX = (int)Math.round(ser.deltaX * (1-splitPoint));
+                            newSer.deltaY = (int)Math.round(ser.deltaY * (1-splitPoint));
+                            newSer.simplify();
+                            ser.generalLineFlag = true;
+                            ser.deltaX -= newSer.deltaX;
+                            ser.deltaY -= newSer.deltaY;
+                            ser.simplify();                            
+                            shape.shapes.shapeRecords.add(i + 1, newSer);
+                            points.add(position, new DisplayPoint(new Point2D.Double(x + ser.deltaX, y + ser.deltaY))); 
+                            shape.getSwf().clearShapeCache();
+                            displayEditImagePanel.repaint();
+                            return true;
+                        }
+                        pointsPos += 1;
+                        ser.simplify();
+                    }
+                    if (rec instanceof CurvedEdgeRecord) {
+                        CurvedEdgeRecord cer = (CurvedEdgeRecord) rec;
+                        if (pointsPos == position) {
+                            Point2D p0 = new Point2D.Double(x, y);
+                            Point2D p1 = new Point2D.Double(x + cer.controlDeltaX, y + cer.controlDeltaY);
+                            Point2D p2 = new Point2D.Double(x + cer.controlDeltaX + cer.anchorDeltaX, y + cer.controlDeltaY + cer.anchorDeltaY);
+                            List<Point2D> v = new ArrayList<>();
+                            v.add(p0);
+                            v.add(p1);
+                            v.add(p2);
+                            BezierUtils bu = new BezierUtils();
+                            List<Point2D> left = new ArrayList<>();
+                            List<Point2D> right = new ArrayList<>();
+                            bu.subdivide(v, splitPoint, left, right);
+                            cer.controlDeltaX = (int)Math.round(left.get(1).getX() - left.get(0).getX());
+                            cer.controlDeltaY = (int)Math.round(left.get(1).getY() - left.get(0).getY());
+                            cer.anchorDeltaX = (int)Math.round(left.get(2).getX() - left.get(1).getX());
+                            cer.anchorDeltaY = (int)Math.round(left.get(2).getY() - left.get(1).getY());
+                            
+                            CurvedEdgeRecord newCer = new CurvedEdgeRecord();
+                            newCer.controlDeltaX = (int)Math.round(right.get(1).getX() - right.get(0).getX());
+                            newCer.controlDeltaY = (int)Math.round(right.get(1).getY() - right.get(0).getY());
+                            newCer.anchorDeltaX = (int)Math.round(right.get(2).getX() - right.get(1).getX());
+                            newCer.anchorDeltaY = (int)Math.round(right.get(2).getY() - right.get(1).getY());
+                            shape.shapes.shapeRecords.add(i + 1, newCer);
+                            points.remove(position);
+                            points.add(position, new DisplayPoint(new Point2D.Double(left.get(1).getX(), left.get(1).getY()), false));
+                            points.add(position + 1, new DisplayPoint(new Point2D.Double(left.get(2).getX(), left.get(2).getY())));
+                            points.add(position + 2, new DisplayPoint(new Point2D.Double(right.get(1).getX(), right.get(1).getY()), false));
+                            shape.getSwf().clearShapeCache();
+                            displayEditImagePanel.repaint();
+                            return true;
+                        }
+                        pointsPos += 2;
+                    }
+                    x = rec.changeX(x);
+                    y = rec.changeY(y);
+                }
+                return false;
+            }           
 
             @Override
             public boolean pointRemoved(List<DisplayPoint> points, int position) {

@@ -246,6 +246,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private static Cursor shearYCursor;
     private static Cursor movePointCursor;
     private static Cursor defaultCursor;
+    private static Cursor addPointCursor;
 
     private Point2D offsetPoint = new Point2D.Double(0, 0);
 
@@ -273,8 +274,14 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private List<DisplayPoint> hilightedPoints = null;
 
+    //private DisplayPoint closestPoint = null;
     private List<Integer> pointsUnderCursor = new ArrayList<>();
     private List<Integer> selectedPoints = new ArrayList<>();
+
+    private Integer pathPointUnderCursor = null;
+    private Double pathPointPosition = null;
+
+    private DisplayPoint closestPoint = null;
 
     private List<DisplayPoint> selectedPointsOriginalValues = new ArrayList<>();
 
@@ -321,10 +328,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
     }
 
-    private boolean firePointAdded(List<DisplayPoint> points, int position, DisplayPoint point) {
+    private boolean fireEdgeSplit(List<DisplayPoint> points, int position, double splitPoint) {
         boolean result = true;
         for (PointUpdateListener listener : pointUpdateListeners) {
-            result = result && listener.pointAdded(points, position, point);
+            result = result && listener.edgeSplit(points, position, splitPoint);
         }
         return result;
     }
@@ -339,9 +346,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private void applyPointsXY() {
         try {
-            int x = (int)Math.round(parseDouble(pointXTextField.getText()) * SWF.unitDivisor);
-            int y = (int)Math.round(parseDouble(pointYTextField.getText()) * SWF.unitDivisor);
-            
+            int x = (int) Math.round(parseDouble(pointXTextField.getText()) * SWF.unitDivisor);
+            int y = (int) Math.round(parseDouble(pointYTextField.getText()) * SWF.unitDivisor);
+
             java.awt.Point minSelectedPoint = getMinSelectedPoint();
             if (minSelectedPoint == null) {
                 return;
@@ -351,15 +358,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 point.x = point.x - minSelectedPoint.x + x;
                 point.y = point.y - minSelectedPoint.y + y;
             }
-            
-            firePointsUpdated(hilightedPoints);            
+
+            firePointsUpdated(hilightedPoints);
         } catch (NumberFormatException nfe) {
             //ignore
-        }        
+        }
     }
-    
+
     private java.awt.Point getMinSelectedPoint() {
-        if (selectedPoints.isEmpty()) {            
+        if (selectedPoints.isEmpty()) {
             return null;
         }
         int minX = Integer.MAX_VALUE;
@@ -375,7 +382,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         return new java.awt.Point(minX, minY);
     }
-    
+
     private void calculatePointsXY() {
         Point2D minPoint = getMinSelectedPoint();
         if (minPoint == null) {
@@ -383,7 +390,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             pointYTextField.setText("");
             return;
         }
-        
+
         pointXTextField.setText(formatDouble(minPoint.getX() / SWF.unitDivisor));
         pointYTextField.setText(formatDouble(minPoint.getY() / SWF.unitDivisor));
     }
@@ -494,7 +501,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             shearYCursor = loadCursor("shear_y", 5, 9);
             movePointCursor = loadCursor("move_point", 0, 0);
             defaultCursor = loadCursor("default", 0, 0);
-
+            addPointCursor = loadCursor("add_point", 0, 0);
         } catch (IOException ex) {
             Logger.getLogger(MainPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -788,13 +795,13 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             }
                             RECT timRect = timelined.getRect();
                             double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
-                            AffineTransform t = new AffineTransform();
-                            t.translate(offsetPoint.getX() - (int) (timRect.Xmin * zoomDouble / SWF.unitDivisor),
+                            AffineTransform trans = new AffineTransform();
+                            trans.translate(offsetPoint.getX() - (int) (timRect.Xmin * zoomDouble / SWF.unitDivisor),
                                     offsetPoint.getY() - (int) (timRect.Ymin * zoomDouble / SWF.unitDivisor));
-                            t.scale(1 / SWF.unitDivisor, 1 / SWF.unitDivisor);
-                            t.scale(zoomDouble, zoomDouble);
+                            trans.scale(1 / SWF.unitDivisor, 1 / SWF.unitDivisor);
+                            trans.scale(zoomDouble, zoomDouble);
                             AffineTransform oldTransform = g2.getTransform();
-                            g2.setTransform(t);
+                            g2.setTransform(trans);
 
                             if (hilightedEdge != null) {
                                 g2.setStroke(new BasicStroke((float) (SWF.unitDivisor * 6 / zoomDouble)));
@@ -831,7 +838,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                                 g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
                                 g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                                
+
                                 g2.setStroke(new BasicStroke((float) (SWF.unitDivisor * 1 / zoomDouble)));
                                 double pointSize = SWF.unitDivisor * 4 / zoomDouble;
                                 //selectedPoints
@@ -856,6 +863,51 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     }
                                     g2.draw(pointShape);
                                 }
+
+                                /*DisplayPoint p = closestPoint;
+                                if (p != null) {
+                                    Shape pointShape;
+                                    pointShape = new Ellipse2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
+                                    g2.setPaint(Color.blue);
+                                    g2.fill(pointShape);
+                                }
+
+                                Integer puc = pathPointUnderCursor;
+                                if (puc != null) {
+                                    p = hilightedPoints.get((int) puc);
+                                    Shape pointShape;
+                                    pointShape = new Ellipse2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
+                                    g2.setPaint(Color.pink);
+                                    g2.fill(pointShape);
+
+                                    if (puc - 1 >= 0) {
+                                        p = hilightedPoints.get(puc - 1);
+                                        pointShape = new Ellipse2D.Double(p.x - pointSize, p.y - pointSize, pointSize * 2, pointSize * 2);
+                                        g2.setPaint(Color.cyan);
+                                        g2.fill(pointShape);
+                                    }
+
+                                }*/
+                                /*for (int i = 0; i < points.size(); i++) {
+                                    DisplayPoint p = points.get(i);
+                                    if (!p.onPath) {
+                                        DisplayPoint p0 = points.get(i - 1);
+                                        DisplayPoint p1 = points.get(i);
+                                        DisplayPoint p2 = points.get(i + 1);
+
+                                        for (int j = 0; j <= 10; j++) {
+                                            double t = j / 10.0;
+                                            double xt = (1 - t) * (1 - t) * p0.x + 2 * t * (1 - t) * p1.x + t * t * p2.x;
+                                            double yt = (1 - t) * (1 - t) * p0.y + 2 * t * (1 - t) * p1.y + t * t * p2.y;
+                                            //System.out.println("P("+t+") = "+xt+","+yt);
+
+                                            Shape pointShape;
+                                            pointShape = new Ellipse2D.Double(xt - pointSize, yt - pointSize, pointSize * 2, pointSize * 2);
+                                            g2.setPaint(Color.green);
+                                            g2.fill(pointShape);
+                                        }
+                                    }
+                                }*/
                             }
                             g2.setTransform(oldTransform);
                         }
@@ -918,6 +970,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             return altDown;
         }
 
+        public boolean isCtrlDown() {
+            return ctrlDown;
+        }
+
         public IconPanel() {
 
             KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
@@ -961,7 +1017,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     return o2 - o1;
                                 }
                             });
-                            for (int i:selectedPointsDesc) {
+                            for (int i : selectedPointsDesc) {
                                 firePointRemoved(hilightedPoints, i);
                             }
                             selectedPoints.clear();
@@ -1079,7 +1135,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                     }
                                 }
                                 if (shiftDown) {
-                                    for (int p: selectedPoints) {
+                                    for (int p : selectedPoints) {
                                         if (!newSelectedPoints.contains(p)) {
                                             newSelectedPoints.add(p);
                                         }
@@ -1087,6 +1143,15 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 }
                                 selectedPoints = newSelectedPoints;
                                 calculatePointsXY();
+                            }
+
+                            if (ctrlDown && pathPointUnderCursor != null) {
+                                fireEdgeSplit(hilightedPoints, pathPointUnderCursor, pathPointPosition);
+                                selectedPoints.clear();
+                                pointsUnderCursor.clear();
+                                pathPointUnderCursor = null;
+                                pathPointPosition = 0.0;
+                                repaint();
                             }
                         }
 
@@ -1656,12 +1721,28 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
                 }
 
+                class DistanceItem {
+
+                    public double distance;
+                    public int pathPoint;
+                    public double pathPosition;
+                    public DisplayPoint closestPoint;
+
+                    public DistanceItem(double distance, int pathPoint, double pathPosition, DisplayPoint closestPoint) {
+                        this.distance = distance;
+                        this.pathPoint = pathPoint;
+                        this.pathPosition = pathPosition;
+                        this.closestPoint = closestPoint;
+                    }
+
+                }
+
                 @Override
                 public void mouseMoved(MouseEvent e) {
                     List<DisplayPoint> points = hilightedPoints;
                     if (points != null) {
-                        Cursor cursor = selectCursor;
                         int maxDistance = 5;
+                        double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
                         List<Integer> newPointsUnderCursor = new ArrayList<>();
                         for (int i = 0; i < points.size(); i++) {
                             DisplayPoint p = points.get(i);
@@ -1670,17 +1751,91 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             int ey = e.getY();
                             if (ex > ip.getX() - maxDistance && ex < ip.getX() + maxDistance) {
                                 if (ey > ip.getY() - maxDistance && ey < ip.getY() + maxDistance) {
-                                    cursor = movePointCursor;
                                     newPointsUnderCursor.add(i);
                                 }
                             }
                         }
-                        if (dragStart == null) {
-                            pointsUnderCursor = newPointsUnderCursor;
+
+                        Point2D p = toTransformPoint(e.getPoint());
+
+                        List<DistanceItem> distanceList = new ArrayList<>();
+                        for (int i = 0; i < points.size() - 1; i++) {
+                            if (points.get(i).onPath && points.get(i + 1).onPath) {
+                                DisplayPoint p0 = points.get(i);
+                                DisplayPoint p1 = points.get(i + 1);
+
+                                //y = mx + b
+                                double lineDistance;
+                                Point2D closestPoint;
+                                if (p1.x == p0.x) {
+                                    lineDistance = Math.abs(p1.x - p.getX());
+                                    closestPoint = new Point2D.Double(p1.x, p.getY());
+                                } else if (p1.y == p0.y) {
+                                    lineDistance = Math.abs(p1.y - p.getY());
+                                    closestPoint = new Point2D.Double(p.getX(), p1.y);
+                                } else {
+                                    double m = (p1.y - p0.y) / (double) (p1.x - p0.x);
+                                    double b = p0.y - m * p0.x;
+
+                                    double m_perp = - 1 / m;
+
+                                    double b_perp = p.getY() - m_perp * p.getX();
+
+                                    double x = (b_perp - b) / (m - m_perp);
+                                    double y = m * x + b;
+                                    closestPoint = new Point2D.Double(x, y);
+                                    lineDistance = p.distance(closestPoint);
+                                }
+                                
+                                double minX = Math.min(p0.x, p1.x) - maxDistance * SWF.unitDivisor / zoomDouble;
+                                double minY = Math.min(p0.y, p1.y) - maxDistance * SWF.unitDivisor / zoomDouble;
+
+                                double maxX = Math.max(p0.x, p1.x) + maxDistance * SWF.unitDivisor / zoomDouble;
+                                double maxY = Math.max(p0.y, p1.y) + maxDistance * SWF.unitDivisor / zoomDouble;
+                                
+                                if (p.getX() >= minX && p.getX() <= maxX && p.getY() >= minY && p.getY() <= maxY) {
+                                    double t = p0.toPoint2D().distance(closestPoint) / p0.toPoint2D().distance(p1.toPoint2D());
+                                    if (lineDistance <= maxDistance * SWF.unitDivisor / zoomDouble) {
+                                        distanceList.add(new DistanceItem(lineDistance, i + 1, t, new DisplayPoint(closestPoint)));
+                                    }
+                                }
+
+                                
+                            }
+                            if (i < points.size() - 2 && !points.get(i + 1).onPath) {
+                                DisplayPoint p0 = points.get(i);
+                                DisplayPoint p1 = points.get(i + 1);
+                                DisplayPoint p2 = points.get(i + 2);
+
+                                BezierUtils bezierUtils = new BezierUtils();
+                                double t = bezierUtils.closestPointToBezier(p, p0.toPoint2D(), p1.toPoint2D(), p2.toPoint2D());
+                                DisplayPoint closestPoint = new DisplayPoint(bezierUtils.pointAt(t, p0.toPoint2D(), p1.toPoint2D(), p2.toPoint2D()));
+                                double curveDistance = Math.sqrt((p.getX() - closestPoint.x) * (p.getX() - closestPoint.x)
+                                        + (p.getY() - closestPoint.y) * (p.getY() - closestPoint.y));
+                                if (curveDistance <= maxDistance * SWF.unitDivisor / zoomDouble) {
+                                    distanceList.add(new DistanceItem(curveDistance, i + 1, t, closestPoint));
+                                }
+                            }
                         }
 
-                        if (getCursor() != cursor) {
-                            setCursor(cursor);
+                        distanceList.sort(new Comparator<DistanceItem>() {
+                            @Override
+                            public int compare(DistanceItem o1, DistanceItem o2) {
+                                return Double.compare(o1.distance, o2.distance);
+                            }
+                        });
+                        if (dragStart == null) {
+                            if (!distanceList.isEmpty()) {
+                                DistanceItem di = distanceList.get(0);
+                                pathPointUnderCursor = di.pathPoint;
+                                pathPointPosition = di.pathPosition;
+                                closestPoint = di.closestPoint;
+                            } else {
+                                pathPointUnderCursor = null;
+                                pathPointPosition = null;
+                                closestPoint = null;
+                            }
+                            pointsUnderCursor = newPointsUnderCursor;
                         }
                         return;
                     }
@@ -2030,7 +2185,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         debugLabel.setAlignmentX(JLabel.LEFT_ALIGNMENT);
         topPanel.add(debugLabel);
 
-        DocumentListener documentListener = new DocumentListener(){            
+        DocumentListener documentListener = new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 applyPointsXY();
@@ -2044,21 +2199,21 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             @Override
             public void changedUpdate(DocumentEvent e) {
                 applyPointsXY();
-            }            
+            }
         };
-        
+
         pointEditPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         pointEditPanel.add(new JLabel(AppStrings.translate("edit.points.x")));
-        pointXTextField = new JTextField(6);                
+        pointXTextField = new JTextField(6);
         pointXTextField.getDocument().addDocumentListener(documentListener);
         pointEditPanel.add(pointXTextField);
         pointEditPanel.add(new JLabel(AppStrings.translate("edit.points.y")));
         pointYTextField = new JTextField(6);
         pointYTextField.getDocument().addDocumentListener(documentListener);
         pointEditPanel.add(pointYTextField);
-                
+
         pointEditPanel.setAlignmentX(JPanel.LEFT_ALIGNMENT);
-        
+
         topPanel.add(pointEditPanel);
         pointEditPanel.setVisible(false);
         add(topPanel, BorderLayout.NORTH);
@@ -3067,6 +3222,23 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 debugLabel.setText(DEFAULT_DEBUG_LABEL_TEXT);
                             } else {
                                 debugLabel.setText(ret.toString());
+                            }
+                            if (hilightedPoints != null) {
+                                Cursor newCursor;
+                                if (!pointsUnderCursor.isEmpty()) {
+                                    newCursor = movePointCursor;
+                                } else if (pathPointUnderCursor != null) {
+                                    if (iconPanel.isCtrlDown()) {
+                                        newCursor = addPointCursor;
+                                    } else {
+                                        newCursor = defaultCursor;
+                                    }
+                                } else {
+                                    newCursor = selectCursor;
+                                }
+                                if (iconPanel.getCursor() != newCursor) { //call setcursor only when needed to avoid cursor flickering when dragging in the tree
+                                    iconPanel.setCursor(newCursor);
+                                }
                             }
                             if (freeTransformDepth == -1 && hilightedPoints == null) {
                                 Cursor newCursor;
