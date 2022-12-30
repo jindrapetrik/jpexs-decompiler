@@ -2573,7 +2573,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
             synchronized (lock) {
                 if (registrationPoint != null) {
-                    registrationPoint = new Point2D.Double(registrationPoint.getX() * zoomDouble / zoomDoubleBefore, registrationPoint.getY() * zoomDouble / zoomDoubleBefore);
+                    //registrationPoint = new Point2D.Double(registrationPoint.getX() * zoomDouble / zoomDoubleBefore, registrationPoint.getY() * zoomDouble / zoomDoubleBefore);
                 }
             }
 
