@@ -1941,7 +1941,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             cursor = moveCursor;
                         } else {
                             newMode = Cursor.DEFAULT_CURSOR;
-                            cursor = selectCursor;
+                            cursor = defaultCursor;
                         }
 
                         if (getCursor() != cursor) {
