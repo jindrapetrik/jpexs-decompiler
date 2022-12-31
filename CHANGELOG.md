@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Scrollbars
 - Morphshape transforming, point editation
 - Raw edit - (MORPH)GRADIENT spreadMode,interpolationMode as enums
+- Unit selection (pixels/twips) in header editation
 
 ### Fixed
 - [#1915] SVG import - gradient when it has two final stops
