@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [18.3.0] - 2023-01-01
 ### Added
 - [#1913] Shape transforming, point editation
 - Hilighting currently selected shape edge in the raw edit
