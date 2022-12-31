@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - [#1913] Shape transforming, point editation
+- Hilighting currently selected shape edge in the raw edit
 - [#1905] Key strokes on folder preview panel
 
 ### Fixed
