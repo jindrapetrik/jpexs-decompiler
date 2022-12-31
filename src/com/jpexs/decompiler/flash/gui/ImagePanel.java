@@ -2078,7 +2078,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     } else if (freeTransformDepth > -1) {
                         setAllowMove(true);
                     } else {
-                        boolean doMove = h > h2 || w > w2;
+                        boolean doMove = (h + dy) > h2 || (w + dx) > w2;
                         setAllowMove(doMove);
                         if (!doMove) {
                             offsetPoint.setLocation(iconPanel.getWidth() / 2 - w / 2 - dx, iconPanel.getHeight() / 2 - h / 2 - dy);
@@ -2413,64 +2413,43 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private void updateScrollBarMinMax() {
 
         RECT timRect = timelined.getRect();
-
-        int w = iconPanel.getWidth();
-        int h = iconPanel.getHeight();
-        
-        
-        Point2D topLeft = toTransformPoint(new Point2D.Double(0, 0));
-        Point2D rightBottom = toTransformPoint(new Point2D.Double(iconPanel.getWidth(), iconPanel.getHeight()));
-
-
+                        
+        /*
         int h_value = horizontalScrollBar.getValue();
         int h_visibleAmount = horizontalScrollBar.getVisibleAmount();
-
+        */
         int h_maximum = timRect.Xmax;
 
-        if (hilightedPoints != null) {
-            h_maximum += SCROLL_SPACE_BEFORE;
-            /*if (rightBottom.getX() < h_maximum + SCROLL_SPACE_BEFORE) {
-                h_maximum += SCROLL_SPACE_BEFORE;
-            }*/
+        if (hilightedPoints != null || freeTransformDepth > -1) {
+            h_maximum += SCROLL_SPACE_BEFORE;            
         }
 
         /*if (h_value + h_visibleAmount > h_maximum) {
             h_maximum = h_value + h_visibleAmount;
         }*/
-        int h_minimum = timRect.Xmin > 0 ? 0 : timRect.Xmin;
-        if (hilightedPoints != null) {
-            h_minimum -= SCROLL_SPACE_BEFORE;
-            /*if (timRect.Xmin > -SCROLL_SPACE_BEFORE) {
-                h_minimum = -SCROLL_SPACE_BEFORE;
-            }*/
-            //h_minimum = Math.min(h_minimum, 0);
-            //h_minimum = Math.min(h_minimum, (int) Math.round(topLeft.getX()));
+        int h_minimum = timRect.Xmin;
+        if (hilightedPoints != null || freeTransformDepth > -1) {
+            h_minimum = timRect.Xmin > 0 ? 0 : timRect.Xmin;
+            h_minimum -= SCROLL_SPACE_BEFORE;            
         }
         horizontalScrollBar.setMinimum(h_minimum);
         horizontalScrollBar.setMaximum(h_maximum);
 
-        int v_value = verticalScrollBar.getValue();
+        /*int v_value = verticalScrollBar.getValue();
         int v_visibleAmount = verticalScrollBar.getVisibleAmount();
-
+*/
         int v_maximum = timRect.Ymax;
-        if (hilightedPoints != null) {            
+        if (hilightedPoints != null || freeTransformDepth > -1) {            
             v_maximum += SCROLL_SPACE_BEFORE;
-            /*if (rightBottom.getY() < v_maximum + SCROLL_SPACE_BEFORE) {
-                v_maximum += SCROLL_SPACE_BEFORE;
-            }*/
         }
         /*if (v_value + v_visibleAmount > v_maximum) {
             v_maximum = v_value + v_visibleAmount;
         }*/
 
-        int v_minimum = timRect.Xmin > 0 ? 0 : timRect.Xmin;
-        if (hilightedPoints != null) {
-            /*if (timRect.Ymin > -SCROLL_SPACE_BEFORE) {
-                v_minimum = -SCROLL_SPACE_BEFORE;
-            }*/
-            v_minimum -= SCROLL_SPACE_BEFORE;
-            //v_minimum = Math.min(v_minimum, 0);
-            //v_minimum = Math.min(v_minimum, (int) Math.round(topLeft.getY()));           
+        int v_minimum = timRect.Ymin;
+        if (hilightedPoints != null || freeTransformDepth > -1) {
+            v_minimum = timRect.Ymin > 0 ? 0 : timRect.Ymin;
+            v_minimum -= SCROLL_SPACE_BEFORE;                   
         }
 
         verticalScrollBar.setMinimum(v_minimum);
