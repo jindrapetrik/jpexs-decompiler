@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - [#1827] Video replacing VP6 reading
 - [#1926] Constructors namespace taken from class - should be always public
 - [#1772] AS1/2 decompilation - StackOverflow during getVariables function
+- [#1890] AS3 - Removing first assignment in for in loop
 
 ### Changed
 - [#1913] SVG export/import of shapes - shape exact position (bounds) is retained
