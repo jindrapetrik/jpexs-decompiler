@@ -838,16 +838,74 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
             @Override
             public boolean edgeSplit(List<DisplayPoint> points, int position, double splitPoint) {
-                ShapeTag shape = (ShapeTag) displayEditTag;
+                
+                List<SHAPERECORD> selectedRecords = new ArrayList<>();
+                List<SHAPERECORD> otherRecords = null;
+                
+                if (displayEditTag instanceof ShapeTag) {
+                    ShapeTag shape = (ShapeTag) displayEditTag;
+                    selectedRecords = shape.shapes.shapeRecords;
+                }
+                if (displayEditTag instanceof MorphShapeTag) {
+                    MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
+                    if (morphDisplayMode == MORPH_START) {
+                        selectedRecords = morphShape.startEdges.shapeRecords;
+                        otherRecords = morphShape.endEdges.shapeRecords;
+                    }
+                    if (morphDisplayMode == MORPH_END) {
+                        selectedRecords = morphShape.endEdges.shapeRecords;
+                        otherRecords = morphShape.startEdges.shapeRecords;
+                    }
+                }
+                
+                Reference<Integer> importantRecordPosRef = new Reference<>(0);
+                
+                if (splitRecords(importantRecordPosRef, points, selectedRecords, position, splitPoint) && otherRecords != null) {
+                    int importantRecordPos = importantRecordPosRef.getVal();
+                    int otherPosition = 0;
+                    int otherImportantRecordPos = 0;
+                    for (int i = 0; i < otherRecords.size(); i++) {
+                        SHAPERECORD rec = otherRecords.get(i);
+                        if (rec instanceof StyleChangeRecord) {
+                            StyleChangeRecord scr = (StyleChangeRecord) rec;
+                            if (scr.stateMoveTo) {
+                                otherPosition++;
+                                otherImportantRecordPos++;
+                            }
+                        }
+                        if (rec instanceof StraightEdgeRecord) {
+                            otherPosition++;                            
+                            otherImportantRecordPos++;
+                        }
+                        
+                        if (rec instanceof CurvedEdgeRecord) {
+                            otherPosition += 2;
+                            otherImportantRecordPos++;
+                        }
+                        if (otherImportantRecordPos == importantRecordPos) {
+                            break;
+                        }
+                    }
+                    splitRecords(importantRecordPosRef, null, otherRecords, otherPosition, splitPoint);
+                }
+                
+                clearCache();
+                displayEditImagePanel.repaint();
+                return false;
+            }
+            
+            private boolean splitRecords(Reference<Integer> importantRecordPosRef, List<DisplayPoint> points, List<SHAPERECORD> selectedRecords, int position, double splitPoint) {
                 int pointsPos = 0;
                 int x = 0;
                 int y = 0;
-                for (int i = 0; i < shape.shapes.shapeRecords.size(); i++) {
-                    SHAPERECORD rec = shape.shapes.shapeRecords.get(i);
+                int importantRecordPos = 0;
+                for (int i = 0; i < selectedRecords.size(); i++) {
+                    SHAPERECORD rec = selectedRecords.get(i);
                     if (rec instanceof StyleChangeRecord) {
                         StyleChangeRecord scr = (StyleChangeRecord) rec;
                         if (scr.stateMoveTo) {
                             pointsPos++;
+                            importantRecordPos++;
                         }
                     }
                     if (rec instanceof StraightEdgeRecord) {
@@ -862,13 +920,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             ser.deltaX -= newSer.deltaX;
                             ser.deltaY -= newSer.deltaY;
                             ser.simplify();
-                            shape.shapes.shapeRecords.add(i + 1, newSer);
-                            points.add(position, new DisplayPoint(new Point2D.Double(x + ser.deltaX, y + ser.deltaY)));
-                            clearCache();
-                            displayEditImagePanel.repaint();
+                            selectedRecords.add(i + 1, newSer);
+                            if (points != null) {
+                                points.add(position, new DisplayPoint(new Point2D.Double(x + ser.deltaX, y + ser.deltaY)));
+                            }               
+                            importantRecordPosRef.setVal(importantRecordPos);
                             return true;
                         }
                         pointsPos += 1;
+                        importantRecordPos++;
                         ser.simplify();
                     }
                     if (rec instanceof CurvedEdgeRecord) {
@@ -895,16 +955,18 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             newCer.controlDeltaY = (int) Math.round(right.get(1).getY() - right.get(0).getY());
                             newCer.anchorDeltaX = (int) Math.round(right.get(2).getX() - right.get(1).getX());
                             newCer.anchorDeltaY = (int) Math.round(right.get(2).getY() - right.get(1).getY());
-                            shape.shapes.shapeRecords.add(i + 1, newCer);
-                            points.remove(position);
-                            points.add(position, new DisplayPoint(new Point2D.Double(left.get(1).getX(), left.get(1).getY()), false));
-                            points.add(position + 1, new DisplayPoint(new Point2D.Double(left.get(2).getX(), left.get(2).getY())));
-                            points.add(position + 2, new DisplayPoint(new Point2D.Double(right.get(1).getX(), right.get(1).getY()), false));
-                            clearCache();
-                            displayEditImagePanel.repaint();
+                            selectedRecords.add(i + 1, newCer);
+                            if (points != null) {
+                                points.remove(position);
+                                points.add(position, new DisplayPoint(new Point2D.Double(left.get(1).getX(), left.get(1).getY()), false));
+                                points.add(position + 1, new DisplayPoint(new Point2D.Double(left.get(2).getX(), left.get(2).getY())));
+                                points.add(position + 2, new DisplayPoint(new Point2D.Double(right.get(1).getX(), right.get(1).getY()), false));
+                            }
+                            importantRecordPosRef.setVal(importantRecordPos);
                             return true;
                         }
                         pointsPos += 2;
+                        importantRecordPos++;
                     }
                     x = rec.changeX(x);
                     y = rec.changeY(y);
@@ -972,6 +1034,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     removePoint(importantRecordPosRef, null, otherRecords, otherPosition);
                 }
                 
+                clearCache();
+                displayEditImagePanel.repaint();
                 return true;
             }
             
