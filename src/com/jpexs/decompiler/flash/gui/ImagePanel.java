@@ -2660,7 +2660,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             }
         };
         lda = new LocalDataArea(stage);
-        synchronized (ImagePanel.this) {
+        synchronized (ImagePanel.this) {        
             stopInternal();
             if (drawable instanceof ButtonTag) {
                 frame = ButtonTag.FRAME_UP;
@@ -2672,7 +2672,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             centerImage();            
             this.swf = swf;
             zoomAvailable = true;
-            timer = null;
             if (frame > -1) {
                 this.frame = frame;
                 this.stillFrame = true;
@@ -2714,7 +2713,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
             hilightedPoints = null;
             pointEditPanel.setVisible(false);
             this.showObjectsUnderCursor = showObjectsUnderCursor;
-            this.registrationPointPosition = RegistrationPointPosition.CENTER;            
+            this.registrationPointPosition = RegistrationPointPosition.CENTER;
+            iconPanel.calcRect();
             redraw();
             if (autoPlay) {
                 play();
@@ -2840,8 +2840,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     }
 
     private void clear() {
-        if (timer != null) {
-            Timer ptimer = timer;
+        Timer ptimer = timer;
+            
+        if (ptimer != null) {
             timer = null;
             ptimer.cancel();
             fireMediaDisplayStateChanged();
