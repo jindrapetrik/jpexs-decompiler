@@ -73,7 +73,9 @@ public class ForInAVM2Item extends LoopItem implements Block {
 
     public ForInAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, Loop loop, InAVM2Item expression, List<GraphTargetItem> commands) {
         super(instruction, lineStartIns, loop);
-        if (!commands.isEmpty()) {
+        
+        //Commented out - see the comment in ForEachInAVM2Item
+        /*if (!commands.isEmpty()) {
             GraphTargetItem firstAssign = commands.get(0);
             if (firstAssign instanceof SetTypeAVM2Item) {
                 if (expression.object instanceof LocalRegAVM2Item) {
@@ -87,7 +89,7 @@ public class ForInAVM2Item extends LoopItem implements Block {
                 }
                 //locAssign.
             }
-        }
+        }*/
         this.expression = expression;
         this.commands = commands;
     }
