@@ -1071,13 +1071,13 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     @Override
     public void saveTo(OutputStream os) throws IOException {
         checkCharset();
-        byte[] uncompressedData = saveToByteArray();
+        byte[] uncompressedData = saveToByteArray(false);
         compress(new ByteArrayInputStream(uncompressedData), os, compression, lzmaProperties);
     }
 
-    public void saveTo(OutputStream os, boolean gfx) throws IOException {
+    public void saveTo(OutputStream os, boolean gfx, boolean includeImported) throws IOException {
         checkCharset();
-        byte[] uncompressedData = saveToByteArray(gfx);
+        byte[] uncompressedData = saveToByteArray(gfx, includeImported);
         compress(new ByteArrayInputStream(uncompressedData), os, compression, lzmaProperties);
     }
 
@@ -1113,8 +1113,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         return ret;
     }
 
-    private byte[] saveToByteArray() throws IOException {
-        return saveToByteArray(gfx);
+    private byte[] saveToByteArray(boolean includeImported) throws IOException {
+        return saveToByteArray(gfx, includeImported);
     }
 
     private void checkCharset() {
@@ -1123,7 +1123,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
     }
 
-    private byte[] saveToByteArray(boolean gfx) throws IOException {
+    private byte[] saveToByteArray(boolean gfx, boolean includeImported) throws IOException {
         byte[] data;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream(); SWFOutputStream sos = new SWFOutputStream(baos, version, charset)) {
             sos.write(getHeaderBytes(SWFCompression.NONE, gfx));
@@ -1133,7 +1133,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             sos.writeFIXED8(frameRate);
             sos.writeUI16(frameCount);
 
-            sos.writeTags(getLocalTags());
+            sos.writeTags(includeImported ?  getTags() : getLocalTags());
             if (hasEndTag) {
                 sos.writeUI16(0);
             }
@@ -1289,7 +1289,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         isModified = false;
 
         try {
-            uncompressedData = saveToByteArray();
+            uncompressedData = saveToByteArray(false);
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "Cannot save SWF", ex);
         }

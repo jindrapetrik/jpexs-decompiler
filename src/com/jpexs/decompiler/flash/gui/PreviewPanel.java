@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.PreviewExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
+import com.jpexs.decompiler.flash.gfx.GfxConvertor;
 import com.jpexs.decompiler.flash.gui.controls.JPersistentSplitPane;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.editor.LineMarkedEditorPane;
@@ -1582,8 +1583,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         }
         try {
             tempFile = File.createTempFile("ffdec_view_", ".swf");
+            SWF savedSWF = swf;
+            if (swf.gfx) {
+                savedSWF = new GfxConvertor().convertSwf(swf);
+            }
             try (OutputStream fos = new BufferedOutputStream(new FileOutputStream(tempFile))) {
-                swf.saveTo(fos, false);
+                swf.saveTo(fos, false, swf.gfx);
             }
             //Inject Loader
             if (swf.isAS3() && Configuration.autoOpenLoadedSWFs.get() && Configuration.useAdobeFlashPlayerForPreviews.get() && !DebuggerTools.hasDebugger(swf)) {
