@@ -660,7 +660,10 @@ public class Helper {
         } catch (IOException | ClassNotFoundException ex) {
             Logger.getLogger(Helper.class.getName()).log(Level.SEVERE, "Copy error", ex);
             return null;
+        } catch (StackOverflowError se) {
+            throw new StackOverflowError("Stack overflow in deepcopy");
         }
+        
     }
 
     public static List<Object> toList(Object... rest) {
