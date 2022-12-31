@@ -359,4 +359,17 @@ public abstract class MorphShapeTag extends DrawableTag {
         cmse.export();
         result.append(cmse.getShapeData());
     }
+    
+    public void updateStartBounds() {
+        startBounds = SHAPERECORD.getBounds(startEdges.shapeRecords, morphLineStyles.getStartLineStyles(getShapeNum()), getShapeNum(), false);
+    }
+    
+    public void updateEndBounds() {
+        startBounds = SHAPERECORD.getBounds(endEdges.shapeRecords, morphLineStyles.getEndLineStyles(getShapeNum()), getShapeNum(), false);
+    }
+    
+    public void updateBounds() {
+        updateStartBounds();
+        updateEndBounds();
+    }
 }

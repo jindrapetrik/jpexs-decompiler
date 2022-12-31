@@ -273,6 +273,10 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private List<SHAPERECORD> oldShapeRecords;
     private RECT oldShapeBounds;
     private RECT oldShapeEdgeBounds;
+    
+    private List<SHAPERECORD> oldEndShapeRecords;
+    private RECT oldEndShapeBounds;
+    private RECT oldEndShapeEdgeBounds;
 
     //used only for flash player
     private TreeItem currentItem;
@@ -764,12 +768,29 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditImagePanel.addPointUpdateListener(new PointUpdateListener() {
             @Override
             public void pointsUpdated(List<DisplayPoint> points) {
-                ShapeTag shape = (ShapeTag) displayEditTag;
+                
+                List<SHAPERECORD> selectedRecords = new ArrayList<>();
+                
+                if (displayEditTag instanceof ShapeTag) {
+                    ShapeTag shape = (ShapeTag) displayEditTag;
+                    selectedRecords = shape.shapes.shapeRecords;
+                }
+                if (displayEditTag instanceof MorphShapeTag) {
+                    MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
+                    if (morphDisplayMode == MORPH_START) {
+                        selectedRecords = morphShape.startEdges.shapeRecords;
+                    }
+                    if (morphDisplayMode == MORPH_END) {
+                        selectedRecords = morphShape.endEdges.shapeRecords;
+                    }
+                }
+                
+                
                 int pointsPos = 0;
                 int x = 0;
                 int y = 0;
-                for (int i = 0; i < shape.shapes.shapeRecords.size(); i++) {
-                    SHAPERECORD rec = shape.shapes.shapeRecords.get(i);
+                for (int i = 0; i < selectedRecords.size(); i++) {
+                    SHAPERECORD rec = selectedRecords.get(i);
                     if (rec instanceof StyleChangeRecord) {
                         StyleChangeRecord scr = (StyleChangeRecord) rec;
                         if (scr.stateMoveTo) {
@@ -797,8 +818,20 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     x = rec.changeX(x);
                     y = rec.changeY(y);
                 }
-                shape.updateBounds();
-                shape.getSwf().clearShapeCache();
+                if (displayEditTag instanceof ShapeTag) {
+                    ShapeTag shape = (ShapeTag) displayEditTag;
+                    shape.updateBounds();
+                }
+                if (displayEditTag instanceof MorphShapeTag) {
+                    MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
+                    if (morphDisplayMode == MORPH_START) {
+                        morphShape.updateStartBounds();
+                    }
+                    if (morphDisplayMode == MORPH_END) {
+                        morphShape.updateEndBounds();
+                    }
+                }
+                displayEditTag.getSwf().clearShapeCache();
                 displayEditImagePanel.repaint();
             }
 
@@ -1971,6 +2004,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             oldShapeRecords = null;
             oldShapeBounds = null;
             oldShapeEdgeBounds = null;
+            oldEndShapeRecords = null;
+            oldEndShapeBounds = null;
+            oldEndShapeEdgeBounds = null;
         }
         Tag hilightTag = null;
         SWF swf = null;
@@ -2071,19 +2107,44 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceShapeUpdateBoundsButton.setVisible(false);
         displayEditEditPointsButton.setVisible(false);
 
-        ShapeTag shape = (ShapeTag) displayEditTag;
+        List<SHAPERECORD> selectedRecords = new ArrayList<>();
+        
+        if (displayEditTag instanceof ShapeTag) {
+            ShapeTag shape = (ShapeTag) displayEditTag;
 
-        oldShapeRecords = Helper.deepCopy(shape.shapes.shapeRecords);
-        oldShapeBounds = shape.shapeBounds;
-        if (shape instanceof DefineShape4Tag) {
-            DefineShape4Tag shape4 = (DefineShape4Tag) shape;
-            oldShapeEdgeBounds = shape4.edgeBounds;
+            oldShapeRecords = Helper.deepCopy(shape.shapes.shapeRecords);
+            oldShapeBounds = shape.shapeBounds;
+            if (shape instanceof DefineShape4Tag) {
+                DefineShape4Tag shape4 = (DefineShape4Tag) shape;
+                oldShapeEdgeBounds = shape4.edgeBounds;
+            }
+            
+            selectedRecords = shape.shapes.shapeRecords;
+        }
+        if (displayEditTag instanceof MorphShapeTag) {
+            MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
+            oldShapeRecords = Helper.deepCopy(morphShape.startEdges.shapeRecords);
+            oldEndShapeRecords = Helper.deepCopy(morphShape.endEdges.shapeRecords);
+            oldShapeBounds = morphShape.startBounds;
+            oldEndShapeBounds = morphShape.endBounds;
+            if (morphShape instanceof DefineMorphShape2Tag) {
+                DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
+                oldShapeEdgeBounds = morphShape2.startEdgeBounds;
+                oldEndShapeEdgeBounds = morphShape2.endEdgeBounds;
+            }
+            
+            if (morphDisplayMode == MORPH_START) {
+                selectedRecords = morphShape.startEdges.shapeRecords;
+            }
+            if (morphDisplayMode == MORPH_END) {
+                selectedRecords = morphShape.endEdges.shapeRecords;
+            }        
         }
         int x = 0;
         int y = 0;
 
         List<DisplayPoint> points = new ArrayList<>();
-        for (SHAPERECORD rec : shape.shapes.shapeRecords) {
+        for (SHAPERECORD rec : selectedRecords) {
             if (rec instanceof StraightEdgeRecord) {
                 StraightEdgeRecord ser = (StraightEdgeRecord) rec;
                 DisplayPoint point = new DisplayPoint(x + ser.deltaX, y + ser.deltaY);
@@ -2365,15 +2426,29 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
         if (displayEditMode == EDIT_POINTS) {
             displayEditImagePanel.setHilightedPoints(null);
-            ShapeTag shape = (ShapeTag) displayEditTag;
-            shape.shapes.shapeRecords = oldShapeRecords;
-            shape.shapeBounds = oldShapeBounds;
-            if (shape instanceof DefineShape4Tag) {
-                DefineShape4Tag shape4 = (DefineShape4Tag) shape;
-                shape4.edgeBounds = oldShapeEdgeBounds;
+            if (displayEditTag instanceof ShapeTag) {
+                ShapeTag shape = (ShapeTag) displayEditTag;
+                shape.shapes.shapeRecords = oldShapeRecords;
+                shape.shapeBounds = oldShapeBounds;
+                if (shape instanceof DefineShape4Tag) {
+                    DefineShape4Tag shape4 = (DefineShape4Tag) shape;
+                    shape4.edgeBounds = oldShapeEdgeBounds;
+                }
+                shape.shapes.clearCachedOutline();
             }
-            shape.shapes.clearCachedOutline();
-            shape.getSwf().clearShapeCache();
+            if (displayEditTag instanceof MorphShapeTag) {
+                MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
+                morphShape.startEdges.shapeRecords = oldShapeRecords;
+                morphShape.endEdges.shapeRecords = oldEndShapeRecords;
+                morphShape.startBounds = oldShapeBounds;
+                morphShape.endBounds = oldEndShapeBounds;
+                if (morphShape instanceof DefineMorphShape2Tag) {
+                    DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
+                    morphShape2.startEdgeBounds = oldShapeEdgeBounds;
+                    morphShape2.endEdgeBounds = oldEndShapeEdgeBounds;
+                }
+            }
+            displayEditTag.getSwf().clearShapeCache();
             displayEditImagePanel.repaint();
             displayEditGenericPanel.setVisible(true);
         }

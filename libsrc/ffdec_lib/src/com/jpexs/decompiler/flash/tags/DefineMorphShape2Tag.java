@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.annotations.Reserved;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
+import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -137,4 +138,17 @@ public class DefineMorphShape2Tag extends MorphShapeTag {
     public int getShapeNum() {
         return 2;
     }
+    
+    @Override
+    public void updateStartBounds() {
+        super.updateStartBounds();
+        startEdgeBounds = SHAPERECORD.getBounds(startEdges.shapeRecords, null, getShapeNum(), true);
+    }
+    
+    @Override
+    public void updateEndBounds() {
+        super.updateEndBounds();
+        endEdgeBounds = SHAPERECORD.getBounds(endEdges.shapeRecords, null, getShapeNum(), true);
+    }
+        
 }
