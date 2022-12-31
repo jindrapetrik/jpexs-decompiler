@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
-- [#1913] Shape transforming
+- [#1913] Shape transforming, point editation
 - [#1905] Key strokes on folder preview panel
 
 ### Fixed
