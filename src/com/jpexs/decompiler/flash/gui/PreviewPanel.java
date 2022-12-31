@@ -837,7 +837,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
 
             @Override
-            public boolean edgeSplit(List<DisplayPoint> points, int position, double splitPoint) {
+            public boolean edgeSplit(int position, double splitPoint) {
                 
                 List<SHAPERECORD> selectedRecords = new ArrayList<>();
                 List<SHAPERECORD> otherRecords = null;
@@ -860,7 +860,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 
                 Reference<Integer> importantRecordPosRef = new Reference<>(0);
                 
-                if (splitRecords(importantRecordPosRef, points, selectedRecords, position, splitPoint) && otherRecords != null) {
+                if (splitRecords(importantRecordPosRef, selectedRecords, position, splitPoint) && otherRecords != null) {
                     int importantRecordPos = importantRecordPosRef.getVal();
                     int otherPosition = 0;
                     int otherImportantRecordPos = 0;
@@ -886,15 +886,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             break;
                         }
                     }
-                    splitRecords(importantRecordPosRef, null, otherRecords, otherPosition, splitPoint);
+                    splitRecords(importantRecordPosRef, otherRecords, otherPosition, splitPoint);
                 }
-                
+                refreshHilightedPoints();
                 clearCache();
                 displayEditImagePanel.repaint();
                 return false;
             }
             
-            private boolean splitRecords(Reference<Integer> importantRecordPosRef, List<DisplayPoint> points, List<SHAPERECORD> selectedRecords, int position, double splitPoint) {
+            private boolean splitRecords(Reference<Integer> importantRecordPosRef, List<SHAPERECORD> selectedRecords, int position, double splitPoint) {
                 int pointsPos = 0;
                 int x = 0;
                 int y = 0;
@@ -920,10 +920,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             ser.deltaX -= newSer.deltaX;
                             ser.deltaY -= newSer.deltaY;
                             ser.simplify();
-                            selectedRecords.add(i + 1, newSer);
-                            if (points != null) {
-                                points.add(position, new DisplayPoint(new Point2D.Double(x + ser.deltaX, y + ser.deltaY)));
-                            }               
+                            selectedRecords.add(i + 1, newSer);                                       
                             importantRecordPosRef.setVal(importantRecordPos);
                             return true;
                         }
@@ -956,12 +953,6 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             newCer.anchorDeltaX = (int) Math.round(right.get(2).getX() - right.get(1).getX());
                             newCer.anchorDeltaY = (int) Math.round(right.get(2).getY() - right.get(1).getY());
                             selectedRecords.add(i + 1, newCer);
-                            if (points != null) {
-                                points.remove(position);
-                                points.add(position, new DisplayPoint(new Point2D.Double(left.get(1).getX(), left.get(1).getY()), false));
-                                points.add(position + 1, new DisplayPoint(new Point2D.Double(left.get(2).getX(), left.get(2).getY())));
-                                points.add(position + 2, new DisplayPoint(new Point2D.Double(right.get(1).getX(), right.get(1).getY()), false));
-                            }
                             importantRecordPosRef.setVal(importantRecordPos);
                             return true;
                         }
@@ -983,7 +974,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
 
             @Override
-            public boolean pointRemoved(List<DisplayPoint> points, int position) {
+            public boolean pointRemoved(int position) {
                 
                 List<SHAPERECORD> selectedRecords = new ArrayList<>();
                 List<SHAPERECORD> otherRecords = null;
@@ -1005,7 +996,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 }
                                
                 Reference<Integer> importantRecordPosRef = new Reference<>(0);
-                if (removePoint(importantRecordPosRef, points, selectedRecords, position) && otherRecords != null) {
+                if (removePoint(importantRecordPosRef, selectedRecords, position) && otherRecords != null) {
                     int importantRecordPos = importantRecordPosRef.getVal();
                     int otherPosition = 0;
                     int otherImportantRecordPos = 0;
@@ -1031,15 +1022,15 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             break;
                         }
                     }
-                    removePoint(importantRecordPosRef, null, otherRecords, otherPosition);
+                    removePoint(importantRecordPosRef, otherRecords, otherPosition);
                 }
-                
+                refreshHilightedPoints();
                 clearCache();
                 displayEditImagePanel.repaint();
                 return true;
             }
             
-            private boolean removePoint(Reference<Integer> importantRecordPosRef, List<DisplayPoint> points, List<SHAPERECORD> selectedRecords, int position) {
+            private boolean removePoint(Reference<Integer> importantRecordPosRef,List<SHAPERECORD> selectedRecords, int position) {
                 int pointsPos = 0;
                 int importantRecordPos = 0;
                 int x = 0;
@@ -1065,11 +1056,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                 nextSer.generalLineFlag = true;
                                 nextSer.deltaX += ser.deltaX;
                                 nextSer.deltaY += ser.deltaY;
-                                selectedRecords.remove(i);
-
-                                if (points != null) {
-                                    points.remove(position);
-                                }          
+                                selectedRecords.remove(i);                                      
                                 
                                 importantRecordPosRef.setVal(importantRecordPos);                                
                                 return true;
@@ -1078,11 +1065,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                 CurvedEdgeRecord cer = (CurvedEdgeRecord) nextRec;
                                 ser.generalLineFlag = true;
                                 ser.deltaX += cer.controlDeltaX + cer.anchorDeltaX;
-                                ser.deltaY += cer.controlDeltaY + cer.anchorDeltaY;
-                                if (points != null) {
-                                    points.remove(position + 1);
-                                    points.remove(position);
-                                }
+                                ser.deltaY += cer.controlDeltaY + cer.anchorDeltaY;                                
                                 selectedRecords.remove(i + 1);    
                                 importantRecordPosRef.setVal(importantRecordPos);
                                 return true;
@@ -1101,10 +1084,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             ser.deltaX = cer.controlDeltaX + cer.anchorDeltaX;
                             ser.deltaY = cer.controlDeltaY + cer.anchorDeltaY;
                             ser.simplify();
-                            selectedRecords.set(i, ser);
-                            if (points != null) {                                
-                                points.remove(position);
-                            }                            
+                            selectedRecords.set(i, ser);                                                      
                             //No need to update otherRecords
                             importantRecordPosRef.setVal(importantRecordPos);                                
                             return false;
@@ -1118,12 +1098,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                 ser.deltaY = cer.controlDeltaY + cer.anchorDeltaY + nextCer.controlDeltaY + nextCer.anchorDeltaY;
                                 ser.simplify();
                                 selectedRecords.set(i, ser);
-                                selectedRecords.remove(i + 1);
-                                if (points != null) {                                
-                                    points.remove(pointsPos + 2);
-                                    points.remove(pointsPos + 1);
-                                    points.remove(pointsPos);
-                                }                      
+                                selectedRecords.remove(i + 1);                                                   
                                 importantRecordPosRef.setVal(importantRecordPos);                                
                                 return true;
                             }
@@ -1133,11 +1108,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                 nextSer.deltaX += cer.controlDeltaX + cer.anchorDeltaX;
                                 nextSer.deltaY += cer.controlDeltaY + cer.anchorDeltaY;
                                 nextSer.simplify();
-                                selectedRecords.remove(i);
-                                if (points != null) {
-                                    points.remove(pointsPos + 1);
-                                    points.remove(pointsPos);
-                                }             
+                                selectedRecords.remove(i);                                           
                                 importantRecordPosRef.setVal(importantRecordPos);                                
                                 return true;
                             }
@@ -2258,8 +2229,6 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditShowEndButton.setVisible(false);
         morphShowSpace.setVisible(false);
         
-        List<SHAPERECORD> selectedRecords = new ArrayList<>();
-        
         if (displayEditTag instanceof ShapeTag) {
             ShapeTag shape = (ShapeTag) displayEditTag;
 
@@ -2268,9 +2237,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             if (shape instanceof DefineShape4Tag) {
                 DefineShape4Tag shape4 = (DefineShape4Tag) shape;
                 oldShapeEdgeBounds = shape4.edgeBounds;
-            }
-            
-            selectedRecords = shape.shapes.shapeRecords;
+            }            
         }
         if (displayEditTag instanceof MorphShapeTag) {
             MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
@@ -2282,14 +2249,27 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
                 oldShapeEdgeBounds = morphShape2.startEdgeBounds;
                 oldEndShapeEdgeBounds = morphShape2.endEdgeBounds;
-            }
-            
+            }               
+        }
+        refreshHilightedPoints();
+
+        mainPanel.setEditingStatus();
+    }
+    
+    private void refreshHilightedPoints() {
+        List<SHAPERECORD> selectedRecords = new ArrayList<>();
+        if (displayEditTag instanceof ShapeTag) {
+            ShapeTag shape = (ShapeTag) displayEditTag;
+            selectedRecords = shape.shapes.shapeRecords;
+        }
+        if (displayEditTag instanceof MorphShapeTag) {
+            MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
             if (morphDisplayMode == MORPH_START) {
                 selectedRecords = morphShape.startEdges.shapeRecords;
             }
             if (morphDisplayMode == MORPH_END) {
                 selectedRecords = morphShape.endEdges.shapeRecords;
-            }        
+            }     
         }
         int x = 0;
         int y = 0;
@@ -2320,8 +2300,6 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             y = rec.changeY(y);
         }
         displayEditImagePanel.setHilightedPoints(points);
-
-        mainPanel.setEditingStatus();
     }
 
     private void transformDisplayEditTagButtonActionPerformed(ActionEvent evt) {
