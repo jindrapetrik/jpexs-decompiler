@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [18.3.0] - 2023-01-01
 ### Added
 - [#1913] Shape transforming, point editation
@@ -2692,7 +2694,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.2.1...dev
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.0...dev
+[18.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.2.1...version18.3.0
 [18.2.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.2.0...version18.2.1
 [18.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.1.0...version18.2.0
 [18.1.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.0.0...version18.1.0
@@ -2838,6 +2841,7 @@ All notable changes to this project will be documented in this file.
 [#1827]: https://www.free-decompiler.com/flash/issues/1827
 [#1926]: https://www.free-decompiler.com/flash/issues/1926
 [#1772]: https://www.free-decompiler.com/flash/issues/1772
+[#1890]: https://www.free-decompiler.com/flash/issues/1890
 [#1922]: https://www.free-decompiler.com/flash/issues/1922
 [#1921]: https://www.free-decompiler.com/flash/issues/1921
 [#1917]: https://www.free-decompiler.com/flash/issues/1917
@@ -2880,7 +2884,6 @@ All notable changes to this project will be documented in this file.
 [#1895]: https://www.free-decompiler.com/flash/issues/1895
 [#1896]: https://www.free-decompiler.com/flash/issues/1896
 [#1769]: https://www.free-decompiler.com/flash/issues/1769
-[#1890]: https://www.free-decompiler.com/flash/issues/1890
 [#1810]: https://www.free-decompiler.com/flash/issues/1810
 [#1891]: https://www.free-decompiler.com/flash/issues/1891
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
