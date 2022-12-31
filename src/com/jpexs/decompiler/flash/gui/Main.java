@@ -46,6 +46,7 @@ import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
+import com.jpexs.decompiler.flash.gfx.GfxConvertor;
 import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
@@ -573,8 +574,12 @@ public class Main {
         try {
             tempFile = File.createTempFile("ffdec_run_", ".swf");
 
+            SWF swfToSave = swf;
+            if (swf.gfx) {
+                swfToSave = new GfxConvertor().convertSwf(swf);
+            }
             try ( FileOutputStream fos = new FileOutputStream(tempFile)) {
-                swf.saveTo(fos);
+                swfToSave.saveTo(fos, false, swf.gfx);
             }
 
             prepareSwf(new SwfRunPrepare(), tempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempFiles);
@@ -620,8 +625,12 @@ public class Main {
                 @Override
                 protected Object doInBackground() throws Exception {
 
+                    SWF swfToSave = swf;
+                    if (swf.gfx) {
+                        swfToSave = new GfxConvertor().convertSwf(swf);
+                    }
                     try ( OutputStream fos = new BufferedOutputStream(new FileOutputStream(fTempFile))) {
-                        swf.saveTo(fos);
+                        swfToSave.saveTo(fos, false, swf.gfx);
                     }
                     prepareSwf(new SwfDebugPrepare(doPCode), fTempFile, swf.getFile() == null ? null : new File(swf.getFile()), tempFiles);
                     return null;
