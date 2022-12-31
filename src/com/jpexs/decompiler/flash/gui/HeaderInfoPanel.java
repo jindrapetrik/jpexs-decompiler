@@ -102,8 +102,15 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
 
     private final JLabel warningLabel = new JLabel();
 
-    private SWF swf;
+    private JComboBox<String> unitComboBox;
+        
+    private final int UNIT_PIXELS = 0;
+    private final int UNIT_TWIPS = 1;
     
+    private int unit = UNIT_PIXELS;
+
+    private SWF swf;
+
     private MainPanel mainPanel;
 
     public HeaderInfoPanel(MainPanel mainPanel) {
@@ -160,8 +167,36 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         displayRectEditorPanel.add(xMaxEditor);
         displayRectEditorPanel.add(new JLabel(","));
         displayRectEditorPanel.add(yMaxEditor);
-        displayRectEditorPanel.add(new JLabel(" twips"));
-
+        
+        unitComboBox = new JComboBox<>(new String[]{
+            AppStrings.translate("header.displayrect.unit.pixels"),
+            AppStrings.translate("header.displayrect.unit.twips")
+        });
+        displayRectEditorPanel.add(unitComboBox);
+        
+        
+        unitComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    int newUnit = unitComboBox.getSelectedIndex();
+                    double multiplier = 1.0;
+                    if (unit == UNIT_PIXELS && newUnit == UNIT_TWIPS) {
+                        multiplier = 20.0;
+                    }
+                    if (unit == UNIT_TWIPS && newUnit == UNIT_PIXELS) {
+                        multiplier = 1 / 20.0;
+                    }
+                    unit = newUnit;
+                    
+                    xMinEditor.setValue(((double)xMinEditor.getValue()) * multiplier);
+                    yMinEditor.setValue(((double)yMinEditor.getValue()) * multiplier);
+                    xMaxEditor.setValue(((double)xMaxEditor.getValue()) * multiplier);
+                    yMaxEditor.setValue(((double)yMaxEditor.getValue()) * multiplier);
+                }
+            }            
+        });
+        
         warningLabel.setIcon(View.getIcon("warning16"));
         warningPanel.setLayout(layout);
         warningPanel.setBackground(new Color(255, 213, 29));
@@ -199,19 +234,18 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         saveButton.addActionListener(this::saveButtonActionPerformed);
 
         cancelButton.addActionListener(this::cancelButtonActionPerformed);
-        
+
         if (Configuration.editorMode.get()) {
             editButton.setVisible(false);
-            saveButton.setVisible(false);        
+            saveButton.setVisible(false);
             saveButton.setEnabled(false);
             cancelButton.setVisible(false);
             cancelButton.setEnabled(false);
         } else {
             editButton.setVisible(false);
-            saveButton.setVisible(false);        
+            saveButton.setVisible(false);
             cancelButton.setVisible(false);
         }
-        
 
         buttonsPanel.setLayout(new FlowLayout());
         buttonsPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
@@ -244,10 +278,14 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         swf.version = getVersionNumber();
         swf.gfx = gfxCheckBox.isSelected();
         swf.frameRate = ((Number) (frameRateEditor.getModel().getValue())).floatValue();
-        swf.displayRect.Xmin = (int) xMinEditor.getModel().getValue();
-        swf.displayRect.Xmax = (int) xMaxEditor.getModel().getValue();
-        swf.displayRect.Ymin = (int) yMinEditor.getModel().getValue();
-        swf.displayRect.Ymax = (int) yMaxEditor.getModel().getValue();
+        double multiplier = 1.0;
+        if (unit == UNIT_PIXELS) {
+            multiplier = 20.0;
+        }
+        swf.displayRect.Xmin = (int) (multiplier * (double)xMinEditor.getModel().getValue());
+        swf.displayRect.Xmax = (int) (multiplier * (double)xMaxEditor.getModel().getValue());
+        swf.displayRect.Ymin = (int) (multiplier * (double)yMinEditor.getModel().getValue());
+        swf.displayRect.Ymax = (int) (multiplier * (double)yMaxEditor.getModel().getValue());
         swf.setHeaderModified(true);
 
         load(swf);
@@ -303,28 +341,47 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
                 .replace("%xmax%", fmtDouble(swf.displayRect.Xmax / SWF.unitDivisor))
                 .replace("%ymax%", fmtDouble(swf.displayRect.Ymax / SWF.unitDivisor)));
 
-        xMinEditor.setModel(new SpinnerNumberModel(swf.displayRect.Xmin, -0x80000000, 0x7fffffff, 1));
-        xMaxEditor.setModel(new SpinnerNumberModel(swf.displayRect.Xmax, -0x80000000, 0x7fffffff, 1));
-        yMinEditor.setModel(new SpinnerNumberModel(swf.displayRect.Ymin, -0x80000000, 0x7fffffff, 1));
-        yMaxEditor.setModel(new SpinnerNumberModel(swf.displayRect.Ymax, -0x80000000, 0x7fffffff, 1));
+        double multiplier = 1.0;
+        if (unit == UNIT_PIXELS) {
+            multiplier = 1 / SWF.unitDivisor;
+        }
+
+        xMinEditor.setModel(new SpinnerNumberModel(swf.displayRect.Xmin * multiplier, -0x80000000, 0x7fffffff, 1));
+        xMaxEditor.setModel(new SpinnerNumberModel(swf.displayRect.Xmax * multiplier, -0x80000000, 0x7fffffff, 1));
+        yMinEditor.setModel(new SpinnerNumberModel(swf.displayRect.Ymin * multiplier, -0x80000000, 0x7fffffff, 1));
+        yMaxEditor.setModel(new SpinnerNumberModel(swf.displayRect.Ymax * multiplier, -0x80000000, 0x7fffffff, 1));
 
         compressionComboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 setModified();
-            }        
+            }
         });
-        versionEditor.addChangeListener((ChangeEvent e) -> {setModified();});
-        gfxCheckBox.addChangeListener((ChangeEvent e) -> {setModified();});
-        frameRateEditor.addChangeListener((ChangeEvent e) -> {setModified();});
-        xMinEditor.addChangeListener((ChangeEvent e) -> {setModified();});
-        xMaxEditor.addChangeListener((ChangeEvent e) -> {setModified();});
-        yMinEditor.addChangeListener((ChangeEvent e) -> {setModified();});
-        yMaxEditor.addChangeListener((ChangeEvent e) -> {setModified();});
-               
+        versionEditor.addChangeListener((ChangeEvent e) -> {
+            setModified();
+        });
+        gfxCheckBox.addChangeListener((ChangeEvent e) -> {
+            setModified();
+        });
+        frameRateEditor.addChangeListener((ChangeEvent e) -> {
+            setModified();
+        });
+        xMinEditor.addChangeListener((ChangeEvent e) -> {
+            setModified();
+        });
+        xMaxEditor.addChangeListener((ChangeEvent e) -> {
+            setModified();
+        });
+        yMinEditor.addChangeListener((ChangeEvent e) -> {
+            setModified();
+        });
+        yMaxEditor.addChangeListener((ChangeEvent e) -> {
+            setModified();
+        });
+
         setEditMode(Configuration.editorMode.get());
     }
-    
+
     private void setModified() {
         saveButton.setEnabled(true);
         cancelButton.setEnabled(true);
@@ -345,7 +402,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
     }
 
     private void setEditMode(boolean edit) {
-        
+
         if (Configuration.editorMode.get()) {
             edit = true;
         }
@@ -418,7 +475,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
     public boolean isEditing() {
         return saveButton.isVisible() && saveButton.isEnabled();
     }
-    
+
     public void startEdit() {
         if (!editButton.isVisible()) {
             return;
