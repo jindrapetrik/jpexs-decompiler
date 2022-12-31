@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - [#1905] Key strokes on folder preview panel
 - Scrollbars
 - Morphshape transforming, point editation
+- Raw edit - (MORPH)GRADIENT spreadMode,interpolationMode as enums
 
 ### Fixed
 - [#1915] SVG import - gradient when it has two final stops
