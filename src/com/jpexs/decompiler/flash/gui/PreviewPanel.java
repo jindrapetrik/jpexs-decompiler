@@ -32,20 +32,20 @@ import com.jpexs.decompiler.flash.gui.player.FlashPlayerPanel;
 import com.jpexs.decompiler.flash.gui.player.MediaDisplay;
 import com.jpexs.decompiler.flash.gui.player.PlayerControls;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineMorphShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.MetadataTag;
-import com.jpexs.decompiler.flash.tags.PlaceObject2Tag;
 import com.jpexs.decompiler.flash.tags.PlaceObject3Tag;
 import com.jpexs.decompiler.flash.tags.ProductInfoTag;
 import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
-import com.jpexs.decompiler.flash.tags.TagStub;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
 import com.jpexs.decompiler.flash.tags.base.ButtonTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
@@ -56,11 +56,15 @@ import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import com.jpexs.decompiler.flash.types.BUTTONRECORD;
 import com.jpexs.decompiler.flash.types.FILLSTYLE;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
-import com.jpexs.decompiler.flash.types.LINESTYLE;
 import com.jpexs.decompiler.flash.types.LINESTYLE2;
 import com.jpexs.decompiler.flash.types.LINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.MATRIX;
+import com.jpexs.decompiler.flash.types.MORPHFILLSTYLE;
+import com.jpexs.decompiler.flash.types.MORPHFILLSTYLEARRAY;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLE2;
+import com.jpexs.decompiler.flash.types.MORPHLINESTYLEARRAY;
 import com.jpexs.decompiler.flash.types.RECT;
+import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.shaperecords.CurvedEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
@@ -104,10 +108,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.JToggleButton;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -116,7 +123,6 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -226,6 +232,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
 
     private JButton displayEditEditPointsButton;
 
+    private JToggleButton displayEditShowAnimationButton;
+
+    private JToggleButton displayEditShowStartButton;
+
+    private JToggleButton displayEditShowEndButton;
+
+    private Component morphShowSpace;
+
     private JPanel parametersPanel;
 
     private FontPanel fontPanel;
@@ -250,6 +264,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     private final int EDIT_RAW = 2;
     private final int EDIT_POINTS = 3;
     private int displayEditMode = EDIT_RAW;
+
+    private final int MORPH_ANIMATE = 0;
+    private final int MORPH_START = 1;
+    private final int MORPH_END = 2;
+    private int morphDisplayMode = MORPH_ANIMATE;
 
     private List<SHAPERECORD> oldShapeRecords;
     private RECT oldShapeBounds;
@@ -802,16 +821,16 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                         if (pointsPos == position) {
                             StraightEdgeRecord newSer = new StraightEdgeRecord();
                             newSer.generalLineFlag = true;
-                            newSer.deltaX = (int)Math.round(ser.deltaX * (1-splitPoint));
-                            newSer.deltaY = (int)Math.round(ser.deltaY * (1-splitPoint));
+                            newSer.deltaX = (int) Math.round(ser.deltaX * (1 - splitPoint));
+                            newSer.deltaY = (int) Math.round(ser.deltaY * (1 - splitPoint));
                             newSer.simplify();
                             ser.generalLineFlag = true;
                             ser.deltaX -= newSer.deltaX;
                             ser.deltaY -= newSer.deltaY;
-                            ser.simplify();                            
+                            ser.simplify();
                             shape.shapes.shapeRecords.add(i + 1, newSer);
-                            points.add(position, new DisplayPoint(new Point2D.Double(x + ser.deltaX, y + ser.deltaY))); 
-                            shape.shapes.clearCachedOutline();         
+                            points.add(position, new DisplayPoint(new Point2D.Double(x + ser.deltaX, y + ser.deltaY)));
+                            shape.shapes.clearCachedOutline();
                             shape.getSwf().clearShapeCache();
                             displayEditImagePanel.repaint();
                             return true;
@@ -833,22 +852,22 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             List<Point2D> left = new ArrayList<>();
                             List<Point2D> right = new ArrayList<>();
                             bu.subdivide(v, splitPoint, left, right);
-                            cer.controlDeltaX = (int)Math.round(left.get(1).getX() - left.get(0).getX());
-                            cer.controlDeltaY = (int)Math.round(left.get(1).getY() - left.get(0).getY());
-                            cer.anchorDeltaX = (int)Math.round(left.get(2).getX() - left.get(1).getX());
-                            cer.anchorDeltaY = (int)Math.round(left.get(2).getY() - left.get(1).getY());
-                            
+                            cer.controlDeltaX = (int) Math.round(left.get(1).getX() - left.get(0).getX());
+                            cer.controlDeltaY = (int) Math.round(left.get(1).getY() - left.get(0).getY());
+                            cer.anchorDeltaX = (int) Math.round(left.get(2).getX() - left.get(1).getX());
+                            cer.anchorDeltaY = (int) Math.round(left.get(2).getY() - left.get(1).getY());
+
                             CurvedEdgeRecord newCer = new CurvedEdgeRecord();
-                            newCer.controlDeltaX = (int)Math.round(right.get(1).getX() - right.get(0).getX());
-                            newCer.controlDeltaY = (int)Math.round(right.get(1).getY() - right.get(0).getY());
-                            newCer.anchorDeltaX = (int)Math.round(right.get(2).getX() - right.get(1).getX());
-                            newCer.anchorDeltaY = (int)Math.round(right.get(2).getY() - right.get(1).getY());
+                            newCer.controlDeltaX = (int) Math.round(right.get(1).getX() - right.get(0).getX());
+                            newCer.controlDeltaY = (int) Math.round(right.get(1).getY() - right.get(0).getY());
+                            newCer.anchorDeltaX = (int) Math.round(right.get(2).getX() - right.get(1).getX());
+                            newCer.anchorDeltaY = (int) Math.round(right.get(2).getY() - right.get(1).getY());
                             shape.shapes.shapeRecords.add(i + 1, newCer);
                             points.remove(position);
                             points.add(position, new DisplayPoint(new Point2D.Double(left.get(1).getX(), left.get(1).getY()), false));
                             points.add(position + 1, new DisplayPoint(new Point2D.Double(left.get(2).getX(), left.get(2).getY())));
                             points.add(position + 2, new DisplayPoint(new Point2D.Double(right.get(1).getX(), right.get(1).getY()), false));
-                            shape.shapes.clearCachedOutline();          
+                            shape.shapes.clearCachedOutline();
                             shape.getSwf().clearShapeCache();
                             displayEditImagePanel.repaint();
                             return true;
@@ -859,7 +878,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                     y = rec.changeY(y);
                 }
                 return false;
-            }           
+            }
 
             @Override
             public boolean pointRemoved(List<DisplayPoint> points, int position) {
@@ -890,7 +909,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                 shape.shapes.shapeRecords.remove(i);
 
                                 points.remove(position);
-                                shape.shapes.clearCachedOutline();            
+                                shape.shapes.clearCachedOutline();
                                 shape.getSwf().clearShapeCache();
                                 displayEditImagePanel.repaint();
                                 return true;
@@ -901,9 +920,9 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                 ser.deltaX += cer.controlDeltaX + cer.anchorDeltaX;
                                 ser.deltaY += cer.controlDeltaY + cer.anchorDeltaY;
                                 points.remove(position + 1);
-                                points.remove(position);                                
+                                points.remove(position);
                                 shape.shapes.shapeRecords.remove(i + 1);
-                                shape.shapes.clearCachedOutline();            
+                                shape.shapes.clearCachedOutline();
                                 shape.getSwf().clearShapeCache();
                                 displayEditImagePanel.repaint();
                                 return true;
@@ -923,7 +942,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                             ser.simplify();
                             shape.shapes.shapeRecords.set(i, ser);
                             points.remove(position);
-                            shape.shapes.clearCachedOutline();            
+                            shape.shapes.clearCachedOutline();
                             shape.getSwf().clearShapeCache();
                             displayEditImagePanel.repaint();
                             return true;
@@ -941,7 +960,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                 points.remove(pointsPos + 2);
                                 points.remove(pointsPos + 1);
                                 points.remove(pointsPos);
-                                shape.shapes.clearCachedOutline();            
+                                shape.shapes.clearCachedOutline();
                                 shape.getSwf().clearShapeCache();
                                 displayEditImagePanel.repaint();
                                 return true;
@@ -955,7 +974,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                                 shape.shapes.shapeRecords.remove(i);
                                 points.remove(pointsPos + 1);
                                 points.remove(pointsPos);
-                                shape.shapes.clearCachedOutline();            
+                                shape.shapes.clearCachedOutline();
                                 shape.getSwf().clearShapeCache();
                                 displayEditImagePanel.repaint();
                                 return true;
@@ -1086,6 +1105,28 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditEditPointsButton.setMargin(new Insets(3, 3, 3, 10));
         displayEditEditPointsButton.addActionListener(this::editPointsDisplayEditTagButtonActionPerformed);
 
+        displayEditShowAnimationButton = new JToggleButton(mainPanel.translate("button.morph.animation"));
+        displayEditShowAnimationButton.setMargin(new Insets(3, 3, 3, 10));
+        displayEditShowAnimationButton.addActionListener(this::showAnimationDisplayEditTagButtonActionPerformed);
+
+        displayEditShowStartButton = new JToggleButton(mainPanel.translate("button.morph.start"));
+        displayEditShowStartButton.setMargin(new Insets(3, 3, 3, 10));
+        displayEditShowStartButton.addActionListener(this::showStartDisplayEditTagButtonActionPerformed);
+
+        displayEditShowEndButton = new JToggleButton(mainPanel.translate("button.morph.end"));
+        displayEditShowEndButton.setMargin(new Insets(3, 3, 3, 10));
+        displayEditShowEndButton.addActionListener(this::showEndDisplayEditTagButtonActionPerformed);
+
+        ButtonGroup morphGroup = new ButtonGroup();
+        morphGroup.add(displayEditShowAnimationButton);
+        morphGroup.add(displayEditShowStartButton);
+        morphGroup.add(displayEditShowEndButton);
+
+        morphShowSpace = Box.createHorizontalStrut(10);
+
+        displayEditShowStartButton.setVisible(false);
+        displayEditShowEndButton.setVisible(false);
+
         replaceShapeButton = new JButton(mainPanel.translate("button.replace"), View.getIcon("importshape16"));
         replaceShapeButton.setMargin(new Insets(3, 3, 3, 10));
         replaceShapeButton.addActionListener(new ActionListener() {
@@ -1118,15 +1159,19 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditCancelButton.setVisible(false);
         }
 
-        ButtonsPanel placeTagButtonsPanel = new ButtonsPanel();
-        placeTagButtonsPanel.add(displayEditTransformButton);
-        placeTagButtonsPanel.add(displayEditEditButton);
-        placeTagButtonsPanel.add(displayEditSaveButton);
-        placeTagButtonsPanel.add(displayEditCancelButton);
-        placeTagButtonsPanel.add(displayEditEditPointsButton);
-        placeTagButtonsPanel.add(replaceShapeButton);
-        placeTagButtonsPanel.add(replaceShapeUpdateBoundsButton);
-        return placeTagButtonsPanel;
+        ButtonsPanel displayEditButtonsPanel = new ButtonsPanel();
+        displayEditButtonsPanel.add(displayEditShowAnimationButton);
+        displayEditButtonsPanel.add(displayEditShowStartButton);
+        displayEditButtonsPanel.add(displayEditShowEndButton);
+        displayEditButtonsPanel.add(morphShowSpace);
+        displayEditButtonsPanel.add(displayEditTransformButton);
+        displayEditButtonsPanel.add(displayEditEditButton);
+        displayEditButtonsPanel.add(displayEditSaveButton);
+        displayEditButtonsPanel.add(displayEditCancelButton);
+        displayEditButtonsPanel.add(displayEditEditPointsButton);
+        displayEditButtonsPanel.add(replaceShapeButton);
+        displayEditButtonsPanel.add(replaceShapeUpdateBoundsButton);
+        return displayEditButtonsPanel;
     }
 
     private void showCardLeft(String card) {
@@ -1455,6 +1500,12 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             Timelined tim = MainPanel.makeTimelined(tag);
             displayEditImagePanel.setTimelined(tim, ((Tag) tag).getSwf(), 0, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false);
         }
+        if (tag instanceof MorphShapeTag) {
+            Timelined tim = MainPanel.makeTimelined(tag);
+            displayEditImagePanel.setTimelined(tim, ((Tag) tag).getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false);
+            morphDisplayMode = MORPH_ANIMATE;
+            displayEditShowAnimationButton.setSelected(true);
+        }
         if (tag instanceof PlaceObjectTypeTag) {
             displayEditImagePanel.setTimelined(((Tag) tag).getTimelined(), ((Tag) tag).getSwf(), frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true);
             PlaceObjectTypeTag place = (PlaceObjectTypeTag) tag;
@@ -1464,7 +1515,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditTransformButton.setVisible(!tag.isReadOnly() && !readOnly);
     }
 
-    public void setImageReplaceButtonVisible(boolean showImage, boolean showAlpha, boolean showShape, boolean showSound, boolean showMovie) {
+    public void setImageReplaceButtonVisible(boolean showImage, boolean showAlpha, boolean showShape, boolean showSound, boolean showMovie, boolean showMorphShape) {
         if (readOnly) {
             showImage = false;
             showAlpha = false;
@@ -1475,7 +1526,11 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceImageButton.setVisible(showImage);
         replaceImageAlphaButton.setVisible(showAlpha);
         replaceShapeButton.setVisible(showShape);
-        displayEditEditPointsButton.setVisible(showShape);
+        displayEditShowAnimationButton.setVisible(showMorphShape);
+        displayEditShowStartButton.setVisible(showMorphShape);
+        displayEditShowEndButton.setVisible(showMorphShape);
+        morphShowSpace.setVisible(showMorphShape);
+        displayEditEditPointsButton.setVisible(showShape || showMorphShape);
         replaceShapeUpdateBoundsButton.setVisible(showShape);
         replaceSoundButton.setVisible(showSound);
         replaceMovieButton.setVisible(showMovie);
@@ -1670,7 +1725,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             swf.clearImageCache();
             if (tag instanceof ShapeTag) {
                 ShapeTag shape = (ShapeTag) tag;
-                shape.shapes.clearCachedOutline();            
+                shape.shapes.clearCachedOutline();
             }
             swf.clearShapeCache();
             swf.updateCharacters();
@@ -1718,6 +1773,139 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         mainPanel.clearEditingStatus();
     }
 
+    private void transformStyles(Matrix matrix, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, int shapeNum) {
+        List<FILLSTYLE> fillStyleToTransform = new ArrayList<>();
+        for (FILLSTYLE fs : fillStyles.fillStyles) {
+            fillStyleToTransform.add(fs);
+        }
+        if (shapeNum >= 4) {
+            for (LINESTYLE2 ls : lineStyles.lineStyles2) {
+                if (ls.hasFillFlag) {
+                    fillStyleToTransform.add(ls.fillType);
+                }
+            }
+        }
+
+        for (FILLSTYLE fs : fillStyleToTransform) {
+            switch (fs.fillStyleType) {
+                case FILLSTYLE.CLIPPED_BITMAP:
+                case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
+                case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
+                case FILLSTYLE.REPEATING_BITMAP:
+                    fs.bitmapMatrix = new Matrix(fs.bitmapMatrix).preConcatenate(matrix).toMATRIX();
+                    break;
+                case FILLSTYLE.LINEAR_GRADIENT:
+                case FILLSTYLE.RADIAL_GRADIENT:
+                case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
+                    fs.gradientMatrix = new Matrix(fs.gradientMatrix).preConcatenate(matrix).toMATRIX();
+                    break;
+            }
+        }
+    }
+    
+    private void transformMorphStyles(Matrix matrix, MORPHFILLSTYLEARRAY fillStyles, MORPHLINESTYLEARRAY lineStyles, int morphShapeNum, boolean doStart, boolean doEnd) {
+        List<MORPHFILLSTYLE> fillStyleToTransform = new ArrayList<>();
+        for (MORPHFILLSTYLE fs : fillStyles.fillStyles) {
+            fillStyleToTransform.add(fs);
+        }
+        
+        if (morphShapeNum == 2) {
+            for (MORPHLINESTYLE2 ls: lineStyles.lineStyles2) {
+                if (ls.hasFillFlag) {
+                    fillStyleToTransform.add(ls.fillType);
+                }
+            }
+        }
+        
+        for (MORPHFILLSTYLE fs : fillStyleToTransform) {
+            switch (fs.fillStyleType) {
+                case FILLSTYLE.CLIPPED_BITMAP:
+                case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
+                case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
+                case FILLSTYLE.REPEATING_BITMAP:
+                    if (doStart) {
+                        fs.startBitmapMatrix = new Matrix(fs.startBitmapMatrix).preConcatenate(matrix).toMATRIX();
+                    }
+                    if (doEnd) {
+                        fs.endBitmapMatrix = new Matrix(fs.endBitmapMatrix).preConcatenate(matrix).toMATRIX();
+                    }
+                    break;
+                case FILLSTYLE.LINEAR_GRADIENT:
+                case FILLSTYLE.RADIAL_GRADIENT:
+                case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
+                    if (doStart) {
+                        fs.startGradientMatrix = new Matrix(fs.startGradientMatrix).preConcatenate(matrix).toMATRIX();
+                    }
+                    if (doEnd) {
+                        fs.endGradientMatrix = new Matrix(fs.endGradientMatrix).preConcatenate(matrix).toMATRIX();
+                    }
+                    break;
+            }
+        }
+    }
+
+    private void transformSHAPE(Matrix matrix, SHAPE shape, int shapeNum) {
+        int x = 0;
+        int y = 0;
+        for (SHAPERECORD rec : shape.shapeRecords) {
+            if (rec instanceof StyleChangeRecord) {
+                StyleChangeRecord scr = (StyleChangeRecord) rec;
+                if (scr.stateNewStyles) {
+                    transformStyles(matrix, scr.fillStyles, scr.lineStyles, shapeNum);
+                }
+                if (scr.stateMoveTo) {
+                    Point nextPoint = new Point(scr.moveDeltaX, scr.moveDeltaY);
+                    x = scr.changeX(x);
+                    y = scr.changeY(y);
+                    Point nextPoint2 = matrix.transform(nextPoint);
+                    scr.moveDeltaX = nextPoint2.x;
+                    scr.moveDeltaY = nextPoint2.y;
+                }
+            }
+            if (rec instanceof StraightEdgeRecord) {
+                StraightEdgeRecord ser = (StraightEdgeRecord) rec;
+                ser.generalLineFlag = true;
+                ser.vertLineFlag = false;
+                Point currentPoint = new Point(x, y);
+                Point nextPoint = new Point(x + ser.deltaX, y + ser.deltaY);
+                x = ser.changeX(x);
+                y = ser.changeY(y);
+                Point currentPoint2 = matrix.transform(currentPoint);
+                Point nextPoint2 = matrix.transform(nextPoint);
+                ser.deltaX = nextPoint2.x - currentPoint2.x;
+                ser.deltaY = nextPoint2.y - currentPoint2.y;
+                ser.simplify();
+            }
+            if (rec instanceof CurvedEdgeRecord) {
+                CurvedEdgeRecord cer = (CurvedEdgeRecord) rec;
+                Point currentPoint = new Point(x, y);
+                Point controlPoint = new Point(x + cer.controlDeltaX, y + cer.controlDeltaY);
+                Point anchorPoint = new Point(x + cer.controlDeltaX + cer.anchorDeltaX, y + cer.controlDeltaY + cer.anchorDeltaY);
+                x = cer.changeX(x);
+                y = cer.changeY(y);
+
+                Point currentPoint2 = matrix.transform(currentPoint);
+                Point controlPoint2 = matrix.transform(controlPoint);
+                Point anchorPoint2 = matrix.transform(anchorPoint);
+
+                cer.controlDeltaX = controlPoint2.x - currentPoint2.x;
+                cer.controlDeltaY = controlPoint2.y - currentPoint2.y;
+                cer.anchorDeltaX = anchorPoint2.x - controlPoint2.x;
+                cer.anchorDeltaY = anchorPoint2.y - controlPoint2.y;
+            }
+        }
+    }
+
+    private RECT transformRECT(Matrix matrix, RECT rect) {
+        ExportRectangle shapeRect = matrix.transform(new ExportRectangle(rect));
+        return new RECT(
+                (int) Math.round(shapeRect.xMin),
+                (int) Math.round(shapeRect.xMax),
+                (int) Math.round(shapeRect.yMin),
+                (int) Math.round(shapeRect.yMax)
+        );
+    }
+
     private void saveDisplayEditTag(boolean refreshTree) {
         if (displayEditMode == EDIT_TRANSFORM) {
             Matrix matrix = displayEditImagePanel.getNewMatrix();
@@ -1728,80 +1916,42 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             }
             if (displayEditTag instanceof ShapeTag) {
                 ShapeTag shape = (ShapeTag) displayEditTag;
-                int x = 0;
-                int y = 0;
-                for (SHAPERECORD rec : shape.shapes.shapeRecords) {
-                    if (rec instanceof StyleChangeRecord) {
-                        StyleChangeRecord scr = (StyleChangeRecord) rec;
-                        if (scr.stateNewStyles) {
-                            transformStyles(matrix, scr.fillStyles, scr.lineStyles, shape.getShapeNum());
-                        }
-                        if (scr.stateMoveTo) {
-                            Point nextPoint = new Point(scr.moveDeltaX, scr.moveDeltaY);
-                            x = scr.changeX(x);
-                            y = scr.changeY(y);
-                            Point nextPoint2 = matrix.transform(nextPoint);
-                            scr.moveDeltaX = nextPoint2.x;
-                            scr.moveDeltaY = nextPoint2.y;
-                        }
-                    }
-                    if (rec instanceof StraightEdgeRecord) {
-                        StraightEdgeRecord ser = (StraightEdgeRecord) rec;
-                        ser.generalLineFlag = true;
-                        ser.vertLineFlag = false;
-                        Point currentPoint = new Point(x, y);
-                        Point nextPoint = new Point(x + ser.deltaX, y + ser.deltaY);
-                        x = ser.changeX(x);
-                        y = ser.changeY(y);
-                        Point currentPoint2 = matrix.transform(currentPoint);
-                        Point nextPoint2 = matrix.transform(nextPoint);
-                        ser.deltaX = nextPoint2.x - currentPoint2.x;
-                        ser.deltaY = nextPoint2.y - currentPoint2.y;
-                        ser.simplify();
-                    }
-                    if (rec instanceof CurvedEdgeRecord) {
-                        CurvedEdgeRecord cer = (CurvedEdgeRecord) rec;
-                        Point currentPoint = new Point(x, y);
-                        Point controlPoint = new Point(x + cer.controlDeltaX, y + cer.controlDeltaY);
-                        Point anchorPoint = new Point(x + cer.controlDeltaX + cer.anchorDeltaX, y + cer.controlDeltaY + cer.anchorDeltaY);
-                        x = cer.changeX(x);
-                        y = cer.changeY(y);
 
-                        Point currentPoint2 = matrix.transform(currentPoint);
-                        Point controlPoint2 = matrix.transform(controlPoint);
-                        Point anchorPoint2 = matrix.transform(anchorPoint);
-
-                        cer.controlDeltaX = controlPoint2.x - currentPoint2.x;
-                        cer.controlDeltaY = controlPoint2.y - currentPoint2.y;
-                        cer.anchorDeltaX = anchorPoint2.x - controlPoint2.x;
-                        cer.anchorDeltaY = anchorPoint2.y - controlPoint2.y;
-                    }
-                }
-
+                transformSHAPE(matrix, shape.shapes, shape.getShapeNum());
                 transformStyles(matrix, shape.shapes.fillStyles, shape.shapes.lineStyles, shape.getShapeNum());
 
-                ExportRectangle shapeRect = matrix.transform(new ExportRectangle(shape.shapeBounds));
-                shape.shapeBounds = new RECT(
-                        (int) Math.round(shapeRect.xMin),
-                        (int) Math.round(shapeRect.xMax),
-                        (int) Math.round(shapeRect.yMin),
-                        (int) Math.round(shapeRect.yMax)
-                );
+                shape.shapeBounds = transformRECT(matrix, shape.shapeBounds);
                 if (shape instanceof DefineShape4Tag) {
                     DefineShape4Tag shape4 = (DefineShape4Tag) shape;
-                    ExportRectangle edgeRect = matrix.transform(new ExportRectangle(shape4.edgeBounds));
-                    shape4.edgeBounds = new RECT(
-                            (int) Math.round(edgeRect.xMin),
-                            (int) Math.round(edgeRect.xMax),
-                            (int) Math.round(edgeRect.yMin),
-                            (int) Math.round(edgeRect.yMax)
-                    );
-                }      
-                //shape.getSwf().getRectCache().cl
-                //DefineSprite sprite = 
-                        //((DefineSpriteTag)displayEditImagePanel.getTimelined());
-                shape.shapes.clearCachedOutline();            
+                    shape4.edgeBounds = transformRECT(matrix, shape4.edgeBounds);
+                }
+                shape.shapes.clearCachedOutline();
                 shape.getSwf().clearShapeCache();
+            }
+
+            if (displayEditTag instanceof MorphShapeTag) {
+                MorphShapeTag morphShape = (MorphShapeTag) displayEditTag;
+
+                if (morphDisplayMode == MORPH_START) {
+                    transformSHAPE(matrix, morphShape.startEdges, morphShape.getShapeNum() == 1 ? 3 : 4);
+                    morphShape.startBounds = transformRECT(matrix, morphShape.startBounds);
+                    if (morphShape instanceof DefineMorphShape2Tag) {
+                        DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
+                        morphShape2.startEdgeBounds = transformRECT(matrix, morphShape2.startEdgeBounds);
+                    }
+                    transformMorphStyles(matrix, morphShape.morphFillStyles, morphShape.morphLineStyles, morphShape.getShapeNum(), true, false);
+                }
+
+                if (morphDisplayMode == MORPH_END) {
+                    transformSHAPE(matrix, morphShape.endEdges, morphShape.getShapeNum() == 1 ? 3 : 4);
+                    morphShape.endBounds = transformRECT(matrix, morphShape.endBounds);
+                    if (morphShape instanceof DefineMorphShape2Tag) {
+                        DefineMorphShape2Tag morphShape2 = (DefineMorphShape2Tag) morphShape;
+                        morphShape2.endEdgeBounds = transformRECT(matrix, morphShape2.endEdgeBounds);
+                    }
+                    transformMorphStyles(matrix, morphShape.morphFillStyles, morphShape.morphLineStyles, morphShape.getShapeNum(), false, true);
+                }
+                morphShape.getSwf().clearShapeCache();
             }
             displayEditTag.setModified(true);
             if (displayEditTag instanceof PlaceObjectTypeTag) {
@@ -1839,6 +1989,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             replaceShapeUpdateBoundsButton.setVisible(true);
             displayEditEditPointsButton.setVisible(true);
         }
+        
+        if (displayEditTag instanceof MorphShapeTag) {
+            displayEditShowAnimationButton.setVisible(true);
+            displayEditShowStartButton.setVisible(true);
+            displayEditShowEndButton.setVisible(true);
+            morphShowSpace.setVisible(true);            
+            displayEditEditPointsButton.setVisible(true);
+        }
 
         displayEditTransformButton.setVisible(true);
         if (Configuration.editorMode.get()) {
@@ -1868,7 +2026,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     private void saveDisplayEditTagButtonActionPerformed(ActionEvent evt) {
-        saveDisplayEditTag(true);
+        saveDisplayEditTag(true);        
     }
 
     private void editDisplayEditTagButtonActionPerformed(ActionEvent evt) {
@@ -1882,6 +2040,24 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceShapeUpdateBoundsButton.setVisible(false);
         displayEditEditPointsButton.setVisible(false);
         mainPanel.setEditingStatus();
+    }
+
+    private void showAnimationDisplayEditTagButtonActionPerformed(ActionEvent evt) {
+        morphDisplayMode = MORPH_ANIMATE;
+        Timelined tim = MainPanel.makeTimelined(displayEditTag);
+        displayEditImagePanel.setTimelined(tim, displayEditTag.getSwf(), -1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false);
+    }
+
+    private void showStartDisplayEditTagButtonActionPerformed(ActionEvent evt) {
+        morphDisplayMode = MORPH_START;
+        Timelined tim = MainPanel.makeTimelined(displayEditTag);
+        displayEditImagePanel.setTimelined(tim, displayEditTag.getSwf(), 0, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false);
+    }
+
+    private void showEndDisplayEditTagButtonActionPerformed(ActionEvent evt) {
+        morphDisplayMode = MORPH_END;
+        Timelined tim = MainPanel.makeTimelined(displayEditTag);
+        displayEditImagePanel.setTimelined(tim, displayEditTag.getSwf(), tim.getFrameCount() - 1, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), false);
     }
 
     private void editPointsDisplayEditTagButtonActionPerformed(ActionEvent evt) {
@@ -1900,8 +2076,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         oldShapeRecords = Helper.deepCopy(shape.shapes.shapeRecords);
         oldShapeBounds = shape.shapeBounds;
         if (shape instanceof DefineShape4Tag) {
-            DefineShape4Tag shape4 = (DefineShape4Tag)shape;
-            oldShapeEdgeBounds = shape4.edgeBounds;                    
+            DefineShape4Tag shape4 = (DefineShape4Tag) shape;
+            oldShapeEdgeBounds = shape4.edgeBounds;
         }
         int x = 0;
         int y = 0;
@@ -1955,6 +2131,16 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         replaceShapeButton.setVisible(false);
         replaceShapeUpdateBoundsButton.setVisible(false);
         displayEditEditPointsButton.setVisible(false);
+        
+        displayEditShowAnimationButton.setVisible(false);
+        displayEditShowStartButton.setVisible(false);
+        displayEditShowEndButton.setVisible(false);
+        morphShowSpace.setVisible(false);
+        
+        if ((displayEditTag instanceof MorphShapeTag) && (morphDisplayMode == MORPH_ANIMATE)) {
+            displayEditShowStartButton.setSelected(true);
+            showStartDisplayEditTagButtonActionPerformed(null);
+        }
 
         if (Configuration.editorMode.get()) {
             displayEditSaveButton.setEnabled(false);
@@ -1983,36 +2169,6 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
                 displayEditTransformPanel.load();
             }
         }, 40); //add some delay before controls are hidden
-    }
-
-    private void transformStyles(Matrix matrix, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, int shapeNum) {
-        List<FILLSTYLE> fillStyleToTransform = new ArrayList<>();
-        for (FILLSTYLE fs : fillStyles.fillStyles) {
-            fillStyleToTransform.add(fs);
-        }
-        if (shapeNum >= 4) {
-            for (LINESTYLE2 ls : lineStyles.lineStyles2) {
-                if (ls.hasFillFlag) {
-                    fillStyleToTransform.add(ls.fillType);
-                }
-            }
-        }
-
-        for (FILLSTYLE fs : fillStyleToTransform) {
-            switch (fs.fillStyleType) {
-                case FILLSTYLE.CLIPPED_BITMAP:
-                case FILLSTYLE.NON_SMOOTHED_CLIPPED_BITMAP:
-                case FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP:
-                case FILLSTYLE.REPEATING_BITMAP:
-                    fs.bitmapMatrix = new Matrix(fs.bitmapMatrix).preConcatenate(matrix).toMATRIX();
-                    break;
-                case FILLSTYLE.LINEAR_GRADIENT:
-                case FILLSTYLE.RADIAL_GRADIENT:
-                case FILLSTYLE.FOCAL_RADIAL_GRADIENT:
-                    fs.gradientMatrix = new Matrix(fs.gradientMatrix).preConcatenate(matrix).toMATRIX();
-                    break;
-            }
-        }
     }
 
     private void saveImageTransform(boolean refreshTree) {
@@ -2213,7 +2369,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             shape.shapes.shapeRecords = oldShapeRecords;
             shape.shapeBounds = oldShapeBounds;
             if (shape instanceof DefineShape4Tag) {
-                DefineShape4Tag shape4 = (DefineShape4Tag)shape;
+                DefineShape4Tag shape4 = (DefineShape4Tag) shape;
                 shape4.edgeBounds = oldShapeEdgeBounds;
             }
             shape.shapes.clearCachedOutline();
@@ -2243,6 +2399,14 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         if (displayEditTag instanceof ShapeTag) {
             replaceShapeButton.setVisible(true);
             replaceShapeUpdateBoundsButton.setVisible(true);
+            displayEditEditPointsButton.setVisible(true);
+        }
+        
+        if (displayEditTag instanceof MorphShapeTag) {
+            displayEditShowAnimationButton.setVisible(true);
+            displayEditShowStartButton.setVisible(true);
+            displayEditShowEndButton.setVisible(true);
+            morphShowSpace.setVisible(true);
             displayEditEditPointsButton.setVisible(true);
         }
 
