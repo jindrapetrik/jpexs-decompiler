@@ -999,7 +999,7 @@ public abstract class Action implements GraphSourceItem {
     }
 
     private static HashMap<String, GraphTargetItem> prepareVariables(GraphSourceItemContainer cnt, HashMap<String, GraphTargetItem> variables) {
-        HashMap<String, GraphTargetItem> variables2 = Helper.deepCopy(variables);
+        HashMap<String, GraphTargetItem> variables2 = new LinkedHashMap<>(variables);
         if (cnt instanceof ActionDefineFunction || cnt instanceof ActionDefineFunction2) {
             for (int r = 0; r < 256; r++) {
                 if (variables2.containsKey("__register" + r)) {

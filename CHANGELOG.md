@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - Uncompressed FLA (XFL) export creates a directory
 - [#1827] Video replacing VP6 reading
 - [#1926] Constructors namespace taken from class - should be always public
+- [#1772] AS1/2 decompilation - StackOverflow during getVariables function
 
 ### Changed
 - [#1913] SVG export/import of shapes - shape exact position (bounds) is retained
@@ -2832,6 +2833,7 @@ All notable changes to this project will be documented in this file.
 [#1923]: https://www.free-decompiler.com/flash/issues/1923
 [#1827]: https://www.free-decompiler.com/flash/issues/1827
 [#1926]: https://www.free-decompiler.com/flash/issues/1926
+[#1772]: https://www.free-decompiler.com/flash/issues/1772
 [#1922]: https://www.free-decompiler.com/flash/issues/1922
 [#1921]: https://www.free-decompiler.com/flash/issues/1921
 [#1917]: https://www.free-decompiler.com/flash/issues/1917
