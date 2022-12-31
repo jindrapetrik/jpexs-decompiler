@@ -281,8 +281,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private List<Integer> pointsUnderCursor = new ArrayList<>();
     private List<Integer> selectedPoints = new ArrayList<>();
 
-    private Integer pathPointUnderCursor = null;
-    private Double pathPointPosition = null;
+    private List<DistanceItem> pathPointsUnderCursor = new ArrayList<>();
 
     private DisplayPoint closestPoint = null;
 
@@ -336,18 +335,18 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
     }
 
-    private boolean fireEdgeSplit(List<DisplayPoint> points, int position, double splitPoint) {
+    private boolean fireEdgeSplit(int position, double splitPoint) {
         boolean result = true;
         for (PointUpdateListener listener : pointUpdateListeners) {
-            result = result && listener.edgeSplit(points, position, splitPoint);
+            result = result && listener.edgeSplit(position, splitPoint);
         }
         return result;
     }
 
-    private boolean firePointRemoved(List<DisplayPoint> points, int position) {
+    private boolean firePointRemoved(int position) {
         boolean result = true;
         for (PointUpdateListener listener : pointUpdateListeners) {
-            result = result && listener.pointRemoved(points, position);
+            result = result && listener.pointRemoved(position);
         }
         return result;
     }
@@ -1028,7 +1027,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 }
                             });
                             for (int i : selectedPointsDesc) {
-                                firePointRemoved(hilightedPoints, i);
+                                firePointRemoved(i);
                             }
                             selectedPoints.clear();
                             repaint();
@@ -1156,12 +1155,20 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 calculatePointsXY();
                             }
 
-                            if (ctrlDown && pathPointUnderCursor != null) {
-                                fireEdgeSplit(hilightedPoints, pathPointUnderCursor, pathPointPosition);
+                            if (ctrlDown && !pathPointsUnderCursor.isEmpty()) {
+                                /*List<Integer> positions = new ArrayList<>();
+                                List<Double> splitPositions = new ArrayList<>();
+                                
+                                for(DistanceItem di:pathPointsUnderCursor) {
+                                    positions.add(di.pathPoint);
+                                    splitPositions.add(di.pathPosition);
+                                }*/
+                                for (DistanceItem di:pathPointsUnderCursor) {
+                                    fireEdgeSplit(di.pathPoint, di.pathPosition);
+                                }
                                 selectedPoints.clear();
                                 pointsUnderCursor.clear();
-                                pathPointUnderCursor = null;
-                                pathPointPosition = 0.0;
+                                pathPointsUnderCursor.clear();
                                 repaint();
                             }                            
                             updateScrollBarMinMax();
@@ -1732,23 +1739,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             repaint();
                         }
                     }
-                }
-
-                class DistanceItem {
-
-                    public double distance;
-                    public int pathPoint;
-                    public double pathPosition;
-                    public DisplayPoint closestPoint;
-
-                    public DistanceItem(double distance, int pathPoint, double pathPosition, DisplayPoint closestPoint) {
-                        this.distance = distance;
-                        this.pathPoint = pathPoint;
-                        this.pathPosition = pathPosition;
-                        this.closestPoint = closestPoint;
-                    }
-
-                }
+                }               
 
                 @Override
                 public void mouseMoved(MouseEvent e) {
@@ -1833,11 +1824,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         distanceList.sort(new Comparator<DistanceItem>() {
                             @Override
                             public int compare(DistanceItem o1, DistanceItem o2) {
-                                return Double.compare(o1.distance, o2.distance);
+                                return o2.pathPoint - o1.pathPoint; //Double.compare(o1.distance, o2.distance);
                             }
                         });
                         if (dragStart == null) {
-                            if (!distanceList.isEmpty()) {
+                            /*if (!distanceList.isEmpty()) {
                                 DistanceItem di = distanceList.get(0);
                                 pathPointUnderCursor = di.pathPoint;
                                 pathPointPosition = di.pathPosition;
@@ -1846,7 +1837,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 pathPointUnderCursor = null;
                                 pathPointPosition = null;
                                 closestPoint = null;
-                            }
+                            }*/
+                            pathPointsUnderCursor = distanceList;
                             pointsUnderCursor = newPointsUnderCursor;
                         }
                         return;
@@ -3426,7 +3418,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 Cursor newCursor;
                                 if (!pointsUnderCursor.isEmpty()) {
                                     newCursor = movePointCursor;
-                                } else if (pathPointUnderCursor != null) {
+                                } else if (!pathPointsUnderCursor.isEmpty()) {
                                     if (iconPanel.isCtrlDown()) {
                                         newCursor = addPointCursor;
                                     } else {
@@ -3969,4 +3961,21 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         return null;
     }
+}
+
+
+class DistanceItem {
+
+    public double distance;
+    public int pathPoint;
+    public double pathPosition;
+    public DisplayPoint closestPoint;
+
+    public DistanceItem(double distance, int pathPoint, double pathPosition, DisplayPoint closestPoint) {
+        this.distance = distance;
+        this.pathPoint = pathPoint;
+        this.pathPosition = pathPosition;
+        this.closestPoint = closestPoint;
+    }
+
 }
