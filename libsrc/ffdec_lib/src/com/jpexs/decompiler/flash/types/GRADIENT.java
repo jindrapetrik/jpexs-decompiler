@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
@@ -30,6 +31,9 @@ public class GRADIENT implements Serializable {
      * Spread mode
      */
     @SWFType(value = BasicType.UB, count = 2)
+    @EnumValue(value = SPREAD_PAD_MODE, text = "Pad")
+    @EnumValue(value = SPREAD_REFLECT_MODE, text = "Reflect")
+    @EnumValue(value = SPREAD_REPEAT_MODE, text = "Repeat")
     public int spreadMode;
 
     public static final int SPREAD_PAD_MODE = 0;
@@ -44,6 +48,8 @@ public class GRADIENT implements Serializable {
      * Interpolation mode
      */
     @SWFType(value = BasicType.UB, count = 2)
+    @EnumValue(value = INTERPOLATION_RGB_MODE, text = "Normal RGB")
+    @EnumValue(value = INTERPOLATION_LINEAR_RGB_MODE, text = "Linear RGB")
     public int interpolationMode;
 
     public static final int INTERPOLATION_RGB_MODE = 0;

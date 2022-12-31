@@ -16,6 +16,12 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import static com.jpexs.decompiler.flash.types.GRADIENT.INTERPOLATION_LINEAR_RGB_MODE;
+import static com.jpexs.decompiler.flash.types.GRADIENT.INTERPOLATION_RGB_MODE;
+import static com.jpexs.decompiler.flash.types.GRADIENT.SPREAD_PAD_MODE;
+import static com.jpexs.decompiler.flash.types.GRADIENT.SPREAD_REFLECT_MODE;
+import static com.jpexs.decompiler.flash.types.GRADIENT.SPREAD_REPEAT_MODE;
+import com.jpexs.decompiler.flash.types.annotations.EnumValue;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import java.io.Serializable;
 
@@ -29,12 +35,17 @@ public class MORPHGRADIENT implements Serializable {
      * Spread mode. See GRADIENT.SPREAD_* constants
      */
     @SWFType(value = BasicType.UB, count = 2)
+    @EnumValue(value = SPREAD_PAD_MODE, text = "Pad")
+    @EnumValue(value = SPREAD_REFLECT_MODE, text = "Reflect")
+    @EnumValue(value = SPREAD_REPEAT_MODE, text = "Repeat")
     public int spreadMode;
 
     /**
      * Interpolation mode. See GRADIENT.INTERPOLATION_* constants
      */
     @SWFType(value = BasicType.UB, count = 2)
+    @EnumValue(value = INTERPOLATION_RGB_MODE, text = "Normal RGB")
+    @EnumValue(value = INTERPOLATION_LINEAR_RGB_MODE, text = "Linear RGB")
     public int interPolationMode;
 
     public MORPHGRADRECORD[] gradientRecords;
