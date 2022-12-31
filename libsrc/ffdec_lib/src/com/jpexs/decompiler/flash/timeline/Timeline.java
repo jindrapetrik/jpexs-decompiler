@@ -322,29 +322,34 @@ public class Timeline {
                 frame.layersChanged = true;
                 fl.placeObjectTag = po;
                 fl.minPlaceObjectNum = Math.max(fl.minPlaceObjectNum, po.getPlaceObjectNum());
-                int characterId = po.getCharacterId();
-                if (characterId != -1) {
-                    fl.characterId = characterId;
-                    fl.hasImage = po.hasImage();
-                }
-                CharacterTag character = swf.getCharacter(characterId);
-                if (character instanceof DefineSpriteTag) {
-                    if (swf.getCyclicCharacters().contains(characterId)) {
-                        fl.characterId = -1;
+                
+                boolean wasEmpty = fl.characterId == -1 && fl.className == null;
+
+                if (po.flagMove() || wasEmpty) {
+                    int characterId = po.getCharacterId();
+                    if (characterId != -1) {
+                        fl.characterId = characterId;
+                        fl.hasImage = po.hasImage();
                     }
-                }
-                String className = po.getClassName();
-                if (className != null) {
-                    fl.className = className;                    
-                    character = swf.getCharacterByClass(className);
+                    CharacterTag character = swf.getCharacter(characterId);
                     if (character instanceof DefineSpriteTag) {
                         if (swf.getCyclicCharacters().contains(characterId)) {
-                            fl.className = null;
+                            fl.characterId = -1;
                         }
                     }
+                    String className = po.getClassName();
+                    if (className != null) {
+                        fl.className = className;
+                        character = swf.getCharacterByClass(className);
+                        if (character instanceof DefineSpriteTag) {
+                            if (swf.getCyclicCharacters().contains(characterId)) {
+                                fl.className = null;
+                            }
+                        }
+                    }
+                    fl.key = characterId != -1 || className != null;
                 }
-                    
-                
+
                 if (po.flagMove()) {
                     MATRIX matrix2 = po.getMatrix();
                     if (matrix2 != null) {
@@ -358,7 +363,7 @@ public class Timeline {
                     if (colorTransForm2 != null) {
                         fl.colorTransForm = colorTransForm2;
                     }
-                    
+
                     String className2 = po.getClassName();
                     if (className2 != null) {
                         fl.className = className2;
@@ -389,7 +394,7 @@ public class Timeline {
                     }
 
                     fl.isVisible = po.isVisible();
-                } else {
+                } else if (wasEmpty) {
                     fl.matrix = po.getMatrix();
                     fl.instanceName = po.getInstanceName();
                     fl.colorTransForm = po.getColorTransform();
@@ -401,7 +406,7 @@ public class Timeline {
                     fl.clipDepth = po.getClipDepth();
                     fl.isVisible = po.isVisible();
                 }
-                fl.key = characterId != -1;
+                
             } else if (t instanceof RemoveTag) {
                 RemoveTag r = (RemoveTag) t;
                 int depth = r.getDepth();
@@ -503,23 +508,23 @@ public class Timeline {
                 }
 
                 String[] pathParts = path.contains(".") ? path.split("\\.") : new String[]{path};
-                AS2Package pkg = as2RootPackage;                
-                
+                AS2Package pkg = as2RootPackage;
+
                 boolean isNamedPackages = "__Packages".equals(pathParts[0]);
-                
+
                 for (int pos = 0; pos < pathParts.length - 1; pos++) {
-                    if (Configuration.flattenASPackages.get()) {                                                
+                    if (Configuration.flattenASPackages.get()) {
                         if (isNamedPackages && pos == 0) {
                             //nothing
-                        } else {                                                                                
-                            
-                            String fullPath;                        
+                        } else {
+
+                            String fullPath;
                             if (isNamedPackages) {
                                 fullPath = path.substring(pathParts[0].length() + 1, path.length() - pathParts[pathParts.length - 1].length() - 1);
                             } else {
                                 fullPath = path.substring(0, path.length() - pathParts[pathParts.length - 1].length() - 1);
                             }
-                            
+
                             AS2Package subPkg = pkg.subPackages.get(fullPath);
                             if (subPkg == null) {
                                 subPkg = new AS2Package(fullPath, pkg, swf, true, false);
@@ -528,8 +533,8 @@ public class Timeline {
                             pkg = subPkg;
                             break;
                         }
-                    }                                        
-                    
+                    }
+
                     String pathPart = pathParts[pos];
                     AS2Package subPkg = pkg.subPackages.get(pathPart);
                     if (subPkg == null) {
@@ -539,15 +544,15 @@ public class Timeline {
 
                     pkg = subPkg;
                 }
-                
+
                 if (Configuration.flattenASPackages.get() && ((pathParts.length == 2 && isNamedPackages) || pathParts.length == 1)) {
-                    String fullPath = AppResources.translate("package.default");                            
+                    String fullPath = AppResources.translate("package.default");
                     AS2Package subPkg = pkg.subPackages.get(fullPath);
                     if (subPkg == null) {
                         subPkg = new AS2Package(fullPath, pkg, swf, true, true);
                         pkg.subPackages.put(fullPath, subPkg);
                     }
-                    pkg = subPkg;                    
+                    pkg = subPkg;
                 }
 
                 pkg.scripts.put(pathParts[pathParts.length - 1], asm);
@@ -602,7 +607,7 @@ public class Timeline {
                 continue;
             }
             usedCharacters.add(ch.getCharacterId());
-            ch.getNeededCharactersDeep(usedCharacters); 
+            ch.getNeededCharactersDeep(usedCharacters);
         }
     }
 
@@ -620,7 +625,7 @@ public class Timeline {
     }
 
     public boolean removeCharacter(int characterId, TagRemoveListener listener) {
-        return swf.removeCharacterFromTimeline(characterId, this, listener);        
+        return swf.removeCharacterFromTimeline(characterId, this, listener);
     }
 
     public double roundToPixel(double val) {
@@ -756,7 +761,7 @@ public class Timeline {
                 double x = filter.getDeltaX();
                 double y = filter.getDeltaY();
                 deltaXMax = Math.max(x, deltaXMax);
-                deltaYMax = Math.max(y, deltaYMax);             
+                deltaYMax = Math.max(y, deltaYMax);
             }
             rect.xMin -= deltaXMax * unzoom * SWF.unitDivisor;
             rect.xMax += deltaXMax * unzoom * SWF.unitDivisor;
@@ -799,7 +804,7 @@ public class Timeline {
                 if (renderContext.cursorPosition != null) {
                     int dx = (int) (viewRect.xMin * unzoom);
                     int dy = (int) (viewRect.yMin * unzoom);
-                    Point cursorPositionInView = new Point((int)Math.round(renderContext.cursorPosition.x * unzoom) - dx, (int)Math.round(renderContext.cursorPosition.y * unzoom) - dy);
+                    Point cursorPositionInView = new Point((int) Math.round(renderContext.cursorPosition.x * unzoom) - dx, (int) Math.round(renderContext.cursorPosition.y * unzoom) - dy);
 
                     Shape buttonShape = drawable.getOutline(ButtonTag.FRAME_HITTEST, time, ratio, renderContext, absMat, true, viewRect, unzoom);
                     if (buttonShape.contains(cursorPositionInView)) {
@@ -845,11 +850,11 @@ public class Timeline {
             }
 
             ColorTransform clrTrans2 = clrTrans;
-            
+
             if (blendMode > 1) {
                 clrTrans2 = null;
-            }            
-            
+            }
+
             if (clipDepth > -1) {
                 //Make transparent colors opaque, mask should be only made by shapes
                 CXFORMWITHALPHA clrMask = new CXFORMWITHALPHA();
@@ -984,14 +989,14 @@ public class Timeline {
             }
             if (!(sameImage && canUseSameImage)) {
                 g.setTransform(drawMatrix.toTransform());
-                
+
                 if (blendMode > 1 && clrTrans != null) {
                     img = clrTrans.apply(img);
                 }
-               
+
                 if (!((blendMode == 11 || blendMode == 12) && parentBlendMode <= 1)) { //alpha and erase modes require parent blendmode not normal
                     g.drawImage(img.getBufferedImage(), 0, 0, null);
-                }                
+                }
             }
             if (g instanceof BlendModeSetable) {
                 ((BlendModeSetable) g).setBlendMode(0);
@@ -1220,7 +1225,7 @@ public class Timeline {
                 continue;
             }
 
-            CharacterTag character =layer.getCharacter();
+            CharacterTag character = layer.getCharacter();
             if (character == null) {
                 continue;
             }
@@ -1366,7 +1371,7 @@ public class Timeline {
                     dframe = ButtonTag.FRAME_UP;
                     if (renderContext.cursorPosition != null) {
                         ButtonTag buttonTag = (ButtonTag) character;
-                        Shape buttonShape = buttonTag.getOutline(ButtonTag.FRAME_HITTEST, time, layer.ratio, renderContext, m, stroked, viewRect, unzoom);                        
+                        Shape buttonShape = buttonTag.getOutline(ButtonTag.FRAME_HITTEST, time, layer.ratio, renderContext, m, stroked, viewRect, unzoom);
                         int dx = (int) Math.round(viewRect.xMin * unzoom);
                         int dy = (int) Math.round(viewRect.yMin * unzoom);
                         Point cursorPositionInView = new Point((int) Math.round(renderContext.cursorPosition.x * unzoom) - dx, (int) Math.round(renderContext.cursorPosition.y * unzoom) - dy);
