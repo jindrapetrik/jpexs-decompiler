@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - Hilighting currently selected shape edge in the raw edit
 - [#1905] Key strokes on folder preview panel
 - Scrollbars
+- Morphshape transforming, point editation
 
 ### Fixed
 - [#1915] SVG import - gradient when it has two final stops
