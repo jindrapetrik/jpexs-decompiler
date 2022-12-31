@@ -170,18 +170,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         //instance initializer - constructor
         if (!instanceInfo.isInterface()) {
-            String modifier = "";
-            Multiname m = abc.constants.getMultiname(instanceInfo.name_index);
-            Namespace ns = m.getNamespace(abc.constants);
-            if (ns != null) {
-                modifier = ns.getPrefix(abc) + " ";
-                if (modifier.equals(" ")) {
-                    modifier = "";
-                }
-                if (modifier.startsWith("private")) { //cannot have private constuctor
-                    modifier = "";
-                }
-            }
+            String modifier = "public ";
+            Multiname m = abc.constants.getMultiname(instanceInfo.name_index);           
 
             writer.newLine();
             writer.startTrait(GraphTextWriter.TRAIT_INSTANCE_INITIALIZER);
