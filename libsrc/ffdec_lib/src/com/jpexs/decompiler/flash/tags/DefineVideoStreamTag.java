@@ -365,7 +365,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
         if (ratio == -1) {
             ratio = 0;
         }
-
+        
         Set<Integer> keyFrames = getFrames().keySet();
 
         int f = 0;
@@ -470,7 +470,7 @@ public class DefineVideoStreamTag extends DrawableTag implements BoundedTag, Tim
             if (frames.containsKey(f)) {
                 tags.add(frames.get(f));
             }
-            tags.add(new PlaceObject2Tag(swf, false, 1, characterID, new MATRIX(), null, f, null, -1, null));
+            tags.add(new PlaceObject2Tag(swf, f == 0 ? false : true, 1, f == 0 ? -1 : characterID, new MATRIX(), null, f, null, -1, null));
             tags.add(new ShowFrameTag(swf));
         }
         this.tags = new ReadOnlyTagList(tags);
