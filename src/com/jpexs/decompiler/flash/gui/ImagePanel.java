@@ -2071,6 +2071,9 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         setAllowMove(true);
                     } else {
                         boolean doMove = (h + dy) > h2 || (w + dx) > w2;
+                        if (zoom.fit) {
+                            doMove = false;
+                        }
                         setAllowMove(doMove);
                         if (!doMove) {
                             offsetPoint.setLocation(iconPanel.getWidth() / 2 - w / 2 - dx, iconPanel.getHeight() / 2 - h / 2 - dy);
