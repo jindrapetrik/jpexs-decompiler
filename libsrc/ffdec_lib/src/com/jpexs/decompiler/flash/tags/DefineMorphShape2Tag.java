@@ -142,13 +142,13 @@ public class DefineMorphShape2Tag extends MorphShapeTag {
     @Override
     public void updateStartBounds() {
         super.updateStartBounds();
-        startEdgeBounds = SHAPERECORD.getBounds(startEdges.shapeRecords, null, getShapeNum(), true);
+        startEdgeBounds = SHAPERECORD.getBounds(startEdges.shapeRecords, null, 4, true);
     }
     
     @Override
     public void updateEndBounds() {
         super.updateEndBounds();
-        endEdgeBounds = SHAPERECORD.getBounds(endEdges.shapeRecords, null, getShapeNum(), true);
+        endEdgeBounds = SHAPERECORD.getBounds(endEdges.shapeRecords, null, 4, true);
     }
         
 }
