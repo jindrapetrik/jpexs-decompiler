@@ -71,12 +71,20 @@ public class DefineExternalImage2 extends ImageTag {
     public String fileName;
 
     public byte[] extraData; //?
-
+    
     public static final int BITMAP_FORMAT_DEFAULT = 0;
-
+    
     public static final int BITMAP_FORMAT_TGA = 1;
 
     public static final int BITMAP_FORMAT_DDS = 2;
+    
+    //It looks like gfxexport produces BITMAP_FORMAT2_* values for format,
+    //but BITMAP_FORMAT_* works the same way
+    public static final int BITMAP_FORMAT2_JPEG = 10;
+    
+    public static final int BITMAP_FORMAT2_TGA = 13;
+
+    public static final int BITMAP_FORMAT2_DDS = 14;
 
     @HideInRawEdit
     private SerializableImage serImage;
