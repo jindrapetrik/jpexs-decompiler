@@ -179,6 +179,7 @@ And also links to these libraries:
 * [gnujpdf] (PDF export) - LGPL License
 * [DDSReader] (DDS reading) - MIT License
 * [vlcj] (DefineVideoStream playback) - GPLv3
+* [Reality Interactive ImageIO TGA library] (TGA file display in GFX files) - LGPL v2.1
 
 [GIT]: http://git-scm.com/downloads
 [Netbeans IDE]: http://www.netbeans.org/
@@ -207,3 +208,4 @@ And also links to these libraries:
 [gnujpdf]: http://gnujpdf.sourceforge.net/
 [DDSReader]: https://github.com/npedotnet/DDSReader/
 [vlcj]: https://github.com/caprica/vlcj
+[Reality Interactive ImageIO TGA library]: https://github.com/tmyroadctfig/com.realityinteractive.imageio.tga
