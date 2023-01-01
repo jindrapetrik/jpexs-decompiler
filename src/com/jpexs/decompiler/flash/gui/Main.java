@@ -1174,15 +1174,15 @@ public class Main {
                                                 try {
                                                     ret.setVal(open(new FileInputStream(selFile), selFile.getAbsolutePath(), selFile.getName()));
                                                     loadedStatus.add("CUSTOM:" + selFile.getAbsolutePath());
-                                                    break;
+                                                    return;
                                                 } catch (Exception ex) {                                                    
                                                     //ignore;
                                                 }
                                             } else {
-                                                loadedStatus.add("NO");
                                                 break;
                                             }
                                         }
+                                        loadedStatus.add("NO");
                                     }
                                 });
                                 return ret.getVal();

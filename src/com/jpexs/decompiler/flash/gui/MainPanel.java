@@ -5422,10 +5422,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     neededCopies.add(dei2);
                 }
             }
+           
 
             ImageTag imageTagCopy = (ImageTag) imageTag.cloneTag();
             imageTagCopy.setSwf(swf);
             int imageCharId = imageTag.getCharacterId();
+            if ((imageTag instanceof DefineExternalImage2) && (((DefineExternalImage2)imageTag).unknownID > 0)) {
+                imageCharId = swf.getNextCharacterId();
+                imageTagCopy.characterID = imageCharId;
+            }
             DefineShape2Tag shapeTag = new DefineShape2Tag(swf);
             int shapeCharId = imageCharId + 1;
             shapeTag.shapeId = shapeCharId;

@@ -306,5 +306,5 @@ public abstract class ImageTag extends DrawableTag {
     @Override
     public RECT getRectWithStrokes() {
         return getRect();
-    }
+    }    
 }

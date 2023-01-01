@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- GFX - DefineExternalImage2 display and correct handling if standalone
 
 ## [18.3.0] - 2023-01-01
 ### Added

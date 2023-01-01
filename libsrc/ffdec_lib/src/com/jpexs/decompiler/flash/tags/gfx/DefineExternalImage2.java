@@ -49,6 +49,15 @@ public class DefineExternalImage2 extends ImageTag {
 
     public int imageID;
     
+    public static final int UNKNOWN_IS_STANDALONE = 0;
+    public static final int UNKNOWN_HAS_SUBIMAGES = 9;
+        
+    /**
+     * Special unknown field.
+     * This seems to have value of 9 when it has DefineSubImages and in this case, 
+     * imageId is not treated as a characterId.
+     * If it has value of 0, this tag is threated as standalone external image - standard character.     
+     */
     public int unknownID;
 
     public int bitmapFormat;
@@ -105,7 +114,7 @@ public class DefineExternalImage2 extends ImageTag {
     public DefineExternalImage2(SWFInputStream sis, ByteArrayRange data) throws IOException {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
-        characterID = -1;
+        characterID = unknownID == 0 ? imageID : - 1;
     }
 
     public DefineExternalImage2(SWF swf) {
@@ -114,7 +123,7 @@ public class DefineExternalImage2 extends ImageTag {
         fileName = "";
         targetWidth = 1;
         targetHeight = 1;
-        unknownID = 9; //?
+        unknownID = UNKNOWN_HAS_SUBIMAGES;
         bitmapFormat = BITMAP_FORMAT_DDS;
         characterID = -1;
         createFailedImage();
@@ -223,6 +232,9 @@ public class DefineExternalImage2 extends ImageTag {
 
     @Override
     public String toString() {
+        if (unknownID == 0) {
+            return super.toString();
+        }
         return tagName + " (i" + imageID + ")";
     }   
 
