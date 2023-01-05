@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - GFX - DefineExternalImage2 display and correct handling if standalone
+- [#1931] DefineSprite rectange calculation (incorrect export dimensions)
 
 ## [18.3.0] - 2023-01-01
 ### Added
@@ -2839,6 +2840,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1931]: https://www.free-decompiler.com/flash/issues/1931
 [#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1905]: https://www.free-decompiler.com/flash/issues/1905
 [#1915]: https://www.free-decompiler.com/flash/issues/1915
