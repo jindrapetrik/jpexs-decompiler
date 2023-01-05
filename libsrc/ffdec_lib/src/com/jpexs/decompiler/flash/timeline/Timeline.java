@@ -750,6 +750,7 @@ public class Timeline {
         } else {
             dframe = time % drawableFrameCount;
         }
+        int dtime = 0;
 
         ExportRectangle viewRect2 = new ExportRectangle(viewRect);
 
@@ -800,13 +801,14 @@ public class Timeline {
             //strokeTransform = strokeTransform.clone();
             //strokeTransform.translate(-rect.xMin, -rect.yMin);
             if (drawable instanceof ButtonTag) {
+                dtime = time;
                 dframe = ButtonTag.FRAME_UP;
                 if (renderContext.cursorPosition != null) {
                     int dx = (int) (viewRect.xMin * unzoom);
                     int dy = (int) (viewRect.yMin * unzoom);
                     Point cursorPositionInView = new Point((int) Math.round(renderContext.cursorPosition.x * unzoom) - dx, (int) Math.round(renderContext.cursorPosition.y * unzoom) - dy);
 
-                    Shape buttonShape = drawable.getOutline(ButtonTag.FRAME_HITTEST, time, ratio, renderContext, absMat, true, viewRect, unzoom);
+                    Shape buttonShape = drawable.getOutline(ButtonTag.FRAME_HITTEST, dtime, ratio, renderContext, absMat, true, viewRect, unzoom);
                     if (buttonShape.contains(cursorPositionInView)) {
                         renderContext.mouseOverButton = (ButtonTag) drawable;
                         if (renderContext.mouseButton > 0) {
@@ -868,7 +870,7 @@ public class Timeline {
             }
 
             if (!(drawable instanceof ImageTag) || (swf.isAS3() && layer.hasImage)) {
-                drawable.toImage(dframe, time, ratio, renderContext, img, fullImage, isClip || clipDepth > -1, m, strokeTransform, absMat, mfull, clrTrans2, unzoom, sameImage, viewRect2, scaleStrokes, drawMode, layer.blendMode);
+                drawable.toImage(dframe, dtime, ratio, renderContext, img, fullImage, isClip || clipDepth > -1, m, strokeTransform, absMat, mfull, clrTrans2, unzoom, sameImage, viewRect2, scaleStrokes, drawMode, layer.blendMode);
             } else {
                 // todo: show one time warning
             }
@@ -973,7 +975,7 @@ public class Timeline {
                         renderContext.stateUnderCursor.add(layer);
                     }
                 } else if (absMat.transform(new ExportRectangle(boundRect)).contains(cursorPositionInView)) {
-                    Shape shape = drawable.getOutline(dframe, time, layer.ratio, renderContext, absMat, true, viewRect, unzoom);
+                    Shape shape = drawable.getOutline(dframe, dtime, layer.ratio, renderContext, absMat, true, viewRect, unzoom);
                     if (shape.contains(cursorPositionInView)) {
                         renderContext.stateUnderCursor.add(layer);
                     }
@@ -984,7 +986,7 @@ public class Timeline {
                 Graphics2D g2 = (Graphics2D) renderContext.borderImage.getGraphics();
                 g2.setPaint(Color.red);
                 g2.setStroke(new BasicStroke(2));
-                Shape shape = drawable.getOutline(dframe, time, layer.ratio, renderContext, absMat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)), true, viewRect, unzoom);
+                Shape shape = drawable.getOutline(dframe, dtime, layer.ratio, renderContext, absMat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)), true, viewRect, unzoom);
                 g2.draw(shape);
             }
             if (!(sameImage && canUseSameImage)) {
