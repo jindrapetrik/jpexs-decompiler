@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.timeline.Timeline;
@@ -224,13 +225,36 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
 
         ret = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
         HashMap<Integer, Integer> depthMap = new HashMap<>();
+        HashMap<Integer, MATRIX> depthMatrixMap = new HashMap<>();
         boolean foundSomething = false;
         for (Tag t : getTags()) {
             MATRIX m = null;
             int characterId = -1;
+            if (t instanceof RemoveTag) {
+                RemoveTag rt = (RemoveTag)t;
+                depthMap.remove(rt.getDepth());
+                depthMatrixMap.remove(rt.getDepth());
+            }
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag pot = (PlaceObjectTypeTag) t;
                 m = pot.getMatrix();
+                
+                if (m == null) {
+                    if (pot.flagMove()) {
+                        if (!depthMatrixMap.containsKey(pot.getDepth())) {
+                            m = null; //??
+                        } else {
+                            m = depthMatrixMap.get(pot.getDepth());
+                        }
+                    }
+                }
+                
+                if (!pot.flagMove() && depthMap.containsKey(pot.getDepth())) {                
+                    continue;
+                }
+                
+                depthMatrixMap.put(pot.getDepth(), m);
+                
                 int charId = pot.getCharacterId();
                 if (charId > -1) {
                     depthMap.put(pot.getDepth(), charId);
@@ -240,10 +264,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
                     if (chi != null) {
                         characterId = chi;
                     }
-                }
-                if (pot.flagMove() && m == null) {
-                    continue;
-                }
+                }                
             }
             if (characterId == -1) {
                 continue;
