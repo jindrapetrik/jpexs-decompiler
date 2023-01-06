@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - GFX - DefineExternalImage2 display and correct handling if standalone
 - [#1931] DefineSprite rectange calculation (incorrect export dimensions)
 - [#1929], [#1932] Wrong subsprite frames display
+- [#1933] AS3 - Detection of variable names from debug info on multiple debug ins with same regindex
 
 ## [18.3.0] - 2023-01-01
 ### Added
@@ -2844,6 +2845,7 @@ All notable changes to this project will be documented in this file.
 [#1931]: https://www.free-decompiler.com/flash/issues/1931
 [#1929]: https://www.free-decompiler.com/flash/issues/1929
 [#1932]: https://www.free-decompiler.com/flash/issues/1932
+[#1933]: https://www.free-decompiler.com/flash/issues/1933
 [#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1905]: https://www.free-decompiler.com/flash/issues/1905
 [#1915]: https://www.free-decompiler.com/flash/issues/1915
