@@ -1,0 +1,195 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Symbol 1" itemID="63b85f0e-0000032e" lastModified="1673034863" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="Symbol 1" currentFrame="2">
+      <layers>
+        <DOMLayer name="Layer 2" color="#9933CC" locked="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMStaticText width="25.2" height="55.35" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="62.4" ty="47.35"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>1</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="50" bitmapSize="1000" face="TimesNewRomanPSMT"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="1" keyMode="9728">
+              <elements>
+                <DOMStaticText selected="true" width="25.2" height="55.35" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="62.4" ty="47.35"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>2</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="50" face="TimesNewRomanPSMT"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="2" keyMode="9728">
+              <elements>
+                <DOMStaticText width="25.2" height="55.35" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="62.4" ty="47.35"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>3</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="50" face="TimesNewRomanPSMT"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="3" keyMode="9728">
+              <elements>
+                <DOMStaticText selected="true" width="25.2" height="55.35" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="62.4" ty="47.35"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>4</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="50" face="TimesNewRomanPSMT"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="4" keyMode="9728">
+              <elements>
+                <DOMStaticText selected="true" width="25.2" height="55.35" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="62.4" ty="47.35"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>5</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="50" face="TimesNewRomanPSMT"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="5" keyMode="9728">
+              <elements>
+                <DOMStaticText width="25.2" height="55.35" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="62.4" ty="47.35"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>6</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="50" face="TimesNewRomanPSMT"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="6" keyMode="9728">
+              <elements>
+                <DOMStaticText selected="true" width="25.2" height="55.35" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="62.4" ty="47.35"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>7</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="50" face="TimesNewRomanPSMT"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="7" keyMode="9728">
+              <elements>
+                <DOMStaticText width="25.2" height="55.35" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="62.4" ty="47.35"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>8</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="50" face="TimesNewRomanPSMT"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="8" keyMode="9728">
+              <elements>
+                <DOMStaticText selected="true" width="25.2" height="55.35" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="62.4" ty="47.35"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>9</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="50" face="TimesNewRomanPSMT"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+            <DOMFrame index="9" keyMode="9728">
+              <elements>
+                <DOMStaticText width="50.2" height="55.35" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="47.4" ty="47.35"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>10</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="50" face="TimesNewRomanPSMT"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" duration="10" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Symbol 2" centerPoint3DX="75" centerPoint3DY="75">
+                  <transformationPoint>
+                    <Point x="75" y="75"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>
