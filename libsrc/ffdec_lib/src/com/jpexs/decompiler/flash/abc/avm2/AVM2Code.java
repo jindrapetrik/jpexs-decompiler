@@ -1451,23 +1451,30 @@ public class AVM2Code implements Cloneable {
     private int toSourceCount = 0;
 
     public Map<Integer, String> getLocalRegNamesFromDebug(ABC abc) {
-        Map<Integer, String> localRegNames = new HashMap<>();
+        Map<Integer, String> regIndexToName = new HashMap<>();
+        Map<String, Integer> regNameToIndex = new HashMap<>();
 
         for (AVM2Instruction ins : code) {
             if (ins.definition instanceof DebugIns) {
                 if (ins.operands[0] == 1) {
                     String v = abc.constants.getString(ins.operands[1]);
+                    int regIndex = ins.operands[2] + 1;
                     // Same name already exists, it may be wrong names inserted by obfuscator
-                    if (localRegNames.values().contains(v)) {
-                        return new HashMap<>();
+                    if (regNameToIndex.containsKey(v)) {
+                        int existingIndex = regNameToIndex.get(v);
+                        if (existingIndex != regIndex) { //if it exists and has different regIndex
+                            return new HashMap<>(); //ignore debug info
+                        }
+                        //it may exist and had same reg index, this is okay          
                     }
-                    localRegNames.put(ins.operands[2] + 1, v);
+                    regNameToIndex.put(v, regIndex);
+                    regIndexToName.put(regIndex, v);
                 }
             }
         }
 
         // TODO: Make this immune to using existing multinames (?)
-        return localRegNames;
+        return regIndexToName;
     }
 
     private Map<Integer, Set<Integer>> killedRegs = new HashMap<>();
