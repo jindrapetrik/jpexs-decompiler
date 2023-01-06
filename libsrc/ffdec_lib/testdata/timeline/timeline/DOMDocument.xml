@@ -1,0 +1,41 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" frameRate="1" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="2" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveEnabled="true" autoSaveHasPrompted="true">
+     <symbols>
+          <Include href="Symbol 1.xml" loadImmediate="false" itemID="63b85f0e-0000032e" lastModified="1673034863"/>
+          <Include href="Symbol 2.xml" loadImmediate="false" itemID="63b85f1d-00000332" lastModified="1673027357"/>
+          <Include href="Symbol 3.xml" loadImmediate="false" itemID="63b860f2-00000339" lastModified="1673028262"/>
+          <Include href="Symbol 4.xml" loadImmediate="false" itemID="63b87c95-00000347" lastModified="1673034901"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1" currentFrame="7">
+               <layers>
+                    <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" duration="14" keyMode="15872">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Symbol 4" centerPoint3DX="254" centerPoint3DY="126.9">
+                                             <matrix>
+                                                  <Matrix tx="179" ty="51.9"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="75" y="111.5"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="2684" publishTime="1673034932"/>
+          <PublishItem publishSize="2724" publishTime="1673028304"/>
+          <PublishItem publishSize="2613" publishTime="1673027986"/>
+          <PublishItem publishSize="2611" publishTime="1673027912"/>
+          <PublishItem publishSize="2629" publishTime="1673027709"/>
+          <PublishItem publishSize="2688" publishTime="1673027659" publishDebug="true"/>
+          <PublishItem publishSize="2689" publishTime="1673027641" publishDebug="true"/>
+          <PublishItem publishSize="2669" publishTime="1673027562" publishDebug="true"/>
+     </publishHistory>
+</DOMDocument>

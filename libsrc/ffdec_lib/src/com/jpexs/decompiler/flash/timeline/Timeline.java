@@ -741,8 +741,8 @@ public class Timeline {
         if (cacheAsBitmap && renderContext.displayObjectCache != null) {
             DisplayObjectCacheKey key = new DisplayObjectCacheKey(layer.placeObjectTag, unzoom, viewRect);
             img = renderContext.displayObjectCache.get(key);
-        }
-
+        }       
+        
         int stateCount = renderContext.stateUnderCursor == null ? 0 : renderContext.stateUnderCursor.size();
         int dframe;
         if (fontFrameNum != -1) {
@@ -750,8 +750,7 @@ public class Timeline {
         } else {
             dframe = time % drawableFrameCount;
         }
-        int dtime = 0;
-
+        int dtime = time - dframe;
         ExportRectangle viewRect2 = new ExportRectangle(viewRect);
 
         if (filters != null && filters.size() > 0) {
