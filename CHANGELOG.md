@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - [#1933] AS3 - Detection of variable names from debug info on multiple debug ins with same regindex
 - GFX - ExporterInfo prefix is NetString
 - Scrollbars on sound playback
+- Clear preview on raw edit to stop sound playback
 
 ## [18.3.0] - 2023-01-01
 ### Added

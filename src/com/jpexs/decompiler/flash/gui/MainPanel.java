@@ -5250,6 +5250,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void showGenericTag(Tag tag) {
+        previewPanel.clear();
         previewPanel.showGenericTagPanel(tag);
         showCard(CARDPREVIEWPANEL);
     }
