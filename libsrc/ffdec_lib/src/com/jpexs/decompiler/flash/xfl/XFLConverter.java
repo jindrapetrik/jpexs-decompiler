@@ -1118,7 +1118,7 @@ public class XFLConverter {
 
     private static HashMap<Integer, CharacterTag> getCharacters(ReadOnlyTagList tags) {
         HashMap<Integer, CharacterTag> ret = new HashMap<>();
-        int maxId = 0;
+        /*int maxId = 0;
         for (Tag t : tags) {
             if (t instanceof CharacterTag) {
                 CharacterTag ct = (CharacterTag) t;
@@ -1126,12 +1126,12 @@ public class XFLConverter {
                     maxId = ct.getCharacterId();
                 }
             }
-        }
+        }*/
         for (Tag t : tags) {
-            if (t instanceof SoundStreamHeadTypeTag) {
+            /*if (t instanceof SoundStreamHeadTypeTag) {
                 SoundStreamHeadTypeTag ssh = (SoundStreamHeadTypeTag) t;
-                ssh.setVirtualCharacterId(++maxId);
-            }
+                ssh.setCharacterId(++maxId);
+            }*/
             if (t instanceof CharacterTag) {
                 CharacterTag ct = (CharacterTag) t;
                 ret.put(ct.getCharacterId(), ct);

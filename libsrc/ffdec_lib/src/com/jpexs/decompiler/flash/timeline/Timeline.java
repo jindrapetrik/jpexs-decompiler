@@ -52,6 +52,7 @@ import com.jpexs.decompiler.flash.tags.base.RenderContext;
 import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.types.BlendMode;
 import com.jpexs.decompiler.flash.types.CLIPACTIONS;
 import com.jpexs.decompiler.flash.types.CXFORMWITHALPHA;
@@ -565,9 +566,14 @@ public class Timeline {
         for (Tag t : tags) {
             if (t instanceof SoundStreamHeadTypeTag) {
                 SoundStreamHeadTypeTag head = (SoundStreamHeadTypeTag) t;
-                head.setVirtualCharacterId(containerId);
+                head.setCharacterId(containerId);
                 blocks = new ArrayList<>();
                 soundStramBlocks.put(containerId, blocks);
+                continue;
+            }
+            if (t instanceof DefineExternalStreamSound) {
+                DefineExternalStreamSound externalStream = (DefineExternalStreamSound) t;
+                externalStream.setCharacterId(containerId);
                 continue;
             }
 

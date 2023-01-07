@@ -2246,7 +2246,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 }
                 updatingScrollBars = true;
                 double zoomDouble = ImagePanel.this.zoom.fit ? getZoomToFit() : ImagePanel.this.zoom.value;
-                RECT timRect = timelined.getRect();
                 updateScrollBarMinMax();
                 //horizontalScrollBar.setVisible(horizontalScrollBar.getVisibleAmount() < horizontalScrollBar.getMaximum() - horizontalScrollBar.getMinimum());
                 //verticalScrollBar.setVisible(verticalScrollBar.getVisibleAmount() < verticalScrollBar.getMaximum() - verticalScrollBar.getMinimum());
@@ -2266,7 +2265,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     return;
                 }
                 updatingScrollBars = true;
-                RECT timRect = timelined.getRect();
                 double zoomDouble = ImagePanel.this.zoom.fit ? getZoomToFit() : ImagePanel.this.zoom.value;
                 updateScrollBarMinMax();
                 //horizontalScrollBar.setVisible(horizontalScrollBar.getVisibleAmount() < horizontalScrollBar.getMaximum() - horizontalScrollBar.getMinimum());
@@ -2407,6 +2405,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
     private void updateScrollBarMinMax() {
 
+        if (timelined == null) {
+            horizontalScrollBar.setVisible(false);
+            verticalScrollBar.setVisible(false);
+            return;
+        }
         RECT timRect = timelined.getRect();
                         
         /*

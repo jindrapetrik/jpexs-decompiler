@@ -30,6 +30,8 @@ import com.jpexs.decompiler.flash.tags.SoundStreamBlockTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.SoundStreamHeadTypeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalSound;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
@@ -141,7 +143,7 @@ public class SoundExporter {
                 fos.write(data.getRangeData());
             }
         } else if ((nativeFormat == SoundExportFormat.FLV && mode.hasFlv()) || mode == SoundExportMode.FLV) {
-            if (st instanceof DefineSoundTag) {
+            if ((st instanceof DefineSoundTag)||(st instanceof DefineExternalSound)||(st instanceof DefineExternalStreamSound)){
                 FLVOutputStream flv = new FLVOutputStream(fos);
                 flv.writeHeader(true, false);
                 List<ByteArrayRange> datas = st.getRawSoundData();

@@ -82,6 +82,8 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.gfx.DefineCompactedFont;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalSound;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.timeline.AS2Package;
 import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
@@ -280,7 +282,11 @@ public abstract class AbstractTagTree extends JTree {
             return TreeNodeType.MOVIE;
         }
 
-        if ((t instanceof DefineSoundTag) || (t instanceof SoundStreamHeadTag) || (t instanceof SoundStreamHead2Tag)) {
+        if ((t instanceof DefineSoundTag) || 
+                (t instanceof SoundStreamHeadTag) || 
+                (t instanceof SoundStreamHead2Tag) || 
+                (t instanceof DefineExternalSound) ||
+                (t instanceof DefineExternalStreamSound)) {
             return TreeNodeType.SOUND;
         }
 

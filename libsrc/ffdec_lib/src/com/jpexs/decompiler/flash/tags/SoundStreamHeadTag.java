@@ -177,11 +177,6 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
     }
 
     @Override
-    public void setVirtualCharacterId(int ch) {
-        virtualCharacterId = ch;
-    }
-
-    @Override
     public long getSoundSampleCount() {
         return streamSoundSampleCount;
     }
@@ -216,7 +211,7 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
 
     @Override
     public boolean importSupported() {
-        return false;
+        return true;
     }   
 
     @Override

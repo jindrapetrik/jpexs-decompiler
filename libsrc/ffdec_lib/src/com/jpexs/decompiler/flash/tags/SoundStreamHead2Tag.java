@@ -172,11 +172,6 @@ public class SoundStreamHead2Tag extends SoundStreamHeadTypeTag {
     }
 
     @Override
-    public void setVirtualCharacterId(int ch) {
-        virtualCharacterId = ch;
-    }
-
-    @Override
     public int getSoundFormatId() {
         return streamSoundCompression;
     }
@@ -206,7 +201,7 @@ public class SoundStreamHead2Tag extends SoundStreamHeadTypeTag {
 
     @Override
     public boolean importSupported() {
-        return false;
+        return true;
     }
 
     @Override

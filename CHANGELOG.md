@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - GFX - support for TGA external images
 - GFX - DefineExternalGradient tag has gradientId in its name
-- GFX - DefineExternalSound is character tag
+- GFX - DefineExternalSound and DefineExternalStreamSound playback
 
 ### Fixed
 - GFX - DefineExternalImage2 display and correct handling if standalone

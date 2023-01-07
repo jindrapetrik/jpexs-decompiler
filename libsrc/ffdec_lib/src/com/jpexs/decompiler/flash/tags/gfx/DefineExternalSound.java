@@ -19,16 +19,31 @@ package com.jpexs.decompiler.flash.tags.gfx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
-import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.SoundTag;
+import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
+import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  *
  * @author JPEXS
  */
-public class DefineExternalSound extends CharacterTag {
+public class DefineExternalSound extends CharacterTag implements SoundTag {
 
     public static final int ID = 1006;
 
@@ -84,7 +99,7 @@ public class DefineExternalSound extends CharacterTag {
         super(sis.getSwf(), ID, NAME, data);
         readData(sis, data, 0, false, false, false);
     }
-    
+
     public DefineExternalSound(SWF swf) {
         super(swf, ID, NAME, null);
         exportName = "";
@@ -113,5 +128,108 @@ public class DefineExternalSound extends CharacterTag {
     @Override
     public void setCharacterId(int characterId) {
         this.characterId = characterId;
+    }
+
+    @Override
+    public SoundExportFormat getExportFormat() {
+        return SoundExportFormat.WAV; //?
+    }
+
+    @Override
+    public boolean importSupported() {
+        return false;
+    }
+
+    @Override
+    public int getSoundRate() {
+        switch ((int) sampleRate) {
+            case 5512:
+                return 0;
+            case 11025:
+                return 1;
+            case 22050:
+                return 2;
+            case 44100:
+                return 3;
+        }
+        return -1; //?
+    }
+
+    @Override
+    public boolean getSoundType() {
+        return channels == 2;
+    }
+
+    @Override
+    public List<ByteArrayRange> getRawSoundData() {
+        List<ByteArrayRange> ret = new ArrayList<>();
+        Path soundPath = getSwf().getFile() == null ? null : Paths.get(getSwf().getFile()).getParent().resolve(Paths.get(fileName));
+        if (soundPath == null || !soundPath.toFile().exists()) {
+            ret.add(new ByteArrayRange(new byte[]{}));
+            return ret;
+        }
+        try (FileInputStream fis = new FileInputStream(soundPath.toFile()); AudioInputStream audioIs = AudioSystem.getAudioInputStream(new BufferedInputStream(fis))) {
+            ret.add(new ByteArrayRange(Helper.readStream(audioIs)));
+            return ret;
+        } catch (IOException | UnsupportedAudioFileException iex) {
+            ret.add(new ByteArrayRange(new byte[]{}));
+            return ret;
+        }
+
+    }
+
+    @Override
+    public int getSoundFormatId() {
+        return SoundFormat.FORMAT_UNCOMPRESSED_LITTLE_ENDIAN;
+    }
+
+    @Override
+    public long getTotalSoundSampleCount() {
+        return sampleCount;
+    }
+
+    @Override
+    public boolean getSoundSize() {
+        return bits == 16;
+    }
+
+    @Override
+    public SoundFormat getSoundFormat() {
+        final int[] rateMap = {5512, 11025, 22050, 44100};
+        return new SoundFormat(getSoundFormatId(), rateMap[getSoundRate()], getSoundType());
+    }
+
+    @Override
+    public void setSoundSize(boolean soundSize) {
+        if (soundSize) {
+            bits = 16;
+        } else {
+            bits = 8;
+        }
+    }
+
+    @Override
+    public void setSoundType(boolean soundType) {
+        if (soundType) {
+            channels = 2;
+        } else {
+            channels = 1;
+        }
+    }
+
+    @Override
+    public void setSoundSampleCount(long soundSampleCount) {
+        this.sampleCount = soundSampleCount;
+    }
+
+    @Override
+    public void setSoundCompression(int soundCompression) {
+        //unsupported
+    }
+
+    @Override
+    public void setSoundRate(int soundRate) {
+        final int[] rateMap = {5512, 11025, 22050, 44100};
+        this.sampleRate = rateMap[soundRate];
     }
 }

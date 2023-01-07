@@ -182,6 +182,7 @@ import com.jpexs.decompiler.flash.tags.base.TextImportErrorHandler;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
 import com.jpexs.decompiler.flash.tags.base.UnsupportedSamplingRateException;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
+import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
 import com.jpexs.decompiler.flash.timeline.DepthState;
@@ -4941,7 +4942,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showImagePanel(timelinedContainer, swf, frame, true, Configuration.autoPlayPreviews.get(), !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false);
         } else if ((treeItem instanceof SoundTag)) { //&& isInternalFlashViewerSelected() && (Arrays.asList("mp3", "wav").contains(((SoundTag) tagObj).getExportFormat())))) {
             previewPanel.showImagePanel(new SerializableImage(View.loadImage("sound32")));
-            previewPanel.setImageReplaceButtonVisible(false, false, false, !((Tag) treeItem).isReadOnly() && (treeItem instanceof SoundTag), false, false);
+            previewPanel.setImageReplaceButtonVisible(false, false, false, !((Tag) treeItem).isReadOnly() && ((SoundTag)treeItem).importSupported(), false, false);
             try {
                 SoundTagPlayer soundThread = new SoundTagPlayer(null, (SoundTag) treeItem, Configuration.loopMedia.get() ? Integer.MAX_VALUE : 1, true);
                 if (!Configuration.autoPlaySounds.get()) {
@@ -5681,7 +5682,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         List<Tag> tags = tim.getTags().toArrayList();
         Map<Integer, List<CharacterIdTag>> nestedTags = new HashMap<>();
         for (Tag t : tags) {
-            if ((t instanceof CharacterIdTag) && !(t instanceof CharacterTag) && !(t instanceof SoundStreamHeadTypeTag)) {
+            if ((t instanceof CharacterIdTag) && !(t instanceof CharacterTag) && !(t instanceof SoundStreamHeadTypeTag) && !(t instanceof DefineExternalStreamSound)) {
                 int characterId = ((CharacterIdTag) t).getCharacterId();
                 if (!nestedTags.containsKey(characterId)) {
                     nestedTags.put(characterId, new ArrayList<>());
@@ -5689,7 +5690,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 nestedTags.get(characterId).add((CharacterIdTag) t);
             }
 
-            if (!(t instanceof CharacterTag) && !(t instanceof SoundStreamHeadTypeTag)) {
+            if (!(t instanceof CharacterTag) && !(t instanceof SoundStreamHeadTypeTag) && !(t instanceof DefineExternalStreamSound)) {
                 int characterId = -1;
                 if (t instanceof CharacterIdTag) {
                     characterId = ((CharacterIdTag) t).getCharacterId();
