@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.gfx;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
@@ -231,5 +232,16 @@ public class DefineExternalSound extends CharacterTag implements SoundTag {
     public void setSoundRate(int soundRate) {
         final int[] rateMap = {5512, 11025, 22050, 44100};
         this.sampleRate = rateMap[soundRate];
+    }
+    
+    @Override
+    public void getTagInfo(TagInfo tagInfo) {
+        super.getTagInfo(tagInfo);
+        SoundFormat soundFormat = getSoundFormat();
+        tagInfo.addInfo("general", "codecName", soundFormat.getFormatName());
+        tagInfo.addInfo("general", "exportFormat", soundFormat.getNativeExportFormat());
+        tagInfo.addInfo("general", "samplingRate", soundFormat.samplingRate);
+        tagInfo.addInfo("general", "stereo", soundFormat.stereo);
+        tagInfo.addInfo("general", "sampleCount", sampleCount);
     }
 }
