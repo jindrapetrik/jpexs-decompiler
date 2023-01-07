@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - [#1931] DefineSprite rectange calculation (incorrect export dimensions)
 - [#1929], [#1932] Wrong subsprite frames display
 - [#1933] AS3 - Detection of variable names from debug info on multiple debug ins with same regindex
+- GFX - ExporterInfo prefix is NetString
 
 ## [18.3.0] - 2023-01-01
 ### Added

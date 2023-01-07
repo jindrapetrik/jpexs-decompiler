@@ -43,7 +43,7 @@ public class ExporterInfo extends Tag {
 
     public int bitmapFormat;
 
-    public byte[] prefix;
+    public String prefix;
 
     public String swfName;
 
@@ -72,8 +72,7 @@ public class ExporterInfo extends Tag {
             sos.writeUI32(flags);
         }
         sos.writeUI16(bitmapFormat);
-        sos.writeUI8(prefix.length);
-        sos.write(prefix);
+        sos.writeNetString(prefix);
         sos.writeNetString(swfName);
         if (codeOffsets != null) {
             sos.writeUI16(codeOffsets.size());
@@ -97,6 +96,7 @@ public class ExporterInfo extends Tag {
 
     public ExporterInfo(SWF swf) {
         super(swf, ID, NAME, null);
+        prefix = "";
         swfName = "";
     }
     
@@ -109,8 +109,7 @@ public class ExporterInfo extends Tag {
             flags = sis.readUI32("flags");
         }
         bitmapFormat = sis.readUI16("bitmapFormat");
-        int prefixLen = sis.readUI8("prefixLen");
-        prefix = sis.readBytesEx(prefixLen, "prefix");
+        prefix = sis.readNetString("prefix");
         swfName = sis.readNetString("swfName");
         if (sis.available() > 0) // (version >= 0x401) //?
         {
