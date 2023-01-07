@@ -85,4 +85,9 @@ public class DefineExternalGradient extends Tag {
         gradientSize = sis.readUI16("gradientSize");
         fileName = sis.readNetString("fileName");
     }
+    
+    @Override
+    public String toString() {
+        return tagName + " (g" + gradientId + ")";
+    }
 }
