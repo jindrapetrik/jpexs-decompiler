@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.TagInfo;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
@@ -243,5 +244,16 @@ public class DefineExternalStreamSound extends Tag implements CharacterIdTag, So
     @Override
     public String toString() {
         return getName() + (virtualCharacterId > 0 ? " (" + virtualCharacterId + ")" : "");
+    }
+    
+    @Override
+    public void getTagInfo(TagInfo tagInfo) {
+        super.getTagInfo(tagInfo);
+        SoundFormat soundFormat = getSoundFormat();
+        tagInfo.addInfo("general", "codecName", soundFormat.getFormatName());
+        tagInfo.addInfo("general", "exportFormat", soundFormat.getNativeExportFormat());
+        tagInfo.addInfo("general", "samplingRate", soundFormat.samplingRate);
+        tagInfo.addInfo("general", "stereo", soundFormat.stereo);
+        tagInfo.addInfo("general", "sampleCount", sampleCount);
     }
 }
