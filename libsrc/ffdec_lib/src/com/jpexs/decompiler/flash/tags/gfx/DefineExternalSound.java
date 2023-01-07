@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
 
@@ -27,7 +28,7 @@ import java.io.IOException;
  *
  * @author JPEXS
  */
-public class DefineExternalSound extends Tag {
+public class DefineExternalSound extends CharacterTag {
 
     public static final int ID = 1006;
 
@@ -102,5 +103,15 @@ public class DefineExternalSound extends Tag {
         exportName = sis.readNetString("exportName");
         fileName = sis.readNetString("fileName");
 
+    }
+
+    @Override
+    public int getCharacterId() {
+        return characterId;
+    }
+
+    @Override
+    public void setCharacterId(int characterId) {
+        this.characterId = characterId;
     }
 }
