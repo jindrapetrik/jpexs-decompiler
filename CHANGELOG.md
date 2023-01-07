@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - GFX - support for TGA external images
+- GFX - DefineExternalGradient tag has gradientId in its name
 
 ### Fixed
 - GFX - DefineExternalImage2 display and correct handling if standalone
