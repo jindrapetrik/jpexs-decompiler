@@ -2751,6 +2751,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         iconPanel.setImg(image);
         drawReady = true;
 
+        horizontalScrollBar.setVisible(false);
+        verticalScrollBar.setVisible(false);
         fireMediaDisplayStateChanged();
     }
 
