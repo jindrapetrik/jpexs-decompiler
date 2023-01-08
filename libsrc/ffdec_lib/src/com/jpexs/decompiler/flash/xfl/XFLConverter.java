@@ -16,6 +16,11 @@
  */
 package com.jpexs.decompiler.flash.xfl;
 
+import com.jpexs.decompiler.flash.xfl.shapefixer.CurvedEdgeRecordAdvanced;
+import com.jpexs.decompiler.flash.xfl.shapefixer.ShapeFixer;
+import com.jpexs.decompiler.flash.xfl.shapefixer.StraightEdgeRecordAdvanced;
+import com.jpexs.decompiler.flash.xfl.shapefixer.ShapeRecordAdvanced;
+import com.jpexs.decompiler.flash.xfl.shapefixer.StyleChangeRecordAdvanced;
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.ReadOnlyTagList;
 import com.jpexs.decompiler.flash.RetryTask;
@@ -140,6 +145,7 @@ import com.jpexs.helpers.SerializableImage;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.awt.Font;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -147,12 +153,15 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -215,51 +224,67 @@ public class XFLConverter {
      */
     private final boolean DEBUG_EXPORT_LAYER_DEPTHS = false;
 
-    private static void convertShapeEdge(MATRIX mat, SHAPERECORD record, int x, int y, StringBuilder ret) {
-        if (record instanceof StyleChangeRecord) {
-            StyleChangeRecord scr = (StyleChangeRecord) record;
-            Point p = new Point(scr.moveDeltaX, scr.moveDeltaY);
+    
+    private static String formatEdgeDouble(double value, boolean curved) {
+        if (value % 1 == 0) {
+            return "" + (int) value;
+        }
+        DecimalFormat df = new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+        df.setGroupingUsed(false);
+        String strValue = "" + df.format(value);
+            
+        if (curved) {
+            String parts[] = strValue.split("\\.");                        
+            return ("#" + Integer.toHexString(Integer.parseInt(parts[0])) + "." + Integer.toHexString(Integer.parseInt(parts[1]))).toUpperCase(Locale.ENGLISH);
+        }
+        return "" + strValue;
+    }
+    
+    private static void convertShapeEdge(MATRIX mat, ShapeRecordAdvanced record, double x, double y, StringBuilder ret) {
+        if (record instanceof StyleChangeRecordAdvanced) {
+            StyleChangeRecordAdvanced scr = (StyleChangeRecordAdvanced) record;
+            Point2D p = new Point2D.Double(scr.moveDeltaX, scr.moveDeltaY);
             if (scr.stateMoveTo) {
-                ret.append("! ").append(p.x).append(" ").append(p.y);
+                ret.append("! ").append(formatEdgeDouble(p.getX(), false)).append(" ").append(formatEdgeDouble(p.getY(), false));
             }
-        } else if (record instanceof StraightEdgeRecord) {
-            StraightEdgeRecord ser = (StraightEdgeRecord) record;
-            if (ser.generalLineFlag || ser.vertLineFlag) {
-                y += ser.deltaY;
-            }
-            if (ser.generalLineFlag || (!ser.vertLineFlag)) {
-                x += ser.deltaX;
-            }
-            Point p = new Point(x, y);
-            ret.append("| ").append(p.x).append(" ").append(p.y);
-        } else if (record instanceof CurvedEdgeRecord) {
-            CurvedEdgeRecord cer = (CurvedEdgeRecord) record;
-            int controlX = cer.controlDeltaX + x;
-            int controlY = cer.controlDeltaY + y;
-            int anchorX = cer.anchorDeltaX + controlX;
-            int anchorY = cer.anchorDeltaY + controlY;
-            Point control = new Point(controlX, controlY);
-            Point anchor = new Point(anchorX, anchorY);
-            ret.append("[ ").append(control.x).append(" ").append(control.y).append(" ").append(anchor.x).append(" ").append(anchor.y);
+        } else if (record instanceof StraightEdgeRecordAdvanced) {
+            StraightEdgeRecordAdvanced ser = (StraightEdgeRecordAdvanced) record;
+            y += ser.deltaY;
+            x += ser.deltaX;
+            Point2D p = new Point2D.Double(x, y);
+            ret.append("| ");
+            ret.append(formatEdgeDouble(p.getX(), false));
+            ret.append(" ");
+            ret.append(formatEdgeDouble(p.getY(), false));
+        } else if (record instanceof CurvedEdgeRecordAdvanced) {
+            CurvedEdgeRecordAdvanced cer = (CurvedEdgeRecordAdvanced) record;
+            double controlX = cer.controlDeltaX + x;
+            double controlY = cer.controlDeltaY + y;
+            double anchorX = cer.anchorDeltaX + controlX;
+            double anchorY = cer.anchorDeltaY + controlY;
+            Point2D control = new Point2D.Double(controlX, controlY);
+            Point2D anchor = new Point.Double(anchorX, anchorY);
+            ret.append("[ ").append(formatEdgeDouble(control.getX(), true)).append(" ").append(formatEdgeDouble(control.getY(), true)).append(" ").append(formatEdgeDouble(anchor.getX(), true)).append(" ").append(formatEdgeDouble(anchor.getY(), true));
         }
     }
 
-    private static void convertShapeEdges(int startX, int startY, MATRIX mat, List<SHAPERECORD> records, StringBuilder ret) {
-        int x = startX;
-        int y = startY;
+    private static void convertShapeEdges(double startX, double startY, MATRIX mat, List<ShapeRecordAdvanced> recordsAdvanced, StringBuilder ret) {                        
+        
+        double x = startX;
+        double y = startY;
         boolean hasMove = false;
-        if (!records.isEmpty()) {
-            if (records.get(0) instanceof StyleChangeRecord) {
-                StyleChangeRecord scr = (StyleChangeRecord) records.get(0);
+        if (!recordsAdvanced.isEmpty()) {
+            if (recordsAdvanced.get(0) instanceof StyleChangeRecordAdvanced) {
+                StyleChangeRecordAdvanced scr = (StyleChangeRecordAdvanced) recordsAdvanced.get(0);
                 if (scr.stateMoveTo) {
                     hasMove = true;
                 }
             }
         }
         if (!hasMove) {
-            ret.append("! ").append(startX).append(" ").append(startY);
+            ret.append("! ").append(formatEdgeDouble(startX, false)).append(" ").append(formatEdgeDouble(startY, false));
         }
-        for (SHAPERECORD rec : records) {
+        for (ShapeRecordAdvanced rec : recordsAdvanced) {
             convertShapeEdge(mat, rec, x, y, ret);
             x = rec.changeX(x);
             y = rec.changeY(y);
@@ -678,76 +703,27 @@ public class XFLConverter {
             index++;
         }
         return ret;
-    }
-
-    /**
-     * Remove bugs in shape:
-     *
-     * ... straightrecord straightrecord stylechange straightrecord (-2,0) <--
-     * merge this with previous stylegchange
-     *
-     * @param shapeRecords
-     * @return
-     */
-    private static List<SHAPERECORD> smoothShape(List<SHAPERECORD> shapeRecords) {
-        List<SHAPERECORD> ret = new ArrayList<>(shapeRecords.size());
-        for (SHAPERECORD rec : shapeRecords) {
-            ret.add(rec.clone());
-        }
-
-        for (int i = 1; i < ret.size() - 1; i++) {
-            if (ret.get(i) instanceof StraightEdgeRecord && (ret.get(i - 1) instanceof StyleChangeRecord) && (ret.get(i + 1) instanceof StyleChangeRecord)) {
-                StraightEdgeRecord ser = (StraightEdgeRecord) ret.get(i);
-                StyleChangeRecord scr = (StyleChangeRecord) ret.get(i - 1);
-                StyleChangeRecord scr2 = (StyleChangeRecord) ret.get(i + 1);
-                if ((!scr.stateMoveTo && !scr.stateNewStyles) && Math.abs(ser.deltaX) < 5 && Math.abs(ser.deltaY) < 5) {
-                    if (i >= 2) {
-                        SHAPERECORD rbef = ret.get(i - 2);
-                        if (rbef instanceof StraightEdgeRecord) {
-                            StraightEdgeRecord ser_b = (StraightEdgeRecord) rbef;
-                            ser_b.generalLineFlag = true;
-                            ser_b.deltaX = ser.changeX(ser_b.deltaX);
-                            ser_b.deltaY = ser.changeY(ser_b.deltaY);
-                        } else if (rbef instanceof CurvedEdgeRecord) {
-                            CurvedEdgeRecord cer_b = (CurvedEdgeRecord) rbef;
-                            cer_b.anchorDeltaX = ser.changeX(cer_b.anchorDeltaX);
-                            cer_b.anchorDeltaY = ser.changeY(cer_b.anchorDeltaY);
-                        } else {
-                            //???
-                        }
-
-                        ret.remove(i - 1);
-                        ret.remove(i - 1);
-                        if (scr.stateFillStyle0 && !scr2.stateFillStyle0) {
-                            scr2.stateFillStyle0 = true;
-                            scr2.fillStyle0 = scr.fillStyle0;
-                        }
-                        if (scr.stateFillStyle1 && !scr2.stateFillStyle1) {
-                            scr2.stateFillStyle1 = true;
-                            scr2.fillStyle1 = scr.fillStyle1;
-                        }
-                        if (scr.stateLineStyle && !scr2.stateLineStyle) {
-                            scr2.stateLineStyle = true;
-                            scr2.lineStyle = scr.lineStyle;
-                        }
-
-                        i -= 2;
-                    }
-                }
-            }
-
-        }
-        return ret;
-    }
+    }   
 
     private static List<String> getShapeLayers(HashMap<Integer, CharacterTag> characters, MATRIX mat, int shapeNum, List<SHAPERECORD> shapeRecords, FILLSTYLEARRAY fillStyles, LINESTYLEARRAY lineStyles, boolean morphshape) throws XMLStreamException {
         if (mat == null) {
             mat = new MATRIX();
         }
 
-        //smoothing fixes some shapes in #503, but also breaks some shapes of #1257
-        //shapeRecords = smoothShape(shapeRecords);
-        List<SHAPERECORD> edges = new ArrayList<>();
+        List<ShapeRecordAdvanced> shapeRecordsAdvanced = new ArrayList<>();
+        for(SHAPERECORD rec:shapeRecords) {
+            ShapeRecordAdvanced arec = ShapeRecordAdvanced.createFromSHAPERECORD(rec);
+            if (arec != null) {
+                shapeRecordsAdvanced.add(arec);
+            }
+        }
+        
+       
+        //#1903, #503, #1257 This is not working at all :-(
+        //ShapeFixer fixer = new ShapeFixer();
+        //shapeRecordsAdvanced = fixer.fixShape(shapeRecordsAdvanced);
+                
+        List<ShapeRecordAdvanced> edges = new ArrayList<>();
         int lineStyleCount = 0;
         int fillStyle0 = -1;
         int fillStyle1 = -1;
@@ -799,17 +775,17 @@ public class XFLConverter {
             currentLayer.writeStartElement("edges");
         }
 
-        int x = 0;
-        int y = 0;
-        int startEdgeX = 0;
-        int startEdgeY = 0;
+        double x = 0;
+        double y = 0;
+        double startEdgeX = 0;
+        double startEdgeY = 0;
 
         LINESTYLEARRAY actualLinestyles = lineStyles;
         int strokeStyleOrig = 0;
         fillStyleCount = fillStyles == null ? 0 : fillStyles.fillStyles.length;
-        for (SHAPERECORD edge : shapeRecords) {
-            if (edge instanceof StyleChangeRecord) {
-                StyleChangeRecord scr = (StyleChangeRecord) edge;
+        for (ShapeRecordAdvanced edge : shapeRecordsAdvanced) {
+            if (edge instanceof StyleChangeRecordAdvanced) {
+                StyleChangeRecordAdvanced scr = (StyleChangeRecordAdvanced) edge;
                 boolean styleChange = false;
                 int lastFillStyle1 = fillStyle1;
                 int lastFillStyle0 = fillStyle0;
