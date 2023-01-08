@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.math.BezierUtils;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFHeader;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
@@ -70,6 +71,8 @@ import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
+import com.jpexs.decompiler.flash.xfl.shapefixer.ShapeFixer;
+import com.jpexs.decompiler.flash.xfl.shapefixer.ShapeRecordAdvanced;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.SerializableImage;
@@ -1240,7 +1243,8 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditEditPointsButton = new JButton(mainPanel.translate("button.edit.points"), View.getIcon("pointsedit16"));
         displayEditEditPointsButton.setMargin(new Insets(3, 3, 3, 10));
         displayEditEditPointsButton.addActionListener(this::editPointsDisplayEditTagButtonActionPerformed);
-
+        
+        
         displayEditShowAnimationButton = new JToggleButton(mainPanel.translate("button.morph.animation"));
         displayEditShowAnimationButton.setMargin(new Insets(3, 3, 3, 10));
         displayEditShowAnimationButton.addActionListener(this::showAnimationDisplayEditTagButtonActionPerformed);
@@ -1300,6 +1304,38 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
             displayEditSaveButton.setVisible(false);
             displayEditCancelButton.setVisible(false);
         }
+        
+        
+        /*JButton fixPathsButton = new JButton("Fix paths");
+        fixPathsButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ShapeTag shape = (ShapeTag) displayEditTag;
+                ShapeFixer fixer = new ShapeFixer();
+                List<Point> newPoints1 = new ArrayList<>();
+                List<Point> newPoints2 = new ArrayList<>();
+                List<ShapeRecordAdvanced> shapeRecordsAdvanced = new ArrayList<>();
+                for (SHAPERECORD rec:shape.shapes.shapeRecords) {
+                    ShapeRecordAdvanced arec = ShapeRecordAdvanced.createFromSHAPERECORD(rec);
+                    if (arec != null) {
+                        shapeRecordsAdvanced.add(arec);
+                    }
+                }
+                List<ShapeRecordAdvanced> fixed = fixer.fixShape(shapeRecordsAdvanced);
+                
+                List<SHAPERECORD> newRecords=new ArrayList<>();
+                
+                for (ShapeRecordAdvanced arec:fixed) {
+                    newRecords.add(arec.toBasicRecord());
+                }
+                newRecords.add(new EndShapeRecord());
+                shape.shapes.shapeRecords = newRecords;
+                //displayEditImagePanel.setShowPoints(newPoints1, newPoints2);
+                displayEditTag.getSwf().clearShapeCache();
+                displayEditImagePanel.repaint();
+                refreshHilightedPoints();
+            }            
+        });*/
 
         ButtonsPanel displayEditButtonsPanel = new ButtonsPanel();        
         displayEditButtonsPanel.add(displayEditTransformButton);
@@ -1307,6 +1343,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
         displayEditButtonsPanel.add(displayEditSaveButton);
         displayEditButtonsPanel.add(displayEditCancelButton);
         displayEditButtonsPanel.add(displayEditEditPointsButton);
+        //displayEditButtonsPanel.add(fixPathsButton);
         displayEditButtonsPanel.add(replaceShapeButton);
         displayEditButtonsPanel.add(replaceShapeUpdateBoundsButton);
         displayEditButtonsPanel.add(morphShowPanel);        

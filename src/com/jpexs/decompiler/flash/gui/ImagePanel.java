@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.math.BezierUtils;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.action.Action;
@@ -296,6 +297,16 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private JScrollBar verticalScrollBar;
     private boolean updatingScrollBars = false;
     private final int SCROLL_SPACE_BEFORE = (int) SWF.unitDivisor * 500;
+    
+    private List<java.awt.Point> showPoints1 = new ArrayList<>();
+    
+    private List<java.awt.Point> showPoints2 = new ArrayList<>();
+
+    
+    public void setShowPoints(List<java.awt.Point> showPoints1, List<java.awt.Point> showPoints2) {
+        this.showPoints1 = showPoints1;
+        this.showPoints2 = showPoints2;
+    }
 
     private static String formatDouble(double value) {
         return DECIMAL_FORMAT.format(value);
@@ -918,6 +929,26 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         }
                                     }
                                 }*/
+                            }
+                            
+                            for (int i = 0; i < showPoints1.size(); i++) {
+                                int xt = showPoints1.get(i).x;
+                                int pointSize = 3;
+                                int yt = showPoints1.get(i).y;
+                                Shape pointShape;
+                                pointShape = new Ellipse2D.Double(xt - pointSize, yt - pointSize, pointSize * 2, pointSize * 2);
+                                g2.setPaint(Color.blue);
+                                g2.fill(pointShape);
+                            }
+                            
+                            for (int i = 0; i < showPoints2.size(); i++) {
+                                int xt = showPoints2.get(i).x;
+                                int pointSize = 3;
+                                int yt = showPoints2.get(i).y;
+                                Shape pointShape;
+                                pointShape = new Ellipse2D.Double(xt - pointSize, yt - pointSize, pointSize * 2, pointSize * 2);
+                                g2.setPaint(Color.red);
+                                g2.fill(pointShape);
                             }
                             g2.setTransform(oldTransform);
                         }
@@ -3910,9 +3941,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         double zoomDouble = zoom.fit ? getZoomToFit() : zoom.value;
         if (lowQuality) {
             zoomDouble /= LQ_FACTOR;
-        }
-        RECT timRect = timelined.getRect();
-
+        }        
         double rx = point.getX() * zoomDouble / SWF.unitDivisor + offsetPoint.getX(); // + offsetXRef.getVal();
         double ry = point.getY() * zoomDouble / SWF.unitDivisor + offsetPoint.getY(); // + offsetYRef.getVal();
 
