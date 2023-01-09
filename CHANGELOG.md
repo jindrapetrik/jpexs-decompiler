@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - CXFORM and GRADRECORD causing NotSerializableException
 - Scrollbars
 - Incorrect frame counting
+- Save as does not change file title upon reload
 
 ## [18.3.0] - 2023-01-01
 ### Added

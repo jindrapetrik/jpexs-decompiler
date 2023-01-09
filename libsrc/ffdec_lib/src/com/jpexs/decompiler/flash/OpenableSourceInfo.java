@@ -34,7 +34,7 @@ public class OpenableSourceInfo {
 
     private String file;
 
-    private final String fileTitle;
+    private String fileTitle;
 
     private final boolean detectBundle;
     
@@ -88,6 +88,10 @@ public class OpenableSourceInfo {
         this.file = file;
         detectKind();
         empty = false;
+    }
+    
+    public void setFileTitle(String fileTitle) {
+        this.fileTitle = fileTitle;
     }
 
     public String getFileTitle() {
