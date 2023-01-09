@@ -16,11 +16,13 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import java.io.Serializable;
+
 /**
  *
  * @author JPEXS
  */
-public class ConstantColorColorTransform extends ColorTransform {
+public class ConstantColorColorTransform extends ColorTransform implements Serializable {
 
     private final int color;
 
