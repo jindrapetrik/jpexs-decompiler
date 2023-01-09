@@ -2101,7 +2101,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     } else if (freeTransformDepth > -1) {
                         setAllowMove(true);
                     } else {
-                        boolean doMove = (h + dy) > h2 || (w + dx) > w2;
+                        boolean doMove = h > h2 || w > w2;
                         if (zoom.fit) {
                             doMove = false;
                         }
