@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [18.3.1] - 2023-01-09
 ### Added
 - GFX - support for TGA external images
@@ -2711,6 +2713,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.1...dev
 [18.3.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.0...version18.3.1
 [18.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.2.1...version18.3.0
 [18.2.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.2.0...version18.2.1
