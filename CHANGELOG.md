@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [18.3.1] - 2023-01-09
 ### Added
 - GFX - support for TGA external images
 - GFX - DefineExternalGradient tag has gradientId in its name
@@ -2711,7 +2711,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.0...dev
+[18.3.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.0...version18.3.1
 [18.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.2.1...version18.3.0
 [18.2.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.2.0...version18.2.1
 [18.2.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.1.0...version18.2.0
@@ -2852,6 +2852,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1931]: https://www.free-decompiler.com/flash/issues/1931
+[#1934]: https://www.free-decompiler.com/flash/issues/1934
 [#1929]: https://www.free-decompiler.com/flash/issues/1929
 [#1932]: https://www.free-decompiler.com/flash/issues/1932
 [#1933]: https://www.free-decompiler.com/flash/issues/1933
