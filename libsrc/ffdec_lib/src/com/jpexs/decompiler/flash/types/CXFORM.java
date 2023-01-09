@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.types;
 import com.jpexs.decompiler.flash.types.annotations.Calculated;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
+import java.io.Serializable;
 
 /**
  * Defines a transform that can be applied to the color space of a graphic
@@ -26,7 +27,7 @@ import com.jpexs.decompiler.flash.types.annotations.SWFType;
  *
  * @author JPEXS
  */
-public class CXFORM extends ColorTransform {
+public class CXFORM extends ColorTransform implements Serializable {
 
     /**
      * Has color addition values

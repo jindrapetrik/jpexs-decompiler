@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - GFX - ExporterInfo prefix is NetString
 - Scrollbars on sound playback
 - Clear preview on raw edit to stop sound playback
+- CXFORM and GRADRECORD causing NotSerializableException
 
 ## [18.3.0] - 2023-01-01
 ### Added
