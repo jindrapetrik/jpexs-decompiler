@@ -301,6 +301,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
     private List<java.awt.Point> showPoints1 = new ArrayList<>();
     
     private List<java.awt.Point> showPoints2 = new ArrayList<>();
+    
+    private int displayedFrame = 0;
 
     
     public void setShowPoints(List<java.awt.Point> showPoints1, List<java.awt.Point> showPoints2) {
@@ -2709,6 +2711,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 this.stillFrame = false;
             }
             this.prevFrame = -1;
+            this.displayedFrame = this.frame;
 
             RECT timRect = drawable.getRect();
 
@@ -2884,9 +2887,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         displayObjectCache.clear();
     }
 
-    private void nextFrame(Timer thisTimer, final int cnt, final int timeShouldBe) {
-        drawFrame(thisTimer, true);
-
+    private void nextFrame(Timer thisTimer, final int cnt, final int timeShouldBe) {                                
         synchronized (ImagePanel.class) {
             if (timelined != null && timer == thisTimer) {
                 int frameCount = timelined.getTimeline().getFrameCount();
@@ -2914,6 +2915,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 } else {
                     time = timeShouldBe;
                 }
+                drawFrame(thisTimer, true);
             }
         }
         fireMediaDisplayStateChanged();
@@ -3339,6 +3341,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         newBounds.getCenterY());
                             }
                         }
+                        //System.out.println("drawFrame "+frame);
                     }
                 }
 
@@ -3585,7 +3588,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                 frame = 0;
                 prevFrame = -1;
             }
-
+            
             startTimer(timeline, true);
         }
     }
@@ -3642,13 +3645,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         return ret;
     }
 
-    private void scheduleTask(boolean singleFrame, long msDelay) {
+    private void scheduleTask(boolean singleFrame, long msDelay, boolean first) {
         TimerTask task = new TimerTask() {
             public final Timer thisTimer = timer;
 
-            public final boolean isSingleFrame = singleFrame;
-
-            private long lastRun = 0L;
+            public final boolean isSingleFrame = singleFrame;                      
 
             @Override
             public void run() {
@@ -3658,7 +3659,6 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             return;
                         }
                     }
-                    lastRun = System.currentTimeMillis();
                     int curFrame = frame;
                     long delay = getMsPerFrame();
                     if (isSingleFrame) {
@@ -3680,7 +3680,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             return;
                         }
                         //How many ticks (= times where frame should be displayed in framerate) are there from hitting play button
-                        int ticksFromStart = (int) Math.floor((frameTimeMsIs - startRun) / (double) getMsPerFrame()) + 1;
+                        int ticksFromStart = (int) Math.floor((frameTimeMsIs - startRun) / (double) getMsPerFrame());
 
                         //How many frames are there between last displayed frame and now. For perfect display(=no framedrop), value should be 1
                         int skipFrames;
@@ -3711,7 +3711,12 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         if (frameCount == 1 || stillFrame) { //We have only one frame, so the ticks on that frame equal ticks on whole timeline
                             currentFrameTicks = ticksFromStart;
                         }
-                        nextFrame(thisTimer, skipFrames, currentFrameTicks);
+                        
+                        if (first) {
+                            drawFrame(thisTimer, true);
+                        } else {
+                            nextFrame(thisTimer, skipFrames, currentFrameTicks);
+                        }
 
                         long afterDrawFrameTimeMsIs = System.currentTimeMillis();
 
@@ -3728,7 +3733,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                         }
                     }
                     //schedule next run of the task
-                    scheduleTask(isSingleFrame, delay);
+                    scheduleTask(isSingleFrame, delay, false);
 
                 } catch (Exception ex) {
                     logger.log(Level.SEVERE, "Frame drawing error", ex);
@@ -3765,8 +3770,8 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
         }
         timer = new Timer();
         fpsShouldBe = timeline.frameRate;
-        fpsIs = fpsShouldBe;
-        scheduleTask(singleFrame, 0);
+        fpsIs = fpsShouldBe;        
+        scheduleTask(singleFrame, 0, true);
     }
 
     @Override
