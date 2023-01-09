@@ -1382,7 +1382,9 @@ public class Main {
         startSaving(savedFile);
         if (mode == SaveFileMode.SAVEAS && openable.getOpenableList() != null /*SWF in binarydata has null*/ && !openable.getOpenableList().isBundle()) {
             openable.setFile(outfile);
-            openable.getOpenableList().sourceInfo.setFile(outfile);
+            OpenableSourceInfo sourceInfo = openable.getOpenableList().sourceInfo;
+            sourceInfo.setFile(outfile);
+            sourceInfo.setFileTitle(null);
             if (mainFrame != null && mainFrame.getPanel() != null) {
                 mainFrame.getPanel().refreshPins();
             }
