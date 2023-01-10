@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [18.3.2] - 2023-01-10
 ### Removed
 - [#1935], [#1913] Retaining shape exact position(bounds) in SVG export/import
 
@@ -2715,7 +2715,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.1...dev
+[18.3.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.1...version18.3.2
 [18.3.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.0...version18.3.1
 [18.3.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.2.1...version18.3.0
 [18.2.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.2.0...version18.2.1
