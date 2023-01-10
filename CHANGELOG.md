@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Removed
+- [#1935], [#1913] Retaining shape exact position(bounds) in SVG export/import
 
 ## [18.3.1] - 2023-01-09
 ### Added
@@ -2854,12 +2856,13 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1935]: https://www.free-decompiler.com/flash/issues/1935
+[#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1931]: https://www.free-decompiler.com/flash/issues/1931
 [#1934]: https://www.free-decompiler.com/flash/issues/1934
 [#1929]: https://www.free-decompiler.com/flash/issues/1929
 [#1932]: https://www.free-decompiler.com/flash/issues/1932
 [#1933]: https://www.free-decompiler.com/flash/issues/1933
-[#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1905]: https://www.free-decompiler.com/flash/issues/1905
 [#1915]: https://www.free-decompiler.com/flash/issues/1915
 [#1923]: https://www.free-decompiler.com/flash/issues/1923
