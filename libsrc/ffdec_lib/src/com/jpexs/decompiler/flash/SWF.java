@@ -429,6 +429,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public static AbcIndexing getAirGlobalAbcIndex() {
         return airGlobalAbcIndex;
     }
+    
+    public void resetAbcIndex() {
+        abcIndex = null;
+    }
 
     public AbcIndexing getAbcIndex() {
         if (abcIndex != null) {
