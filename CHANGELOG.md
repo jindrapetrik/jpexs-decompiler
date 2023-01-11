@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#1913] Retaining shape exact position(bounds) in SVG export (Can be turned on in advanced settings)
+
 ### Fixed
 - [#1888] AS3 - missing casts in declarations
 - [#1894] Switch inside loop

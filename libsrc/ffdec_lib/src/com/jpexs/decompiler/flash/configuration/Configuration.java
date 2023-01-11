@@ -879,6 +879,10 @@ public final class Configuration {
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> showImportSoundInfo = null;
     
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Boolean> svgRetainBounds = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
