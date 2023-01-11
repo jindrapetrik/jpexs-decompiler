@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#1888] AS3 - missing casts in declarations
 - [#1894] Switch inside loop
+- [#1801] AS3 - AIR/Flash switching
 
 ## [18.3.2] - 2023-01-10
 ### Removed
@@ -2865,8 +2866,11 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
-[#1935]: https://www.free-decompiler.com/flash/issues/1935
 [#1913]: https://www.free-decompiler.com/flash/issues/1913
+[#1888]: https://www.free-decompiler.com/flash/issues/1888
+[#1894]: https://www.free-decompiler.com/flash/issues/1894
+[#1801]: https://www.free-decompiler.com/flash/issues/1801
+[#1935]: https://www.free-decompiler.com/flash/issues/1935
 [#1931]: https://www.free-decompiler.com/flash/issues/1931
 [#1934]: https://www.free-decompiler.com/flash/issues/1934
 [#1929]: https://www.free-decompiler.com/flash/issues/1929
@@ -2917,14 +2921,12 @@ All notable changes to this project will be documented in this file.
 [#1006]: https://www.free-decompiler.com/flash/issues/1006
 [#1828]: https://www.free-decompiler.com/flash/issues/1828
 [#1796]: https://www.free-decompiler.com/flash/issues/1796
-[#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1895]: https://www.free-decompiler.com/flash/issues/1895
 [#1896]: https://www.free-decompiler.com/flash/issues/1896
 [#1769]: https://www.free-decompiler.com/flash/issues/1769
 [#1810]: https://www.free-decompiler.com/flash/issues/1810
 [#1891]: https://www.free-decompiler.com/flash/issues/1891
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
-[#1894]: https://www.free-decompiler.com/flash/issues/1894
 [#1887]: https://www.free-decompiler.com/flash/issues/1887
 [#1882]: https://www.free-decompiler.com/flash/issues/1882
 [#1880]: https://www.free-decompiler.com/flash/issues/1880
@@ -2998,7 +3000,6 @@ All notable changes to this project will be documented in this file.
 [#1711]: https://www.free-decompiler.com/flash/issues/1711
 [#270]: https://www.free-decompiler.com/flash/issues/270
 [#1718]: https://www.free-decompiler.com/flash/issues/1718
-[#1801]: https://www.free-decompiler.com/flash/issues/1801
 [#1761]: https://www.free-decompiler.com/flash/issues/1761
 [#1762]: https://www.free-decompiler.com/flash/issues/1762
 [#1763]: https://www.free-decompiler.com/flash/issues/1763

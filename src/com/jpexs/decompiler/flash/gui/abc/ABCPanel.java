@@ -1005,6 +1005,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 }
                 SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
                 conf.setCustomData(CustomConfigurationKeys.KEY_LIBRARY, "" + libraryComboBox.getSelectedIndex());
+                swf.resetAbcIndex();
+                reload();
             }
         });
 
