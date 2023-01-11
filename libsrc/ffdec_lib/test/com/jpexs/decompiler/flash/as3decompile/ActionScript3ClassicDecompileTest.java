@@ -1503,6 +1503,34 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testSwitchContinue() {
+        decompileMethod("classic", "testSwitchContinue", "var i:int = 0;\r\n"
+                + "var r:int = Math.random() % 10;\r\n"
+                + "if(r > 5)\r\n"
+                + "{\r\n"
+                + "for(i = 0; i < 10; i++)\r\n"
+                + "{\r\n"
+                + "switch(i)\r\n"
+                + "{\r\n"
+                + "case 0:\r\n"
+                + "trace(\"hello\");\r\n"
+                + "break;\r\n"
+                + "case 1:\r\n"
+                + "trace(\"hi\");\r\n"
+                + "break;\r\n"
+                + "case 2:\r\n"
+                + "trace(\"howdy\");\r\n"
+                + "break;\r\n"
+                + "default:\r\n"
+                + "continue;\r\n"
+                + "}\r\n"
+                + "trace(\"message shown\");\r\n"
+                + "}\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testSwitchDefault() {
         decompileMethod("classic", "testSwitchDefault", "var a:* = 5;\r\n"
                 + "switch(a)\r\n"

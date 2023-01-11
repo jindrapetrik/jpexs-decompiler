@@ -96,6 +96,7 @@ package
 		TestStringConcat;
 		TestStrings;		
 		TestSwitch;
+        TestSwitchContinue;
 		TestSwitchComma;
 		TestSwitchDefault;
 		TestSwitchIf;

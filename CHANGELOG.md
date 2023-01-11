@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#1888] AS3 - missing casts in declarations
+- [#1894] Switch inside loop
 
 ## [18.3.2] - 2023-01-10
 ### Removed

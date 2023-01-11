@@ -446,11 +446,11 @@ public class Graph {
             commonSet.add(new PartCommon(r, commonLevel));
         }
 
-        Set<GraphPart> partsLeadingToStopPart = new LinkedHashSet<>();
+        /*Set<GraphPart> partsLeadingToStopPart = new LinkedHashSet<>();
         if (stopPart != null) {
             for (GraphPart p : parts) {
                 for (GraphPart sp : stopPart) {
-                    if (sp == p || p.leadsTo(localData, this, code, sp, new ArrayList<Loop>() /*IGNORE LOOPS*/, throwStates, false)) {
+                    if (sp == p || p.leadsTo(localData, this, code, sp, new ArrayList<Loop>(), throwStates, false)) {
                         partsLeadingToStopPart.add(p);
                     }
                 }
@@ -478,23 +478,19 @@ public class Graph {
             System.err.println("partsLeadingToStopPart:");
             for (GraphPart p : partsLeadingToStopPart) {
                 System.err.println("- " + p);
-            }
-
-            /*if (partsLeadingToStopPart.isEmpty()) {
-                return null; //?
-            }*/
-        }
+            }           
+        }*/
 
         loopc:
         for (PartCommon pc : commonSet) {
-            for (GraphPart p : partsLeadingToStopPart) {
+            /*for (GraphPart p : partsLeadingToStopPart) {
                 if (p != pc.part && !p.leadsTo(localData, this, code, pc.part, loops, throwStates, false)) {
                     if (debugPrintLoopList) {
                         System.err.println("ignoring " + pc.part + ", " + p + " does not lead to it");
                     }
                     continue loopc;
                 }
-            }
+            }*/
             if (pc.level <= 1) {
                 return null;
             }
@@ -823,9 +819,10 @@ public class Graph {
                         }
                     }
                 }
-                if (hasContinues && breakCaseIndex > -1 && i + 1 < list.size() && (list.get(list.size() - 1) instanceof ContinueItem)) {
+                if (hasContinues && breakCaseIndex > -1 && i + 1 < list.size()) {
                     List<GraphTargetItem> toAdd = new ArrayList<>();
-                    for (int j = i + 1; j < list.size() - 1; j++) {
+                    boolean continueOnEnd = list.get(list.size() - 1 ) instanceof ContinueItem;
+                    for (int j = i + 1; j < list.size() - (continueOnEnd ? 1 : 0); j++) {
                         toAdd.add(list.remove(i + 1));
                     }
                     List<GraphTargetItem> targetCommands = swi.caseCommands.get(breakCaseIndex);
@@ -833,7 +830,9 @@ public class Graph {
                         targetCommands.remove(targetCommands.size() - 1);
                     }
                     targetCommands.addAll(toAdd);
-                    targetCommands.add(new BreakItem(null, null, swi.loop.id));
+                    if (toAdd.isEmpty() || (!((toAdd.get(toAdd.size()-1) instanceof ExitItem)||(toAdd.get(toAdd.size()-1) instanceof BreakItem)))) {
+                        targetCommands.add(new BreakItem(null, null, swi.loop.id));
+                    }
                 }
             }
         }
@@ -3377,6 +3376,44 @@ public class Graph {
                 }
             }
             caseCommands.add(currentCaseCommands);
+        }
+        
+        
+        /*
+        switch(a)
+        {
+        case 0:
+        case 1:
+            break;
+        case 2:
+            break;        
+        }
+        
+        =>
+        
+        switch(a)
+        {
+        case 0:
+        case 1:
+        case 2:
+            break;        
+        }
+        
+        */
+        for (int i = 0; i < caseCommands.size(); i++) {
+            if (caseCommands.get(i).size() == 1 && 
+                    (caseCommands.get(i).get(0) instanceof BreakItem) && 
+                    (((BreakItem)caseCommands.get(i).get(0)).loopId == currentLoop.id)) {
+                for (int j = i + 1; j < caseCommands.size(); j++) {
+                    if (caseCommands.get(j).size() == 1 && 
+                        (caseCommands.get(j).get(0) instanceof BreakItem) && 
+                        (((BreakItem)caseCommands.get(j).get(0)).loopId == currentLoop.id)) {
+                        caseCommands.get(j - 1).remove(0);
+                    } else {
+                        break;
+                    }
+                }
+            }
         }
 
         //If the lastone is default empty and alone, remove it
