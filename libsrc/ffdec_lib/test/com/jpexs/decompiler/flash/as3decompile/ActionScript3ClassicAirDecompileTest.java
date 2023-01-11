@@ -230,7 +230,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var lc:LocalClass;\r\n"
                 + "var f:Function;\r\n"
                 + "var s:String = \"a\";\r\n"
-                + "var i:int = s;\r\n"
+                + "var i:int = int(s);\r\n"
                 + "var j:int = n;\r\n"
                 + "s = String(j);\r\n"
                 + "s = ns;\r\n"
