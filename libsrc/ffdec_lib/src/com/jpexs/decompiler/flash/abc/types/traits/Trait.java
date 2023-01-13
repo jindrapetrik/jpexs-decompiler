@@ -351,8 +351,7 @@ public abstract class Trait implements Cloneable, Serializable {
                 if (identifier != null && !identifier.isEmpty()) {
                     writer.appendNoHilight(identifier).appendNoHilight(" ");
                 }
-            }
-            if (ns != null) {
+            } else if (ns != null) {
                 String nsPrefix = ns.getPrefix(abc);
                 if (nsPrefix != null && !nsPrefix.isEmpty()) {
                     writer.appendNoHilight(nsPrefix).appendNoHilight(" ");

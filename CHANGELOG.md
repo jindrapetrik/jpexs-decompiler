@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - [#1888] AS3 - missing casts in declarations
 - [#1894] Switch inside loop
 - [#1801] AS3 - AIR/Flash switching
+- [#1892] AS3 - internal modifier after implicit namespace
 
 ## [18.3.2] - 2023-01-10
 ### Removed
