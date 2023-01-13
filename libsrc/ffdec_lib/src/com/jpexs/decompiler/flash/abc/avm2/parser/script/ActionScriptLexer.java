@@ -19,10 +19,10 @@
 package com.jpexs.decompiler.flash.abc.avm2.parser.script;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import java.io.StringReader;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.math.BigInteger;
 
 
 /**
@@ -938,9 +938,12 @@ public final class ActionScriptLexer {
 
     public void yypushbackstr(String s, int state)
     {
+        int numLines = count(s, "\n");
+        int newYyline = yyline - numLines;
         sourceCode = s + sourceCode.substring(yychar + yylength());
         yyreset(new StringReader(sourceCode));
         yybegin(state);
+        yyline = newYyline;
     }
 
     public void yypushbackstr(String s)
