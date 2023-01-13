@@ -206,7 +206,7 @@ public class CallAVM2Item extends AVM2Item {
          if (receiver instanceof ThisAVM2Item) {
          recPart = "";
          }*/
-        if (function.getPrecedence() > precedence) {
+        if (function.getPrecedence() > precedence || (function instanceof NewFunctionAVM2Item)) {
             writer.append("(");
             function.toString(writer, localData);
             writer.append(")");

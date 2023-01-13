@@ -1217,6 +1217,27 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testInlineFunctions2() {
+        decompileMethod("classic", "testInlineFunctions2", "var f:Function = function(a:int):int\r\n"
+                + "{\r\n"
+                + "return a + 1;\r\n"
+                + "};\r\n"
+                + "var g:Function = function(a:int):int\r\n"
+                + "{\r\n"
+                + "return a + 1;\r\n"
+                + "};\r\n"
+                + "var h:Function = function h2(a:int):int\r\n"
+                + "{\r\n"
+                + "return a + 1;\r\n"
+                + "};\r\n"
+                + "(function(a:int):int\r\n"
+                + "{\r\n"
+                + "return a + 1;\r\n"
+                + "})(1);\r\n",
+                 false);
+    }
+
+    @Test
     public void testInnerFunctionScope() {
         decompileMethod("classic", "testInnerFunctionScope", "var innerFunc:Function = function(b:String):*\r\n"
                 + "{\r\n"
@@ -1351,7 +1372,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testNamedAnonFunctions() {
-        decompileMethod("classic", "testNamedAnonFunctions", "var test:* = new function testFunc(param1:*, param2:int, param3:Array):Boolean\r\n"
+        decompileMethod("classic", "testNamedAnonFunctions", "var test:* = function testFunc(param1:*, param2:int, param3:Array):Boolean\r\n"
                 + "{\r\n"
                 + "return (param1 as TestClass2).attrib1 == 5;\r\n"
                 + "};\r\n",

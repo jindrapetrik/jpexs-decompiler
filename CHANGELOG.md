@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - super properties resolving
 - AS3 - line numbering on pushback string on regexp
 - AS3 Direct editation - removing method bodies after unsuccessful edit
+- [#1936] AS3 - Parentheses around function definition call
 
 ## [18.3.2] - 2023-01-10
 ### Removed
@@ -2879,6 +2880,7 @@ All notable changes to this project will be documented in this file.
 [#1894]: https://www.free-decompiler.com/flash/issues/1894
 [#1801]: https://www.free-decompiler.com/flash/issues/1801
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
+[#1936]: https://www.free-decompiler.com/flash/issues/1936
 [#1935]: https://www.free-decompiler.com/flash/issues/1935
 [#1931]: https://www.free-decompiler.com/flash/issues/1931
 [#1934]: https://www.free-decompiler.com/flash/issues/1934

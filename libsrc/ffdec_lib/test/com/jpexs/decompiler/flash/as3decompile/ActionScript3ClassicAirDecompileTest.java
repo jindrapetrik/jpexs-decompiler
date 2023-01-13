@@ -1217,6 +1217,31 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testInlineFunctions2() {
+        decompileMethod("classic_air", "testInlineFunctions2", "var f:* = function(a:int):int\r\n"
+                + "{\r\n"
+                + "return a + 1;\r\n"
+                + "};\r\n"
+                + "var g:Function = function(a:int):int\r\n"
+                + "{\r\n"
+                + "return a + 1;\r\n"
+                + "};\r\n"
+                + "var h:Function = (function():*\r\n"
+                + "{\r\n"
+                + "var h2:Function;\r\n"
+                + "return h2 = function(a:int):int\r\n"
+                + "{\r\n"
+                + "return a + 1;\r\n"
+                + "};\r\n"
+                + "})();\r\n"
+                + "(function(a:int):int\r\n"
+                + "{\r\n"
+                + "return a + 1;\r\n"
+                + "})(1);\r\n",
+                 false);
+    }
+
+    @Test
     public void testInnerFunctionScope() {
         decompileMethod("classic_air", "testInnerFunctionScope", "var innerFunc:Function = function(b:String):*\r\n"
                 + "{\r\n"
@@ -1351,14 +1376,14 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
 
     @Test
     public void testNamedAnonFunctions() {
-        decompileMethod("classic_air", "testNamedAnonFunctions", "var test:* = new (function():*\r\n"
+        decompileMethod("classic_air", "testNamedAnonFunctions", "var test:* = (function():*\r\n"
                 + "{\r\n"
                 + "var testFunc:Function;\r\n"
                 + "return testFunc = function(param1:*, param2:int, param3:Array):Boolean\r\n"
                 + "{\r\n"
                 + "return (param1 as TestClass2).attrib1 == 5;\r\n"
                 + "};\r\n"
-                + "}())();\r\n",
+                + "})();\r\n",
                  false);
     }
 

@@ -4,7 +4,7 @@ package tests
    {
       public function run() : *
       {
-         var test:* = new function testFunc(param1:*, param2:int, param3:Array):Boolean
+         var test:* = function testFunc(param1:*, param2:int, param3:Array):Boolean
 			{
 				return (param1 as TestClass2).attrib1 == 5;
 			};
