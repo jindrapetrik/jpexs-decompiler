@@ -322,7 +322,7 @@ public class FolderPreviewPanel extends JPanel {
             String key = "frame_" + fn.frame + "_" + timeline.id + "_" + zoom;
             imgSrc = swf.getFromCache(key);
             if (imgSrc == null) {
-                imgSrc = SWF.frameToImageGet(timeline, fn.frame, 0, null, 0, rect, new Matrix(), null, null, zoom);
+                imgSrc = SWF.frameToImageGet(timeline, fn.frame, 0, null, 0, rect, new Matrix(), null, null, zoom, !Configuration.disableBitmapSmoothing.get());
                 swf.putToCache(key, imgSrc);
             }
 
@@ -378,7 +378,7 @@ public class FolderPreviewPanel extends JPanel {
         if (imgSrc == null) {
             DrawableTag drawable = (DrawableTag) treeItem;
             ExportRectangle viewRectangle = new ExportRectangle(0, 0, ow, oh);
-            drawable.toImage(0, 0, 0, new RenderContext(), image, image, false, m, new Matrix(), m, m, null, scale, false, viewRectangle, true, Timeline.DRAW_MODE_ALL, 0);
+            drawable.toImage(0, 0, 0, new RenderContext(), image, image, false, m, new Matrix(), m, m, null, scale, false, viewRectangle, true, Timeline.DRAW_MODE_ALL, 0, !Configuration.disableBitmapSmoothing.get());
         } else {
             Graphics2D g = (Graphics2D) image.getGraphics();
             g.setTransform(m.toTransform());

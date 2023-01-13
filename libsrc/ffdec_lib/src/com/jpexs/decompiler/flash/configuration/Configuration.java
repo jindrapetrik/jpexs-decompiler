@@ -883,6 +883,10 @@ public final class Configuration {
     @ConfigurationCategory("export")
     public static ConfigurationItem<Boolean> svgRetainBounds = null;
     
+    @ConfigurationDefaultBoolean(false)
+    @ConfigurationCategory("display")
+    public static ConfigurationItem<Boolean> disableBitmapSmoothing = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

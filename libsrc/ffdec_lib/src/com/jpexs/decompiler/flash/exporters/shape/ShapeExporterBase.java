@@ -63,6 +63,8 @@ public abstract class ShapeExporterBase implements IShapeExporter {
 
     private final ColorTransform colorTransform;
 
+    private boolean canUseSmoothing = true;
+    
     public ShapeExporterBase(int shapeNum, SWF swf, SHAPE shape, ColorTransform colorTransform) {
         this.shape = shape;
         this.colorTransform = colorTransform;
@@ -123,6 +125,10 @@ public abstract class ShapeExporterBase implements IShapeExporter {
         _aliasedFillPaths = cachedData.aliasedFillPaths;
         _linePaths = cachedData.linePaths;
     }
+
+    public void setCanUseSmoothing(boolean canUseSmoothing) {
+        this.canUseSmoothing = canUseSmoothing;
+    }        
 
     public void export() {
         // Let the doc handler know that a shape export starts
@@ -354,7 +360,7 @@ public abstract class ShapeExporterBase implements IShapeExporter {
                                         fillStyle.bitmapId,
                                         fillStyle.bitmapMatrix,
                                         (fillStyle.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fillStyle.fillStyleType == FILLSTYLE.NON_SMOOTHED_REPEATING_BITMAP),
-                                        (fillStyle.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fillStyle.fillStyleType == FILLSTYLE.CLIPPED_BITMAP),
+                                        canUseSmoothing && (fillStyle.fillStyleType == FILLSTYLE.REPEATING_BITMAP || fillStyle.fillStyleType == FILLSTYLE.CLIPPED_BITMAP),
                                         colorTransform
                                 );
                                 break;

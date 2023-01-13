@@ -3103,7 +3103,7 @@ public class CommandLineArgumentParser {
                         renderContext.stateUnderCursor = new ArrayList<>();
 
                         try {
-                            tim.toImage(fframe, fframe, renderContext, image, image, false, m, new Matrix(), m, null, zoom, true, new ExportRectangle(rect), m, true, Timeline.DRAW_MODE_ALL, 0);
+                            tim.toImage(fframe, fframe, renderContext, image, image, false, m, new Matrix(), m, null, zoom, true, new ExportRectangle(rect), m, true, Timeline.DRAW_MODE_ALL, 0, true);
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }

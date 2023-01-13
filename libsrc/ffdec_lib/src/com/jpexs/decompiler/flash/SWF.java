@@ -3336,7 +3336,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         return ret;
     }
 
-    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, Point cursorPosition, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor, double zoom) {
+    public static SerializableImage frameToImageGet(Timeline timeline, int frame, int time, Point cursorPosition, int mouseButton, RECT displayRect, Matrix transformation, ColorTransform colorTransform, Color backGroundColor, double zoom, boolean canUseSmoothing) {
         if (timeline.getFrameCount() == 0) {
             return new SerializableImage(1, 1, SerializableImage.TYPE_INT_ARGB_PRE);
         }
@@ -3361,7 +3361,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         renderContext.cursorPosition = cursorPosition;
         renderContext.mouseButton = mouseButton;
         ExportRectangle viewRect = new ExportRectangle(rect);
-        timeline.toImage(frame, time, renderContext, image, image, false, m, new Matrix(), m, colorTransform, zoom, false, viewRect, m, true, Timeline.DRAW_MODE_ALL, 0);
+        timeline.toImage(frame, time, renderContext, image, image, false, m, new Matrix(), m, colorTransform, zoom, false, viewRect, m, true, Timeline.DRAW_MODE_ALL, 0, canUseSmoothing);
 
         return image;
     }
