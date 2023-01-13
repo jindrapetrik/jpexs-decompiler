@@ -1039,6 +1039,10 @@ public class ABC implements Openable {
 
         return abcMethodIndexing;
     }
+    
+    public void resetMethodIndexing() {
+        abcMethodIndexing = null;
+    }
 
     public DottedChain nsValueToName(String valueStr) {
         if (valueStr == null) {
