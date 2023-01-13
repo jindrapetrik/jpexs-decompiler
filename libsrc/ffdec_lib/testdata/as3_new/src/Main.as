@@ -72,6 +72,7 @@ package
 		TestInc2;
 		TestIncDec;
 		TestInlineFunctions;
+		TestInlineFunctions2;
 		TestInnerFunctions;
 		TestInnerFunctionScope;
 		TestInnerIf;
