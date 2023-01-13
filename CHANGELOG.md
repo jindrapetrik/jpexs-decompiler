@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - [#1888] AS3 - Coerce to int when Number
 - AS3 - super properties resolving
 - AS3 - line numbering on pushback string on regexp
+- AS3 Direct editation - removing method bodies after unsuccessful edit
 
 ## [18.3.2] - 2023-01-10
 ### Removed
