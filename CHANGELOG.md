@@ -13,6 +13,8 @@ All notable changes to this project will be documented in this file.
 - [#1892] AS3 - internal modifier after implicit namespace
 - [#1888] AS3 - Coerce to string
 - AS3 - local registers type declarations vs for..in clause
+- [#1888] AS3 - Coerce to int when Number
+- AS3 - super properties resolving
 
 ## [18.3.2] - 2023-01-10
 ### Removed

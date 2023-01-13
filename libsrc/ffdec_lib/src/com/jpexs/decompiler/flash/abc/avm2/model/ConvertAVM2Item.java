@@ -54,24 +54,34 @@ public class ConvertAVM2Item extends AVM2Item {
         GraphTargetItem valueReturnType = value.returnType();
         switch (type.toString()) {
             case "Boolean":
-                displayConvert = !valueReturnType.equals(TypeItem.BOOLEAN) &&
-                                 !valueReturnType.equals(TypeItem.UNBOUNDED);
+                displayConvert = !valueReturnType.equals(TypeItem.BOOLEAN)
+                        && !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
             case "Number":
+                displayConvert = !valueReturnType.equals(TypeItem.INT)
+                        && !valueReturnType.equals(TypeItem.NUMBER)
+                        && !valueReturnType.equals(TypeItem.UINT)
+                        && !valueReturnType.equals(TypeItem.UNBOUNDED);
+                break;
             case "int":
+                displayConvert = !valueReturnType.equals(TypeItem.INT)
+                        && !valueReturnType.equals(TypeItem.UNBOUNDED);
+                break;
             case "uint":
-                displayConvert = !valueReturnType.equals(TypeItem.INT) && 
-                                !valueReturnType.equals(TypeItem.NUMBER) && 
-                                !valueReturnType.equals(TypeItem.UINT) &&
-                                !valueReturnType.equals(TypeItem.UNBOUNDED);
+                if (valueReturnType.equals(TypeItem.INT) && (value instanceof IntegerValueAVM2Item)) {
+                    displayConvert = (((IntegerValueAVM2Item) value).value < 0);
+                } else {
+                    displayConvert = !valueReturnType.equals(TypeItem.UINT)
+                            && !valueReturnType.equals(TypeItem.UNBOUNDED);
+                }
                 break;
             case "String":
-                displayConvert = !valueReturnType.equals(TypeItem.STRING) &&
-                                !valueReturnType.equals(new TypeItem("XML")) &&
-                                !valueReturnType.equals(new TypeItem("XMLList")) &&
-                                !valueReturnType.equals(new TypeItem("null")) &&
-                                 !valueReturnType.equals(TypeItem.UNBOUNDED);
-                break;            
+                displayConvert = !valueReturnType.equals(TypeItem.STRING)
+                        && !valueReturnType.equals(new TypeItem("XML"))
+                        && !valueReturnType.equals(new TypeItem("XMLList"))
+                        && !valueReturnType.equals(new TypeItem("null"))
+                        && !valueReturnType.equals(TypeItem.UNBOUNDED);
+                break;
         }
         if (displayConvert) {
             type.toString(writer, localData).append("(");

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.avm2.model.clauses;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
@@ -60,8 +61,8 @@ public class DeclarationAVM2Item extends AVM2Item {
 
     public DeclarationAVM2Item(GraphTargetItem assignment) {
         this(assignment, null);
-    }
-
+    }   
+    
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
 
@@ -105,7 +106,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             type.appendTry(writer, localData);
             if (showValue) {
                 writer.append(" = ");
-                val.toString(writer, localData);
+                SetTypeIns.handleNumberToInt(val, type).toString(writer, localData);
             }
             return writer;
         }
@@ -124,7 +125,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             type.appendTry(writer, localData);
             if (showValue) {
                 writer.append(" = ");
-                val.toString(writer, localData);
+                SetTypeIns.handleNumberToInt(val, type).toString(writer, localData);
             }
             return writer;
         }
@@ -144,7 +145,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             type.appendTry(writer, localData);
             if (showValue) {
                 writer.append(" = ");
-                val.toString(writer, localData);
+                SetTypeIns.handleNumberToInt(val, type).toString(writer, localData);
             }
             return writer;
         }

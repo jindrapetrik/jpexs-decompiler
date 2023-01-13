@@ -66,23 +66,33 @@ public class CoerceAVM2Item extends AVM2Item {
                 displayCoerce = false;
                 break;
             case "Boolean":
-                displayCoerce = !valueReturnType.equals(TypeItem.BOOLEAN) &&
-                                 !valueReturnType.equals(TypeItem.UNBOUNDED);
+                displayCoerce = !valueReturnType.equals(TypeItem.BOOLEAN)
+                        && !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
             case "Number":
+                displayCoerce = !valueReturnType.equals(TypeItem.INT)
+                        && !valueReturnType.equals(TypeItem.NUMBER)
+                        && !valueReturnType.equals(TypeItem.UINT)
+                        && !valueReturnType.equals(TypeItem.UNBOUNDED);
+                break;
             case "int":
+                displayCoerce = !valueReturnType.equals(TypeItem.INT)
+                        && !valueReturnType.equals(TypeItem.UNBOUNDED);
+                break;
             case "uint":
-                displayCoerce = !valueReturnType.equals(TypeItem.INT) && 
-                                !valueReturnType.equals(TypeItem.NUMBER) && 
-                                !valueReturnType.equals(TypeItem.UINT) &&
-                                !valueReturnType.equals(TypeItem.UNBOUNDED);
+                if (valueReturnType.equals(TypeItem.INT) && (value instanceof IntegerValueAVM2Item)) {
+                    displayCoerce = (((IntegerValueAVM2Item) value).value < 0);
+                } else {
+                    displayCoerce = !valueReturnType.equals(TypeItem.UINT)
+                            && !valueReturnType.equals(TypeItem.UNBOUNDED);
+                }
                 break;
             case "String":
-                displayCoerce = !valueReturnType.equals(TypeItem.STRING) &&
-                                !valueReturnType.equals(new TypeItem("XML")) &&
-                                !valueReturnType.equals(new TypeItem("XMLList")) &&
-                                !valueReturnType.equals(new TypeItem("null")) &&
-                                 !valueReturnType.equals(TypeItem.UNBOUNDED);
+                displayCoerce = !valueReturnType.equals(TypeItem.STRING)
+                        && !valueReturnType.equals(new TypeItem("XML"))
+                        && !valueReturnType.equals(new TypeItem("XMLList"))
+                        && !valueReturnType.equals(new TypeItem("null"))
+                        && !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;
             default:
                 displayCoerce = false;
@@ -149,7 +159,7 @@ public class CoerceAVM2Item extends AVM2Item {
         }
         if (typeObj instanceof TypeItem) {
             return typeObj;
-        }                
+        }
         return new TypeItem(typeObj.toString());
     }
 

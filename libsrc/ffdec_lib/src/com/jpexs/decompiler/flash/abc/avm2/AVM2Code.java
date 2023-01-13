@@ -255,6 +255,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.NewActivationAVM2Item;
@@ -1780,6 +1781,8 @@ public class AVM2Code implements Cloneable {
             vtype = ((CoerceAVM2Item) assignment.value).typeObj;
         } else if (assignment instanceof LocalRegAVM2Item) { //for..in
             vtype = ((LocalRegAVM2Item)assignment).type;
+        } else if (assignment instanceof GetSlotAVM2Item) { //for..in
+            vtype = ((GetSlotAVM2Item)assignment).slotType;
         } else if ((assignment.value instanceof SimpleValue) && ((SimpleValue) assignment.value).isSimpleValue()) {
             vtype = assignment.value.returnType();
         }        
@@ -2196,19 +2199,19 @@ public class AVM2Code implements Cloneable {
                 type = new TypeItem(abc.constants.getMultiname(param_types[i]).getNameWithNamespace(abc.constants, true));
             }
             if (d.length > r) {
-                d[r] = new DeclarationAVM2Item(new SetLocalAVM2Item(null, null, r, new NullAVM2Item(null, null)), type);
+                d[r] = new DeclarationAVM2Item(new SetLocalAVM2Item(null, null, r, new NullAVM2Item(null, null), type), type);
             }
             r++;
         }
         if (abc.method_info.get(body.method_info).flagNeed_arguments()) {
             if (d.length > r) {
-                d[r] = new DeclarationAVM2Item(new SetLocalAVM2Item(null, null, r, new NullAVM2Item(null, null)), TypeItem.ARRAY /*?*/);
+                d[r] = new DeclarationAVM2Item(new SetLocalAVM2Item(null, null, r, new NullAVM2Item(null, null), TypeItem.ARRAY), TypeItem.ARRAY /*?*/);
             }
             r++;
         }
         if (abc.method_info.get(body.method_info).flagNeed_rest()) {
             if (d.length > r) {
-                d[r] = new DeclarationAVM2Item(new SetLocalAVM2Item(null, null, r, new NullAVM2Item(null, null)), TypeItem.ARRAY/*?*/);
+                d[r] = new DeclarationAVM2Item(new SetLocalAVM2Item(null, null, r, new NullAVM2Item(null, null), TypeItem.ARRAY), TypeItem.ARRAY/*?*/);
             }
             r++;
         }

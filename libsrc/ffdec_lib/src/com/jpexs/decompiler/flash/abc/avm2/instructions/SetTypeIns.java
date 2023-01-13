@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -33,7 +34,18 @@ import java.util.List;
  */
 public interface SetTypeIns {
 
-    public static void handleResult(GraphTargetItem value, TranslateStack stack, List<GraphTargetItem> output, AVM2LocalData localData, GraphTargetItem result, int regId) {
+    public static GraphTargetItem handleNumberToInt(GraphTargetItem value, GraphTargetItem type) {
+        if ((value instanceof ConvertAVM2Item) || (value instanceof CoerceAVM2Item)) {
+            if (type != null && (type.equals(TypeItem.INT) || type.equals(TypeItem.UINT))) {
+                if (value.value.returnType().equals(TypeItem.NUMBER)) {
+                    return value.value;
+                }
+            }
+        }
+        return value;
+    }
+    
+    public static void handleResult(GraphTargetItem value, TranslateStack stack, List<GraphTargetItem> output, AVM2LocalData localData, GraphTargetItem result, int regId, GraphTargetItem type) {
         GraphTargetItem notCoercedValue = value;
         if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
             notCoercedValue = value.value;
@@ -84,7 +96,7 @@ public interface SetTypeIns {
                     }
                 }
             }
-        }
+        }                
         output.add(result);
     }
 }

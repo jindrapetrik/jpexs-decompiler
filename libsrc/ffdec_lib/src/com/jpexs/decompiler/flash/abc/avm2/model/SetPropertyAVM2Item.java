@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AVM2SourceGenerator;
@@ -103,7 +104,7 @@ public class SetPropertyAVM2Item extends AVM2Item implements SetTypeAVM2Item, As
         /*if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
             return value.value.toString(writer, localData);
         }*/
-        return value.toString(writer, localData);
+        return SetTypeIns.handleNumberToInt(value, type).toString(writer, localData);
     }
 
     @Override
