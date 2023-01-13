@@ -1776,14 +1776,13 @@ public class AVM2Code implements Cloneable {
         GraphTargetItem vtype = TypeItem.UNBOUNDED;
         if (assignment.value instanceof ConvertAVM2Item) {
             vtype = ((ConvertAVM2Item) assignment.value).type;
-        }
-
-        if (vtype.equals(TypeItem.UNBOUNDED) && (assignment.value instanceof CoerceAVM2Item)) {
+        } else if (assignment.value instanceof CoerceAVM2Item) {
             vtype = ((CoerceAVM2Item) assignment.value).typeObj;
-        }
-        if (vtype.equals(TypeItem.UNBOUNDED) && (assignment.value instanceof SimpleValue) && ((SimpleValue) assignment.value).isSimpleValue()) {
+        } else if (assignment instanceof LocalRegAVM2Item) { //for..in
+            vtype = ((LocalRegAVM2Item)assignment).type;
+        } else if ((assignment.value instanceof SimpleValue) && ((SimpleValue) assignment.value).isSimpleValue()) {
             vtype = assignment.value.returnType();
-        }
+        }        
 
         if (declaredRegisters[reg] == null) {
             declaredRegisters[reg] = new DeclarationAVM2Item(assignment, vtype);
