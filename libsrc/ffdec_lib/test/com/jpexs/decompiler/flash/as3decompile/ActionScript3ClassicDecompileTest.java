@@ -699,7 +699,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testForInIf() {
-        decompileMethod("classic", "testForInIf", "var a:* = null;\r\n"
+        decompileMethod("classic", "testForInIf", "var a:String = null;\r\n"
                 + "var arr:Array = [\"a\",\"b\",\"c\"];\r\n"
                 + "var b:int = 5;\r\n"
                 + "for(a in arr)\r\n"
@@ -733,7 +733,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testForInSwitch() {
-        decompileMethod("classic", "testForInSwitch", "var a:* = null;\r\n"
+        decompileMethod("classic", "testForInSwitch", "var a:String = null;\r\n"
                 + "var arr:Array = [\"a\",\"b\",\"c\"];\r\n"
                 + "for(a in arr)\r\n"
                 + "{\r\n"
