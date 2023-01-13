@@ -166,8 +166,9 @@ public class BitmapExporter extends ShapeExporterBase {
         }
     }
 
-    public static void export(int shapeNum, SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform, boolean scaleStrokes) {
+    public static void export(int shapeNum, SWF swf, SHAPE shape, Color defaultColor, SerializableImage image, double unzoom, Matrix transformation, Matrix strokeTransformation, ColorTransform colorTransform, boolean scaleStrokes, boolean canUseSmoothing) {
         BitmapExporter exporter = new BitmapExporter(shapeNum, swf, shape, defaultColor, colorTransform);
+        exporter.setCanUseSmoothing(canUseSmoothing);
         exporter.exportTo(shapeNum, image, unzoom, transformation, strokeTransformation, scaleStrokes);
     }
 

@@ -431,7 +431,7 @@ public class FrameExporter {
                 }
 
                 int fframe = fframes.get(pos++);
-                BufferedImage result = SWF.frameToImageGet(tim, fframe, 0, null, 0, tim.displayRect, new Matrix(), null, fusesTransparency ? null : fbackgroundColor, settings.zoom).getBufferedImage();
+                BufferedImage result = SWF.frameToImageGet(tim, fframe, 0, null, 0, tim.displayRect, new Matrix(), null, fusesTransparency ? null : fbackgroundColor, settings.zoom, true).getBufferedImage();
                 if (Thread.currentThread().isInterrupted()) {
                     return null;
                 }
@@ -551,7 +551,7 @@ public class FrameExporter {
                             renderContext.stateUnderCursor = new ArrayList<>();
 
                             try {
-                                tim.toImage(fframe, fframe, renderContext, image, image, false, m, new Matrix(), m, null, zoom, true, new ExportRectangle(rect), m, true, Timeline.DRAW_MODE_ALL, 0);
+                                tim.toImage(fframe, fframe, renderContext, image, image, false, m, new Matrix(), m, null, zoom, true, new ExportRectangle(rect), m, true, Timeline.DRAW_MODE_ALL, 0, true);
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                             }

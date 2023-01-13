@@ -3,7 +3,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
-- [#1913] Retaining shape exact position(bounds) in SVG export (Can be turned on in advanced settings)
+- [#1913] Option to retain shape exact position(bounds) in SVG export
+- [#1913] Option to disable bitmap smoothing for display
 
 ### Fixed
 - [#1888] AS3 - missing casts in declarations
