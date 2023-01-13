@@ -58,8 +58,47 @@ public class CoerceAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        //return hilight("(" + type + ")", highlight)+
-        return value.toString(writer, localData);
+        //Same for ConvertAVM2Item
+        boolean displayCoerce = true;
+        GraphTargetItem valueReturnType = value.returnType();
+        switch (typeObj.toString()) {
+            case "*":
+                displayCoerce = false;
+                break;
+            case "Boolean":
+                displayCoerce = !valueReturnType.equals(TypeItem.BOOLEAN) &&
+                                 !valueReturnType.equals(TypeItem.UNBOUNDED);
+                break;
+            case "Number":
+            case "int":
+            case "uint":
+                displayCoerce = !valueReturnType.equals(TypeItem.INT) && 
+                                !valueReturnType.equals(TypeItem.NUMBER) && 
+                                !valueReturnType.equals(TypeItem.UINT) &&
+                                !valueReturnType.equals(TypeItem.UNBOUNDED);
+                break;
+            case "String":
+                displayCoerce = !valueReturnType.equals(TypeItem.STRING) &&
+                                !valueReturnType.equals(new TypeItem("XML")) &&
+                                !valueReturnType.equals(new TypeItem("XMLList")) &&
+                                !valueReturnType.equals(new TypeItem("null")) &&
+                                 !valueReturnType.equals(TypeItem.UNBOUNDED);
+                break;
+            default:
+                displayCoerce = false;
+                break;
+            //default:
+            // there should be something like instanceof, or not, just comment it out...
+            //    displayCoerce = !valueReturnType.equals(typeObj);
+        }
+        if (displayCoerce) {
+            typeObj.toString(writer, localData).append("(");
+        }
+        value.toString(writer, localData);
+        if (displayCoerce) {
+            writer.append(")");
+        }
+        return writer;
     }
 
     @Override

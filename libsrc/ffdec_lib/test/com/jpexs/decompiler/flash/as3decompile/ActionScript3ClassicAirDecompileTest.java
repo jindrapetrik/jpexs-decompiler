@@ -292,7 +292,8 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "if(o)\r\n"
                 + "{\r\n"
                 + "trace(\"obj\");\r\n"
-                + "}\r\n",
+                + "}\r\n"
+                + "s = xlist;\r\n",
                  false);
     }
 
