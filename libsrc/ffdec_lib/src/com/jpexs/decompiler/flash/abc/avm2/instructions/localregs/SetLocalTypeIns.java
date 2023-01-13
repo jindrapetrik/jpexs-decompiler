@@ -124,7 +124,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
             }
         }
 
-        SetLocalAVM2Item result = new SetLocalAVM2Item(ins, localData.lineStartInstruction, regId, value);
+        SetLocalAVM2Item result = new SetLocalAVM2Item(ins, localData.lineStartInstruction, regId, value, value.returnType());
         if (value.getNotCoerced() instanceof CompoundableBinaryOp) {
             CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoerced();
             if (binaryOp.getLeftSide() instanceof LocalRegAVM2Item) {
@@ -136,7 +136,7 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
             }
         }
 
-        SetTypeIns.handleResult(value, stack, output, localData, result, regId);
+        SetTypeIns.handleResult(value, stack, output, localData, result, regId, value.returnType());
     }
 
     @Override

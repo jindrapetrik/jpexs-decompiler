@@ -364,7 +364,7 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
         SetPropertyAVM2Item result = new SetPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, value, type.getVal(), callType.getVal(), isStatic.getVal());
         handleCompound(localData, obj, multiname, value, output, result);
 
-        SetTypeIns.handleResult(value, stack, output, localData, result, -1);
+        SetTypeIns.handleResult(value, stack, output, localData, result, -1, type.getVal());
     }
 
     public static void handleCompound(AVM2LocalData localData, GraphTargetItem obj, FullMultinameAVM2Item multiname, GraphTargetItem value, List<GraphTargetItem> output, SetTypeAVM2Item result) {

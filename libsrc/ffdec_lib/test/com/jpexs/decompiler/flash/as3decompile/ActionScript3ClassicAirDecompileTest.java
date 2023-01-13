@@ -229,6 +229,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "var xlist:XMLList;\r\n"
                 + "var lc:LocalClass;\r\n"
                 + "var f:Function;\r\n"
+                + "var d:Number;\r\n"
                 + "var s:String = \"a\";\r\n"
                 + "var i:int = int(s);\r\n"
                 + "var j:int = n;\r\n"
@@ -293,7 +294,18 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "{\r\n"
                 + "trace(\"obj\");\r\n"
                 + "}\r\n"
-                + "s = xlist;\r\n",
+                + "s = xlist;\r\n"
+                + "d = 0;\r\n"
+                + "d = 1;\r\n"
+                + "d = 1.5;\r\n"
+                + "i = 1;\r\n"
+                + "i = 1.5;\r\n"
+                + "o[int(d * 5)] = 1;\r\n"
+                + "this.n = 1.5;\r\n"
+                + "super.prot = 1.5;\r\n"
+                + "super.prot = int(s);\r\n"
+                + "i = super.prot;\r\n"
+                + "s = String(super.prot);\r\n",
                  false);
     }
 

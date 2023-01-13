@@ -168,7 +168,7 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
             }
         }
 
-        SetTypeIns.handleResult(value, stack, output, localData, result, -1);
+        SetTypeIns.handleResult(value, stack, output, localData, result, -1, slotType);
     }
 
     @Override

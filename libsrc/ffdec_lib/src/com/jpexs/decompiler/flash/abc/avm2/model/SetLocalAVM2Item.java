@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.abc.avm2.model;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.SetTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.AssignmentAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.clauses.DeclarationAVM2Item;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -43,6 +44,8 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
     public GraphTargetItem compoundValue;
 
     public String compoundOperator;
+    
+    public GraphTargetItem type;
 
     @Override
     public DeclarationAVM2Item getDeclaration() {
@@ -54,9 +57,10 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         this.declaration = declaration;
     }
 
-    public SetLocalAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex, GraphTargetItem value) {
+    public SetLocalAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, int regIndex, GraphTargetItem value, GraphTargetItem type) {
         super(instruction, lineStartIns, PRECEDENCE_ASSIGMENT, value);
         this.regIndex = regIndex;
+        this.type = type;
     }
 
     @Override
@@ -73,8 +77,8 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
         writer.append(" = ");
         /*if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
             return value.value.toString(writer, localData);
-        }*/
-        return value.toString(writer, localData);
+        }*/        
+        return SetTypeIns.handleNumberToInt(value, type).toString(writer, localData);
     }
 
     @Override
@@ -141,7 +145,7 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
 
     @Override
     public GraphTargetItem returnType() {        
-        return value.returnType();
+        return type;
     }
 
     @Override

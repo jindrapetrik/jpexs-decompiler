@@ -90,7 +90,19 @@ package tests
             if (o) {
                 trace("obj");
             }             
-            s = xlist;        			
+            s = xlist;
+            var d:Number = 0;
+            d = 1;
+            d = 1.5;
+            i = 1;
+            i = 1.5;  
+            o[int(d * 5)] = 1;
+            this.n = 1.5;
+            super.prot = 1.5;
+            super.prot = int(s);
+            i = super.prot;
+            s = String(super.prot);      
+            			
 		}
 	}
 }
