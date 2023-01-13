@@ -42,7 +42,7 @@ public class MethodInfo {
     public boolean deleted;
 
     public void delete(ABC abc, boolean d) {
-        this.deleted = true;
+        this.deleted = d;
         MethodBody body = abc.findBody(this);
         if (body != null) {
             for (AVM2Instruction ins : body.getCode().code) {
