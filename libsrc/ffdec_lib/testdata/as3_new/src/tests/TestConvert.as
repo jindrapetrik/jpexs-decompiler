@@ -89,7 +89,8 @@ package tests
         
             if (o) {
                 trace("obj");
-            }                     			
+            }             
+            s = xlist;        			
 		}
 	}
 }

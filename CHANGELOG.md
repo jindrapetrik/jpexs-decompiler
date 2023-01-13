@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - [#1894] Switch inside loop
 - [#1801] AS3 - AIR/Flash switching
 - [#1892] AS3 - internal modifier after implicit namespace
+- [#1888] AS3 - Coerce to string
 
 ## [18.3.2] - 2023-01-10
 ### Removed
@@ -2871,6 +2872,7 @@ All notable changes to this project will be documented in this file.
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1894]: https://www.free-decompiler.com/flash/issues/1894
 [#1801]: https://www.free-decompiler.com/flash/issues/1801
+[#1892]: https://www.free-decompiler.com/flash/issues/1892
 [#1935]: https://www.free-decompiler.com/flash/issues/1935
 [#1931]: https://www.free-decompiler.com/flash/issues/1931
 [#1934]: https://www.free-decompiler.com/flash/issues/1934
@@ -2927,7 +2929,6 @@ All notable changes to this project will be documented in this file.
 [#1769]: https://www.free-decompiler.com/flash/issues/1769
 [#1810]: https://www.free-decompiler.com/flash/issues/1810
 [#1891]: https://www.free-decompiler.com/flash/issues/1891
-[#1892]: https://www.free-decompiler.com/flash/issues/1892
 [#1887]: https://www.free-decompiler.com/flash/issues/1887
 [#1882]: https://www.free-decompiler.com/flash/issues/1882
 [#1880]: https://www.free-decompiler.com/flash/issues/1880

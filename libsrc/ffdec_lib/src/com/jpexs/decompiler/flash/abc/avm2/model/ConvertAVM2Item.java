@@ -49,12 +49,9 @@ public class ConvertAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
+        //Same for CoerceAVM2Item
         boolean displayConvert = true;
         GraphTargetItem valueReturnType = value.returnType();
-        /*if (valueReturnType instanceof TypeItem) {
-            TypeItem ti = (TypeItem)valueReturnType;
-            ti.fullTypeName.toRawString()
-        }*/
         switch (type.toString()) {
             case "Boolean":
                 displayConvert = !valueReturnType.equals(TypeItem.BOOLEAN) &&
@@ -70,6 +67,9 @@ public class ConvertAVM2Item extends AVM2Item {
                 break;
             case "String":
                 displayConvert = !valueReturnType.equals(TypeItem.STRING) &&
+                                !valueReturnType.equals(new TypeItem("XML")) &&
+                                !valueReturnType.equals(new TypeItem("XMLList")) &&
+                                !valueReturnType.equals(new TypeItem("null")) &&
                                  !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;            
         }

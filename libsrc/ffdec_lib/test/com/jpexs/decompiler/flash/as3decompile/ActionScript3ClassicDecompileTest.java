@@ -291,7 +291,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "if(Boolean(o))\r\n"
                 + "{\r\n"
                 + "trace(\"obj\");\r\n"
-                + "}\r\n",
+                + "}\r\n"
+                + "s = xlist;\r\n",
                  false);
     }
 

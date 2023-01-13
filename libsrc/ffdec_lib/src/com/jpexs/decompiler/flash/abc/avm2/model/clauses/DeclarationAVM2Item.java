@@ -98,18 +98,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             srcData.regIndex = lti.regIndex;
 
             GraphTargetItem val = lti.value;
-            GraphTargetItem coerType = TypeItem.UNBOUNDED;
-            if (lti.value instanceof CoerceAVM2Item) {
-                coerType = ((CoerceAVM2Item) lti.value).typeObj;
-            }
-            if (lti.value instanceof ConvertAVM2Item) {
-                coerType = ((ConvertAVM2Item) lti.value).type;
-            }
-            //strip coerce if its declared as this type
-            if ((lti.value instanceof CoerceAVM2Item) && coerType.equals(type) && !coerType.equals(TypeItem.UNBOUNDED)) {
-                val = val.value;
-            }
-            srcData.declaredType = (coerType instanceof TypeItem) ? ((TypeItem) coerType).fullTypeName : DottedChain.ALL;
+            srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName : DottedChain.ALL;
             writer.append("var ");
             writer.append(localName);
             writer.append(":");
@@ -126,19 +115,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             srcData.localName = ssti.getNameAsStr(localData);
             srcData.declaration = true;
 
-            GraphTargetItem val = ssti.value;
-            GraphTargetItem coerType = TypeItem.UNBOUNDED;
-            if (ssti.value instanceof CoerceAVM2Item) {
-                coerType = ((CoerceAVM2Item) ssti.value).typeObj;
-            }
-            if (ssti.value instanceof ConvertAVM2Item) {
-                coerType = ((ConvertAVM2Item) ssti.value).type;
-            }
-            //strip coerce if its declared as this type
-            if ((ssti.value instanceof CoerceAVM2Item) && coerType.equals(type) && !coerType.equals(TypeItem.UNBOUNDED)) {
-                val = val.value;
-            }
-
+            GraphTargetItem val = ssti.value;                        
             srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName : DottedChain.ALL;
             writer.append("var ");
             ssti.getName(writer, localData);
@@ -158,19 +135,7 @@ public class DeclarationAVM2Item extends AVM2Item {
             srcData.localName = ((FullMultinameAVM2Item) spti.propertyName).resolvedMultinameName;
             srcData.declaration = true;
 
-            GraphTargetItem val = spti.value;
-            GraphTargetItem coerType = TypeItem.UNBOUNDED;
-            if (spti.value instanceof CoerceAVM2Item) {
-                coerType = ((CoerceAVM2Item) spti.value).typeObj;
-            }
-            if (spti.value instanceof ConvertAVM2Item) {
-                coerType = ((ConvertAVM2Item) spti.value).type;
-            }
-            //strip coerce if its declared as this type
-            if ((spti.value instanceof CoerceAVM2Item) && coerType.equals(type) && !coerType.equals(TypeItem.UNBOUNDED)) {
-                val = val.value;
-            }
-
+            GraphTargetItem val = spti.value;      
             srcData.declaredType = (type instanceof TypeItem) ? ((TypeItem) type).fullTypeName : DottedChain.ALL;
             writer.append("var ");
             writer.append(IdentifiersDeobfuscation.printIdentifier(true, ((FullMultinameAVM2Item) spti.propertyName).resolvedMultinameName));
