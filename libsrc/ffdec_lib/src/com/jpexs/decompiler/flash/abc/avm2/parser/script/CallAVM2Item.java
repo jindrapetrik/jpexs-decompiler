@@ -48,11 +48,11 @@ public class CallAVM2Item extends AVM2Item {
     public int line;
 
     public List<NamespaceItem> openedNamespaces;
-    
+
     private AbcIndexing abcIndex;
 
     public CallAVM2Item(List<NamespaceItem> openedNamespaces, int line, GraphTargetItem name, List<GraphTargetItem> arguments, AbcIndexing abcIndex) {
-        super(null, null, NOPRECEDENCE);        
+        super(null, null, NOPRECEDENCE);
         this.openedNamespaces = openedNamespaces;
         this.name = name;
         this.arguments = arguments;
@@ -168,7 +168,7 @@ public class CallAVM2Item extends AVM2Item {
             return ((NamespacedAVM2Item) callable).toSource(localData, generator, needsReturn, true, arguments, false, false);
         }
 
-        return toSourceMerge(localData, generator, callable, ins(AVM2Instructions.GetGlobalScope), arguments, ins(AVM2Instructions.Call, arguments.size()));
+        return toSourceMerge(localData, generator, callable, ins(AVM2Instructions.GetGlobalScope), arguments, ins(AVM2Instructions.Call, arguments.size()), needsReturn ? null : ins(AVM2Instructions.Pop));
     }
 
     @Override
