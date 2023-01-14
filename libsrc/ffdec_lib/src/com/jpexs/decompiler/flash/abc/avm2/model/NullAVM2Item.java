@@ -25,6 +25,7 @@ import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -35,7 +36,7 @@ import java.util.Set;
  *
  * @author JPEXS
  */
-public class NullAVM2Item extends AVM2Item {
+public class NullAVM2Item extends AVM2Item implements SimpleValue {
 
     public NullAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
@@ -91,5 +92,10 @@ public class NullAVM2Item extends AVM2Item {
     public int hashCode() {
         int hash = 3;
         return hash;
+    }
+
+    @Override
+    public boolean isSimpleValue() {
+        return true;
     }
 }

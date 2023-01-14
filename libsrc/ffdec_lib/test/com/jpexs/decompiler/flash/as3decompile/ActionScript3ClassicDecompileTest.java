@@ -348,6 +348,22 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testDeclarationInterface() {
+        decompileMethod("classic", "testDeclarationInterface", "var i:MyIFace = null;\r\n"
+                + "var n:int = 2;\r\n"
+                + "switch(n)\r\n"
+                + "{\r\n"
+                + "case 0:\r\n"
+                + "i = new MyClass();\r\n"
+                + "break;\r\n"
+                + "case 1:\r\n"
+                + "i = new MyClass2();\r\n"
+                + "}\r\n"
+                + "return i;\r\n",
+                 false);
+    }
+
+    @Test
     public void testDeclarations() {
         decompileMethod("classic", "testDeclarations", "var vall:* = undefined;\r\n"
                 + "var vstr:String = null;\r\n"

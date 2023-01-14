@@ -1193,14 +1193,14 @@ public class AVM2Code implements Cloneable {
     }
 
     public GraphTextWriter toASMSource(ABC abc, AVM2ConstantPool constants, MethodInfo info, MethodBody body, List<Integer> outputMap, ScriptExportMode exportMode, GraphTextWriter writer) {
-        
+
         if (info != null) {
             writer.appendNoHilight("method");
             if (Configuration.indentAs3PCode.get()) {
                 writer.indent();
             }
             writer.newLine();
-        
+
             info.toASMSource(constants, writer);
         }
         writer.newLine();
@@ -1780,22 +1780,31 @@ public class AVM2Code implements Cloneable {
         } else if (assignment.value instanceof CoerceAVM2Item) {
             vtype = ((CoerceAVM2Item) assignment.value).typeObj;
         } else if (assignment instanceof LocalRegAVM2Item) { //for..in
-            vtype = ((LocalRegAVM2Item)assignment).type;
+            vtype = ((LocalRegAVM2Item) assignment).type;
         } else if (assignment instanceof GetSlotAVM2Item) { //for..in
-            vtype = ((GetSlotAVM2Item)assignment).slotType;
+            vtype = ((GetSlotAVM2Item) assignment).slotType;
         } else if ((assignment.value instanceof SimpleValue) && ((SimpleValue) assignment.value).isSimpleValue()) {
             vtype = assignment.value.returnType();
-        }        
+        }
+        
+        boolean isNull = false;
+        if (vtype.equals(new TypeItem(DottedChain.NULL))) {
+            vtype = TypeItem.UNBOUNDED;                
+        }
 
-        if (declaredRegisters[reg] == null) {
+        if (declaredRegisters[reg] == null) {            
             declaredRegisters[reg] = new DeclarationAVM2Item(assignment, vtype);
             if (assignment instanceof SetTypeAVM2Item) {
                 ((SetTypeAVM2Item) assignment).setDeclaration(declaredRegisters[reg]);
             }
+            declaredRegisters[reg].typeIsNull = isNull;
             return declaredRegisters[reg];
         }
 
-        if (declaredRegisters[reg].type == TypeItem.UNBOUNDED) {
+        if (declaredRegisters[reg].typeIsNull) {
+            declaredRegisters[reg].type = vtype;
+            declaredRegisters[reg].typeIsNull = isNull;
+        } else if (declaredRegisters[reg].type == TypeItem.UNBOUNDED) {
 
         } else if (!declaredRegisters[reg].type.equals(vtype)) { //already declared with different type
             declaredRegisters[reg].type = TypeItem.UNBOUNDED;
@@ -1896,7 +1905,7 @@ public class AVM2Code implements Cloneable {
                             Slot sl = new Slot(new NewActivationAVM2Item(null, null), propertyMultiName);
                             if (!paramNames.contains(propertyName)) {
                                 if (traits.containsKey(propertyName) && !beginDeclaredSlotsNames.contains(propertyName)) {
-                                    hasPrevReference.setVal(true);                                    
+                                    hasPrevReference.setVal(true);
                                 }
                             }
                         }
@@ -1956,7 +1965,7 @@ public class AVM2Code implements Cloneable {
                     int reg = ((LocalRegAVM2Item) fi.expression.object).regIndex;
                     fi.expression.object = handleDeclareReg(minreg, fi.expression.object, declaredRegisters, declaredSlots, reg);
                 }
-            }           
+            }
 
             for (GraphTargetItem subItem : itemsOnLine) {
                 if (subItem instanceof SetLocalAVM2Item) {
@@ -1987,11 +1996,11 @@ public class AVM2Code implements Cloneable {
                                         sp.setDeclaration(d);
                                         declaredPropsDec.add(d);
                                         declaredProperties.add(propName.resolvedMultinameName);
-                                        
+
                                         Slot sl = new Slot(new NewActivationAVM2Item(null, null), abc.constants.getMultiname(tsc.name_index));
                                         declaredSlotsDec.add(d);
                                         declaredSlots.add(sl);
-                                        
+
                                         if (subItem == currentItem) {
                                             items.set(i, d);
                                         } else {
@@ -2025,7 +2034,7 @@ public class AVM2Code implements Cloneable {
                                 ssti.setDeclaration(d);
                                 declaredSlotsDec.add(d);
                                 declaredSlots.add(sl);
-                                
+
                                 declaredPropsDec.add(d);
                                 declaredProperties.add(slotPropertyName);
 
@@ -2088,10 +2097,10 @@ public class AVM2Code implements Cloneable {
             localRegTypes.put(i + 1, AbcIndexing.multinameToType(abc.method_info.get(methodIndex).param_types[i], abc.constants));
         }
 
-        ScopeStack prevScopeStack = (ScopeStack)scopeStack.clone();
-        try{
+        ScopeStack prevScopeStack = (ScopeStack) scopeStack.clone();
+        try {
             list = AVM2Graph.translateViaGraph(null, callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssigmentIps, refs, thisHasDefaultToPrimitive);
-        } catch(SecondPassException spe) {
+        } catch (SecondPassException spe) {
             list = AVM2Graph.translateViaGraph(spe.getData(), callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, prevScopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssigmentIps, refs, thisHasDefaultToPrimitive);
         }
         if (initTraits != null) {
@@ -2549,19 +2558,19 @@ public class AVM2Code implements Cloneable {
 
     public int removeTraps(Trait trait, int methodInfo, MethodBody body, ABC abc, int scriptIndex, int classIndex, boolean isStatic, String path) throws InterruptedException {
         SWFDecompilerPlugin.fireAvm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
-        try ( Statistics s = new Statistics("AVM2DeobfuscatorGetSet")) {
+        try (Statistics s = new Statistics("AVM2DeobfuscatorGetSet")) {
             new AVM2DeobfuscatorGetSet().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
         }
-        try ( Statistics s = new Statistics("AVM2DeobfuscatorSimple")) {
+        try (Statistics s = new Statistics("AVM2DeobfuscatorSimple")) {
             new AVM2DeobfuscatorSimpleOld().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
         }
-        try ( Statistics s = new Statistics("AVM2DeobfuscatorRegisters")) {
+        try (Statistics s = new Statistics("AVM2DeobfuscatorRegisters")) {
             new AVM2DeobfuscatorRegistersOld().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
         }
-        try ( Statistics s = new Statistics("AVM2DeobfuscatorJumps")) {
+        try (Statistics s = new Statistics("AVM2DeobfuscatorJumps")) {
             new AVM2DeobfuscatorJumps().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
         }
-        try ( Statistics s = new Statistics("AVM2DeobfuscatorZeroJumpsNullPushes")) {
+        try (Statistics s = new Statistics("AVM2DeobfuscatorZeroJumpsNullPushes")) {
             new AVM2DeobfuscatorZeroJumpsNullPushes().avm2CodeRemoveTraps(path, classIndex, isStatic, scriptIndex, abc, trait, methodInfo, body);
         }
         return 1;
