@@ -228,7 +228,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         if (resolved == null) {
-            throw new RuntimeException("Unresolved: " + toString());
+            throw new CompilationException("Undefined variable or property: "+ toString(), line);
         }
         return resolved.toSource(localData, generator);
     }
@@ -236,7 +236,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     @Override
     public List<GraphSourceItem> toSourceIgnoreReturnValue(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         if (resolved == null) {
-            throw new RuntimeException("Unresolved");
+            throw new CompilationException("Undefined variable or property: "+ toString(), line);
         }
         return resolved.toSourceIgnoreReturnValue(localData, generator);
     }
@@ -279,12 +279,12 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
     @Override
     public List<GraphSourceItem> toSourceChange(SourceGeneratorLocalData localData, SourceGenerator generator, boolean post, boolean decrement, boolean needsReturn) throws CompilationException {
         if (resolved == null) {
-            throw new RuntimeException("Unresolved");
+            throw new CompilationException("Undefined variable or property: "+ toString(), line);
         }
         if (resolved instanceof AssignableAVM2Item) {
             return ((AssignableAVM2Item) resolved).toSourceChange(localData, generator, post, decrement, needsReturn);
         }
-        throw new RuntimeException("Cannot assign");
+        throw new CompilationException("Cannot assign", line);
     }
 
     public GraphTargetItem resolve(SourceGeneratorLocalData localData /*can be null!!!*/, String currentClass, GraphTargetItem thisType, List<GraphTargetItem> paramTypes, List<String> paramNames, AbcIndexing abc, List<MethodBody> callStack, List<AssignableAVM2Item> variables) throws CompilationException {
