@@ -1789,7 +1789,8 @@ public class AVM2Code implements Cloneable {
         
         boolean isNull = false;
         if (vtype.equals(new TypeItem(DottedChain.NULL))) {
-            vtype = TypeItem.UNBOUNDED;                
+            vtype = TypeItem.UNBOUNDED;
+            isNull = true;
         }
 
         if (declaredRegisters[reg] == null) {            
