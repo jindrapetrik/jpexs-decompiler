@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - [#1936] AS3 Direct editation - colliding try..catch variable
 - [#1936] AS3 Direct editation - missing pop after call
 - [#1936] AS3 Direct editation - slots increment, decrement
+- [#1936] AS3 Direct editation - scope of nested functions
 
 ## [18.3.2] - 2023-01-10
 ### Removed

@@ -1505,7 +1505,7 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     @Test
     public void testSlots() {
         decompileMethod("classic_air", "testSlots", "var i:int = 1;\r\n"
-                + "var f:* = function():void\r\n"
+                + "var f:Function = function():void\r\n"
                 + "{\r\n"
                 + "trace(\"hello\");\r\n"
                 + "};\r\n"
@@ -1514,6 +1514,23 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "trace(i--);\r\n"
                 + "trace(++i);\r\n"
                 + "trace(--i);\r\n",
+                 false);
+    }
+
+    @Test
+    public void testSlots2() {
+        decompileMethod("classic_air", "testSlots2", "var f:Function = function():void\r\n"
+                + "{\r\n"
+                + "var n:int = 0;\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"intry\");\r\n"
+                + "}\r\n"
+                + "catch(e:Error)\r\n"
+                + "{\r\n"
+                + "n = 1;\r\n"
+                + "}\r\n"
+                + "};\r\n",
                  false);
     }
 
