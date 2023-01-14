@@ -2085,11 +2085,11 @@ public class AVM2Code implements Cloneable {
             localRegTypes.put(i + 1, AbcIndexing.multinameToType(abc.method_info.get(methodIndex).param_types[i], abc.constants));
         }
 
-        //try {
+        ScopeStack prevScopeStack = (ScopeStack)scopeStack.clone();
         try{
             list = AVM2Graph.translateViaGraph(null, callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssigmentIps, refs, thisHasDefaultToPrimitive);
         } catch(SecondPassException spe) {
-            list = AVM2Graph.translateViaGraph(spe.getData(), callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssigmentIps, refs, thisHasDefaultToPrimitive);
+            list = AVM2Graph.translateViaGraph(spe.getData(), callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, prevScopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssigmentIps, refs, thisHasDefaultToPrimitive);
         }
         if (initTraits != null) {
             loopi:
