@@ -55,6 +55,10 @@ public class MethodCodePanel extends JPanel {
 
     private final DocsPanel docsPanel;
 
+    public ABC getABC() {
+        return sourceTextArea.abc;
+    }
+    
     public void refreshMarkers() {
         sourceTextArea.refreshMarkers();
     }
