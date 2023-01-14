@@ -44,6 +44,8 @@ public class DeclarationAVM2Item extends AVM2Item {
     public GraphTargetItem assignment;
 
     public GraphTargetItem type;
+    
+    public boolean typeIsNull = false;
 
     public boolean showValue = true;
 
