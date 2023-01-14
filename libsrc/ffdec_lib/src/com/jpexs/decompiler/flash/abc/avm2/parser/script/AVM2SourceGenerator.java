@@ -1654,7 +1654,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         List<String> registerNames = new ArrayList<>();
         List<Integer> registerLines = new ArrayList<>();
         List<GraphTargetItem> registerTypes = new ArrayList<>();
-        if (className != null) {
+        if (className != null && !subMethod) {
             String fullClassName = pkg.addWithSuffix(className).toRawString();
             registerTypes.add(new TypeItem(fullClassName));
             localData.scopeStack.add(new LocalRegAVM2Item(null, null, registerNames.size(), null, new TypeItem(fullClassName)));

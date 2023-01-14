@@ -6,7 +6,7 @@ package tests
 		public function run():*
 		{
 			var i:int = 1;
-            var f = function():void
+            var f:Function = function():void
               {
                  trace("hello");
               };

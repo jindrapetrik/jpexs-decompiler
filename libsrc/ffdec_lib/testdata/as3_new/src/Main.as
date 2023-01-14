@@ -95,6 +95,7 @@ package
 		TestRegExp;
 		TestRest;
         TestSlots;
+		TestSlots2;
 		TestStrictEquals;
 		TestStringConcat;
 		TestStrings;		
