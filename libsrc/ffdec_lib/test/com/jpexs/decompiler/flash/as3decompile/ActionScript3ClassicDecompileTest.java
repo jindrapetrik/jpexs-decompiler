@@ -109,6 +109,29 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testCollidingTry() {
+        decompileMethod("classic", "testCollidingTry", "var e:int = 0;\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "e = 0;\r\n"
+                + "}\r\n"
+                + "catch(e:*)\r\n"
+                + "{\r\n"
+                + "trace(e);\r\n"
+                + "}\r\n"
+                + "try\r\n"
+                + "{\r\n"
+                + "trace(\"x\");\r\n"
+                + "}\r\n"
+                + "catch(e:*)\r\n"
+                + "{\r\n"
+                + "trace(e);\r\n"
+                + "}\r\n"
+                + "trace(\"y\");\r\n",
+                 false);
+    }
+
+    @Test
     public void testComma() {
         decompileMethod("classic", "testComma", "var a:int = 5;\r\n"
                 + "var b:int = 0;\r\n"

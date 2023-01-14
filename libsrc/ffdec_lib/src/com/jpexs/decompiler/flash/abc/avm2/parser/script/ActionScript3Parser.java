@@ -1777,9 +1777,10 @@ public class ActionScript3Parser {
                         List<GraphTargetItem> cc = commands(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, loops, loopLabels, registerVars, inFunction, inMethod, forinlevel, catchVars);
                         expectedType(SymbolType.CURLY_CLOSE);
                         catchesVars.add(catchVars);
-                        variables.addAll(catchVars);
+                        List<AssignableAVM2Item> newVariables = new ArrayList<>(catchVars);
 
-                        for (AssignableAVM2Item a : catchVars) {
+                        for (int i = 0; i < newVariables.size(); i++) {
+                            AssignableAVM2Item a = newVariables.get(i);
                             if (a instanceof UnresolvedAVM2Item) {
                                 UnresolvedAVM2Item ui = (UnresolvedAVM2Item) a;
                                 if (ui.getVariableName().equals(DottedChain.parseWithSuffix(e.getVariableName()))) {
@@ -1792,11 +1793,13 @@ public class ActionScript3Parser {
                                     }
                                     ui.setSlotNumber(e.getSlotNumber());
                                     ui.setSlotScope(e.getSlotScope());
-                                    variables.remove(a);
+                                    newVariables.remove(i);
+                                    i--;
                                 }
 
                             }
                         }
+                        variables.addAll(newVariables);                                                       
 
                         catchCommands.add(cc);
                         s = lex();

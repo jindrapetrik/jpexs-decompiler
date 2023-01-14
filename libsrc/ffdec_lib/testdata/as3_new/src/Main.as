@@ -22,9 +22,10 @@ package
 		TestCatchFinally;
 		TestChain2;
 		TestChainedAssignments;
-        TestConvert;
-		TestComplexExpressions;
+        TestCollidingTry;
+        TestComplexExpressions;
 		TestContinueLevels;
+        TestConvert;		
 		TestComma;
 		TestCompoundAssignments;
 		TestDecl2;
