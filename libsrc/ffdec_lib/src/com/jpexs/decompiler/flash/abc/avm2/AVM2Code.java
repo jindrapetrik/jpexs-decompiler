@@ -1839,6 +1839,9 @@ public class AVM2Code implements Cloneable {
                 GraphTargetItem value = null;
                 if (item instanceof SetSlotAVM2Item) {
                     SetSlotAVM2Item ss = (SetSlotAVM2Item) item;
+                    if (ss.slotName == null) {
+                        break;
+                    }
                     propNameStr = ss.slotName.getName(abc.constants, new ArrayList<>(), true, true);
                     value = ss.value;
                 } else if (item instanceof SetPropertyAVM2Item) {
