@@ -27,6 +27,8 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.swing.JCheckBox;
 import javax.swing.JRootPane;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -90,7 +92,7 @@ public class QuickFindDialog extends javax.swing.JDialog
         getRootPane().setWindowDecorationStyle(JRootPane.NONE);
 
     }
-
+    
     public void showFor(final JTextComponent target) {
         oldCaretPosition = target.getCaretPosition();
         Container view = target.getParent();
@@ -99,6 +101,13 @@ public class QuickFindDialog extends javax.swing.JDialog
         Point loc = new Point(0, view.getHeight());
         setSize(wd);
         setLocationRelativeTo(view);
+        if (view.getParent() instanceof JScrollPane) {
+            JScrollPane scrollPane = (JScrollPane) view.getParent();
+            JScrollBar horizontalScrollBar = scrollPane.getHorizontalScrollBar();
+            if (horizontalScrollBar.isVisible()) {
+                loc.y += horizontalScrollBar.getHeight();
+            }
+        }
         SwingUtilities.convertPointToScreen(loc, view);
         setLocation(loc);
         jTxtFind.setFont(target.getFont());
