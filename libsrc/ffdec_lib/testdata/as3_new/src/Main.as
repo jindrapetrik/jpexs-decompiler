@@ -94,6 +94,7 @@ package
 		TestProperty;
 		TestRegExp;
 		TestRest;
+        TestSlots;
 		TestStrictEquals;
 		TestStringConcat;
 		TestStrings;		

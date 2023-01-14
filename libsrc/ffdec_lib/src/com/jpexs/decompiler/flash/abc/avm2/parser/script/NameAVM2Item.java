@@ -352,7 +352,6 @@ public class NameAVM2Item extends AssignableAVM2Item {
             }
         }
         return toSourceMerge(localData, generator,
-                slotNumber > -1 ? ins(AVM2Instructions.GetScopeObject, slotScope) : null,
                 //Start get original
                 generateGetLoc(regNumber), generateGetSlot(slotScope, slotNumber),
                 //End get original
@@ -363,7 +362,11 @@ public class NameAVM2Item extends AssignableAVM2Item {
                 (post) ? (decrement ? ins(isInteger ? AVM2Instructions.DecrementI : AVM2Instructions.Decrement) : ins(isInteger ? AVM2Instructions.IncrementI : AVM2Instructions.Increment)) : null,
                 generateCoerce(localData, generator, returnType()),
                 generateSetLoc(regNumber),
-                slotNumber > -1 ? ins(AVM2Instructions.SetSlot, slotNumber) : null
+                slotNumber > -1 ? Arrays.asList(
+                        ins(AVM2Instructions.GetScopeObject, slotScope),
+                        ins(AVM2Instructions.Swap),
+                        ins(AVM2Instructions.SetSlot, slotNumber)
+                ) : null
         );
     }
 
