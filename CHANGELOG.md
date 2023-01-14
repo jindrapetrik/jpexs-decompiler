@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - empty P-code shown on clicking script
 - [#1888] AS3 - Coerces, module operator
 - [#1937] AS3 - declarations vs null
+- [#1458] Quick find bar overlaying horizontal scrollbar
 
 ## [18.3.2] - 2023-01-10
 ### Removed
@@ -2891,6 +2892,7 @@ All notable changes to this project will be documented in this file.
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
 [#1936]: https://www.free-decompiler.com/flash/issues/1936
 [#1937]: https://www.free-decompiler.com/flash/issues/1937
+[#1458]: https://www.free-decompiler.com/flash/issues/1458
 [#1935]: https://www.free-decompiler.com/flash/issues/1935
 [#1931]: https://www.free-decompiler.com/flash/issues/1931
 [#1934]: https://www.free-decompiler.com/flash/issues/1934
