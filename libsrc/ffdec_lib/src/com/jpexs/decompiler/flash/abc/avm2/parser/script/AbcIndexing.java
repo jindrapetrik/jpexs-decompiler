@@ -321,6 +321,13 @@ public final class AbcIndexing {
         public GraphTargetItem type;
         public DottedChain pkg;
 
+        private GraphTargetItem noNsType(GraphTargetItem type) {
+            TypeItem ti = (TypeItem)type;
+            ti = (TypeItem)ti.clone();
+            ti.ns = null;
+            return ti;
+        }
+        
         public ClassDef(GraphTargetItem type, ABC abc, Integer scriptIndex) {
             this.type = type;
             if (scriptIndex != null) {
@@ -336,7 +343,7 @@ public final class AbcIndexing {
         @Override
         public int hashCode() {
             int hash = 3;
-            hash = 17 * hash + Objects.hashCode(this.type);
+            hash = 17 * hash + Objects.hashCode(noNsType(this.type));
             hash = 17 * hash + Objects.hashCode(this.pkg);
             return hash;
         }
@@ -353,7 +360,7 @@ public final class AbcIndexing {
                 return false;
             }
             final ClassDef other = (ClassDef) obj;
-            if (!Objects.equals(this.type, other.type)) {
+            if (!Objects.equals(noNsType(this.type), noNsType(other.type))) {
                 return false;
             }
             return Objects.equals(this.pkg, other.pkg);

@@ -2592,9 +2592,10 @@ public class ActionScript3Parser {
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(
                 new HashMap<>(), 0, Boolean.FALSE, 0);
         ScriptInfo si = new ScriptInfo();
+        int scriptIndex = abcIndex.getSelectedAbc().script_info.size();
         abcIndex.getSelectedAbc().script_info.add(si);
         try {
-            gen.generateScriptInfo(si, allOpenedNamespaces, localData, items, classPos);
+            gen.generateScriptInfo(scriptIndex, si, allOpenedNamespaces, localData, items, classPos);
         } catch (Exception ex) {
             abcIndex.getSelectedAbc().script_info.remove(si);
             throw ex;
