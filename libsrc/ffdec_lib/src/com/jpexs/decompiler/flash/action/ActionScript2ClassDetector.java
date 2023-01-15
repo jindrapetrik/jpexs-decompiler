@@ -279,7 +279,7 @@ public class ActionScript2ClassDetector {
     }
 
     private boolean checkClassContent(List<GraphTargetItem> parts, HashMap<String, GraphTargetItem> variables, int partsPos, int commandsStartPos, int commandsEndPos, List<GraphTargetItem> commands, List<String> classNamePath, String scriptPath) {
-
+                    
         try {
 
             GraphTargetItem extendsOp = null;
@@ -299,29 +299,7 @@ public class ActionScript2ClassDetector {
                     StoreRegisterActionItem sr = (StoreRegisterActionItem) item;
                     definedRegisters.add(sr.register.number);
                 }
-            }
-
-            /*
-            Hack:
-            When register is not used after setting, then FFDec discards its value,
-            but the value is crucial as there is setmember, atc.
-            This will bypass the situation.
-            
-            This happens when there are no methods/vars, constructor only.
-             */
-            int numr = 0;
-            for (String s : variables.keySet()) {
-                Matcher m = regPattern.matcher(s);
-                if (m.matches()) {
-                    if (variables.get(s) instanceof TemporaryRegister) {
-                        int regId = Integer.parseInt(m.group(1));
-                        if (!definedRegisters.contains(regId)) {
-                            parts.add(partsPos + numr, variables.get(s).value);
-                            numr++;
-                        }
-                    }
-                }
-            }
+            }           
 
             if (parts.size() > partsPos) {
                 item = parts.get(partsPos);

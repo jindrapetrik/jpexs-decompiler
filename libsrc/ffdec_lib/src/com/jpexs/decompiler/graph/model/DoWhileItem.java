@@ -101,13 +101,15 @@ public class DoWhileItem extends LoopItem implements Block {
         }
         writer.append("(");
 
+        boolean first = true;
         for (int i = 0; i < expression.size(); i++) {
             if (expression.get(i).isEmpty()) {
                 continue;
             }
-            if (i != 0) {
+            if (!first) {
                 writer.append(", ");
             }
+            first = false;            
             if (i == expression.size() - 1) {
                 expression.get(i).toStringBoolean(writer, localData);
             } else {

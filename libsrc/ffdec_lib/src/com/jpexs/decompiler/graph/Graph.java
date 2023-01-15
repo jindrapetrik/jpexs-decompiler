@@ -1485,7 +1485,7 @@ public class Graph {
             }
             end = p.end;
             int start = p.start;
-            ret.addAll(code.translatePart(part, localData, stack, start, end, staticOperation, path));
+            ret.addAll(code.translatePart(this, part, localData, stack, start, end, staticOperation, path));
         }
         return ret;
     }
@@ -2039,6 +2039,7 @@ public class Graph {
     }
 
     protected List<GraphTargetItem> printGraph(List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, BaseLocalData localData, TranslateStack stack, Set<GraphPart> allParts, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> ret, int staticOperation, String path, int recursionLevel) throws InterruptedException {
+        loopPrintGraph:while(true) {
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }
@@ -2273,7 +2274,7 @@ public class Graph {
             do {
                 exHappened = false;
                 try {
-                    output.addAll(code.translatePart(part, localData, stack, ipStart, part.end, staticOperation, path));
+                    output.addAll(code.translatePart(this, part, localData, stack, ipStart, part.end, staticOperation, path));
                 } catch (GraphPartChangeException ex) { //Special case for ifFrameLoaded when it's over multiple parts
                     output.addAll(ex.getOutput());
                     for (GraphPart p : allParts) {
@@ -2282,7 +2283,8 @@ public class Graph {
                                 currentRet.addAll(output);
                                 //to check for stopparts,etc. we need to call printGraph again
                                 part = p;
-                                return printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, parent, part, stopPart, stopPartKind, loops, throwStates, ret, staticOperation, path, recursionLevel);
+                                //return printGraph(foundGotos, partCodes, partCodePos, visited, localData, stack, allParts, parent, part, stopPart, stopPartKind, loops, throwStates, ret, staticOperation, path, recursionLevel);
+                                continue loopPrintGraph;
                             }
                             exHappened = true;
                             ipStart = ex.getIp();
@@ -2932,7 +2934,8 @@ public class Graph {
                 printGraph(foundGotos, partCodes, partCodePos, visited, localData, sPreLoop, allParts, part, currentLoop.loopBreak, stopPart, stopPartKind, loops, throwStates, ret, staticOperation, path, recursionLevel + 1);
             }
         }
-
+            break;
+        }
         return ret;
     }
 
@@ -3169,8 +3172,8 @@ public class Graph {
             i--;
         }
     }
-
-    public static void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
+    
+    public void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
         int clen = commands.size();
         boolean isExit = false;
         if (clen > 0) {

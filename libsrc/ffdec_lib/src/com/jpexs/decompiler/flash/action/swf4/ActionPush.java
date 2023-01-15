@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.action.ActionList;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
+import com.jpexs.decompiler.flash.action.model.TemporaryRegisterMark;
 import com.jpexs.decompiler.flash.action.model.UnresolvedConstantActionItem;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
 import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
@@ -448,6 +449,16 @@ public class ActionPush extends Action {
                     }
                 }
                 if (dvt.computedRegValue instanceof TemporaryRegister) {
+                    ((TemporaryRegister)dvt.computedRegValue).used = true;
+                    for(int i = 0; i < output.size(); i++) {
+                        if(output.get(i) instanceof TemporaryRegisterMark) {
+                            TemporaryRegisterMark trm = (TemporaryRegisterMark)output.get(i);
+                            if(trm.tempReg == dvt.computedRegValue) {
+                                output.remove(i);
+                                break;
+                            }
+                        }
+                    }
                     stack.push(new TemporaryRegister(((RegisterNumber) o).number, ((TemporaryRegister) dvt.computedRegValue).value));
                 } else {
                     stack.push(dvt);

@@ -293,4 +293,39 @@ public class ActionScript2AssemblerTest extends ActionScript2TestBase {
                 + "}\n"
                 + "}");
     }
+
+    @Test
+    public void testNonStandardForIn() {
+        String res = decompileClassPcode("ConstantPool\n"
+                + "Push \"x\" 0 \"Object\"\n"
+                + "NewObject\n"
+                + "StoreRegister 1\n"
+                + "SetVariable\n"
+                + "Push \"_global\"\n"
+                + "GetVariable\n"
+                + "Push \"x\"\n"
+                + "GetMember\n"
+                + "StoreRegister 2\n"
+                + "Enumerate2\n"
+                + "loc003d:StoreRegister 0\n"
+                + "Push null\n"
+                + "Equals2\n"
+                + "If loc0066\n"
+                + "Push register1 register0 register2 register0\n"
+                + "GetMember\n"
+                + "SetMember\n"
+                + "Jump loc003d\n"
+                + "loc0066:Pop\n"
+                + "Push \"after\"\n"
+                + "Trace");
+        res = cleanPCode(res);
+        assertEquals(res, "var _loc1_ = null;\n"
+                + "x = _loc1_ = new Object();\n"
+                + "var _loc2_ = _global.x;\n"
+                + "for(var _loc0_ in _loc2_)\n"
+                + "{\n"
+                + "_loc1_[_loc0_] = _loc2_[_loc0_];\n"
+                + "}\n"
+                + "trace(\"after\");");
+    }
 }

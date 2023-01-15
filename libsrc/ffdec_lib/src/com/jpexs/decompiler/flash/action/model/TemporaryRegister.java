@@ -31,6 +31,8 @@ import java.util.Objects;
 public class TemporaryRegister extends ActionItem {
 
     private final int regId;
+    
+    public boolean used = false;
 
     public TemporaryRegister(int regId, GraphTargetItem value) {
         super(value.getSrc(), value.getLineStartItem(), value.getPrecedence(), value);
