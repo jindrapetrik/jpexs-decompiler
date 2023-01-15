@@ -63,8 +63,15 @@ public class InitObjectActionItem extends ActionItem {
             if (i < values.size() - 1) {
                 writer.append(",");
             }
-            //AS1/2 does not allow quotes in name here
-            writer.append(IdentifiersDeobfuscation.printIdentifier(false, names.get(i).toStringNoQuotes(localData)));
+            //AS1/2 does not allow quotes in name here            
+            if ((names.get(i) instanceof DirectValueActionItem) 
+                &&(((DirectValueActionItem)names.get(i)).isSimpleValue())) {
+                writer.append(IdentifiersDeobfuscation.printIdentifier(false, names.get(i).toStringNoQuotes(localData)));           
+            } else {
+                writer.append("(");
+                names.get(i).appendTo(writer, localData);
+                writer.append(")");
+            }
             writer.append(":");
             if (values.get(i) instanceof TernarOpItem) { //Ternar operator contains ":"
                 writer.append("(");
