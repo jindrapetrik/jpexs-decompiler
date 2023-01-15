@@ -80,14 +80,14 @@ public class AddAVM2Item extends BinaryOpItem implements CompoundableBinaryOp {
 
     @Override
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
-        if (rightSide instanceof IntegerValueAVM2Item) {
+        /*if (rightSide instanceof IntegerValueAVM2Item) {
             IntegerValueAVM2Item iv = (IntegerValueAVM2Item) rightSide;
             if (iv.value == 1) {
                 return toSourceMerge(localData, generator, leftSide,
                         new AVM2Instruction(0, AVM2Instructions.Increment, null)
                 );
             }
-        }
+        }*/
         return toSourceMerge(localData, generator, leftSide, rightSide,
                 new AVM2Instruction(0, AVM2Instructions.Add, null)
         );

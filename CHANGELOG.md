@@ -37,6 +37,9 @@ All notable changes to this project will be documented in this file.
 - [#1938] AS3 Direct editation - setting default values for slots
 - AS3 Direct editation - using local classes as types
 - [#1938] AS3 - coercion call type
+- [#1938] AS3 - shortening + 1 to increment
+- [#1938] AS3 - implicit coercion of operations
+- [#1938] AS3 - initproperty compound operators, increment/decrement
 
 ## [18.3.2] - 2023-01-10
 ### Removed
