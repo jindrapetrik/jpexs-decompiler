@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - [#1937] AS3 - declarations vs null
 - [#1458] Quick find bar overlaying horizontal scrollbar
 - [#1842] AS1/2 Better handling obfuscated code, for..in
+- [#1842] AS1/2 use parenthesis when initObject has nonstring keys
 
 ## [18.3.2] - 2023-01-10
 ### Removed
