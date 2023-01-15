@@ -412,7 +412,7 @@ public class UnresolvedAVM2Item extends AssignableAVM2Item {
         if (!isProperty) {
             for (int i = 0; i < name.size(); i++) {
                 DottedChain fname = name.subChain(i + 1);
-                AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(fname), abc.getSelectedAbc(), localData.scriptIndex);
+                AbcIndexing.ClassIndex ci = abc.findClass(new TypeItem(fname), localData != null ? abc.getSelectedAbc() : null, localData != null ? localData.scriptIndex : null);
                 if (ci != null) {
                     if (!subtypes.isEmpty() && name.size() > i + 1) {
                         continue;
