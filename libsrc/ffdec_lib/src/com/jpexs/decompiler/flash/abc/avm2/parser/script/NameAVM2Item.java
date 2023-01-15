@@ -214,6 +214,9 @@ public class NameAVM2Item extends AssignableAVM2Item {
             case "uint":
                 ins = ins(AVM2Instructions.ConvertU);
                 break;
+            case "Number":
+                ins = ins(AVM2Instructions.ConvertD);
+                break;
             default:
                 int type_index = AVM2SourceGenerator.resolveType(localData, ttype, ((AVM2SourceGenerator) generator).abcIndex);
                 ins = ins(AVM2Instructions.Coerce, type_index);
@@ -254,7 +257,7 @@ public class NameAVM2Item extends AssignableAVM2Item {
                         killTemp(localData, generator, Arrays.asList(ret_temp)));
             } else {
 
-                return toSourceMerge(localData, generator, assignedValue, !(("" + assignedValue.returnType()).equals("" + type) && (basicTypes.contains("" + type))) ? generateCoerce(localData, generator, type) : null, needsReturn
+                return toSourceMerge(localData, generator, assignedValue, generateCoerce(localData, generator, type), needsReturn
                         ? ins(AVM2Instructions.Dup) : null, generateSetLoc(regNumber));
             }
         } else {
