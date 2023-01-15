@@ -49,7 +49,7 @@ public class DuplicateItem extends GraphTargetItem implements SimpleValue {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
-        if (((value instanceof SimpleValue) && (((SimpleValue) value).isSimpleValue())) || !Configuration.displayDupInstructions.get()) {
+        if (!value.hasSideEffect() || !Configuration.displayDupInstructions.get()) {
             return value.appendTry(writer, localData);
         }
         writer.append("§§dup(");

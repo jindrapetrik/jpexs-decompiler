@@ -62,4 +62,9 @@ public class PopItem extends GraphTargetItem {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return generator.generate(localData, this);
     }
+
+    @Override
+    public boolean hasSideEffect() {
+        return true; //?
+    }        
 }
