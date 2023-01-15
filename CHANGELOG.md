@@ -31,6 +31,7 @@ All notable changes to this project will be documented in this file.
 - [#1842] AS1/2 Better handling obfuscated code, for..in
 - [#1842] AS1/2 use parenthesis when initObject has nonstring keys
 - [#1842] AS - Do not display §§dup when the value has no sideeffect
+- Deobfuscation icon on script toolbar did not match the deobfuscation status
 
 ## [18.3.2] - 2023-01-10
 ### Removed

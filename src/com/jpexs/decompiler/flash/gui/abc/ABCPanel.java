@@ -45,6 +45,7 @@ import com.jpexs.decompiler.flash.action.parser.script.ActionScriptLexer;
 import com.jpexs.decompiler.flash.action.parser.script.ParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.configuration.CustomConfigurationKeys;
 import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -971,7 +972,12 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         deobfuscateButton.addActionListener(this::deobfuscateButtonActionPerformed);
         deobfuscateButton.setToolTipText(AppStrings.translate("button.deobfuscate"));
         deobfuscateButton.setSelected(Configuration.autoDeobfuscate.get());
-        
+        Configuration.autoDeobfuscate.addListener(new ConfigurationItemChangeListener<Boolean>(){
+            @Override
+            public void configurationItemChanged(Boolean newValue) {
+                deobfuscateButton.setSelected(newValue);
+            }
+        });
         
         JButton deobfuscateOptionsButton = new JButton(View.getIcon("deobfuscateoptions16"));
         deobfuscateOptionsButton.addActionListener(this::deobfuscateOptionsButtonActionPerformed);
