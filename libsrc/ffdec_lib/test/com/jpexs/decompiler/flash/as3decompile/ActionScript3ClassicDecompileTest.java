@@ -1431,6 +1431,22 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testNames2() {
+        decompileMethod("classic", "testNames2", "var j:int = 0;\r\n"
+                + "var g:Function = null;\r\n"
+                + "this.i = 0;\r\n"
+                + "this.i = 1;\r\n"
+                + "j = 2;\r\n"
+                + "trace(this.i);\r\n"
+                + "trace(this.i);\r\n"
+                + "trace(j);\r\n"
+                + "this.f();\r\n"
+                + "this.f();\r\n"
+                + "g();\r\n",
+                 false);
+    }
+
+    @Test
     public void testNegate() {
         decompileMethod("classic", "testNegate", "var a:int = 5;\r\n"
                 + "var b:int = ~a;\r\n",

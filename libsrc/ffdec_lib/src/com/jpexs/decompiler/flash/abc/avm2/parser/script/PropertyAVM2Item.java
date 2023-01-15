@@ -482,11 +482,12 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 namespaceSuffixInt = Integer.parseInt(namespaceSuffix.substring(1));
             }
             
-            if (!localData.subMethod && cname != null && AVM2SourceGenerator.searchPrototypeChain(namespaceSuffixInt, otherNs, localData.privateNs, localData.protectedNs, true, abcIndex, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType) && (localData.getFullClass().equals(outNs.getVal().addWithSuffix(outName.getVal()).toRawString()))) {
+            //For using this when appropriate (Non ASC2 approach):
+            /*if (!localData.subMethod && cname != null && AVM2SourceGenerator.searchPrototypeChain(namespaceSuffixInt, otherNs, localData.privateNs, localData.protectedNs, true, abcIndex, pkgName, cname, propertyName, outName, outNs, outPropNs, outPropNsKind, outPropNsIndex, outPropType, outPropValue, outPropValueAbc, isType) && (localData.getFullClass().equals(outNs.getVal().addWithSuffix(outName.getVal()).toRawString()))) {
                 NameAVM2Item nobj = new NameAVM2Item(new TypeItem(localData.getFullClass()), 0, false, "this", "", null, false, openedNamespaces, abcIndex);
                 nobj.setRegNumber(0);
                 obj = nobj;
-            } else {
+            } else {*/
                 Reference<GraphTargetItem> objType = new Reference<>(null);
                 Reference<GraphTargetItem> propType = new Reference<>(null);
                 Reference<Integer> propIndex = new Reference<>(0);
@@ -495,7 +496,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
 
                 resolve(false, localData, isType, objType, propType, propIndex, outPropValue, propValueAbc);
                 obj = ins(AVM2Instructions.FindPropertyStrict, propIndex.getVal());
-            }
+            //}
         }
         return obj;
     }
