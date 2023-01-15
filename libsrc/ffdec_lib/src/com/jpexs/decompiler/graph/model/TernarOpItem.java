@@ -95,11 +95,13 @@ public class TernarOpItem extends GraphTargetItem {
 
     @Override
     public GraphTargetItem returnType() {
-        if (onTrue.returnType().equals(onFalse.returnType())) {
-            return onTrue.returnType();
+        GraphTargetItem onTrueType = onTrue.returnType();
+        GraphTargetItem onFalseType = onFalse.returnType();
+        if (onTrueType.equals(onFalseType)) {
+            return onTrueType;
         }
-        if ((onTrue.returnType().equals(TypeItem.NUMBER) || onTrue.returnType().equals(TypeItem.INT) || onTrue.returnType().equals(TypeItem.UINT))
-                && (onFalse.returnType().equals(TypeItem.NUMBER) || onFalse.returnType().equals(TypeItem.INT) || onFalse.returnType().equals(TypeItem.UINT))) {
+        if ((onTrueType.equals(TypeItem.NUMBER) || onTrueType.equals(TypeItem.INT) || onTrueType.equals(TypeItem.UINT))
+                && (onFalseType.equals(TypeItem.NUMBER) || onFalseType.equals(TypeItem.INT) || onFalseType.equals(TypeItem.UINT))) {
             return TypeItem.NUMBER;
         }
         return TypeItem.UNKNOWN;

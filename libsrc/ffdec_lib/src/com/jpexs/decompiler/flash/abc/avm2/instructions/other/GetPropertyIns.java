@@ -180,7 +180,7 @@ public class GetPropertyIns extends InstructionDefinition {
                             GraphTargetItem ti = AbcIndexing.multinameToType(multiname.multinameIndex, localData.abc.constants);//new TypeItem(localData.abc.constants.getMultiname(multiname.multinameIndex).getNameWithNamespace(localData.abc.constants, true));
                             if (localData.abcIndex.findClass(ti, localData.abc, localData.scriptIndex) != null) {
                                 type.setVal(ti);
-                                callType.setVal(TypeItem.UNBOUNDED);
+                                callType.setVal(ti); //coercion  i = int(xx);
                                 isStatic.setVal(true);
                                 return;
                             }
