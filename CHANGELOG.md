@@ -33,6 +33,7 @@ All notable changes to this project will be documented in this file.
 - [#1842] AS - Do not display §§dup when the value has no sideeffect
 - Deobfuscation icon on script toolbar did not match the deobfuscation status
 - [#1938] AS3 Direct editation - implied this instead of findprop
+- [#1938] AS3 Direct editation - local registers coerce/convert
 
 ## [18.3.2] - 2023-01-10
 ### Removed
