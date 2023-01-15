@@ -34,6 +34,7 @@ All notable changes to this project will be documented in this file.
 - Deobfuscation icon on script toolbar did not match the deobfuscation status
 - [#1938] AS3 Direct editation - implied this instead of findprop
 - [#1938] AS3 Direct editation - local registers coerce/convert
+- [#1938] AS3 Direct editation - setting default values for slots
 
 ## [18.3.2] - 2023-01-10
 ### Removed

@@ -1850,7 +1850,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     continue;
                 }
 
-                NameAVM2Item d = new NameAVM2Item(n.type, n.line, n.isAttribute(), n.getVariableName(), n.getNamespaceSuffix(), NameAVM2Item.getDefaultValue("" + n.type), true, n.openedNamespaces, abcIndex);
+                NameAVM2Item d = new NameAVM2Item(n.type, n.line, n.isAttribute(), n.getVariableName(), n.getNamespaceSuffix(), null /*NameAVM2Item.getDefaultValue("" + n.type)*/, true, n.openedNamespaces, abcIndex);
                 //no index
                 if (needsActivation) {
                     if (d.getSlotNumber() <= 0) {
