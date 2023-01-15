@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.action.parser.script.SymbolType;
 import com.jpexs.decompiler.flash.action.swf4.ActionPush;
 import com.jpexs.decompiler.flash.action.swf4.ConstantIndex;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.configuration.ConfigurationItemChangeListener;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.gui.AppStrings;
 import com.jpexs.decompiler.flash.gui.DebugPanel;
@@ -811,6 +812,12 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
         deobfuscateButton.addActionListener(this::deobfuscateButtonActionPerformed);
         deobfuscateButton.setToolTipText(AppStrings.translate("button.deobfuscate"));
         deobfuscateButton.setSelected(Configuration.autoDeobfuscate.get());
+        Configuration.autoDeobfuscate.addListener(new ConfigurationItemChangeListener<Boolean>(){
+            @Override
+            public void configurationItemChanged(Boolean newValue) {
+                deobfuscateButton.setSelected(newValue);
+            }
+        });
         
         
         JButton deobfuscateOptionsButton = new JButton(View.getIcon("deobfuscateoptions16"));
