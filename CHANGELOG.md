@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
 - [#1938] AS3 Direct editation - implied this instead of findprop
 - [#1938] AS3 Direct editation - local registers coerce/convert
 - [#1938] AS3 Direct editation - setting default values for slots
+- AS3 Direct editation - using local classes as types
 
 ## [18.3.2] - 2023-01-10
 ### Removed

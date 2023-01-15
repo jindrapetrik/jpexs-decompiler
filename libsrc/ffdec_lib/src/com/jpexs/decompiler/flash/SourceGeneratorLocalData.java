@@ -69,6 +69,8 @@ public class SourceGeneratorLocalData implements Serializable {
     public List<GraphTargetItem> scopeStack = new ArrayList<>();
 
     public ScriptInfo currentScript;
+    
+    public int scriptIndex;
 
     public boolean subMethod = false;
 
