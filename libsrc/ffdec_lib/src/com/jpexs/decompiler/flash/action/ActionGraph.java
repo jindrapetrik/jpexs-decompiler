@@ -28,7 +28,6 @@ import com.jpexs.decompiler.flash.action.model.GetPropertyActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTarget2ActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTargetActionItem;
 import com.jpexs.decompiler.flash.action.model.SetTypeActionItem;
-import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegisterMark;
@@ -426,6 +425,10 @@ public class ActionGraph extends Graph {
     }
 
     public void makeAllCommands(List<GraphTargetItem> commands, TranslateStack stack) {
+        GraphTargetItem enumerate = null;
+        if(!commands.isEmpty() && (commands.get(commands.size()-1) instanceof EnumerateActionItem)) {
+            enumerate = commands.remove(commands.size() -1 );
+        }
         super.makeAllCommands(commands, stack);
         //ags.getVariables()
         ActionGraphSource ags = (ActionGraphSource) code;
@@ -461,6 +464,9 @@ public class ActionGraph extends Graph {
             }
         }
 
+        if (enumerate != null) {
+            commands.add(enumerate);
+        }
     }
 
     @Override
