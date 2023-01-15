@@ -48,6 +48,9 @@ public class CommaExpressionItem extends GraphTargetItem {
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) throws InterruptedException {
         boolean first = true;
         for (GraphTargetItem t : commands) {
+            if (t.isEmpty()) {
+                continue;
+            }
             if (!first) {
                 writer.append(", ");
             }

@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Stack;
 
 /**
  *
@@ -73,11 +74,10 @@ public class GraphPart implements Serializable {
     public int finishedTime;
 
     public int order;
-    
+
     public int numBlocks = Integer.MAX_VALUE;
 
     //public List<GraphPart> throwParts = new ArrayList<>();
-
     public enum StopPartType {
 
         NONE, AND_OR, COMMONPART
@@ -125,7 +125,7 @@ public class GraphPart implements Serializable {
         ordered.add(this);
         return time;
     }
-    
+
     public void setNumblocks(int numBlocks) {
         this.numBlocks = numBlocks;
         numBlocks++;
@@ -133,10 +133,78 @@ public class GraphPart implements Serializable {
             if (next.numBlocks > numBlocks) {
                 next.setNumblocks(numBlocks);
             }
-        }        
+        }
     }
 
     private boolean leadsTo(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops, List<ThrowState> throwStates, boolean useThrow) throws InterruptedException {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new InterruptedException();
+        }
+
+        Stack<GraphPart> todo = new Stack<>();
+        todo.push(this);
+
+        looptodo:while (!todo.isEmpty()) {
+            GraphPart thisPart = todo.pop();
+
+            GraphPart tpart = gr.checkPart(null, localData, prev, thisPart, null);
+            if (tpart == null) {
+                continue;
+            }
+            if (tpart != thisPart) {
+                todo.push(tpart);                
+                continue;
+            }
+            for (Loop l : loops) {
+                if (l.phase == 1) {
+                    if (l.loopContinue == thisPart) {
+                        continue looptodo;
+                    }
+                    if (l.loopPreContinue == thisPart) {
+                        continue looptodo;
+                    }
+                    if (l.loopBreak == thisPart) {
+                        //return false;    //?
+                    }
+                }
+            }
+            if (visited.contains(thisPart)) {
+                continue;
+            }
+            visited.add(thisPart);
+            if (thisPart.end < code.size() && code.get(thisPart.end).isBranch() && (code.get(thisPart.end).ignoredLoops())) {
+                continue;
+            }
+            for (GraphPart p : thisPart.nextParts) {                
+                if (p == part) {
+                    return true;
+                }
+                if (visited.contains(p)) {
+                    continue;
+                }
+                todo.push(p);
+            }
+            for (ThrowState ts : throwStates) {
+                if (ts.state != 1) {
+                    if (ts.throwingParts.contains(thisPart)) {
+                        GraphPart p = ts.targetPart;
+                        
+                        if (p == part) {
+                            return true;
+                        }
+                        if (visited.contains(p)) {
+                            continue;
+                        }
+                        
+                        todo.push(p);
+                    }
+                }
+            }            
+        }
+        return false;
+    }
+    
+    private boolean leadsToRecursive(BaseLocalData localData, Graph gr, GraphSource code, GraphPart prev, GraphPart part, HashSet<GraphPart> visited, List<Loop> loops, List<ThrowState> throwStates, boolean useThrow) throws InterruptedException {        
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException();
         }

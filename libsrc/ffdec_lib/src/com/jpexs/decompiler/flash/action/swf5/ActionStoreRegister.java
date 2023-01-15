@@ -161,7 +161,9 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
         }
 
         if ((value instanceof EnumeratedValueActionItem)) {
-            variables.put("__register" + registerNumber, new TemporaryRegister(registerNumber, new EnumerationAssignmentValueActionItem()));
+            //variables.put("__register" + registerNumber, new TemporaryRegister(registerNumber, new EnumerationAssignmentValueActionItem()));
+            //variables.put("__register" + registerNumber, null);
+            variables.remove("__register" + registerNumber);
         }
         StoreRegisterActionItem ret = new StoreRegisterActionItem(this, lineStartAction, rn, value, define);
         if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOp) {

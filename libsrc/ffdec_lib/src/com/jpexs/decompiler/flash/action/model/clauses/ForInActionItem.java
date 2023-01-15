@@ -128,7 +128,13 @@ public class ForInActionItem extends LoopActionItem implements Block {
         }
 
         writer.append(" in ");
+        if (enumVariable.getPrecedence() > PRECEDENCE_PRIMARY) {
+            writer.append("(");
+        }
         enumVariable.toString(writer, localData);
+        if (enumVariable.getPrecedence() > PRECEDENCE_PRIMARY) {
+            writer.append(")");
+        }        
         writer.append(")").startBlock();
         for (GraphTargetItem ti : commands) {
             ti.toStringSemicoloned(writer, localData).newLine();

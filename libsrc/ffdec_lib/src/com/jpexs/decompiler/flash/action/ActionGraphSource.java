@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action;
 
 import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphPartChangeException;
 import com.jpexs.decompiler.graph.GraphSource;
@@ -109,10 +110,10 @@ public class ActionGraphSource extends GraphSource {
     }
 
     @Override
-    public List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
+    public List<GraphTargetItem> translatePart(Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException {
         Reference<GraphSourceItem> fi = new Reference<>(localData.lineStartInstruction);
 
-        List<GraphTargetItem> r = Action.actionsPartToTree(localData.allSwitchParts, localData.secondPassData, this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path, charset);
+        List<GraphTargetItem> r = Action.actionsPartToTree((ActionGraph)graph, localData.allSwitchParts, localData.secondPassData, this.insideDoInitAction, fi, registerNames, variables, functions, stack, actions, start, end, version, staticOperation, path, charset);
         localData.lineStartInstruction = fi.getVal();
         return r;
     }

@@ -30,6 +30,7 @@ import com.jpexs.decompiler.flash.action.model.PostIncrementActionItem;
 import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
+import com.jpexs.decompiler.flash.action.model.TemporaryRegisterMark;
 import com.jpexs.decompiler.flash.action.model.operations.PreDecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.operations.PreIncrementActionItem;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -172,7 +173,9 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
                     ((SetVariableActionItem) ret).setValue(sr);
                 }
 
-                variables.put("__register" + sr.register.number, new TemporaryRegister(sr.register.number, ret));
+                TemporaryRegister tr = new TemporaryRegister(sr.register.number, ret);
+                variables.put("__register" + sr.register.number, tr);
+                output.add(new TemporaryRegisterMark(tr));                   
                 return;
             }
         }

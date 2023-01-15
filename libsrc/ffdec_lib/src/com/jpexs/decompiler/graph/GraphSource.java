@@ -36,7 +36,7 @@ public abstract class GraphSource implements Serializable {
 
     public abstract boolean isEmpty();
 
-    public abstract List<GraphTargetItem> translatePart(GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException;
+    public abstract List<GraphTargetItem> translatePart(Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException, GraphPartChangeException;
 
     public abstract Set<Long> getImportantAddresses();
 
