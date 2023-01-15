@@ -51,6 +51,6 @@ public class NegAVM2Item extends UnaryOpItem {
 
     @Override
     public GraphTargetItem returnType() {
-        return TypeItem.UNBOUNDED;
+        return TypeItem.NUMBER;
     }
 }

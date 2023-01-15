@@ -40,36 +40,7 @@ public class InitPropertyIns extends InstructionDefinition {
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        int multinameIndex = ins.operands[0];
-
-        GraphTargetItem val = stack.pop();
-        FullMultinameAVM2Item multiname = resolveMultiname(localData, true, stack, localData.getConstants(), multinameIndex, ins);
-        GraphTargetItem obj = stack.pop();
-        
-        /*GraphTargetItem propertyType = TypeItem.UNBOUNDED;
-        String multinameStr = localData.abc.constants.getMultiname(multiname.multinameIndex).getName(localData.abc.constants, new ArrayList<>(), true, true);
-        
-        for (Trait t : localData.methodBody.traits.traits) {
-            if (t instanceof TraitSlotConst) {
-                TraitSlotConst tsc = (TraitSlotConst) t;
-                if (Objects.equals(
-                        tsc.getName(localData.abc).getName(localData.abc.constants, new ArrayList<>(), true, true),
-                        multinameStr
-                )) {
-                    propertyType = PropertyAVM2Item.multinameToType(tsc.type_index, localData.abc.constants);
-                    break;
-                }
-            }
-        }*/
-        
-        Reference<Boolean> isStatic = new Reference<>(false);
-        Reference<GraphTargetItem> type = new Reference<>(null);
-        Reference<GraphTargetItem> callType = new Reference<>(null);
-        GetPropertyIns.resolvePropertyType(localData, obj, multiname, isStatic, type, callType);
-        
-        InitPropertyAVM2Item result = new InitPropertyAVM2Item(ins, localData.lineStartInstruction, obj, multiname, val, type.getVal(), callType.getVal(), isStatic.getVal());
-        SetPropertyIns.handleCompound(localData, obj, multiname, val, output, result);
-        output.add(result);
+        handleSetProperty(true, localData, stack, ins, output, path);
     }
 
     @Override
