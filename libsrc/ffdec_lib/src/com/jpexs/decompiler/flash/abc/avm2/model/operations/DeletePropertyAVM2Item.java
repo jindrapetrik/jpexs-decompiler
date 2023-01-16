@@ -84,7 +84,7 @@ public class DeletePropertyAVM2Item extends AVM2Item {
         }
         if (p instanceof PropertyAVM2Item) {
             PropertyAVM2Item prop = (PropertyAVM2Item) p;
-            return toSourceMerge(localData, generator, prop.resolveObject(localData, generator),
+            return toSourceMerge(localData, generator, prop.resolveObject(localData, generator, true),
                     ins(AVM2Instructions.DeleteProperty, prop.resolveProperty(localData))
             );
         }

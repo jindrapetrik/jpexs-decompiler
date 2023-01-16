@@ -405,7 +405,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         resolve(false, localData, isType, objType, propType, propIndex, outPropValue, outPropValueAbc);
 
         int propertyId = propIndex.getVal();
-        Object obj = resolveObject(localData, generator);
+        Object obj = resolveObject(localData, generator, assignedValue == null);
         Reference<Integer> ret_temp = new Reference<>(-1);
         if (assignedValue != null) {
             GraphTargetItem targetType = propType.getVal();
@@ -451,7 +451,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         return true;
     }
 
-    public Object resolveObject(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+    public Object resolveObject(SourceGeneratorLocalData localData, SourceGenerator generator, boolean mustExist) throws CompilationException {
         Object obj = object;
 
         if (obj == null) {
@@ -495,7 +495,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
                 Reference<ABC> propValueAbc = new Reference<>(null);
 
                 resolve(false, localData, isType, objType, propType, propIndex, outPropValue, propValueAbc);
-                obj = ins(AVM2Instructions.FindPropertyStrict, propIndex.getVal());
+                obj = ins(mustExist ? AVM2Instructions.FindPropertyStrict : AVM2Instructions.FindProperty, propIndex.getVal());
             //}
         }
         return obj;
@@ -514,7 +514,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         resolve(false, localData, isType, objType, propType, propIndex, outPropValue, outPropValueAbc);
 
         int propertyId = propIndex.getVal();
-        Object obj = resolveObject(localData, generator);
+        Object obj = resolveObject(localData, generator, false);
 
         Reference<Integer> ret_temp = new Reference<>(-1);
         Reference<Integer> obj_temp = new Reference<>(-1);

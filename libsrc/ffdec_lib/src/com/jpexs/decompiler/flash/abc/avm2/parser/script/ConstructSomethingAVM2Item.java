@@ -80,7 +80,7 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
 
         if (resname instanceof PropertyAVM2Item) {
             PropertyAVM2Item prop = (PropertyAVM2Item) resname;
-            return toSourceMerge(localData, generator, prop.resolveObject(localData, generator), arguments,
+            return toSourceMerge(localData, generator, prop.resolveObject(localData, generator, true), arguments,
                     ins(AVM2Instructions.ConstructProp, prop.resolveProperty(localData), arguments.size())
             );
         }
