@@ -314,9 +314,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1427,27 +1429,7 @@ public class AVM2Code implements Cloneable {
 
         AVM2Instruction ins = code.get(code.size() - 1);
         return (int) (ins.getAddress() + ins.getBytesLength());
-    }
-
-    /**
-     * Test for killed register. CalcKilledStats must be called before
-     *
-     * @param regName
-     * @param start
-     * @param end
-     * @return
-     */
-    public boolean isKilled(int regName, int start, int end) {
-        if (!killedRegs.containsKey(regName)) {
-            return false;
-        }
-        for (int ip : killedRegs.get(regName)) {
-            if (ip >= start && ip <= end) {
-                return true;
-            }
-        }
-        return false;
-    }
+    }  
 
     private int toSourceCount = 0;
 
@@ -1476,27 +1458,7 @@ public class AVM2Code implements Cloneable {
 
         // TODO: Make this immune to using existing multinames (?)
         return regIndexToName;
-    }
-
-    private Map<Integer, Set<Integer>> killedRegs = new HashMap<>();
-
-    public void calcKilledStats(MethodBody body) throws InterruptedException {
-        killedRegs.clear();
-        HashMap<Integer, List<Integer>> vis = visitCode(body);
-
-        for (int k = 0; k < code.size(); k++) {
-            if (vis.get(k).isEmpty()) {
-                continue;
-            }
-            if (code.get(k).definition instanceof KillIns) {
-                int regid = code.get(k).operands[0];
-                if (!killedRegs.containsKey(regid)) {
-                    killedRegs.put(regid, new HashSet<>());
-                }
-                killedRegs.get(regid).add(k);
-            }
-        }
-    }
+    }  
 
     public int getIpThroughJumpAndDebugLine(int ip) {
         if (code.isEmpty()) {
@@ -1524,8 +1486,7 @@ public class AVM2Code implements Cloneable {
         return pos2adr(getIpThroughJumpAndDebugLine(adr2pos(addr, true)));
     }
 
-    public ConvertOutput toSourceOutput(Set<GraphPart> switchParts, List<MethodBody> callStack, AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, boolean thisHasDefaultToPrimitive, Reference<GraphSourceItem> lineStartItem, String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ABC abc, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws ConvertException, InterruptedException {
-        calcKilledStats(body);
+    public ConvertOutput toSourceOutput(Set<GraphPart> switchParts, List<MethodBody> callStack, AbcIndexing abcIndex, Map<Integer, Set<Integer>> setLocalPosToGetLocalPos, boolean thisHasDefaultToPrimitive, Reference<GraphSourceItem> lineStartItem, String path, GraphPart part, boolean processJumps, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, TranslateStack stack, ScopeStack scopeStack, ABC abc, MethodBody body, int start, int end, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, boolean[] visited, HashMap<Integer, Integer> localRegAssigmentIps) throws ConvertException, InterruptedException {
         boolean debugMode = DEBUG_MODE;
         if (debugMode) {
             System.err.println("OPEN SubSource:" + start + "-" + end + " " + code.get(start).toString() + " to " + code.get(end).toString());
@@ -1599,7 +1560,7 @@ public class AVM2Code implements Cloneable {
                 do {
                     AVM2Instruction insAfter = ip + 1 < code.size() ? code.get(ip + 1) : null;
                     if (insAfter == null) {
-                        ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this, thisHasDefaultToPrimitive);
+                        ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, this, thisHasDefaultToPrimitive);
                         ip++;
                         break;
                     }
@@ -1621,14 +1582,14 @@ public class AVM2Code implements Cloneable {
                         //stack.add("(" + stack.pop() + ")||");
                         isAnd = false;
                     } else {
-                        ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this, thisHasDefaultToPrimitive);
+                        ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, this, thisHasDefaultToPrimitive);
                         ip++;
                         break;
                         //throw new ConvertException("Unknown pattern after DUP:" + insComparsion.toString());
                     }
                 } while (ins.definition instanceof DupIns);
             } else if ((ins.definition instanceof ReturnValueIns) || (ins.definition instanceof ReturnVoidIns) || (ins.definition instanceof ThrowIns)) {
-                ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this, thisHasDefaultToPrimitive);
+                ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, this, thisHasDefaultToPrimitive);
                 //ip = end + 1;
                 break;
             } else if (ins.definition instanceof NewFunctionIns) {
@@ -1664,13 +1625,13 @@ public class AVM2Code implements Cloneable {
                     }
                 }
                 // What to do when hasDup is false?
-                ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this, thisHasDefaultToPrimitive);
+                ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, this, thisHasDefaultToPrimitive);
                 NewFunctionAVM2Item nft = (NewFunctionAVM2Item) stack.peek();
                 nft.functionName = functionName;
                 ip++;
             } else {
                 try {
-                    ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, refs, this, thisHasDefaultToPrimitive);
+                    ins.definition.translate(switchParts, callStack, abcIndex, setLocalPosToGetLocalPos, lineStartItem, isStatic, scriptIndex, classIndex, localRegs, stack, scopeStack, ins, output, body, abc, localRegNames, localRegTypes, fullyQualifiedNames, path, localRegAssigmentIps, ip, this, thisHasDefaultToPrimitive);
                 } catch (RuntimeException re) {
                     /*String last="";
                      int len=5;
@@ -2084,7 +2045,7 @@ public class AVM2Code implements Cloneable {
         }*/
     }
 
-    public List<GraphTargetItem> toGraphTargetItems(List<MethodBody> callStack, AbcIndexing abcIndex, boolean thisHasDefaultToPrimitive, ConvertData convertData, String path, int methodIndex, boolean isStatic, int scriptIndex, int classIndex, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, int initializerType, List<DottedChain> fullyQualifiedNames, List<Traits> initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
+    public List<GraphTargetItem> toGraphTargetItems(List<MethodBody> callStack, AbcIndexing abcIndex, boolean thisHasDefaultToPrimitive, ConvertData convertData, String path, int methodIndex, boolean isStatic, int scriptIndex, int classIndex, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, ScopeStack scopeStack, int initializerType, List<DottedChain> fullyQualifiedNames, List<Traits> initTraits, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps) throws InterruptedException {
         initToSource();
         List<GraphTargetItem> list;
         HashMap<Integer, GraphTargetItem> localRegs = new HashMap<>();
@@ -2100,9 +2061,9 @@ public class AVM2Code implements Cloneable {
 
         ScopeStack prevScopeStack = (ScopeStack) scopeStack.clone();
         try {
-            list = AVM2Graph.translateViaGraph(null, callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssigmentIps, refs, thisHasDefaultToPrimitive);
+            list = AVM2Graph.translateViaGraph(null, callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssigmentIps, thisHasDefaultToPrimitive);
         } catch (SecondPassException spe) {
-            list = AVM2Graph.translateViaGraph(spe.getData(), callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, prevScopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssigmentIps, refs, thisHasDefaultToPrimitive);
+            list = AVM2Graph.translateViaGraph(spe.getData(), callStack, abcIndex, path, this, abc, body, isStatic, scriptIndex, classIndex, localRegs, prevScopeStack, localRegNames, localRegTypes, fullyQualifiedNames, staticOperation, localRegAssigmentIps, thisHasDefaultToPrimitive);
         }
         if (initTraits != null) {
             loopi:
@@ -2748,20 +2709,20 @@ public class AVM2Code implements Cloneable {
         return stats;
     }
 
-    private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs) throws InterruptedException {
-        List<Integer> toVisit = new ArrayList<>();
-        List<Integer> toVisitLast = new ArrayList<>();
+    private void visitCode(int ip, int lastIp, HashMap<Integer, List<Integer>> refs) throws InterruptedException {        
+        Queue<Integer> toVisit = new LinkedList<>();
+        Queue<Integer> toVisitLast = new LinkedList<>();
         toVisit.add(ip);
         toVisitLast.add(lastIp);
         while (!toVisit.isEmpty()) {
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
             }
-            ip = toVisit.remove(0);
-            lastIp = toVisitLast.remove(0);
+            ip = toVisit.remove();
+            lastIp = toVisitLast.remove();
             while (ip < code.size()) {
                 if (!refs.containsKey(ip)) {
-                    refs.put(ip, new ArrayList<>());
+                    refs.put(ip, new ArrayList<>(2));
                 }
                 refs.get(ip).add(lastIp);
                 lastIp = ip;
@@ -2809,7 +2770,7 @@ public class AVM2Code implements Cloneable {
         };
     }
 
-    public HashMap<Integer, List<Integer>> visitCode(MethodBody body) throws InterruptedException {
+    public HashMap<Integer, List<Integer>> visitCode(MethodBody body) throws InterruptedException {        
         HashMap<Integer, List<Integer>> refs = new HashMap<>();
         for (int i = 0; i < code.size(); i++) {
             refs.put(i, new ArrayList<>());
@@ -3045,7 +3006,6 @@ public class AVM2Code implements Cloneable {
                 ret.code = codeCopy;
             }
 
-            ret.killedRegs = new HashMap<>();
             return ret;
         } catch (CloneNotSupportedException ex) {
             throw new RuntimeException();

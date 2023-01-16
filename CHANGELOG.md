@@ -41,6 +41,7 @@ All notable changes to this project will be documented in this file.
 - [#1938] AS3 - implicit coercion of operations
 - [#1938] AS3 - initproperty compound operators, increment/decrement
 - [#1938] "Open loaded during play" Loader injection for Multiname types
+- AS3 - not using visitCode when not needed => faster decompilation
  
 ## [18.3.2] - 2023-01-10
 ### Removed
