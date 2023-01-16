@@ -29,6 +29,7 @@ import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -90,33 +91,79 @@ public class DebuggerTools {
         if (hasDebugger(swf)) {
             ScriptPack dsp = getDebuggerScriptPack(swf);
             String debuggerPkg = dsp.getClassPath().packageStr.toRawString();
+            List<String> displayTypes = Arrays.asList("Loader");
+            List<String> utilsTypes = Arrays.asList(
+                    "getDefinitionByName",
+                    "getQualifiedClassName",
+                    "getQualifiedSuperclassName",
+                    "describeType"
+            );
+
             for (ABCContainerTag ct : swf.getAbcList()) {
                 ABC a = ct.getABC();
                 if (dsp.abc == a) { //do not replace Loader in debugger itself
                     continue;
                 }
+                int debuggerNs = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
                 for (int i = 1; i < a.constants.getMultinameCount(); i++) {
                     Multiname m = a.constants.getMultiname(i);
-                    if ("flash.display.Loader".equals(m.getNameWithNamespace(a.constants, true).toRawString())) {
-                        m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
-                        m.name_index = a.constants.getStringId("DebugLoader", true);
-                        ((Tag) ct).setModified(true);
-                    } else if ("flash.utils.getDefinitionByName".equals(m.getNameWithNamespace(a.constants, true).toRawString())) {
-                        m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
-                        m.name_index = a.constants.getStringId("debugGetDefinitionByName", true);
-                        ((Tag) ct).setModified(true);
-                    } else if ("flash.utils.getQualifiedClassName".equals(m.getNameWithNamespace(a.constants, true).toRawString())) {
-                        m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
-                        m.name_index = a.constants.getStringId("debugGetQualifiedClassName", true);
-                        ((Tag) ct).setModified(true);
-                    } else if ("flash.utils.getQualifiedSuperclassName".equals(m.getNameWithNamespace(a.constants, true).toRawString())) {
-                        m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
-                        m.name_index = a.constants.getStringId("debugGetQualifiedSuperclassName", true);
-                        ((Tag) ct).setModified(true);
-                    } else if ("flash.utils.describeType".equals(m.getNameWithNamespace(a.constants, true).toRawString())) {
-                        m.namespace_index = a.constants.getNamespaceId(Namespace.KIND_PACKAGE, debuggerPkg, 0, true);
-                        m.name_index = a.constants.getStringId("debugDescribeType", true);
-                        ((Tag) ct).setModified(true);
+                    String rawNsName = m.getNameWithNamespace(a.constants, true).toRawString();
+                    if (m.kind == Multiname.MULTINAME) {
+                        String simpleName = m.getName(a.constants, new ArrayList<>(), true, false);
+                        String nsToSearch;
+                        if (displayTypes.contains(simpleName)) {
+                            nsToSearch = "flash.display";
+                        } else if (utilsTypes.contains(simpleName)) {
+                            nsToSearch = "flash.utils";
+                        } else {
+                            continue;
+                        }
+
+                        int nsFoundId = -1;
+                        for (int ns : a.constants.getNamespaceSet(m.namespace_set_index).namespaces) {
+                            String nsString = a.constants.namespaceToString(ns);
+                            if (nsString != null) {
+                                if (nsString.equals(nsToSearch)) {
+                                    nsFoundId = ns;
+                                    break;
+                                }
+                            }
+                        }
+                        if (nsFoundId > -1) {
+                            m.kind = Multiname.QNAME;
+                            m.namespace_index = nsFoundId;
+                            m.namespace_set_index = 0;
+                            rawNsName = m.getNameWithNamespace(a.constants, true).toRawString();
+                        }
+                    }
+                    if (null != rawNsName) {
+                        switch (rawNsName) {
+                            case "flash.display.Loader":
+                                m.namespace_index = debuggerNs;
+                                m.name_index = a.constants.getStringId("DebugLoader", true);
+                                ((Tag) ct).setModified(true);
+                                break;
+                            case "flash.utils.getDefinitionByName":
+                                m.namespace_index = debuggerNs;
+                                m.name_index = a.constants.getStringId("debugGetDefinitionByName", true);
+                                ((Tag) ct).setModified(true);
+                                break;
+                            case "flash.utils.getQualifiedClassName":
+                                m.namespace_index = debuggerNs;
+                                m.name_index = a.constants.getStringId("debugGetQualifiedClassName", true);
+                                ((Tag) ct).setModified(true);
+                                break;
+                            case "flash.utils.getQualifiedSuperclassName":
+                                m.namespace_index = debuggerNs;
+                                m.name_index = a.constants.getStringId("debugGetQualifiedSuperclassName", true);
+                                ((Tag) ct).setModified(true);
+                                break;
+                            case "flash.utils.describeType":
+                                m.namespace_index = debuggerNs;
+                                m.name_index = a.constants.getStringId("debugDescribeType", true);
+                                ((Tag) ct).setModified(true);
+                                break;
+                        }
                     }
                 }
             }
@@ -204,7 +251,7 @@ public class DebuggerTools {
                         }
                     }
                     //Add to target SWF
-                    ((Tag) ds).setSwf(swf);                    
+                    ((Tag) ds).setSwf(swf);
                     swf.addTagBefore((Tag) ds, (Tag) firstAbc);
                     swf.getAbcList().add(swf.getAbcList().indexOf(firstAbc), ds);
                     ((Tag) ds).setModified(true);

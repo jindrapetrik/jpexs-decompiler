@@ -40,7 +40,8 @@ All notable changes to this project will be documented in this file.
 - [#1938] AS3 - shortening + 1 to increment
 - [#1938] AS3 - implicit coercion of operations
 - [#1938] AS3 - initproperty compound operators, increment/decrement
-
+- [#1938] "Open loaded during play" Loader injection for Multiname types
+ 
 ## [18.3.2] - 2023-01-10
 ### Removed
 - [#1935], [#1913] Retaining shape exact position(bounds) in SVG export/import
