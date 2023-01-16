@@ -88,7 +88,19 @@ public class AVM2ConstantPool implements Cloneable {
 
     @Internal
     public Map<String, DottedChain> dottedChainCache = new HashMap<>();
+    
+    @Internal
+    public Map<Multiname, DottedChain> multinameWithNamespaceCache = new HashMap<>();
 
+    
+    public DottedChain getCachedMultinameWithNamespace(Multiname multiName) {
+        return multinameWithNamespaceCache.get(multiName);
+    }
+    
+    public void cacheMultinameWithNamespace(Multiname multiName, DottedChain multinameWithNamespace) {
+        multinameWithNamespaceCache.put(multiName, multinameWithNamespace);
+    }
+    
     private void ensureDefault(List<?> list) {
         if (list.isEmpty()) {
             list.add(null);
@@ -681,6 +693,7 @@ public class AVM2ConstantPool implements Cloneable {
             ret.constant_namespace_set = new HashArrayList<>(constant_namespace_set);
             ret.constant_multiname = new HashArrayList<>(constant_multiname);
             ret.dottedChainCache = new HashMap<>();
+            ret.multinameWithNamespaceCache = new HashMap<>();
             return ret;
         } catch (CloneNotSupportedException ex) {
             throw new RuntimeException();

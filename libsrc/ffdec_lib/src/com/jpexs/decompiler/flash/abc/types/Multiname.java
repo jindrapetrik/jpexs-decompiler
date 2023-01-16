@@ -406,6 +406,10 @@ public class Multiname {
     }
 
     public DottedChain getNameWithNamespace(AVM2ConstantPool constants, boolean withSuffix) {
+        DottedChain cached = constants.getCachedMultinameWithNamespace(this);
+        if (cached != null) {
+            return cached;
+        }
         Namespace ns = getNamespace(constants);
         if (ns == null) {
             NamespaceSet nss = getNamespaceSet(constants);
@@ -416,10 +420,14 @@ public class Multiname {
             }
         }
         String name = getName(constants, null, true, false);
+        DottedChain ret;
         if (ns != null) {
-            return ns.getName(constants).add(name, withSuffix ? getNamespaceSuffix() : "");
+            ret = ns.getName(constants).add(name, withSuffix ? getNamespaceSuffix() : "");
+        } else {
+            ret = new DottedChain(new String[]{name}, new String[]{withSuffix ? getNamespaceSuffix() : ""});        
         }
-        return new DottedChain(new String[]{name}, new String[]{withSuffix ? getNamespaceSuffix() : ""});
+        constants.cacheMultinameWithNamespace(this, ret);
+        return ret;
     }
 
     public Namespace getNamespace(AVM2ConstantPool constants) {
