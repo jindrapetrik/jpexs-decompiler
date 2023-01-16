@@ -110,9 +110,7 @@ public class AVM2LocalData extends BaseLocalData {
     public HashMap<Integer, Integer> localRegAssignmentIps;
 
     public Integer ip;
-
-    public HashMap<Integer, List<Integer>> refs;
-
+    
     public AVM2Code code;
 
     public boolean thisHasDefaultToPrimitive;
@@ -161,7 +159,6 @@ public class AVM2LocalData extends BaseLocalData {
         scriptIndex = localData.scriptIndex;
         localRegAssignmentIps = localData.localRegAssignmentIps;
         ip = localData.ip;
-        refs = localData.refs;
         code = localData.code;
         thisHasDefaultToPrimitive = localData.thisHasDefaultToPrimitive;
         setLocalPosToGetLocalPos = localData.setLocalPosToGetLocalPos;
