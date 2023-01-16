@@ -111,6 +111,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -2787,7 +2788,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
             if (m != null) {
                 Namespace ns = ci.abc.instance_info.get(ci.index).getName(ci.abc.constants).getNamespace(ci.abc.constants);
                 String n = m.getName(ci.abc.constants, new ArrayList<>(), true, true /*FIXME!!*/);
-                String nsn = ns == null ? null : ns.getName(ci.abc.constants).toRawString();
+                String nsn = ns == null ? null : ns.getRawName(ci.abc.constants);
                 name_index = constants.getQnameId(
                         n,
                         ns == null ? Namespace.KIND_PACKAGE : ns.kind,
@@ -2795,10 +2796,11 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
         }
 
+        String pkgRaw = pkg.toRawString();
         for (int i = 1; i < constants.getMultinameCount(); i++) {
             Multiname mname = constants.getMultiname(i);
             if (mname != null && name.equals(mname.getName(constants, null, true, true /*FIXME!!*/))) {
-                if (mname.getNamespace(constants) != null && pkg.equals(mname.getNamespace(constants).getName(constants))) {
+                if (mname.getNamespace(constants) != null && Objects.equals(pkgRaw, mname.getNamespace(constants).getRawName(constants))){
                     name_index = i;
                     break;
                 }

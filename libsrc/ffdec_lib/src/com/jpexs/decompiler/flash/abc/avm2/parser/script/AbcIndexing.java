@@ -536,29 +536,29 @@ public final class AbcIndexing {
          */
         //search all static first
         if (findStatic && classProperties.containsKey(prop)) {
-            if (!classProperties.containsKey(prop)) {
-                if (parent != null) {
-                    TraitIndex ret = parent.findProperty(prop, findStatic, findInstance, findProtected);
-                    if (ret != null) {
-                        return ret;
-                    }
-                }
-            } else {
-                return classProperties.get(prop);
+            TraitIndex ti = classProperties.get(prop);
+            if (ti != null) {
+                return ti;
             }
+            if (parent != null) {
+                TraitIndex ret = parent.findProperty(prop, findStatic, findInstance, findProtected);
+                if (ret != null) {
+                    return ret;
+                }
+            }            
         }
 
         //now search instance
         if (findInstance && instanceProperties.containsKey(prop)) {
-            if (!instanceProperties.containsKey(prop)) {
-                if (parent != null) {
-                    TraitIndex ret = parent.findProperty(prop, findStatic, findInstance, findProtected);
-                    if (ret != null) {
-                        return ret;
-                    }
+            TraitIndex ti = instanceProperties.get(prop);
+            if (ti != null) {
+                return ti;
+            }
+            if (parent != null) {
+                TraitIndex ret = parent.findProperty(prop, findStatic, findInstance, findProtected);
+                if (ret != null) {
+                    return ret;
                 }
-            } else {
-                return instanceProperties.get(prop);
             }
         }
 
