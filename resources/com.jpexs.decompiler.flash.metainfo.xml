@@ -63,6 +63,55 @@
 		</screenshot>
 	</screenshots>
 	<releases>		
+		<release version="18.3.3" date="2023-01-22">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1913 Option to retain shape exact position(bounds) in SVG export</li>
+					<li>#1913 Option to disable bitmap smoothing for display</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1888 AS3 - missing casts in declarations</li>
+					<li>#1894 Switch inside loop</li>
+					<li>#1801 AS3 - AIR/Flash switching</li>
+					<li>#1892 AS3 - internal modifier after implicit namespace</li>
+					<li>#1888 AS3 - Coerce to string</li>
+					<li>AS3 - local registers type declarations vs for..in clause</li>
+					<li>#1888 AS3 - Coerce to int when Number</li>
+					<li>AS3 - super properties resolving</li>
+					<li>AS3 - line numbering on pushback string on regexp</li>
+					<li>AS3 Direct editation - removing method bodies after unsuccessful edit</li>
+					<li>#1936 AS3 - Parentheses around function definition call</li>
+					<li>#1936 AS3 - Scope stack in second pass</li>
+					<li>#1936 AS3 Direct editation - handling undefined variables</li>
+					<li>#1936 AS3 Direct editation - colliding try..catch variable</li>
+					<li>#1936 AS3 Direct editation - missing pop after call</li>
+					<li>#1936 AS3 Direct editation - slots increment, decrement</li>
+					<li>#1936 AS3 Direct editation - scope of nested functions</li>
+					<li>AS3 - empty P-code shown on clicking script</li>
+					<li>#1888 AS3 - Coerces, module operator</li>
+					<li>#1937 AS3 - declarations vs null</li>
+					<li>#1458 Quick find bar overlaying horizontal scrollbar</li>
+					<li>#1842 AS1/2 Better handling obfuscated code, for..in</li>
+					<li>#1842 AS1/2 use parenthesis when initObject has nonstring keys</li>
+					<li>#1842 AS - Do not display §§dup when the value has no sideeffect</li>
+					<li>Deobfuscation icon on script toolbar did not match the deobfuscation status</li>
+					<li>#1938 AS3 Direct editation - implied this instead of findprop</li>
+					<li>#1938 AS3 Direct editation - local registers coerce/convert</li>
+					<li>#1938 AS3 Direct editation - setting default values for slots</li>
+					<li>AS3 Direct editation - using local classes as types</li>
+					<li>#1938 AS3 - coercion call type</li>
+					<li>#1938 AS3 - shortening + 1 to increment</li>
+					<li>#1938 AS3 - implicit coercion of operations</li>
+					<li>#1938 AS3 - initproperty compound operators, increment/decrement</li>
+					<li>#1938 "Open loaded during play" Loader injection for Multiname types</li>
+					<li>AS3 - not using visitCode when not needed => faster decompilation</li>
+					<li>Cache thread as daemon</li>
+					<li>#1949 Incorrect reading FIXED and FIXED8 SWF values causing wrong Filters size and OutOfMemory</li>
+				</ul>
+			</description>
+		</release>
 		<release version="18.3.2" date="2023-01-10">
 			<description>
 				<p>Removed</p>
