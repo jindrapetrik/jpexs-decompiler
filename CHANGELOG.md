@@ -43,6 +43,7 @@ All notable changes to this project will be documented in this file.
 - [#1938] "Open loaded during play" Loader injection for Multiname types
 - AS3 - not using visitCode when not needed => faster decompilation
 - Cache thread as daemon
+- [#1949] Incorrect reading FIXED and FIXED8 SWF values causing wrong Filters size and OutOfMemory
  
 ## [18.3.2] - 2023-01-10
 ### Removed
@@ -2910,6 +2911,7 @@ All notable changes to this project will be documented in this file.
 [#1458]: https://www.free-decompiler.com/flash/issues/1458
 [#1842]: https://www.free-decompiler.com/flash/issues/1842
 [#1938]: https://www.free-decompiler.com/flash/issues/1938
+[#1949]: https://www.free-decompiler.com/flash/issues/1949
 [#1935]: https://www.free-decompiler.com/flash/issues/1935
 [#1931]: https://www.free-decompiler.com/flash/issues/1931
 [#1934]: https://www.free-decompiler.com/flash/issues/1934
