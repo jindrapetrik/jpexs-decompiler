@@ -593,14 +593,19 @@ public class SWFInputStream implements AutoCloseable {
      */
     public long readSI32(String name) throws IOException {
         newDumpLevel(name, "SI32");
-        long uval = readEx() + (readEx() << 8) + (readEx() << 16) + (readEx() << 24);
-        if (uval >= 0x80000000) {
-            uval = -(((~uval) & 0xffffffff) + 1);
-        }
+        long uval = readSI32Internal();
         endDumpLevel(uval);
         return uval;
     }
 
+    private long readSI32Internal() throws IOException {
+        long uval = readEx() + (readEx() << 8) + (readEx() << 16) + (readEx() << 24);
+        if (uval >= 0x80000000) {
+            uval = -(((~uval) & 0xffffffff) + 1);
+        }
+        return uval;
+    }
+    
     /**
      * Reads one SI16 (Signed 16bit integer) value from the stream
      *
@@ -610,11 +615,16 @@ public class SWFInputStream implements AutoCloseable {
      */
     public int readSI16(String name) throws IOException {
         newDumpLevel(name, "SI16");
+        int uval = readSI16Internal();
+        endDumpLevel(uval);
+        return uval;
+    }
+    
+    private int readSI16Internal() throws IOException {
         int uval = readEx() + (readEx() << 8);
         if (uval >= 0x8000) {
             uval = -(((~uval) & 0xffff) + 1);
         }
-        endDumpLevel(uval);
         return uval;
     }
 
@@ -655,9 +665,8 @@ public class SWFInputStream implements AutoCloseable {
      */
     public double readFIXED(String name) throws IOException {
         newDumpLevel(name, "FIXED");
-        int afterPoint = readUI16Internal();
-        int beforePoint = readUI16Internal();
-        double ret = beforePoint + ((double) (afterPoint)) / 65536;
+        long si = readSI32Internal();
+        double ret = si / (double)(1 << 16);
         endDumpLevel(ret);
         return ret;
     }
@@ -671,9 +680,8 @@ public class SWFInputStream implements AutoCloseable {
      */
     public float readFIXED8(String name) throws IOException {
         newDumpLevel(name, "FIXED8");
-        int afterPoint = readEx();
-        int beforePoint = readSI8Internal();
-        float ret = beforePoint + ((float) afterPoint) / 256;
+        int si = readSI16Internal();
+        float ret = si / (float)(1 << 8);
         endDumpLevel(ret);
         return ret;
     }

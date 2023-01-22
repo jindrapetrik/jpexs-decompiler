@@ -285,10 +285,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeFIXED(double value) throws IOException {
         long valueLong = (long) (value * (1 << 16));
-        int beforePoint = (int) valueLong >> 16;
-        int afterPoint = (int) valueLong % (1 << 16);
-        writeUI16(afterPoint);
-        writeUI16(beforePoint);
+        writeSI32(valueLong);
     }
 
     /**
@@ -299,10 +296,7 @@ public class SWFOutputStream extends OutputStream {
      */
     public void writeFIXED8(float value) throws IOException {
         int valueInt = (int) (value * (1 << 8));
-        int beforePoint = (int) valueInt >> 8;
-        int afterPoint = (int) valueInt % (1 << 8);
-        writeUI8(afterPoint);
-        writeSI8(beforePoint);
+        writeSI16(valueInt);
     }
 
     private void writeLong(long value) throws IOException {
