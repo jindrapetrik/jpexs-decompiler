@@ -62,14 +62,46 @@
 			<image width="1527" height="935">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/master/graphics/screenshots/version14.4.0/12_debug_pcode.png</image>
 		</screenshot>
 	</screenshots>
-	<releases>
+	<releases>		
+		<release version="18.3.2" date="2023-01-10">
+			<description>
+				<p>Removed</p>
+				<ul>
+					<li>#1935, #1913 Retaining shape exact position(bounds) in SVG export/import</li>
+				</ul>
+			</description>
+		</release>
+		<release version="18.3.1" date="2023-01-09">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>GFX - support for TGA external images</li>
+					<li>GFX - DefineExternalGradient tag has gradientId in its name</li>
+					<li>GFX - DefineExternalSound and DefineExternalStreamSound playback</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>GFX - DefineExternalImage2 display and correct handling if standalone</li>
+					<li>#1931, #1934 DefineSprite rectange calculation (incorrect export dimensions)</li>
+					<li>#1929, #1932 Wrong subsprite frames display</li>
+					<li>#1933 AS3 - Detection of variable names from debug info on multiple debug ins with same regindex</li>
+					<li>GFX - ExporterInfo prefix is NetString</li>
+					<li>Scrollbars on sound playback</li>
+					<li>Clear preview on raw edit to stop sound playback</li>
+					<li>CXFORM and GRADRECORD causing NotSerializableException</li>
+					<li>Scrollbars</li>
+					<li>Incorrect frame counting</li>
+					<li>Save as does not change file title upon reload</li>
+				</ul>
+			</description>
+		</release>
 		<release version="18.3.0" date="2023-01-01">
 			<description>
 				<p>Added</p>
 				<ul>
-					<li>[#1913] Shape transforming, point editation</li>
+					<li>#1913 Shape transforming, point editation</li>
 					<li>Hilighting currently selected shape edge in the raw edit</li>
-					<li>[#1905] Key strokes on folder preview panel</li>
+					<li>#1905 Key strokes on folder preview panel</li>
 					<li>Scrollbars</li>
 					<li>Morphshape transforming, point editation</li>
 					<li>Raw edit - (MORPH)GRADIENT spreadMode,interpolationMode as enums</li>
@@ -77,19 +109,19 @@
 				</ul>
 				<p>Fixed</p>
 				<ul>
-					<li>[#1915] SVG import - gradient when it has two final stops</li>
+					<li>#1915 SVG import - gradient when it has two final stops</li>
 					<li>Native sound export format for ADPCM compression is FLV</li>
-					<li>[#1923] Wrong cyclic tag detection causing hidden sprites</li>
+					<li>#1923 Wrong cyclic tag detection causing hidden sprites</li>
 					<li>Ctrl + G shortcut for tag list view</li>
 					<li>Uncompressed FLA (XFL) export creates a directory</li>
-					<li>[#1827] Video replacing VP6 reading</li>
-					<li>[#1926] Constructors namespace taken from class - should be always public</li>
-					<li>[#1772] AS1/2 decompilation - StackOverflow during getVariables function</li>
-					<li>[#1890] AS3 - Removing first assignment in for in loop</li>
+					<li>#1827 Video replacing VP6 reading</li>
+					<li>#1926 Constructors namespace taken from class - should be always public</li>
+					<li>#1772 AS1/2 decompilation - StackOverflow during getVariables function</li>
+					<li>#1890 AS3 - Removing first assignment in for in loop</li>
 				</ul>
 				<p>Changed</p>
 				<ul>
-					<li>[#1913] SVG export/import of shapes - shape exact position (bounds) is retained</li>
+					<li>#1913 SVG export/import of shapes - shape exact position (bounds) is retained</li>
 				</ul>
 			</description>
 		</release>
@@ -98,8 +130,8 @@
 				<p>Fixed</p>
 				<ul>
 					<li>Copy/Move/Cut with dependencies did not handle original tag when not charactertag</li>
-					<li>[#1922] FLA/XFL/Canvas/SVG export - exporting DefineBitsJPEG3/4 with alpha as JPEG with PNG extension</li>
-					<li>[#1921] AS3 direct editation - exception on code save - wrong selected ABC</li>
+					<li>#1922 FLA/XFL/Canvas/SVG export - exporting DefineBitsJPEG3/4 with alpha as JPEG with PNG extension</li>
+					<li>#1921 AS3 direct editation - exception on code save - wrong selected ABC</li>
 				</ul>
 			</description>
 		</release>
@@ -107,18 +139,18 @@
 			<description>
 				<p>Added</p>
 				<ul>
-					<li>[#1917] Better error message for sound import on unsupported sampling rate</li>
-					<li>[#1827] Replacing and bulk import of DefineVideoStream</li>
+					<li>#1917 Better error message for sound import on unsupported sampling rate</li>
+					<li>#1827 Replacing and bulk import of DefineVideoStream</li>
 					<li>Movie FLV export - writing simple onMetadata tag</li>
-					<li>[#1424], [#1473], [#1835], [#1852] Replacing sound streams (SoundStreamHead, SoundStreamBlock)</li>
+					<li>#1424, #1473, #1835, #1852 Replacing sound streams (SoundStreamHead, SoundStreamBlock)</li>
 					<li>Bulk import sounds and sound streams</li>
 				</ul>
 				<p>Fixed</p>
 				<ul>
-					<li>[#1914] DropShadow filter</li>
-					<li>[#1916] Translation tool did not load up</li>
+					<li>#1914 DropShadow filter</li>
+					<li>#1916 Translation tool did not load up</li>
 					<li>PlaceObject preview not cleared causing sound to repeat</li>
-					<li>[#1920] AS3 - Slower decompilation (returnType method optimization)</li>
+					<li>#1920 AS3 - Slower decompilation (returnType method optimization)</li>
 				</ul>
 			</description>
 		</release>
