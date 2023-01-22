@@ -138,7 +138,7 @@ public class SWFStreamTest {
         assertTrue(Double.compare(7.5, sis.readFIXED("test")) == 0);
         sis.close();
 
-        double[] dds = new double[]{5.25, 65535.25};
+        double[] dds = new double[]{5.25, -5.25, 127.75, -128};
         for (double dd : dds) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName);
@@ -161,25 +161,7 @@ public class SWFStreamTest {
             assertEquals(ff, ff2, "Written and read value not equals. Written: " + ff + " read: " + ff2);
             sis.close();
         }
-    }
-
-    //@Test
-    public void testAllFIXED8() throws IOException {
-        for (int i = 0; i < 65536; i++) {
-            byte[] data = new byte[]{(byte) (i % 256), (byte) (i / 256)};
-            SWFInputStream sis = new SWFInputStream(null, data);
-            float d = sis.readFIXED8("test");
-            sis.close();
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            SWFOutputStream sos = new SWFOutputStream(baos, SWF.DEFAULT_VERSION, Utf8Helper.charsetName);
-            sos.writeFIXED8(d);
-            sos.close();
-            byte[] data2 = baos.toByteArray();
-
-            assertTrue(data[0] == data2[0] && data[1] == data2[1]);
-        }
-    }
+    }    
 
     @Test
     public void testRECT() throws IOException {
