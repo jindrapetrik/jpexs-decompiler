@@ -56,7 +56,7 @@ public class Cache<K, V> implements Freed {
             
     private static final long CLEAN_INTERVAL = 5 * 1000; //5 seconds
     
-    private static Thread oldCleaner = null;
+    private static Thread oldCleaner = null;  
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -90,6 +90,7 @@ public class Cache<K, V> implements Freed {
                     }
                 }                
             };
+            oldCleaner.setDaemon(true);
             oldCleaner.setPriority(Thread.MIN_PRIORITY);
             oldCleaner.start();
         }
