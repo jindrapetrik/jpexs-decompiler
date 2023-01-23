@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#1948] Timeout while deobfuscation did not skip method
 - [#1948] NullPointerException on Simplify expressions on incrementent/decrement
+- [#1941] Export when no node is selected after SWF opening
 
 ## [18.3.3] - 2023-01-22
 ### Added
@@ -2908,6 +2909,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1948]: https://www.free-decompiler.com/flash/issues/1948
+[#1941]: https://www.free-decompiler.com/flash/issues/1941
 [#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1894]: https://www.free-decompiler.com/flash/issues/1894

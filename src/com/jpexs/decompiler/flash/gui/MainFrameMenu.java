@@ -430,7 +430,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
         View.checkAccess();
 
         if (openable != null) {
-            mainFrame.getPanel().export(onlySelected, mainFrame.getPanel().getCurrentTree().getSelected());
+            mainFrame.getPanel().export(onlySelected, getSelectedOrCurrentOpenable());
             return true;
         }
 
@@ -456,7 +456,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        mainFrame.getPanel().importSwfXml(mainFrame.getPanel().getCurrentTree().getSelected());
+        mainFrame.getPanel().importSwfXml(getSelectedOrCurrentOpenable());
     }
 
     protected void exportXmlActionPerformed(ActionEvent evt) {
@@ -467,7 +467,15 @@ public abstract class MainFrameMenu implements MenuBuilder {
             return;
         }
 
-        mainFrame.getPanel().exportSwfXml(mainFrame.getPanel().getCurrentTree().getSelected());
+        mainFrame.getPanel().exportSwfXml(getSelectedOrCurrentOpenable());
+    }
+    
+    private List<TreeItem> getSelectedOrCurrentOpenable() {
+        List<TreeItem> sel = mainFrame.getPanel().getCurrentTree().getSelected();
+        if (sel.isEmpty() && openable != null) {
+            sel.add(openable);
+        }
+        return sel;
     }
 
     protected boolean searchActionPerformed(ActionEvent evt) {
