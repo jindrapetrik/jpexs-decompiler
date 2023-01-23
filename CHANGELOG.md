@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#1948] Timeout while deobfuscation did not skip method
+- [#1948] NullPointerException on Simplify expressions on incrementent/decrement
 
 ## [18.3.3] - 2023-01-22
 ### Added

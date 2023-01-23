@@ -548,7 +548,7 @@ public abstract class InstructionDefinition implements Serializable {
             LocalRegAVM2Item valueLocalReg = (LocalRegAVM2Item) value;
             LocalRegAVM2Item nameLocalReg = null;
             if (multiname.name instanceof LocalRegAVM2Item) {
-                nameLocalReg = (LocalRegAVM2Item) multiname.name;;
+                nameLocalReg = (LocalRegAVM2Item) multiname.name;
             }
             if (obj instanceof LocalRegAVM2Item) {
                 LocalRegAVM2Item objLocalReg = (LocalRegAVM2Item) obj;
@@ -669,7 +669,7 @@ public abstract class InstructionDefinition implements Serializable {
 
                         if ((valueLocalReg.regIndex == valueSetLocalReg.regIndex)
                                 && (propertyName.multinameIndex == multinameIndex)
-                                && ((nameLocalReg == null && nameSetLocalReg == null) || (nameLocalReg.regIndex == nameSetLocalReg.regIndex))
+                                && ((nameLocalReg == null && nameSetLocalReg == null) || (nameLocalReg != null && nameSetLocalReg != null && nameLocalReg.regIndex == nameSetLocalReg.regIndex))
                                 && (objLocalReg.regIndex == objSetLocalReg.regIndex)) {
                             if (nameSetLocalReg != null) {
                                 propertyName.name = nameSetLocalReg.value;
