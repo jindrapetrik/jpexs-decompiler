@@ -109,7 +109,7 @@ public class DependencyParser {
             }
         }
         MethodBody body = abc.findBody(method_index);
-        if (body != null) {
+        if (body != null && body.convertException == null) {
             body = body.convertMethodBodyCanUseLast(Configuration.autoDeobfuscate.get(), "", isStatic, scriptIndex, classIndex, abc, trait);
             body.traits.getDependencies(scriptIndex, classIndex, isStatic, ignoredCustom, abc, dependencies, uses, ignorePackage, fullyQualifiedNames);
             for (ABCException ex : body.exceptions) {
