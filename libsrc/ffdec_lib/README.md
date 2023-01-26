@@ -24,6 +24,7 @@ These include:
 * jPacker - `jpacker.jar` - HTML Canvas export scripts compression
 * gnujpdf - `gnujpdf.jar` - PDF export
 * vlcj - `vlcj-4.7.3.jar`, `vlcj-natives-4.7.0.jar` - Display/Export of video tags
+* Java Native Access - `jna-3.5.1.jar`, `jna-platform-3.5.1.jar` - Display/Export of video tags
 * DDSReader - `ddsreader.jar` - DDS images reading (GFX files)
 * Reality Interactive ImageIO TGA library - `tga.jar` - TGA images reading (GFX files)
 * Flashdebugger library - `flashdebugger.jar` - Flash debugging
