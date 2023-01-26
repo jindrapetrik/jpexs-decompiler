@@ -22,12 +22,15 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -86,7 +89,11 @@ public class Cache<K, V> implements Freed {
                         } catch (InterruptedException ex) {
                             return;
                         }
-                        clearAllOld();                        
+                        try {
+                            clearAllOld();                        
+                        } catch (Exception cme) {
+                            Logger.getLogger(Cache.class.getSimpleName()).log(Level.SEVERE, "Error during clearing cache thread", cme);
+                        }
                     }
                 }                
             };
