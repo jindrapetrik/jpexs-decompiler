@@ -83,3 +83,8 @@ exported1.all.bin
 /libsrc/flamingo/build/
 /libsrc/flamingo/dist/
 /libsrc/jlayer-1.0.2/target/
+/libsrc/nellymoser/nbproject/private/
+/libsrc/LZMA/build/
+/libsrc/nellymoser/dist/
+/libsrc/nellymoser/build/
+/libsrc/ttf/dist/

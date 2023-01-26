@@ -70,4 +70,9 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <target name="-post-jar">
+        <copy todir="../ffdec_lib/lib/">
+            <fileset file="${dist.jar}"/>
+        </copy>
+    </target>
 </project>
