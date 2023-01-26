@@ -158,28 +158,9 @@ And links also these libraries:
 * FFDec Library (LGPLv3) - see below
 
 Application uses also some icons of the [Silk icons pack], [Silk companion 1], [FatCow icons pack] and [Aha-Soft icons pack].
-### Library
 
-FFDec Library is licensed under GNU LGPL v3 (LGPL-3.0-or-later), see [license.txt](libsrc/ffdec_lib/license.txt) for details.
-It uses modified code of these libraries:
-
-* [sfntly] (WOFF font export) - Apache License 2.0
-* [JLayer] (Decoding MP3) - LGPL
-* UAB "DKD" NellyMoser ASAO codec (Decoding Nelly Moser sound format) - LGPL
-* [Animated GIF Writer] (Frames to GIF export) - Creative Commons Attribution 3.0 Unported
-* [Animated GIF Encoder] (Frames to GIF export)
-
-And also links to these libraries:
-
-* [LZMA SDK] (SWF de/compress) - public domain
-* [Monte Media Library] (Frames to AVI export) - LGPL
-* [Fontastic] (Font TTF export) - LGPL
-* [DoubleType] (Font TTF export) - GPLv2
-* [jPacker] (Canvas scripts compression) - MIT License
-* [gnujpdf] (PDF export) - LGPL License
-* [DDSReader] (DDS reading) - MIT License
-* [vlcj] (DefineVideoStream playback) - GPLv3
-* [Reality Interactive ImageIO TGA library] (TGA file display in GFX files) - LGPL v2.1
+## Library
+See [library README](libsrc/ffdec_lib/README.md) for more info about FFDec library.
 
 [GIT]: http://git-scm.com/downloads
 [Netbeans IDE]: http://www.netbeans.org/
@@ -196,16 +177,3 @@ And also links to these libraries:
 [Silk companion 1]: http://damieng.com/creative/icons/silk-companion-1-icons
 [FatCow icons pack]: http://www.fatcow.com/free-icons
 [Aha-Soft icons pack]: http://www.aha-soft.com
-[sfntly]: https://code.google.com/p/sfntly/
-[JLayer]: http://www.javazoom.net/javalayer/javalayer.html
-[Animated GIF Writer]: http://elliot.kroo.net/software/java/GifSequenceWriter/
-[Animated GIF Encoder]: http://www.fmsware.com/stuff/gif.html
-[LZMA SDK]: http://www.7-zip.org/sdk.html
-[Monte Media Library]: http://www.randelshofer.ch/monte/
-[Fontastic]: http://code.andreaskoller.com/libraries/fontastic/
-[DoubleType]: http://sourceforge.net/projects/doubletype/
-[jPacker]: https://code.google.com/p/jpacker/
-[gnujpdf]: http://gnujpdf.sourceforge.net/
-[DDSReader]: https://github.com/npedotnet/DDSReader/
-[vlcj]: https://github.com/caprica/vlcj
-[Reality Interactive ImageIO TGA library]: https://github.com/tmyroadctfig/com.realityinteractive.imageio.tga

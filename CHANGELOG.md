@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#1029] Better separation of library and main app, dependencies inside library zip, library readme
+
 ### Fixed
 - [#1948] Timeout while deobfuscation did not skip method
 - [#1948] NullPointerException on Simplify expressions on incrementent/decrement
@@ -2911,6 +2914,7 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1948]: https://www.free-decompiler.com/flash/issues/1948
 [#1941]: https://www.free-decompiler.com/flash/issues/1941
+[#1029]: https://www.free-decompiler.com/flash/issues/1029
 [#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1894]: https://www.free-decompiler.com/flash/issues/1894

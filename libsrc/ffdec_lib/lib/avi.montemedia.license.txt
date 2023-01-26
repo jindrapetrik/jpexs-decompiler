@@ -1,0 +1,8 @@
+Monte Media Library © 2012
+Werner Randelshofer, Hausmatt 10, CH-6405 Goldau Switzerland
+werner.randelshofer@bluewin.ch
+All Rights Reserved.
+
+The Monte Media Library can be licensed under the terms of the Creative Commons BY 3.0 license, and/or under the terms of the Lesser General Public License LGPL Version 3.
+
+The license is free for commercial and non-commercial use.
