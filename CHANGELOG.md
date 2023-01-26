@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#1948] Timeout while deobfuscation did not skip method
 - [#1948] NullPointerException on Simplify expressions on incrementent/decrement
 - [#1941] Export when no node is selected after SWF opening
+- Exception handling in cache clearing thread
 
 ## [18.3.3] - 2023-01-22
 ### Added
