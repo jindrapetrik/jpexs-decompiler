@@ -282,6 +282,9 @@
                     <source-file>
                         <location>nbproject/ide-targets.xml</location>
                     </source-file>
+                    <source-file>
+                        <location>README.md</location>
+                    </source-file>
                 </items>
                 <context-menu>
                     <ide-action name="build"/>
@@ -320,7 +323,7 @@
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/4">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="compile">lib/LZMA.jar;lib/jpproxy.jar;lib/trident-6.2.jar;lib/substance-flamingo-6.2.jar;lib/flamingo-6.2.jar;lib/substance-6.2.jar;lib/nellymoser.jar;lib/gif.jar;lib/avi.jar;lib/ttf.jar;lib/jpacker.jar;lib/sfntly.jar;lib/gnujpdf.jar;libsrc/ffdec_lib/src;lib/tablelayout.jar;lib/jsyntaxpane-0.9.5.jar;lib/JavactiveX.jar;lib/flashdebugger.jar;lib/treetable.jar;lib/minimal-json-0.9.5.jar;lib/graphs.jar;lib/vlcj-4.7.3.jar;lib/jna-3.5.1.jar;lib/jna-platform-3.5.1.jar;lib/jlayer-1.0.2.jar</classpath>
+                <classpath mode="compile">lib/jpproxy.jar;lib/trident-6.2.jar;lib/substance-flamingo-6.2.jar;lib/flamingo-6.2.jar;lib/substance-6.2.jar;libsrc/ffdec_lib/src;lib/tablelayout.jar;lib/jsyntaxpane-0.9.5.jar;lib/JavactiveX.jar;lib/flashdebugger.jar;lib/treetable.jar;lib/minimal-json-0.9.5.jar;libsrc/ffdec_lib/lib/gnujpdf.jar;libsrc/ffdec_lib/lib/jna-3.5.1.jar;libsrc/ffdec_lib/lib/jna-platform-3.5.1.jar;libsrc/ffdec_lib/lib/flashdebugger.jar</classpath>
                 <built-to>build</built-to>
                 <built-to>javadoc</built-to>
                 <built-to>reports</built-to>

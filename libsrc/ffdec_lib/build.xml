@@ -41,7 +41,12 @@
    
     <target name="compile" depends="lexers">
         <mkdir dir="${compile.dir}"/>
-        <mkdir dir="${lib.dir}"/>        
+        <mkdir dir="${lib.dir}"/>  
+        <copy todir="${lib.dir}">
+            <fileset dir="${liblib.dir}">
+                <type type="file"/>
+            </fileset>
+        </copy>      
         <javac srcdir="${src.dir}" destdir="${compile.dir}" includes="**/*.java" target="${target.java}" source="${target.java}" debug="true"
                debuglevel="lines,vars,source" includeantruntime="false" encoding="utf-8">
             <compilerarg line="-Xlint:unchecked -Xlint:deprecation"/> <!-- For Java 8: -Xdiags:verbose -->
@@ -244,7 +249,9 @@
         <zip destfile="${releases.dir}/${prefix.filename}_${version}${version.suffix}.zip">
             <zipfileset file="${dist.dir}/${jar.filename}.jar" filemode="755" fullpath="${jar.filename}.jar"></zipfileset>
             <zipfileset file="${gui.changelog.file}" fullpath="${changelog.file}"></zipfileset>
-            <zipfileset file="${license.file}" fullpath="${license.file}"></zipfileset>
+            <zipfileset file="${license.file}" fullpath="${license.file}"></zipfileset> 
+            <zipfileset file="${readme.file}" fullpath="${readme.file}"></zipfileset>
+            <zipfileset dir="${liblib.dir}" fullpath=""></zipfileset>
         </zip>
     </target>
     
