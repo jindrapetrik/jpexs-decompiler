@@ -242,6 +242,10 @@ public class GetPropertyIns extends InstructionDefinition {
                             //TODO: handle method calls to return proper param type results
                         }
                     }
+                    if (localData.abc.constants.getMultiname(multiname.multinameIndex).isAttribute()) {
+                        type.setVal(new TypeItem("XMLList"));
+                        return;
+                    }
                     if (receiverType.equals(new TypeItem("XMLList"))) {
                         if (multiname.name != null && multiname.name.returnType().equals(TypeItem.INT)) {
                             type.setVal(new TypeItem("XML"));

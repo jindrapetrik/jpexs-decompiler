@@ -77,8 +77,8 @@ public class ConvertAVM2Item extends AVM2Item {
                 break;
             case "String":
                 displayConvert = !valueReturnType.equals(TypeItem.STRING)
-                        && !valueReturnType.equals(new TypeItem("XML"))
-                        && !valueReturnType.equals(new TypeItem("XMLList"))
+                        //&& !valueReturnType.equals(new TypeItem("XML"))
+                        //&& !valueReturnType.equals(new TypeItem("XMLList"))
                         && !valueReturnType.equals(new TypeItem("null"))
                         && !valueReturnType.equals(TypeItem.UNBOUNDED);
                 break;

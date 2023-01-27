@@ -2,6 +2,7 @@ package tests
 {
     import tests_classes.TestConvertParent;
     import flash.utils.getTimer;
+    import flash.utils.Dictionary;
 	
 	public class TestConvert extends TestConvertParent
 	{
@@ -12,10 +13,13 @@ package tests
         
         public var TEST:int = 5;
         
+        private var f:Function = null;
+        
 		public function run():void
 		{
             var s:String;
-            var i:int;            
+            var i:int;   
+            var dict:Dictionary = new Dictionary();     
             s = "a";
             i = int(s);
             var j:int = n;
@@ -69,13 +73,15 @@ package tests
             i = int(xlist[i].@id);
             trace("c");
             i = int(x.item[i].@id);
+            
+            dict[String(x.item[i].@id)] = "Hello";
             				
             var lc:LocalClass = new LocalClass();
             i = lc.attr;      
             s = String(lc.attr);
             
             
-            var f:Function = function():void {};
+            var f:Function = this.f;
             if (Boolean(f)) {
                 trace("OK");
             }
