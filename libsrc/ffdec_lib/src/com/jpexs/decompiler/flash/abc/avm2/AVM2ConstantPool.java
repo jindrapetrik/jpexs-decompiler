@@ -101,6 +101,14 @@ public class AVM2ConstantPool implements Cloneable {
         multinameWithNamespaceCache.put(multiName, multinameWithNamespace);
     }
     
+    public void clearCachedMultinames() {
+        multinameWithNamespaceCache.clear();
+    }
+    
+    public void clearCachedDottedChains() {
+        dottedChainCache.clear();
+    }
+    
     private void ensureDefault(List<?> list) {
         if (list.isEmpty()) {
             list.add(null);

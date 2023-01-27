@@ -2695,12 +2695,16 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         for (Tag tag : getTags()) {
             if (tag instanceof ABCContainerTag) {
                 ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(deobfuscated, renameType, true);
+                ((ABCContainerTag) tag).getABC().constants.clearCachedMultinames();
+                ((ABCContainerTag) tag).getABC().constants.clearCachedDottedChains();
                 tag.setModified(true);
             }
         }
         for (Tag tag : getTags()) {
             if (tag instanceof ABCContainerTag) {
                 ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(deobfuscated, renameType, false);
+                ((ABCContainerTag) tag).getABC().constants.clearCachedMultinames();
+                ((ABCContainerTag) tag).getABC().constants.clearCachedDottedChains();
                 tag.setModified(true);
             }
         }

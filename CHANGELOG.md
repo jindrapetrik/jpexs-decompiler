@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - [#1941] Export when no node is selected after SWF opening
 - Exception handling in cache clearing thread
 - DottedChain.PathPart NoSerializable exception
+- [#1951] Clearing Namespace/Multiname cache after renaming identifiers
 
 ## [18.3.3] - 2023-01-22
 ### Added
@@ -2913,9 +2914,10 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1029]: https://www.free-decompiler.com/flash/issues/1029
 [#1948]: https://www.free-decompiler.com/flash/issues/1948
 [#1941]: https://www.free-decompiler.com/flash/issues/1941
-[#1029]: https://www.free-decompiler.com/flash/issues/1029
+[#1951]: https://www.free-decompiler.com/flash/issues/1951
 [#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1894]: https://www.free-decompiler.com/flash/issues/1894
