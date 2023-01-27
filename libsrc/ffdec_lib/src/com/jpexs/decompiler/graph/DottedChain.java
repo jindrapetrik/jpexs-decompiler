@@ -347,7 +347,7 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         return toRawString().compareTo(o.toRawString());
     }
 
-    private static class PathPart {
+    private static class PathPart implements Serializable {
 
         public String name;
         public boolean attribute;
