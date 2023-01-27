@@ -134,26 +134,26 @@ public class AVM2Deobfuscation {
             DottedChain newName;
             if (namesMap.containsKey(sChain)) {
                 newName = namesMap.get(sChain);
-                constants.setString(strIndex, newName.toRawString());
-            } else {
-                List<String> ret = new ArrayList<>();
-                for (int p = 0; p < sChain.size(); p++) {
-                    String part = sChain.get(p);
-                    if (!isValidNSPart(part)) {
-                        ret.add(fooString(namesMap, part, false, "package", renameType));
-                    } else {
-                        ret.add(part);
-                    }
-                }
-                newName = new DottedChain(ret);
-                namesMap.put(sChain, newName);
+                return constants.getStringId(newName.toRawString(), true); //constants.setString(strIndex, newName.toRawString());
             }
+            
+            List<String> ret = new ArrayList<>();
+            for (int p = 0; p < sChain.size(); p++) {
+                String part = sChain.get(p);
+                if (!isValidNSPart(part)) {
+                    ret.add(fooString(namesMap, part, false, "package", renameType));
+                } else {
+                    ret.add(part);
+                }
+            }
+            newName = new DottedChain(ret);
+            namesMap.put(sChain, newName);
+            
             if (stringUsages.contains(strIndex)) {
                 strIndex = constants.addString(newName.toRawString());
             } else {
                 constants.setString(strIndex, newName.toRawString());
             }
-
         }
         return strIndex;
     }
@@ -189,10 +189,12 @@ public class AVM2Deobfuscation {
             DottedChain sChain = DottedChain.parseWithSuffix(s);
             if (namesMap.containsKey(sChain)) {
                 newname = namesMap.get(sChain);
-            } else {
-                String str = fooString(namesMap, constants.getString(strIndex), firstUppercase, stringUsageTypes.get(strIndex), renameType);
-                newname = DottedChain.parseWithSuffix(str);
+                return constants.getStringId(newname, true);
             }
+            
+            String str = fooString(namesMap, constants.getString(strIndex), firstUppercase, stringUsageTypes.get(strIndex), renameType);
+            newname = DottedChain.parseWithSuffix(str);
+            
             if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { // this name is already referenced as String
                 strIndex = constants.addString(s); // add new index
             }

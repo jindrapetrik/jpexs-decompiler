@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - Exception handling in cache clearing thread
 - DottedChain.PathPart NoSerializable exception
 - [#1951] Clearing Namespace/Multiname cache after renaming identifiers
+- [#1951] Renaming invalid identifiers with existing string collisions
 
 ## [18.3.3] - 2023-01-22
 ### Added
