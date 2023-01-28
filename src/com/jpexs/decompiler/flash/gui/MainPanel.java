@@ -4497,7 +4497,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             updateUi();
         }
 
-        reload(false);
+        reload(false, false);
 
         if (source == dumpTree) {
             TreeItem t = null;
@@ -5017,6 +5017,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     public void reload(boolean forceReload) {
+        reload(forceReload, true);
+    }
+    
+    public void reload(boolean forceReload, boolean scrollToVisible) {
         View.checkAccess();
         
         JScrollBar folderPreviewScrollBar = ((JScrollPane)folderPreviewPanel.getParent().getParent()).getVerticalScrollBar();
@@ -5024,7 +5028,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         Map<Integer, TreeItem> folderItems = new HashMap<>(folderPreviewPanel.selectedItems);   
         
 
-        tagTree.scrollPathToVisible(tagTree.getSelectionPath());
+        if (scrollToVisible) {
+            tagTree.scrollPathToVisible(tagTree.getSelectionPath());
+        }
         if (currentView == VIEW_DUMP) {
             dumpViewReload(forceReload);
             return;
