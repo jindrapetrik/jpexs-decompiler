@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - [#1951] Clearing Namespace/Multiname cache after renaming identifiers
 - [#1951] Renaming invalid identifiers with existing string collisions
 - [#1888] String casts - ConvertS on XML, XMLList
+- [#1953] Save as EXE - add file extension when missing
 
 ## [18.3.3] - 2023-01-22
 ### Added
@@ -2920,8 +2921,9 @@ All notable changes to this project will be documented in this file.
 [#1948]: https://www.free-decompiler.com/flash/issues/1948
 [#1941]: https://www.free-decompiler.com/flash/issues/1941
 [#1951]: https://www.free-decompiler.com/flash/issues/1951
-[#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
+[#1953]: https://www.free-decompiler.com/flash/issues/1953
+[#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1894]: https://www.free-decompiler.com/flash/issues/1894
 [#1801]: https://www.free-decompiler.com/flash/issues/1801
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
