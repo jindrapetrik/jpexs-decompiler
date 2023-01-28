@@ -207,6 +207,7 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
         }
 
         RECT rect = new RECT(Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE);
+        boolean foundSomething = false;
         for (BUTTONRECORD r : characters) {
             CharacterTag ch = swf.getCharacter(r.characterId);
             if (ch instanceof BoundedTag) {
@@ -223,8 +224,13 @@ public class DefineButton2Tag extends ButtonTag implements ASMSourceContainer {
                     rect.Ymin = Math.min(r2.Ymin, rect.Ymin);
                     rect.Xmax = Math.max(r2.Xmax, rect.Xmax);
                     rect.Ymax = Math.max(r2.Ymax, rect.Ymax);
+                    foundSomething = true;
                 }
             }
+        }
+        
+        if (!foundSomething) {
+            rect = new RECT();
         }
 
         if (cache != null) {
