@@ -1899,6 +1899,7 @@ public class Main {
         };
 
         ExeExportMode exeExportMode = null;
+        FileFilter exeFilter = null;
         if (mode == SaveFileMode.EXE) {
             exeExportMode = Configuration.exeExportMode.get();
             if (exeExportMode == null) {
@@ -1925,7 +1926,7 @@ public class Main {
 
             String fext = ext;
             String ffilterDescription = filterDescription;
-            FileFilter exeFilter = new FileFilter() {
+            exeFilter = new FileFilter() {
                 @Override
                 public boolean accept(File f) {
                     return (f.getName().toLowerCase(Locale.ENGLISH).endsWith(fext)) || (f.isDirectory());
@@ -1969,6 +1970,11 @@ public class Main {
                 if (selFilter == abcFilter) {
                     if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(".abc")) {
                         fileName += ".abc";
+                    }
+                }
+                if (selFilter == exeFilter) {
+                    if (!fileName.toLowerCase(Locale.ENGLISH).endsWith(extension)) {
+                        fileName += extension;
                     }
                 }
                 Main.saveFile(openable, fileName, mode, exeExportMode);
