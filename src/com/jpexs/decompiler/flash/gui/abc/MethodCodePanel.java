@@ -47,6 +47,8 @@ public class MethodCodePanel extends JPanel {
 
     private final ASMSourceEditorPane sourceTextArea;
 
+    private final FasterScrollPane sourceScrollPane;
+    
     public JPanel buttonsPanel;
 
     private final JToggleButton hexButton;
@@ -58,6 +60,10 @@ public class MethodCodePanel extends JPanel {
     public ABC getABC() {
         return sourceTextArea.abc;
     }
+
+    public FasterScrollPane getSourceScrollPane() {
+        return sourceScrollPane;
+    }        
     
     public void refreshMarkers() {
         sourceTextArea.refreshMarkers();
@@ -127,9 +133,9 @@ public class MethodCodePanel extends JPanel {
         docsPanel = new DocsPanel();
         sourceTextArea.addDocsListener(docsPanel);
         if (Configuration.displayAs3PCodeDocsPanel.get()) {
-            add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, new FasterScrollPane(sourceTextArea), new FasterScrollPane(docsPanel), Configuration.guiAvm2DocsSplitPaneDividerLocationPercent));
+            add(new JPersistentSplitPane(JSplitPane.VERTICAL_SPLIT, sourceScrollPane = new FasterScrollPane(sourceTextArea), new FasterScrollPane(docsPanel), Configuration.guiAvm2DocsSplitPaneDividerLocationPercent));
         } else {
-            add(new FasterScrollPane(sourceTextArea));
+            add(sourceScrollPane = new FasterScrollPane(sourceTextArea));
         }
         sourceTextArea.changeContentType("text/flasm3");
         sourceTextArea.setFont(Configuration.getSourceFont());

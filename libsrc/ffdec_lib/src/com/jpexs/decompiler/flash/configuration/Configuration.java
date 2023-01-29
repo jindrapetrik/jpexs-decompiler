@@ -887,6 +887,22 @@ public final class Configuration {
     @ConfigurationCategory("display")
     public static ConfigurationItem<Boolean> disableBitmapSmoothing = null;
     
+    @ConfigurationDefaultString("")    
+    public static ConfigurationItem<String> pinnedItemsScrollPos = null;
+    
+    @ConfigurationDefaultInt(30)
+    @ConfigurationCategory("ui")    
+    public static ConfigurationItem<Integer> maxRememberedScrollposItems = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> rememberScriptsScrollPos = null;
+    
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("ui")
+    public static ConfigurationItem<Boolean> rememberFoldersScrollPos = null;
+    
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }

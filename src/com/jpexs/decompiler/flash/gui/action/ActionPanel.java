@@ -182,6 +182,8 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
     private CancellableWorker setSourceWorker;
 
     private List<Runnable> scriptListeners = new ArrayList<>();
+    
+    private boolean scriptLoaded = true;
 
     public void addScriptListener(Runnable listener) {
         scriptListeners.add(listener);
@@ -189,6 +191,20 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
     public void removeScriptListener(Runnable listener) {
         scriptListeners.remove(listener);
+    }
+    
+    public void runWhenLoaded(Runnable l) {
+        if (scriptLoaded) {
+            l.run();
+        } else {
+            addScriptListener(new Runnable() {
+                @Override
+                public void run() {
+                    l.run();
+                    removeScriptListener(this);
+                }
+            });
+        }
     }
 
     private void fireScript() {
@@ -462,6 +478,8 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
     public void setSource(final ASMSource src, final boolean useCache) {
         View.checkAccess();
+        
+        scriptLoaded = false;
 
         if (setSourceWorker != null) {
             setSourceWorker.cancel(true);
@@ -570,6 +588,7 @@ public class ActionPanel extends JPanel implements SearchListener<ScriptSearchRe
 
         setHex(getExportMode(), asm.getScriptName(), actions);
         setDecompiledText(asm.getScriptName(), decompiledText.text);
+        scriptLoaded = true;
         fireScript();
     }
 

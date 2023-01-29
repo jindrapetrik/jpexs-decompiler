@@ -2789,6 +2789,10 @@ public class Main {
     }
 
     public static void exit() {
+        if (mainFrame != null && mainFrame.getPanel() != null) {
+            mainFrame.getPanel().scrollPosStorage.saveScrollPos(mainFrame.getPanel().getCurrentTree().getCurrentTreeItem());                    
+            mainFrame.getPanel().savePins();
+        }
         try {
             searchResultsStorage.save();
         } catch (IOException ex) {

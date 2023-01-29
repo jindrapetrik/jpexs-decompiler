@@ -94,9 +94,25 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
     private CancellableWorker setSourceWorker;
 
     private final List<Runnable> scriptListeners = new ArrayList<>();
+    
+    private boolean scriptLoaded = true;
 
     public void addScriptListener(Runnable l) {
         scriptListeners.add(l);
+    }
+        
+    public void runWhenLoaded(Runnable l) {
+        if (scriptLoaded) {
+            l.run();
+        } else {
+            addScriptListener(new Runnable() {
+                @Override
+                public void run() {
+                    l.run();
+                    removeScriptListener(this);
+                }
+            });
+        }
     }
 
     public ABCPanel getAbcPanel() {
@@ -771,11 +787,14 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
             setSourceWorker.cancel(true);
             setSourceWorker = null;
         }
+        scriptLoaded = false;
 
-        if (!force && this.script == scriptLeaf) {
+        if (!force && this.script == scriptLeaf) {            
+            scriptLoaded = true;
             fireScript();
             return;
         }
+               
 
         String sn = scriptLeaf.getClassPath().toString();
         setScriptName(sn);
@@ -881,6 +900,8 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 }
             }
         }
+        
+        scriptLoaded = true;
 
         fireScript();
     }

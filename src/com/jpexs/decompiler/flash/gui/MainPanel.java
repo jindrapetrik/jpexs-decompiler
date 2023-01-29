@@ -441,6 +441,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private List<List<String>> unfilteredTreeExpandedNodes = new ArrayList<>();
     private List<List<String>> unfilteredTagListExpandedNodes = new ArrayList<>();
+    
+    public ScrollPosStorage scrollPosStorage;
 
     public void savePins() {
         pinsPanel.save();
@@ -1225,6 +1227,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         });
         detailPanel.setVisible(false);
 
+        scrollPosStorage = new ScrollPosStorage(this);
+        
         updateUi();
 
         this.openables.addCollectionChangedListener((e) -> {
@@ -1321,7 +1325,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 resetAllTimelines();
                 refreshTree();
             }
-        });
+        });                 
     }
 
     public void resetAllTimelines() {
@@ -1429,9 +1433,18 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             List<ABCContainerTag> abcList = swf.getAbcList();
 
             boolean hasAbc = !abcList.isEmpty();
-
-            if (hasAbc) {
-                getABCPanel().setAbc(abcList.get(0).getABC());
+            
+            if (hasAbc) {            
+                boolean abcFound = false;   
+                for (ABCContainerTag c : abcList) {
+                    if (getABCPanel().abc == c.getABC()) {
+                        abcFound = true;
+                        break;
+                    }
+                }
+                if (!abcFound) {
+                    getABCPanel().setAbc(abcList.get(0).getABC());
+                }
             }
         }
         mainMenu.updateComponents(openable);
@@ -1511,6 +1524,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 return false;
             }
         }
+        
+        scrollPosStorage.saveScrollPos(getCurrentTree().getCurrentTreeItem());
 
         clearPins();
 
@@ -4478,7 +4493,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         if (treeItem == null) {
             return;
         }
-
+        
         if (!(treeItem instanceof OpenableList)) {
             Openable openable = treeItem.getOpenable();
             if (openables.isEmpty()) {
@@ -4496,7 +4511,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else {
             updateUi();
         }
-
+        
         reload(false, false);
 
         if (source == dumpTree) {
@@ -5015,7 +5030,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         showDetail(DETAILCARDEMPTYPANEL);
         showCard(CARDEMPTYPANEL);
     }
-
+    
     public void reload(boolean forceReload) {
         reload(forceReload, true);
     }
@@ -5066,6 +5081,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
         if (oldItem != treeItem) {
+            scrollPosStorage.saveScrollPos(oldItem);
             closeTag();
         }
 
@@ -5246,6 +5262,14 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         
         folderPreviewPanel.selectedItems = folderItems;
         folderPreviewScrollBar.setValue(scrollValue);     
+        
+        View.execInEventDispatchLater(new Runnable(){
+            @Override
+            public void run() {
+                scrollPosStorage.loadScrollPos(oldItem);
+            }            
+        });
+        
         
     }
 
