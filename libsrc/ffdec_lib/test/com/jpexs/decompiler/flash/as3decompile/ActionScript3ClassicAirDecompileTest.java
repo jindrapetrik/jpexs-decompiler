@@ -496,6 +496,14 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testExecutionOrder() {
+        decompileMethod("classic_air", "testExecutionOrder", "var m:MyClass = null;\r\n"
+                + "m.x = (m = create() as MyClass).x + 5;\r\n"
+                + "trace(m.x);\r\n",
+                 false);
+    }
+
+    @Test
     public void testExpressions() {
         decompileMethod("classic_air", "testExpressions", "var arr:Array = null;\r\n"
                 + "var i:int = 5;\r\n"

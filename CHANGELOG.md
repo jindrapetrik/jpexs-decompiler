@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - [#1953] Save as EXE - add file extension when missing
 - [#1954] Incorrect calculation of empty button bounds causing OutOfMemory
 - [#1944] Scroll position not retained on Ctrl+click in the tag tree
+- [#1940] AS3 decompilation - wrong assignment
 
 ## [18.3.3] - 2023-01-22
 ### Added
@@ -2927,6 +2928,7 @@ All notable changes to this project will be documented in this file.
 [#1953]: https://www.free-decompiler.com/flash/issues/1953
 [#1954]: https://www.free-decompiler.com/flash/issues/1954
 [#1944]: https://www.free-decompiler.com/flash/issues/1944
+[#1940]: https://www.free-decompiler.com/flash/issues/1940
 [#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1894]: https://www.free-decompiler.com/flash/issues/1894
 [#1801]: https://www.free-decompiler.com/flash/issues/1801

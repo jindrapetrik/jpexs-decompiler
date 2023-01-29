@@ -46,6 +46,10 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
     public String compoundOperator;
     
     public GraphTargetItem type;
+    
+    public boolean hideValue = false;
+    
+    public boolean causedByDup = false;
 
     @Override
     public DeclarationAVM2Item getDeclaration() {
@@ -73,6 +77,9 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
             writer.append(compoundOperator);
             writer.append("= ");
             return compoundValue.toString(writer, localData);
+        }
+        if (hideValue) {
+            return writer;
         }
         writer.append(" = ");
         /*if (declaration != null && !declaration.type.equals(TypeItem.UNBOUNDED) && (value instanceof ConvertAVM2Item)) {
@@ -200,4 +207,14 @@ public class SetLocalAVM2Item extends AVM2Item implements SetTypeAVM2Item, Assig
     public String getCompoundOperator() {
         return compoundOperator;
     }
+
+    @Override
+    public int getPrecedence() {
+        if (hideValue) {
+            return PRECEDENCE_PRIMARY;
+        }
+        return precedence;
+    }
+    
+    
 }

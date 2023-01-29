@@ -20,8 +20,8 @@ import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.model.AVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
-import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.SetLocalAVM2Item;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.TypeItem;
@@ -75,8 +75,8 @@ public interface SetTypeIns {
                             stack.push(new LocalRegAVM2Item(null, localData.lineStartInstruction, regId, value, localData.localRegTypes.containsKey(regId) ? localData.localRegTypes.get(regId) : value.returnType()));
                         }
                         return;
-                    } else {
-
+                    } else {                       
+                        
                         if ((value instanceof CoerceAVM2Item) || (value instanceof ConvertAVM2Item)) {
                             value.value = insideDup;
                         } else {
@@ -84,6 +84,10 @@ public interface SetTypeIns {
                         }
 
                         result.value = value;
+                        
+                        if ((result instanceof SetLocalAVM2Item) && regId > -1) {
+                            ((SetLocalAVM2Item)result).causedByDup = true;
+                        }
 
                         if (regId > -1 && AVM2Item.mustStayIntact2(insideDup.getNotCoerced())) { //hack
                             output.add(result);

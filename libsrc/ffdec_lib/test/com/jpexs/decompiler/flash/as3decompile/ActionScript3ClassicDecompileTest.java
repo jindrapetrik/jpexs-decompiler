@@ -498,6 +498,14 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testExecutionOrder() {
+        decompileMethod("classic", "testExecutionOrder", "var m:MyClass = null;\r\n"
+                + "m.x = (m = create() as MyClass).x + 5;\r\n"
+                + "trace(m.x);\r\n",
+                 false);
+    }
+
+    @Test
     public void testExpressions() {
         decompileMethod("classic", "testExpressions", "var arr:Array = null;\r\n"
                 + "var i:int = 5;\r\n"
