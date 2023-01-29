@@ -47,6 +47,7 @@ public class PinsPanel extends JPanel {
 
     private List<String> missingTagTreePaths = new ArrayList<>();
     private List<String> missingTagListPaths = new ArrayList<>();
+    private List<String> missingScrollPos = new ArrayList<>();
 
     private static final String PATHS_SEPARATOR = "{#sep#}";
 
@@ -61,6 +62,9 @@ public class PinsPanel extends JPanel {
      */
     public void destroy() {
         items.clear();
+        missingScrollPos.clear();
+        missingTagListPaths.clear();
+        missingTagTreePaths.clear();
         rebuild();
         save();
     }
@@ -81,8 +85,11 @@ public class PinsPanel extends JPanel {
                 tagListPath = "";
             }
 
+            String scrollPos = mainPanel.scrollPosStorage.getSerializedScrollPos(item);
+            
             missingTagTreePaths.add(tagTreePath);
             missingTagListPaths.add(tagListPath);
+            missingScrollPos.add(scrollPos);
         }
         items.clear();
         rebuild();
@@ -232,15 +239,18 @@ public class PinsPanel extends JPanel {
     public void save() {
         StringBuilder tagTreePathsBuilder = new StringBuilder();
         StringBuilder tagListPathsBuilder = new StringBuilder();
+        StringBuilder scrollPosesBuilder = new StringBuilder();
         boolean first = true;
 
         for (int i = 0; i < missingTagTreePaths.size(); i++) {
             if (!first) {
                 tagTreePathsBuilder.append(PATHS_SEPARATOR);
                 tagListPathsBuilder.append(PATHS_SEPARATOR);
+                scrollPosesBuilder.append(PATHS_SEPARATOR);
             }
             tagTreePathsBuilder.append(missingTagTreePaths.get(i));
             tagListPathsBuilder.append(missingTagListPaths.get(i));
+            scrollPosesBuilder.append(missingScrollPos.get(i));
             first = false;
         }
 
@@ -259,17 +269,23 @@ public class PinsPanel extends JPanel {
             if (tagListPath == null) {
                 tagListPath = "";
             }
+            
+            String scrollPos = mainPanel.scrollPosStorage.getSerializedScrollPos(item);
+            
             if (!first) {
                 tagTreePathsBuilder.append(PATHS_SEPARATOR);
                 tagListPathsBuilder.append(PATHS_SEPARATOR);
+                scrollPosesBuilder.append(PATHS_SEPARATOR);
             }
             tagTreePathsBuilder.append(tagTreePath);
             tagListPathsBuilder.append(tagListPath);
+            scrollPosesBuilder.append(scrollPos);
             first = false;
         }
 
         Configuration.pinnedItemsTagTreePaths.set(tagTreePathsBuilder.toString());
         Configuration.pinnedItemsTagListPaths.set(tagListPathsBuilder.toString());
+        Configuration.pinnedItemsScrollPos.set(scrollPosesBuilder.toString());
     }
 
     public void load() {
@@ -278,10 +294,14 @@ public class PinsPanel extends JPanel {
 
         List<String> missingTagTreePaths = new ArrayList<>();
         List<String> missingTagListPaths = new ArrayList<>();
+        List<String> missingScrollPos = new ArrayList<>();
         String tagTreePathsCombined = Configuration.pinnedItemsTagTreePaths.get() + PATHS_SEPARATOR + PATHS_END;
         String tagListPathsCombined = Configuration.pinnedItemsTagListPaths.get() + PATHS_SEPARATOR + PATHS_END;
+        String scrollPosCombined = Configuration.pinnedItemsScrollPos.get() + PATHS_SEPARATOR + PATHS_END;
+        
         String[] tagTreePaths = tagTreePathsCombined.split(Pattern.quote(PATHS_SEPARATOR));
         String[] tagListPaths = tagListPathsCombined.split(Pattern.quote(PATHS_SEPARATOR));
+        String[] scrollPoses = scrollPosCombined.split(Pattern.quote(PATHS_SEPARATOR));
         if (tagTreePaths.length != tagListPaths.length) {
             return;
         }
@@ -293,16 +313,24 @@ public class PinsPanel extends JPanel {
             if (item == null || (item instanceof TreeRoot)) {
                 item = mainPanel.tagListTree.getTreeItemFromPathString(tagListPath);
             }
+            String scrollPosStr = "";
+            if (!Configuration.pinnedItemsScrollPos.get().isEmpty()) {
+                scrollPosStr = scrollPoses[i];
+            }
+            
             if (item != null && !(item instanceof TreeRoot)) {
                 items.add(item);
+                mainPanel.scrollPosStorage.setSerializedScrollPos(item, scrollPosStr);
             } else {
                 missingTagTreePaths.add(tagTreePath);
                 missingTagListPaths.add(tagListPath);
+                missingScrollPos.add(scrollPosStr);
             }
         }
         this.items = items;
         this.missingTagTreePaths = missingTagTreePaths;
         this.missingTagListPaths = missingTagListPaths;
+        this.missingScrollPos = missingScrollPos;
         rebuild();
     }
 
@@ -321,9 +349,12 @@ public class PinsPanel extends JPanel {
                 if (tagListPath == null) {
                     tagListPath = "";
                 }
+                
+                String scrollPos = mainPanel.scrollPosStorage.getSerializedScrollPos(item);
 
                 missingTagTreePaths.add(tagTreePath);
                 missingTagListPaths.add(tagListPath);
+                missingScrollPos.add(scrollPos);
 
                 items.remove(i);
                 i--;

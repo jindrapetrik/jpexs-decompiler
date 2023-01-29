@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - [#1029] Better separation of library and main app, dependencies inside library zip, library readme
+- Remembering script+folder scroll/caret position when switching between items, saving for pinned items
 
 ### Fixed
 - [#1948] Timeout while deobfuscation did not skip method
