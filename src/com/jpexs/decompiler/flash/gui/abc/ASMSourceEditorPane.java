@@ -389,6 +389,8 @@ public class ASMSourceEditorPane extends DebuggableEditorPane implements CaretLi
     public void clear() {
         setText("");
         bodyIndex = -1;
+        methodIndex = -1;
+        scriptIndex = -1;
         setCaretPosition(0);
     }
 
