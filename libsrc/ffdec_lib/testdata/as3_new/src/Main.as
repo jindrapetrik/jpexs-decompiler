@@ -38,6 +38,7 @@ package
         TestDoWhile2;
         TestDoWhile3;
         TestDoWhile4;
+        TestExecutionOrder;
         TestExpressions;
         TestFinallyZeroJump;
         TestFor;

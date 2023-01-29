@@ -138,7 +138,7 @@ public class AVM2Graph extends Graph {
     private final ABC abc;
 
     private final MethodBody body;
-    
+
     private final AbcIndexing abcIndex;
 
     private final Logger logger = Logger.getLogger(AVM2Graph.class.getName());
@@ -485,7 +485,6 @@ public class AVM2Graph extends Graph {
                         }
                     }
                 }*/
-
                 localData.ignoredSwitches.put(e, switchPart);
             } else {
                 //there is probably return in all branches and no other way outside finally
@@ -650,7 +649,7 @@ public class AVM2Graph extends Graph {
         Set<GraphPart> allParts = new HashSet<>();
         for (GraphPart head : g.heads) {
             populateParts(head, allParts);
-        }        
+        }
         return g.translate(localData, staticOperation, path);
     }
 
@@ -1792,7 +1791,7 @@ public class AVM2Graph extends Graph {
                                             setLocalIp = avm2code.adr2pos(setLocal.getSrc().getAddress());
                                             break;
                                         }
-                                    } else if (output.get(i) instanceof PushItem){
+                                    } else if (output.get(i) instanceof PushItem) {
                                         //allowed
                                     } else {
                                         break;
@@ -1826,7 +1825,7 @@ public class AVM2Graph extends Graph {
 
                                 for (int i = output.size() - 2 /*last is loop*/; i >= 0; i--) {
                                     if (output.get(i) instanceof PushItem) {
-                                        PushItem pu = (PushItem)output.remove(i);
+                                        PushItem pu = (PushItem) output.remove(i);
                                         stack.push(pu.value);
                                     } else {
                                         break;
@@ -1941,6 +1940,7 @@ public class AVM2Graph extends Graph {
                             Reference<Integer> kindRef = new Reference<>(0);
                             first.visitRecursively(new AbstractGraphTargetVisitor() {
                                 private boolean handled = false;
+
                                 @Override
                                 public void visit(GraphTargetItem item) {
                                     if (handled) {
@@ -1948,28 +1948,28 @@ public class AVM2Graph extends Graph {
                                     }
                                     if ((item instanceof NextNameAVM2Item) || (item instanceof NextValueAVM2Item)) {
                                         handled = true;
-                                        if (item instanceof NextValueAVM2Item){
+                                        if (item instanceof NextValueAVM2Item) {
                                             NextValueAVM2Item nv = (NextValueAVM2Item) item;
-                                            nv.localReg = hn.index;                                                                       
+                                            nv.localReg = hn.index;
                                             kindRef.setVal(1);
                                         }
-                                        if (item instanceof NextNameAVM2Item){
+                                        if (item instanceof NextNameAVM2Item) {
                                             NextNameAVM2Item nn = (NextNameAVM2Item) item;
                                             nn.localReg = hn.index;
                                             kindRef.setVal(2);
-                                        }                                        
-                                    }                                
+                                        }
+                                    }
                                 }
                             });
-                            
+
                             if (kindRef.getVal() == 1) {
-                                return new ForEachInAVM2Item(w.getSrc(), w.getLineStartItem(), w.loop, new InAVM2Item(hn.getInstruction(), hn.getLineStartIns(), hn.index, hn.obj), w.commands);                            
+                                return new ForEachInAVM2Item(w.getSrc(), w.getLineStartItem(), w.loop, new InAVM2Item(hn.getInstruction(), hn.getLineStartIns(), hn.index, hn.obj), w.commands);
                             }
                             if (kindRef.getVal() == 2) {
-                                return new ForInAVM2Item(w.getSrc(), w.getLineStartItem(), w.loop, new InAVM2Item(hn.getInstruction(), hn.getLineStartIns(),hn.index , hn.obj), w.commands);                            
-                            }                            
+                                return new ForInAVM2Item(w.getSrc(), w.getLineStartItem(), w.loop, new InAVM2Item(hn.getInstruction(), hn.getLineStartIns(), hn.index, hn.obj), w.commands);
+                            }
                         }
-                            
+
                     }
                 }
             }
@@ -2069,10 +2069,10 @@ public class AVM2Graph extends Graph {
                                     }
                                 }
                             }
-                        }                                                
+                        }
                     }
                 }
-            }            
+            }
         }
 
         List<GraphTargetItem> ret = list;
@@ -2235,13 +2235,143 @@ public class AVM2Graph extends Graph {
             }
         }
 
+        /*
+        convert this situation:
+        
+        loc1.x = (loc1 = create()).x + 1;
+        
+        where loc1.x references newly created loc1.               
+        
+        to:
+        
+        loc1 = create();
+        loc1.x = loc1.x + 1;
+        
+        It's TestSwapAssignment assembled test case.
+        
+         */
+        for (int i = 0; i < list.size(); i++) {
+
+            GraphTargetItem item = list.get(i);
+            Map<Integer, List<SetLocalAVM2Item>> setRegisters = new HashMap<>();
+            item.visitRecursivelyNoBlock(new AbstractGraphTargetVisitor() {
+                @Override
+                public void visit(GraphTargetItem item) {
+                    if (item instanceof SetLocalAVM2Item) {
+                        SetLocalAVM2Item setLoc = (SetLocalAVM2Item) item;
+                        if (setLoc.causedByDup) {
+                            if (!setRegisters.containsKey(setLoc.regIndex)) {
+                                setRegisters.put(setLoc.regIndex, new ArrayList<>());
+                            }
+                            setRegisters.get(setLoc.regIndex).add(setLoc);
+                        }
+                    }
+                }
+            });
+
+            Set<Integer> nextReferencedRegisters = new HashSet<>();
+
+            for (int regIndex : setRegisters.keySet()) {
+                Set<GraphTargetItem> visitedItems = new HashSet<>();
+                item.visitNoBlock(new AbstractGraphTargetVisitor() {
+
+                    boolean foundGetLoc = false;
+                    boolean foundSetLoc = false;
+
+                    @Override
+                    public void visit(GraphTargetItem item) {
+                        if (foundGetLoc || foundSetLoc) {
+                            return;
+                        }
+                        if (item != null && !visitedItems.contains(item)) {
+                            visitedItems.add(item);
+
+                            if (item instanceof SetLocalAVM2Item) {
+                                SetLocalAVM2Item setLoc = (SetLocalAVM2Item) item;
+                                if (setLoc.regIndex == regIndex) {
+                                    foundSetLoc = true;
+                                    return;
+                                }
+                            }
+
+                            if (item instanceof LocalRegAVM2Item) {
+                                LocalRegAVM2Item getLoc = (LocalRegAVM2Item) item;
+                                if (getLoc.regIndex == regIndex) {
+                                    //This depends on visit order assuming visitorder is execution order.
+                                    if (!foundSetLoc) {
+                                        AVM2FinalProcessLocalData aLocalData = (AVM2FinalProcessLocalData) localData;
+                                        boolean isSetLocUsage = true;
+                                        if (getLoc.getSrc() != null) {
+                                            int getIp = code.adr2pos(getLoc.getSrc().getAddress());
+                                            isSetLocUsage = false;
+                                            for (SetLocalAVM2Item setLoc : setRegisters.get(regIndex)) {
+                                                if (setLoc.getSrc() != null) {
+                                                    Set<Integer> usages = aLocalData.getSetLocalUsages(code.adr2pos(setLoc.getSrc().getAddress()));
+                                                    if (usages.contains(getIp)) {
+                                                        isSetLocUsage = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        
+                                        if (isSetLocUsage) {
+                                            nextReferencedRegisters.add(regIndex);
+                                            foundGetLoc = true;
+                                            return;
+                                        }                                        
+                                    }
+                                }
+                            }
+
+                            item.visitNoBlock(this);
+                        }
+                    }
+                }
+                );
+            }
+
+            Set<GraphTargetItem> visitedItems = new HashSet<>();
+            Reference<Integer> newI = new Reference<>(i);
+            item.visitNoBlock(new AbstractGraphTargetVisitor() {
+
+                boolean found = false;
+
+                @Override
+                public void visit(GraphTargetItem item) {
+                    if (found) {
+                        return;
+                    }
+                    if (item != null && !visitedItems.contains(item)) {
+                        visitedItems.add(item);
+
+                        if (item instanceof SetLocalAVM2Item) {
+                            SetLocalAVM2Item setLoc = (SetLocalAVM2Item) item;
+                            if (nextReferencedRegisters.contains(setLoc.regIndex)) {
+
+                                SetLocalAVM2Item setlocClone = (SetLocalAVM2Item) setLoc.clone();
+                                //TODO: handle the replacing better. It should convert SetLocal to LocalReg
+                                setLoc.hideValue = true;
+                                list.add(newI.getVal(), setlocClone);
+                                newI.setVal(newI.getVal() + 1);
+                                return;
+                            }
+                        }
+
+                        item.visitNoBlock(this);
+                    }
+                }
+            });
+            i = newI.getVal();
+        }
+
         //Handle for loops at the end:
         super.finalProcess(list, level, localData, path);
     }
 
     @Override
     protected FinalProcessLocalData getFinalData(BaseLocalData localData, List<Loop> loops, List<ThrowState> throwStates) {
-        FinalProcessLocalData finalProcess = new AVM2FinalProcessLocalData(loops, ((AVM2LocalData) localData).localRegNames);
+        FinalProcessLocalData finalProcess = new AVM2FinalProcessLocalData(loops, ((AVM2LocalData) localData).localRegNames, ((AVM2LocalData) localData).setLocalPosToGetLocalPos);
         finalProcess.registerUsage = ((AVM2LocalData) localData).setLocalPosToGetLocalPos;
         return finalProcess;
     }
@@ -2440,5 +2570,5 @@ public class AVM2Graph extends Graph {
     @Override
     protected SecondPassData prepareSecondPass(List<GraphTargetItem> list) {
         return new SecondPassData();
-    }       
+    }
 }

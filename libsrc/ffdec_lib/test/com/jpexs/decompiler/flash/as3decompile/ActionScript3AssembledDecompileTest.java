@@ -171,6 +171,14 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     }
 
     @Test
+    public void testSwapAssignment() {
+        decompileMethod("assembled", "testSwapAssignment", "var _loc6_:Bitmap = MyFactory.createBitmap();\r\n"
+                + "_loc6_.x = _loc6_.x + 5;\r\n"
+                + "_loc6_.y = -10;\r\n",
+                 false);
+    }
+
+    @Test
     public void testSwitch() {
         decompileMethod("assembled", "testSwitch", "switch(int(somevar))\r\n"
                 + "{\r\n"
