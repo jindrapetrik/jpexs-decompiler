@@ -20,6 +20,8 @@ All notable changes to this project will be documented in this file.
 - [#1944] Scroll position not retained on Ctrl+click in the tag tree
 - [#1940] AS3 decompilation - wrong assignment
 - AS3 - incorrect switching P-code causing empty text
+- AS3 - Select the trait after adding new
+- [#1955] AS3 - Exception during removing trait
 
 ## [18.3.3] - 2023-01-22
 ### Added
@@ -2931,6 +2933,7 @@ All notable changes to this project will be documented in this file.
 [#1954]: https://www.free-decompiler.com/flash/issues/1954
 [#1944]: https://www.free-decompiler.com/flash/issues/1944
 [#1940]: https://www.free-decompiler.com/flash/issues/1940
+[#1955]: https://www.free-decompiler.com/flash/issues/1955
 [#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1894]: https://www.free-decompiler.com/flash/issues/1894
 [#1801]: https://www.free-decompiler.com/flash/issues/1801

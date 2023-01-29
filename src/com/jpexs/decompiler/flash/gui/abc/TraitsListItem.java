@@ -20,12 +20,14 @@ import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitType;
+import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.search.ABCSearchResult;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -99,14 +101,22 @@ public class TraitsListItem {
                 }
             } else if (isStatic) {
                 ConvertData convertData = new ConvertData();
-                Trait trait = abc.class_info.get(classIndex).static_traits.traits.get(index);
+                List<Trait> traits = abc.class_info.get(classIndex).static_traits.traits;
+                if (index >= traits.size()) {
+                    return "";
+                }
+                Trait trait = traits.get(index);
                 trait.convertHeader(null, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
                 trait.toStringHeader(null, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
                 s = writer.toString();
             } else {
                 ConvertData convertData = new ConvertData();
-                Trait trait = abc.instance_info.get(classIndex).instance_traits.traits.get(index);
+                List<Trait> traits = abc.instance_info.get(classIndex).instance_traits.traits;                
+                if (index >= traits.size()) {
+                    return "";
+                }
+                Trait trait = traits.get(index);
                 trait.convertHeader(null, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
                 trait.toStringHeader(null, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
