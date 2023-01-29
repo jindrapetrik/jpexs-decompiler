@@ -122,6 +122,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
@@ -1781,7 +1782,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         }
 
         if (ViewMessages.showConfirmDialog(this, AppStrings.translate("message.confirm.removetrait"), AppStrings.translate("message.warning"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.OK_OPTION) {
-
+            navigator.setModel(new DefaultListModel<>());
             if (scriptTraitsUsed) {
                 final int fTraitIndex = traitIndex;
                 final Traits fTraits = traits;
@@ -1802,7 +1803,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 ((Tag) abc.parentTag).setModified(true);
                 reload();
             }
-
+            
         }
     }
 
@@ -1857,6 +1858,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 }
             }
         } while (again);
+        navigator.setModel(new DefaultListModel<>());            
         switch (kind) {
             case Trait.TRAIT_GETTER:
             case Trait.TRAIT_SETTER:
@@ -1906,8 +1908,14 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 abc.script_info.get(scriptIndex).setModified(true);
             }
             ((Tag) abc.parentTag).setModified(true);
-            reload();
-            decompiledTextArea.gotoTrait(traitId);
+            decompiledTextArea.addScriptListener(new Runnable() {
+                @Override
+                public void run() {
+                    decompiledTextArea.gotoTrait(traitId);
+                    decompiledTextArea.removeScriptListener(this);
+                }
+            });
+            reload();            
         }
     }
 
