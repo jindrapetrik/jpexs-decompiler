@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - [#1954] Incorrect calculation of empty button bounds causing OutOfMemory
 - [#1944] Scroll position not retained on Ctrl+click in the tag tree
 - [#1940] AS3 decompilation - wrong assignment
+- AS3 - incorrect switching P-code causing empty text
 
 ## [18.3.3] - 2023-01-22
 ### Added
