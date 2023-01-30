@@ -24,6 +24,9 @@ All notable changes to this project will be documented in this file.
 - [#1955] AS3 - Exception during removing trait
 - [#688] AS3 Direct editation - construction (new keyword) converted to call when result not used
 
+### Changed
+- [#1957] Increased maximum stack size to avoid StackOverflowErrors on unusual scripts
+
 ## [18.3.3] - 2023-01-22
 ### Added
 - [#1913] Option to retain shape exact position(bounds) in SVG export
@@ -2936,6 +2939,7 @@ All notable changes to this project will be documented in this file.
 [#1940]: https://www.free-decompiler.com/flash/issues/1940
 [#1955]: https://www.free-decompiler.com/flash/issues/1955
 [#688]: https://www.free-decompiler.com/flash/issues/688
+[#1957]: https://www.free-decompiler.com/flash/issues/1957
 [#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1894]: https://www.free-decompiler.com/flash/issues/1894
 [#1801]: https://www.free-decompiler.com/flash/issues/1801
