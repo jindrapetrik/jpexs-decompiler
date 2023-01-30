@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [18.3.4] - 2023-01-30
 ### Added
 - [#1029] Better separation of library and main app, dependencies inside library zip, library readme
@@ -2785,6 +2787,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.4...dev
 [18.3.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.3...version18.3.4
 [18.3.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.2...version18.3.3
 [18.3.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.1...version18.3.2
