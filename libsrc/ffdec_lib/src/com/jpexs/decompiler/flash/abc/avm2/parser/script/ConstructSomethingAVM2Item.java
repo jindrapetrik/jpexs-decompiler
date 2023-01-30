@@ -45,18 +45,8 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
         return name.returnType();
     }
 
-    private int allNsSetWithVec(AbcIndexing abc) throws CompilationException {
-        int[] nssa = new int[openedNamespaces.size() + 1];
-        for (int i = 0; i < openedNamespaces.size(); i++) {
-            nssa[i] = openedNamespaces.get(i).getCpoolIndex(abc);
-        }
-        nssa[nssa.length - 1] = abc.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_PACKAGE, "__AS3__.vec", 0, true);
-        return abc.getSelectedAbc().constants.getNamespaceSetId(nssa, true);
-
-    }
-
     @Override
-    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
+    public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator, boolean needsReturn) throws CompilationException {
 
         GraphTargetItem resname = name;
         if (resname instanceof UnresolvedAVM2Item) {
@@ -68,35 +58,38 @@ public class ConstructSomethingAVM2Item extends CallAVM2Item {
             if (localData.isStatic && localData.pkg.addWithSuffix(localData.currentClass).equals(prop.fullTypeName)) {
                 return toSourceMerge(localData, generator,
                         new AVM2Instruction(0, AVM2Instructions.GetLocal0, new int[]{}), arguments,
-                        new AVM2Instruction(0, AVM2Instructions.Construct, new int[]{arguments.size()}));
+                        new AVM2Instruction(0, AVM2Instructions.Construct, new int[]{arguments.size()}),
+                        needsReturn ? null : ins(AVM2Instructions.Pop));
 
             }
             int type_index = AVM2SourceGenerator.resolveType(localData, resname, ((AVM2SourceGenerator) generator).abcIndex);
             return toSourceMerge(localData, generator,
                     new AVM2Instruction(0, AVM2Instructions.FindPropertyStrict, new int[]{type_index, arguments.size()}), arguments,
-                    new AVM2Instruction(0, AVM2Instructions.ConstructProp, new int[]{type_index, arguments.size()})
+                    new AVM2Instruction(0, AVM2Instructions.ConstructProp, new int[]{type_index, arguments.size()}),
+                    needsReturn ? null : ins(AVM2Instructions.Pop)
             );
         }
 
         if (resname instanceof PropertyAVM2Item) {
             PropertyAVM2Item prop = (PropertyAVM2Item) resname;
             return toSourceMerge(localData, generator, prop.resolveObject(localData, generator, true), arguments,
-                    ins(AVM2Instructions.ConstructProp, prop.resolveProperty(localData), arguments.size())
+                    ins(AVM2Instructions.ConstructProp, prop.resolveProperty(localData), arguments.size()),
+                    needsReturn ? null : ins(AVM2Instructions.Pop)
             );
         }
 
         if (resname instanceof NameAVM2Item) {
-            return toSourceMerge(localData, generator, resname, arguments, ins(AVM2Instructions.Construct, arguments.size()));
+            return toSourceMerge(localData, generator, resname, arguments, ins(AVM2Instructions.Construct, arguments.size()), needsReturn ? null : ins(AVM2Instructions.Pop));
         }
 
         if (resname instanceof IndexAVM2Item) {
-            return ((IndexAVM2Item) resname).toSource(localData, generator, true, false, arguments, false, true);
+            return ((IndexAVM2Item) resname).toSource(localData, generator, needsReturn, false, arguments, false, true);
         }
 
         if (resname instanceof NamespacedAVM2Item) {
-            return ((NamespacedAVM2Item) resname).toSource(localData, generator, true, false, arguments, false, true);
+            return ((NamespacedAVM2Item) resname).toSource(localData, generator, needsReturn, false, arguments, false, true);
         }
-        return toSourceMerge(localData, generator, resname, arguments, ins(AVM2Instructions.Construct, arguments.size()));
+        return toSourceMerge(localData, generator, resname, arguments, ins(AVM2Instructions.Construct, arguments.size()), needsReturn ? null : ins(AVM2Instructions.Pop));
     }
 
     @Override
