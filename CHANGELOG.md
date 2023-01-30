@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - incorrect switching P-code causing empty text
 - AS3 - Select the trait after adding new
 - [#1955] AS3 - Exception during removing trait
+- [#688] AS3 Direct editation - construction (new keyword) converted to call when result not used
 
 ## [18.3.3] - 2023-01-22
 ### Added
@@ -2934,6 +2935,7 @@ All notable changes to this project will be documented in this file.
 [#1944]: https://www.free-decompiler.com/flash/issues/1944
 [#1940]: https://www.free-decompiler.com/flash/issues/1940
 [#1955]: https://www.free-decompiler.com/flash/issues/1955
+[#688]: https://www.free-decompiler.com/flash/issues/688
 [#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1894]: https://www.free-decompiler.com/flash/issues/1894
 [#1801]: https://www.free-decompiler.com/flash/issues/1801
@@ -3456,7 +3458,6 @@ All notable changes to this project will be documented in this file.
 [#710]: https://www.free-decompiler.com/flash/issues/710
 [#711]: https://www.free-decompiler.com/flash/issues/711
 [#681]: https://www.free-decompiler.com/flash/issues/681
-[#688]: https://www.free-decompiler.com/flash/issues/688
 [#691]: https://www.free-decompiler.com/flash/issues/691
 [#524]: https://www.free-decompiler.com/flash/issues/524
 [#663]: https://www.free-decompiler.com/flash/issues/663
