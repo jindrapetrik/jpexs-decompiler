@@ -7,7 +7,7 @@ Open Source Flash SWF decompiler and editor. Extract resources, convert SWF to F
 For information about using the software, list of features, etc., visit [FFDec Wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki).
 
 ## Free-Decompiler.com website
-In the past (before 2018), we were using *free-decompiler.com* domain as homepage and GitHub for the source code, We've now moved all information to GitHub.
+In the past (before 2018), we were using *free-decompiler.com* domain as homepage and GitHub for the source code, We've now moved all information (except the issue tracker) to GitHub.
 
 ## Download application
 For downloading the app, see [latest release](https://github.com/jindrapetrik/jpexs-decompiler/releases/latest).
