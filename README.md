@@ -131,10 +131,9 @@ The application was made in Czech Republic.
 * **koiru** - japanese translation
 
 ## Contact
-You can use our Issue tracker to report bugs, but our support is VERY limited.
-[https://www.free-decompiler.com/flash/issues](https://www.free-decompiler.com/flash/issues)
+If you want to report a problem or request new feature, use our issue tracker at [https://www.free-decompiler.com/flash/issues](https://www.free-decompiler.com/flash/issues)
 
-See [Frequently Asked Questions (FAQ) in wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki/FAQ) before you try to contact me.
+You should see [Frequently Asked Questions (FAQ) in wiki](https://github.com/jindrapetrik/jpexs-decompiler/wiki/FAQ) before.
 
 ### Email contact
 Emergency contact to JPEXS developer is `jindra.petrik@gmail.com`.
