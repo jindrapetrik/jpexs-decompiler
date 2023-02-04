@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#1960] Hide tag tree root handles as it was in previous versions
 
+### Changed
+- [#1960] Quick search does not search in SWF name or folder names
+
 ## [18.3.4] - 2023-01-30
 ### Added
 - [#1029] Better separation of library and main app, dependencies inside library zip, library readme
