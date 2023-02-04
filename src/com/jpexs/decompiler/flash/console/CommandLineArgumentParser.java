@@ -549,11 +549,12 @@ public class CommandLineArgumentParser {
 
         if (filter == null || filter.equals("replace")) {
             out.println(" " + (cnt++) + ") -replace <infile> <outfile> (<characterId1>|<scriptName1>) <importDataFile1> [nofill] ([<format1>][<methodBodyIndex1>]) [(<characterId2>|<scriptName2>) <importDataFile2> [nofill] ([<format2>][<methodBodyIndex2>])]...");
-            out.println(" ...replaces the data of the specified BinaryData, Image, Shape, Text, DefineSound tag or Script");
+            out.println(" ...replaces the data of the specified BinaryData, Image, Shape, Text, Sound tag or Script");
             out.println(" ...nofill parameter can be specified only for shape replace");
             out.println(" ...<format> parameter can be specified for Image and Shape tags");
             out.println(" ...valid formats: lossless, lossless2, jpeg2, jpeg3, jpeg4");
             out.println(" ...<methodBodyIndexN> parameter should be specified if and only if the imported entity is an AS3 P-Code");
+            out.println(" ...use -1 as characterId to replace main timeline SoundStreamHead");
 
             out.println(" " + (cnt++) + ") -replace <infile> <outfile> <argsfile>");
             out.println(" ... same as -replace command, but the rest of arguments is read as lines from a text file <argsfile>");
@@ -3180,7 +3181,7 @@ public class CommandLineArgumentParser {
 
                         SoundStreamHeadTypeTag soundStreamHead = null;
                         CharacterTag characterTag = null;
-                        if (characterId == 0) {
+                        if (characterId == -1) {
                             //replacing soundstreamhead on main timeline
                         } else if (swf.getCharacters().containsKey(characterId)) {
                             characterTag = swf.getCharacter(characterId);

@@ -1017,7 +1017,7 @@ public class XFLConverter {
         return layer;
     }
 
-    private static int getLayerCount(ReadOnlyTagList tags) {
+    private static int getMaxDepth(ReadOnlyTagList tags) {
         int maxDepth = 0;
         for (Tag t : tags) {
             if (t instanceof PlaceObjectTypeTag) {
@@ -2944,7 +2944,7 @@ public class XFLConverter {
             index++;
         }
 
-        int layerCount = getLayerCount(timelineTags);
+        int maxDepth = getMaxDepth(timelineTags);
 
         List<Integer> clipFrameSplitters = new ArrayList<>();
         List<PlaceObjectTypeTag> clipPlaces = new ArrayList<>();
@@ -2995,13 +2995,13 @@ public class XFLConverter {
         clipPlaces.add(null);
 
         Map<Integer, List<Integer>> depthToFramesList = new HashMap<>();
-        for (int d = layerCount; d >= 1; d--) {
+        for (int d = maxDepth; d >= 0; d--) {
             depthToFramesList.put(d, new ArrayList<>());
             for (int i = 0; i < frameCount; i++) {
                 depthToFramesList.get(d).add(i);
             }
         }
-        for (int d = layerCount; d >= 1; d--) {
+        for (int d = maxDepth; d >= 0; d--) {
 
             for (int p = 0; p < clipPlaces.size() - 1; p++) {
                 PlaceObjectTypeTag po = clipPlaces.get(p);
@@ -3054,8 +3054,8 @@ public class XFLConverter {
             }
         }
 
-        int soundLayerIndex = layerCount;
-        layerCount++;
+        int soundLayerIndex = maxDepth;
+        maxDepth++;
         convertSoundLayer(soundLayerIndex, timelineTags, files, writer);
         writer.writeEndElement();
         writer.writeEndElement();

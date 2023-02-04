@@ -75,7 +75,7 @@ public class SoundStreamHead2Tag extends SoundStreamHeadTypeTag {
     public int latencySeek;
 
     @Internal
-    private int virtualCharacterId = 0;
+    private int virtualCharacterId = -1;
 
     /**
      * Constructor
@@ -251,7 +251,7 @@ public class SoundStreamHead2Tag extends SoundStreamHeadTypeTag {
 
     @Override
     public String toString() {
-        return getName() + (virtualCharacterId > 0 ? " (" + virtualCharacterId + ")" : "");
+        return getName() + " (" + virtualCharacterId + ")";
     }
     
     //getNeededCharacters intentionally not defined
