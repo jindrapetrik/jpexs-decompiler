@@ -22,6 +22,7 @@ import static com.jpexs.decompiler.flash.gui.AppDialog.CANCEL_OPTION;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTree;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DoInitActionTag;
+import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.timeline.Timelined;
@@ -163,9 +164,11 @@ public class SelectTagPositionDialog extends AppDialog {
 
         private final int frame;
         private boolean invalid;
+        private List<String> labels;
 
-        public MyFrame(int frame) {
+        public MyFrame(int frame, List<String> labels) {
             this.frame = frame;
+            this.labels = labels;
         }
 
         public int getFrame() {
@@ -182,7 +185,11 @@ public class SelectTagPositionDialog extends AppDialog {
 
         @Override
         public String toString() {
-            return "frame " + frame;
+            String name = "frame " + frame;
+            if (!labels.isEmpty()) {
+                name += " (" + String.join(", ", labels) + ")";
+            }
+            return name;
         }
     }
 
@@ -190,7 +197,8 @@ public class SelectTagPositionDialog extends AppDialog {
         int f = 1;
 
         MyTreeNode frameNode = new MyTreeNode();
-        frameNode.setData(new MyFrame(1));
+        List<String> labels = new ArrayList<>();        
+        frameNode.setData(new MyFrame(1, labels));
         frameNode.setParent(root);
         root.addChild(frameNode);
 
@@ -204,12 +212,16 @@ public class SelectTagPositionDialog extends AppDialog {
                     populateNodes(node, (DefineSpriteTag) t);
                 }
             }
+            if (t instanceof FrameLabelTag) {
+                labels.add(((FrameLabelTag)t).name);
+            }
             if (t instanceof ShowFrameTag) {
                 f++;
                 frameNode = new MyTreeNode();
-                frameNode.setData(new MyFrame(f));
+                labels = new ArrayList<>();
+                frameNode.setData(new MyFrame(f, labels));
                 frameNode.setParent(root);
-                root.addChild(frameNode);
+                root.addChild(frameNode);                
             }
         }
         if (frameNode.isLeaf()) {

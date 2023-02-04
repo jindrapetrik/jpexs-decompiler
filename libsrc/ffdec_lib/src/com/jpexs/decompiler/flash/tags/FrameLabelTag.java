@@ -86,4 +86,10 @@ public class FrameLabelTag extends Tag {
     public boolean isNamedAnchor() {
         return namedAnchor;
     }
+
+    @Override
+    public String toString() {
+        return getName() + (name.isEmpty() ? "" : " (" + name + ")");
+    }
+
 }
