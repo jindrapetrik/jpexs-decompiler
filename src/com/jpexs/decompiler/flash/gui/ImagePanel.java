@@ -3425,7 +3425,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     first = false;
                     CharacterTag c = ds.getCharacter();
                     ret.append(c.toString());
-                    if (ds.depth > 0) {
+                    if (ds.depth > -1) {
                         ret.append(" ");
                         ret.append(AppStrings.translate("imagePanel.depth"));
                         ret.append(" ");

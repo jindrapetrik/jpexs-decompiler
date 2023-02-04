@@ -439,14 +439,14 @@ public class Timeline {
         createASPackages();
         if (timelined instanceof SWF) {
             // popuplate only for main timeline
-            populateSoundStreamBlocks(0, timelined.getTags());
+            populateSoundStreamBlocks(-1, timelined.getTags());
         }
 
         initialized = true;
     }
 
     private synchronized void detectTweens() {
-        for (int d = 1; d <= maxDepth; d++) {
+        for (int d = 0; d <= maxDepth; d++) {
             int characterId = -1;
             String charClassName = null;
             int len = 0;
@@ -486,7 +486,7 @@ public class Timeline {
 
     private synchronized void calculateMaxDepthFrames() {
         depthMaxFrame.clear();
-        for (int d = 1; d <= maxDepth; d++) {
+        for (int d = 0; d <= maxDepth; d++) {
             for (int f = frames.size() - 1; f >= 0; f--) {
                 if (frames.get(f).layers.get(d) != null) {
                     depthMaxFrame.put(d, f);
@@ -1037,7 +1037,7 @@ public class Timeline {
 
         int maxDepth = getMaxDepth();
         int clipCount = 0;
-        for (int i = 1; i <= maxDepth; i++) {
+        for (int i = 0; i <= maxDepth; i++) {
             boolean clipChanged = clipCount != clips.size();
             for (int c = 0; c < clips.size(); c++) {
                 if (clips.get(c).depth < i) {
@@ -1200,7 +1200,7 @@ public class Timeline {
         int maxDepth = getMaxDepth();
         int clipCount = 0;
         Element clipGroup = null;
-        for (int i = 1; i <= maxDepth; i++) {
+        for (int i = 0; i <= maxDepth; i++) {
             boolean clipChanged = clipCount != clips.size();
             for (int c = 0; c < clips.size(); c++) {
                 if (clips.get(c).depth < i) {
@@ -1422,7 +1422,7 @@ public class Timeline {
 
     public boolean isSingleFrame(int frame) {
         Frame frameObj = getFrame(frame);
-        for (int i = 1; i <= maxDepth; i++) {
+        for (int i = 0; i <= maxDepth; i++) {
             if (!frameObj.layers.containsKey(i)) {
                 continue;
             }

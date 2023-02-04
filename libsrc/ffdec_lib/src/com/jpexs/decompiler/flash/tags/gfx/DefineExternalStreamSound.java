@@ -70,7 +70,7 @@ public class DefineExternalStreamSound extends Tag implements CharacterIdTag, So
     public static final int SOUND_FORMAT_WAV = 0;
     
     @Internal
-    private int virtualCharacterId = 0;
+    private int virtualCharacterId = -1;
 
     /**
      * Gets data bytes
@@ -243,7 +243,7 @@ public class DefineExternalStreamSound extends Tag implements CharacterIdTag, So
     
     @Override
     public String toString() {
-        return getName() + (virtualCharacterId > 0 ? " (" + virtualCharacterId + ")" : "");
+        return getName() + " (" + virtualCharacterId + ")";
     }
     
     @Override

@@ -32,7 +32,6 @@ import com.jpexs.decompiler.flash.types.sound.SoundExportFormat;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.helpers.ByteArrayRange;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,7 +84,7 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
     public int latencySeek;
 
     @Internal
-    private int virtualCharacterId = 0;
+    private int virtualCharacterId = -1;
 
     /**
      * Constructor
@@ -261,7 +260,7 @@ public class SoundStreamHeadTag extends SoundStreamHeadTypeTag {
 
     @Override
     public String toString() {
-        return getName() + (virtualCharacterId > 0 ? " (" + virtualCharacterId + ")" : "");
+        return getName() + " (" + virtualCharacterId + ")";
     }
         
     //getNeededCharacters intentionally not defined

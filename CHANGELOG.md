@@ -5,9 +5,11 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#1960] Hide tag tree root handles as it was in previous versions
 - [#1964] Freezing on releasing mouse while shape transforming (deadlock)
+- [#1961] Characters can use characterId 0, PlaceObject can use depth 0
 
 ### Changed
 - [#1960] Quick search does not search in SWF name or folder names
+- [#1961] SoundStreamHead on main timeline is exported/imported with identifier "-1"
 
 ## [18.3.4] - 2023-01-30
 ### Added
@@ -2939,6 +2941,7 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1960]: https://www.free-decompiler.com/flash/issues/1960
 [#1964]: https://www.free-decompiler.com/flash/issues/1964
+[#1961]: https://www.free-decompiler.com/flash/issues/1961
 [#1029]: https://www.free-decompiler.com/flash/issues/1029
 [#1948]: https://www.free-decompiler.com/flash/issues/1948
 [#1941]: https://www.free-decompiler.com/flash/issues/1941
