@@ -2026,7 +2026,7 @@ public class SWFInputStream implements AutoCloseable {
         ret.clipEventPress = readUB(1, "clipEventPress") == 1;
         ret.clipEventInitialize = readUB(1, "clipEventInitialize") == 1;
         ret.clipEventData = readUB(1, "clipEventData") == 1;
-        if (swf.version >= 6) {
+        if (swf.version >= 6 && available() > 0) {
             ret.reserved = (int) readUB(5, "reserved");
             ret.clipEventConstruct = readUB(1, "clipEventConstruct") == 1;
             ret.clipEventKeyPress = readUB(1, "clipEventKeyPress") == 1;
