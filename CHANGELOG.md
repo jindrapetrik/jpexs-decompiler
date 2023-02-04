@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#1959] Display frame labels along frames and FrameLabel tags
+
 ### Fixed
 - [#1960] Hide tag tree root handles as it was in previous versions
 - [#1964] Freezing on releasing mouse while shape transforming (deadlock)
@@ -2939,6 +2942,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1959]: https://www.free-decompiler.com/flash/issues/1959
 [#1960]: https://www.free-decompiler.com/flash/issues/1960
 [#1964]: https://www.free-decompiler.com/flash/issues/1964
 [#1961]: https://www.free-decompiler.com/flash/issues/1961

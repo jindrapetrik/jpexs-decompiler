@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.tags.DoActionTag;
+import com.jpexs.decompiler.flash.tags.FrameLabelTag;
 import com.jpexs.decompiler.flash.tags.ShowFrameTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.base.ASMSourceContainer;
@@ -93,7 +94,17 @@ public class Frame implements TreeItem, Exportable {
 
     @Override
     public String toString() {
-        return "frame " + (frame + 1);
+        String name = "frame " + (frame + 1);
+        List<String> labels = new ArrayList<>();
+        for (Tag t : innerTags) {
+            if (t instanceof FrameLabelTag) {
+                labels.add(((FrameLabelTag)t).name);
+            }
+        }
+        if (!labels.isEmpty()) {
+            name += " (" + String.join(", ", labels) + ")";
+        }
+        return name;
     }
 
     @Override
