@@ -99,7 +99,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.VolatileImage;
-import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -1219,7 +1218,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                 registrationPoint = new Point2D.Double(registrationPointUpdated.getX(), registrationPointUpdated.getY());
                                 transform = new Matrix(transformUpdated);
                                 transformUpdated = null;
-                                calcRect();
+                                
 
                                 Rectangle2D transBoundsAfter = getTransformBounds();
                                 Point2D transRegPointAfter = registrationPoint;
@@ -1237,10 +1236,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                                         || mode == Cursor.W_RESIZE_CURSOR;
                                 if (!isResize && mode != Cursor.DEFAULT_CURSOR && !transRegPointPercentBefore.equals(transRegPointPercentAfter)) {
                                     registrationPointPosition = null;
-                                }
-
-                                fireBoundsChange(getTransformBounds(), registrationPoint, registrationPointPosition);
+                                }                                
                             }
+                            calcRect(); //do not put this inside synchronized block, it cause deadlock
+                            fireBoundsChange(getTransformBounds(), registrationPoint, registrationPointPosition);
                             repaint();
                         }
                         mode = Cursor.DEFAULT_CURSOR;

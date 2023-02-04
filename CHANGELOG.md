@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#1960] Hide tag tree root handles as it was in previous versions
+- [#1964] Freezing on releasing mouse while shape transforming (deadlock)
 
 ### Changed
 - [#1960] Quick search does not search in SWF name or folder names
@@ -2937,6 +2938,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1960]: https://www.free-decompiler.com/flash/issues/1960
+[#1964]: https://www.free-decompiler.com/flash/issues/1964
 [#1029]: https://www.free-decompiler.com/flash/issues/1029
 [#1948]: https://www.free-decompiler.com/flash/issues/1948
 [#1941]: https://www.free-decompiler.com/flash/issues/1941
