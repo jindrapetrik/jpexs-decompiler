@@ -10,10 +10,12 @@ All notable changes to this project will be documented in this file.
 - [#1964] Freezing on releasing mouse while shape transforming (deadlock)
 - [#1961] Characters can use characterId 0, PlaceObject can use depth 0
 - [#1963] Reading CLIPEVENTFLAGS ClipActionEndFlag on SWF versions >= 6
+- [#1968], [#1971], [#1957] Cannot start FFDec due to large stack size on some configurations
 
 ### Changed
 - [#1960] Quick search does not search in SWF name or folder names
 - [#1961] SoundStreamHead on main timeline is exported/imported with identifier "-1"
+- [#1957] Larger stack size (when needed) must be configured manually in ffdec.bat or ffdec.sh
 
 ## [18.3.4] - 2023-01-30
 ### Added
@@ -2948,6 +2950,8 @@ All notable changes to this project will be documented in this file.
 [#1964]: https://www.free-decompiler.com/flash/issues/1964
 [#1961]: https://www.free-decompiler.com/flash/issues/1961
 [#1963]: https://www.free-decompiler.com/flash/issues/1963
+[#1968]: https://www.free-decompiler.com/flash/issues/1968
+[#1971]: https://www.free-decompiler.com/flash/issues/1971
 [#1029]: https://www.free-decompiler.com/flash/issues/1029
 [#1948]: https://www.free-decompiler.com/flash/issues/1948
 [#1941]: https://www.free-decompiler.com/flash/issues/1941
