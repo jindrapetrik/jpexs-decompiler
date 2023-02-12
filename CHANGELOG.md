@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#1970] FLA export - do not strip empty frames at the end of timeline
 - [#1970] AS2 Renaming invalid identifiers for direct strings (no constant indices)
 - [#1970] AS2 Renaming invalid identifiers IndexOutOfBounds on invalid constant index (obfuscated code, etc.)
+- [#1972] AS3 Renaming invalid identifiers - '#' character
 
 ## [18.3.5] - 2023-02-12
 ### Added
@@ -2953,6 +2954,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1970]: https://www.free-decompiler.com/flash/issues/1970
+[#1972]: https://www.free-decompiler.com/flash/issues/1972
 [#1959]: https://www.free-decompiler.com/flash/issues/1959
 [#1960]: https://www.free-decompiler.com/flash/issues/1960
 [#1964]: https://www.free-decompiler.com/flash/issues/1964

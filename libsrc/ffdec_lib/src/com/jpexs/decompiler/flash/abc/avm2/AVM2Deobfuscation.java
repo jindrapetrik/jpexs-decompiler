@@ -93,7 +93,7 @@ public class AVM2Deobfuscation {
         return null;
     }
 
-    private String fooString(HashMap<DottedChain, DottedChain> deobfuscated, String orig, boolean firstUppercase, String usageType, RenameType renameType) {
+    private String fooString(HashMap<DottedChain, DottedChain> deobfuscated, String orig, boolean firstUppercase, String usageType, RenameType renameType, boolean autoAdd) {
         if (usageType == null) {
             usageType = "name";
         }
@@ -111,12 +111,14 @@ public class AVM2Deobfuscation {
             }
             if (swf.as3StringConstantExists(ret)
                     || IdentifiersDeobfuscation.isReservedWord2(ret)
-                    || deobfuscated.containsValue(DottedChain.parseWithSuffix(ret))) {
+                    || deobfuscated.containsValue(DottedChain.parseNoSuffix(ret))) {
                 found = true;
                 rndSize++;
             }
         } while (found);
-        deobfuscated.put(DottedChain.parseWithSuffix(orig), DottedChain.parseWithSuffix(ret));
+        if (autoAdd) {
+            deobfuscated.put(DottedChain.parseNoSuffix(orig), DottedChain.parseNoSuffix(ret));
+        }
         return ret;
     }
 
@@ -141,7 +143,7 @@ public class AVM2Deobfuscation {
             for (int p = 0; p < sChain.size(); p++) {
                 String part = sChain.get(p);
                 if (!isValidNSPart(part)) {
-                    ret.add(fooString(namesMap, part, false, "package", renameType));
+                    ret.add(fooString(namesMap, part, false, "package", renameType, true));
                 } else {
                     ret.add(part);
                 }
@@ -186,21 +188,21 @@ public class AVM2Deobfuscation {
 
         if (!isValid) {
             DottedChain newname;
-            DottedChain sChain = DottedChain.parseWithSuffix(s);
+            DottedChain sChain = DottedChain.parseNoSuffix(s);
             if (namesMap.containsKey(sChain)) {
                 newname = namesMap.get(sChain);
                 return constants.getStringId(newname, true);
             }
             
-            String str = fooString(namesMap, constants.getString(strIndex), firstUppercase, stringUsageTypes.get(strIndex), renameType);
-            newname = DottedChain.parseWithSuffix(str);
+            String str = fooString(namesMap, constants.getString(strIndex), firstUppercase, stringUsageTypes.get(strIndex), renameType, false);
+            newname = DottedChain.parseNoSuffix(str);
             
             if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { // this name is already referenced as String
                 strIndex = constants.addString(s); // add new index
             }
             constants.setString(strIndex, newname.toRawString());
             if (!namesMap.containsKey(sChain)) {
-                namesMap.put(sChain, DottedChain.parseWithSuffix(constants.getString(strIndex)));
+                namesMap.put(sChain, DottedChain.parseNoSuffix(constants.getString(strIndex)));
             }
         }
         return strIndex;

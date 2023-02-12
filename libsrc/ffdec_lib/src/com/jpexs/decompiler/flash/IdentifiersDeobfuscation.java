@@ -222,7 +222,7 @@ public class IdentifiersDeobfuscation {
     }
 
     public String deobfuscateNameWithPackage(boolean as3, String n, HashMap<DottedChain, DottedChain> namesMap, RenameType renameType, Map<DottedChain, DottedChain> selected) {
-        DottedChain nChain = DottedChain.parseWithSuffix(n);
+        DottedChain nChain = DottedChain.parseNoSuffix(n);
         DottedChain pkg = nChain.getWithoutLast();
         String name = nChain.getLast();
 
@@ -340,7 +340,7 @@ public class IdentifiersDeobfuscation {
             usageType = "name";
         }
 
-        DottedChain sChain = DottedChain.parseWithSuffix(s);
+        DottedChain sChain = DottedChain.parseNoSuffix(s);
         if (selected != null) {
             if (selected.containsKey(sChain)) {
                 return selected.get(sChain).toRawString();
@@ -366,14 +366,14 @@ public class IdentifiersDeobfuscation {
                         ret = fooString(firstUppercase, rndSize);
                         if (allVariableNamesStr.contains(ret)
                                 || isReservedWord(ret, as3)
-                                || namesMap.containsValue(DottedChain.parseWithSuffix(ret))) {
+                                || namesMap.containsValue(DottedChain.parseNoSuffix(ret))) {
                             found = true;
                             rndSize++;
                         }
                     }
                 } while (found);
 
-                namesMap.put(DottedChain.parseWithSuffix(s), DottedChain.parseWithSuffix(ret));
+                namesMap.put(DottedChain.parseNoSuffix(s), DottedChain.parseNoSuffix(ret));
                 return ret;
             }
         }
