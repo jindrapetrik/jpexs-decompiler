@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- [#1970] FLA export - do not strip empty frames at the end of timeline
 
 ## [18.3.5] - 2023-02-12
 ### Added
@@ -2948,6 +2950,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1970]: https://www.free-decompiler.com/flash/issues/1970
 [#1959]: https://www.free-decompiler.com/flash/issues/1959
 [#1960]: https://www.free-decompiler.com/flash/issues/1960
 [#1964]: https://www.free-decompiler.com/flash/issues/1964

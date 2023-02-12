@@ -2469,7 +2469,8 @@ public class XFLConverter {
                 }
             }
         }
-        if (!lastElements.isEmpty()) {
+        if (!lastElements.isEmpty() || writer2.length() > 0)
+        {
             frame++;
             convertFrame(false, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files, writer2);
         }
