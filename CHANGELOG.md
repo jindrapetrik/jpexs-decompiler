@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#1970] FLA export - do not strip empty frames at the end of timeline
+- [#1970] AS2 Renaming invalid identifiers for direct strings (no constant indices)
+- [#1970] AS2 Renaming invalid identifiers IndexOutOfBounds on invalid constant index (obfuscated code, etc.)
 
 ## [18.3.5] - 2023-02-12
 ### Added
