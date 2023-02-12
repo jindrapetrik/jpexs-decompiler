@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
+# This is a comment, it starts with "#".
+
 # Set following to higher value if you want more memory
 # You need 64 bit OS and 64 bit java to set it to higher values
 MEMORY=1024m
 
-# Set following to higher value when you encounter StackOverFlowErrors
-STACK_SIZE=32m
+# Uncomment following when you encounter StackOverFlowErrors. 
+# If the app then terminates with OutOfMemory you can experiment with lower value.
+# STACK_SIZE=32m
 
 # Hide VLC error output
 export VLC_VERBOSE=-1
@@ -77,7 +80,14 @@ fi
 
 popd > /dev/null
 
-args=(-Djava.net.preferIPv4Stack=true -Xmx$MEMORY -Xss$STACK_SIZE -jar $JAR_FILE "$@")
+if [ -n "$STACK_SIZE" ]; then
+    STACK_SIZE_PARAM=" -Xss$STACK_SIZE"
+fi
+if [ -n "$MEMORY" ]; then
+    MEMORY_PARAM=" -Xmx$MEMORY"
+fi
+
+args=(-Djava.net.preferIPv4Stack=true${MEMORY_PARAM}${STACK_SIZE_PARAM} -jar $JAR_FILE "$@")
 
 if [ "`uname`" = "Darwin" ]; then
 	args=(-Xdock:name=FFDec -Xdock:icon=icon.png "${args[@]}")

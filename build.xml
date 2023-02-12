@@ -420,7 +420,7 @@
                     <jdkPreference>preferJre</jdkPreference>
                     <runtimeBits>64/32</runtimeBits>
                     <maxHeapPercent>${max.heap.size.percent}</maxHeapPercent>
-                    <opt>-Xss${max.stack.size}m</opt>
+                    <!-- <opt>-Xss${max.stack.size}m</opt> -->
                     <opt>-Djava.net.preferIPv4Stack=true</opt>
                     <opt>-Djna.nosys=true</opt>
                 </jre>
@@ -696,7 +696,7 @@
         <java jar="${dist.dir}/${jar.filename}.jar" fork="true">
             <env key="VLC_VERBOSE" value="-1" />          
             <jvmarg value="-Xmx${max.heap.size.run}m" />
-            <jvmarg value="-Xss${max.stack.size}m"/>
+            <!-- <jvmarg value="-Xss${max.stack.size}m"/> -->
             <jvmarg value="-Djava.net.preferIPv4Stack=true" />
             <arg line="${run.params}" />
         </java>
