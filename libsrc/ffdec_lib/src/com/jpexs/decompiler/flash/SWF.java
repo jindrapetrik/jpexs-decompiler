@@ -2747,6 +2747,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     private int renameAS2Identifiers(RenameType renameType, Map<DottedChain, DottedChain> selected) throws InterruptedException {
+        boolean wrongConstantIndices = false;
         HashMap<ASMSource, ActionList> actionsMap = new HashMap<>();
         List<GraphSourceItem> allFunctions = new ArrayList<>();
         List<MyEntry<DirectValueActionItem, ConstantPool>> allVariableNames = new ArrayList<>();
@@ -2963,7 +2964,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                         pool.constants.add(changed);
                         ci.index = pool.constants.size() - 1;
                     } else {
-                        pool.constants.set(ci.index, changed);
+                        if (ci.index >= pool.constants.size()) {
+                            wrongConstantIndices = true;
+                        } else {
+                            pool.constants.set(ci.index, changed);
+                        }
                     }
                 } else {
                     pu.replacement.set(it.getKey().pos, changed);
@@ -2983,6 +2988,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
 
         deobfuscation.deobfuscateInstanceNames(false, deobfuscated, renameType, getTags(), selected);
+        if (wrongConstantIndices) {
+            logger.warning("Cannot properly rename some invalid AS2 identifiers as there exist unresolved constant indices. It might be fixed by turning Deobfuscation on and try to rename identifiers again.");
+        }
         return ret;
     }
 

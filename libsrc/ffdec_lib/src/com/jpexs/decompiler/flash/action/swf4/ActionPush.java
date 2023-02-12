@@ -128,7 +128,11 @@ public class ActionPush extends Action {
 
     @Override
     protected void getContentBytes(SWFOutputStream sos) throws IOException {
-        for (Object o : values) {
+        List<Object> vals = values;
+        if (replacement != null) {
+            vals = replacement;
+        }
+        for (Object o : vals) {
             if (o instanceof String) {
                 sos.writeUI8(0);
                 sos.writeString((String) o);
@@ -179,8 +183,12 @@ public class ActionPush extends Action {
      */
     @Override
     protected int getContentBytesLength() {
+        List<Object> vals = values;
+        if (replacement != null) {
+            vals = replacement;
+        }
         int res = 0;
-        for (Object o : values) {
+        for (Object o : vals) {
             if (o instanceof String) {
                 res += Utf8Helper.getBytesLength((String) o) + 2;
             } else if (o instanceof Float) {
@@ -402,36 +410,7 @@ public class ActionPush extends Action {
                 } else {
                     o = constantPool.get(((ConstantIndex) o).index);
                 }
-            }
-            /*if (o instanceof RegisterNumber) {
-             if (regNames.containsKey(((RegisterNumber) o).number)) {
-             ((RegisterNumber) o).name = regNames.get(((RegisterNumber) o).number);
-             } else if (output.size() >= 2) { //chained assignments:, ignore for class prototype assignment
-             GraphTargetItem last = output.get(output.size() - 1);
-             GraphTargetItem prev = output.get(output.size() - 2);
-             if (last instanceof SetTypeActionItem) {
-             if (prev instanceof StoreRegisterActionItem) {
-             StoreRegisterActionItem str = (StoreRegisterActionItem) prev;
-             if (str.register.number == ((RegisterNumber) o).number) {
-             SetTypeActionItem stt = (SetTypeActionItem) last;
-             stt.setTempRegister(((RegisterNumber) o).number);
-             if ((stt.getValue() instanceof IncrementActionItem) && (((IncrementActionItem) stt.getValue()).object.equals(stt.getObject()))) {
-             stack.push(new PreIncrementActionItem(this, lineStartAction, stt.getObject()));
-             } else if ((stt.getValue() instanceof DecrementActionItem) && (((DecrementActionItem) stt.getValue()).object.equals(stt.getObject()))) {
-             stack.push(new PreDecrementActionItem(this, lineStartAction, stt.getObject()));
-             } else {
-             //stack.push(last);
-             continue;
-             }
-             output.remove(output.size() - 1);
-             output.remove(output.size() - 1);
-             pos++;
-             continue;
-             }
-             }
-             }
-             }
-             }*/
+            }           
             if (o instanceof Boolean) {
                 Boolean b = (Boolean) o;
                 if (b) {
