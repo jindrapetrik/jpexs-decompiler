@@ -63,6 +63,28 @@
 		</screenshot>
 	</screenshots>
 	<releases>		
+		<release version="18.3.5" date="2023-02-12">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1959 Display frame labels along frames and FrameLabel tags</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1960 Hide tag tree root handles as it was in previous versions</li>
+					<li>#1964 Freezing on releasing mouse while shape transforming (deadlock)</li>
+					<li>#1961 Characters can use characterId 0, PlaceObject can use depth 0</li>
+					<li>#1963 Reading CLIPEVENTFLAGS ClipActionEndFlag on SWF versions >= 6</li>
+					<li>#1968, #1971, #1957 Cannot start FFDec due to large stack size on some configurations</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#1960 Quick search does not search in SWF name or folder names</li>
+					<li>#1961 SoundStreamHead on main timeline is exported/imported with identifier "-1"</li>
+					<li>#1957 Larger stack size (when needed) must be configured manually in ffdec.bat or ffdec.sh</li>
+				</ul>
+			</description>
+		</release>
 		<release version="18.3.4" date="2023-01-30">
 			<description>
 				<p>Added</p>

@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [18.3.5] - 2023-02-12
 ### Added
 - [#1959] Display frame labels along frames and FrameLabel tags
 
@@ -2801,7 +2801,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.4...dev
+[18.3.5]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.4...version18.3.5
 [18.3.4]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.3...version18.3.4
 [18.3.3]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.2...version18.3.3
 [18.3.2]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.1...version18.3.2
@@ -2952,6 +2952,7 @@ All notable changes to this project will be documented in this file.
 [#1963]: https://www.free-decompiler.com/flash/issues/1963
 [#1968]: https://www.free-decompiler.com/flash/issues/1968
 [#1971]: https://www.free-decompiler.com/flash/issues/1971
+[#1957]: https://www.free-decompiler.com/flash/issues/1957
 [#1029]: https://www.free-decompiler.com/flash/issues/1029
 [#1948]: https://www.free-decompiler.com/flash/issues/1948
 [#1941]: https://www.free-decompiler.com/flash/issues/1941
@@ -2963,7 +2964,6 @@ All notable changes to this project will be documented in this file.
 [#1940]: https://www.free-decompiler.com/flash/issues/1940
 [#1955]: https://www.free-decompiler.com/flash/issues/1955
 [#688]: https://www.free-decompiler.com/flash/issues/688
-[#1957]: https://www.free-decompiler.com/flash/issues/1957
 [#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1894]: https://www.free-decompiler.com/flash/issues/1894
 [#1801]: https://www.free-decompiler.com/flash/issues/1801
