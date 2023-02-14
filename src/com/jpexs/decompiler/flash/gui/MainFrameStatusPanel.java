@@ -54,6 +54,16 @@ public class MainFrameStatusPanel extends JPanel {
     private int blinkPos;
 
     private CancellableWorker currentWorker;
+    
+    private String oldStatus = "";
+    
+    private boolean statusHidden = false;
+
+    public boolean isStatusHidden() {
+        return statusHidden;
+    }
+    
+    
 
     public MainFrameStatusPanel(MainPanel mainPanel) {
         this.mainPanel = mainPanel;
@@ -107,11 +117,29 @@ public class MainFrameStatusPanel extends JPanel {
 
     public void setStatus(String s) {
         statusLabel.setText(s);
+        oldStatus = s;
+        statusHidden = false;
     }
 
     public CancellableWorker getCurrentWorker() {
         return currentWorker;
     }   
+    
+    public void setWorkStatusHidden(String s, CancellableWorker worker) {
+        currentWorker = worker;
+        cancelButton.setVisible(worker != null);
+        oldStatus = s;
+        statusHidden = true;
+    }
+    
+    public void showOldStatus() {
+        if (oldStatus.isEmpty()) {
+            loadingPanel.setVisible(false);
+        } else {
+            loadingPanel.setVisible(true);
+        }
+        statusLabel.setText(oldStatus);
+    }
     
     public void setWorkStatus(String s, CancellableWorker worker) {
         if (s.isEmpty()) {
@@ -122,6 +150,8 @@ public class MainFrameStatusPanel extends JPanel {
         statusLabel.setText(s);
         currentWorker = worker;
         cancelButton.setVisible(worker != null);
+        oldStatus = s;
+        statusHidden = false;
     }
 
     public void setErrorState(ErrorState errorState) {
