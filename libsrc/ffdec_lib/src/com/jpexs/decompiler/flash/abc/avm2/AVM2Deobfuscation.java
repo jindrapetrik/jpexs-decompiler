@@ -198,8 +198,10 @@ public class AVM2Deobfuscation {
             newname = DottedChain.parseNoSuffix(str);
             
             if (stringUsages.contains(strIndex) || namespaceUsages.contains(strIndex)) { // this name is already referenced as String
+                String usageType = stringUsageTypes.get(strIndex);
                 strIndex = constants.addString(s); // add new index
-            }
+                stringUsageTypes.put(strIndex, usageType);                
+            }           
             constants.setString(strIndex, newname.toRawString());
             if (!namesMap.containsKey(sChain)) {
                 namesMap.put(sChain, DottedChain.parseNoSuffix(constants.getString(strIndex)));

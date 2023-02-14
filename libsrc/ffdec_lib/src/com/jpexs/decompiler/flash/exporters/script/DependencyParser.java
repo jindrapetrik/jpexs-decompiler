@@ -50,7 +50,7 @@ public class DependencyParser {
 
         if (parseUsagesFromNS(ignoredCustom, abc, dependencies, uses, namespace_index, ignorePackage, name)) {
             return;
-        } else if ((ns.kind != Namespace.KIND_PACKAGE) && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
+        } else if (ns.kind != Namespace.KIND_PACKAGE) { // && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
             return;
         }
         newimport = newimport.addWithSuffix(name);
