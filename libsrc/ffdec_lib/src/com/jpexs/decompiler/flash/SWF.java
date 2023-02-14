@@ -2690,9 +2690,23 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public int deobfuscateAS3Identifiers(RenameType renameType) {
+        
+        Map<Tag, Map<Integer, String>> stringUsageTypesMap = new HashMap<>();
+        Map<Tag, Set<Integer>> stringUsagesMap = new HashMap<>();
+        informListeners("deobfuscate", "Getting usages...");                
         for (Tag tag : getTags()) {
-            if (tag instanceof ABCContainerTag) {
-                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(deobfuscated, renameType, true);
+            if (tag instanceof ABCContainerTag) {        
+                Map<Integer, String> stringUsageTypes = new HashMap<>();
+                Set<Integer> stringUsages = ((ABCContainerTag)tag).getABC().getStringUsages();
+                ((ABCContainerTag)tag).getABC().getStringUsageTypes(stringUsageTypes);
+                stringUsageTypesMap.put(tag, stringUsageTypes);
+                stringUsagesMap.put(tag, stringUsages);
+            }
+        }
+        
+        for (Tag tag : getTags()) {
+            if (tag instanceof ABCContainerTag) {                
+                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(stringUsageTypesMap.get(tag),stringUsagesMap.get(tag), deobfuscated, renameType, true);
                 ((ABCContainerTag) tag).getABC().constants.clearCachedMultinames();
                 ((ABCContainerTag) tag).getABC().constants.clearCachedDottedChains();
                 tag.setModified(true);
@@ -2700,7 +2714,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         for (Tag tag : getTags()) {
             if (tag instanceof ABCContainerTag) {
-                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(deobfuscated, renameType, false);
+                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(stringUsageTypesMap.get(tag),stringUsagesMap.get(tag), deobfuscated, renameType, false);
                 ((ABCContainerTag) tag).getABC().constants.clearCachedMultinames();
                 ((ABCContainerTag) tag).getABC().constants.clearCachedDottedChains();
                 tag.setModified(true);
