@@ -113,7 +113,7 @@ public class LoadingPanel extends JPanel {
                         rot2 += Math.PI * 2;
                     }
                     setRotation(rot2);
-                    repaint();
+                    repaint();                    
                 }
             }
         }, idelay, idelay);
@@ -146,8 +146,9 @@ public class LoadingPanel extends JPanel {
                 drawTimer.cancel();
                 drawTimer = null;
             }
+            lastImage = null;
         }
 
-        super.setVisible(visible);
+        super.setVisible(visible);        
     }
 }

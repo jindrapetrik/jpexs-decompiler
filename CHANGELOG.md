@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - [#1970] AS2 Renaming invalid identifiers for direct strings (no constant indices)
 - [#1970] AS2 Renaming invalid identifiers IndexOutOfBounds on invalid constant index (obfuscated code, etc.)
 - [#1972] AS3 Renaming invalid identifiers - '#' character
+- Unresponsive status bar and its icon
 
 ## [18.3.5] - 2023-02-12
 ### Added

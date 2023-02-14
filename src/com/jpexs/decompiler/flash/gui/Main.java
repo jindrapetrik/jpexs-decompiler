@@ -125,6 +125,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.ConsoleHandler;
@@ -817,11 +819,37 @@ public class Main {
         startWork(name, percent, mainFrame.getPanel().getCurrentWorker());
     }
 
+    
+    private static long lastTimeStartWork = 0L;
+    
+    
+    private static final Timer statusTimer = new Timer("status", true);
+    
+    static {
+        statusTimer.schedule(new TimerTask(){
+            @Override
+            public void run() {
+                if (mainFrame != null && mainFrame.getPanel().getStatusPanel().isStatusHidden()) {
+                    long nowTime = System.currentTimeMillis();                
+                    if(nowTime > lastTimeStartWork + 5000) {
+                        mainFrame.getPanel().showOldStatus();                         
+                    }
+                }
+            }            
+        }, 5000, 5000);
+    }
+    
     public static void startWork(final String name, final int percent, final CancellableWorker worker) {
         working = true;
-        View.execInEventDispatchLater(() -> {
+        long nowTime = System.currentTimeMillis();
+        if (mainFrame != null && nowTime < lastTimeStartWork + 1000) {            
+            mainFrame.getPanel().setWorkStatusHidden(name, worker);
+            return;
+        }
+        lastTimeStartWork = nowTime;
+        View.execInEventDispatch(() -> {
             if (mainFrame != null) {
-                mainFrame.getPanel().setWorkStatus(name, worker);
+                 mainFrame.getPanel().setWorkStatus(name, worker);
                 if (percent == -1) {
                     mainFrame.getPanel().hidePercent();
                 } else {

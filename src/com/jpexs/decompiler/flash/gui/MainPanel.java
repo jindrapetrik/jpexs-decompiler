@@ -921,6 +921,15 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         statusPanel.setWorkStatus(s, worker);
         mainMenu.updateComponents();
     }
+    
+    public void setWorkStatusHidden(String s, CancellableWorker worker) {
+        statusPanel.setWorkStatusHidden(s, worker);
+    }
+    
+    public void showOldStatus() {
+        statusPanel.showOldStatus();
+        mainMenu.updateComponents();
+    }
 
     public CancellableWorker getCurrentWorker() {
         return statusPanel.getCurrentWorker();
@@ -5853,4 +5862,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         }
 
     }   
+
+    public MainFrameStatusPanel getStatusPanel() {
+        return statusPanel;
+    }    
+    
 }
