@@ -1035,36 +1035,48 @@ public class XFLConverter {
     }
 
     private static void walkShapeUsages(ReadOnlyTagList timeLineTags, HashMap<Integer, CharacterTag> characters, HashMap<Integer, Integer> usages) {
+        Map<Integer, Integer> depthMap = new HashMap<>();
         for (Tag t : timeLineTags) {
             if (t instanceof DefineSpriteTag) {
                 DefineSpriteTag sprite = (DefineSpriteTag) t;
                 walkShapeUsages(sprite.getTags(), characters, usages);
             }
+            if (t instanceof RemoveTag) {
+                depthMap.remove(((RemoveTag)t).getDepth());
+            }
             if (t instanceof PlaceObjectTypeTag) {
                 PlaceObjectTypeTag po = (PlaceObjectTypeTag) t;
-                int ch = po.getCharacterId();
-                if (ch > -1) {
+                int d = po.getDepth();
+                if (po.flagMove() || !depthMap.containsKey(d)) {
+                    int ch = po.getCharacterId();
+                    if (ch == -1) {      
+                        if (depthMap.containsKey(d)) {
+                            ch = depthMap.get(d);
+                        }
+                    } else {
+                        depthMap.put(d, ch);
+                    }
+                    if (ch == -1) {
+                        continue;
+                    }
+                   
                     if (!usages.containsKey(ch)) {
                         usages.put(ch, 0);
                     }
                     int usageCount = usages.get(ch);
+                    usageCount++;
                     if (po.getInstanceName() != null) {
                         usageCount++;
-                    }
-                    if (po.getColorTransform() != null) {
+                    } else if (po.getColorTransform() != null) {
+                        usageCount++;
+                    } else if (po.cacheAsBitmap()) {
+                        usageCount++;
+                    } else if (po.getMatrix() != null && !po.getMatrix().isEmpty()){
                         usageCount++;
                     }
-                    if (po.cacheAsBitmap()) {
-                        usageCount++;
-                    }
-                    MATRIX mat = po.getMatrix();
-                    if (mat != null) {
-                        if (!mat.isEmpty()) {
-                            usageCount++;
-                        }
-                    }
-                    usages.put(ch, usageCount + 1);
+                    usages.put(ch, usageCount);                    
                 }
+                
             }
         }
     }
