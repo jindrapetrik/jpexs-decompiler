@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - [#1972] AS3 imports taken only from packages, not package internal
 - Unresponsive status bar and its icon
 - [#1973] FLA export - improper calculation of shape instance count
+- FLA export - XML formatting with blank lines on Java9+
 
 ## [18.3.5] - 2023-02-12
 ### Added

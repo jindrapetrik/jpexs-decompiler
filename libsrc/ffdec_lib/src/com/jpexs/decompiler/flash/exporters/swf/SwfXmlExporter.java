@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.types.annotations.Multiline;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
+import com.jpexs.helpers.XmlPrettyFormat;
 import com.jpexs.helpers.utf8.Utf8OutputStreamWriter;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -45,11 +46,6 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  *
@@ -78,15 +74,10 @@ public class SwfXmlExporter {
                 xmlWriter.flush();
                 xmlWriter.close();
             }
-
-            TransformerFactory factory = TransformerFactory.newInstance();
-
-            Transformer transformer = factory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-
-            transformer.transform(new StreamSource(tmp), new StreamResult(outFile));
-
+            
+            if (!new XmlPrettyFormat().prettyFormat(tmp, outFile, 2, true)) {
+                logger.log(Level.SEVERE, "Cannot prettyformat SVG");
+            }
             tmp.delete();
         } catch (Exception ex) {
             logger.log(Level.SEVERE, null, ex);
