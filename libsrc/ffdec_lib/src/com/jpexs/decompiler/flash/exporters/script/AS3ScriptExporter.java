@@ -49,10 +49,9 @@ import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.CancellableWorker;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
+import com.jpexs.helpers.XmlPrettyFormat;
 import com.jpexs.helpers.utf8.Utf8Helper;
 import java.io.File;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,14 +67,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  *
@@ -86,22 +77,7 @@ public class AS3ScriptExporter {
     private static final Logger logger = Logger.getLogger(AS3ScriptExporter.class.getName());
 
     private static String prettyFormatXML(String input) {
-        int indent = 5;
-        try {
-            Source xmlInput = new StreamSource(new StringReader(input));
-            StringWriter stringWriter = new StringWriter();
-            StreamResult xmlOutput = new StreamResult(stringWriter);
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            transformerFactory.setAttribute("indent-number", indent);
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-            transformer.transform(xmlInput, xmlOutput);
-            return xmlOutput.getWriter().toString();
-        } catch (TransformerFactoryConfigurationError | IllegalArgumentException | TransformerException e) {
-            logger.log(Level.SEVERE, "Pretty print error", e);
-            return input;
-        }
+        return new XmlPrettyFormat().prettyFormat(input, 5, false);
     }
 
     private String handleMxmlMethod(AbcIndexing abcIndex, Map<String, String> namespaces, ScriptPack pack, int cindex, TraitMethodGetterSetter t) {
