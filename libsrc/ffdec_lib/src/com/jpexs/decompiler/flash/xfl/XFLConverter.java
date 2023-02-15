@@ -2481,8 +2481,7 @@ public class XFLConverter {
                 }
             }
         }
-        if (!lastElements.isEmpty() || writer2.length() > 0)
-        {
+        if (!lastElements.isEmpty() || writer2.length() > 0) {
             frame++;
             convertFrame(false, null, null, (frame - duration < 0 ? 0 : frame - duration), duration, "", lastElements, files, writer2);
         }
@@ -2852,7 +2851,7 @@ public class XFLConverter {
         return hasLabel;
     }
 
-    private void convertSoundLayer(int layerIndex, ReadOnlyTagList timeLineTags, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
+    private void convertSoundLayer(ReadOnlyTagList timeLineTags, HashMap<String, byte[]> files, XFLXmlWriter writer) throws XMLStreamException {
         int soundLayerIndex = 0;
         XFLXmlWriter writer2 = new XFLXmlWriter();
         List<StartSoundTag> startSounds = new ArrayList<>();
@@ -3063,15 +3062,39 @@ public class XFLConverter {
             }*/
             boolean nonEmpty = writeLayer(index, depthToFramesList.get(d), d, 0, Integer.MAX_VALUE, -1, writer, nonLibraryShapes, tags, timelineTags, characters, flaVersion, files);
             if (nonEmpty) {
-                index++;
+                index++;                
             }
         }
+        
+        if (index == 0) {
+            writeEmptyLayer(writer, frameCount);
+            index++;
+        }
 
-        int soundLayerIndex = maxDepth;
-        maxDepth++;
-        convertSoundLayer(soundLayerIndex, timelineTags, files, writer);
+        convertSoundLayer(timelineTags, files, writer);
         writer.writeEndElement();
         writer.writeEndElement();
+    }
+    
+    private void writeEmptyLayer(XFLXmlWriter writer, int frameCount) throws XMLStreamException {
+        writer.writeStartElement("DOMLayer", new String[]{
+            "name", "Layer 1",
+            "color", randomOutlineColor()
+        });
+        writer.writeAttribute("current", true);
+        writer.writeAttribute("isSelected", true);
+        writer.writeStartElement("frames");
+        
+        writer.writeStartElement("DOMFrame");
+        writer.writeAttribute("index", 0);
+        writer.writeAttribute("duration", frameCount);
+        writer.writeAttribute("keyMode", KEY_MODE_NORMAL);
+        writer.writeStartElement("elements");
+        writer.writeEndElement(); //elements
+        writer.writeEndElement(); //DOMFrame
+        
+        writer.writeEndElement();//frames
+        writer.writeEndElement();//DOMLayer        
     }
 
     private boolean writeLayer(int index, List<Integer> onlyFrames, int d, int startFrame, int endFrame, int parentLayer, XFLXmlWriter writer, List<Integer> nonLibraryShapes, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, FLAVersion flaVersion, HashMap<String, byte[]> files) throws XMLStreamException {
