@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#1973] FLA export - improper calculation of shape instance count
 - FLA export - XML formatting with blank lines on Java9+
 - [#1974] DefineBits image reading problem
+- [#1963] AS2 properly decompile/direct edit long classes
 
 ## [18.3.5] - 2023-02-12
 ### Added
@@ -2963,11 +2964,11 @@ All notable changes to this project will be documented in this file.
 [#1972]: https://www.free-decompiler.com/flash/issues/1972
 [#1973]: https://www.free-decompiler.com/flash/issues/1973
 [#1974]: https://www.free-decompiler.com/flash/issues/1974
+[#1963]: https://www.free-decompiler.com/flash/issues/1963
 [#1959]: https://www.free-decompiler.com/flash/issues/1959
 [#1960]: https://www.free-decompiler.com/flash/issues/1960
 [#1964]: https://www.free-decompiler.com/flash/issues/1964
 [#1961]: https://www.free-decompiler.com/flash/issues/1961
-[#1963]: https://www.free-decompiler.com/flash/issues/1963
 [#1968]: https://www.free-decompiler.com/flash/issues/1968
 [#1971]: https://www.free-decompiler.com/flash/issues/1971
 [#1957]: https://www.free-decompiler.com/flash/issues/1957

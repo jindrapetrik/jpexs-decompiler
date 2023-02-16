@@ -695,6 +695,8 @@ public class ActionScript2ClassDetector {
                 } else if (item instanceof DirectValueActionItem) {
                     //ignore such values
                     //TODO: maybe somehow display in the class ?
+                } else if (item instanceof ScriptEndItem){
+                    //ignore
                 } else {
                     throw new AssertException("unknown item - " + item.getClass().getSimpleName());
                 }
@@ -812,7 +814,13 @@ public class ActionScript2ClassDetector {
                         }
                         List<String> classPath = pathToSearchVariant1;
                         classPath.remove(0); //remove _global
-                        if (this.checkClassContent(ifItem.onTrue, variables, 0, pos, checkPos, commands, classPath, scriptPath)) {
+                        if (ifItem.onTrue.isEmpty()) { //if can have zero offset as the code is larger than bytes limit. TODO: make this check also for variant 2 (?)
+                            if (this.checkClassContent(commands, variables, checkPos + 1, pos, commands.size() - 1, commands, classPath, scriptPath)) {
+                                return true;
+                            } else {
+                                break check_variant1;
+                            }                           
+                        } else if (this.checkClassContent(ifItem.onTrue, variables, 0, pos, checkPos, commands, classPath, scriptPath)) {
                             return true;
                         } else {
                             break check_variant1;
