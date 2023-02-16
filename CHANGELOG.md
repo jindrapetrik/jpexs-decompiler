@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - Unresponsive status bar and its icon
 - [#1973] FLA export - improper calculation of shape instance count
 - FLA export - XML formatting with blank lines on Java9+
+- [#1974] DefineBits image reading problem
 
 ## [18.3.5] - 2023-02-12
 ### Added
@@ -2961,6 +2962,7 @@ All notable changes to this project will be documented in this file.
 [#1970]: https://www.free-decompiler.com/flash/issues/1970
 [#1972]: https://www.free-decompiler.com/flash/issues/1972
 [#1973]: https://www.free-decompiler.com/flash/issues/1973
+[#1974]: https://www.free-decompiler.com/flash/issues/1974
 [#1959]: https://www.free-decompiler.com/flash/issues/1959
 [#1960]: https://www.free-decompiler.com/flash/issues/1960
 [#1964]: https://www.free-decompiler.com/flash/issues/1964
