@@ -2334,16 +2334,17 @@ public class ActionScript2Parser {
         return retTree;
     }
 
-    private List<GraphSourceItem> generateActionList(List<GraphTargetItem> tree, List<String> constantPool) throws CompilationException {
+    private List<GraphSourceItem> generateActionList(List<GraphTargetItem> tree, List<String> constantPool, boolean secondRun) throws CompilationException {
         ActionSourceGenerator gen = new ActionSourceGenerator(swfVersion, constantPool, charset);
         SourceGeneratorLocalData localData = new SourceGeneratorLocalData(new HashMap<>(), 0, Boolean.FALSE, 0);
+        localData.secondRun = secondRun;
         return gen.generate(localData, tree);
     }
 
     private List<Action> actionsFromTree(List<GraphTargetItem> tree, List<String> constantPool, boolean doOrder, String charset) throws CompilationException, NeedsGenerateAgainException {
         List<Action> ret = new ArrayList<>();
 
-        List<GraphSourceItem> srcList = generateActionList(tree, constantPool);
+        List<GraphSourceItem> srcList = generateActionList(tree, constantPool, doOrder == false);
 
         if (doOrder) {
             List<String> orderedConstantPool = new ArrayList<>();

@@ -75,6 +75,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  *
@@ -868,7 +869,14 @@ public class ActionSourceGenerator implements SourceGenerator {
         ret.addAll(typeToActions(globalClassTypeStr, null));
         ret.add(new ActionNot());
         ret.add(new ActionNot());
-        ret.add(new ActionIf(Action.actionsToBytes(ifbody, false, SWF.DEFAULT_VERSION).length,charset));
+        int ifOffset = Action.actionsToBytes(ifbody, false, SWF.DEFAULT_VERSION).length;
+        if (ifOffset > 0x7fff) {
+            if (!localData.secondRun) { //to avoid printing the warning twice
+                Logger.getLogger(ActionSourceGenerator.class.getName()).warning("The class is long. If offset for its header would be longer than max value for SI16, 0 was stored instead. This should not have any negative impact.");
+            }
+            ifOffset = 0;
+        }
+        ret.add(new ActionIf(ifOffset, charset));
         ret.addAll(ifbody);
         ret.add(new ActionPop());
         return ret;
