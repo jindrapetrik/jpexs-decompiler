@@ -17,16 +17,17 @@
 package com.jpexs.decompiler.flash.abc.usages;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 
 /**
  *
  * @author JPEXS
  */
-public class ImplementsMultinameUsage extends MultinameUsage implements InsideClassMultinameUsageInterface {
+public class SuperInterfaceMultinameUsage extends MultinameUsage implements InsideClassMultinameUsageInterface {
 
     private final int classIndex;
 
-    public ImplementsMultinameUsage(ABC abc, int multinameIndex, int classIndex, int scriptIndex) {
+    public SuperInterfaceMultinameUsage(ABC abc, int multinameIndex, int classIndex, int scriptIndex) {
         super(abc, multinameIndex, scriptIndex);
         this.classIndex = classIndex;
     }
@@ -38,7 +39,9 @@ public class ImplementsMultinameUsage extends MultinameUsage implements InsideCl
 
     @Override
     public String toString() {
-        return super.toString() + " implements";
+        InstanceInfo ii = abc.instance_info.get(classIndex);
+        String kind = ii.isInterface() ? "interface" : "class";
+        return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc.constants, true) + " " + (ii.isInterface() ? "extends" : "implements");
     }
 
     @Override
@@ -62,7 +65,7 @@ public class ImplementsMultinameUsage extends MultinameUsage implements InsideCl
         if (!super.equals(obj)) {
             return false;
         }
-        final ImplementsMultinameUsage other = (ImplementsMultinameUsage) obj;
+        final SuperInterfaceMultinameUsage other = (SuperInterfaceMultinameUsage) obj;
         if (this.classIndex != other.classIndex) {
             return false;
         }
@@ -72,5 +75,10 @@ public class ImplementsMultinameUsage extends MultinameUsage implements InsideCl
     @Override
     public boolean collides(MultinameUsage other) {
         return false;
+    }
+    
+    @Override
+    public int getScriptIndex() {
+        return scriptIndex;
     }
 }

@@ -576,6 +576,7 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         Highlighting sh = Highlighting.searchPos(highlightedText.getSpecialHighlights(), pos);
         if (sh != null) {
             switch (sh.getProperties().subtype) {
+                case CLASS_NAME:                
                 case TYPE_NAME:
                     String typeName = sh.getProperties().specialValue;
                     for (int i = 1; i < abc.constants.getMultinameCount(); i++) {
@@ -594,7 +595,8 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                     break;
                 case TRAIT_NAME:
                     if (currentTrait != null) {
-                        //return currentTrait.name_index;
+                        //TODO: this should be handled better = to match method usages on the same class, not all matching classes. But that requires decompiling target usages.
+                        return currentTrait.name_index;
                     }
                     break;
                 case RETURNS:
@@ -735,6 +737,24 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         }
     }
 
+    /**
+     * WARNING: This won't change script. This only hilights class in current script     
+     */
+    public void gotoClassHeader() {
+        Highlighting tc = Highlighting.searchIndex(highlightedText.getClassHighlights(), classIndex);
+        if (tc != null) {
+            final int fpos = tc.startPos;
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if (fpos <= getDocument().getLength()) {
+                        setCaretPosition(fpos);
+                    }
+                }
+            }, 100);
+        }
+    }
+    
     public void gotoTrait(int traitId) {
         boolean isScriptInit = traitId == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER;
 

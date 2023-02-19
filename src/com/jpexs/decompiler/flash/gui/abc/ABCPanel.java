@@ -1104,7 +1104,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 Reference<ABC> usedAbc = new Reference<>(null);
                 int multinameIndex = decompiledTextArea.getMultinameUnderCaret(usedAbc);
                 if (multinameIndex > -1) {
-                    UsageFrame usageFrame = new UsageFrame(usedAbc.getVal(), multinameIndex, ABCPanel.this, false);
+                    UsageFrame usageFrame = new UsageFrame(usedAbc.getVal(), multinameIndex, false, ABCPanel.this, false);
                     usageFrame.setVisible(true);
                 }
             }
@@ -1166,7 +1166,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                         }
                         int multinameIndex = constantTable.convertRowIndexToModel(rowIndex);
                         if (multinameIndex > 0) {
-                            UsageFrame usageFrame = new UsageFrame(abc, multinameIndex, t, false);
+                            UsageFrame usageFrame = new UsageFrame(abc, multinameIndex, true, t, false);
                             usageFrame.setVisible(true);
                         }
                     }
@@ -1297,7 +1297,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
 
             //more than one? display list
             if (usages.size() > 1) {
-                UsageFrame usageFrame = new UsageFrame(usedAbc, multinameIndex, ABCPanel.this, true);
+                UsageFrame usageFrame = new UsageFrame(usedAbc, multinameIndex, false, ABCPanel.this, true);
                 usageFrame.setVisible(true);
                 return;
             } else if (!usages.isEmpty()) { //one
