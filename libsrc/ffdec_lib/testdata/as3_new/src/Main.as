@@ -8,6 +8,7 @@ package
     import tests_classes.mypackage3.SetupMyPackage3;
     import tests_classes.*;
     import tests_edit.*;
+    import tests_uses.TestOtherClass;
     
     /**
      * ...
@@ -137,6 +138,8 @@ package
         TestUnaryMinus;
         
         TestModifiers;
+        
+        TestOtherClass;
         
         public function Main()
         {

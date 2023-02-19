@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.abc.usages;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 
 /**
  *
@@ -38,7 +39,9 @@ public class ClassNameMultinameUsage extends MultinameUsage implements Definitio
 
     @Override
     public String toString() {
-        return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants, true).toPrintableString(true) + " trait name";
+        InstanceInfo ii = abc.instance_info.get(classIndex);
+        String kind = ii.isInterface() ? "interface" : "class";
+        return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc.constants, true).toPrintableString(true) + " name";
     }
 
     @Override
@@ -80,5 +83,10 @@ public class ClassNameMultinameUsage extends MultinameUsage implements Definitio
             return sameMultinameName(other);
         }
         return false;
+    }
+    
+    @Override
+    public int getScriptIndex() {
+        return scriptIndex;
     }
 }

@@ -17,7 +17,9 @@
 package com.jpexs.decompiler.flash.abc.usages;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
+import com.jpexs.decompiler.graph.DottedChain;
 import java.util.Objects;
 
 /**
@@ -56,7 +58,13 @@ public abstract class TraitMultinameUsage extends MultinameUsage implements Insi
 
     @Override
     public String toString() {
-        return "class " + abc.constants.getMultiname(abc.instance_info.get(classIndex).name_index).getNameWithNamespace(abc.constants, true).toPrintableString(true);
+        if (classIndex != -1) {
+            InstanceInfo ii = abc.instance_info.get(classIndex);
+            String kind = ii.isInterface() ? "interface" : "class";
+            return kind + " " + ii.getName(abc.constants).getNameWithNamespace(abc.constants, true).toPrintableString(true);
+        }
+        DottedChain scriptSimpleName = abc.script_info.get(scriptIndex).getSimplePackName(abc);
+        return "script " + (scriptSimpleName == null ? "" + scriptIndex:scriptSimpleName.toPrintableString(true));
     }
 
     @Override

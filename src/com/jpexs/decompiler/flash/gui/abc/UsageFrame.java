@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.gui.abc;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitType;
 import com.jpexs.decompiler.flash.abc.usages.InsideClassMultinameUsageInterface;
 import com.jpexs.decompiler.flash.abc.usages.MethodMultinameUsage;
 import com.jpexs.decompiler.flash.abc.usages.MultinameUsage;
@@ -55,10 +56,18 @@ public class UsageFrame extends AppDialog implements MouseListener {
 
     private final ABCPanel abcPanel;
 
-    public UsageFrame(ABC abc, int multinameIndex, ABCPanel abcPanel, boolean definitions) {
+    /**
+     * 
+     * @param abc
+     * @param multinameIndex
+     * @param exactMatch False = also consider Multiname.MULTINAME kind equal to QNAME with same name+namespace in the list. This is used in some of "extends/implements" cause.
+     * @param abcPanel
+     * @param definitions 
+     */
+    public UsageFrame(ABC abc, int multinameIndex, boolean exactMatch, ABCPanel abcPanel, boolean definitions) {
         super(abcPanel.getMainPanel().getMainFrame().getWindow());
-        this.abcPanel = abcPanel;
-        List<MultinameUsage> usages = definitions ? abc.findMultinameDefinition(multinameIndex) : abc.findMultinameUsage(multinameIndex);
+        this.abcPanel = abcPanel;         
+        List<MultinameUsage> usages = definitions ? abc.findMultinameDefinition(multinameIndex) : abc.findMultinameUsage(multinameIndex, exactMatch);
         Multiname m = abc.constants.getMultiname(multinameIndex);
         if (m.namespace_index > 0 && abc.constants.getNamespace(m.namespace_index).kind != Namespace.KIND_PRIVATE) {
             for (ABCContainerTag at : abc.getAbcTags()) {
@@ -68,7 +77,7 @@ public class UsageFrame extends AppDialog implements MouseListener {
                 }
                 List<Integer> mids = a.constants.getMultinameIds(m, abc.constants);
                 for (int mid : mids) {
-                    usages.addAll(definitions ? a.findMultinameDefinition(mid) : a.findMultinameUsage(mid));
+                    usages.addAll(definitions ? a.findMultinameDefinition(mid) : a.findMultinameUsage(mid, exactMatch));
                 }
             }
         }
@@ -126,10 +135,12 @@ public class UsageFrame extends AppDialog implements MouseListener {
                         if (tmu instanceof MethodMultinameUsage) {
                             MethodMultinameUsage mmu = (MethodMultinameUsage) usage;
                             if (mmu.isInitializer() == true) {
-                                traitIndex = newAbc.class_info.get(mmu.getClassIndex()).static_traits.traits.size() + newAbc.instance_info.get(mmu.getClassIndex()).instance_traits.traits.size() + (mmu.getTraitsType() == TraitMultinameUsage.TRAITS_TYPE_CLASS ? 1 : 0);
+                                traitIndex = mmu.getAbc().getGlobalTraitId(mmu.getClassIndex() == -1 ? TraitType.SCRIPT_INITIALIZER : TraitType.INITIALIZER, mmu.getTraitsType() == TraitMultinameUsage.TRAITS_TYPE_CLASS, -1, -1);
                             }
                         }
                         decompiledTextArea.gotoTrait(traitIndex);
+                    } else {
+                        decompiledTextArea.gotoClassHeader();
                     }
                 }
             };
@@ -138,7 +149,15 @@ public class UsageFrame extends AppDialog implements MouseListener {
                 setTrait.run();
             } else {
                 decompiledTextArea.addScriptListener(setTrait);
-                abcPanel.hilightScript(abcPanel.getOpenable(), icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(icu.getAbc().constants, true).toRawString());
+                String scriptName;                
+                if (icu.getClassIndex() > -1) {
+                    scriptName = icu.getAbc().instance_info.get(icu.getClassIndex()).getName(icu.getAbc().constants).getNameWithNamespace(icu.getAbc().constants, true).toRawString();
+                } else if (icu.getScriptIndex() > -1) {
+                    scriptName = icu.getAbc().script_info.get(icu.getScriptIndex()).getSimplePackName(icu.getAbc()).toRawString();
+                } else {
+                    scriptName = "";
+                }
+                abcPanel.hilightScript(abcPanel.getOpenable(), scriptName);
             }
         }
     }
