@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - [#1974] DefineBits image reading problem
 - [#1963] AS2 properly decompile/direct edit long classes
 - [#1977] AS3 Find usages - class and function usages, various fixes
+- IllegalArgumentException: JSplitPane weight must be between 0 and 1
 
 ## [18.3.5] - 2023-02-12
 ### Added

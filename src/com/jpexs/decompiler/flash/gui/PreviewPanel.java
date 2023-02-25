@@ -1653,7 +1653,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     public void showDisplayEditTagPanel(Tag tag, int frame) {
         showCardLeft(DISPLAYEDIT_TAG_CARD);
         displayEditTag = tag;
-        displayEditSplitPane.setDividerLocation((int) (0.6 * this.getWidth()));
+        displayEditSplitPane.setDividerLocation(0.6);
         displayEditGenericPanel.setVisible(!readOnly);
 
         if (Configuration.editorMode.get()) {
