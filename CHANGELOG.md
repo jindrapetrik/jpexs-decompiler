@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - [#1963] AS2 properly decompile/direct edit long classes
 - [#1977] AS3 Find usages - class and function usages, various fixes
 - IllegalArgumentException: JSplitPane weight must be between 0 and 1
+- [#1979] SVG import - autoclosing fill paths (without closing stroke paths)
 
 ## [18.3.5] - 2023-02-12
 ### Added
@@ -2968,6 +2969,7 @@ All notable changes to this project will be documented in this file.
 [#1974]: https://www.free-decompiler.com/flash/issues/1974
 [#1963]: https://www.free-decompiler.com/flash/issues/1963
 [#1977]: https://www.free-decompiler.com/flash/issues/1977
+[#1979]: https://www.free-decompiler.com/flash/issues/1979
 [#1959]: https://www.free-decompiler.com/flash/issues/1959
 [#1960]: https://www.free-decompiler.com/flash/issues/1960
 [#1964]: https://www.free-decompiler.com/flash/issues/1964
