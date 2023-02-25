@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.jpexs.decompiler.flash.gui;
+package com.jpexs.build;
 
 import com.jpexs.helpers.Helper;
 import java.io.UnsupportedEncodingException;
@@ -26,16 +26,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
+ * Updates CHANGELOG.md file. Adds links to issue numbers - brackets, adds links to versions
  * @author JPEXS
  */
 public class ChangelogUpdater {
 
     private static final String GITHUB_ADDRESS = "https://github.com/jindrapetrik/jpexs-decompiler/";
     private static final String ISSUE_TRACKER_ADDRESS = "https://www.free-decompiler.com/flash/issues/";
+    
+    private static final String CHANGELOG_FILENAME = "CHANGELOG.md";
 
     public static void main(String[] args) throws UnsupportedEncodingException {
-        String changeLog = Helper.readTextFile("CHANGELOG.md");
+        String changeLog = Helper.readTextFile(CHANGELOG_FILENAME);
         changeLog = changeLog.replaceAll("\\[[^\\]]+\\]: [^\\r\\n]+\\r\\n", "");
 
         changeLog = changeLog.replaceAll("\\[#([0-9]+)\\]", "#$1");
@@ -89,6 +91,6 @@ public class ChangelogUpdater {
             changeLog += "[#" + issue + "]: " + ISSUE_TRACKER_ADDRESS + issue + "\r\n";
         }
 
-        Helper.writeFile("CHANGELOG.md", changeLog.getBytes("UTF-8"));
+        Helper.writeFile(CHANGELOG_FILENAME, changeLog.getBytes("UTF-8"));
     }
 }

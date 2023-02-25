@@ -904,4 +904,110 @@
         <fixcrlf srcdir="${src.dir}" includes="**/*.sh" eol="lf" />
         <ant antfile="${core.lib.script}" target="fix-src-endoflines" inheritAll="false" usenativebasedir="true" />        
     </target>
+    
+    <target name="update-changelog-md" depends="compile">
+        <java classname="com.jpexs.build.ChangelogUpdater" failonerror="true" fork="true">
+            <classpath>
+                <fileset dir="${basedir}" includes="lib/**/*.jar"/>
+                <pathelement location="build/classes"/>
+            </classpath>
+        </java>
+    </target>
+    
+    <target name="update-metainfo" depends="compile" >
+        <java classname="com.jpexs.build.MetainfoUpdater" failonerror="true" fork="true">
+            <classpath>
+                <fileset dir="${basedir}" includes="lib/**/*.jar"/>
+                <pathelement location="build/classes"/>
+            </classpath>
+        </java>
+    </target>
+    
+    <target name="-github-newversion-input">
+        <input message="Enter new version number (for example 19.2.3) :" addproperty="gh.newversion" />
+        <fail unless="gh.newversion">Version number must be nonempty</fail>
+        <tstamp>
+            <format property="gh.newversion.time" pattern="yyyy-MM-dd" />
+        </tstamp>
+    </target>
+    
+    <target name="rename-unreleased-section" depends="-github-newversion-input">        
+        <replace file="${basedir}/${changelog.file}" token="## [Unreleased]" value="## [${gh.newversion}] - ${gh.newversion.time}"/>
+    </target>
+    
+    <target name="-add-unreleased-section" depends="-github-newversion-input">
+        <replace file="${basedir}/${changelog.file}" token="## [${gh.newversion}] - ${gh.newversion.time}" value="## [Unreleased]${line.separator}${line.separator}## [${gh.newversion}] - ${gh.newversion.time}"/>        
+    </target>
+    
+    <target name="-git-checkout-master" depends="-git-required">
+        <exec executable="git" failonerror="true">
+            <arg value="checkout"/>
+            <arg value="master"/>
+        </exec> 
+        <exec executable="git" failonerror="true">
+            <arg value="pull"/>
+            <arg value="origin"/>
+            <arg value="master"/>
+        </exec> 
+    </target>
+    
+    <target name="github-newversion" depends="-git-required,-git-checkout-master,-github-newversion-input,rename-unreleased-section,update-changelog-md,update-metainfo">
+        <exec executable="git" failonerror="true">
+            <arg value="add"/>
+            <arg value="${changelog.file}"/>            
+            <arg value="${metainfo.file}"/>   
+        </exec> 
+        
+        <exec executable="git" failonerror="true">
+            <arg value="commit"/>
+            <arg value="-m"/>
+            <arg value="version changed to ${gh.newversion}"/>   
+        </exec> 
+        
+        <exec executable="git" failonerror="true">
+            <arg value="tag"/>
+            <arg value="version${gh.newversion}"/>            
+        </exec>
+        
+        <exec executable="git" failonerror="true">
+            <arg value="push"/>
+            <arg value="origin"/>
+            <arg value="master"/>
+            <arg value="version${gh.newversion}"/>
+        </exec>
+        
+        <antcall target="-add-unreleased-section" />
+        <antcall target="update-changelog-md" />
+    
+        <exec executable="git" failonerror="false">
+            <arg value="branch"/>
+            <arg value="-D"/>            
+            <arg value="dev"/>
+        </exec>
+        
+        <exec executable="git" failonerror="true">
+            <arg value="checkout"/>
+            <arg value="-b"/>            
+            <arg value="dev"/>
+        </exec>
+        
+        <exec executable="git" failonerror="true">
+            <arg value="add"/>
+            <arg value="${changelog.file}"/>  
+        </exec> 
+        
+        <exec executable="git" failonerror="true">
+            <arg value="commit"/>
+            <arg value="-m"/>
+            <arg value="created new Unreleased section in CHANGELOG.md"/>   
+        </exec> 
+        
+        <exec executable="git" failonerror="true">
+            <arg value="push"/>
+            <arg value="--set-upstream"/>
+            <arg value="origin"/>
+            <arg value="dev"/>
+            <arg value="--force"/>
+        </exec> 
+    </target>
 </project>
