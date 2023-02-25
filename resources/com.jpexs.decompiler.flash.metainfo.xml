@@ -62,7 +62,28 @@
 			<image width="1527" height="935">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/master/graphics/screenshots/version14.4.0/12_debug_pcode.png</image>
 		</screenshot>
 	</screenshots>
-	<releases>		
+	<releases>
+		<release version="18.3.6" date="2023-02-25">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#1970 FLA export - do not strip empty frames at the end of timeline</li>
+					<li>#1970 AS2 Renaming invalid identifiers for direct strings (no constant indices)</li>
+					<li>#1970 AS2 Renaming invalid identifiers IndexOutOfBounds on invalid constant index (obfuscated code, etc.)</li>
+					<li>#1972 AS3 Renaming invalid identifiers - '#' character</li>
+					<li>#1972 AS3 Renaming invalid identifiers - various fixes</li>
+					<li>#1972 AS3 imports taken only from packages, not package internal</li>
+					<li>Unresponsive status bar and its icon</li>
+					<li>#1973 FLA export - improper calculation of shape instance count</li>
+					<li>FLA export - XML formatting with blank lines on Java9+</li>
+					<li>#1974 DefineBits image reading problem</li>
+					<li>#1963 AS2 properly decompile/direct edit long classes</li>
+					<li>#1977 AS3 Find usages - class and function usages, various fixes</li>
+					<li>IllegalArgumentException: JSplitPane weight must be between 0 and 1</li>
+					<li>#1979 SVG import - autoclosing fill paths (without closing stroke paths)</li>
+				</ul>
+			</description>
+		</release>		
 		<release version="18.3.5" date="2023-02-12">
 			<description>
 				<p>Added</p>
