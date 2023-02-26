@@ -51,14 +51,12 @@ public class NewFunctionAVM2Item extends AVM2Item {
     public int classIndex;
 
     public ABC abc;
-
-    public List<DottedChain> fullyQualifiedNames;
-
+    
     public int methodIndex;
 
     public ScopeStack scopeStack;
 
-    public NewFunctionAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, List<DottedChain> fullyQualifiedNames, int methodIndex, ScopeStack scopeStack) {
+    public NewFunctionAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, String functionName, String path, boolean isStatic, int scriptIndex, int classIndex, ABC abc, int methodIndex, ScopeStack scopeStack) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.functionName = functionName;
         this.path = path;
@@ -66,7 +64,6 @@ public class NewFunctionAVM2Item extends AVM2Item {
         this.scriptIndex = scriptIndex;
         this.classIndex = classIndex;
         this.abc = abc;
-        this.fullyQualifiedNames = fullyQualifiedNames;
         this.methodIndex = methodIndex;
         this.scopeStack = scopeStack;
     }
@@ -76,13 +73,12 @@ public class NewFunctionAVM2Item extends AVM2Item {
         if (localData.seenMethods.contains(methodIndex)) {
             return writer.append("§§method(").append(methodIndex).append(")");
         }
-        //if (methodIndex == 9141)
         MethodBody body = abc.findBody(methodIndex);
         writer.append("function");
         writer.startMethod(methodIndex);
         writer.append((!functionName.isEmpty() ? " " + functionName : ""));
         writer.appendNoHilight("(");
-        abc.method_info.get(methodIndex).getParamStr(writer, abc.constants, body, abc, fullyQualifiedNames);
+        abc.method_info.get(methodIndex).getParamStr(writer, abc.constants, body, abc, localData.fullyQualifiedNames);
         writer.appendNoHilight("):");
         if (Configuration.showMethodBodyId.get()) {
             writer.appendNoHilight("// method body index: ");
@@ -91,13 +87,13 @@ public class NewFunctionAVM2Item extends AVM2Item {
             writer.appendNoHilight(methodIndex);
             writer.newLine();
         }
-        abc.method_info.get(methodIndex).getReturnTypeStr(writer, abc.constants, fullyQualifiedNames);
+        abc.method_info.get(methodIndex).getReturnTypeStr(writer, abc.constants, localData.fullyQualifiedNames);
         writer.startBlock();
         if (body != null) {
             List<MethodBody> callStack = new ArrayList<>(localData.callStack);
             callStack.add(body);
-            body.convert(callStack, localData.abcIndex, new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), fullyQualifiedNames, null, false, new HashSet<>(localData.seenMethods));
-            body.toString(callStack, localData.abcIndex, path + "/inner", ScriptExportMode.AS, abc, null, writer, fullyQualifiedNames, new HashSet<>(localData.seenMethods));
+            body.convert(callStack, localData.abcIndex, new ConvertData(), path + "/inner", ScriptExportMode.AS, isStatic, methodIndex, scriptIndex, classIndex, abc, null, new ScopeStack(), 0, new NulWriter(), localData.fullyQualifiedNames, null, false, new HashSet<>(localData.seenMethods));
+            body.toString(callStack, localData.abcIndex, path + "/inner", ScriptExportMode.AS, abc, null, writer, localData.fullyQualifiedNames, new HashSet<>(localData.seenMethods));
         }
         writer.endBlock();
         writer.endMethod();

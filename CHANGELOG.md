@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- [#1981] AS3 fully qualified (colliding) types in submethods
 
 ## [18.3.6] - 2023-02-25
 ### Fixed
@@ -2966,6 +2968,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1981]: https://www.free-decompiler.com/flash/issues/1981
 [#1970]: https://www.free-decompiler.com/flash/issues/1970
 [#1972]: https://www.free-decompiler.com/flash/issues/1972
 [#1973]: https://www.free-decompiler.com/flash/issues/1973
