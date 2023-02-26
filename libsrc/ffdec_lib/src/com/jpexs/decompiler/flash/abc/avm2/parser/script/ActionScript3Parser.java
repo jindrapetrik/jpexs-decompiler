@@ -1667,7 +1667,7 @@ public class ActionScript3Parser {
                     int pos = 0;
                     while (s.type == SymbolType.CASE || s.type == SymbolType.DEFAULT) {
                         while (s.type == SymbolType.CASE || s.type == SymbolType.DEFAULT) {
-                            GraphTargetItem curCaseExpr = s.type == SymbolType.DEFAULT ? new DefaultItem() : expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false);
+                            GraphTargetItem curCaseExpr = s.type == SymbolType.DEFAULT ? new DefaultItem() : expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, true);
                             expectedType(SymbolType.COLON);
                             s = lex();
                             caseExprsAll.add(curCaseExpr);
