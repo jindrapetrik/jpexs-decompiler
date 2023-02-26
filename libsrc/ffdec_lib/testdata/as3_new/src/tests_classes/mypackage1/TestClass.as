@@ -23,5 +23,12 @@
 			var b : tests_classes.mypackage2.TestInterface = this;
 			b = new tests_classes.mypackage2.TestClass();
 		}
+        
+        public function testParam(p1:tests_classes.mypackage1.TestInterface, p2:tests_classes.mypackage2.TestInterface) : void {
+            var m:Function = function(m1:tests_classes.mypackage1.TestInterface, m2:tests_classes.mypackage2.TestInterface) : void {
+                var v1:tests_classes.mypackage1.TestInterface = null;
+                var v2:tests_classes.mypackage2.TestInterface = null;                
+            };
+        }
 	}
 }
