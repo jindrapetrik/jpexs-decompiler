@@ -2406,7 +2406,7 @@ public class ActionScript3Parser {
                 break;
             case DOUBLE:
                 ret = new FloatValueAVM2Item(null, null, (Double) s.value);
-
+                allowMemberOrCall = true; // 5.2.toString();
                 break;
             case DELETE:
                 GraphTargetItem varDel = expressionPrimary(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, false, registerVars, inFunction, inMethod, true, variables);//name(allOpenedNamespaces, thisType,false, openedNamespaces, registerVars, inFunction, inMethod, variables);
