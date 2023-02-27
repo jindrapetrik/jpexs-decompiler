@@ -1230,6 +1230,14 @@ public class ActionScript3Parser {
     private GraphTargetItem add(Object a, Object b) {
         GraphTargetItem ta = add(a);
         GraphTargetItem tb = add(b);
+        
+        if ((ta instanceof StringAVM2Item) && (tb instanceof StringAVM2Item)) {
+            String sa = ((StringAVM2Item)ta).getValue();
+            String sb = ((StringAVM2Item)tb).getValue();
+            
+            return new StringAVM2Item(ta.getSrc(), ta.getLineStartItem(), sa + sb);
+        }
+        
         if (ta == null && tb == null) {
             return null;
         }
