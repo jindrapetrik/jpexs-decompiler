@@ -1576,10 +1576,18 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
 
     @Test
     public void testRegExp() {
-        decompileMethod("classic", "testRegExp", "var a1:* = /[a-z\\r\\n0-9\\\\]+/i;\r\n"
+        decompileMethod("classic", "testRegExp", "var r:Number = NaN;\r\n"
+                + "var a1:* = /[a-z\\r\\n0-9\\\\]+/i;\r\n"
                 + "var a2:* = /[a-z\\r\\n0-9\\\\]+/i;\r\n"
                 + "var b1:* = /[0-9AB]+/;\r\n"
-                + "var b2:* = /[0-9AB]+/;\r\n",
+                + "var b2:* = /[0-9AB]+/;\r\n"
+                + "var n1:Number = 5;\r\n"
+                + "var n2:Number = 2;\r\n"
+                + "var n3:Number = 1;\r\n"
+                + "trace(\"not a regexp 1\");\r\n"
+                + "r = n1 / n2 / n3;\r\n"
+                + "trace(\"not a regexp 2\");\r\n"
+                + "r /= n1 / n2;\r\n",
                  false);
     }
 
