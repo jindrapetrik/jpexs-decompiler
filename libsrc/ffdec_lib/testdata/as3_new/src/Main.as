@@ -90,6 +90,7 @@ package
         TestNames2;
         TestNegate;
         TestNumberCall;
+        TestOperations;
         TestOptionalParameters;
         TestParamNames;
         TestParamsCount;
