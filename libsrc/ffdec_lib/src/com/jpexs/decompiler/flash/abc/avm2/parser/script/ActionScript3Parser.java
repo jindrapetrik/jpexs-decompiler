@@ -2185,13 +2185,7 @@ public class ActionScript3Parser {
                         ((NameAVM2Item) lhs).setDefinition(false);
                     }
                     lhs = as;
-                    break;
-                case DESCENDANTS:
-                    expected(lookahead, lexer.yyline(), SymbolGroup.IDENTIFIER, SymbolType.MULTIPLY);
-                    lookahead = lex();
-                    lhs = new GetDescendantsAVM2Item(lhs, lookahead.type == SymbolType.MULTIPLY ? null : lookahead.value.toString(), openedNamespaces);
-                    allowRemainder = true;
-                    break;
+                    break;                
             }
         }
         if (lhs instanceof ParenthesisItem) {
