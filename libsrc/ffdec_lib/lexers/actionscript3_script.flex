@@ -38,6 +38,8 @@ import java.math.BigInteger;
 
     private int repeatNum = 1;
 
+    private boolean enableWhiteSpace = false;
+
     public ActionScriptLexer(String sourceCode){
         this(new StringReader(sourceCode));
         this.sourceCode = sourceCode;
@@ -51,6 +53,17 @@ import java.math.BigInteger;
         yyreset(new StringReader(sourceCode));
         yybegin(state);
         yyline = newYyline;
+    }
+
+    public void setEnableWhiteSpace(boolean enable)
+    {
+        this.enableWhiteSpace = enable;
+    }
+
+    public void begin(int state)
+    {
+        string.setLength(0);
+        yybegin(state);
     }
 
     public void yypushbackstr(String s)
@@ -216,7 +229,7 @@ NamespaceSuffix = "#" {DecIntegerLiteral}
 
 RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
-%state STRING, CHARLITERAL,XMLOPENTAG,XMLOPENTAGATTRIB,XMLINSTROPENTAG,XMLINSTRATTRIB,XMLCDATA,XMLCOMMENT,XML,OIDENTIFIER,XMLCDATAALONE,XMLCOMMENTALONE
+%state STRING, CHARLITERAL,XMLOPENTAG,XMLCLOSETAGFINISH,XMLOPENTAGATTRIB,XMLINSTR,XMLCDATA,XMLCOMMENT,XML,OIDENTIFIER,XMLCDATAALONE,XMLCOMMENTALONE
 
 %%
 
@@ -387,9 +400,12 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   /* comments */
   {Comment}                      { yyline += count(yytext(),"\n"); }
 
-  {LineTerminator}               { yyline++;}
+  {LineTerminator}               {
+                                    yyline++;
+                                    if (enableWhiteSpace) { return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_WHITESPACE, yytext()); }
+                                 }
   /* whitespace */
-  {WhiteSpace}                   { /*ignore*/ }
+  {WhiteSpace}                   { if (enableWhiteSpace) { return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_WHITESPACE, yytext()); } }
   {TypeNameSpec}                 { return new ParsedSymbol(SymbolGroup.TYPENAME, SymbolType.TYPENAME, yytext()); }
   {XmlOpenTagStart}              {
                                     yybegin(XMLOPENTAG);
@@ -410,7 +426,22 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   {NamespaceSuffix}              { return new ParsedSymbol(SymbolGroup.NAMESPACESUFFIX, SymbolType.NAMESPACESUFFIX, Integer.parseInt(yytext().substring(1))); }   
 }
 
-<XMLOPENTAG> {
+<XMLCLOSETAGFINISH> {
+    ">"                            { 
+                                    yybegin(XML);
+                                    pushback(new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.GREATER_THAN, yytext()));
+                                    if (string.length() > 0){
+                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
+                                       string.setLength(0);
+                                    }
+                                    return lex();
+                                  }
+
+   {LineTerminator}               { string.append(yytext());  yyline++;}
+   (\u0020 | \u0009)+             { string.append(yytext()); }
+}
+
+<XMLOPENTAG> {   
    {XmlAttribute}                 {
                                     yybegin(XMLOPENTAGATTRIB);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRIBUTENAME, yytext()));
@@ -446,7 +477,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                        string.setLength(0);
                                     }
                                     return lex();
-                                  }   
+                                  }      
    {LineTerminator}               { string.append(yytext());  yyline++;}
    {WhiteSpace}                   { string.append(yytext()); }
 }
@@ -465,53 +496,17 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 }
 
 
-<XMLINSTROPENTAG> {
-   {XmlAttribute}                 {
-                                    yybegin(XMLINSTRATTRIB);
-                                    pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRIBUTENAME, yytext()));
-                                    if (string.length() > 0){
-                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
-                                       string.setLength(0);
-                                    }
-                                    return lex();
-                                  }
-   "{"                            {
-                                    yybegin(YYINITIAL);
-                                    pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_INSTRATTRNAMEVAR_BEGIN, yytext()));
-                                    if (string.length() > 0){
-                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
-                                       string.setLength(0);
-                                    }
-                                    return lex();
-                                  }
+<XMLINSTR> {
    {XmlInstrEnd}                  {
                                     yybegin(XML);
-                                    pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_INSTR_END, yytext()));
-                                    if (string.length() > 0){
-                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
-                                       string.setLength(0);
-                                    }
-                                    return lex();
+                                    string.append(yytext());
+                                    String tos = string.toString();
+                                    string.setLength(0);
+                                    return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_INSTR, tos);
                                   }
    {LineTerminator}               { string.append(yytext());  yyline++;}
-   {WhiteSpace}                   { string.append(yytext()); }
+   [^]                            { string.append(yytext()); }
 }
-
-<XMLINSTRATTRIB> {
-    \"{XmlDQuoteStringChar}*\"      {
-                                        yybegin(XMLINSTROPENTAG);
-                                        return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRIBUTEVALUE, yytext());
-                                    }
-    \"{XmlSQuoteStringChar}*\"      {
-                                        yybegin(XMLINSTROPENTAG);
-                                        return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_ATTRIBUTEVALUE, yytext());
-                                    }
-    "{"                             {
-                                      yybegin(YYINITIAL);
-                                      return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_INSTRATTRVALVAR_BEGIN, yytext());
-                                    }
-}
-
 
 <XMLCDATA> {
     {XmlCDataEnd}                 {
@@ -567,23 +562,15 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                     if (!ret.isEmpty()) return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, ret);
                                   }
    {XmlInstrStart}                {
-                                    yybegin(XMLINSTROPENTAG);
-                                    pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_INSTR_BEGIN, yytext()));
+                                    yybegin(XMLINSTR);
                                     if (string.length() > 0){
-                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
+                                       String tos = string.toString(); 
                                        string.setLength(0);
+                                       string.append(yytext());
+                                       return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, tos);                                       
                                     }
-                                    return lex();
-                                  }
-   "<?{"                          {
-                                    yybegin(YYINITIAL);
-                                    pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_INSTRVARTAG_BEGIN, yytext()));
-                                    if (string.length() > 0){
-                                       pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, string.toString()));
-                                       string.setLength(0);
-                                    }
-                                    return lex();
-                                  }
+                                    string.append(yytext());
+                                  }   
    {XmlCommentStart}                        {
                                      String ret = string.toString(); string.setLength(0); string.append(yytext()); yybegin(XMLCOMMENT);
                                      if (!ret.isEmpty()) return new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_TEXT, ret);
@@ -605,7 +592,7 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                     }
                                     return lex();
                                   }
-
+  
    "<{"                           {
                                     yybegin(YYINITIAL);
                                     pushback(new ParsedSymbol(SymbolGroup.XML, SymbolType.XML_STARTVARTAG_BEGIN, yytext()));
@@ -671,7 +658,9 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   \"                             {
                                      yybegin(YYINITIAL);
                                      // length also includes the trailing quote
-                                     return new ParsedSymbol(SymbolGroup.STRING, SymbolType.STRING, string.toString());
+                                     String tos = string.toString();
+                                     string.setLength(0);
+                                     return new ParsedSymbol(SymbolGroup.STRING, SymbolType.STRING, tos);
                                  }
 
   {StringCharacter}+             { string.append(yytext()); }

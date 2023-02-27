@@ -30,10 +30,13 @@ import com.jpexs.decompiler.flash.abc.avm2.model.FindPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GetSlotAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.RegExpAvm2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.StringAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.XMLAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.AddAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.SlotAVM2Item;
 import com.jpexs.decompiler.flash.ecma.ObjectType;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TranslateStack;
@@ -76,17 +79,28 @@ public class ConstructIns extends InstructionDefinition {
     }
 
     public static boolean walkXML(GraphTargetItem item, List<GraphTargetItem> list) {
-        boolean ret = true;
-        if (item instanceof StringAVM2Item) {
-            list.add(item);
-        } else if (item instanceof AddAVM2Item) {
-            ret = ret && walkXML(((AddAVM2Item) item).leftSide, list);
-            ret = ret && walkXML(((AddAVM2Item) item).rightSide, list);
+        boolean ret = walkXMLSub(item, list);
+        if (list.size() == 1) {
+            return true;
+        }
+        return ret;
+    }
+    public static boolean walkXMLSub(GraphTargetItem item, List<GraphTargetItem> list) {
+        boolean ret = false;
+        if (item instanceof AddAVM2Item) {
+            if (walkXMLSub(((AddAVM2Item) item).leftSide, list)) {
+                ret = true;
+            }
+            if (walkXMLSub(((AddAVM2Item) item).rightSide, list)) {
+                ret = true;
+            }                
         } else if ((item instanceof EscapeXElemAVM2Item) || (item instanceof EscapeXAttrAVM2Item)) {
+            ret = true;
             list.add(item);
         } else {
-            return false;
+            list.add(item);
         }
+        
         return ret;
     }
 

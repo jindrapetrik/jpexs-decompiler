@@ -129,6 +129,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -1253,7 +1254,7 @@ public class ActionScript3Parser {
         }
     }
 
-    private List<GraphTargetItem> xmltag(List<List<NamespaceItem>> allOpenedNamespaces, TypeItem thisType, NamespaceItem pkg, Reference<Boolean> usesVars, List<String> openedTags, Reference<Integer> closedVarTags, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException, InterruptedException {
+    private List<GraphTargetItem> xmltag(List<List<NamespaceItem>> allOpenedNamespaces, TypeItem thisType, NamespaceItem pkg, Reference<Boolean> usesVars, List<String> openedTags, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException, InterruptedException {
         ParsedSymbol s;
         List<GraphTargetItem> rets = new ArrayList<>();
         //GraphTargetItem ret = null;
@@ -1262,10 +1263,9 @@ public class ActionScript3Parser {
         do {
             s = lex();
             List<String> sub = new ArrayList<>();
-            Reference<Integer> subclose = new Reference<>(0);
             Reference<Boolean> subusesvars = new Reference<>(false);
             switch (s.type) {
-                case XML_ATTRNAMEVAR_BEGIN: //add
+                case XML_ATTRNAMEVAR_BEGIN: // {...}=       add
                     usesVars.setVal(true);
                     addS(rets, sb);
                     rets.add(expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false));
@@ -1274,7 +1274,7 @@ public class ActionScript3Parser {
                     sb.append("=");
                     lexer.yybegin(ActionScriptLexer.XMLOPENTAGATTRIB);
                     break;
-                case XML_ATTRVALVAR_BEGIN: //esc_xattr
+                case XML_ATTRVALVAR_BEGIN: // ={...}         esc_xattr
                     usesVars.setVal(true);
                     sb.append("\"");
                     addS(rets, sb);
@@ -1282,49 +1282,37 @@ public class ActionScript3Parser {
                     sb.append("\"");
                     expectedType(SymbolType.CURLY_CLOSE);
                     lexer.yybegin(ActionScriptLexer.XMLOPENTAG);
-                    break;
-                case XML_INSTRATTRNAMEVAR_BEGIN: //add
-                    usesVars.setVal(true);
-                    addS(rets, sb);
-                    rets.add(expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false));
-                    expectedType(SymbolType.CURLY_CLOSE);
-                    expectedType(SymbolType.ASSIGN);
-                    sb.append("=");
-                    lexer.yybegin(ActionScriptLexer.XMLOPENTAGATTRIB);
-                    break;
-                case XML_INSTRATTRVALVAR_BEGIN: //esc_xattr
-                    usesVars.setVal(true);
-                    sb.append("\"");
-                    addS(rets, sb);
-                    rets.add(new EscapeXAttrAVM2Item(null, null, expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false)));
-                    sb.append("\"");
-                    expectedType(SymbolType.CURLY_CLOSE);
-                    lexer.yybegin(ActionScriptLexer.XMLOPENTAG);
-                    break;
-                case XML_VAR_BEGIN: //esc_xelem
+                    break;                 
+                case XML_VAR_BEGIN: // {...}                esc_xelem
                     usesVars.setVal(true);
                     addS(rets, sb);
                     rets.add(new EscapeXElemAVM2Item(null, null, expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false)));
                     expectedType(SymbolType.CURLY_CLOSE);
                     lexer.yybegin(ActionScriptLexer.XML);
                     break;
-                case XML_FINISHVARTAG_BEGIN: //add
+                case XML_FINISHVARTAG_BEGIN: // </{...}>    add
                     usesVars.setVal(true);
-                    closedVarTags.setVal(closedVarTags.getVal() + 1);
                     sb.append("</");
                     addS(rets, sb);
 
                     rets.add(expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false));
                     expectedType(SymbolType.CURLY_CLOSE);
-                    expectedType(SymbolType.GREATER_THAN);
+                    lexer.begin(ActionScriptLexer.XMLCLOSETAGFINISH);
+                    s = lex();
+                    while(s.isType(SymbolType.XML_TEXT)) {
+                        sb.append(s.value);
+                        s = lex();
+                    }
+                    expected(s, lexer.yyline(), SymbolType.GREATER_THAN);
                     sb.append(">");
                     addS(rets, sb);
-                    lexer.yybegin(ActionScriptLexer.XML);
+                    
+                    if (openedTags.isEmpty()) {
+                        throw new AVM2ParseException("XML : Closing unopened tag", lexer.yyline());
+                    }
+                    openedTags.remove(openedTags.size() - 1);                    
                     break;
-                case XML_STARTVARTAG_BEGIN: //add
-                    //openedTags.add("*");
-
-                    //ret = add(ret, );
+                case XML_STARTVARTAG_BEGIN: // <{...}>      add
                     GraphTargetItem ex = expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false);
                     expectedType(SymbolType.CURLY_CLOSE);
                     lexer.yybegin(ActionScriptLexer.XMLOPENTAG);
@@ -1332,36 +1320,23 @@ public class ActionScript3Parser {
                     sb.append("<");
                     addS(rets, sb);
                     rets.add(ex);
-                    rets.addAll(xmltag(allOpenedNamespaces, thisType, pkg, subusesvars, sub, subclose, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
-                    closedVarTags.setVal(subclose.getVal() + subclose.getVal());
+                    rets.addAll(xmltag(allOpenedNamespaces, thisType, pkg, subusesvars, sub, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));                    
                     break;
-                case XML_INSTRVARTAG_BEGIN: //add
-                    usesVars.setVal(true);
-                    addS(rets, sb);
-                    sb.append("<?");
-                    addS(rets, sb);
-                    rets.add(expression(allOpenedNamespaces, thisType, pkg, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, true, variables, false));
-                    expectedType(SymbolType.CURLY_CLOSE);
-                    lexer.yybegin(ActionScriptLexer.XMLINSTROPENTAG);
-                    break;
-                case XML_STARTTAG_BEGIN:
+                case XML_STARTTAG_BEGIN:    // <xxx>
                     sub.add(s.value.toString().trim().substring(1)); //remove < from beginning
-                    List<GraphTargetItem> st = xmltag(allOpenedNamespaces, thisType, pkg, subusesvars, sub, closedVarTags, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables);
+                    List<GraphTargetItem> st = xmltag(allOpenedNamespaces, thisType, pkg, subusesvars, sub, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables);
                     sb.append(s.value.toString());
                     addS(rets, sb);
                     rets.addAll(st);
-                    closedVarTags.setVal(subclose.getVal() + subclose.getVal());
                     break;
-                /*case XML_STARTTAG_END:
-                 sb.append(s.value.toString());
-                 ret = addstr(ret,sb);
-                 break;*/
                 case XML_FINISHTAG:
                     String tname = s.value.toString().substring(2, s.value.toString().length() - 1).trim();
-                    if (openedTags.contains(tname)) {
-                        openedTags.remove(tname);
-                    } else if (openedTags.contains("*")) {
-                        openedTags.remove("*");
+                    if (openedTags.isEmpty()) {
+                        throw new AVM2ParseException("XML : Closing unopened tag", lexer.yyline());
+                    }
+                    String lastTName = openedTags.get(openedTags.size() - 1);
+                    if (lastTName.equals(tname) || lastTName.equals("*")) {
+                        openedTags.remove(openedTags.size() - 1);
                     } else {
                         throw new AVM2ParseException("XML : Closing unopened tag", lexer.yyline());
                     }
@@ -1377,18 +1352,26 @@ public class ActionScript3Parser {
                     sb.append(s.value.toString());
                     break;
             }
-        } while (!(openedTags.isEmpty() || closedVarTags.getVal() >= openedTags.size()));
+        } while (!openedTags.isEmpty());
         addS(rets, sb);
         return rets;
     }
 
     private GraphTargetItem xml(List<List<NamespaceItem>> allOpenedNamespaces, TypeItem thisType, NamespaceItem pkg, Reference<Boolean> needsActivation, List<DottedChain> importedClasses, List<NamespaceItem> openedNamespaces, HashMap<String, Integer> registerVars, boolean inFunction, boolean inMethod, List<AssignableAVM2Item> variables) throws IOException, AVM2ParseException, InterruptedException {
-        List<String> openedTags = new ArrayList<>();
-        int closedVarTags = 0;
-
-        GraphTargetItem ret = add(xmltag(allOpenedNamespaces, thisType, pkg, new Reference<>(false), openedTags, new Reference<>(closedVarTags), needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables));
+        List<String> openedTags = new ArrayList<>();        
+        List<GraphTargetItem> xmlParts = xmltag(allOpenedNamespaces, thisType, pkg, new Reference<>(false), openedTags, needsActivation, importedClasses, openedNamespaces, registerVars, inFunction, inMethod, variables);
+        lexer.setEnableWhiteSpace(true);
+        lexer.begin(ActionScriptLexer.YYINITIAL);
+        ParsedSymbol s = lexer.lex();
+        while (s.isType(SymbolType.XML_WHITESPACE)) {
+            addS(xmlParts, new StringBuilder(s.value.toString()));
+            s = lexer.lex();
+        } 
+        lexer.setEnableWhiteSpace(false);
+        lexer.pushback(s);
+        GraphTargetItem ret = add(xmlParts);
         ret = new XMLAVM2Item(ret);
-        lexer.yybegin(ActionScriptLexer.YYINITIAL);
+        //lexer.yybegin(ActionScriptLexer.YYINITIAL);
         //TODO: Order of additions as in official compiler
         return ret;
     }
@@ -2282,6 +2265,7 @@ public class ActionScript3Parser {
 
                 break;
             case XML_STARTTAG_BEGIN:
+            case XML_STARTVARTAG_BEGIN:
             case XML_CDATA:
             case XML_COMMENT:
                 lexer.pushback(s);

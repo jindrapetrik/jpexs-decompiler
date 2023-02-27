@@ -30,8 +30,27 @@ package tests
 				}
 			]]>;
 			
-			var testComment:XML = <!-- myXML comment-->;
-						
+			var testComment:XML = <!-- myXML comment-->;           
+			
+            var xtaga:String = "a";
+            var xtagb:String = "b";
+            var xattrname:String = "attr";
+            var xattrval:String = "value";
+            var xcontent:String = "content";
+            
+            var xxx:XML = <{xtaga}>
+                            <{xtagb}>
+                                <ul>
+                                  <li>Item 1</li>                            
+                                  <li {xattrname}="val" attr2={xattrval}>Item 2: {xcontent}</li>
+                                  <?processinstr testvalue ?>
+                                  <!-- 
+                                  comment
+                                  -->
+                                </ul>
+                            </{xtagb}>
+                        </{xtaga}>			
+                        ; //intentionally on new line
 		}
 		
 	}
