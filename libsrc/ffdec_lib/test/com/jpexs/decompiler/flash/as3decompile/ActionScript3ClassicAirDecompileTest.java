@@ -1472,6 +1472,67 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testOperations() {
+        decompileMethod("classic_air", "testOperations", "var cr:MyClass = null;\r\n"
+                + "var br:* = false;\r\n"
+                + "var r:Number = NaN;\r\n"
+                + "var xlr:XMLList = null;\r\n"
+                + "var c:MyClass = new MyClass();\r\n"
+                + "var d:Dictionary = new Dictionary();\r\n"
+                + "var n1:Number = 2;\r\n"
+                + "var n2:Number = 3;\r\n"
+                + "var b1:Boolean = true;\r\n"
+                + "var b2:Boolean = false;\r\n"
+                + "var x:XML = <a>\r\n"
+                + "<b>one\r\n"
+                + "<c>\r\n"
+                + "<b>two</b>\r\n"
+                + "</c>\r\n"
+                + "</b>\r\n"
+                + "<b>three</b>\r\n"
+                + "</a>;\r\n"
+                + "cr = c as MyClass;\r\n"
+                + "br = \"hello\" in d;\r\n"
+                + "r = b1 ? n1 : n2;\r\n"
+                + "r = n1 << n2;\r\n"
+                + "r = n1 >> n2;\r\n"
+                + "r = n1 >>> n2;\r\n"
+                + "r = n1 & n2;\r\n"
+                + "r = n1 | n2;\r\n"
+                + "r = n1 / n2;\r\n"
+                + "r = n1 % n2;\r\n"
+                + "br = n1 == n2;\r\n"
+                + "br = n1 === n2;\r\n"
+                + "br = n1 != n2;\r\n"
+                + "br = n1 !== n2;\r\n"
+                + "br = n1 < n2;\r\n"
+                + "br = n1 <= n2;\r\n"
+                + "br = n1 > n2;\r\n"
+                + "br = n1 >= n2;\r\n"
+                + "br = b1 && b2;\r\n"
+                + "br = b1 || b2;\r\n"
+                + "r = n1 - n2;\r\n"
+                + "r = n1 * n2;\r\n"
+                + "r = n1 + n2;\r\n"
+                + "r = n1 ^ n2;\r\n"
+                + "br = c instanceof MyClass;\r\n"
+                + "br = c is MyClass;\r\n"
+                + "xlr = x..b;\r\n"
+                + "r &= n1;\r\n"
+                + "r |= n1;\r\n"
+                + "r /= n1;\r\n"
+                + "r -= n1;\r\n"
+                + "r %= n1;\r\n"
+                + "r *= n1;\r\n"
+                + "r += n1;\r\n"
+                + "r <<= n1;\r\n"
+                + "r >>= n1;\r\n"
+                + "r >>>= n1;\r\n"
+                + "r ^= n1;\r\n",
+                 false);
+    }
+
+    @Test
     public void testParamNames() {
         decompileMethod("classic_air", "testParamNames", "return firstp + secondp + thirdp;\r\n",
                  false);
