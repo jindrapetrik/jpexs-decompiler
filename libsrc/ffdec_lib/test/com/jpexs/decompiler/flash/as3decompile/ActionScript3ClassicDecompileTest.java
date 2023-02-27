@@ -2060,6 +2060,12 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "var g:XML = null;\r\n"
                 + "var testCdata:XML = null;\r\n"
                 + "var testComment:XML = null;\r\n"
+                + "var xtaga:String = null;\r\n"
+                + "var xtagb:String = null;\r\n"
+                + "var xattrname:String = null;\r\n"
+                + "var xattrval:String = null;\r\n"
+                + "var xcontent:String = null;\r\n"
+                + "var xxx:XML = null;\r\n"
                 + "var name:String = \"ahoj\";\r\n"
                 + "var myXML:XML = <order id=\"604\">\r\n"
                 + "<book isbn=\"12345\">\r\n"
@@ -2179,7 +2185,24 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "here some code;\r\n"
                 + "}\r\n"
                 + "]]>;\r\n"
-                + "testComment =  <!-- myXML comment-->;\r\n",
+                + "testComment =  <!-- myXML comment-->;\r\n"
+                + "xtaga = \"a\";\r\n"
+                + "xtagb = \"b\";\r\n"
+                + "xattrname = \"attr\";\r\n"
+                + "xattrval = \"value\";\r\n"
+                + "xcontent = \"content\";\r\n"
+                + "xxx = <{xtaga}>\r\n"
+                + "<{xtagb}>\r\n"
+                + "<ul>\r\n"
+                + "<li>Item 1</li>\r\n"
+                + "<li {xattrname}=\"val\" attr2={xattrval}>Item 2: {xcontent}</li>\r\n"
+                + "<?processinstr testvalue ?>\r\n"
+                + "<!--\r\n"
+                + "comment\r\n"
+                + "-->\r\n"
+                + "</ul>\r\n"
+                + "</{xtagb}>\r\n"
+                + "</{xtaga}>;\r\n",
                  false);
     }
 }

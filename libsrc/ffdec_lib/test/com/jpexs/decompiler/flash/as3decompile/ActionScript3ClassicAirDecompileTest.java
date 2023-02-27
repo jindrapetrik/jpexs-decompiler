@@ -2060,12 +2060,12 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     @Test
     public void testXml() {
         decompileMethod("classic_air", "testXml", "var name:String = \"ahoj\";\r\n"
-                + "var myXML:XML = <order id=\"604\">\r\n"
+                + "var myXML:XML;\r\n"
+                + "var k:* = (myXML = <order id=\"604\">\r\n"
                 + "<book isbn=\"12345\">\r\n"
                 + "<title>{name}</title>\r\n"
                 + "</book>\r\n"
-                + "</order>;\r\n"
-                + "var k:* = myXML.@id;\r\n"
+                + "</order>).@id;\r\n"
                 + "var all:String = myXML.@*.toXMLString();\r\n"
                 + "k = myXML.book;\r\n"
                 + "k = myXML.book.(@isbn == \"12345\");\r\n"
@@ -2178,7 +2178,25 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "here some code;\r\n"
                 + "}\r\n"
                 + "]]>;\r\n"
-                + "var testComment:XML = <!-- myXML comment-->;\r\n",
+                + "var testComment:XML = <!-- myXML comment-->;\r\n"
+                + "var xtaga:String = \"a\";\r\n"
+                + "var xtagb:String = \"b\";\r\n"
+                + "var xattrname:String = \"attr\";\r\n"
+                + "var xattrval:String = \"value\";\r\n"
+                + "var xcontent:String = \"content\";\r\n"
+                + "var xxx:XML = <{xtaga} >\r\n"
+                + "<{xtagb} >\r\n"
+                + "<ul>\r\n"
+                + "<li>Item 1</li>\r\n"
+                + "<li  {xattrname}=\"val\" attr2={xattrval}>Item 2: {xcontent}</li>\r\n"
+                + "<?processinstr testvalue ?>\r\n"
+                + "<!--\r\n"
+                + "comment\r\n"
+                + "-->\r\n"
+                + "</ul>\r\n"
+                + "</{xtagb} >\r\n"
+                + "</{xtaga} >\r\n"
+                + ";\r\n",
                  false);
     }
 }

@@ -192,17 +192,20 @@ public enum SymbolType {
     XML_STARTFINISHTAG_END(GraphTargetItem.PRECEDENCE_PRIMARY, false), // />
     XML_COMMENT(GraphTargetItem.PRECEDENCE_PRIMARY, false), // <!-- ... -->
     XML_CDATA(GraphTargetItem.PRECEDENCE_PRIMARY, false), //<![CDATA[ ... ]]>
-    XML_INSTR_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY, false), // <?xxx
-    XML_INSTR_END(GraphTargetItem.PRECEDENCE_PRIMARY, false), // ?>
+    XML_INSTR(GraphTargetItem.PRECEDENCE_PRIMARY, false), // <?xxx a b c ?>
+    //XML_INSTR_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY, false), // <?xxx
+    //XML_INSTR_END(GraphTargetItem.PRECEDENCE_PRIMARY, false), // ?>
     XML_VAR_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY, false), // {
     XML_ATTRIBUTENAME(GraphTargetItem.PRECEDENCE_PRIMARY, false), // aaa=
     XML_ATTRIBUTEVALUE(GraphTargetItem.PRECEDENCE_PRIMARY, false), // "vvv"
     XML_TEXT(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     XML_ATTRNAMEVAR_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY, false), // {...}=
     XML_ATTRVALVAR_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY, false), // aaa={
-    XML_INSTRATTRNAMEVAR_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY, false), // {...}=
-    XML_INSTRATTRVALVAR_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY, false), // aaa={
-    XML_INSTRVARTAG_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY, false), // <?{
+    XML_END(GraphTargetItem.PRECEDENCE_PRIMARY, false),
+    XML_WHITESPACE(GraphTargetItem.PRECEDENCE_PRIMARY, false), //only when enabled - for example for XML
+    //XML_INSTRATTRNAMEVAR_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY, false), // {...}=
+    // XML_INSTRATTRVALVAR_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY, false), // aaa={
+    //XML_INSTRVARTAG_BEGIN(GraphTargetItem.PRECEDENCE_PRIMARY, false), // <?{
     FILTER(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     DESCENDANTS(GraphTargetItem.PRECEDENCE_PRIMARY, false),
     NATIVE,

@@ -114,9 +114,9 @@ TypeNameSpec = ".<" {Identifier} ">"
 LetterColon = [:jletter] | ":"
 XMLIdentifier = {Identifier} | {IdentifierNs}
 XMLAttribute = " "* {XMLIdentifier} " "* "=" " "* \" {InputCharacter}* \" " "*
-XMLBeginOneTag = "<" {XMLIdentifier} {XMLAttribute}* ">"
-XMLBeginTag = "<" {XMLIdentifier} " "
-XMLEndTag = "</" {XMLIdentifier} ">"
+XMLBeginOneTag = "<" {XMLIdentifier} {XMLAttribute}* ">" | "<{" {XMLIdentifier} "}" {XMLAttribute}* " "* ">"
+XMLBeginTag = "<" {XMLIdentifier} " " | "<{" {XMLIdentifier} "} "
+XMLEndTag = "</" {XMLIdentifier} " "* ">" | "</{" {XMLIdentifier} "}" " "* ">"
 
 /* integer literals */
 DecIntegerLiteral = 0 | [1-9][0-9]*
@@ -229,7 +229,6 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
 
   "("                            { return  token(TokenType.OPERATOR,  PARAN); }
   ")"                            { return token(TokenType.OPERATOR, -PARAN); }
-  "{"                            { return token(TokenType.OPERATOR,  CURLY); }
   "}"                            { return token(TokenType.OPERATOR, -CURLY); }
   "["                            { return token(TokenType.OPERATOR,  BRACKET); }
   "]"                            { return token(TokenType.OPERATOR, -BRACKET); }
@@ -238,7 +237,6 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   "..."                          |
   "."                            |
   "="                            |
-  ">"                            |
   "<"                            |
   "!"                            |
   "~"                            |
@@ -336,6 +334,11 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
                                     }
                                     xmlTagName = s;
                                  }
+
+  ">"                            { return token(TokenType.OPERATOR); }
+  
+  "{"                            { return token(TokenType.OPERATOR,  CURLY); }
+  
   /* identifiers */
   {Identifier}{NamespaceSuffix}  { return token(TokenType.REGEX); }
   {Identifier}                   { return token(TokenType.IDENTIFIER); }
@@ -351,7 +354,8 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
    {XMLBeginOneTag}                 { tokenLength += yylength();}
    {XMLEndTag}                   { tokenLength += yylength();
                                    String endtagname=yytext();
-                                   endtagname=endtagname.substring(2,endtagname.length()-1);
+                                   endtagname = endtagname.substring(2,endtagname.length()-1);
+                                   endtagname = endtagname.trim();
                                    if(endtagname.equals(xmlTagName)){
                                        yybegin(YYINITIAL);
                                        return token(TokenType.STRING, tokenStart, tokenLength);

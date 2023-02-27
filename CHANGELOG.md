@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#1981] AS3 fully qualified (colliding) types in submethods
+- AS3 direct editation - Allow member or call for doubles
+- AS3 direct editation - Allow comma operator in XML filter operation
+- AS3 direct editation - Allow comma operator in switch expressions
+- AS3 XML embedded variables display and direct edit
 
 ## [18.3.6] - 2023-02-25
 ### Fixed
