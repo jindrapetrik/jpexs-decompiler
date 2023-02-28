@@ -127,8 +127,8 @@ public abstract class SetLocalTypeIns extends InstructionDefinition implements S
         SetLocalAVM2Item result = new SetLocalAVM2Item(ins, localData.lineStartInstruction, regId, value, value.returnType());
         if (value.getNotCoerced() instanceof CompoundableBinaryOp) {
             CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoerced();
-            if (binaryOp.getLeftSide() instanceof LocalRegAVM2Item) {
-                LocalRegAVM2Item loc = (LocalRegAVM2Item) binaryOp.getLeftSide();
+            if (binaryOp.getLeftSide().getNotCoerced() instanceof LocalRegAVM2Item) {
+                LocalRegAVM2Item loc = (LocalRegAVM2Item) binaryOp.getLeftSide().getNotCoerced();
                 if (loc.regIndex == regId) {
                     result.setCompoundValue(binaryOp.getRightSide());
                     result.setCompoundOperator(binaryOp.getOperator());

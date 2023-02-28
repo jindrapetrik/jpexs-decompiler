@@ -18,6 +18,7 @@ package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.model.CompoundableBinaryOpAs12;
 import com.jpexs.decompiler.flash.action.swf4.ActionAdd;
 import com.jpexs.decompiler.flash.action.swf5.ActionAdd2;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
@@ -38,7 +39,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class AddActionItem extends BinaryOpItem implements CompoundableBinaryOp {
+public class AddActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {
 
     boolean version2;
 

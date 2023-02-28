@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.model.CompoundableBinaryOpAs12;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitAnd;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -33,7 +34,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class BitAndActionItem extends BinaryOpItem implements CompoundableBinaryOp {
+public class BitAndActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {
 
     public BitAndActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_BITWISEAND, leftSide, rightSide, "&", "int", "int");

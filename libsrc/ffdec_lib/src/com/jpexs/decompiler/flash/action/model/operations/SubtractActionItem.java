@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.model.CompoundableBinaryOpAs12;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
 import com.jpexs.decompiler.flash.action.swf4.ActionSubtract;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -35,7 +36,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class SubtractActionItem extends BinaryOpItem implements CompoundableBinaryOp {
+public class SubtractActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {
 
     public SubtractActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_ADDITIVE, leftSide, rightSide, "-", "Number", "Number");

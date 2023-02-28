@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class OrItem extends BinaryOpItem {
+public class OrItem extends BinaryOpItem implements CompoundableBinaryOp {
 
     public OrItem(GraphSourceItem src, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(src, lineStartIns, PRECEDENCE_LOGICALOR, leftSide, rightSide, "||", "Boolean", "Boolean");

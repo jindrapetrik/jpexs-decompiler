@@ -158,8 +158,8 @@ public class SetSlotIns extends InstructionDefinition implements SetTypeIns {
         if (value.getNotCoerced() instanceof CompoundableBinaryOp) {
             if (!obj.hasSideEffect()) {
                 CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoerced();
-                if (binaryOp.getLeftSide() instanceof GetSlotAVM2Item) {
-                    GetSlotAVM2Item getSlot = (GetSlotAVM2Item) binaryOp.getLeftSide();
+                if (binaryOp.getLeftSide().getNotCoerced() instanceof GetSlotAVM2Item) {
+                    GetSlotAVM2Item getSlot = (GetSlotAVM2Item) binaryOp.getLeftSide().getNotCoerced();
                     if (Objects.equals(obj, getSlot.scope.getThroughDuplicate()) && slotIndex == getSlot.slotIndex) {
                         result.compoundValue = binaryOp.getRightSide();
                         result.compoundOperator = binaryOp.getOperator();

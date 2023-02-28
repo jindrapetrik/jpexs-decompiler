@@ -2133,11 +2133,10 @@ public class ActionScript3Parser {
                 case ASSIGN_SHIFT_RIGHT:
                 case ASSIGN_USHIFT_RIGHT:
                 case ASSIGN_XOR:
+                case ASSIGN_AND:
+                case ASSIGN_OR:
                     GraphTargetItem assigned = rhs;
-                    switch (op.type) {
-                        case ASSIGN:
-                            //assigned = assigned;
-                            break;
+                    switch (op.type) {                        
                         case ASSIGN_BITAND:
                             assigned = new BitAndAVM2Item(null, null, lhs, assigned);
                             break;
@@ -2170,6 +2169,16 @@ public class ActionScript3Parser {
                             break;
                         case ASSIGN_XOR:
                             assigned = new BitXorAVM2Item(null, null, lhs, assigned);
+                            break;
+                        case ASSIGN_AND:
+                            assigned = new AndItem(null, null, lhs, assigned);
+                            break;
+                        case ASSIGN_OR:
+                            assigned = new OrItem(null, null, lhs, assigned);
+                            break;
+                        case ASSIGN:
+                        default:
+                            //assigned = assigned;
                             break;
                     }
 

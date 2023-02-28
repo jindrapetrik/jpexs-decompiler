@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.model.CompoundableBinaryOpAs12;
 import com.jpexs.decompiler.flash.action.swf5.ActionBitRShift;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
@@ -33,7 +34,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class RShiftActionItem extends BinaryOpItem implements CompoundableBinaryOp {
+public class RShiftActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {
 
     public RShiftActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_BITWISESHIFT, leftSide, rightSide, ">>", "int", "int");

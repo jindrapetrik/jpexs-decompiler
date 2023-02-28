@@ -311,7 +311,9 @@ RegExp = \/([^\r\n/]|\\\/)+\/[a-z]*
   ">="                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.GREATER_EQUAL, yytext());  }
   "!=="                          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.STRICT_NOT_EQUAL, yytext());  }
   "!="                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.NOT_EQUAL, yytext());  }
+  "&&="                          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_AND, yytext());  }
   "&&"                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.AND, yytext());  }
+  "||="                          { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.ASSIGN_OR, yytext());  }
   "||"                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.OR, yytext());  }
   "++"                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.INCREMENT, yytext());  }
   "--"                           { return new ParsedSymbol(SymbolGroup.OPERATOR, SymbolType.DECREMENT, yytext());  }
