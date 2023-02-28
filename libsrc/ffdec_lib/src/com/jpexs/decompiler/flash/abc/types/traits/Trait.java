@@ -417,9 +417,9 @@ public abstract class Trait implements Cloneable, Serializable {
             writer.hilightSpecial("0x8", HighlightSpecialType.ATTR_0x8);
         }
         if ((kindFlags & ATTR_Metadata) > 0) {
-            writer.newLine();
             for (int m : metadata) {
-                writer.append("metadata");
+                writer.newLine();            
+                writer.append("metadata ");
                 writer.append("\"");
                 writer.append(Helper.escapePCodeString(abc.constants.getString(abc.metadata_info.get(m).name_index)));
                 writer.append("\"");
