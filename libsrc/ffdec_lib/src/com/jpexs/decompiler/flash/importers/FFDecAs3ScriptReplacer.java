@@ -86,10 +86,10 @@ public class FFDecAs3ScriptReplacer implements As3ScriptReplacerInterface {
             abc.pack();//remove old deleted items
             ((Tag) abc.parentTag).setModified(true);
         } catch (AVM2ParseException ex) {
-            ex.printStackTrace();
+            //ex.printStackTrace();
             throw new As3ScriptReplaceException(new As3ScriptReplaceExceptionItem(null, ex.text, (int) ex.line));
         } catch (CompilationException ex) {
-            ex.printStackTrace();
+            //ex.printStackTrace();
             throw new As3ScriptReplaceException(new As3ScriptReplaceExceptionItem(null, ex.text, (int) ex.line));
         }
     }

@@ -78,8 +78,8 @@ public class SetPropertyIns extends InstructionDefinition implements SetTypeIns 
                                 if (setLocName.regIndex == locName.regIndex) {
                                     if (setLocVal.value instanceof CompoundableBinaryOp) {
                                         CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) setLocVal.value;
-                                        if (binaryOp.getLeftSide() instanceof GetPropertyAVM2Item) {
-                                            GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) binaryOp.getLeftSide();
+                                        if (binaryOp.getLeftSide().getNotCoerced() instanceof GetPropertyAVM2Item) {
+                                            GetPropertyAVM2Item getProp = (GetPropertyAVM2Item) binaryOp.getLeftSide().getNotCoerced();
                                             if (((FullMultinameAVM2Item) getProp.propertyName).compareSame(multiname) && Objects.equals(getProp.object, obj)) {
                                                 multiname.name = setLocName.value;
                                                 result.setCompoundValue(binaryOp.getRightSide());

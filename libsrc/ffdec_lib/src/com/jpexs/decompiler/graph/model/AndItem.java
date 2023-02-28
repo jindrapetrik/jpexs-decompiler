@@ -30,7 +30,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class AndItem extends BinaryOpItem {
+public class AndItem extends BinaryOpItem implements CompoundableBinaryOp {
 
     @Override
     public List<GraphSourceItemPos> getNeededSources() {

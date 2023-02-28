@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.StoreTypeAction;
+import com.jpexs.decompiler.flash.action.model.CompoundableBinaryOpAs12;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -136,7 +137,7 @@ public class ActionSetVariable extends Action implements StoreTypeAction {
         if (inside instanceof StoreRegisterActionItem) {
             inside = inside.value;
         }
-        if (inside instanceof CompoundableBinaryOp) {
+        if (inside instanceof CompoundableBinaryOpAs12) {
             if (!name.hasSideEffect()) {
                 CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) inside;
                 if (binaryOp.getLeftSide() instanceof GetVariableActionItem) {

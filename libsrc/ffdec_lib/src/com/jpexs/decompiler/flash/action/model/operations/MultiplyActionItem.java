@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.action.model.operations;
 
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
+import com.jpexs.decompiler.flash.action.model.CompoundableBinaryOpAs12;
 import com.jpexs.decompiler.flash.action.swf4.ActionMultiply;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
@@ -32,7 +33,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class MultiplyActionItem extends BinaryOpItem implements CompoundableBinaryOp {
+public class MultiplyActionItem extends BinaryOpItem implements CompoundableBinaryOpAs12 {
 
     public MultiplyActionItem(GraphSourceItem instruction, GraphSourceItem lineStartIns, GraphTargetItem leftSide, GraphTargetItem rightSide) {
         super(instruction, lineStartIns, PRECEDENCE_MULTIPLICATIVE, leftSide, rightSide, "*", "Number", "Number");

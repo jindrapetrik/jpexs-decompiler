@@ -15,6 +15,7 @@ package tests
             var b2:Boolean = false;
             var br:Boolean;            
             var r:Number;
+            var v:*;
             var x:XML = <a>
             			<b>one
             				<c> 
@@ -23,7 +24,18 @@ package tests
             			</b>
             			<b>three</b>
             		</a>;    
-            var xlr:XMLList;        
+            var xlr:XMLList;  
+            var o:Object = {a:1, b:2}; 
+            var sr:String;  
+            var s1:String = "hello";
+            var s2:String = "there";   
+            
+            
+            r = -n1;
+            r = ~n1;
+            br = !b1;
+            r = ++n1;
+            r = n1++;
             
             cr = c as MyClass;            
             br = "hello" in d;            
@@ -53,7 +65,7 @@ package tests
             br = c instanceof MyClass;
             br = c is MyClass;
             xlr = x..b;
-            
+            sr = s1 + s2;                        
                         
             r &= n1;
             r |= n1;
@@ -65,10 +77,21 @@ package tests
             r <<= n1;
             r >>= n1;
             r >>>= n1;
-            r ^= n1;            
-            
+            r ^= n1;
+            br &&= b1;
+            br ||= b1; 
+            sr += s1;
+                      
+            delete o.a;
+            v = void("test" + this.f()); //TODO: implement compiling this
+            sr = typeof c;
                    
 		}
+        
+        public function f():int {
+            trace("f");
+            return 5;
+        }
 	}
 }
 

@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.BaseLocalData;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionScriptObject;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
+import com.jpexs.decompiler.flash.action.model.CompoundableBinaryOpAs12;
 import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.IncrementActionItem;
@@ -122,7 +123,7 @@ public class ActionSetMember extends Action {
         if (inside instanceof StoreRegisterActionItem) {
             inside = inside.value;
         }
-        if (inside instanceof CompoundableBinaryOp) {
+        if (inside instanceof CompoundableBinaryOpAs12) {
             if (!object.hasSideEffect() && !memberName.hasSideEffect()) {
                 CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) inside;
                 if (binaryOp.getLeftSide() instanceof GetMemberActionItem) {

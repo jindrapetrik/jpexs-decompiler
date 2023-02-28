@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.LocalDataArea;
 import com.jpexs.decompiler.flash.action.StoreTypeAction;
+import com.jpexs.decompiler.flash.action.model.CompoundableBinaryOpAs12;
 import com.jpexs.decompiler.flash.action.model.ConstantPool;
 import com.jpexs.decompiler.flash.action.model.DecrementActionItem;
 import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
@@ -166,7 +167,7 @@ public class ActionStoreRegister extends Action implements StoreTypeAction {
             variables.remove("__register" + registerNumber);
         }
         StoreRegisterActionItem ret = new StoreRegisterActionItem(this, lineStartAction, rn, value, define);
-        if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOp) {
+        if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOpAs12) {
             CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoercedNoDup();
             if (binaryOp.getLeftSide() instanceof DirectValueActionItem) {
                 DirectValueActionItem directValue = (DirectValueActionItem) binaryOp.getLeftSide();

@@ -118,6 +118,8 @@ public enum SymbolType {
     ASSIGN_SHIFT_LEFT(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
     ASSIGN_SHIFT_RIGHT(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
     ASSIGN_USHIFT_RIGHT(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN_AND(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),
+    ASSIGN_OR(GraphTargetItem.PRECEDENCE_ASSIGMENT, true, true),    
     AS(GraphTargetItem.PRECEDENCE_RELATIONAL, true),
     DELETE(GraphTargetItem.PRECEDENCE_UNARY, false),
     INSTANCEOF(GraphTargetItem.PRECEDENCE_RELATIONAL, true),

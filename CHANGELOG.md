@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- AS3 support for logical AND/OR compound operator
+
 ### Fixed
 - [#1981] AS3 fully qualified (colliding) types in submethods
 - AS3 direct editation - Allow member or call for doubles

@@ -61,8 +61,8 @@ public class SetSuperIns extends InstructionDefinition implements SetTypeIns {
         if (value.getNotCoercedNoDup() instanceof CompoundableBinaryOp) {
             if (!obj.hasSideEffect() && !multiname.hasSideEffect()) {
                 CompoundableBinaryOp binaryOp = (CompoundableBinaryOp) value.getNotCoercedNoDup();
-                if (binaryOp.getLeftSide() instanceof GetSuperAVM2Item) {
-                    GetSuperAVM2Item getSuper = (GetSuperAVM2Item) binaryOp.getLeftSide();
+                if (binaryOp.getLeftSide().getNotCoerced() instanceof GetSuperAVM2Item) {
+                    GetSuperAVM2Item getSuper = (GetSuperAVM2Item) binaryOp.getLeftSide().getNotCoerced();
                     if (Objects.equals(obj, getSuper.object.getThroughDuplicate()) && Objects.equals(multiname, getSuper.propertyName)) {
                         result.setCompoundValue(binaryOp.getRightSide());
                         result.setCompoundOperator(binaryOp.getOperator());
