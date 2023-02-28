@@ -433,15 +433,23 @@ public abstract class Trait implements Cloneable, Serializable {
                         int val = abc.metadata_info.get(m).values[i];
                         writer.append("item ");
 
-                        writer.append("\"");
-                        writer.append(Helper.escapePCodeString(abc.constants.getString(key)));
-                        writer.append("\"");
+                        if (key == 0) {
+                            writer.append("null");
+                        } else {
+                            writer.append("\"");
+                            writer.append(Helper.escapePCodeString(abc.constants.getString(key)));
+                            writer.append("\"");
+                        }
 
                         writer.append(" ");
 
-                        writer.append("\"");
-                        writer.append(Helper.escapePCodeString(abc.constants.getString(val)));
-                        writer.append("\"");
+                        if (val == 0) {
+                            writer.append("null");
+                        } else {
+                            writer.append("\"");
+                            writer.append(Helper.escapePCodeString(abc.constants.getString(val)));
+                            writer.append("\"");
+                        }
                         writer.newLine();
                     }
                 }
