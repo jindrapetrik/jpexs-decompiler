@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -102,7 +103,7 @@ public abstract class Trait implements Cloneable, Serializable {
         for (int m : metadata) {
             if (m >= 0 && m < abc.metadata_info.size()) {
                 String name = abc.constants.getString(abc.metadata_info.get(m).name_index);
-                Map<String, String> data = new HashMap<>();
+                Map<String, String> data = new LinkedHashMap<>();
                 for (int i = 0; i < abc.metadata_info.get(m).keys.length; i++) {
                     data.put(abc.constants.getString(abc.metadata_info.get(m).keys[i]),
                             abc.constants.getString(abc.metadata_info.get(m).values[i]));

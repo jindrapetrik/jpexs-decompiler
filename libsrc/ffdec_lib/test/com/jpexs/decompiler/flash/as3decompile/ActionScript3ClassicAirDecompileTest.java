@@ -1384,6 +1384,12 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
     }
 
     @Test
+    public void testMetadata() {
+        decompileMethod("classic_air", "testMetadata", "trace(\"hello\");\r\n",
+                 false);
+    }
+
+    @Test
     public void testMissingDefault() {
         decompileMethod("classic_air", "testMissingDefault", "var jj:int = 1;\r\n"
                 + "switch(jj - 1)\r\n"

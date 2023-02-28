@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - AS3 direct editation - Allow comma operator in XML filter operation
 - AS3 direct editation - Allow comma operator in switch expressions
 - AS3 XML embedded variables display and direct edit
+- AS3 Metadata values order
 
 ## [18.3.6] - 2023-02-25
 ### Fixed
