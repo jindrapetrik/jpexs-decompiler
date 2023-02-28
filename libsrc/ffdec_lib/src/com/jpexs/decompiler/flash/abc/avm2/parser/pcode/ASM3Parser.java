@@ -156,8 +156,10 @@ public class ASM3Parser {
                 Map<String, String> items = new HashMap<>();
                 while (symb.type == ParsedSymbol.TYPE_KEYWORD_ITEM) {
                     symb = lexer.lex();
-                    expected(symb, ParsedSymbol.TYPE_STRING, "string key");
-                    String key = (String) symb.value;
+                    if (symb.type != ParsedSymbol.TYPE_KEYWORD_NULL && symb.type != ParsedSymbol.TYPE_STRING) {
+                        throw new AVM2ParseException("string/null value expected", lexer.yyline());
+                    }
+                    String key = symb.type == ParsedSymbol.TYPE_KEYWORD_NULL ? null : (String) symb.value;
                     symb = lexer.lex();
                     expected(symb, ParsedSymbol.TYPE_STRING, "string value");
                     String val = (String) symb.value;

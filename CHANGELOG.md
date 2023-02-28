@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - AS3 XML embedded variables display and direct edit
 - AS3 Metadata values order
 - AS3 Metadata in P-code formatting
+- AS3 Metadata single value (null item key)
 
 ## [18.3.6] - 2023-02-25
 ### Fixed

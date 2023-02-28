@@ -6,6 +6,7 @@ package tests
         [MyVarTag(var1 = "var 1", var2 = "var 2")]
         public var v:int = 5;
     
+        [MySingleTag("tag")]
 		public function run(): void
 		{
 			trace("hello");         
