@@ -1380,6 +1380,12 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
     }
 
     @Test
+    public void testMetadata() {
+        decompileMethod("classic", "testMetadata", "trace(\"hello\");\r\n",
+                 false);
+    }
+
+    @Test
     public void testMissingDefault() {
         decompileMethod("classic", "testMissingDefault", "var jj:int = 1;\r\n"
                 + "switch(jj)\r\n"

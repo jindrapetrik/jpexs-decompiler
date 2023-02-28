@@ -83,6 +83,7 @@ package
         TestInnerTry;
         TestLogicalComputing;
         TestManualConvert;
+        TestMetadata;
         TestMissingDefault;
         TestMultipleCondition;
         TestNamedAnonFunctions;
