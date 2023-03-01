@@ -180,7 +180,7 @@ public class ValueKind {
                 ret = "UInteger(" + constants.getUInt(value_index) + ")";
                 break;
             case CONSTANT_Double:
-                ret = "Double(" + constants.getDouble(value_index) + ")";
+                ret = "Double(" + EcmaScript.toString(constants.getDouble(value_index)) + ")";
                 break;
             case CONSTANT_DecimalOrFloat:
                 ret = "Decimal(" + constants.getDecimal(value_index) + ")";

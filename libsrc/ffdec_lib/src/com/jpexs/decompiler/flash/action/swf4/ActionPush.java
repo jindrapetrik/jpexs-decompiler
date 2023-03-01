@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.action.parser.pcode.ASMParsedSymbol;
 import com.jpexs.decompiler.flash.action.parser.pcode.FlasmLexer;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.ecma.Null;
 import com.jpexs.decompiler.flash.ecma.Undefined;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -346,6 +347,8 @@ public class ActionPush extends Action {
             ret = "\"" + Helper.escapeActionScriptString((String) value) + "\"";
         } else if (value instanceof RegisterNumber) {
             ret = ((RegisterNumber) value).toStringNoName();
+        } else if ((value instanceof Float)||(value instanceof Double)) {
+            ret = EcmaScript.toString(value);
         } else {
             ret = value.toString();
         }
