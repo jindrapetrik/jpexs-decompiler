@@ -456,6 +456,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 abcIndex.addAbc(((ABCContainerTag) tag).getABC());
             }
         }
+        abcIndex.rebuildPkgToObjectsNameMap();
         return abcIndex;
     }
 

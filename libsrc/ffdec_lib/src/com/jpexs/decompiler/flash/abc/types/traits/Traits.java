@@ -298,9 +298,9 @@ public class Traits implements Cloneable, Serializable {
         }
     }
 
-    public void getDependencies(int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public void getDependencies(int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         for (Trait t : traits) {
-            t.getDependencies(scriptIndex, classIndex, isStatic, customNs, abc, dependencies, uses, ignorePackage, fullyQualifiedNames);
+            t.getDependencies(scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, fullyQualifiedNames);
         }
     }
 

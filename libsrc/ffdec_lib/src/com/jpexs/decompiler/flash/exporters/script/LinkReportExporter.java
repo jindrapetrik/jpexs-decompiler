@@ -163,11 +163,9 @@ public class LinkReportExporter {
                 reportTrait(scriptIndex, externalDefs, existingObjects, swf, abc, it);
             }
             List<Dependency> dependencies = new ArrayList<>();
-            List<String> uses = new ArrayList<>();
-
             sb.append(indent(3)).append("<dep id=\"AS3\" />").append(newLineChar); //Automatic
 
-            tc.getDependencies(scriptIndex, -1, false, null, abc, dependencies, uses, new DottedChain(new String[]{"FAKE!PACKAGE"}), new ArrayList<>());
+            tc.getDependencies(scriptIndex, -1, false, null, abc, dependencies, new DottedChain(new String[]{"FAKE!PACKAGE"}), new ArrayList<>());
             for (Dependency dependency : dependencies) {
                 DottedChain dc = dependency.getId();
                 if (!"*".equals(dc.getLast())) {

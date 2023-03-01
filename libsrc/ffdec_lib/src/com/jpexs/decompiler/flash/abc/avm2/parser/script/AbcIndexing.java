@@ -40,6 +40,8 @@ import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -83,6 +85,7 @@ public final class AbcIndexing {
             for (ABCContainerTag at : swf.getAbcList()) {
                 addAbc(at.getABC());
             }
+            rebuildPkgToObjectsNameMap();
         }
     }
 
@@ -425,6 +428,8 @@ public final class AbcIndexing {
         }
     }
 
+    private Map<DottedChain, Set<String>> pkgToObjectsName = new LinkedHashMap<>();
+    
     private final Map<ClassDef, ClassIndex> classes = new HashMap<>();
 
     private final Map<PropertyDef, TraitIndex> instanceProperties = new HashMap<>();
@@ -436,6 +441,36 @@ public final class AbcIndexing {
     private final Map<PropertyNsDef, TraitIndex> classNsProperties = new HashMap<>();
 
     private final Map<PropertyNsDef, TraitIndex> scriptProperties = new HashMap<>();
+    
+    public void rebuildPkgToObjectsNameMap() {
+        pkgToObjectsName.clear();
+        for (ClassDef cd:classes.keySet()) {
+            if (!(cd.type instanceof TypeItem)) {
+                continue;
+            }
+            if (!pkgToObjectsName.containsKey(cd.pkg)) {
+                pkgToObjectsName.put(cd.pkg, new LinkedHashSet<>());
+            }            
+            pkgToObjectsName.get(cd.pkg).add(((TypeItem)cd.type).fullTypeName.getLast());
+        }
+        for (PropertyNsDef nsdef:scriptProperties.keySet()) {
+            if (!pkgToObjectsName.containsKey(nsdef.ns)) {
+                pkgToObjectsName.put(nsdef.ns, new LinkedHashSet<>());
+            }
+            pkgToObjectsName.get(nsdef.ns).add(nsdef.propName);
+        }
+    }
+    
+    public Set<String> getPackageObjects(DottedChain pkg) {
+        Set<String> classNames = new LinkedHashSet<>();
+        if (pkgToObjectsName.containsKey(pkg)) {
+            classNames.addAll(pkgToObjectsName.get(pkg));
+        }
+        if (parent != null) {
+            classNames.addAll(parent.getPackageObjects(pkg));
+        }
+        return classNames;
+    }
 
     public ClassIndex findClass(GraphTargetItem cls, ABC abc, Integer scriptIndex) {
         ClassDef keyWithScriptIndex = new ClassDef(cls, abc, scriptIndex);
@@ -717,6 +752,7 @@ public final class AbcIndexing {
         }
         removeAbc(abc);
         addAbc(abc);
+        rebuildPkgToObjectsNameMap();
     }
 
     public void removeAbc(ABC abc) {
@@ -808,7 +844,7 @@ public final class AbcIndexing {
             }
         }
         abcs.add(abc);
-        selectedAbc = abc;
+        selectedAbc = abc;        
     }
 
     public void selectAbc(ABC abc) {
@@ -816,6 +852,7 @@ public final class AbcIndexing {
             selectedAbc = abc;
         } else {
             addAbc(abc);
+            rebuildPkgToObjectsNameMap();
         }
     }
 
