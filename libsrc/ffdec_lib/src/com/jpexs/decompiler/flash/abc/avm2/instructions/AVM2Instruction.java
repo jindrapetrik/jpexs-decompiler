@@ -31,6 +31,7 @@ import com.jpexs.decompiler.flash.abc.types.Float4;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.configuration.Configuration;
+import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphSource;
@@ -327,7 +328,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                     } else {
                         s.append(" ");
                         try {
-                            s.append(constants.getDouble(operands[i]));
+                            s.append(EcmaScript.toString(constants.getDouble(operands[i])));
                         } catch (IndexOutOfBoundsException iob) {
                             s.append("Unknown(").append(operands[i]).append(")");
                         }  
@@ -339,7 +340,7 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                     } else {
                         s.append(" ");
                         try {
-                            s.append(constants.getFloat(operands[i]));
+                            s.append(EcmaScript.toString(constants.getFloat(operands[i])));
                         } catch (IndexOutOfBoundsException iob) {
                             s.append("Unknown(").append(operands[i]).append(")");
                         }  
@@ -351,10 +352,10 @@ public class AVM2Instruction implements Cloneable, GraphSourceItem {
                     } else {
                         try {
                             Float4 f4 = constants.getFloat4(operands[i]);
-                            s.append(" ").append(f4.values[0]);
-                            s.append(" ").append(f4.values[1]);
-                            s.append(" ").append(f4.values[2]);
-                            s.append(" ").append(f4.values[3]);
+                            s.append(" ").append(EcmaScript.toString(f4.values[0]));
+                            s.append(" ").append(EcmaScript.toString(f4.values[1]));
+                            s.append(" ").append(EcmaScript.toString(f4.values[2]));
+                            s.append(" ").append(EcmaScript.toString(f4.values[3]));
                         } catch (IndexOutOfBoundsException iob) {
                             s.append(" Unknown(").append(operands[i]).append(")");
                         }  

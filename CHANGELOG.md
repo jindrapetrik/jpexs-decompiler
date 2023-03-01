@@ -16,6 +16,9 @@ All notable changes to this project will be documented in this file.
 - AS3 Metadata single value (null item key)
 - [#1981] AS3 star import collisions
 
+### Changed
+- AS1/2/3 P-code - format Number values with EcmaScript toString function
+
 ## [18.3.6] - 2023-02-25
 ### Fixed
 - [#1970] FLA export - do not strip empty frames at the end of timeline
