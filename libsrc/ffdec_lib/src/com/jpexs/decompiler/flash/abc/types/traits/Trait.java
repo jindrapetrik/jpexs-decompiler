@@ -49,6 +49,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  *
@@ -170,14 +171,15 @@ public abstract class Trait implements Cloneable, Serializable {
         return getName(abc).getNamespace(abc.constants).getName(abc.constants);
     }
 
-    public void getDependencies(int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public void getDependencies(int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (ignoredCustom == null) {
             Namespace n = getName(abc).getNamespace(abc.constants);
             if (n.kind == Namespace.KIND_NAMESPACE) {
                 ignoredCustom = n.getName(abc.constants).toRawString();
             }
         }
-        DependencyParser.parseUsagesFromMultiname(ignoredCustom, abc, dependencies, uses, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE);
+        DependencyParser.parseDependenciesFromMultiname(ignoredCustom, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE);
+        //DependencyParser.parseUsagesFromMultiname(ignoredCustom, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE);
     }
 
     private static final String[] builtInClasses = {"ArgumentError", "arguments", "Array", "Boolean", "Class", "Date", "DefinitionError", "Error", "EvalError", "Function", "int", "JSON", "Math", "Namespace", "Number", "Object", "QName", "RangeError", "ReferenceError", "RegExp", "SecurityError", "String", "SyntaxError", "TypeError", "uint", "URIError", "VerifyError", "XML", "XMLList"};
@@ -190,23 +192,8 @@ public abstract class Trait implements Cloneable, Serializable {
         }
         return false;
     }
-
-    
-    public void writeUses(int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer) throws InterruptedException {
-        List<Dependency> dependencies = new ArrayList<>();
-        List<String> uses = new ArrayList<>();
-        String customNs = null;
-        Namespace ns = getName(abc).getNamespace(abc.constants);
-        if (ns.kind == Namespace.KIND_NAMESPACE) {
-            customNs = ns.getName(abc.constants).toRawString();
-        }
-        getDependencies(scriptIndex, classIndex, isStatic, customNs, abc, dependencies, uses, null, new ArrayList<>());
-        for (String us : uses) {
-            writer.appendNoHilight("use namespace " + us + ";").newLine();
-        }
-    }
-    
-    public void writeImportsUsages(int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+        
+    public void writeImports(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
 
         List<String> namesInThisPackage = new ArrayList<>();
         for (ABCContainerTag tag : abc.getAbcTags()) {
@@ -222,13 +209,12 @@ public abstract class Trait implements Cloneable, Serializable {
 
         //imports
         List<Dependency> dependencies = new ArrayList<>();
-        List<String> uses = new ArrayList<>();
         String customNs = null;
         Namespace ns = getName(abc).getNamespace(abc.constants);
         if (ns.kind == Namespace.KIND_NAMESPACE) {
             customNs = ns.getName(abc.constants).toRawString();
         }
-        getDependencies(scriptIndex, classIndex, isStatic, customNs, abc, dependencies, uses, ignorePackage, new ArrayList<>());
+        getDependencies(scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, new ArrayList<>());
 
         List<DottedChain> imports = new ArrayList<>();
         for (Dependency d : dependencies) {
@@ -240,21 +226,21 @@ public abstract class Trait implements Cloneable, Serializable {
         List<String> importnames = new ArrayList<>();
         importnames.addAll(namesInThisPackage);
         importnames.addAll(Arrays.asList(builtInClasses));
-        for (int i = 0; i < imports.size(); i++) {
-            DottedChain ipath = imports.get(i);
-            if (ipath.getWithoutLast().equals(ignorePackage)) { //do not check classes from same package, they are imported automatically
-                imports.remove(i);
-                i--;
-                continue;
-            }
-            String name = ipath.getLast();
-            if (importnames.contains(name)) {
-                fullyQualifiedNames.add(DottedChain.parseWithSuffix(name));
-            } else {
-                importnames.add(name);
+        
+        for (DottedChain imp : imports) {
+            if (imp.getLast().equals("*")) {
+                Set<String> objectsInPkg = abcIndex.getPackageObjects(imp.getWithoutLast());
+                for (String objectName : objectsInPkg) {
+                    if (importnames.contains(objectName)) {
+                        fullyQualifiedNames.add(DottedChain.parseWithSuffix(objectName));
+                    } else {
+                        importnames.add(objectName);
+                    }
+                }
             }
         }
-
+        
+        
         for (int i = 0; i < imports.size(); i++) {
             DottedChain imp = imports.get(i);
             DottedChain pkg = imp.getWithoutLast();
@@ -268,6 +254,28 @@ public abstract class Trait implements Cloneable, Serializable {
                 i--;
             }
         }
+        
+        for (int i = 0; i < imports.size(); i++) {
+            DottedChain ipath = imports.get(i);
+            String name = ipath.getLast();
+            if (ipath.getWithoutLast().equals(ignorePackage)) { //do not check classes from same package, they are imported automatically
+                if (importnames.contains(name)) {
+                    fullyQualifiedNames.add(DottedChain.parseWithSuffix(name));
+                }
+                
+                imports.remove(i);
+                i--;                
+                continue;
+            }
+            
+            if (importnames.contains(name)) {
+                fullyQualifiedNames.add(DottedChain.parseWithSuffix(name));
+            } else {
+                importnames.add(name);
+            }
+        }
+
+        
 
         boolean hasImport = false;
         Collections.sort(imports);
@@ -291,12 +299,6 @@ public abstract class Trait implements Cloneable, Serializable {
         if (hasImport) {
             writer.newLine();
         }
-        /*for (String us : uses) {
-            writer.appendNoHilight("use namespace " + us + ";").newLine();
-        }
-        if (uses.size() > 0) {
-            writer.newLine();
-        }*/
     }
 
     public final GraphTextWriter getMetaData(Trait parent, ConvertData convertData, ABC abc, GraphTextWriter writer) {

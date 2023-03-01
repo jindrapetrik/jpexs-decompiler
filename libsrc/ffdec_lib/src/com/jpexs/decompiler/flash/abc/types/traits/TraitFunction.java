@@ -82,7 +82,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
 
     @Override
     public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
-        writeImportsUsages(scriptIndex, classIndex, false, abc, writer, getPackage(abc), fullyQualifiedNames);
+        writeImports(abcIndex, scriptIndex, classIndex, false, abc, writer, getPackage(abc), fullyQualifiedNames);
         getMetaData(parent, convertData, abc, writer);
         writer.startMethod(method_info);
         toStringHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
@@ -105,7 +105,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     @Override
     public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
         fullyQualifiedNames = new ArrayList<>();
-        writeImportsUsages(scriptIndex, classIndex, false, abc, writer, getPackage(abc), fullyQualifiedNames);
+        writeImports(abcIndex, scriptIndex, classIndex, false, abc, writer, getPackage(abc), fullyQualifiedNames);
         writer.startMethod(method_info);
         convertHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
         int bodyIndex = abc.findBodyIndex(method_info);
@@ -133,14 +133,14 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void getDependencies(int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, List<String> uses, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public void getDependencies(int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getDependencies(scriptIndex, classIndex, false, customNs, abc, dependencies, uses, ignorePackage, fullyQualifiedNames);
+        super.getDependencies(scriptIndex, classIndex, false, customNs, abc, dependencies, ignorePackage, fullyQualifiedNames);
         //if (method_info != 0)
         {
-            DependencyParser.parseDependenciesFromMethodInfo(this, scriptIndex, classIndex, false, customNs, abc, method_info, dependencies, uses, ignorePackage, fullyQualifiedNames, new ArrayList<>());
+            DependencyParser.parseDependenciesFromMethodInfo(this, scriptIndex, classIndex, false, customNs, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>());
         }
     }
 
