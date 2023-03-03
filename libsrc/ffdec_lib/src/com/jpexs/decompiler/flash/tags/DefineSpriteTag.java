@@ -400,8 +400,8 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     }
 
     @Override
-    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
-        return getTimeline().getOutline(frame, time, renderContext, transformation, stroked, viewRect, unzoom);
+    public Shape getOutline(boolean fast, int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
+        return getTimeline().getOutline(fast, frame, time, renderContext, transformation, stroked, viewRect, unzoom);
     }
 
     @Override

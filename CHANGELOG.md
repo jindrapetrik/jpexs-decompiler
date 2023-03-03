@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 - AS3 Metadata in P-code formatting
 - AS3 Metadata single value (null item key)
 - [#1981] AS3 star import collisions
+- [#1982] Slow calculation of large shape outlines - now use only rectangles for large shapes
 
 ### Changed
 - AS1/2/3 P-code - format Number values with EcmaScript toString function
@@ -2983,6 +2984,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1981]: https://www.free-decompiler.com/flash/issues/1981
+[#1982]: https://www.free-decompiler.com/flash/issues/1982
 [#1970]: https://www.free-decompiler.com/flash/issues/1970
 [#1972]: https://www.free-decompiler.com/flash/issues/1972
 [#1973]: https://www.free-decompiler.com/flash/issues/1973

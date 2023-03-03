@@ -349,8 +349,8 @@ public abstract class MorphShapeTag extends DrawableTag {
     }
 
     @Override
-    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
-        return transformation.toTransform().createTransformedShape(getShapeAtRatio(ratio).getOutline(getShapeNum() == 2 ? 4 : 1, swf, stroked));
+    public Shape getOutline(boolean fast, int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
+        return transformation.toTransform().createTransformedShape(getShapeAtRatio(ratio).getOutline(fast, getShapeNum() == 2 ? 4 : 1, swf, stroked));
     }
 
     @Override

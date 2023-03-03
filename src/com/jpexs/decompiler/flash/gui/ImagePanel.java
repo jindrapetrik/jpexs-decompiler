@@ -2978,7 +2978,11 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     }
 
                     int dframe = time % drawableFrameCount;
-                    Shape outline = dt.getOutline(dframe, time, ds.ratio, renderContext, Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m.concatenate(new Matrix(ds.matrix))), true, viewRect, zoom);
+                    Matrix transformation = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m.concatenate(new Matrix(ds.matrix)));
+                    RECT dtRect = dt.getRect();
+                    Rectangle2D dtRect2D = new Rectangle2D.Double(dtRect.Xmin, dtRect.Ymin, dtRect.getWidth(), dtRect.getHeight());
+                    Shape outline = transformation.toTransform().createTransformedShape(dtRect2D);
+                    //dt.getOutline(dframe, time, ds.ratio, renderContext, Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m.concatenate(new Matrix(ds.matrix))), true, viewRect, zoom);
                     Rectangle bounds = outline.getBounds();
                     gg.setStroke(new BasicStroke(2.0f,
                             BasicStroke.CAP_BUTT,
@@ -3007,10 +3011,10 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
 
                     int dframe = time % drawableFrameCount;
                     //Matrix finalMatrix = Matrix.getScaleInstance(1 / SWF.unitDivisor).concatenate(m).concatenate(new Matrix(ds.matrix));
-                    Shape outline = dt.getOutline(dframe, time, ds.ratio, renderContext, transform, true, viewRect, zoom);
+                    Shape outline = dt.getOutline(true, dframe, time, ds.ratio, renderContext, transform, true, viewRect, zoom);
 
                     if (temporaryMatrix != null) {
-                        Shape tempOutline = dt.getOutline(dframe, time, ds.ratio, renderContext, temporaryMatrix, true, viewRect, zoom);
+                        Shape tempOutline = dt.getOutline(true, dframe, time, ds.ratio, renderContext, temporaryMatrix, true, viewRect, zoom);
                         gg.setStroke(new BasicStroke(1));
                         gg.setPaint(Color.black);
                         gg.draw(tempOutline);
@@ -3995,7 +3999,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                     if (lowQuality) {
                         zoomDouble /= LQ_FACTOR;
                     }
-                    Shape outline = dt.getOutline(dframe, time, ds.ratio, renderContext, b.concatenate(new Matrix(ds.matrix)), true, _viewRect, zoomDouble);
+                    Shape outline = dt.getOutline(true, dframe, time, ds.ratio, renderContext, b.concatenate(new Matrix(ds.matrix)), true, _viewRect, zoomDouble);
                     return outline.getBounds2D();
                 }
             }
