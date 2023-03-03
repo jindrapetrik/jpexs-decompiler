@@ -813,7 +813,7 @@ public class Timeline {
                     int dy = (int) (viewRect.yMin * unzoom);
                     Point cursorPositionInView = new Point((int) Math.round(renderContext.cursorPosition.x * unzoom) - dx, (int) Math.round(renderContext.cursorPosition.y * unzoom) - dy);
 
-                    Shape buttonShape = drawable.getOutline(ButtonTag.FRAME_HITTEST, dtime, ratio, renderContext, absMat, true, viewRect, unzoom);
+                    Shape buttonShape = ((ButtonTag) drawable).getOutline(true, ButtonTag.FRAME_HITTEST, dtime, ratio, renderContext, absMat, true, viewRect, unzoom);
                     if (buttonShape.contains(cursorPositionInView)) {
                         renderContext.mouseOverButton = (ButtonTag) drawable;
                         if (renderContext.mouseButton > 0) {
@@ -980,7 +980,7 @@ public class Timeline {
                         renderContext.stateUnderCursor.add(layer);
                     }
                 } else if (absMat.transform(new ExportRectangle(boundRect)).contains(cursorPositionInView)) {
-                    Shape shape = drawable.getOutline(dframe, dtime, layer.ratio, renderContext, absMat, true, viewRect, unzoom);
+                    Shape shape = drawable.getOutline(true, dframe, dtime, layer.ratio, renderContext, absMat, true, viewRect, unzoom);
                     if (shape.contains(cursorPositionInView)) {
                         renderContext.stateUnderCursor.add(layer);
                     }
@@ -991,7 +991,7 @@ public class Timeline {
                 Graphics2D g2 = (Graphics2D) renderContext.borderImage.getGraphics();
                 g2.setPaint(Color.red);
                 g2.setStroke(new BasicStroke(2));
-                Shape shape = drawable.getOutline(dframe, dtime, layer.ratio, renderContext, absMat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)), true, viewRect, unzoom);
+                Shape shape = drawable.getOutline(true, dframe, dtime, layer.ratio, renderContext, absMat.preConcatenate(Matrix.getScaleInstance(1 / SWF.unitDivisor)), true, viewRect, unzoom);
                 g2.draw(shape);
             }
             if (!(sameImage && canUseSameImage)) {
@@ -1341,7 +1341,7 @@ public class Timeline {
         }
     }
 
-    public Shape getOutline(int frame, int time, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
+    public Shape getOutline(boolean fast, int frame, int time, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
         Frame fr = getFrame(frame);
         Area area = new Area();
         Stack<Clip> clips = new Stack<>();
@@ -1378,7 +1378,7 @@ public class Timeline {
                     dframe = ButtonTag.FRAME_UP;
                     if (renderContext.cursorPosition != null) {
                         ButtonTag buttonTag = (ButtonTag) character;
-                        Shape buttonShape = buttonTag.getOutline(ButtonTag.FRAME_HITTEST, time, layer.ratio, renderContext, m, stroked, viewRect, unzoom);
+                        Shape buttonShape = buttonTag.getOutline(fast, ButtonTag.FRAME_HITTEST, time, layer.ratio, renderContext, m, stroked, viewRect, unzoom);
                         int dx = (int) Math.round(viewRect.xMin * unzoom);
                         int dy = (int) Math.round(viewRect.yMin * unzoom);
                         Point cursorPositionInView = new Point((int) Math.round(renderContext.cursorPosition.x * unzoom) - dx, (int) Math.round(renderContext.cursorPosition.y * unzoom) - dy);
@@ -1392,7 +1392,7 @@ public class Timeline {
                     }
                 }
 
-                Shape cshape = ((DrawableTag) character).getOutline(dframe, time, layer.ratio, renderContext, m, stroked, viewRect, unzoom);
+                Shape cshape = ((DrawableTag) character).getOutline(fast, dframe, time, layer.ratio, renderContext, m, stroked, viewRect, unzoom);
                 Area addArea = new Area(cshape);
                 if (currentClip != null) {
                     Area a = new Area(new Rectangle(displayRect.Xmin, displayRect.Ymin, displayRect.getWidth(), displayRect.getHeight()));

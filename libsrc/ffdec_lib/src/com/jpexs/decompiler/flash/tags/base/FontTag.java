@@ -427,7 +427,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     @Override
-    public Shape getOutline(int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
+    public Shape getOutline(boolean fast, int frame, int time, int ratio, RenderContext renderContext, Matrix transformation, boolean stroked, ExportRectangle viewRect, double unzoom) {
         RECT r = getRect();
         return new Area(new Rectangle(r.Xmin, r.Ymin, r.getWidth(), r.getHeight()));
     }
