@@ -279,7 +279,7 @@ public class ActionScript2ClassDetector {
     }
 
     private boolean checkClassContent(List<GraphTargetItem> parts, HashMap<String, GraphTargetItem> variables, int partsPos, int commandsStartPos, int commandsEndPos, List<GraphTargetItem> commands, List<String> classNamePath, String scriptPath) {
-                    
+
         try {
 
             GraphTargetItem extendsOp = null;
@@ -299,7 +299,7 @@ public class ActionScript2ClassDetector {
                     StoreRegisterActionItem sr = (StoreRegisterActionItem) item;
                     definedRegisters.add(sr.register.number);
                 }
-            }           
+            }
 
             if (parts.size() > partsPos) {
                 item = parts.get(partsPos);
@@ -341,16 +341,18 @@ public class ActionScript2ClassDetector {
                     List<String> protoPath = new ArrayList<>(classNamePath);
                     protoPath.add("prototype");
                     List<String> smPath = getSetMembersPath(sm);
-                    if (smPath.get(0).equals("_global")) {
-                        smPath.remove(0);
-                    }
-                    if (smPath.equals(protoPath)) {
-                        if (sm.value instanceof StoreRegisterActionItem) {
-                            partsPos++;
-                            if (parts.size() > partsPos) {
-                                item = parts.get(partsPos);
-                            } else {
-                                item = null;
+                    if (smPath != null) { //null = can start with TempRegister for example
+                        if (smPath.get(0).equals("_global")) {
+                            smPath.remove(0);
+                        }
+                        if (smPath.equals(protoPath)) {
+                            if (sm.value instanceof StoreRegisterActionItem) {
+                                partsPos++;
+                                if (parts.size() > partsPos) {
+                                    item = parts.get(partsPos);
+                                } else {
+                                    item = null;
+                                }
                             }
                         }
                     }
@@ -695,7 +697,7 @@ public class ActionScript2ClassDetector {
                 } else if (item instanceof DirectValueActionItem) {
                     //ignore such values
                     //TODO: maybe somehow display in the class ?
-                } else if (item instanceof ScriptEndItem){
+                } else if (item instanceof ScriptEndItem) {
                     //ignore
                 } else {
                     throw new AssertException("unknown item - " + item.getClass().getSimpleName());
@@ -819,7 +821,7 @@ public class ActionScript2ClassDetector {
                                 return true;
                             } else {
                                 break check_variant1;
-                            }                           
+                            }
                         } else if (this.checkClassContent(ifItem.onTrue, variables, 0, pos, checkPos, commands, classPath, scriptPath)) {
                             return true;
                         } else {
