@@ -34,6 +34,8 @@ import java.util.Objects;
  */
 public class NamespaceItem {
 
+    public static final int KIND_NAMESPACE_CUSTOM = -2;
+    
     public DottedChain name;
 
     public int kind;
@@ -89,6 +91,9 @@ public class NamespaceItem {
             return;
         }
         if (kind == Namespace.KIND_NAMESPACE) {
+            nsIndex = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_NAMESPACE, name, 0, true);
+        }
+        if (kind == KIND_NAMESPACE_CUSTOM) {
             String custom = name.toRawString();
             PropertyAVM2Item prop = new PropertyAVM2Item(null, false, custom, "", abcIndex, openedNamespaces, new ArrayList<>());
             Reference<ValueKind> value = new Reference<>(null);
@@ -125,7 +130,7 @@ public class NamespaceItem {
                     }
                 }
 
-                throw new CompilationException("Namespace \"" + name + "\"+not defined", -1);
+                throw new CompilationException("Namespace \"" + name + "\" not defined", -1);
             }
             nsIndex = abcIndex.getSelectedAbc().constants.getNamespaceId(Namespace.KIND_NAMESPACE,
                     outAbc.getVal().constants.getNamespace(value.getVal().value_index).getName(outAbc.getVal().constants), 0, true);

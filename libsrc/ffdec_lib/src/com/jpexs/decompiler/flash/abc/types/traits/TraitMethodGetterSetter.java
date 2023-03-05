@@ -63,11 +63,11 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public void getDependencies(int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getDependencies(scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, fullyQualifiedNames);
+        super.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, fullyQualifiedNames);
 
         if (customNs == null) {
             Namespace n = getName(abc).getNamespace(abc.constants);
@@ -77,7 +77,7 @@ public class TraitMethodGetterSetter extends Trait {
         }
         //if (method_info != 0)
         {
-            DependencyParser.parseDependenciesFromMethodInfo(this, scriptIndex, classIndex, isStatic, customNs, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>());
+            DependencyParser.parseDependenciesFromMethodInfo(abcIndex, this, scriptIndex, classIndex, isStatic, customNs, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>());
         }
     }
 

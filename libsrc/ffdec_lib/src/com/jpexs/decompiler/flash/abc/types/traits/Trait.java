@@ -171,14 +171,14 @@ public abstract class Trait implements Cloneable, Serializable {
         return getName(abc).getNamespace(abc.constants).getName(abc.constants);
     }
 
-    public void getDependencies(int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (ignoredCustom == null) {
             Namespace n = getName(abc).getNamespace(abc.constants);
             if (n.kind == Namespace.KIND_NAMESPACE) {
                 ignoredCustom = n.getName(abc.constants).toRawString();
             }
         }
-        DependencyParser.parseDependenciesFromMultiname(ignoredCustom, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE);
+        DependencyParser.parseDependenciesFromMultiname(abcIndex, ignoredCustom, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE);
         //DependencyParser.parseUsagesFromMultiname(ignoredCustom, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE);
     }
 
@@ -214,7 +214,7 @@ public abstract class Trait implements Cloneable, Serializable {
         if (ns.kind == Namespace.KIND_NAMESPACE) {
             customNs = ns.getName(abc.constants).toRawString();
         }
-        getDependencies(scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, new ArrayList<>());
+        getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, new ArrayList<>());
 
         List<DottedChain> imports = new ArrayList<>();
         for (Dependency d : dependencies) {
@@ -349,7 +349,11 @@ public abstract class Trait implements Cloneable, Serializable {
 
             Namespace ns = m.getNamespace(abc.constants);
 
-            if (nsname != null) {
+            if (ns.kind == Namespace.KIND_NAMESPACE && nsname == null) {
+                writer.append("§§namespace(\"");
+                writer.append(Helper.escapeActionScriptString(ns.getRawName(abc.constants)));
+                writer.append("\") ");
+            } else if (nsname != null) {
                 String identifier = IdentifiersDeobfuscation.printIdentifier(true, nsname);
                 if (identifier != null && !identifier.isEmpty()) {
                     writer.appendNoHilight(identifier).appendNoHilight(" ");

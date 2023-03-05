@@ -158,7 +158,7 @@ public class ValueKind {
             case CONSTANT_Undefined:
                 ret = "undefined";
                 break;
-            case CONSTANT_Namespace:
+            case CONSTANT_Namespace:                
             case CONSTANT_PackageInternalNs:
             case CONSTANT_ProtectedNamespace:
             case CONSTANT_ExplicitNamespace:
@@ -200,13 +200,34 @@ public class ValueKind {
             case CONSTANT_Undefined:
                 ret = "Undefined()"; //"Void()" is also synonym
                 break;
-            case CONSTANT_Namespace:
+            case CONSTANT_Namespace:               
             case CONSTANT_PackageInternalNs:
             case CONSTANT_ProtectedNamespace:
             case CONSTANT_ExplicitNamespace:
             case CONSTANT_StaticProtectedNs:
-            case CONSTANT_PrivateNs:
-                ret = constants.getNamespace(value_index).getKindStr() + "(\"" + constants.getNamespace(value_index).getName(constants).toRawString() + "\")"; //assume not null name
+            case CONSTANT_PrivateNs:                
+                String nsVal = constants.getNamespace(value_index).getKindStr() + "(\"" + constants.getNamespace(value_index).getName(constants).toRawString() + "\")"; //assume not null name
+                
+                switch (value_kind) {
+                    case CONSTANT_Namespace:   
+                        ret = "Namespace(" + nsVal + ")";
+                        break;
+                    case CONSTANT_PackageInternalNs:
+                        ret = "PackageInternalNs(" + nsVal + ")";
+                        break;
+                    case CONSTANT_ProtectedNamespace:
+                        ret = "ProtectedNamespace(" + nsVal + ")";
+                        break;
+                    case CONSTANT_ExplicitNamespace:
+                        ret = "ExplicitNamespace(" + nsVal + ")";
+                        break;
+                    case CONSTANT_StaticProtectedNs:
+                        ret = "StaticProtectedNs(" + nsVal + ")";
+                        break;
+                    case CONSTANT_PrivateNs:
+                        ret = "PrivateNamespace(" + nsVal + ")";
+                        break;
+                }
                 break;
         }
         return ret;

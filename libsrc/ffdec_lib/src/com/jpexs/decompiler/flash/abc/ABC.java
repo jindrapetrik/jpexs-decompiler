@@ -2222,7 +2222,10 @@ public class ABC implements Openable {
         String name = constants.getString(ns.name_index);
         if (name.equals("http://adobe.com/AS3/2006/builtin")) { //TODO: This should really be resolved using ABC indexing, not hardcoded constant
             return DottedChain.parseNoSuffix("AS3");
-        }
+        }  
+        
+        return getSwf().getAbcIndex().nsValueToName(name);      
+        /*
         for (ABCContainerTag abcTag : getAbcTags()) {
             DottedChain dc = abcTag.getABC().nsValueToName(name);
             nsname = dc.getLast();
@@ -2233,8 +2236,8 @@ public class ABC implements Openable {
             if (!nsname.isEmpty()) {
                 return dc;
             }
-        }
-        return null;
+        }*/
+        //return null;
     }
 
     public void clearPacksCache() {

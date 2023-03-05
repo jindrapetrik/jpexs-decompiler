@@ -398,7 +398,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     @Internal
     private AbcIndexing abcIndex;
-
+    
+    private int numAbcIndexDependencies = 0;
+    
+        
     private static AbcIndexing playerGlobalAbcIndex;
 
     private static AbcIndexing airGlobalAbcIndex;
@@ -458,6 +461,24 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         abcIndex.rebuildPkgToObjectsNameMap();
         return abcIndex;
+    }
+
+    public int getNumAbcIndexDependencies() {
+        return numAbcIndexDependencies;
+    }        
+    
+    public void setAbcIndexDependencies(List<SWF> swfs) {
+        abcIndex = null;
+        getAbcIndex();
+        for (SWF swf:swfs) {
+            for (Tag tag:swf.tags) {
+                if (tag instanceof ABCContainerTag) {
+                    abcIndex.addAbc(((ABCContainerTag)tag).getABC());
+                }
+            }
+        }
+        abcIndex.rebuildPkgToObjectsNameMap();
+        numAbcIndexDependencies = swfs.size();
     }
 
     public static void initPlayer() throws IOException, InterruptedException {

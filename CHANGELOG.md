@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - AS3 support for logical AND/OR compound operator
+- AS3 Display missing namespaces along traits as §§namespace("url")
+- [#1892] AS3 option to select SWF dependencies to properly resolve namespaces, types, etc. (currently in GUI only)
 
 ### Fixed
 - [#1981] AS3 fully qualified (colliding) types in submethods
@@ -17,6 +19,8 @@ All notable changes to this project will be documented in this file.
 - [#1981] AS3 star import collisions
 - [#1982] Slow calculation of large shape outlines - now use only rectangles for large shapes
 - [#1986] AS2 Class detection - NullPointerException on certain classes
+- AS3 P-code ValueKind namespaces handling
+- AS3 direct editation - namespace definition without explicit value
 
 ### Changed
 - AS1/2/3 P-code - format Number values with EcmaScript toString function
@@ -2984,6 +2988,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1892]: https://www.free-decompiler.com/flash/issues/1892
 [#1981]: https://www.free-decompiler.com/flash/issues/1981
 [#1982]: https://www.free-decompiler.com/flash/issues/1982
 [#1986]: https://www.free-decompiler.com/flash/issues/1986
@@ -3015,7 +3020,6 @@ All notable changes to this project will be documented in this file.
 [#1913]: https://www.free-decompiler.com/flash/issues/1913
 [#1894]: https://www.free-decompiler.com/flash/issues/1894
 [#1801]: https://www.free-decompiler.com/flash/issues/1801
-[#1892]: https://www.free-decompiler.com/flash/issues/1892
 [#1936]: https://www.free-decompiler.com/flash/issues/1936
 [#1937]: https://www.free-decompiler.com/flash/issues/1937
 [#1458]: https://www.free-decompiler.com/flash/issues/1458

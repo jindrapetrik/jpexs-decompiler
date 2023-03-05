@@ -42,12 +42,14 @@ public class ConstAVM2Item extends AVM2Item {
     public int line;
 
     public NamespaceItem pkg;
+    
+    public boolean generatedNs;
 
     public boolean isStatic() {
         return isStatic;
     }
 
-    public ConstAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, String customNamespace, boolean isStatic, String var, GraphTargetItem type, GraphTargetItem value, int line) {
+    public ConstAVM2Item(List<Map.Entry<String, Map<String, String>>> metadata, NamespaceItem pkg, String customNamespace, boolean isStatic, String var, GraphTargetItem type, GraphTargetItem value, int line, boolean generatedNs) {
 
         super(null, null, NOPRECEDENCE, value);
         this.metadata = metadata;
@@ -57,6 +59,7 @@ public class ConstAVM2Item extends AVM2Item {
         this.var = var;
         this.type = type;
         this.customNamespace = customNamespace;
+        this.generatedNs = generatedNs;
     }
 
     @Override
