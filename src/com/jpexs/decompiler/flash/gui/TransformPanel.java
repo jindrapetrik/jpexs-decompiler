@@ -895,14 +895,7 @@ public class TransformPanel extends JPanel {
         } catch (ParseException ex) {
             throw new NumberFormatException();
         }
-    }
-
-    public static void main(String[] args) {
-        System.out.println("20 twip to px =" + convertUnit(20, Unit.TWIP, Unit.PX));
-        System.out.println("1 turn to deg =" + convertUnit(1, Unit.TURN, Unit.DEG));
-        System.out.println("1 deg to rad =" + convertUnit(1, Unit.DEG, Unit.RAD));
-        System.out.println("1 deg to grad =" + convertUnit(1, Unit.DEG, Unit.GRAD));
-    }
+    } 
 }
 
 class RegistrationPointPanel extends JPanel {
