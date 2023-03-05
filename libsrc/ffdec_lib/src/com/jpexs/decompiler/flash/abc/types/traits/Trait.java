@@ -349,7 +349,9 @@ public abstract class Trait implements Cloneable, Serializable {
 
             Namespace ns = m.getNamespace(abc.constants);
 
-            if (ns.kind == Namespace.KIND_NAMESPACE && nsname == null && !insideInterface) {
+            if (insideInterface) {
+                //no namespace identifier
+            } else if (ns.kind == Namespace.KIND_NAMESPACE && nsname == null) {
                 writer.append("§§namespace(\"");
                 writer.append(Helper.escapeActionScriptString(ns.getRawName(abc.constants)));
                 writer.append("\") ");
