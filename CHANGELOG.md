@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - [#1986] AS2 Class detection - NullPointerException on certain classes
 - AS3 P-code ValueKind namespaces handling
 - AS3 direct editation - namespace definition without explicit value
+- AS3 direct editation - var/const outside package
 
 ### Changed
 - AS1/2/3 P-code - format Number values with EcmaScript toString function
