@@ -697,27 +697,28 @@ public class ActionScript3Parser {
                     case PUBLIC:
                         namespace = publicNs;
                         if (isInterface) {
-                            throw new AVM2ParseException("Interface cannot have public, private or protected modifier", lexer.yyline());
+                            throw new AVM2ParseException("Interface members cannot be declared public, private, protected, or internal", lexer.yyline());
                         }
                         break;
                     case PRIVATE:
                         isPrivate = true;
                         namespace = privateNs;
                         if (isInterface) {
-                            throw new AVM2ParseException("Interface cannot have public, private or protected modifier", lexer.yyline());
+                            throw new AVM2ParseException("Interface members cannot be declared public, private, protected, or internal", lexer.yyline());
                         }
                         break;
                     case PROTECTED:
                         namespace = protectedNs;
                         if (isInterface) {
-                            throw new AVM2ParseException("Interface cannot have public, private or protected modifier", lexer.yyline());
+                            throw new AVM2ParseException("Interface members cannot be declared public, private, protected, or internal", lexer.yyline());
                         }
                         break;
                     case INTERNAL:
                         namespace = packageInternalNs;
-                        break;
-                        
-                         
+                        if (isInterface) {
+                            throw new AVM2ParseException("Interface members cannot be declared public, private, protected, or internal", lexer.yyline());
+                        }
+                        break;                                                 
                     case PREPROCESSOR:    
                         if (((String)s.value).toLowerCase().equals("namespace")) {
                                 expectedType(SymbolType.PARENT_OPEN);
