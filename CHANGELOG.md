@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - AS3 support for logical AND/OR compound operator
 - AS3 Display missing namespaces along traits as §§namespace("url")
-- [#1892] AS3 option to select SWF dependencies to properly resolve namespaces, types, etc. (currently in GUI only)
+- [#1888], [#1892] AS3 option to select SWF dependencies to properly resolve namespaces, types, etc. (currently in GUI only)
 
 ### Fixed
 - [#1981] AS3 fully qualified (colliding) types in submethods
@@ -2988,6 +2988,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
 [#1981]: https://www.free-decompiler.com/flash/issues/1981
 [#1982]: https://www.free-decompiler.com/flash/issues/1982
@@ -3010,7 +3011,6 @@ All notable changes to this project will be documented in this file.
 [#1948]: https://www.free-decompiler.com/flash/issues/1948
 [#1941]: https://www.free-decompiler.com/flash/issues/1941
 [#1951]: https://www.free-decompiler.com/flash/issues/1951
-[#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1953]: https://www.free-decompiler.com/flash/issues/1953
 [#1954]: https://www.free-decompiler.com/flash/issues/1954
 [#1944]: https://www.free-decompiler.com/flash/issues/1944
