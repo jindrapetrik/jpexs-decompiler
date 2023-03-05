@@ -162,9 +162,14 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "method"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_METHOD, yytext());}
   "metadata"                    {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_METADATA_BLOCK, yytext());}
   "item"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_ITEM, yytext());}
+  "instance"                    {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_INSTANCE, yytext());}
+  "extends"                     {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_EXTENDS, yytext());}
+  "implements"                  {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_IMPLEMENTS, yytext());}
+  "protectedns"                 {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_PROTECTEDNS_BLOCK, yytext());}
   "end"                         {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_END, yytext());}
   
 /*in params too:*/
+  "class"                       {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_CLASS, yytext());}
   "dispid"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_DISPID, yytext());}
   "slotid"                      {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_SLOTID, yytext());}
   "value"                       {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_VALUE, yytext());}
@@ -269,6 +274,10 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "FINAL"                      {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_FINAL, yytext());}
   "OVERRIDE"                   {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_OVERRIDE, yytext());}
   "METADATA"                   {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_METADATA, yytext());}
+  "SEALED"                     {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_SEALED, yytext());}
+  "INTERFACE"                  {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_INTERFACE, yytext());}
+  "PROTECTEDNS"                {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_PROTECTEDNS, yytext());}
+  "NON_NULLABLE"               {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NON_NULLABLE, yytext());}
   
   /* numeric literals */
 

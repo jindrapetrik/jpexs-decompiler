@@ -56,12 +56,16 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
     public JPanel unsupportedTraitPanel;
 
     public SlotConstTraitDetailPanel slotConstTraitPanel;
+    
+    public ClassTraitDetailPanel classTraitPanel;
 
     public static final String METHOD_GETTER_SETTER_TRAIT_CARD = "abc.detail.methodtrait";
 
     public static final String UNSUPPORTED_TRAIT_CARD = "abc.detail.unsupported";
 
     public static final String SLOT_CONST_TRAIT_CARD = "abc.detail.slotconsttrait";
+    
+    public static final String CLASS_TRAIT_CARD = "abc.detail.classstrait";
 
     private final JPanel innerPanel;
 
@@ -108,6 +112,9 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
 
         slotConstTraitPanel = new SlotConstTraitDetailPanel(abcPanel.decompiledTextArea);
         cardMap.put(SLOT_CONST_TRAIT_CARD, slotConstTraitPanel);
+        
+        classTraitPanel = new ClassTraitDetailPanel(abcPanel.decompiledTextArea);
+        cardMap.put(CLASS_TRAIT_CARD, classTraitPanel);
 
         for (String key : cardMap.keySet()) {
             innerPanel.add(cardMap.get(key), key);
@@ -181,6 +188,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
         topPanel.add(traitInfoPanel, BorderLayout.CENTER);
         methodTraitPanel.methodCodePanel.getSourceTextArea().addTextChangedListener(this::editorTextChanged);
         slotConstTraitPanel.slotConstEditor.addTextChangedListener(this::editorTextChanged);
+        classTraitPanel.classEditor.addTextChangedListener(this::editorTextChanged);
         add(topPanel, BorderLayout.NORTH);
     }
 
@@ -212,6 +220,7 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
         {
             slotConstTraitPanel.setEditMode(val);
             methodTraitPanel.setEditMode(val);
+            classTraitPanel.setEditMode(val);
             saveButton.setVisible(val);
             saveButton.setEnabled(false);
             editButton.setVisible(!val);
@@ -343,11 +352,13 @@ public class DetailPanel extends JPanel implements TagEditorPanel {
                     return;
                 }
                 int lastTrait = decompiledTextArea.lastTraitIndex;
+                int lastClassIndex = decompiledTextArea.getClassIndex();
 
                 Runnable reloadComplete = new Runnable() {
                     @Override
                     public void run() {
                         decompiledTextArea.removeScriptListener(this);
+                        decompiledTextArea.setClassIndex(lastClassIndex); //reload resets caret to first class
                         if (lastTrait == GraphTextWriter.TRAIT_UNKNOWN) {
                             decompiledTextArea.gotoLastMethod();
                         } else {

@@ -229,21 +229,21 @@ public class Traits implements Cloneable, Serializable {
             }
             writer.newLine();
             int h = abc.getGlobalTraitId(TraitType.METHOD /*non-initializer*/, isStatic, classIndex, t);
-            if (trait instanceof TraitClass) {
-                writer.startClass(((TraitClass) trait).class_info);
-            } else {
+            //if (trait instanceof TraitClass) {
+//                writer.startClass(((TraitClass) trait).class_info);
+            //} else {
                 writer.startTrait(h);
-            }
+            //}
             if (makePackages) {
                 trait.toStringPackaged(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             } else {
                 trait.toString(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             }
-            if (trait instanceof TraitClass) {
-                writer.endClass();
-            } else {
+            //if (trait instanceof TraitClass) {
+            //    writer.endClass();
+            //} else {
                 writer.endTrait();
-            }
+            //}
         }
         return writer;
     }

@@ -201,6 +201,23 @@ public class ParsedSymbol {
     public static final int TYPE_KEYWORD_END = 88;
     
     public static final int TYPE_KEYWORD_UNKNOWN = 89;
+    
+    public static final int TYPE_KEYWORD_SEALED = 90;
+
+    public static final int TYPE_KEYWORD_INTERFACE = 91;
+    
+    public static final int TYPE_KEYWORD_PROTECTEDNS = 92;
+    
+    public static final int TYPE_KEYWORD_NON_NULLABLE = 93;
+
+    public static final int TYPE_KEYWORD_INSTANCE = 94;
+    
+    public static final int TYPE_KEYWORD_EXTENDS = 95;
+    
+    public static final int TYPE_KEYWORD_IMPLEMENTS = 96;
+    
+    public static final int TYPE_KEYWORD_PROTECTEDNS_BLOCK = 97;
+
 
     public ParsedSymbol(int type, Object value) {
         this.type = type;
