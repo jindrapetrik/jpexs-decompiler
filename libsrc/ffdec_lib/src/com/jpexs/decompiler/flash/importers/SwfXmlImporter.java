@@ -39,6 +39,7 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.decompiler.flash.tags.TagTypeInfo;
 import com.jpexs.decompiler.flash.tags.UnknownTag;
@@ -313,6 +314,19 @@ public class SwfXmlImporter {
                 ((SWF) obj).setCharset(val);
                 continue;
             }
+            
+            //backwards compatibility
+            if (name.equals("reserved1") && "FileAttributesTag".equals(attributes.get("type"))) {
+                name = "reservedA";
+            }            
+            if (name.equals("reserved2") && "FileAttributesTag".equals(attributes.get("type"))) {
+                name = "swfRelativeUrls";
+            }
+            if (name.equals("reserved3") && "FileAttributesTag".equals(attributes.get("type"))) {
+                name = "reservedB";
+            }
+            
+            
             if (!name.equals("type")) {
                 try {
                     Field field = getField(cls, name);
