@@ -100,6 +100,7 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -127,7 +128,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -211,6 +211,8 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
     private final JButton cancelDecompiledButton = new JButton(AppStrings.translate("button.cancel"), View.getIcon("cancel16"));
 
     private String lastDecompiled = null;
+    
+    private JLabel linksLabel = new JLabel("");
 
     public MainPanel getMainPanel() {
         View.checkAccess();
@@ -260,6 +262,7 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         setDecompiledEditMode(false);
         navigator.setAbc(abc);
         updateConstList();
+        updateLinksLabel();
     }
 
     public void updateConstList() {
@@ -998,7 +1001,10 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         toolbarPanel = new JPanel(new BorderLayout());
         toolbarPanel.add(iconsPanel, BorderLayout.WEST);
 
-        JPanel librarySelectPanel = new JPanel(new FlowLayout());
+        JPanel libraryAndLinkPanel = new JPanel(new FlowLayout());
+        
+        LinkDialog linkDialog = new LinkDialog(mainPanel);
+        
         libraryComboBox = new JComboBox<>();
         libraryComboBox.addItem("AIR (airglobal.swc)");
         libraryComboBox.addItem("Flash (playerglobal.swc)");
@@ -1012,14 +1018,41 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
                 }
                 SwfSpecificCustomConfiguration conf = Configuration.getOrCreateSwfSpecificCustomConfiguration(swf.getShortPathTitle());
                 conf.setCustomData(CustomConfigurationKeys.KEY_LIBRARY, "" + libraryComboBox.getSelectedIndex());
-                swf.resetAbcIndex();
-                reload();
+                linkDialog.load(getSwf());
+                linkDialog.save(getSwf(), true);
             }
         });
 
-        librarySelectPanel.add(new JLabel(AppStrings.translate("library")));
-        librarySelectPanel.add(libraryComboBox);
-        toolbarPanel.add(librarySelectPanel, BorderLayout.EAST);
+        libraryAndLinkPanel.add(new JLabel(AppStrings.translate("library")));
+        libraryAndLinkPanel.add(libraryComboBox);
+        
+        
+        libraryAndLinkPanel.add(linksLabel);
+        
+        JButton linkButton = new JButton(View.getIcon("link16"));                
+        linkButton.setToolTipText(AppStrings.translate("button.abc.linkedSwfs.hint"));
+                       
+        linkDialog.addSaveListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                reload();
+            }            
+        });
+        
+        linkButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                linkDialog.setLocationRelativeTo(linkButton);
+                Point loc = new Point(0, linkButton.getHeight());
+                SwingUtilities.convertPointToScreen(loc, linkButton);
+                linkDialog.setLocation(loc);
+           
+                linkDialog.show(getSwf());                
+            }            
+        });
+        libraryAndLinkPanel.add(linkButton);
+        
+        toolbarPanel.add(libraryAndLinkPanel, BorderLayout.EAST);
 
         topPanel.add(toolbarPanel, BorderLayout.CENTER);
 
@@ -1384,7 +1417,22 @@ public class ABCPanel extends JPanel implements ItemListener, SearchListener<Scr
         }
 
         decompiledTextArea.reloadClass();
-        detailPanel.methodTraitPanel.methodCodePanel.clear();
+        detailPanel.methodTraitPanel.methodCodePanel.clear();                
+        updateLinksLabel();
+    }
+    
+    private void updateLinksLabel() {
+        SWF swf = getSwf();
+        if (swf == null) {
+            linksLabel.setText("");
+        } else {
+            int num = swf.getNumAbcIndexDependencies();      
+            if (num == 0) {
+                linksLabel.setText("");
+            } else {
+                linksLabel.setText(AppStrings.translate(num == 1 ? "abc.linkedSwfs.one" : "abc.linkedSwfs.more").replace("%num%", "" + num));
+            }
+        }
     }
 
     @Override

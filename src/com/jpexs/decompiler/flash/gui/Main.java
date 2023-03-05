@@ -47,6 +47,7 @@ import com.jpexs.decompiler.flash.console.CommandLineArgumentParser;
 import com.jpexs.decompiler.flash.console.ContextMenuTools;
 import com.jpexs.decompiler.flash.exporters.modes.ExeExportMode;
 import com.jpexs.decompiler.flash.gfx.GfxConvertor;
+import com.jpexs.decompiler.flash.gui.abc.LinkDialog;
 import com.jpexs.decompiler.flash.gui.debugger.DebugListener;
 import com.jpexs.decompiler.flash.gui.debugger.DebuggerTools;
 import com.jpexs.decompiler.flash.gui.pipes.FirstInstance;
@@ -119,6 +120,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1500,6 +1502,7 @@ public class Main {
             boolean first = true;
             SWF firstSWF = null;
             Openable firstOpenable = null;
+            List<OpenableList> openableLists = new ArrayList<>();
             for (int index = 0; index < sourceInfos.length; index++) {
                 OpenableSourceInfo sourceInfo = sourceInfos[index];
                 OpenableList openables = null;
@@ -1532,6 +1535,7 @@ public class Main {
                     continue;
                 }
 
+                openableLists.add(openables);                
                 final OpenableList openables1 = openables;
                 final boolean first1 = first;
                 first = false;
@@ -1558,6 +1562,31 @@ public class Main {
                 }
             }
 
+            
+            if (mainFrame != null) {
+                for (OpenableList openableList:openableLists) {
+                    for (Openable openable:openableList) {
+                        if (openable instanceof SWF) {
+                            SWF swf = (SWF) openable;
+                            SwfSpecificCustomConfiguration conf = Configuration.getSwfSpecificCustomConfiguration(swf.getShortPathTitle());
+                            if (conf != null) {
+                                String abcDependencies = conf.getCustomData(CustomConfigurationKeys.KEY_ABC_DEPENDENCIES, "");
+                                if (!abcDependencies.isEmpty()) {
+                                    String[] parts = (abcDependencies + LinkDialog.ABC_DEPS_SEPARATOR).split(Pattern.quote(LinkDialog.ABC_DEPS_SEPARATOR));
+                                    List<String> preselectedNames = new ArrayList<>();
+                                    for (String part : parts) {
+                                        if (!part.isEmpty()) {
+                                            preselectedNames.add(part);
+                                        }
+                                    }
+                                    swf.setAbcIndexDependencies(namesToSwfs(preselectedNames));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
             loadingDialog.setVisible(false);
             shouldCloseWhenClosingLoadingDialog = false;
 
@@ -2816,6 +2845,51 @@ public class Main {
         }
     }
 
+    public static List<SWF> namesToSwfs(List<String> names) {
+        List<SWF> ret = new ArrayList<>();
+        Map<String, SWF> swfs = new LinkedHashMap<>();
+        populateAllSWFs(swfs);
+        for (String name : names) {
+            if (swfs.containsKey(name)) {
+                ret.add(swfs.get(name));
+            }
+        }
+        return ret;
+    }
+
+    public static void populateAllSWFs(Map<String, SWF> swfs) {
+        if (mainFrame == null) {
+            return;
+        }
+        List<OpenableList> ols = mainFrame.getPanel().getSwfs();
+        for (OpenableList ol : ols) {
+            for (Openable op : ol) {
+                if (op instanceof SWF) {
+                    SWF swf = (SWF) op;
+                    populateSwf(swfs, swf, swf.getShortPathTitle()); //swf.getShortFileName());
+                }
+            }
+        }
+    }
+    
+    private static void populateSwf(Map<String, SWF> ret, SWF swf, String name) {
+        int pos = 1;
+        String baseName = name;
+        while (ret.containsKey(name)) {
+            pos++;
+            name = baseName + "[" + pos + "]";
+        }
+        ret.put(name, swf);
+        for (Tag t : swf.getTags()) {
+            if (t instanceof DefineBinaryDataTag) {
+                DefineBinaryDataTag binaryData = (DefineBinaryDataTag) t;
+                if (binaryData.innerSwf != null) {
+                    populateSwf(ret, binaryData.innerSwf, binaryData.innerSwf.getShortPathTitle());//name + " / " + t.getTagName() + " (" + ((DefineBinaryDataTag) t).getCharacterId() + ")");
+                }
+            }
+        }
+    }
+    
     public static void exit() {
         if (mainFrame != null && mainFrame.getPanel() != null) {
             mainFrame.getPanel().scrollPosStorage.saveScrollPos(mainFrame.getPanel().getCurrentTree().getCurrentTreeItem());                    

@@ -633,8 +633,9 @@ public class ASM3Parser {
                         value_kind = ValueKind.CONSTANT_PackageNamespace;
                         break;
                 }
-                lexer.pushback(type);
+                expected(ParsedSymbol.TYPE_PARENT_OPEN, "(", lexer);
                 value_index = parseNamespace(constants, lexer);
+                expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
                 break;
             default:
                 if (Configuration._debugMode.get()) {

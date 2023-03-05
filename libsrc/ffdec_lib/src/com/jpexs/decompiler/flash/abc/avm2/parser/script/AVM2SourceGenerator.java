@@ -1875,7 +1875,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
 
         for (int i = 0; i < paramValues.size(); i++) {
-            optional[i] = getValueKind(Namespace.KIND_NAMESPACE/*FIXME*/, paramTypes.get(paramTypes.size() - paramValues.size() + i), paramValues.get(i));
+            optional[i] = getValueKind(Namespace.KIND_NAMESPACE/*FIXME*/, paramTypes.get(paramTypes.size() - paramValues.size() + i), paramValues.get(i), false);
             if (optional[i] == null) {
                 throw new CompilationException("Default value must be compiletime constant", line);
             }
@@ -2059,7 +2059,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         return mindex;
     }
 
-    public ValueKind getValueKind(int ns, GraphTargetItem type, GraphTargetItem val) {
+    public ValueKind getValueKind(int ns, GraphTargetItem type, GraphTargetItem val, boolean generatedNs) {
 
         if (val instanceof BooleanAVM2Item) {
             BooleanAVM2Item bi = (BooleanAVM2Item) val;
@@ -2084,7 +2084,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         if (val instanceof StringAVM2Item) {
             StringAVM2Item sval = (StringAVM2Item) val;
             if (isNs) {
-                return new ValueKind(namespace(Namespace.KIND_NAMESPACE, sval.getValue()), ValueKind.CONSTANT_Namespace);
+                return new ValueKind(namespace(generatedNs ? Namespace.KIND_PACKAGE_INTERNAL : Namespace.KIND_NAMESPACE, sval.getValue()), ValueKind.CONSTANT_Namespace);
             } else {
                 return new ValueKind(str(sval.getValue()), ValueKind.CONSTANT_Utf8);
             }
@@ -2394,8 +2394,10 @@ public class AVM2SourceGenerator implements SourceGenerator {
                     namespace = sai.pkg == null ? 0 : sai.pkg.getCpoolIndex(abcIndex);
                     metadata = generateMetadata(((SlotAVM2Item) item).metadata);
                 }
+                boolean generatedNs = false;
                 if (item instanceof ConstAVM2Item) {
                     ConstAVM2Item cai = (ConstAVM2Item) item;
+                    generatedNs = cai.generatedNs;
                     if (cai.isStatic() != generateStatic) {
                         continue;
                     }
@@ -2415,7 +2417,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 }
                 tsc.type_index = isNamespace ? 0 : (type == null ? 0 : typeName(localData, type));
 
-                ValueKind vk = getValueKind(namespace, type, val);
+                ValueKind vk = getValueKind(namespace, type, val, generatedNs);
                 if (vk == null) {
                     tsc.value_index = ValueKind.CONSTANT_Undefined;
                     tsc.value_kind = ValueKind.CONSTANT_Undefined;

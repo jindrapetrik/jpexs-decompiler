@@ -133,14 +133,14 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void getDependencies(int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
+    public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String customNs, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getDependencies(scriptIndex, classIndex, false, customNs, abc, dependencies, ignorePackage, fullyQualifiedNames);
+        super.getDependencies(abcIndex, scriptIndex, classIndex, false, customNs, abc, dependencies, ignorePackage, fullyQualifiedNames);
         //if (method_info != 0)
         {
-            DependencyParser.parseDependenciesFromMethodInfo(this, scriptIndex, classIndex, false, customNs, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>());
+            DependencyParser.parseDependenciesFromMethodInfo(abcIndex, this, scriptIndex, classIndex, false, customNs, abc, method_info, dependencies, ignorePackage, fullyQualifiedNames, new ArrayList<>());
         }
     }
 

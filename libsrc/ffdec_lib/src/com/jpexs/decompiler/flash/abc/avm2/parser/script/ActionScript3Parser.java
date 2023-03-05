@@ -83,6 +83,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.operations.SubtractAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.TypeOfAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.operations.URShiftAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
+import static com.jpexs.decompiler.flash.abc.avm2.parser.script.SymbolType.PREPROCESSOR;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.action.swf4.ActionIf;
@@ -648,6 +649,7 @@ public class ActionScript3Parser {
             boolean isPrivate = false;
 
             String customNs = null;
+            String rawCustomNs = null;
             NamespaceItem namespace = null;
             ParsedSymbol s = lex();
             //static class initializer
@@ -660,7 +662,7 @@ public class ActionScript3Parser {
             List<Map.Entry<String, Map<String, String>>> metadata = parseMetadata();
             s = lex();
 
-            while (s.isType(SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER, SymbolType.INTERNAL)) {
+            while (s.isType(SymbolType.STATIC, SymbolType.PUBLIC, SymbolType.PRIVATE, SymbolType.PROTECTED, SymbolType.OVERRIDE, SymbolType.FINAL, SymbolType.DYNAMIC, SymbolGroup.IDENTIFIER, SymbolType.INTERNAL, SymbolType.PREPROCESSOR)) {
                 if (s.type == SymbolType.FINAL) {
                     if (isFinal) {
                         throw new AVM2ParseException("Only one final keyword allowed", lexer.yyline());
@@ -714,6 +716,19 @@ public class ActionScript3Parser {
                     case INTERNAL:
                         namespace = packageInternalNs;
                         break;
+                        
+                         
+                    case PREPROCESSOR:    
+                        if (((String)s.value).toLowerCase().equals("namespace")) {
+                                expectedType(SymbolType.PARENT_OPEN);
+                                s = lex();
+                                expected(s, lexer.yyline(), SymbolType.STRING);
+                                namespace = new NamespaceItem((String)s.value, Namespace.KIND_NAMESPACE);
+                                expectedType(SymbolType.PARENT_CLOSE);
+                        } else {
+                            lexer.pushback(s);
+                        }
+                        break;
                 }
                 s = lex();
             }
@@ -725,7 +740,7 @@ public class ActionScript3Parser {
             }
             if (namespace == null && customNs != null) {
                 //Special: it will be resolved later:
-                namespace = new NamespaceItem(customNs, Namespace.KIND_NAMESPACE);
+                namespace = new NamespaceItem(customNs, NamespaceItem.KIND_NAMESPACE_CUSTOM);
             }
 
             switch (s.type) {
@@ -833,6 +848,7 @@ public class ActionScript3Parser {
                     String nval;
                     s = lex();
 
+                    boolean generatedNs = false;
                     if (s.type == SymbolType.ASSIGN) {
                         s = lex();
                         expected(s, lexer.yyline(), SymbolType.STRING);
@@ -840,12 +856,13 @@ public class ActionScript3Parser {
                         s = lex();
                     } else {
                         nval = (pkg.name.toRawString() + ":" + classNameStr) + "/" + nname;
+                        generatedNs = true;
                     }
                     if (s.type != SymbolType.SEMICOLON) {
                         lexer.pushback(s);
                     }
 
-                    ConstAVM2Item ns = new ConstAVM2Item(metadata, namespace, customNs, true, nname, new TypeItem(DottedChain.NAMESPACE), new StringAVM2Item(null, null, nval), lexer.yyline());
+                    ConstAVM2Item ns = new ConstAVM2Item(metadata, namespace, customNs, true, nname, new TypeItem(DottedChain.NAMESPACE), new StringAVM2Item(null, null, nval), lexer.yyline(), generatedNs);
                     traits.add(ns);
                     break;
                 case CONST:
@@ -887,7 +904,7 @@ public class ActionScript3Parser {
                     }
                     GraphTargetItem tar;
                     if (isConst) {
-                        tar = new ConstAVM2Item(metadata, namespace, customNs, isStatic, vcname, type, value, lexer.yyline());
+                        tar = new ConstAVM2Item(metadata, namespace, customNs, isStatic, vcname, type, value, lexer.yyline(), false);
                     } else {
                         tar = new SlotAVM2Item(metadata, namespace, customNs, isStatic, vcname, type, value, lexer.yyline());
                     }
@@ -1111,7 +1128,7 @@ public class ActionScript3Parser {
                     }
                     GraphTargetItem tar;
                     if (isConst) {
-                        tar = new ConstAVM2Item(metadata, ns, null, false, vcname, type, value, lexer.yyline());
+                        tar = new ConstAVM2Item(metadata, ns, null, false, vcname, type, value, lexer.yyline(), false);
                     } else {
                         tar = new SlotAVM2Item(metadata, ns, null, false, vcname, type, value, lexer.yyline());
                     }
@@ -1131,19 +1148,21 @@ public class ActionScript3Parser {
                     String nval;
                     s = lex();
 
+                    boolean generatedNs = false;
                     if (s.type == SymbolType.ASSIGN) {
                         s = lex();
                         expected(s, lexer.yyline(), SymbolType.STRING);
                         nval = s.value.toString();
                         s = lex();
                     } else {
-                        nval = ns + "/" + nname;
+                        generatedNs = true;
+                        nval = ns.name.toRawString() + ":" + nname;
                     }
                     if (s.type != SymbolType.SEMICOLON) {
                         lexer.pushback(s);
                     }
 
-                    traits.add(new ConstAVM2Item(metadata, ns, null, true, nname, new TypeItem(DottedChain.NAMESPACE), new StringAVM2Item(null, null, nval), lexer.yyline()));
+                    traits.add(new ConstAVM2Item(metadata, ns, null, true, nname, new TypeItem(DottedChain.NAMESPACE), new StringAVM2Item(null, null, nval), lexer.yyline(), generatedNs));
                     break;
                 default:
                     lexer.pushback(s);
