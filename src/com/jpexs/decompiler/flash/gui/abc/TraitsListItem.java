@@ -108,7 +108,11 @@ public class TraitsListItem {
                 Trait trait = traits.get(index);
                 trait.convertHeader(null, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-                trait.toStringHeader(null, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
+                boolean insideInterface = false;
+                if (classIndex > -1) {
+                    insideInterface = abc.instance_info.get(classIndex).isInterface();
+                }
+                trait.toStringHeader(null, convertData, "", abc, true, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false, insideInterface);
                 s = writer.toString();
             } else {
                 ConvertData convertData = new ConvertData();
@@ -119,7 +123,11 @@ public class TraitsListItem {
                 Trait trait = traits.get(index);
                 trait.convertHeader(null, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, new NulWriter(), new ArrayList<>(), false);
                 HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
-                trait.toStringHeader(null, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false);
+                boolean insideInterface = false;
+                if (classIndex > -1) {
+                    insideInterface = abc.instance_info.get(classIndex).isInterface();
+                }
+                trait.toStringHeader(null, convertData, "", abc, false, ScriptExportMode.AS, scriptIndex, classIndex, writer, new ArrayList<>(), false, insideInterface);
                 s = writer.toString();
             }
         } catch (InterruptedException ex) {

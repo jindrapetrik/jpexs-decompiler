@@ -163,7 +163,7 @@ public class Traits implements Cloneable, Serializable {
         }
     }
 
-    public GraphTextWriter toString(AbcIndexing abcIndex, Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, List<Integer> ignoredTraitNames) throws InterruptedException {
+    public GraphTextWriter toString(AbcIndexing abcIndex, Class[] traitTypes, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, boolean makePackages, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, List<Integer> ignoredTraitNames, boolean insideInterface) throws InterruptedException {
 
         List<Trait> ordered = new ArrayList<>(traits);
         loopi:
@@ -235,9 +235,9 @@ public class Traits implements Cloneable, Serializable {
                 writer.startTrait(h);
             }
             if (makePackages) {
-                trait.toStringPackaged(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+                trait.toStringPackaged(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             } else {
-                trait.toString(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+                trait.toString(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             }
             if (trait instanceof TraitClass) {
                 writer.endClass();
