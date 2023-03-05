@@ -130,12 +130,13 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         String instanceInfoName = instanceInfoMultiname.getName(abc.constants, fullyQualifiedNames, false, true);
 
-        writer.startClass(class_info);
-
+        
         getMetaData(parent, convertData, abc, writer);
         //class header
         instanceInfo.getClassHeaderStr(writer, abc, fullyQualifiedNames, false);
+        writer.endTrait();        
         writer.startBlock();
+        writer.startClass(class_info);
 
         //static variables & constants
         ClassInfo classInfo = abc.class_info.get(class_info);
@@ -206,8 +207,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
         //instance methods
         instanceInfo.instance_traits.toString(abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, convertData.ignoreFrameScripts ? frameTraitNames : new ArrayList<>(), isInterface);
 
+        writer.endClass();        
         writer.endBlock(); // class
-        writer.endClass();
         writer.newLine();
         return writer;
     }
@@ -343,12 +344,41 @@ public class TraitClass extends Trait implements TraitWithSlot {
     @Override
     public GraphTextWriter convertTraitHeader(ABC abc, GraphTextWriter writer) {
         convertCommonHeaderFlags("class", abc, writer);
-        writer.appendNoHilight(" slotid ");
+        writer.newLine();
+        writer.appendNoHilight("slotid ");
         writer.hilightSpecial(Integer.toString(slot_id), HighlightSpecialType.SLOT_ID);
         writer.newLine();
-        /*writer.appendNoHilight("class_info "); //not in RAbcDasm
-        writer.appendNoHilight("" + class_info);
-        writer.newLine();*/
+        writer.appendNoHilight("class").newLine();
+        writer.indent();
+        InstanceInfo ii = abc.instance_info.get(class_info);
+        writer.appendNoHilight("instance ").hilightSpecial(abc.constants.multinameToString(ii.name_index), HighlightSpecialType.INSTANCE_NAME).newLine();
+        writer.indent();
+        writer.appendNoHilight("extends ").hilightSpecial(abc.constants.multinameToString(ii.super_index), HighlightSpecialType.EXTENDS).newLine();
+        for(int iface : ii.interfaces) {
+            writer.appendNoHilight("implements ").hilightSpecial(abc.constants.multinameToString(iface), HighlightSpecialType.IMPLEMENTS).newLine();
+        }
+        if ((ii.flags & InstanceInfo.CLASS_SEALED) == InstanceInfo.CLASS_SEALED) {
+            writer.appendNoHilight("flag SEALED").newLine();
+        }
+        if ((ii.flags & InstanceInfo.CLASS_FINAL) == InstanceInfo.CLASS_FINAL) {
+            writer.appendNoHilight("flag FINAL").newLine();
+        }
+        if ((ii.flags & InstanceInfo.CLASS_INTERFACE) == InstanceInfo.CLASS_INTERFACE) {
+            writer.appendNoHilight("flag INTERFACE").newLine();
+        }
+        if ((ii.flags & InstanceInfo.CLASS_PROTECTEDNS) == InstanceInfo.CLASS_PROTECTEDNS) {
+            writer.appendNoHilight("flag PROTECTEDNS").newLine();
+        }        
+        if ((ii.flags & InstanceInfo.CLASS_NON_NULLABLE) == InstanceInfo.CLASS_NON_NULLABLE) {
+            writer.appendNoHilight("flag NON_NULLABLE").newLine();
+        }
+        if ((ii.flags & InstanceInfo.CLASS_PROTECTEDNS) == InstanceInfo.CLASS_PROTECTEDNS) {
+            writer.appendNoHilight("protectedns ").hilightSpecial(Multiname.namespaceToString(abc.constants, ii.protectedNS), HighlightSpecialType.PROTECTEDNS).newLine();
+        }
+        writer.unindent();
+        writer.appendNoHilight("end ; instance").newLine();
+        writer.unindent();
+        writer.appendNoHilight("end ; class").newLine();        
         return writer;
     }
 

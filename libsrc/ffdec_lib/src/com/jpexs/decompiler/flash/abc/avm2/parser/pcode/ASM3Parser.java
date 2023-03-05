@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushShortIns;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
 import com.jpexs.decompiler.flash.abc.types.Float4;
+import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MetadataInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
@@ -35,6 +36,7 @@ import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.ValueKind;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
@@ -110,6 +112,14 @@ public class ASM3Parser {
             throw new AVM2ParseException("Invalid multiname index", line);
         }
         return index;
+    }
+    
+    private static void expectEnd(Flasm3Lexer lexer) throws IOException, AVM2ParseException {
+        expected(ParsedSymbol.TYPE_KEYWORD_END, "end", lexer);
+        ParsedSymbol symb = lexer.lex();
+        if (symb.type != ParsedSymbol.TYPE_COMMENT) {
+            lexer.pushback(symb);
+        }
     }
 
     private static void expected(int type, String expStr, Flasm3Lexer lexer) throws IOException, AVM2ParseException {
@@ -235,6 +245,86 @@ public class ASM3Parser {
         tsc.slot_id = slotid;
         tsc.type_index = type;
         tsc.name_index = name_index;
+        return true;
+    }
+
+    public static boolean parseClass(ABC abc, Reader reader, AVM2ConstantPool constants, TraitClass tc) throws IOException, AVM2ParseException {
+        Flasm3Lexer lexer = new Flasm3Lexer(reader);
+        return parseClass(abc, lexer, constants, tc);
+    }
+
+    private static boolean parseClass(ABC abc, Flasm3Lexer lexer, AVM2ConstantPool constants, TraitClass tc) throws IOException, AVM2ParseException {
+        expected(ParsedSymbol.TYPE_KEYWORD_TRAIT, "trait", lexer);
+        expected(ParsedSymbol.TYPE_KEYWORD_CLASS, "class", lexer);
+        int name_index = parseMultiName(constants, lexer);
+        parseTraitParams(abc, lexer, tc);
+        expected(ParsedSymbol.TYPE_KEYWORD_SLOTID, "slotid", lexer);
+        ParsedSymbol symb;
+        symb = lexer.lex();
+        expected(symb, ParsedSymbol.TYPE_INTEGER, "Integer");
+        int slotid = (int) (Integer) symb.value;
+
+        expected(ParsedSymbol.TYPE_KEYWORD_CLASS, "class", lexer);
+        expected(ParsedSymbol.TYPE_KEYWORD_INSTANCE, "instance", lexer);
+
+        int instance_name_index = parseMultiName(constants, lexer);
+        expected(ParsedSymbol.TYPE_KEYWORD_EXTENDS, "extends", lexer);
+        int super_index = parseMultiName(constants, lexer);
+        symb = lexer.lex();
+        List<Integer> ifacesList = new ArrayList<>();
+        while (symb.type == ParsedSymbol.TYPE_KEYWORD_IMPLEMENTS) {
+            ifacesList.add(parseMultiName(constants, lexer));
+            symb = lexer.lex();
+        }
+        int interfaces[] = new int[ifacesList.size()];
+        for(int i = 0; i < ifacesList.size(); i++) {
+            interfaces[i] = ifacesList.get(i);
+        }
+        int instanceFlags = 0;
+        while (symb.type == ParsedSymbol.TYPE_KEYWORD_FLAG) {
+            symb = lexer.lex();
+            switch (symb.type) {
+                case ParsedSymbol.TYPE_KEYWORD_SEALED:
+                    instanceFlags |= InstanceInfo.CLASS_SEALED;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_FINAL:
+                    instanceFlags |= InstanceInfo.CLASS_FINAL;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_INTERFACE:
+                    instanceFlags |= InstanceInfo.CLASS_INTERFACE;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_PROTECTEDNS:
+                    instanceFlags |= InstanceInfo.CLASS_PROTECTEDNS;
+                    break;
+                case ParsedSymbol.TYPE_KEYWORD_NON_NULLABLE:
+                    instanceFlags |= InstanceInfo.CLASS_NON_NULLABLE;
+                    break;
+                default:
+                    throw new AVM2ParseException("SEALED,FINAL,INTERFACE,PROTECTEDNS or NON_NULLABLE expected", lexer.yyline());
+            }
+            symb = lexer.lex();
+        }
+        int protectedns = 0;
+        if (symb.type == ParsedSymbol.TYPE_KEYWORD_PROTECTEDNS_BLOCK && ((instanceFlags & InstanceInfo.CLASS_PROTECTEDNS)==InstanceInfo.CLASS_PROTECTEDNS)) {
+            protectedns = parseNamespace(constants, lexer);
+        } else {
+            lexer.pushback(symb);
+        }        
+        expectEnd(lexer); //instance
+        expectEnd(lexer); //class
+        expectEnd(lexer); //trait
+        
+        InstanceInfo ii = abc.instance_info.get(tc.class_info);
+        ii.name_index = instance_name_index;
+        ii.super_index = super_index;
+        ii.interfaces = interfaces;
+        ii.flags = instanceFlags;                
+        if ((instanceFlags & InstanceInfo.CLASS_PROTECTEDNS)==InstanceInfo.CLASS_PROTECTEDNS) {
+            ii.protectedNS = protectedns;
+        }        
+        
+        tc.slot_id = slotid;
+        
         return true;
     }
 
@@ -961,7 +1051,7 @@ public class ASM3Parser {
                                     lexer.pushback(parsedOperand);
                                     operandsList.add(parseNamespace(constants, lexer));
                                     break;
-                                case AVM2Code.DAT_STRING_INDEX:                                    
+                                case AVM2Code.DAT_STRING_INDEX:
                                     if (parsedOperand.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                                         operandsList.add(0);
                                     } else if (parsedOperand.type == ParsedSymbol.TYPE_STRING) {

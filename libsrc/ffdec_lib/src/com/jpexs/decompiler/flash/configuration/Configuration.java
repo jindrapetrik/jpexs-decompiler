@@ -902,6 +902,11 @@ public final class Configuration {
     @ConfigurationCategory("ui")
     public static ConfigurationItem<Boolean> rememberFoldersScrollPos = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationName("warning.initializers.class")
+    @ConfigurationCategory("script")
+    public static ConfigurationItem<Boolean> warningInitializersClass = null;
+    
     
     private enum OSId {
         WINDOWS, OSX, UNIX

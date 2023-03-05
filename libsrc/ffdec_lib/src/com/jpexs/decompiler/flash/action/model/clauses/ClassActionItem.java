@@ -169,7 +169,6 @@ public class ClassActionItem extends ActionItem implements Block {
             makePrintObfuscated(im);
         }
 
-        writer.startClass(className.toStringNoQuotes(localData));
         writer.append("class ");
         className.toStringNoQuotes(writer, localData);
         if (extendsOp != null) {
@@ -188,6 +187,7 @@ public class ClassActionItem extends ActionItem implements Block {
             }
         }
         writer.startBlock();
+        writer.startClass(className.toStringNoQuotes(localData));        
 
         /*if (constructor != null) {
             constructor.toString(writer, localData).newLine();
@@ -232,8 +232,8 @@ public class ClassActionItem extends ActionItem implements Block {
             writer.append(v);
             writer.append(";").newLine();
         }
-        writer.endBlock();
         writer.endClass();
+        writer.endBlock();
         return writer;
     }
 

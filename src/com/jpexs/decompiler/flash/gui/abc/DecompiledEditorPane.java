@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
+import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitFunction;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitSlotConst;
@@ -674,7 +675,21 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 lastTraitIndex = (int) currentTraitHighlight.getProperties().index;
                 currentTrait = getCurrentTrait();
                 if (currentTrait != null) {
-                    if (currentTrait instanceof TraitSlotConst) {
+                    if (currentTrait instanceof TraitClass) {
+                        abcPanel.detailPanel.classTraitPanel.load((TraitClass)currentTrait, abc, true);
+                        final Trait ftrait = currentTrait;
+                        final int ftraitIndex = lastTraitIndex;
+                        View.execInEventDispatch(() -> {
+                            abcPanel.detailPanel.showCard(DetailPanel.CLASS_TRAIT_CARD, ftrait, ftraitIndex, abc);
+                        });
+                        abcPanel.detailPanel.setEditMode(false);
+                        currentMethodHighlight = null;
+                        Highlighting spec = Highlighting.searchPos(highlightedText.getSpecialHighlights(), pos, currentTraitHighlight.startPos, currentTraitHighlight.startPos + currentTraitHighlight.len);
+                        if (spec != null) {
+                            abcPanel.detailPanel.classTraitPanel.hilightSpecial(spec);
+                        }
+                        return;
+                    } else if (currentTrait instanceof TraitSlotConst) {
                         abcPanel.detailPanel.slotConstTraitPanel.load((TraitSlotConst) currentTrait, abc,
                                 abc.isStaticTraitId(classIndex, lastTraitIndex));
                         final Trait ftrait = currentTrait;
@@ -759,6 +774,31 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
         boolean isScriptInit = traitId == GraphTextWriter.TRAIT_SCRIPT_INITIALIZER;
 
         Highlighting tc = Highlighting.searchIndex(highlightedText.getClassHighlights(), classIndex);
+        
+        if (!isScriptInit && tc == null) {
+            List<Highlighting> traitHighlights = highlightedText.getTraitHighlights();
+            List<Highlighting> classHighlights = highlightedText.getClassHighlights();
+            looph: for (Highlighting th:traitHighlights) {
+                if (th.getProperties().index == traitId) {
+                    for (Highlighting tc2:classHighlights) {
+                        if (tc2.startPos <= th.startPos && tc2.startPos + tc2.len >= th.startPos+th.len) {
+                            continue looph;
+                        }
+                    }
+                    final int fpos = th.startPos;
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            if (fpos <= getDocument().getLength()) {
+                                setCaretPosition(fpos);
+                            }
+                        }
+                    }, 100);
+                    break;
+                }
+            }            
+        }
+        
         if (tc != null || isScriptInit) {
             Highlighting th = Highlighting.searchIndex(highlightedText.getTraitHighlights(), traitId, isScriptInit ? 0 : tc.startPos, isScriptInit ? -1 : tc.startPos + tc.len);
             int pos = 0;

@@ -195,6 +195,10 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "Void"                      |
   "Undefined"                  {  return token(TokenType.KEYWORD2);}
    
+  "SEALED"                     |
+  "INTERFACE"                  |
+  "PROTECTEDNS"                |
+  "NON_NULLABLE"               |
   "FINAL"                      |
   "OVERRIDE"                   |
   "METADATA"                   {  return token(TokenType.KEYWORD2);}

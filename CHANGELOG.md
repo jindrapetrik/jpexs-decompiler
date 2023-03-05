@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - AS3 Display missing namespaces along traits as §§namespace("url")
 - [#1888], [#1892] AS3 option to select SWF dependencies to properly resolve namespaces, types, etc. (currently in GUI only)
 - FileAttributes tag - SWF relative Urls flag
+- AS3 P-code editing class trait
 
 ### Fixed
 - [#1981] AS3 fully qualified (colliding) types in submethods
