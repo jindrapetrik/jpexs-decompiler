@@ -82,7 +82,7 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
+    public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {
         String addKind = "";
         if (kindType == TRAIT_GETTER) {
             addKind = "get ";
@@ -92,7 +92,7 @@ public class TraitMethodGetterSetter extends Trait {
         }
         MethodBody body = abc.findBody(method_info);
         
-        getModifiers(abc, isStatic, writer);
+        getModifiers(abc, isStatic, insideInterface, writer);
         
         if (abc.method_info.get(method_info).flagExplicit()) {
             writer.appendNoHilight("native ");
@@ -129,7 +129,7 @@ public class TraitMethodGetterSetter extends Trait {
     }
 
     @Override
-    public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
 
         if (classIndex < 0) {
             writeImports(abcIndex, scriptIndex, classIndex, isStatic, abc, writer, getPackage(abc), fullyQualifiedNames);
@@ -137,7 +137,7 @@ public class TraitMethodGetterSetter extends Trait {
         getMetaData(parent, convertData, abc, writer);
         writer.startMethod(method_info);
         path = path + "." + getName(abc).getName(abc.constants, fullyQualifiedNames, false, true);
-        toStringHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+        toStringHeader(parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
         int bodyIndex = abc.findBodyIndex(method_info);
         if (classIndex != -1 && abc.instance_info.get(classIndex).isInterface() || bodyIndex == -1) {
             writer.appendNoHilight(";");

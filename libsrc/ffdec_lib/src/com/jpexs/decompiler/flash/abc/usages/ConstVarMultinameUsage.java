@@ -56,15 +56,20 @@ public abstract class ConstVarMultinameUsage extends TraitMultinameUsage {
 
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
         writer.appendNoHilight(super.toString() + " ");
+        boolean insideInterface = false;
+        if (classIndex > -1) {
+            insideInterface = abc.instance_info.get(classIndex).isInterface();
+        }
+        
         if (parentTraitIndex > -1) {
             if (traitsType == TRAITS_TYPE_CLASS) {
-                ((TraitMethodGetterSetter) abc.class_info.get(classIndex).static_traits.traits.get(parentTraitIndex)).toStringHeader(null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false);
+                ((TraitMethodGetterSetter) abc.class_info.get(classIndex).static_traits.traits.get(parentTraitIndex)).toStringHeader(null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
             } else if (traitsType == TRAITS_TYPE_INSTANCE) {
-                ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits.get(parentTraitIndex)).toStringHeader(null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false);
+                ((TraitMethodGetterSetter) abc.instance_info.get(classIndex).instance_traits.traits.get(parentTraitIndex)).toStringHeader(null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
             }
         }
         try {
-            ((TraitSlotConst) traits.traits.get(traitIndex)).toStringHeader(null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false);
+            ((TraitSlotConst) traits.traits.get(traitIndex)).toStringHeader(null, convertData, "", abc, traitsType == TRAITS_TYPE_CLASS, ScriptExportMode.AS, -1/*FIXME*/, classIndex, writer, new ArrayList<>(), false, insideInterface);
         } catch (InterruptedException ex) {
             // ignore
         }

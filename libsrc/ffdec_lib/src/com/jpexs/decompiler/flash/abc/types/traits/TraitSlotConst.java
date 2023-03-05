@@ -160,7 +160,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         getMetaData(parent, convertData, abc, writer);
         Multiname n = getName(abc);
         boolean showModifier = true;
@@ -173,7 +173,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             }
         }
         if (showModifier) {
-            getModifiers(abc, isStatic, writer);
+            getModifiers(abc, isStatic, insideInterface, writer);
         }
         if (convertData.assignedValues.containsKey(this)) {
             GraphTargetItem val = convertData.assignedValues.get(this).value;

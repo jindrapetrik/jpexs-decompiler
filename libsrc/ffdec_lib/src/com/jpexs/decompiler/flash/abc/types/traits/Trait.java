@@ -333,7 +333,7 @@ public abstract class Trait implements Cloneable, Serializable {
         return writer;
     }
 
-    public final GraphTextWriter getModifiers(ABC abc, boolean isStatic, GraphTextWriter writer) {
+    public final GraphTextWriter getModifiers(ABC abc, boolean isStatic, boolean insideInterface, GraphTextWriter writer) {
         if ((kindFlags & ATTR_Final) > 0) {
             if (!isStatic) {
                 writer.appendNoHilight("final ");
@@ -349,7 +349,7 @@ public abstract class Trait implements Cloneable, Serializable {
 
             Namespace ns = m.getNamespace(abc.constants);
 
-            if (ns.kind == Namespace.KIND_NAMESPACE && nsname == null) {
+            if (ns.kind == Namespace.KIND_NAMESPACE && nsname == null && !insideInterface) {
                 writer.append("§§namespace(\"");
                 writer.append(Helper.escapeActionScriptString(ns.getRawName(abc.constants)));
                 writer.append("\") ");
@@ -384,7 +384,7 @@ public abstract class Trait implements Cloneable, Serializable {
         return abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata);
     }
 
-    public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         writer.appendNoHilight(abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " kind=" + kindType + " metadata=" + Helper.intArrToString(metadata));
         return writer;
     }
@@ -468,7 +468,7 @@ public abstract class Trait implements Cloneable, Serializable {
         return writer;
     }
 
-    public GraphTextWriter toStringPackaged(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public GraphTextWriter toStringPackaged(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
         Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
         if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
             String nsname = ns.getName(abc.constants).toPrintableString(true);
@@ -477,7 +477,7 @@ public abstract class Trait implements Cloneable, Serializable {
                 writer.appendNoHilight(" " + nsname); //assume not null name
             }
             writer.startBlock();
-            toString(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+            toString(abcIndex, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
             writer.endBlock();
             writer.newLine();
         }
@@ -492,8 +492,8 @@ public abstract class Trait implements Cloneable, Serializable {
         }
     }
 
-    public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
-        toString(null, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel);
+    public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
+        toString(null, parent, convertData, path, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, insideInterface);
         return writer;
     }
 
