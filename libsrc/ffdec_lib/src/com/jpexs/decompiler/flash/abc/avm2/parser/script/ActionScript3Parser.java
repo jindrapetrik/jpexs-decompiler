@@ -626,6 +626,8 @@ public class ActionScript3Parser {
         NamespaceItem protectedNs = new NamespaceItem(pkg.name.toRawString().isEmpty() ? classNameStr : pkg.name.toRawString() + ":" + classNameStr, Namespace.KIND_PROTECTED);
         NamespaceItem staticProtectedNs = new NamespaceItem(pkg.name.toRawString().isEmpty() ? classNameStr : pkg.name.toRawString() + ":" + classNameStr, Namespace.KIND_STATIC_PROTECTED);
         NamespaceItem packageInternalNs = new NamespaceItem(pkg.name, Namespace.KIND_PACKAGE_INTERNAL);
+        NamespaceItem interfaceNs = new NamespaceItem(pkg.name.toRawString().isEmpty() ? classNameStr : pkg.name.toRawString() + ":" + classNameStr, Namespace.KIND_NAMESPACE);
+
 
         openedNamespaces = new ArrayList<>(openedNamespaces);
         allOpenedNamespaces.add(openedNamespaces);
@@ -690,6 +692,9 @@ public class ActionScript3Parser {
                     throw new AVM2ParseException("Cannot compile native code", lexer.yyline());
                 } else if (s.group == SymbolGroup.IDENTIFIER) {
                     customNs = s.value.toString();
+                    if (isInterface) {
+                        throw new AVM2ParseException("Namespace attributes are not permitted on interface methods", lexer.yyline());
+                    }
                 } else if (namespace != null) {
                     throw new AVM2ParseException("Only one access identifier allowed", lexer.yyline());
                 }
@@ -733,6 +738,11 @@ public class ActionScript3Parser {
                 }
                 s = lex();
             }
+            
+            if (isInterface) {
+                namespace = interfaceNs;
+            }
+                            
             if (namespace == null && customNs == null) {
                 namespace = packageInternalNs;
             }
@@ -799,7 +809,7 @@ public class ActionScript3Parser {
                             } else {
                                 lexer.pushback(s);
                             }
-
+                            
                             MethodAVM2Item ft = method(allOpenedNamespaces, outsidePackage, isPrivate, metadata, namespace, isInterface, customNs, new Reference<>(false), importedClasses, isOverride, isFinal, thisType, openedNamespaces, isStatic, fname, true, new ArrayList<>());
 
                             if (isGetter) {
