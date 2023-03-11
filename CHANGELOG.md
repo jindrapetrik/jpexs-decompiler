@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - [#1888], [#1892] AS3 option to select SWF dependencies to properly resolve namespaces, types, etc. (currently in GUI only)
 - FileAttributes tag - SWF relative Urls flag
 - AS3 P-code editing class trait
+- [#355] Updated Chinese translation
 
 ### Fixed
 - [#1981] AS3 fully qualified (colliding) types in submethods
@@ -3000,6 +3001,7 @@ All notable changes to this project will be documented in this file.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
+[#355]: https://www.free-decompiler.com/flash/issues/355
 [#1981]: https://www.free-decompiler.com/flash/issues/1981
 [#1982]: https://www.free-decompiler.com/flash/issues/1982
 [#1986]: https://www.free-decompiler.com/flash/issues/1986
@@ -3693,7 +3695,6 @@ All notable changes to this project will be documented in this file.
 [#378]: https://www.free-decompiler.com/flash/issues/378
 [#325]: https://www.free-decompiler.com/flash/issues/325
 [#210]: https://www.free-decompiler.com/flash/issues/210
-[#355]: https://www.free-decompiler.com/flash/issues/355
 [#313]: https://www.free-decompiler.com/flash/issues/313
 [#330]: https://www.free-decompiler.com/flash/issues/330
 [#332]: https://www.free-decompiler.com/flash/issues/332
