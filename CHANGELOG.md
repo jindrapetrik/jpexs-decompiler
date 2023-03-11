@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - AS3 p-code docs - deldescendants, negate_p operands
 - AS3 p-code - IGNORE_REST method flag incorrectly shown as EXPLICIT
 - [#1989] AS3 - Slow deobfuscation (AVM2DeobfuscatorSimpleOld)
+- AS3 p-code - getouterscope instruction docs
 
 ### Changed
 - AS1/2/3 P-code - format Number values with EcmaScript toString function
