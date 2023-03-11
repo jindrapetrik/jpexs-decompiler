@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - AS3 direct editation - var/const outside package
 - AS3 interfaces - internal modifier on methods
 - AS3 direct editation - interface method namespace
+- AS3 p-code docs - deldescendants, negate_p operands
 
 ### Changed
 - AS1/2/3 P-code - format Number values with EcmaScript toString function
