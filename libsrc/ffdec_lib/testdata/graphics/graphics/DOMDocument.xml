@@ -1,11 +1,11 @@
-<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" viewAngle3D="50.6510299754819" nextSceneIdentifier="83" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveEnabled="true" autoSaveHasPrompted="true">
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="500" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" timelineLabelWidth="236" viewAngle3D="50.6510299754819" nextSceneIdentifier="87" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveEnabled="true" autoSaveHasPrompted="true">
      <fonts>
-          <DOMFontItem name="Font 2" itemID="604e7a9e-00000444" font="TimesNewRomanPS-BoldMT" size="30" id="2" sourceLastImported="1615755934" embedRanges="1|2"/>
           <DOMFontItem name="Font 1" itemID="604e2b4c-00000400" font="TimesNewRomanPSMT" size="0" id="1" sourceLastImported="1615735628" embedRanges="1|2"/>
+          <DOMFontItem name="Font 2" itemID="604e7a9e-00000444" font="TimesNewRomanPS-BoldMT" size="30" id="2" sourceLastImported="1615755934" embedRanges="1|2"/>
      </fonts>
      <media>
           <DOMBitmapItem name="bitmapfill.png" itemID="604dcb84-00000229" sourceLastImported="1615711005" externalFileSize="1931" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill.png" bitmapDataHRef="M 2 1615711026.dat" frameRight="640" frameBottom="1280"/>
-          <DOMBitmapItem name="bitmapfill_smooth.png" itemID="60608683-0000020b" sourceExternalFilepath="./LIBRARY/bitmapfill_smooth.png" sourceLastImported="1616938546" externalFileSize="1931" allowSmoothing="true" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill_smooth.png" bitmapDataHRef="M 5 1616938529.dat" frameRight="640" frameBottom="1280"/>
+          <DOMBitmapItem name="bitmapfill_smooth.png" itemID="60608683-0000020b" sourceExternalFilepath="./LIBRARY/bitmapfill_smooth.png" sourceLastImported="1678292098" externalFileSize="1931" allowSmoothing="true" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="bitmapfill_smooth.png" bitmapDataHRef="M 5 1616938529.dat" frameRight="640" frameBottom="1280"/>
           <DOMVideoItem name="Cute Cat - 3092.flv" itemID="60671758-000001ff" sourceExternalFilepath="C:/Dropbox/Programovani/JavaSE/FFDec/libsrc/ffdec_lib/testdata/graphics/Cute Cat - 3092.flv" sourceLastImported="1617368859" videoDataHRef="M 6 1617368920.dat" videoType="h263 media" fps="24" channels="0" width="640" height="360" length="29.25"/>
           <DOMBitmapItem name="pony.jpg" itemID="604de7c7-000002d8" sourceLastImported="1615718230" externalFileSize="222138" quality="50" href="pony.jpg" bitmapDataHRef="M 4 1615718240.dat" frameRight="16000" frameBottom="10680" isJPEG="true"/>
      </media>
@@ -36,7 +36,7 @@
           <Include href="VideoSprite.xml" loadImmediate="false" itemID="60672f60-00000201" lastModified="1617375202"/>
      </symbols>
      <timelines>
-          <DOMTimeline name="Scene 1">
+          <DOMTimeline name="Scene 1" currentFrame="64">
                <layers>
                     <DOMLayer name="Scripts layer" color="#9933CC" autoNamed="false">
                          <frames>
@@ -50,7 +50,7 @@
                     </DOMLayer>
                     <DOMLayer name="Prev next buttons" color="#4FFF4F" locked="true" autoNamed="false">
                          <frames>
-                              <DOMFrame index="0" duration="61" keyMode="9728">
+                              <DOMFrame index="0" duration="65" keyMode="9728">
                                    <elements>
                                         <DOMSymbolInstance libraryItemName="btnNext" symbolType="button">
                                              <matrix>
@@ -166,6 +166,66 @@
                               </DOMFrame>
                          </frames>
                     </DOMLayer>
+                    <DOMLayer name="Graphics layer 2" color="#4FFF4F" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" duration="61" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="61" duration="3" tweenType="shape" keyMode="17922">
+                                   <MorphShape>
+                                        <morphSegments>
+                                             <MorphSegment startPointA="#17.7, #3.E8" startPointB="#17.7, #3.E8" strokeIndex1="0" strokeIndex2="0" fillIndex1="0" fillIndex2="1">
+                                                  <MorphCurves controlPointA="#1D.4C, #3.E8" anchorPointA="#23.28, #3.E8" controlPointB="#1D.4C, #3.E8" anchorPointB="#23.28, #3.E8" isLine="true"/>
+                                                  <MorphCurves controlPointA="#23.28, #9.C4" anchorPointA="#23.28, #F.A" controlPointB="#23.28, #9.C4" anchorPointB="#23.28, #F.A" isLine="true"/>
+                                                  <MorphCurves controlPointA="#1D.4C, #F.A" anchorPointA="#17.7, #F.A" controlPointB="#1D.4C, #F.A" anchorPointB="#17.7, #F.A" isLine="true"/>
+                                                  <MorphCurves controlPointA="#17.7, #9.C4" anchorPointA="#17.7, #3.E8" controlPointB="#17.7, #9.C4" anchorPointB="#17.7, #3.E8" isLine="true"/>
+                                             </MorphSegment>
+                                        </morphSegments>
+                                        <morphHintsList/>
+                                   </MorphShape>
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <RadialGradient focalPointRatio="0.737254901960784">
+                                                            <matrix>
+                                                                 <Matrix a="0.0821990966796875" b="0.081695556640625" c="-0.081695556640625" d="0.0821990966796875" tx="372" ty="119"/>
+                                                            </matrix>
+                                                            <GradientEntry color="#00FF00" ratio="0"/>
+                                                            <GradientEntry ratio="1"/>
+                                                       </RadialGradient>
+                                                  </FillStyle>
+                                             </fills>
+                                             <edges>
+                                                  <Edge fillStyle1="1" edges="
+!9000 4000|6000 4000!6000 4000|6000 1000!6000 1000|9000 1000!9000 1000|9000 4000"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="64" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <RadialGradient focalPointRatio="0.356862745098039">
+                                                            <matrix>
+                                                                 <Matrix a="-0.0341949462890625" b="0.127716064453125" c="-0.127716064453125" d="-0.0341949462890625" tx="372" ty="119"/>
+                                                            </matrix>
+                                                            <GradientEntry color="#00FFDB" ratio="0"/>
+                                                            <GradientEntry ratio="1"/>
+                                                       </RadialGradient>
+                                                  </FillStyle>
+                                             </fills>
+                                             <edges>
+                                                  <Edge fillStyle1="1" edges="
+!9000 4000|6000 4000!6000 4000|6000 1000!6000 1000|9000 1000!9000 1000|9000 4000"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
                     <DOMLayer name="Graphics layer" color="#4FFF4F" current="true" isSelected="true" autoNamed="false">
                          <frames>
                               <DOMFrame index="0" keyMode="9728">
@@ -246,10 +306,10 @@
                                              <edges>
                                                   <Edge fillStyle1="2" edges="
 !5000 2500|6500 2500!6500 2500|6500 5500!6500 5500|3500 5500!3500 5500|3500 4001"/>
-                                                  <Edge fillStyle1="1" edges="
-!3500 4001|2000 4001!2000 4001|2000 1001!2000 1001|5000 1001!5000 1001|5000 2500"/>
                                                   <Edge fillStyle0="1" fillStyle1="2" edges="
 !3500 4001|3500 2500!3500 2500|5000 2500"/>
+                                                  <Edge fillStyle0="1" edges="
+!5000 2500|5000 1001!5000 1001|2000 1001!2000 1001|2000 4001!2000 4001|3500 4001"/>
                                              </edges>
                                         </DOMShape>
                                    </elements>
@@ -778,10 +838,10 @@
 !3980 1990|2980 1990!2980 1990|2980 990!2980 990|3980 990!3980 990|3980 1990"/>
                                                   <Edge strokeStyle="5" edges="
 !1960 990|1960 1990!1960 1990|960 1990!960 1990|960 990!960 990|1960 990"/>
-                                                  <Edge strokeStyle="6" edges="
-!2980 3990|3980 3990!3980 3990|3980 4990!3980 4990|2980 4990!2980 4990|2980 3990"/>
                                                   <Edge strokeStyle="7" edges="
 !1980 4990|980 4990!980 4990|980 3990!980 3990|1980 3990!1980 3990|1980 4990"/>
+                                                  <Edge strokeStyle="6" edges="
+!2980 3990|3980 3990!3980 3990|3980 4990!3980 4990|2980 4990!2980 4990|2980 3990"/>
                                                   <Edge strokeStyle="8" edges="
 !5980 3990|5980 4990!5980 4990|4980 4990!4980 4990|4980 3990!4980 3990|5980 3990"/>
                                                   <Edge cubics="!1960 990(;1960,990 1960,1990 1960,1990q1960 990 1960 1990);"/>
@@ -1380,18 +1440,18 @@
                                                   </StrokeStyle>
                                              </strokes>
                                              <edges>
-                                                  <Edge strokeStyle="5" edges="
-!5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
                                                   <Edge strokeStyle="2" edges="
 !3500 1000|3500 2000!3500 2000|2500 2000!2500 2000|2500 1000"/>
+                                                  <Edge strokeStyle="5" edges="
+!5000 1000|5000 2000!5000 2000|4000 2000!4000 2000|4000 1000"/>
                                                   <Edge strokeStyle="1" edges="
 !2000 1000|2000 2000!2000 2000|1000 2000!1000 2000|1000 1000"/>
-                                                  <Edge strokeStyle="4" edges="
-!1000 3660/1295 4670!1295 4670/1372 3660"/>
-                                                  <Edge strokeStyle="3" edges="
-!2553 3660/2848 4670!2848 4670/2925 3660"/>
                                                   <Edge strokeStyle="6" edges="
 !4647 3660/4942 4670!4942 4670/5019 3660"/>
+                                                  <Edge strokeStyle="3" edges="
+!2553 3660/2848 4670!2848 4670/2925 3660"/>
+                                                  <Edge strokeStyle="4" edges="
+!1000 3660/1295 4670!1295 4670/1372 3660"/>
                                                   <Edge cubics="!5000 2000(;5000,2000 4000,2000 4000,2000q5000 2000 4000 2000);"/>
                                                   <Edge cubics="!4000 2000(4000,2000;4000,2000 4000,1000 4000,1000q4000 2000 4000 1000);"/>
                                                   <Edge cubics="!5000 1000(;5000,1000 5000,2000 5000,2000q5000 1000 5000 2000);"/>
@@ -2358,6 +2418,59 @@
                                                   <Edge cubics="!4434 3435(;4590,3279 4779,3200 5000,3200q4434 3435Q4669 3200q5000 3200);"/>
                                                   <Edge cubics="!5000 4800(;4779,4800 4590,4722 4434,4566q5000 4800Q4669 4800q4434 4566);"/>
                                                   <Edge cubics="!5565 4566(;5409,4722 5220,4800 5000,4800q5565 4566Q5331 4800q5000 4800);"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="61" duration="3" tweenType="shape" keyMode="17922">
+                                   <MorphShape>
+                                        <morphSegments>
+                                             <MorphSegment startPointA="#3.E8, #3.E8" startPointB="#3.E8, #3.E8" strokeIndex1="0" strokeIndex2="0" fillIndex1="0" fillIndex2="1">
+                                                  <MorphCurves controlPointA="#9.C4, #3.E8" anchorPointA="#F.A, #3.E8" controlPointB="#9.C4, #3.E8" anchorPointB="#F.A, #3.E8" isLine="true"/>
+                                                  <MorphCurves controlPointA="#F.A, #9.C4" anchorPointA="#F.A, #F.A" controlPointB="#F.A, #9.C4" anchorPointB="#F.A, #F.A" isLine="true"/>
+                                                  <MorphCurves controlPointA="#9.C4, #F.A" anchorPointA="#3.E8, #F.A" controlPointB="#9.C4, #F.A" anchorPointB="#3.E8, #F.A" isLine="true"/>
+                                                  <MorphCurves controlPointA="#3.E8, #9.C4" anchorPointA="#3.E8, #3.E8" controlPointB="#3.E8, #9.C4" anchorPointB="#3.E8, #3.E8" isLine="true"/>
+                                             </MorphSegment>
+                                        </morphSegments>
+                                        <morphHintsList/>
+                                   </MorphShape>
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <RadialGradient>
+                                                            <matrix>
+                                                                 <Matrix a="0.12945556640625" d="0.12945556640625" tx="125" ty="125"/>
+                                                            </matrix>
+                                                            <GradientEntry color="#FF3809" ratio="0"/>
+                                                            <GradientEntry ratio="1"/>
+                                                       </RadialGradient>
+                                                  </FillStyle>
+                                             </fills>
+                                             <edges>
+                                                  <Edge fillStyle1="1" edges="
+!4000 1000|4000 4000!4000 4000|1000 4000!1000 4000|1000 1000!1000 1000|4000 1000"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="64" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <RadialGradient>
+                                                            <matrix>
+                                                                 <Matrix a="0.12945556640625" d="0.12945556640625" tx="125" ty="125"/>
+                                                            </matrix>
+                                                            <GradientEntry color="#FFFC00" ratio="0"/>
+                                                            <GradientEntry color="#F75151" ratio="1"/>
+                                                       </RadialGradient>
+                                                  </FillStyle>
+                                             </fills>
+                                             <edges>
+                                                  <Edge fillStyle1="1" edges="
+!4000 4000|1000 4000!1000 4000|1000 1000!1000 1000|4000 1000!4000 1000|4000 4000"/>
                                              </edges>
                                         </DOMShape>
                                    </elements>
@@ -3628,7 +3741,7 @@
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>061 Bitmap smoothing</characters>
+                                                       <characters>056 Bitmap smoothing</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
@@ -3645,7 +3758,7 @@
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>062 Video</characters>
+                                                       <characters>057 Video</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
@@ -3656,13 +3769,13 @@
                               </DOMFrame>
                               <DOMFrame index="57" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>063 Multiline text</characters>
+                                                       <characters>058 Multiline text</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
@@ -3673,13 +3786,13 @@
                               </DOMFrame>
                               <DOMFrame index="58" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>064 Rotated stroke normal scaling</characters>
+                                                       <characters>059 Rotated stroke normal scaling</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
@@ -3690,13 +3803,13 @@
                               </DOMFrame>
                               <DOMFrame index="59" keyMode="9728">
                                    <elements>
-                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                        <DOMStaticText selected="true" width="446" height="33.25" includeOutlines="true" isSelectable="false">
                                              <matrix>
                                                   <Matrix tx="22" ty="342"/>
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>065 Rotated vertical/horiz. scaling</characters>
+                                                       <characters>060 Rotated vertical/horiz. scaling</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
@@ -3713,7 +3826,24 @@
                                              </matrix>
                                              <textRuns>
                                                   <DOMTextRun>
-                                                       <characters>066 Antialiasing</characters>
+                                                       <characters>061 Antialiasing</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="61" duration="4" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText width="446" height="33.25" includeOutlines="true" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="22" ty="342"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>062-065 radial/focal tween</characters>
                                                        <textAttrs>
                                                             <DOMTextAttrs aliasText="false" size="30" face="TimesNewRomanPSMT"/>
                                                        </textAttrs>
@@ -3729,6 +3859,10 @@
      </timelines>
      <PrinterSettings/>
      <publishHistory>
+          <PublishItem publishSize="1583" publishTime="1678292643"/>
+          <PublishItem publishSize="1574" publishTime="1678292643"/>
+          <PublishItem publishSize="1575" publishTime="1678292643"/>
+          <PublishItem publishSize="1575" publishTime="1678292642"/>
           <PublishItem publishSize="1431142" publishTime="1671978132" publishDebug="true"/>
           <PublishItem publishSize="3657857" publishTime="1668349897"/>
           <PublishItem publishSize="3657883" publishTime="1666634735"/>
@@ -3745,9 +3879,5 @@
           <PublishItem publishSize="1609" publishTime="1666586837"/>
           <PublishItem publishSize="1609" publishTime="1666586837"/>
           <PublishItem publishSize="1592" publishTime="1637176557"/>
-          <PublishItem publishSize="1586" publishTime="1637176556"/>
-          <PublishItem publishSize="1586" publishTime="1637176556"/>
-          <PublishItem publishSize="1586" publishTime="1637176556"/>
-          <PublishItem publishSize="3655062" publishTime="1617375217"/>
      </publishHistory>
 </DOMDocument>
