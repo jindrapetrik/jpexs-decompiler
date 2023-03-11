@@ -1,0 +1,100 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="3" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveEnabled="true" autoSaveHasPrompted="true">
+     <symbols>
+          <Include href="Circle.xml" loadImmediate="false" itemID="640b7469-0000023d" lastModified="1678472297"/>
+          <Include href="Rect.xml" loadImmediate="false" itemID="640b7414-00000237" lastModified="1678472212"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="My first scene" currentFrame="9">
+               <layers>
+                    <DOMLayer name="Layer 2" color="#9933CC" current="true" isSelected="true" autoNamed="false">
+                         <frames>
+                              <DOMFrame index="0" duration="9" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="9" duration="11" name="S1 MiddleFrame" labelType="name" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 1" color="#4FFF4F">
+                         <frames>
+                              <DOMFrame index="0" duration="19" tweenType="motion" motionTweenSnap="true" keyMode="22017">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Rect" selected="true" centerPoint3DX="145.5" centerPoint3DY="169">
+                                             <matrix>
+                                                  <Matrix tx="78" ty="109"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="67.5" y="60"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="19" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Rect" centerPoint3DX="402.5" centerPoint3DY="262">
+                                             <matrix>
+                                                  <Matrix tx="335" ty="202"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="67.5" y="60"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+          <DOMTimeline name="My second scene" currentFrame="9">
+               <layers>
+                    <DOMLayer name="Layer 2" color="#9933CC" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" duration="9" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="9" duration="11" name="S2 MiddleFrame" labelType="name" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 1" color="#4FFF4F">
+                         <frames>
+                              <DOMFrame index="0" duration="19" tweenType="motion" motionTweenSnap="true" keyMode="22017">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Circle" selected="true" centerPoint3DX="141.75" centerPoint3DY="306.75">
+                                             <matrix>
+                                                  <Matrix tx="74" ty="239"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="67.75" y="67.75"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="19" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Circle" selected="true" centerPoint3DX="415.75" centerPoint3DY="107.75">
+                                             <matrix>
+                                                  <Matrix tx="348" ty="40"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="67.75" y="67.75"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="1256" publishTime="1678473688" publishDebug="true"/>
+          <PublishItem publishSize="1315" publishTime="1678473622" publishDebug="true"/>
+          <PublishItem publishSize="1000" publishTime="1678473077" publishDebug="true"/>
+          <PublishItem publishSize="999" publishTime="1678472885" publishDebug="true"/>
+          <PublishItem publishSize="947" publishTime="1678472416"/>
+     </publishHistory>
+</DOMDocument>
