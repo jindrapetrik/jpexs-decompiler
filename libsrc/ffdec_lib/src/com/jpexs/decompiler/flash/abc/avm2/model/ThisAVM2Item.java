@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.SourceGeneratorLocalData;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instructions;
@@ -41,12 +42,15 @@ public class ThisAVM2Item extends AVM2Item {
     public DottedChain className;
 
     public boolean basicObject;
+    
+    public boolean showClassName;
 
-    public ThisAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, DottedChain className, boolean basicObject) {
+    public ThisAVM2Item(GraphSourceItem instruction, GraphSourceItem lineStartIns, DottedChain className, boolean basicObject, boolean showClassName) {
         super(instruction, lineStartIns, PRECEDENCE_PRIMARY);
         this.className = className;
         this.basicObject = basicObject;
-        getSrcData().localName = "this";
+        this.showClassName = showClassName;
+        getSrcData().localName = "this";        
     }
 
     public boolean isBasicObject() {
@@ -84,6 +88,14 @@ public class ThisAVM2Item extends AVM2Item {
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+        if (showClassName) {
+            if (className != null) {
+                if (localData.fullyQualifiedNames != null && localData.fullyQualifiedNames.contains(className)) {
+                    return writer.append(className.toPrintableString(true)).append(".this");
+                }
+                return writer.append(IdentifiersDeobfuscation.printIdentifier(true, className.getLast())).append(".this");
+            }
+        }
         return writer.append("this");
     }
 

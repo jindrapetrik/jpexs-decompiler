@@ -38,7 +38,7 @@ public class GetScopeObjectIns extends InstructionDefinition {
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
         int index = ins.operands[0];
-        stack.push(localData.scopeStack.get(index));
+        stack.push(localData.localScopeStack.get(index));
     }
 
     @Override

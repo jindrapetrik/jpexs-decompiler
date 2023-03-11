@@ -44,6 +44,7 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
     public void init() throws IOException, InterruptedException {
         addSwf("standard", "testdata/as3_new/bin/as3_new.flex.swf");
         addSwf("assembled", "testdata/as3_assembled/bin/as3_assembled.swf");
+        addSwf("getouterscope", "testdata/getouterscope/getouterscope.swf");
     }
 
     private void decompileScriptPack(String swfId, String path, String expectedResult) {
@@ -487,6 +488,44 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "      myInternal2 function func_inst_namespace_implicit() : int\n"
                 + "      {\n"
                 + "         return 12;\n"
+                + "      }\n"
+                + "   }\n"
+                + "}");
+    }
+
+    @Test
+    public void testGetOuterScope() {
+        decompileScriptPack("getouterscope", "mypkg.MainClass", "package mypkg\n"
+                + "{\n"
+                + "   import flash.display.DisplayObject;\n"
+                + "   import flash.display.DisplayObjectContainer;\n"
+                + "   import flash.display.InteractiveObject;\n"
+                + "   import flash.display.MovieClip;\n"
+                + "   import flash.display.Sprite;\n"
+                + "   import flash.events.EventDispatcher;\n"
+                + "   import flash.text.TextField;\n"
+                + "   \n"
+                + "   public class MainClass extends MovieClip\n"
+                + "   {\n"
+                + "       \n"
+                + "      \n"
+                + "      private var myTextBox:TextField;\n"
+                + "      \n"
+                + "      public function MainClass()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "         this.myTextBox = new TextField();\n"
+                + "         this.myTextBox.text = \"\";\n"
+                + "         this.myTextBox.width = 1024;\n"
+                + "         this.myTextBox.height = 1024;\n"
+                + "         this.myTextBox.multiline = true;\n"
+                + "         addChild(this.myTextBox);\n"
+                + "         this.test();\n"
+                + "      }\n"
+                + "      \n"
+                + "      internal function test() : void\n"
+                + "      {\n"
+                + "         this.myTextBox.text = \"scopes:\\n\" + global + \"\\n\" + Object + \"\\n\" + EventDispatcher + \"\\n\" + DisplayObject + \"\\n\" + InteractiveObject + \"\\n\" + DisplayObjectContainer + \"\\n\" + Sprite + \"\\n\" + MovieClip + \"\\n\" + MainClass + \"\\n\";\n"
                 + "      }\n"
                 + "   }\n"
                 + "}");

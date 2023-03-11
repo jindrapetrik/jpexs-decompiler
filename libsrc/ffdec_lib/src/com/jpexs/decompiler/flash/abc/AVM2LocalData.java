@@ -50,6 +50,8 @@ public class AVM2LocalData extends BaseLocalData {
     public HashMap<Integer, GraphTargetItem> localRegs;
 
     public ScopeStack scopeStack;
+    
+    public ScopeStack localScopeStack;
 
     public MethodBody methodBody;
     
@@ -145,6 +147,7 @@ public class AVM2LocalData extends BaseLocalData {
         classIndex = localData.classIndex;
         localRegs = localData.localRegs;
         scopeStack = localData.scopeStack;
+        localScopeStack = localData.localScopeStack;
         methodBody = localData.methodBody;
         callStack = localData.callStack;
         abc = localData.abc;

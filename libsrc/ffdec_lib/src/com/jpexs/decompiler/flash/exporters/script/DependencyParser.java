@@ -26,12 +26,14 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunction
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.FindPropertyStrictIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetLexIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetOuterScopeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.GetSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.SetSuperIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.AsTypeIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.types.CoerceIns;
+import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.InitVectorAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
@@ -42,6 +44,8 @@ import com.jpexs.decompiler.flash.abc.types.NamespaceSet;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.decompiler.graph.TypeItem;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DependencyParser {
@@ -152,6 +156,30 @@ public class DependencyParser {
                             parseDependenciesFromMethodInfo(abcIndex, trait, scriptIndex, classIndex, isStatic, ignoredCustom, abc, ins.operands[0], dependencies, ignorePackage, fullyQualifiedNames, visitedMethods);
                         }
                     }
+                }
+                if (classIndex > -1 && ins.definition instanceof GetOuterScopeIns) {
+                    if (ins.operands[0] > 0) { //first is global
+                        DottedChain type = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, true);                
+                        AbcIndexing.ClassIndex cls = abcIndex.findClass(new TypeItem(type), abc, scriptIndex);
+                        List<AbcIndexing.ClassIndex> clsList = new ArrayList<>();
+                        cls = cls.parent;
+                        while(cls != null) {
+                            clsList.add(0, cls);
+                            cls = cls.parent;
+                        }
+                        if (ins.operands[0] < 1 + clsList.size()) {
+                            AbcIndexing.ClassIndex cls2 = clsList.get(ins.operands[0] - 1);
+                            DottedChain nimport = cls2.abc.instance_info.get(cls2.index).getName(cls2.abc.constants).getNameWithNamespace(cls2.abc.constants, true);
+                            Dependency depExp = new Dependency(nimport, DependencyType.EXPRESSION);
+                            if (!dependencies.contains(depExp)) {
+                                dependencies.add(depExp);
+                            }
+                        }
+                    }
+                    
+                    /*for (AbcIndexing.ClassIndex cls2: clsList) {
+                        newScopeStack.push(new ClassAVM2Item(cls2.abc.instance_info.get(cls2.index).getName(cls2.abc.constants).getNameWithNamespace(cls2.abc.constants, true)));
+                    } */         
                 }
                 for (int k = 0; k < ins.definition.operands.length; k++) {
                     if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {

@@ -103,7 +103,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
         fullyQualifiedNames = new ArrayList<>();
         writeImports(abcIndex, scriptIndex, classIndex, false, abc, writer, getPackage(abc), fullyQualifiedNames);
         writer.startMethod(method_info);
@@ -112,7 +112,7 @@ public class TraitFunction extends Trait implements TraitWithSlot {
         if (bodyIndex != -1) {
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(abc.bodies.get(bodyIndex));
-            abc.bodies.get(bodyIndex).convert(callStack, abcIndex, convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, new ScopeStack(), 0, writer, fullyQualifiedNames, null, true, new HashSet<>());
+            abc.bodies.get(bodyIndex).convert(callStack, abcIndex, convertData, path + "." + abc.constants.getMultiname(name_index).getName(abc.constants, fullyQualifiedNames, false, true), exportMode, isStatic, method_info, scriptIndex, classIndex, abc, this, scopeStack, 0, writer, fullyQualifiedNames, null, true, new HashSet<>());
         }
         writer.endMethod();
     }

@@ -161,8 +161,8 @@ public class AVM2Graph extends Graph {
         return ret;
     }
 
-    public AVM2Graph(AbcIndexing abcIndex, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssigmentIps) {
-        super(new AVM2GraphSource(code, isStatic, scriptIndex, classIndex, localRegs, scopeStack, abc, body, localRegNames, fullyQualifiedNames, localRegAssigmentIps), getExceptionEntries(body));
+    public AVM2Graph(AbcIndexing abcIndex, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, ScopeStack localScopeStack, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssigmentIps) {
+        super(new AVM2GraphSource(code, isStatic, scriptIndex, classIndex, localRegs, abc, body, localRegNames, fullyQualifiedNames, localRegAssigmentIps), getExceptionEntries(body));
         this.avm2code = code;
         this.abc = abc;
         this.body = body;
@@ -248,7 +248,8 @@ public class AVM2Graph extends Graph {
             TranslateStack finallyTryTargetStack = (TranslateStack) new TranslateStack("try_target");
 
             AVM2LocalData localData2 = new AVM2LocalData(localData);
-            localData2.scopeStack = new ScopeStack();
+            //localData2.scopeStack = new ScopeStack();
+            localData2.localScopeStack = new ScopeStack();
 
             List<GraphTargetItem> targetOutput;
             try {
@@ -626,7 +627,8 @@ public class AVM2Graph extends Graph {
     }
 
     public static List<GraphTargetItem> translateViaGraph(SecondPassData secondPassData, List<MethodBody> callStack, AbcIndexing abcIndex, String path, AVM2Code code, ABC abc, MethodBody body, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, HashMap<Integer, String> localRegNames, HashMap<Integer, GraphTargetItem> localRegTypes, List<DottedChain> fullyQualifiedNames, int staticOperation, HashMap<Integer, Integer> localRegAssigmentIps, boolean thisHasDefaultToPrimitive) throws InterruptedException {
-        AVM2Graph g = new AVM2Graph(abcIndex, code, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localRegNames, fullyQualifiedNames, localRegAssigmentIps);
+        ScopeStack localScopeStack = new ScopeStack();
+        AVM2Graph g = new AVM2Graph(abcIndex, code, abc, body, isStatic, scriptIndex, classIndex, localRegs, scopeStack, localScopeStack, localRegNames, fullyQualifiedNames, localRegAssigmentIps);
 
         AVM2LocalData localData = new AVM2LocalData();
         localData.secondPassData = secondPassData;
@@ -635,6 +637,7 @@ public class AVM2Graph extends Graph {
         localData.classIndex = classIndex;
         localData.localRegs = localRegs;
         localData.scopeStack = scopeStack;
+        localData.localScopeStack = localScopeStack;
         localData.methodBody = body;
         localData.callStack = callStack;
         localData.abc = abc;
@@ -1063,7 +1066,8 @@ public class AVM2Graph extends Graph {
                 st2.clear();
                 st2.add(new ExceptionAVM2Item(finallyException));
                 AVM2LocalData localData2 = new AVM2LocalData(localData);
-                localData2.scopeStack = new ScopeStack();
+                //localData2.scopeStack = new ScopeStack();
+                localData2.localScopeStack = new ScopeStack();
 
                 try {
                     //We are assuming Finally target has only 1 part
@@ -1181,7 +1185,8 @@ public class AVM2Graph extends Graph {
                     }
                 }
                 AVM2LocalData localData2 = new AVM2LocalData(localData);
-                localData2.scopeStack = new ScopeStack();
+                //localData2.scopeStack = new ScopeStack();
+                localData2.localScopeStack = new ScopeStack();
 
                 List<GraphPart> stopPart2 = new ArrayList<>(stopPart);
                 List<StopPartKind> stopPartKind2 = new ArrayList<>(stopPartKind);
@@ -1202,7 +1207,7 @@ public class AVM2Graph extends Graph {
                     WithAVM2Item w = (WithAVM2Item) currentCatchCommands.get(0);
                     if (w.scope instanceof LocalRegAVM2Item) {
                         int regId = ((LocalRegAVM2Item) w.scope).regIndex;
-                        for (GraphTargetItem item : localData.scopeStack) {
+                        for (GraphTargetItem item : localData.localScopeStack) {
                             if (item instanceof WithObjectAVM2Item) {
                                 WithObjectAVM2Item wo = (WithObjectAVM2Item) item;
 
@@ -2381,8 +2386,8 @@ public class AVM2Graph extends Graph {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         AVM2LocalData ret = new AVM2LocalData(aLocalData);
         ScopeStack copyScopeStack = new ScopeStack();
-        copyScopeStack.addAll(ret.scopeStack);
-        ret.scopeStack = copyScopeStack;
+        copyScopeStack.addAll(ret.localScopeStack);
+        ret.localScopeStack = copyScopeStack;
         return ret;
     }
 

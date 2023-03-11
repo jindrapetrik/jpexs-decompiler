@@ -17,9 +17,16 @@
 package com.jpexs.decompiler.flash.abc.avm2.instructions.other;
 
 import com.jpexs.decompiler.flash.abc.ABC;
+import com.jpexs.decompiler.flash.abc.AVM2LocalData;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
+import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
+import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.TranslateStack;
+import java.util.List;
 
 /**
  *
@@ -31,6 +38,19 @@ public class GetOuterScopeIns extends InstructionDefinition {
         super(0x67, "getouterscope", new int[]{AVM2Code.DAT_SCOPE_INDEX}, false);
     }
 
+    @Override
+    public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
+        int index = ins.operands[0];
+        GraphTargetItem item = localData.scopeStack.get(index);
+        if (item instanceof ThisAVM2Item) {
+            if (((ThisAVM2Item)item).className.equals(DottedChain.parseNoSuffix("global"))) {
+                stack.push(new GlobalAVM2Item(null, null));
+                return;
+            }
+        }
+        stack.push(item);
+    }
+    
     @Override
     public int getStackPopCount(AVM2Instruction ins, ABC abc) {
         return 0;
