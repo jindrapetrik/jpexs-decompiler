@@ -18,9 +18,11 @@ package com.jpexs.decompiler.flash.abc.types.traits;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.ClassAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
@@ -214,7 +216,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
     }
 
     @Override
-    public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) throws InterruptedException {
+    public void convert(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
 
         fullyQualifiedNames = new ArrayList<>();
 
@@ -234,8 +236,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
             }
         } else {
             convertData.thisHasDefaultToPrimitive = true;
-        }
-
+        }        
+        ScopeStack newScopeStack = (ScopeStack)scopeStack.clone();
         //class initializer
         int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);
         if (bodyIndex != -1) {
@@ -243,11 +245,27 @@ public class TraitClass extends Trait implements TraitWithSlot {
             List<Traits> ts = new ArrayList<>();
             ts.add(classInfo.static_traits);
             List<MethodBody> callStack = new ArrayList<>();
-            callStack.add(abc.bodies.get(bodyIndex));               
-            abc.bodies.get(bodyIndex).convert(callStack, abcIndex, convertData, path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
+            callStack.add(abc.bodies.get(bodyIndex));   
+            
+            if (!abc.instance_info.get(class_info).isInterface()) {
+                AbcIndexing.ClassIndex cls = abcIndex.findClass(AbcIndexing.multinameToType(abc.instance_info.get(class_info).name_index, abc.constants), abc, scriptIndex);
+                List<AbcIndexing.ClassIndex> clsList = new ArrayList<>();
+                cls = cls.parent;
+                while(cls != null) {
+                    clsList.add(0, cls);
+                    cls = cls.parent;
+                }
+                for (AbcIndexing.ClassIndex cls2: clsList) {
+                    newScopeStack.push(new ClassAVM2Item(cls2.abc.instance_info.get(cls2.index).getName(cls2.abc.constants).getNameWithNamespace(cls2.abc.constants, true)));
+                }                
+            }                                                 
+            
+            abc.bodies.get(bodyIndex).convert(callStack, abcIndex, convertData, path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, newScopeStack, GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
+            
+            newScopeStack.push(new ClassAVM2Item(abc.instance_info.get(class_info).getName(abc.constants)));        
             classInitializerIsEmpty = !writer.getMark();
-        }
-
+        }            
+        
         //constructor - instance initializer
         if (!instanceInfo.isInterface()) {
             bodyIndex = abc.findBodyIndex(instanceInfo.iinit_index);
@@ -312,9 +330,9 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
 
         //static variables,constants & methods
-        classInfo.static_traits.convert(abcIndex, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        classInfo.static_traits.convert(abcIndex, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, true, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, newScopeStack);
 
-        instanceInfo.instance_traits.convert(abcIndex, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel);
+        instanceInfo.instance_traits.convert(abcIndex, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, newScopeStack);
     }
 
     @Override

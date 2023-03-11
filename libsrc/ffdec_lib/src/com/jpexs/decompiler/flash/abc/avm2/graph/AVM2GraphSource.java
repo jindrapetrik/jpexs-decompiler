@@ -53,8 +53,6 @@ public class AVM2GraphSource extends GraphSource {
 
     HashMap<Integer, GraphTargetItem> localRegs;
 
-    ScopeStack scopeStack;
-
     ABC abc;
 
     MethodBody body;
@@ -69,12 +67,11 @@ public class AVM2GraphSource extends GraphSource {
         return code;
     }
 
-    public AVM2GraphSource(AVM2Code code, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ScopeStack scopeStack, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssigmentIp) {
+    public AVM2GraphSource(AVM2Code code, boolean isStatic, int scriptIndex, int classIndex, HashMap<Integer, GraphTargetItem> localRegs, ABC abc, MethodBody body, HashMap<Integer, String> localRegNames, List<DottedChain> fullyQualifiedNames, HashMap<Integer, Integer> localRegAssigmentIp) {
         this.code = code;
         this.isStatic = isStatic;
         this.classIndex = classIndex;
         this.localRegs = localRegs;
-        this.scopeStack = scopeStack;
         this.abc = abc;
         this.body = body;
         this.localRegNames = localRegNames;
@@ -115,9 +112,8 @@ public class AVM2GraphSource extends GraphSource {
     @Override
     public List<GraphTargetItem> translatePart(Graph graph, GraphPart part, BaseLocalData localData, TranslateStack stack, int start, int end, int staticOperation, String path) throws InterruptedException {
         List<GraphTargetItem> ret = new ArrayList<>();
-        ScopeStack newstack = ((AVM2LocalData) localData).scopeStack;
         Reference<GraphSourceItem> lineStartItem = new Reference<>(localData.lineStartInstruction);
-        ConvertOutput co = code.toSourceOutput(localData.allSwitchParts, ((AVM2LocalData) localData).callStack, ((AVM2LocalData) localData).abcIndex, ((AVM2LocalData) localData).setLocalPosToGetLocalPos, ((AVM2LocalData) localData).thisHasDefaultToPrimitive, lineStartItem, path, part, false, isStatic, scriptIndex, classIndex, localRegs, stack, newstack, abc, body, start, end, localRegNames, ((AVM2LocalData) localData).localRegTypes, fullyQualifiedNames, new boolean[size()], localRegAssigmentIps);
+        ConvertOutput co = code.toSourceOutput(localData.allSwitchParts, ((AVM2LocalData) localData).callStack, ((AVM2LocalData) localData).abcIndex, ((AVM2LocalData) localData).setLocalPosToGetLocalPos, ((AVM2LocalData) localData).thisHasDefaultToPrimitive, lineStartItem, path, part, false, isStatic, scriptIndex, classIndex, localRegs, stack, ((AVM2LocalData) localData).scopeStack, ((AVM2LocalData) localData).localScopeStack, abc, body, start, end, localRegNames, ((AVM2LocalData) localData).localRegTypes, fullyQualifiedNames, new boolean[size()], localRegAssigmentIps);
         localData.lineStartInstruction = lineStartItem.getVal();
         ret.addAll(co.output);
         return ret;

@@ -16,8 +16,10 @@
  */
 package com.jpexs.decompiler.flash.abc.avm2.model;
 
+import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
 import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
@@ -29,14 +31,27 @@ import com.jpexs.decompiler.graph.model.LocalData;
 public class ClassAVM2Item extends AVM2Item {
 
     public Multiname className;
+    
+    public DottedChain classNameAsStr;
 
     public ClassAVM2Item(Multiname className) {
         super(null, null, PRECEDENCE_PRIMARY);
         this.className = className;
     }
+    
+    public ClassAVM2Item(DottedChain className) {
+        super(null, null, PRECEDENCE_PRIMARY);
+        this.classNameAsStr = className;
+    }
 
     @Override
     public GraphTextWriter appendTo(GraphTextWriter writer, LocalData localData) {
+        if (classNameAsStr != null) {
+            if (localData.fullyQualifiedNames != null && localData.fullyQualifiedNames.contains(classNameAsStr)) {
+                return writer.append(classNameAsStr.toPrintableString(true));
+            }
+            return writer.append(IdentifiersDeobfuscation.printIdentifier(true, classNameAsStr.getLast()));
+        }
         return writer.append(className.getName(localData.constantsAvm2, localData.fullyQualifiedNames, false, true));
     }
 

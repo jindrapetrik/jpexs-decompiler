@@ -28,6 +28,7 @@ import com.jpexs.decompiler.flash.abc.avm2.model.ConvertAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.DecrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.FullMultinameAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.model.GlobalAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IncrementAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.LocalRegAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.PostDecrementAVM2Item;
@@ -71,8 +72,12 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
         int regId = getRegisterId(ins);
 
         if (regId == 0) {
-            if ((localData.classIndex >= localData.getInstanceInfo().size()) || localData.classIndex < 0) {
-                stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, DottedChain.OBJECT /*?*/, false));
+            if (localData.classIndex == -1) {
+                stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, DottedChain.parseNoSuffix("global"), false, false));
+                return;
+            }            
+            if ((localData.classIndex >= localData.getInstanceInfo().size())) {
+                stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, DottedChain.OBJECT /*?*/, false, false));
                 return;
             }
             if (localData.isStatic) {
@@ -81,7 +86,7 @@ public abstract class GetLocalTypeIns extends InstructionDefinition {
                 List<Trait> ts = localData.getInstanceInfo().get(localData.classIndex).instance_traits.traits;
                 boolean isBasicObject = localData.thisHasDefaultToPrimitive;
                 Multiname m = localData.getInstanceInfo().get(localData.classIndex).getName(localData.getConstants());
-                stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, m.getNameWithNamespace(localData.getConstants(), true), isBasicObject));
+                stack.push(new ThisAVM2Item(ins, localData.lineStartInstruction, m.getNameWithNamespace(localData.getConstants(), true), isBasicObject, false));
             }
             return;
         }

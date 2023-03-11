@@ -65,7 +65,7 @@ public class PushScopeIns extends InstructionDefinition {
             }
             
         }
-        localData.scopeStack.push(top);
+        localData.localScopeStack.push(top);
     }
 
     @Override

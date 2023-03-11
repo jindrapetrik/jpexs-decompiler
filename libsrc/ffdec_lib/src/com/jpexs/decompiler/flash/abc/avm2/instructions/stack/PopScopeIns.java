@@ -46,7 +46,7 @@ public class PopScopeIns extends InstructionDefinition {
 
     @Override
     public void translate(AVM2LocalData localData, TranslateStack stack, AVM2Instruction ins, List<GraphTargetItem> output, String path) {
-        GraphTargetItem scope = localData.scopeStack.pop();
+        GraphTargetItem scope = localData.localScopeStack.pop();
         if (scope instanceof WithObjectAVM2Item) {
             scope = ((WithObjectAVM2Item) scope).scope;
             output.add(new WithEndAVM2Item(ins, localData.lineStartInstruction, scope));
