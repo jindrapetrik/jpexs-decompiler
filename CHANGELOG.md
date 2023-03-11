@@ -27,9 +27,11 @@ All notable changes to this project will be documented in this file.
 - AS3 interfaces - internal modifier on methods
 - AS3 direct editation - interface method namespace
 - AS3 p-code docs - deldescendants, negate_p operands
+- AS3 p-code - IGNORE_REST method flag incorrectly shown as EXPLICIT
 
 ### Changed
 - AS1/2/3 P-code - format Number values with EcmaScript toString function
+- AS3 p-code - EXPLICIT method flag renamed to NATIVE
 
 ## [18.3.6] - 2023-02-25
 ### Fixed

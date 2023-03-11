@@ -248,9 +248,11 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   "flag"                        {  yybegin(PARAMETERS); return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_FLAG, yytext());}
   
 
+  /* Flag - old alias for "NATIVE" */
+  "EXPLICIT"                   {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NATIVE, yytext());}  
 
    /*Flags*/
-  "EXPLICIT"                   {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_EXPLICIT, yytext());}
+  "NATIVE"                     {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_NATIVE, yytext());}  
   "HAS_OPTIONAL"               {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_HAS_OPTIONAL, yytext());}
   "HAS_PARAM_NAMES"            {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_HAS_PARAM_NAMES, yytext());}
   "IGNORE_REST"                {  return new ParsedSymbol(ParsedSymbol.TYPE_KEYWORD_IGNORE_REST, yytext());}

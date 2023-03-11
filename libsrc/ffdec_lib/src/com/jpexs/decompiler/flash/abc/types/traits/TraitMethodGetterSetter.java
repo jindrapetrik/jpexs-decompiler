@@ -94,7 +94,7 @@ public class TraitMethodGetterSetter extends Trait {
         
         getModifiers(abc, isStatic, insideInterface, writer);
         
-        if (abc.method_info.get(method_info).flagExplicit()) {
+        if (abc.method_info.get(method_info).flagNative()) {
             writer.appendNoHilight("native ");
         }
 

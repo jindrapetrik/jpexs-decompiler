@@ -888,8 +888,8 @@ public class ASM3Parser {
             if (symb.type == ParsedSymbol.TYPE_KEYWORD_FLAG) {
                 symb = lexer.lex();
                 switch (symb.type) {
-                    case ParsedSymbol.TYPE_KEYWORD_EXPLICIT:
-                        info.setFlagExplicit();
+                    case ParsedSymbol.TYPE_KEYWORD_NATIVE:
+                        info.setFlagNative();
                         break;
                     case ParsedSymbol.TYPE_KEYWORD_HAS_OPTIONAL:
                         info.setFlagHas_optional();
