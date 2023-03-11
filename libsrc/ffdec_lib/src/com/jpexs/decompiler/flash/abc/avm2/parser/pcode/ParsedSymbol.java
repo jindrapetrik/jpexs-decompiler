@@ -116,7 +116,7 @@ public class ParsedSymbol {
 
     public static final int TYPE_KEYWORD_FLAG = 45;
 
-    public static final int TYPE_KEYWORD_EXPLICIT = 46;
+    public static final int TYPE_KEYWORD_NATIVE = 46;
 
     public static final int TYPE_KEYWORD_HAS_OPTIONAL = 47;
 

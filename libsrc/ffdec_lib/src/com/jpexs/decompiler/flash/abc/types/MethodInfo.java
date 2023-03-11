@@ -60,7 +60,7 @@ public class MethodInfo {
     public int ret_type;
 
     public int name_index; //0=no name
-    // 1=need_arguments, 2=need_activation, 4=need_rest 8=has_optional 16=ignore_rest, 32=explicit, 64=setsdxns, 128=has_paramnames
+    // 1=need_arguments, 2=need_activation, 4=need_rest 8=has_optional 16=ignore_rest, 32=native, 64=setsdxns, 128=has_paramnames
 
     public static int FLAG_NEED_ARGUMENTS = 1;
 
@@ -72,7 +72,7 @@ public class MethodInfo {
 
     public static int FLAG_IGNORE_REST = 16;
 
-    public static int FLAG_EXPLICIT = 32;
+    public static int FLAG_NATIVE = 32;
 
     public static int FLAG_SETSDXNS = 64;
 
@@ -88,8 +88,8 @@ public class MethodInfo {
         flags |= FLAG_IGNORE_REST;
     }
 
-    public void setFlagExplicit() {
-        flags |= FLAG_EXPLICIT;
+    public void setFlagNative() {
+        flags |= FLAG_NATIVE;
     }
 
     public void setFlagNeed_Arguments() {
@@ -206,8 +206,8 @@ public class MethodInfo {
         return (flags & FLAG_IGNORE_REST) == FLAG_IGNORE_REST;
     }
 
-    public boolean flagExplicit() {
-        return (flags & FLAG_EXPLICIT) == FLAG_EXPLICIT;
+    public boolean flagNative() {
+        return (flags & FLAG_NATIVE) == FLAG_NATIVE;
     }
 
     public boolean flagSetsdxns() {
@@ -404,9 +404,9 @@ public class MethodInfo {
         writer.appendNoHilight("name ");
         writer.hilightSpecial(name_index == 0 ? "null" : "\"" + Helper.escapeActionScriptString(getName(constants)) + "\"", HighlightSpecialType.METHOD_NAME);
         writer.newLine();
-        if (flagExplicit()) {
+        if (flagNative()) {
             writer.appendNoHilight("flag ");
-            writer.hilightSpecial("EXPLICIT", HighlightSpecialType.FLAG_EXPLICIT);
+            writer.hilightSpecial("NATIVE", HighlightSpecialType.FLAG_NATIVE);
             writer.newLine();
         }
         if (flagHas_optional()) {
@@ -421,7 +421,7 @@ public class MethodInfo {
         }
         if (flagIgnore_rest()) {
             writer.appendNoHilight("flag ");
-            writer.hilightSpecial("EXPLICIT", HighlightSpecialType.FLAG_IGNORE_REST);
+            writer.hilightSpecial("IGNORE_REST", HighlightSpecialType.FLAG_IGNORE_REST);
             writer.newLine();
         }
         if (flagNeed_activation()) {

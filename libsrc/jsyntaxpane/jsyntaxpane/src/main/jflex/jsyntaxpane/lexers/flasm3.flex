@@ -169,8 +169,11 @@ ExceptionTarget = "exceptiontarget "{PositiveNumberLiteral}":"
   ","                          {  return token(TokenType.OPERATOR); }
 
 
+  /* Flag - old alias for "NATIVE" */
+  "EXPLICIT"                   {  return token(TokenType.KEYWORD2);}
+
   /*Flags*/
-  "EXPLICIT"                   |
+  "NATIVE"                     |
   "HAS_OPTIONAL"               |
   "HAS_PARAM_NAMES"            |
   "IGNORE_REST"                |
