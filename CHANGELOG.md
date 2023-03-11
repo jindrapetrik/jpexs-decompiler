@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
 - AS3 direct editation - interface method namespace
 - AS3 p-code docs - deldescendants, negate_p operands
 - AS3 p-code - IGNORE_REST method flag incorrectly shown as EXPLICIT
+- [#1989] AS3 - Slow deobfuscation (AVM2DeobfuscatorSimpleOld)
 
 ### Changed
 - AS1/2/3 P-code - format Number values with EcmaScript toString function
@@ -3001,6 +3002,7 @@ All notable changes to this project will be documented in this file.
 [#1981]: https://www.free-decompiler.com/flash/issues/1981
 [#1982]: https://www.free-decompiler.com/flash/issues/1982
 [#1986]: https://www.free-decompiler.com/flash/issues/1986
+[#1989]: https://www.free-decompiler.com/flash/issues/1989
 [#1970]: https://www.free-decompiler.com/flash/issues/1970
 [#1972]: https://www.free-decompiler.com/flash/issues/1972
 [#1973]: https://www.free-decompiler.com/flash/issues/1973

@@ -2798,10 +2798,16 @@ public class AVM2Code implements Cloneable {
     }
 
     public int removeDeadCode(MethodBody body) throws InterruptedException {
+        return removeDeadCode(body, new Reference<>(-1));
+    }
+    
+    public int removeDeadCode(MethodBody body, Reference<Integer> minChangedIpRef) throws InterruptedException {
         HashMap<Integer, List<Integer>> refs = visitCode(body);
         int cnt = 0;
+        Integer minChangedIp = -1;
         for (int i = code.size() - 1; i >= 0; i--) {
             if (refs.get(i).isEmpty()) {
+                minChangedIp = i;
                 code.get(i).setIgnored(true, 0);
                 cnt++;
             }
@@ -2814,6 +2820,9 @@ public class AVM2Code implements Cloneable {
             if (ins.definition instanceof JumpIns) {
                 if (ins.operands[0] == 0) {
                     ins.setIgnored(true, 0);
+                    if (minChangedIp == -1 || minChangedIp > i) {
+                        minChangedIp = i;
+                    }
                     cnt++;
                 }
             }
@@ -2821,6 +2830,8 @@ public class AVM2Code implements Cloneable {
 
         removeIgnored(body);
 
+        minChangedIpRef.setVal(minChangedIp);
+        
         return cnt;
     }
 
