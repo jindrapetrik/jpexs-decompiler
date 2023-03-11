@@ -40,8 +40,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.localregs.SetLocalTypeIn
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.HasNext2Ins;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.LabelIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.other.NopIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.DecLocalPIns;
-import com.jpexs.decompiler.flash.abc.avm2.instructions.other2.IncLocalPIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.DecLocalPIns;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.other.decimalsupport.IncLocalPIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PopIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushByteIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushScopeIns;
