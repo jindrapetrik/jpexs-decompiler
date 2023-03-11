@@ -101,6 +101,7 @@ import com.jpexs.decompiler.graph.TranslateException;
 import com.jpexs.decompiler.graph.TranslateStack;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.TrueItem;
+import com.jpexs.helpers.Reference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -176,16 +177,18 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
             if (Thread.currentThread().isInterrupted()) {
                 throw new InterruptedException();
             }
-
+            
             localData.scopeStack.clear();
             localData.localRegs.clear();
             localData.localRegAssignmentIps.clear();
             localData.localRegs.clear();
             initLocalRegs(localData, localReservedCount, body.max_regs);
-
-            if (executeInstructions(importantOffsets, staticRegs, body, abc, code, localData, i, code.code.size() - 1, null, inlineIns, jumpTargets)) {
-                //startover because dead code was removed and current ip is thus invalid
-                i = -1;
+            Reference<Integer> minChangedIpRef = new Reference<>(-1);
+            if (executeInstructions(importantOffsets, staticRegs, body, abc, code, localData, i, code.code.size() - 1, null, inlineIns, jumpTargets, minChangedIpRef)) {
+                int minChangedIp = minChangedIpRef.getVal();
+                if (minChangedIp < i + 1) {
+                    i = minChangedIp - 1;
+                }
             }
         }
 
@@ -221,11 +224,13 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
         }
     }
 
-    private boolean executeInstructions(Set<Long> importantOffsets, Map<Integer, GraphTargetItem> staticRegs, MethodBody body, ABC abc, AVM2Code code, AVM2LocalData localData, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns, List<Integer> jumpTargets) throws InterruptedException {
+    private boolean executeInstructions(Set<Long> importantOffsets, Map<Integer, GraphTargetItem> staticRegs, MethodBody body, ABC abc, AVM2Code code, AVM2LocalData localData, int idx, int endIdx, ExecutionResult result, List<AVM2Instruction> inlineIns, List<Integer> jumpTargets, Reference<Integer> minChangedIpRef) throws InterruptedException {
         List<GraphTargetItem> output = new ArrayList<>();
 
         FixItemCounterTranslateStack stack = new FixItemCounterTranslateStack("");
         int instructionsProcessed = 0;
+        
+        int minChangedIp = Integer.MAX_VALUE;
 
         endIdx = code.code.size() - 1;
         while (true) {
@@ -270,9 +275,11 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                             if (fins.definition instanceof NewFunctionIns) {
                                 int fidx = code.code.indexOf(fins);
                                 code.removeInstruction(fidx, body);
+                                if (fidx < minChangedIp) minChangedIp = fidx;
                             }
                             int nidx = code.code.indexOf(ins);
                             code.removeInstruction(nidx, body);
+                            if (nidx < minChangedIp) minChangedIp = nidx;
                             if (nins == null) {
                                 idx = code.code.size();
                             } else {
@@ -295,6 +302,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                         int regId = ((SetLocalTypeIns) def).getRegisterId(ins);
                         staticRegs.put(regId, localData.localRegs.get(regId).getNotCoerced());
                         code.replaceInstruction(idx, new AVM2Instruction(0, DeobfuscatePopIns.getInstance(), null), body);
+                        if (idx < minChangedIp) minChangedIp = idx;
 
                         importantOffsets.clear();
                         importantOffsets.addAll(code.getImportantOffsets(body, false));
@@ -315,6 +323,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                     }
 
                     code.replaceInstruction(idx, pushins, body);
+                    if (idx < minChangedIp) minChangedIp = idx;
                     stack.push(staticRegs.get(regId));
                     ins = pushins;
                     def = ins.definition;
@@ -418,6 +427,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
             boolean ifed = false;
             if (def instanceof PopIns) {
                 code.replaceInstruction(idx, new AVM2Instruction(ins.getAddress(), DeobfuscatePopIns.getInstance(), null), body);
+                if (idx < minChangedIp) minChangedIp = idx;
                 idx++;
             } else if (def instanceof JumpIns) {
                 long address = ins.getTargetAddress();
@@ -449,6 +459,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                     AVM2Instruction jumpIns = new AVM2Instruction(0, AVM2Instructions.Jump, new int[]{0});
                     //jumpIns.operands[0] = ins.operands[0] /*- ins.getBytes().length*/ + jumpIns.getBytes().length;
                     code.replaceInstruction(idx, jumpIns, body);
+                    if (idx < minChangedIp) minChangedIp = idx;
                     jumpIns.operands[0] = (int) (tarIns.getAddress() - jumpIns.getAddress() - jumpIns.getBytesLength());
                     for (int s = 0; s < stackCount; s++) {
                         code.insertInstruction(idx, new AVM2Instruction(ins.getAddress(), DeobfuscatePopIns.getInstance(), null), true, body);
@@ -457,6 +468,7 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                     idx = code.adr2pos(jumpIns.getTargetAddress());
                 } else {
                     //System.err.println("replacing " + ins + " on " + idx + " with pop");
+                    if (idx < minChangedIp) minChangedIp = idx;
                     code.replaceInstruction(idx, new AVM2Instruction(ins.getAddress(), DeobfuscatePopIns.getInstance(), null), body);
                     for (int s = 1 /*first is replaced*/; s < stackCount; s++) {
                         code.insertInstruction(idx, new AVM2Instruction(ins.getAddress(), DeobfuscatePopIns.getInstance(), null), true, body);
@@ -465,13 +477,24 @@ public class AVM2DeobfuscatorSimpleOld extends AVM2DeobfuscatorZeroJumpsNullPush
                     idx++;
                 }
 
-                //this might be slow:-(, but makes importantOffsets relevant
-                code.removeDeadCode(body);
-                removeZeroJumps(code, body);
+                Reference<Integer> minChangedIp2Ref = new Reference<>(-1);
+                //this might be slow:-(, but makes importantOffsets relevant               
+                code.removeDeadCode(body, minChangedIp2Ref);
+                
+                if (minChangedIp2Ref.getVal() != -1 && minChangedIp2Ref.getVal() < minChangedIp) {
+                    minChangedIp = minChangedIp2Ref.getVal();
+                }
+                minChangedIp2Ref.setVal(-1);
+                removeZeroJumps(code, body, minChangedIp2Ref);
+                
+                if (minChangedIp2Ref.getVal() != -1 && minChangedIp2Ref.getVal() < minChangedIp) {
+                    minChangedIp = minChangedIp2Ref.getVal();
+                }
 
                 importantOffsets.clear();
                 importantOffsets.addAll(code.getImportantOffsets(body, false));
 
+                minChangedIpRef.setVal(minChangedIp);
                 return true;
                 //endIdx = code.code.size()-1;
 

@@ -37,6 +37,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushUndefinedIns;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.helpers.SWFDecompilerAdapter;
+import com.jpexs.helpers.Reference;
 import java.util.Set;
 
 /**
@@ -45,8 +46,13 @@ import java.util.Set;
  */
 public class AVM2DeobfuscatorZeroJumpsNullPushes extends SWFDecompilerAdapter {
 
+    
     protected boolean removeZeroJumps(AVM2Code code, MethodBody body) throws InterruptedException {
+        return removeZeroJumps(code, body, new Reference<>(-1));
+    }
+    protected boolean removeZeroJumps(AVM2Code code, MethodBody body, Reference<Integer> minChangedIpRef) throws InterruptedException {
         boolean result = false;
+        int minChangedIp = -1;
         for (int i = 0; i < code.code.size(); i++) {
             AVM2Instruction ins = code.code.get(i);
             if (ins.definition instanceof JumpIns) {
@@ -55,12 +61,16 @@ public class AVM2DeobfuscatorZeroJumpsNullPushes extends SWFDecompilerAdapter {
                         throw new InterruptedException();
                     }
 
+                    if (minChangedIp == -1) {
+                        minChangedIp = i;
+                    }
                     code.removeInstruction(i, body);
                     i--;
                     result = true;
                 }
             }
         }
+        minChangedIpRef.setVal(minChangedIp);
         return result;
     }
 
