@@ -18,6 +18,10 @@ package com.jpexs.decompiler.flash.abc.avm2.instructions.other.unknown;
 
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
+import com.jpexs.decompiler.flash.abc.avm2.AVM2Runtime;
+import com.jpexs.decompiler.flash.abc.avm2.LocalDataArea;
+import com.jpexs.decompiler.flash.abc.avm2.exceptions.AVM2VerifyErrorException;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2InstructionFlag;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
@@ -32,6 +36,15 @@ public class PushConstantIns extends InstructionDefinition {
 
     public PushConstantIns() {
         super(0x22, "pushconstant", new int[]{AVM2Code.OPT_U30}, false /*?*/, AVM2InstructionFlag.UNDOCUMENTED, AVM2InstructionFlag.UNKNOWN_STACK, AVM2InstructionFlag.NO_FLASH_PLAYER);
+    }
+    
+    @Override
+    public void verify(LocalDataArea lda, AVM2ConstantPool constants, AVM2Instruction ins) throws AVM2VerifyErrorException {
+        if (lda.getRuntime() == AVM2Runtime.ADOBE_FLASH) {
+            illegalOpCode(lda, ins);
+        }
+
+        super.verify(lda, constants, ins);
     }
 
     @Override
