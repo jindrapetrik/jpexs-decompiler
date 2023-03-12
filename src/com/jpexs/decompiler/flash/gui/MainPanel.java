@@ -5600,7 +5600,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (frame < 0 || frame >= pageCount) {
                         frame = 0;
                     }
-
+                    //TODO: make this static texts instead of FontTag as drawable.
+                    //We do not want to draw fonts directly added to stage as
+                    //Fonts are really added to stage in some corner cases like for vertical text.
                     Frame f = new Frame(timeline, 0);
                     DepthState ds = new DepthState(tag.getSwf(), f);
                     ds.characterId = ((CharacterTag) tag).getCharacterId();
