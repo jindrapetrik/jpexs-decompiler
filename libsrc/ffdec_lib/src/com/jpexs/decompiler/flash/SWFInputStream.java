@@ -1608,7 +1608,7 @@ public class SWFInputStream implements AutoCloseable {
             tagLength = available;
         }
 
-        ByteArrayRange dataRange = new ByteArrayRange(swf.uncompressedData, (int) pos, (int) (tagLength + headerLength));
+        ByteArrayRange dataRange = new ByteArrayRange(this.data, (int) pos, (int) (tagLength + headerLength));
         skipBytes(tagLength);
 
         TagStub tagStub = new TagStub(swf, tagID, "Unresolved", dataRange, tagDataStream);
