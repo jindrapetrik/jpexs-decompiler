@@ -32,7 +32,7 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
 public class PushDNanIns extends InstructionDefinition {
 
     public PushDNanIns() {
-        super(0x34, "pushdnan", new int[]{}, true, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.ES4_NUMERICS_MINOR, AVM2InstructionFlag.UNKNOWN_STACK);
+        super(0x34, "pushdnan", new int[]{}, true, AVM2InstructionFlag.NO_FLASH_PLAYER, AVM2InstructionFlag.ES4_NUMERICS_MINOR);
     }
 
     @Override
