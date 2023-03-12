@@ -548,7 +548,7 @@ public class AVM2Code implements Cloneable {
         /*0x59*/ new GetDescendantsIns(),
         /*0x5A*/ new NewCatchIns(),
         /*0x5B*/ new DelDescendantsIns(), //deldescendants according to Flex, findpropglobalstrict(internal-only) according to Tamarin
-        /*0x5C*/ new FindPropGlobalIns(), //Tamarin (internal-only)
+        /*0x5C*/ //new FindPropGlobalIns(), //Tamarin (internal-only)
         /*0x5D*/ new FindPropertyStrictIns(),
         /*0x5E*/ new FindPropertyIns(),
         /*0x5F*/ new FindDefIns(),
