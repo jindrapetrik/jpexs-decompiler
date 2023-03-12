@@ -30,7 +30,8 @@ import com.jpexs.decompiler.flash.abc.avm2.instructions.InstructionDefinition;
  *
  * @author JPEXS
  * 
- * source: https://github.com/magicalhobo/SWFWire/blob/master/SWFWireDecompiler/src/com/swfwire/decompiler/abc/ABCInstructions.as
+ * source: https://github.com/adobe-flash/avmplus/blob/65a05927767f3735db37823eebf7d743531f5d37/utils/abcdis/abc/Constants.as
+ * (internal only)
  */
 public class FindPropGlobalIns extends InstructionDefinition {
 
