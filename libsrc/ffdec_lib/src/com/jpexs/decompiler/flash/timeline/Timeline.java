@@ -44,6 +44,7 @@ import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DisplayObjectCacheKey;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.MorphShapeTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
@@ -337,7 +338,7 @@ public class Timeline {
                         if (swf.getCyclicCharacters().contains(characterId)) {
                             fl.characterId = -1;
                         }
-                    }
+                    }                    
                     String className = po.getClassName();
                     if (className != null) {
                         fl.className = className;
@@ -348,7 +349,17 @@ public class Timeline {
                             }
                         }
                     }
-                    fl.key = characterId != -1 || className != null;
+                    //Special case, as FontTags are sometimes added to stage (like intestdata/as2.swf, Sprite 10)
+                    //Do not display them.
+                    //Steps to reproduce: Create new static text and set its orientation to vertical
+                    //TODO: handle this better. Do not treat FontTag as drawable for example
+                    if (character instanceof FontTag) {
+                        fl.characterId = -1;
+                        fl.className = null;
+                        fl.key = true;
+                    } else {
+                        fl.key = characterId != -1 || className != null;
+                    }
                 }
 
                 if (po.flagMove()) {
