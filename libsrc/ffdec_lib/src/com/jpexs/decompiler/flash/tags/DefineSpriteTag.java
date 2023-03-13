@@ -27,6 +27,7 @@ import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
 import com.jpexs.decompiler.flash.tags.base.RemoveTag;
 import com.jpexs.decompiler.flash.tags.base.RenderContext;
@@ -266,6 +267,12 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
                         characterId = chi;
                     }
                 }                
+            }
+            if (characterId != -1 && swf != null) {
+                //Do not handle Fonts as characters. TODO: make this better
+                if (swf.getCharacter(characterId) instanceof FontTag) {
+                    characterId = -1;
+                }
             }
             if (characterId == -1) {
                 continue;
