@@ -32,6 +32,7 @@ import com.jpexs.decompiler.flash.action.model.SetMemberActionItem;
 import com.jpexs.decompiler.flash.action.model.SetVariableActionItem;
 import com.jpexs.decompiler.flash.action.model.StoreRegisterActionItem;
 import com.jpexs.decompiler.flash.action.model.TemporaryRegister;
+import com.jpexs.decompiler.flash.action.model.TemporaryRegisterMark;
 import com.jpexs.decompiler.flash.action.model.clauses.ClassActionItem;
 import com.jpexs.decompiler.flash.action.model.clauses.InterfaceActionItem;
 import com.jpexs.decompiler.flash.action.swf4.RegisterNumber;
@@ -698,6 +699,8 @@ public class ActionScript2ClassDetector {
                     //ignore such values
                     //TODO: maybe somehow display in the class ?
                 } else if (item instanceof ScriptEndItem) {
+                    //ignore
+                } else if (item instanceof TemporaryRegisterMark) {
                     //ignore
                 } else {
                     throw new AssertException("unknown item - " + item.getClass().getSimpleName());
