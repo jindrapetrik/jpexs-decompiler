@@ -33,6 +33,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - getouterscope instruction support
 - [#1990] Cloning DefineSprite causing incorrect tags written
 - Do not display fonts added to stage (for example in testdata/as2.swf, the vertical text - sprite 10)
+- AS2 Class detection - TemporaryRegisterMark handling
 
 ### Changed
 - AS1/2/3 P-code - format Number values with EcmaScript toString function
