@@ -3552,22 +3552,26 @@ public class XFLConverter {
         if (!useAS3 && flaVersion.minASVersion() > 2) {
             throw new IllegalArgumentException("FLA version " + flaVersion + " does not support AS1/2");
         }        
-        File file = new File(outfile);                        
+        File flaFile = new File(outfile);  //c:/mydir/myfile.fla                      
         String baseName = swfFileName;
-        File f = new File(baseName);
+        File f = new File(baseName); //myfile.swf
         baseName = f.getName();
         if (baseName.contains(".")) {
-            baseName = baseName.substring(0, baseName.lastIndexOf('.'));
+            baseName = baseName.substring(0, baseName.lastIndexOf('.')); //myfile
         }        
         
-        File outDir = file.getParentFile();
+        File scriptsDir = flaFile.getParentFile(); //c:/mydir
+        
+        Path.createDirectorySafe(scriptsDir);
+        
+        File xflDataDir = null;
+        String xflFile = null;
         if (!settings.compressed) {
-            outDir = new File(Path.combine(outDir.getAbsolutePath(), baseName));
-            outfile = Path.combine(outDir.getAbsolutePath(), baseName + ".xfl");
-            file = new File(outfile);
+            xflDataDir = new File(Path.combine(flaFile.getParentFile().getAbsolutePath(), baseName)); //c:/mydir/myfile/
+            xflFile = Path.combine(xflDataDir.getAbsolutePath(), baseName + ".xfl"); // c:/mydir/myfile.xfl
+            Path.createDirectorySafe(xflDataDir);        
         }
         
-        Path.createDirectorySafe(outDir);
         
         
         final HashMap<String, byte[]> files = new HashMap<>();
@@ -3667,9 +3671,9 @@ public class XFLConverter {
                                     expDir = expDir.replace(".", File.separator);
                                 }
                                 expPath = expPath.replace(".", File.separator);
-                                File cdir = new File(outDir.getAbsolutePath() + File.separator + expDir);
+                                File cdir = new File(scriptsDir.getAbsolutePath() + File.separator + expDir);
                                 Path.createDirectorySafe(cdir);
-                                writeFile(handler, Utf8Helper.getBytes(data), outDir.getAbsolutePath() + File.separator + expPath + ".as");
+                                writeFile(handler, Utf8Helper.getBytes(data), scriptsDir.getAbsolutePath() + File.separator + expPath + ".as");
                             }
                         }
                     }
@@ -3948,12 +3952,12 @@ public class XFLConverter {
             }, handler).run();
 
         } else {
-            Path.createDirectorySafe(outDir);
-            writeFile(handler, Utf8Helper.getBytes(domDocumentStr), outDir.getAbsolutePath() + File.separator + "DOMDocument.xml");
-            writeFile(handler, Utf8Helper.getBytes(publishSettingsStr), outDir.getAbsolutePath() + File.separator + "PublishSettings.xml");
-            File libraryDir = new File(outDir.getAbsolutePath() + File.separator + "LIBRARY");
+            Path.createDirectorySafe(xflDataDir);
+            writeFile(handler, Utf8Helper.getBytes(domDocumentStr), xflDataDir.getAbsolutePath() + File.separator + "DOMDocument.xml");
+            writeFile(handler, Utf8Helper.getBytes(publishSettingsStr), xflDataDir.getAbsolutePath() + File.separator + "PublishSettings.xml");
+            File libraryDir = new File(xflDataDir.getAbsolutePath() + File.separator + "LIBRARY");
             libraryDir.mkdir();
-            File binDir = new File(outDir.getAbsolutePath() + File.separator + "bin");
+            File binDir = new File(xflDataDir.getAbsolutePath() + File.separator + "bin");
             binDir.mkdir();
             for (String fileName : files.keySet()) {
                 writeFile(handler, files.get(fileName), libraryDir.getAbsolutePath() + File.separator + fileName);
@@ -3961,12 +3965,12 @@ public class XFLConverter {
             for (String fileName : datfiles.keySet()) {
                 writeFile(handler, datfiles.get(fileName), binDir.getAbsolutePath() + File.separator + fileName);
             }
-            writeFile(handler, Utf8Helper.getBytes("PROXY-CS5"), outfile);
+            writeFile(handler, Utf8Helper.getBytes("PROXY-CS5"), xflFile);
         }
         if (useAS3 && settings.exportScript) {
             try {
                 ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, true);
-                swf.exportActionScript(handler, outDir.getAbsolutePath(), scriptExportSettings, parallel, null);
+                swf.exportActionScript(handler, scriptsDir.getAbsolutePath(), scriptExportSettings, parallel, null);
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, "Error during ActionScript3 export", ex);
             }
