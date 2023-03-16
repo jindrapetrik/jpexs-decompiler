@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.xfl;
 
+import com.jpexs.debugger.flash.GetVariableFlag;
 import com.jpexs.helpers.XmlPrettyFormat;
 import com.jpexs.decompiler.flash.xfl.shapefixer.CurvedEdgeRecordAdvanced;
 import com.jpexs.decompiler.flash.xfl.shapefixer.StraightEdgeRecordAdvanced;
@@ -35,7 +36,12 @@ import com.jpexs.decompiler.flash.abc.avm2.model.GetLexAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.GetPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.IntegerValueAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.ThisAVM2Item;
+import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScriptLexer;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.ParsedSymbol;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.SymbolGroup;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.SymbolType;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.InstanceInfo;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
@@ -45,6 +51,12 @@ import com.jpexs.decompiler.flash.abc.types.ScriptInfo;
 import com.jpexs.decompiler.flash.abc.types.traits.Trait;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
+import com.jpexs.decompiler.flash.action.Action;
+import com.jpexs.decompiler.flash.action.ActionTreeOperation;
+import com.jpexs.decompiler.flash.action.model.CallMethodActionItem;
+import com.jpexs.decompiler.flash.action.model.DirectValueActionItem;
+import com.jpexs.decompiler.flash.action.model.GetMemberActionItem;
+import com.jpexs.decompiler.flash.action.model.GetVariableActionItem;
 import com.jpexs.decompiler.flash.amf.amf3.Amf3Value;
 import com.jpexs.decompiler.flash.amf.amf3.types.ObjectType;
 import com.jpexs.decompiler.flash.configuration.Configuration;
@@ -136,8 +148,10 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
+import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
+import com.jpexs.decompiler.graph.model.ScriptEndItem;
 import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.SerializableImage;
@@ -165,6 +179,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.xml.parsers.DocumentBuilder;
@@ -1476,14 +1492,18 @@ public class XFLConverter {
         writer.writeEndElement();
     }
 
-    private static String convertActionScript12(ASMSource as) {
+    private static String convertActionScript12(ASMSource as, List<ActionTreeOperation> treeOperations) {
         HighlightedTextWriter writer = new HighlightedTextWriter(Configuration.getCodeFormatting(), false);
         try {
-            as.getActionScriptSource(writer, null);
+            as.getActionScriptSource(writer, null, treeOperations);
         } catch (InterruptedException ex) {
             logger.log(Level.SEVERE, null, ex);
         }
         return writer.toString();
+    }
+    
+    private static String convertActionScript12(ASMSource as) {
+        return convertActionScript12(as, new ArrayList<>());
     }
 
     private static long getTimestamp(SWF swf) {
@@ -1543,10 +1563,10 @@ public class XFLConverter {
                     symbolStr.writeAttribute("scaleGridTop", doubleToString(scalingGrid.splitter.Ymin / SWF.unitDivisor));
                     symbolStr.writeAttribute("scaleGridBottom", doubleToString(scalingGrid.splitter.Ymax / SWF.unitDivisor));
                 }
-
-                symbolStr.writeStartElement("timeline");
+                
                 String itemIcon = null;
                 if (symbol instanceof ButtonTag) {
+                    symbolStr.writeStartElement("timeline");
                     itemIcon = "0";
                     symbolStr.writeStartElement("DOMTimeline", new String[]{"name", "Symbol " + symbol.getCharacterId(), "currentFrame", "0"});
                     symbolStr.writeStartElement("layers");
@@ -1696,15 +1716,17 @@ public class XFLConverter {
                     }
                     symbolStr.writeEndElement(); // layers
                     symbolStr.writeEndElement(); // DOMTimeline
+                    symbolStr.writeEndElement(); // timeline
                 } else if (symbol instanceof DefineSpriteTag) {
                     DefineSpriteTag sprite = (DefineSpriteTag) symbol;
                     if (sprite.getTags().isEmpty()) { //probably AS2 class
                         continue;
                     }
                     final ScriptPack spriteScriptPack = characterScriptPacks.containsKey(sprite.spriteId) ? characterScriptPacks.get(sprite.spriteId) : null;
-                    convertTimeline(swf.getAbcIndex(), sprite.spriteId, nonLibraryShapes, backgroundColor, tags, sprite.getTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files, symbolStr, spriteScriptPack);
+                    convertTimeline(swf.getAbcIndex(), sprite.spriteId, characterVariables.get(sprite.spriteId), nonLibraryShapes, backgroundColor, tags, sprite.getTags(), characters, "Symbol " + symbol.getCharacterId(), flaVersion, files, symbolStr, spriteScriptPack);
 
                 } else if (symbol instanceof ShapeTag) {
+                    symbolStr.writeStartElement("timeline");
                     itemIcon = "1";
                     ShapeTag shape = (ShapeTag) symbol;
                     symbolStr.writeStartElement("DOMTimeline", new String[]{"name", "Symbol " + symbol.getCharacterId(), "currentFrame", "0"});
@@ -1716,8 +1738,9 @@ public class XFLConverter {
 
                     symbolStr.writeEndElement(); // layers
                     symbolStr.writeEndElement(); // DOMTimeline
+                    symbolStr.writeEndElement(); // timeline
                 }
-                symbolStr.writeEndElement(); // timeline
+                
                 symbolStr.writeEndElement(); // DOMSymbolItem
                 String symbolStr2 = prettyFormatXML(symbolStr.toString());
                 String symbolFile = "Symbol " + symbol.getCharacterId() + ".xml";
@@ -2684,20 +2707,12 @@ public class XFLConverter {
         return ret;
     }
 
-    private boolean convertActionScriptLayer(AbcIndexing abcIndex, int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException {
+    private boolean convertActionScriptLayer(String initClipScript, AbcIndexing abcIndex, int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException {
         boolean hasScript = false;
 
-        String script = "";
+        String script = initClipScript;
         int duration = 0;
-        int frame = 0;
-        for (Tag t : tags) {
-            if (t instanceof DoInitActionTag) {
-                DoInitActionTag dia = (DoInitActionTag) t;
-                if (dia.spriteId == spriteId) {
-                    script += convertActionScript12(dia);
-                }
-            }
-        }
+        int frame = 0;        
         if (!script.isEmpty()) {
             script = "#initclip\r\n" + script + "#endinitclip\r\n";
         }        
@@ -2764,7 +2779,7 @@ public class XFLConverter {
         return hasScript;
     }
 
-    private boolean convertLabelsLayer(int spriteId, ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor, XFLXmlWriter writer) throws XMLStreamException {
+    private boolean convertLabelsLayer(ReadOnlyTagList tags, ReadOnlyTagList timeLineTags, String backgroundColor, XFLXmlWriter writer) throws XMLStreamException {
         boolean hasLabel = false;
 
         Map<Integer, List<FrameLabelTag>> frameToLabels = new HashMap<>();
@@ -2920,12 +2935,116 @@ public class XFLConverter {
         return outlineColor.toHexRGB();
     }
 
-    private void convertTimeline(AbcIndexing abcIndex, int spriteId, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException {
+    private String getMembersToClassName(GraphTargetItem item) {
+        List<String> ret = new ArrayList<>();
+        while (item instanceof GetMemberActionItem) {
+            GetMemberActionItem mem = (GetMemberActionItem) item;
+            if (!(mem.memberName instanceof DirectValueActionItem)) {
+                return null;
+            }
+            DirectValueActionItem dv = ((DirectValueActionItem) mem.memberName);
+            if (!dv.isString()) {
+                return null;
+            }
+            ret.add(0, dv.getAsString());
+            item = mem.object;
+        }
+        if (!(item instanceof GetVariableActionItem)) {
+            return null;
+        }
+        GetVariableActionItem gv = (GetVariableActionItem) item;
+        if (!(gv.name instanceof DirectValueActionItem)) {
+            return null;
+        }
+        DirectValueActionItem dv = ((DirectValueActionItem) gv.name);
+        if (!dv.isString()) {
+            return null;
+        }
+        String varName = dv.getAsString();
+        ret.add(0, varName);
+        return String.join(".", ret);
+    }
+    
+    private void convertTimeline(AbcIndexing abcIndex, int spriteId, String linkageIdentifier, List<Integer> nonLibraryShapes, String backgroundColor, ReadOnlyTagList tags, ReadOnlyTagList timelineTags, HashMap<Integer, CharacterTag> characters, String name, FLAVersion flaVersion, HashMap<String, byte[]> files, XFLXmlWriter writer, ScriptPack scriptPack) throws XMLStreamException {
+        
+        List<String> classNames = new ArrayList<>();
+        //Searches for Object.registerClass("linkageIdentifier",mypkg.MyClass);        
+        ActionTreeOperation getRegisterClassOp = new ActionTreeOperation() {
+            @Override
+            public void run(List<GraphTargetItem> tree) {
+                List<Integer> listToRemove = new ArrayList<>();
+                List<String> newClassNames = new ArrayList<>();
+                for (int i = 0; i < tree.size(); i++) {
+                    GraphTargetItem item = tree.get(i);
+                    if (!(item instanceof CallMethodActionItem)) {
+                        continue;
+                    }
+                    CallMethodActionItem callMethod = (CallMethodActionItem) item;
+                    if (!(callMethod.scriptObject instanceof GetVariableActionItem)) {
+                        continue;
+                    }
+                    GetVariableActionItem methodObject = (GetVariableActionItem)callMethod.scriptObject;
+                    if (!(methodObject.name instanceof DirectValueActionItem)) {
+                        continue;
+                    }
+                    if (methodObject.name == null || !methodObject.name.toString().equals("Object")) {
+                        continue;
+                    }
+                    if (!(callMethod.methodName instanceof DirectValueActionItem)) {
+                        continue;
+                    }
+                    if (!callMethod.methodName.toString().equals("registerClass")) {
+                        continue;
+                    }
+                    if (callMethod.arguments.size() != 2) {
+                        continue;
+                    }
+                    if (!(callMethod.arguments.get(0) instanceof DirectValueActionItem)) {
+                        continue;
+                    }
+                    if (linkageIdentifier != null && !linkageIdentifier.equals(callMethod.arguments.get(0).toString())) {
+                        continue;
+                    }                        
+                    String className = getMembersToClassName(callMethod.arguments.get(1));
+                    if (className == null) {
+                        continue;
+                    }
+                    newClassNames.add(className);
+                    listToRemove.add(i);
+                }
+                //There's only single one
+                if (listToRemove.size() != 1) {
+                    return;
+                }
+                classNames.add(newClassNames.get(0));
+                tree.remove((int)listToRemove.get(0));                
+            }
+        };                
+        List<ActionTreeOperation> treeOps = new ArrayList<>();
+        treeOps.add(getRegisterClassOp);                
+        
+        String initClipScript = "";
+        for (Tag t : tags) {
+            if (t instanceof DoInitActionTag) {
+                DoInitActionTag dia = (DoInitActionTag) t;
+                if (dia.spriteId == spriteId) {
+                    initClipScript += convertActionScript12(dia, treeOps);
+                }
+            }
+        }
+        if (classNames.size() == 1) {
+            writer.writeAttribute("linkageClassName", classNames.get(0));
+        }              
+        if (spriteId == -1) {
+            writer.writeStartElement("timelines");
+        } else {
+            writer.writeStartElement("timeline");
+        }
         writer.writeStartElement("DOMTimeline", new String[]{"name", name});
         writer.writeStartElement("layers");
 
-        boolean hasLabel = convertLabelsLayer(spriteId, tags, timelineTags, backgroundColor, writer);
-        boolean hasScript = convertActionScriptLayer(abcIndex, spriteId, tags, timelineTags, backgroundColor, writer, scriptPack);
+        boolean hasLabel = convertLabelsLayer(tags, timelineTags, backgroundColor, writer);
+        boolean hasScript = convertActionScriptLayer(initClipScript, abcIndex, spriteId, tags, timelineTags, backgroundColor, writer, scriptPack);
 
         int index = 0;
 
@@ -3053,8 +3172,9 @@ public class XFLConverter {
         }
 
         convertSoundLayer(timelineTags, files, writer);
-        writer.writeEndElement();
-        writer.writeEndElement();
+        writer.writeEndElement(); //layers
+        writer.writeEndElement(); //DOMTimeline
+        writer.writeEndElement(); //timeline/s
     }
     
     private void writeEmptyLayer(XFLXmlWriter writer, int frameCount) throws XMLStreamException {
@@ -3624,10 +3744,10 @@ public class XFLConverter {
             convertFonts(swf.getTags(), domDocument);
             convertLibrary(swf, characterVariables, characterClasses, characterScriptPacks, nonLibraryShapes, backgroundColor, swf.getTags(), characters, files, datfiles, flaVersion, domDocument);
 
-            domDocument.writeStartElement("timelines");
+            //domDocument.writeStartElement("timelines");
             ScriptPack documentScriptPack = characterScriptPacks.containsKey(0) ? characterScriptPacks.get(0) : null;
-            convertTimeline(swf.getAbcIndex(), 0, nonLibraryShapes, backgroundColor, swf.getTags(), swf.getTags(), characters, "Scene 1", flaVersion, files, domDocument, documentScriptPack);
-            domDocument.writeEndElement();
+            convertTimeline(swf.getAbcIndex(), -1, null, nonLibraryShapes, backgroundColor, swf.getTags(), swf.getTags(), characters, "Scene 1", flaVersion, files, domDocument, documentScriptPack);
+            //domDocument.writeEndElement();
 
             if (hasAmfMetadata) {
                 domDocument.writeStartElement("persistentData");

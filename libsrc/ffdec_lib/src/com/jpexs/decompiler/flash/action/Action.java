@@ -857,6 +857,10 @@ public abstract class Action implements GraphSourceItem {
         return actionsToTree(insideDoInitAction, insideFunction, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
     }
 
+    public static GraphTextWriter actionsToSource(final ASMSource asm, final List<Action> actions, final String path, GraphTextWriter writer, String charset) throws InterruptedException {
+        return Action.actionsToSource(asm, actions, path, writer, charset, new ArrayList<>());
+    }
+    
     /**
      * Converts list of actions to ActionScript source code
      *
@@ -864,10 +868,12 @@ public abstract class Action implements GraphSourceItem {
      * @param actions List of actions
      * @param path
      * @param writer
+     * @param charset
+     * @param treeOperations
      * @return
      * @throws java.lang.InterruptedException
      */
-    public static GraphTextWriter actionsToSource(final ASMSource asm, final List<Action> actions, final String path, GraphTextWriter writer, String charset) throws InterruptedException {
+    public static GraphTextWriter actionsToSource(final ASMSource asm, final List<Action> actions, final String path, GraphTextWriter writer, String charset, List<ActionTreeOperation> treeOperations) throws InterruptedException {
         writer.suspendMeasure();
         List<GraphTargetItem> tree = null;
         Throwable convertException = null;
@@ -882,6 +888,9 @@ public abstract class Action implements GraphSourceItem {
                     boolean insideDoInitAction = (asm instanceof DoInitActionTag);
                     List<GraphTargetItem> tree = actionsToTree(insideDoInitAction, false, new HashMap<>(), new HashMap<>(), new HashMap<>(), actions, version, staticOperation, path, charset);
                     SWFDecompilerPlugin.fireActionTreeCreated(tree, swf);
+                    for (ActionTreeOperation treeOperation:treeOperations) {
+                        treeOperation.run(tree);
+                    }
                     if (Configuration.autoDeobfuscate.get()) {
                         new ActionDeobfuscator().actionTreeCreated(tree, swf);
                     }
