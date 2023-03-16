@@ -1,0 +1,48 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="list" itemID="602d8c01-00000217" lastModified="1613718129">
+  <timeline>
+    <DOMTimeline name="list">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FFFF33"/>
+                    </FillStyle>
+                  </fills>
+                  <strokes>
+                    <StrokeStyle index="1">
+                      <SolidStroke scaleMode="normal">
+                        <fill>
+                          <SolidColor/>
+                        </fill>
+                      </SolidStroke>
+                    </StrokeStyle>
+                  </strokes>
+                  <edges>
+                    <Edge fillStyle1="1" strokeStyle="1" edges="!0 4400|0 0!0 0|4400 0!4400 0|4400 4400!4400 4400|0 4400"/>
+                  </edges>
+                </DOMShape>
+                <DOMStaticText width="119.05" height="152.4" autoExpand="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="57.9" ty="37.95"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>First&#xD;Second&#xD;Third&#xD;Fourth    ř</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" size="30" bitmapSize="600" face="Calibri"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMStaticText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

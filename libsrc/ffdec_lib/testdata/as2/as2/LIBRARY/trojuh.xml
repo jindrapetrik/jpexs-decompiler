@@ -1,0 +1,29 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="trojuh" itemID="51a79736-00000258" lastModified="1369937760">
+  <timeline>
+    <DOMTimeline name="trojuh">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#00FFFF"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle0="1" edges="!1040 930|530 -45!530 -45|0 930!0 930|1040 930"/>
+                    <Edge cubics="!530 0(;530,0 0,930 0,930p530 0 0 930);"/>
+                    <Edge cubics="!0 930(;0,930 1015,870 1015,870p0 930 1015 870);"/>
+                    <Edge cubics="!1015 870(;1015,870 530,0 530,0p1015 870 530 0);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

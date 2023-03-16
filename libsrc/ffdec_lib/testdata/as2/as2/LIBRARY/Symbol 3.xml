@@ -1,0 +1,24 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Symbol 3" itemID="51ab1831-0000022b" lastModified="1370172625" lastUniqueIdentifier="2">
+  <timeline>
+    <DOMTimeline name="Symbol 3">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Symbol 1" centerPoint3DX="122.5" centerPoint3DY="94">
+                  <matrix>
+                    <Matrix a="3.31268310546875" d="1.73257446289063" tx="36.55" ty="49"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="25.95" y="25.95"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

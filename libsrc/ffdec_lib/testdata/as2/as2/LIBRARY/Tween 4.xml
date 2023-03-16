@@ -1,0 +1,77 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Tween 4" itemID="50f29c22-000001ed" symbolType="graphic" lastModified="1358076962">
+  <timeline>
+    <DOMTimeline name="Tween 4">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape selected="true" isFloating="true">
+                  <matrix>
+                    <Matrix tx="-273.95" ty="-204.5"/>
+                  </matrix>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#990000"/>
+                    </FillStyle>
+                  </fills>
+                  <strokes>
+                    <StrokeStyle index="1">
+                      <SolidStroke scaleMode="normal">
+                        <fill>
+                          <SolidColor/>
+                        </fill>
+                      </SolidStroke>
+                    </StrokeStyle>
+                  </strokes>
+                  <edges>
+                    <Edge fillStyle1="1" strokeStyle="1" edges="!8005 3898S6[8070 4226 8095 4422!8095 4422[8168 5000 8006 5315!8006 5315[7802 5712 7185 5837!7185 5837[6281 6037 5841 6131!5841 6131[5064 6297 4611 6330!4611 6330[4009 6372 3687 6217!3687 6217[3316 6037 3266 5577!3266 5577[3179 4765 3434
+ 4640!3434 4640[3513 4600 3618 4635!3618 4635[3670 4652 3706 4677!3706 4677[3527 4110 3107 3371!3107 3371[2649 2615 2496 2332!2496 2332[2247 1869 2351 1735!2351 1735[2476 1574 3146 1757!3146 1757[3757 1924 4721 1884!4721 1884[5059 1870
+ 5542 1825!5542 1825[5811 1800 6315 1752!6315 1752[7170 1677 7504 1763!7504 1763[7954 1877 7865 2317!7865 2317[7786 2706 7899 3356!7899 3356[7917 3459 8005 3898"/>
+                    <Edge cubics="!3706 4677(;3126,2837 1247,1237 3146,1757q3706 4677Q3527 4110q3107 3371Q2649 2615q2496 2332Q2247 1869q2351 1735Q2476 1574q3146 1757);"/>
+                    <Edge cubics="!3146 1757(;5045,2277 8125,1037 7865,2317q3146 1757Q3757 1924q4721 1884Q5059 1870q5542 1825Q5811 1800q6315 1752Q7170 1677q7504 1763Q7954 1877q7865 2317);"/>
+                    <Edge cubics="!7865 2317(;7605,3597 8965,5477 7185,5837q7865 2317Q7786 2706q7899 3356Q7917 3459q8005 3898Q8070 4226q8095 4422Q8168 5000q8006 5315Q7802 5712q7185 5837);"/>
+                    <Edge cubics="!7185 5837(;5405,6197 3406,6877 3266,5577q7185 5837Q6281 6037q5841 6131Q5064 6297q4611 6330Q4009 6372q3687 6217Q3316 6037q3266 5577);"/>
+                    <Edge cubics="!3266 5577(;3126,4277 3706,4677 3706,4677q3266 5577Q3179 4765q3434 4640Q3513 4600q3618 4635Q3670 4652q3706 4677);"/>
+                  </edges>
+                </DOMShape>
+                <DOMSymbolInstance libraryItemName="blue" selected="true" centerPoint3DX="-206.95" centerPoint3DY="-48.5">
+                  <matrix>
+                    <Matrix tx="-234.1" ty="-81.75"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="27.15" y="33.25"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="blue" selected="true" centerPoint3DX="198" centerPoint3DY="-137.5">
+                  <matrix>
+                    <Matrix tx="170.85" ty="-170.75"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="27.15" y="33.25"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="blue" selected="true" centerPoint3DX="-190.95" centerPoint3DY="137.5">
+                  <matrix>
+                    <Matrix tx="-218.1" ty="104.25"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="27.15" y="33.25"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="blue" selected="true" centerPoint3DX="207" centerPoint3DY="127.5">
+                  <matrix>
+                    <Matrix tx="179.85" ty="94.25"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="27.15" y="33.25"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

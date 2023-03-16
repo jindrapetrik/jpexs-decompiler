@@ -1,0 +1,72 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="blue" itemID="50f29ad0-000001d6" linkageExportForAS="true" linkageIdentifier="blue" linkageClassName="MyBlueSprite" lastModified="1678904510">
+  <timeline>
+    <DOMTimeline name="blue">
+      <layers>
+        <DOMLayer name="Layer 2" color="#9933CC" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <Actionscript>
+                <script><![CDATA[#initclip
+trace("init_blue");
+#endinitclip]]></script>
+              </Actionscript>
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Layer 1" color="#4FFF4F">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMGroup>
+                  <members>
+                    <DOMShape>
+                      <fills>
+                        <FillStyle index="1">
+                          <SolidColor color="#33CC33"/>
+                        </FillStyle>
+                      </fills>
+                      <strokes>
+                        <StrokeStyle index="1">
+                          <SolidStroke scaleMode="normal">
+                            <fill>
+                              <SolidColor/>
+                            </fill>
+                          </SolidStroke>
+                        </StrokeStyle>
+                      </strokes>
+                      <edges>
+                        <Edge fillStyle1="1" strokeStyle="1" edges="!1262 253[1226 402 1321 562!1321 562[1336 582 1523 825!1523 825[1642 976 1647 1087!1647 1087[1654 1238 1475 1397!1475 1397[1351 1509 1091 1776!1091 1776[861 2014 767 2089!767 2089[619 2208 569 2155!569 2155[511 2092 568 1787!568 1787
+|724 930!724 930[464 939 243 859!243 859[50 787 -57 669!-57 669[-160 555 -134 455!-134 455[-106 348 59 314!59 314[178 288 456 198!456 198[750 102 875 73!875 73[1331 -36 1262 253"/>
+                        <Edge cubics="!724 930(;-16,957 -399,411 59,314q724 930Q464 939q243 859Q50 787q-57 669Q-160 555q-134 455Q-106 348q59 314);"/>
+                        <Edge cubics="!59 314(;518,215 1372,-211 1262,253q59 314Q178 288q456 198Q750 102q875 73Q1331 -36q1262 253);"/>
+                        <Edge cubics="!1262 253(;1152,717 1996,929 1475,1397q1262 253Q1226 402q1321 562Q1336 582q1523 825Q1642 976q1647 1087Q1654 1238q1475 1397);"/>
+                        <Edge cubics="!1475 1397(;955,1865 410,2646 568,1787q1475 1397Q1351 1509q1091 1776Q861 2014q767 2089Q619 2208q569 2155Q511 2092q568 1787);"/>
+                        <Edge cubics="!568 1787(;724,930 724,930 724,930q568 1787 724 930);"/>
+                      </edges>
+                    </DOMShape>
+                  </members>
+                </DOMGroup>
+                <DOMRectangleObject objectWidth="74" objectHeight="61" x="50.15" y="35.25" lockFlag="true">
+                  <matrix>
+                    <Matrix a="0.86602783203125" b="0.499984741210938" c="-0.499984741210938" d="0.86602783203125" tx="44.55" ty="-34.75"/>
+                  </matrix>
+                  <fill>
+                    <SolidColor color="#CC0033"/>
+                  </fill>
+                  <stroke>
+                    <SolidStroke scaleMode="normal">
+                      <fill>
+                        <SolidColor/>
+                      </fill>
+                    </SolidStroke>
+                  </stroke>
+                </DOMRectangleObject>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

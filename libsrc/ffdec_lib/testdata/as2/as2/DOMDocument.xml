@@ -1,0 +1,3352 @@
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" currentTimeline="1" xflVersion="2.2" creatorInfo="Adobe Flash Professional CS6" platform="Windows" versionInfo="Saved by Adobe Flash Windows 12.0 build 481" majorVersion="12" buildNumber="481" nextSceneIdentifier="39" playOptionsPlayLoop="false" playOptionsPlayPages="false" playOptionsPlayFrameActions="false" autoSaveEnabled="true" autoSaveHasPrompted="true">
+     <media>
+          <DOMSoundItem name="Banana_Slap-AngryFlash-2001109808.wav" itemID="56b4f524-00000204" sourceExternalFilepath="./LIBRARY/Banana_Slap-AngryFlash-2001109808.wav" sourceLastImported="1454699803" externalFileCRC32="2782492837" externalFileSize="147466" href="Banana_Slap-AngryFlash-2001109808.wav" soundDataHRef="M 3 1454699812.dat" format="44kHz 16bit Stereo" sampleCount="36335"/>
+          <DOMBitmapItem name="Database-Delete-32.png" itemID="51a2751c-000001f8" sourceExternalFilepath="./LIBRARY/Database-Delete-32.png" sourceLastImported="1365451187" externalFileCRC32="828107249" externalFileSize="1713" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="Database-Delete-32.png" bitmapDataHRef="M 1 1369601308.dat" frameRight="640" frameBottom="640"/>
+          <DOMSoundItem name="neck_snap-Vladimir-719669812.wav" itemID="56b4f58d-00000210" sourceExternalFilepath="./LIBRARY/neck_snap-Vladimir-719669812.wav" sourceLastImported="1454699908" externalFileCRC32="2565139104" externalFileSize="29804" href="neck_snap-Vladimir-719669812.wav" soundDataHRef="M 6 1454699917.dat" format="22kHz 16bit Stereo" sampleCount="7436"/>
+          <DOMBitmapItem name="Page-White-Code-32.png" itemID="51a27a70-00000204" sourceExternalFilepath="./LIBRARY/Page-White-Code-32.png" sourceLastImported="1365452226" externalFileCRC32="3511245725" externalFileSize="1131" useImportedJPEGData="false" compressionType="lossless" originalCompressionType="lossless" quality="50" href="Page-White-Code-32.png" bitmapDataHRef="M 2 1369602672.dat" frameRight="640" frameBottom="640"/>
+          <DOMSoundItem name="POOL-Pool_Shot-709343898.wav" itemID="56b4f54c-00000208" sourceExternalFilepath="./LIBRARY/POOL-Pool_Shot-709343898.wav" sourceLastImported="1454699842" externalFileCRC32="188406570" externalFileSize="207370" href="POOL-Pool_Shot-709343898.wav" soundDataHRef="M 4 1454699852.dat" format="44kHz 16bit Stereo" sampleCount="51311"/>
+          <DOMSoundItem name="punch_or_whack_-Vladimir-403040765.wav" itemID="56b4f54f-0000020c" sourceExternalFilepath="./LIBRARY/punch_or_whack_-Vladimir-403040765.wav" sourceLastImported="1454699830" externalFileCRC32="3062495803" externalFileSize="140100" href="punch_or_whack_-Vladimir-403040765.wav" soundDataHRef="M 5 1454699855.dat" format="44kHz 16bit Stereo" sampleCount="34995"/>
+     </media>
+     <symbols>
+          <Include href="blue.xml" itemID="50f29ad0-000001d6" lastModified="1678904510"/>
+          <Include href="klikatice.xml" loadImmediate="false" itemID="51a64400-0000024b" lastModified="1369850880"/>
+          <Include href="kolo.xml" loadImmediate="false" itemID="51a5fc86-00000244" lastModified="1370164793"/>
+          <Include href="list.xml" loadImmediate="false" itemID="602d8c01-00000217" lastModified="1613718129"/>
+          <Include href="MyButton.xml" itemIcon="0" loadImmediate="false" itemID="56b4f2dd-000001e1" lastModified="1454699930"/>
+          <Include href="mycircle.xml" loadImmediate="false" itemID="602a47d3-0000028b" lastModified="1613383803"/>
+          <Include href="myclip.xml" loadImmediate="false" itemID="602a14ec-00000247" lastModified="1678904493"/>
+          <Include href="mystar.xml" loadImmediate="false" itemID="602a486c-0000029b" lastModified="1613383812"/>
+          <Include href="NineSlice.xml" loadImmediate="false" itemID="56c88c3f-00000278" lastModified="1455984018"/>
+          <Include href="rectx.xml" loadImmediate="false" itemID="602df192-00000203" lastModified="1613684843"/>
+          <Include href="Symbol 1.xml" itemIcon="1" loadImmediate="false" itemID="51a27b8f-00000206" lastModified="1668872148"/>
+          <Include href="Symbol 2.xml" itemIcon="1" loadImmediate="false" itemID="51a43c10-00000240" lastModified="1370021547"/>
+          <Include href="Symbol 3.xml" loadImmediate="false" itemID="51ab1831-0000022b" lastModified="1370172625"/>
+          <Include href="Symbol 4.xml" loadImmediate="false" itemID="51ab1902-00000238" lastModified="1370167554"/>
+          <Include href="Symbolek.xml" loadImmediate="false" itemID="50fbf38c-000001e7" lastModified="1613371507"/>
+          <Include href="trojuh.xml" loadImmediate="false" itemID="51a79736-00000258" lastModified="1369937760"/>
+          <Include href="Tween 1.xml" itemIcon="1" loadImmediate="false" itemID="50f29bc3-000001e4" lastModified="1358076867"/>
+          <Include href="Tween 2.xml" itemIcon="1" loadImmediate="false" itemID="50f29bc3-000001e6" lastModified="1358076867"/>
+          <Include href="Tween 3.xml" itemIcon="1" loadImmediate="false" itemID="50f29c22-000001eb" lastModified="1358076962"/>
+          <Include href="Tween 4.xml" itemIcon="1" loadImmediate="false" itemID="50f29c22-000001ed" lastModified="1358076962"/>
+          <Include href="Tween 5.xml" itemIcon="1" loadImmediate="false" itemID="60429674-00000289" lastModified="1614976628"/>
+     </symbols>
+     <timelines>
+          <DOMTimeline name="Scene 1">
+               <layers>
+                    <DOMLayer name="Layer 16" color="#FF4F4F">
+                         <frames>
+                              <DOMFrame index="0" duration="78" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="78" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="list" centerPoint3DX="275.15" centerPoint3DY="184">
+                                             <matrix>
+                                                  <Matrix a="0.927581787109375" b="-0.373611450195313" c="0.373611450195313" d="0.927581787109375" tx="131.85" ty="123.05"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="110" y="110"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="79" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText width="174" height="33.25" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="132" ty="122"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>ABC</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="30" bitmapSize="600" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="80" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="rectx" centerPoint3DX="321.75" centerPoint3DY="200.75">
+                                             <matrix>
+                                                  <Matrix a="0.86602783203125" b="-0.499984741210938" c="0.499984741210938" d="0.86602783203125" tx="137.1" ty="165.55"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="142.45" y="122.1"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 15" color="#4F80FF">
+                         <frames>
+                              <DOMFrame index="0" duration="77" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="77" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="mycircle" centerPoint3DX="190.5" centerPoint3DY="138.5">
+                                             <matrix>
+                                                  <Matrix tx="138" ty="86"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="52.5" y="52.5"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 14" color="#808080">
+                         <frames>
+                              <DOMFrame index="0" duration="76" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="76" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="NineSlice" centerPoint3DX="109.45" centerPoint3DY="89.45">
+                                             <matrix>
+                                                  <Matrix a="0.38946533203125" d="0.791000366210938" tx="31.65" ty="10.35"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="200" y="99.85"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="NineSlice" centerPoint3DX="206.4" centerPoint3DY="308.45">
+                                             <matrix>
+                                                  <Matrix a="0.999343872070313" d="0.791000366210938" tx="6.65" ty="229.35"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="200" y="99.85"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="NineSlice" centerPoint3DX="481.4" centerPoint3DY="192.7">
+                                             <matrix>
+                                                  <Matrix a="0.309494018554688" d="1.93113708496094" tx="419.6" ty="-0.15"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="200" y="99.85"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 13" color="#4FFFFF">
+                         <frames>
+                              <DOMFrame index="0" duration="76" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="MyButton" symbolType="button">
+                                             <matrix>
+                                                  <Matrix tx="16" ty="235"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="52.5" y="32.5"/>
+                                             </transformationPoint>
+                                             <Actionscript>
+                                                  <script><![CDATA[on(press){
+	trace("button pressed");		 
+}]]></script>
+                                             </Actionscript>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 12" color="#FF4FFF">
+                         <frames>
+                              <DOMFrame index="0" duration="21" tweenType="shape" keyMode="17922">
+                                   <MorphShape>
+                                        <morphSegments>
+                                             <MorphSegment startPointA="#11.1C, #10.FA" startPointB="#F.5, #11.94" strokeIndex1="0" strokeIndex2="0">
+                                                  <MorphCurves controlPointA="#13.F1, #10.FA" anchorPointA="#16.C6, #10.FA" controlPointB="#12.25, #11.94" anchorPointB="#14.FA, #11.94" isLine="true"/>
+                                                  <MorphCurves controlPointA="#16.C6, #13.CF" anchorPointA="#16.C6, #16.A4" controlPointB="#14.FA, #14.69" anchorPointB="#14.FA, #17.3E" isLine="true"/>
+                                                  <MorphCurves controlPointA="#13.F1, #16.A4" anchorPointA="#11.1C, #16.A4" controlPointB="#12.25, #17.3E" anchorPointB="#F.5, #17.3E" isLine="true"/>
+                                                  <MorphCurves controlPointA="#11.1C, #13.CF" anchorPointA="#11.1C, #10.FA" controlPointB="#F.5, #14.69" anchorPointB="#F.5, #11.94" isLine="true"/>
+                                             </MorphSegment>
+                                             <MorphSegment startPointA="#11.1C, #10.FA" startPointB="#F.5, #11.94" strokeIndex1="0" strokeIndex2="0" fillIndex1="0" fillIndex2="1">
+                                                  <MorphCurves controlPointA="#13.F1, #10.FA" anchorPointA="#16.C6, #10.FA" controlPointB="#12.25, #11.94" anchorPointB="#14.FA, #11.94" isLine="true"/>
+                                                  <MorphCurves controlPointA="#16.C6, #13.CF" anchorPointA="#16.C6, #16.A4" controlPointB="#14.FA, #14.69" anchorPointB="#14.FA, #17.3E" isLine="true"/>
+                                                  <MorphCurves controlPointA="#13.F1, #16.A4" anchorPointA="#11.1C, #16.A4" controlPointB="#12.25, #17.3E" anchorPointB="#F.5, #17.3E" isLine="true"/>
+                                                  <MorphCurves controlPointA="#11.1C, #13.CF" anchorPointA="#11.1C, #10.FA" controlPointB="#F.5, #14.69" anchorPointB="#F.5, #11.94" isLine="true"/>
+                                             </MorphSegment>
+                                        </morphSegments>
+                                        <morphHintsList/>
+                                   </MorphShape>
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <BitmapFill bitmapPath="Page-White-Code-32.png" bitmapIsClipped="false">
+                                                            <matrix>
+                                                                 <Matrix a="20" d="20" tx="239.25" ty="237.55"/>
+                                                            </matrix>
+                                                       </BitmapFill>
+                                                  </FillStyle>
+                                             </fills>
+                                             <strokes>
+                                                  <StrokeStyle index="1">
+                                                       <SolidStroke scaleMode="normal">
+                                                            <fill>
+                                                                 <SolidColor/>
+                                                            </fill>
+                                                       </SolidStroke>
+                                                  </StrokeStyle>
+                                             </strokes>
+                                             <edges>
+                                                  <Edge fillStyle1="1" strokeStyle="1" edges="!5830 5796|4380 5796!4380 5796|4380 4346!4380 4346|5830 4346!5830 4346|5830 5796"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="21" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <BitmapFill bitmapPath="Page-White-Code-32.png" bitmapIsClipped="false">
+                                                            <matrix>
+                                                                 <Matrix a="15.6096343994141" b="9.35897827148438" c="-14.8356628417969" d="16.7303466796875" tx="238.35" ty="247.1"/>
+                                                            </matrix>
+                                                       </BitmapFill>
+                                                  </FillStyle>
+                                             </fills>
+                                             <strokes>
+                                                  <StrokeStyle index="1">
+                                                       <SolidStroke scaleMode="normal">
+                                                            <fill>
+                                                                 <SolidColor/>
+                                                            </fill>
+                                                       </SolidStroke>
+                                                  </StrokeStyle>
+                                             </strokes>
+                                             <edges>
+                                                  <Edge fillStyle1="1" strokeStyle="1" edges="!3920 5950|3920 4500!3920 4500|5370 4500!5370 4500|5370 5950!5370 5950|3920 5950"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 2" color="#9933CC">
+                         <frames>
+                              <DOMFrame index="0" duration="21" tweenType="shape" keyMode="17922">
+                                   <MorphShape>
+                                        <morphSegments>
+                                             <MorphSegment startPointA="#18.81, #3.7E" startPointB="#17.9E, #1.89" strokeIndex1="0" strokeIndex2="0">
+                                                  <MorphCurves controlPointA="#18.81, #3.52" anchorPointA="#18.85, #3.28" controlPointB="#17.8D, #1.38" anchorPointB="23.75, #1.04"/>
+                                                  <MorphCurves controlPointA="#18.94, #2.95" anchorPointA="#18.D7, #2.17" controlPointB="#18.21, #0.A3" anchorPointB="#19.8C, #0.85"/>
+                                                  <MorphCurves controlPointA="#19.0D, #1.B1" anchorPointA="#19.64, #1.5A" controlPointB="#1A.14, #0.7A" anchorPointB="#1B.11, #0.78"/>
+                                                  <MorphCurves controlPointA="#19.7E, 1.25" anchorPointA="#19.99, #1.29" controlPointB="#1B.4A, #0.77" anchorPointB="#1B.88, #0.77"/>
+                                                  <MorphCurves controlPointA="#19.D, #0.FA" anchorPointA="#1A.0D, #0.D8" controlPointB="#1B.AA, #0.77" anchorPointB="#1C.7E, #0.6E"/>
+                                                  <MorphCurves controlPointA="#1A.69, #0.A4" anchorPointA="#1A.D, #0.8C" controlPointB="#1D.4D, #0.66" anchorPointB="#1D.D6, #0.67"/>
+                                                  <MorphCurves controlPointA="#1B.28, #0.77" anchorPointA="#1B.88, #0.77" controlPointB="#1E.88, #0.68" anchorPointB="#1F.02, #0.77"/>
+                                                  <MorphCurves controlPointA="#1B.DE, #0.77" anchorPointA="#1C.2D, #0.87" controlPointB="#1F.BB, #0.8F" anchorPointB="#1F.F4, #0.C8"/>
+                                                  <MorphCurves controlPointA="#1C.5B, #0.9" anchorPointA="#1C.87, #0.9F" controlPointB="#20.27, #0.FB" anchorPointB="#1F.FC, #1.56"/>
+                                                  <MorphCurves controlPointA="#1C.C8, #0.B5" anchorPointA="#1D.04, #0.D8" controlPointB="#1F.DE, #1.96" anchorPointB="#1F.7A, #2.0B"/>
+                                                  <MorphCurves controlPointA="#1D.47, #0.FF" anchorPointA="#1D.83, #1.34" controlPointB="#1E.F8, #2.A5" anchorPointB="#1E.DC, #2.CD"/>
+                                                  <MorphCurves controlPointA="#1D.98, #1.46" anchorPointA="#1D.AC, #1.5A" controlPointB="#1E.BF, #2.F5" anchorPointB="#1E.AD, #3.17"/>
+                                                  <MorphCurves controlPointA="#1D.C3, #1.71" anchorPointA="#1D.D8, #1.89" controlPointB="#1E.8F, #3.52" anchorPointB="#1E.8F, #3.7E"/>
+                                                  <MorphCurves controlPointA="#1E.0A, #1.C3" anchorPointA="#1E.2E, #2.03" controlPointB="#1E.8F, #3.C1" anchorPointB="#1E.C3, #4.7"/>
+                                                  <MorphCurves controlPointA="#1E.61, #2.5D" anchorPointA="#1E.79, #2.C2" controlPointB="#1E.E1, #4.D6" anchorPointB="#1F.2A, #5.BF"/>
+                                                  <MorphCurves controlPointA="#1E.8F, #3.1C" anchorPointA="#1E.8F, #3.7E" controlPointB="#1F.5E, #6.6F" anchorPointB="#1F.6F, #6.E7"/>
+                                                  <MorphCurves controlPointA="#1E.8F, #3.CE" anchorPointA="#1E.81, #4.18" controlPointB="#1F.89, #7.9B" anchorPointB="#1F.54, #7.D"/>
+                                                  <MorphCurves controlPointA="#1E.66, #4.A6" anchorPointA="#1E.17, #5.1F" controlPointB="#1E.FF, #8.25" anchorPointB="#1D.86, #7.63"/>
+                                                  <MorphCurves controlPointA="#1D.EA, #5.64" anchorPointA="#1D.AC, #5.A2" controlPointB="#1C.F5, #7.16" anchorPointB="#1C.9F, #6.EB"/>
+                                                  <MorphCurves controlPointA="#1D.9E, #5.B" anchorPointA="#1D.8F, #5.BD" controlPointB="#1C.7E, #6.DA" anchorPointB="#1C.65, #6.CE"/>
+                                                  <MorphCurves controlPointA="#1D.57, #5.F" anchorPointA="#1D.1A, #6.16" controlPointB="#1B.CD, #6.85" anchorPointB="#1B.88, #6.85"/>
+                                                  <MorphCurves controlPointA="#1C.E, #6.3A" anchorPointA="#1C.A1, #6.52" controlPointB="#1B.43, #6.85" anchorPointB="#1A.B2, #6.CB"/>
+                                                  <MorphCurves controlPointA="#1C.49, #6.74" anchorPointA="#1B.E8, #6.7F" controlPointB="#19.FE, #7.29" anchorPointB="#19.A, #7.59"/>
+                                                  <MorphCurves controlPointA="#1B.B9, #6.85" anchorPointA="#1B.88, #6.85" controlPointB="#19.56, 7.5" anchorPointB="#19.17, #7.9B"/>
+                                                  <MorphCurves controlPointA="#1B.2, #6.85" anchorPointA="#1A.C2, #6.6D" controlPointB="#18.2B, #7.FF" anchorPointB="#17.E8, #7.BC"/>
+                                                  <MorphCurves controlPointA="#1A.28, #6.46" anchorPointA="#19.A9, #5.E" controlPointB="#17.8F, #7.63" anchorPointB="#17.FC, #5.B5"/>
+                                                  <MorphCurves controlPointA="#19.85, #5.C3" anchorPointA="#19.64, #5.A2" controlPointB="#18.11, #5.69" anchorPointB="#18.22, #5.2B"/>
+                                                  <MorphCurves controlPointA="#19.37, #5.75" anchorPointA="#19.13, #5.44" controlPointB="#18.43, #4.B" anchorPointB="#18.54, #4.6D"/>
+                                                  <MorphCurves controlPointA="#18.E4, #5.05" anchorPointA="#18.C4, 4.75" controlPointB="#18.81, 3.75" anchorPointB="#18.81, #3.7E"/>
+                                                  <MorphCurves controlPointA="#18.AE, #4.9" anchorPointA="#18.9F, #4.5D" controlPointB="#18.81, #3.39" anchorPointB="#18.4E, #2.D6"/>
+                                                  <MorphCurves controlPointA="#18.8F, #4.25" anchorPointA="#18.88, #3.EA" controlPointB="#18.48, #2.CA" anchorPointB="#17.E8, #2.29"/>
+                                                  <MorphCurves controlPointA="#18.81, #3.B5" anchorPointA="#18.81, #3.7E" controlPointB="#17.AE, #1.C7" anchorPointB="#17.9F, #1.8D"/>
+                                             </MorphSegment>
+                                             <MorphSegment startPointA="#18.81, #3.7E" startPointB="#17.9E, #1.89" strokeIndex1="0" strokeIndex2="0" fillIndex1="0" fillIndex2="1">
+                                                  <MorphCurves controlPointA="#18.81, #3.52" anchorPointA="#18.85, #3.28" controlPointB="#17.8D, #1.38" anchorPointB="23.75, #1.04"/>
+                                                  <MorphCurves controlPointA="#18.94, #2.95" anchorPointA="#18.D7, #2.17" controlPointB="#18.21, #0.A3" anchorPointB="#19.8C, #0.85"/>
+                                                  <MorphCurves controlPointA="#19.0D, #1.B1" anchorPointA="#19.64, #1.5A" controlPointB="#1A.14, #0.7A" anchorPointB="#1B.11, #0.78"/>
+                                                  <MorphCurves controlPointA="#19.7E, 1.25" anchorPointA="#19.99, #1.29" controlPointB="#1B.4A, #0.77" anchorPointB="#1B.88, #0.77"/>
+                                                  <MorphCurves controlPointA="#19.D, #0.FA" anchorPointA="#1A.0D, #0.D8" controlPointB="#1B.AA, #0.77" anchorPointB="#1C.7E, #0.6E"/>
+                                                  <MorphCurves controlPointA="#1A.69, #0.A4" anchorPointA="#1A.D, #0.8C" controlPointB="#1D.4D, #0.66" anchorPointB="#1D.D6, #0.67"/>
+                                                  <MorphCurves controlPointA="#1B.28, #0.77" anchorPointA="#1B.88, #0.77" controlPointB="#1E.88, #0.68" anchorPointB="#1F.02, #0.77"/>
+                                                  <MorphCurves controlPointA="#1B.DE, #0.77" anchorPointA="#1C.2D, #0.87" controlPointB="#1F.BB, #0.8F" anchorPointB="#1F.F4, #0.C8"/>
+                                                  <MorphCurves controlPointA="#1C.5B, #0.9" anchorPointA="#1C.87, #0.9F" controlPointB="#20.27, #0.FB" anchorPointB="#1F.FC, #1.56"/>
+                                                  <MorphCurves controlPointA="#1C.C8, #0.B5" anchorPointA="#1D.04, #0.D8" controlPointB="#1F.DE, #1.96" anchorPointB="#1F.7A, #2.0B"/>
+                                                  <MorphCurves controlPointA="#1D.47, #0.FF" anchorPointA="#1D.83, #1.34" controlPointB="#1E.F8, #2.A5" anchorPointB="#1E.DC, #2.CD"/>
+                                                  <MorphCurves controlPointA="#1D.98, #1.46" anchorPointA="#1D.AC, #1.5A" controlPointB="#1E.BF, #2.F5" anchorPointB="#1E.AD, #3.17"/>
+                                                  <MorphCurves controlPointA="#1D.C3, #1.71" anchorPointA="#1D.D8, #1.89" controlPointB="#1E.8F, #3.52" anchorPointB="#1E.8F, #3.7E"/>
+                                                  <MorphCurves controlPointA="#1E.0A, #1.C3" anchorPointA="#1E.2E, #2.03" controlPointB="#1E.8F, #3.C1" anchorPointB="#1E.C3, #4.7"/>
+                                                  <MorphCurves controlPointA="#1E.61, #2.5D" anchorPointA="#1E.79, #2.C2" controlPointB="#1E.E1, #4.D6" anchorPointB="#1F.2A, #5.BF"/>
+                                                  <MorphCurves controlPointA="#1E.8F, #3.1C" anchorPointA="#1E.8F, #3.7E" controlPointB="#1F.5E, #6.6F" anchorPointB="#1F.6F, #6.E7"/>
+                                                  <MorphCurves controlPointA="#1E.8F, #3.CE" anchorPointA="#1E.81, #4.18" controlPointB="#1F.89, #7.9B" anchorPointB="#1F.54, #7.D"/>
+                                                  <MorphCurves controlPointA="#1E.66, #4.A6" anchorPointA="#1E.17, #5.1F" controlPointB="#1E.FF, #8.25" anchorPointB="#1D.86, #7.63"/>
+                                                  <MorphCurves controlPointA="#1D.EA, #5.64" anchorPointA="#1D.AC, #5.A2" controlPointB="#1C.F5, #7.16" anchorPointB="#1C.9F, #6.EB"/>
+                                                  <MorphCurves controlPointA="#1D.9E, #5.B" anchorPointA="#1D.8F, #5.BD" controlPointB="#1C.7E, #6.DA" anchorPointB="#1C.65, #6.CE"/>
+                                                  <MorphCurves controlPointA="#1D.57, #5.F" anchorPointA="#1D.1A, #6.16" controlPointB="#1B.CD, #6.85" anchorPointB="#1B.88, #6.85"/>
+                                                  <MorphCurves controlPointA="#1C.E, #6.3A" anchorPointA="#1C.A1, #6.52" controlPointB="#1B.43, #6.85" anchorPointB="#1A.B2, #6.CB"/>
+                                                  <MorphCurves controlPointA="#1C.49, #6.74" anchorPointA="#1B.E8, #6.7F" controlPointB="#19.FE, #7.29" anchorPointB="#19.A, #7.59"/>
+                                                  <MorphCurves controlPointA="#1B.B9, #6.85" anchorPointA="#1B.88, #6.85" controlPointB="#19.56, 7.5" anchorPointB="#19.17, #7.9B"/>
+                                                  <MorphCurves controlPointA="#1B.2, #6.85" anchorPointA="#1A.C2, #6.6D" controlPointB="#18.2B, #7.FF" anchorPointB="#17.E8, #7.BC"/>
+                                                  <MorphCurves controlPointA="#1A.28, #6.46" anchorPointA="#19.A9, #5.E" controlPointB="#17.8F, #7.63" anchorPointB="#17.FC, #5.B5"/>
+                                                  <MorphCurves controlPointA="#19.85, #5.C3" anchorPointA="#19.64, #5.A2" controlPointB="#18.11, #5.69" anchorPointB="#18.22, #5.2B"/>
+                                                  <MorphCurves controlPointA="#19.37, #5.75" anchorPointA="#19.13, #5.44" controlPointB="#18.43, #4.B" anchorPointB="#18.54, #4.6D"/>
+                                                  <MorphCurves controlPointA="#18.E4, #5.05" anchorPointA="#18.C4, 4.75" controlPointB="#18.81, 3.75" anchorPointB="#18.81, #3.7E"/>
+                                                  <MorphCurves controlPointA="#18.AE, #4.9" anchorPointA="#18.9F, #4.5D" controlPointB="#18.81, #3.39" anchorPointB="#18.4E, #2.D6"/>
+                                                  <MorphCurves controlPointA="#18.8F, #4.25" anchorPointA="#18.88, #3.EA" controlPointB="#18.48, #2.CA" anchorPointB="#17.E8, #2.29"/>
+                                                  <MorphCurves controlPointA="#18.81, #3.B5" anchorPointA="#18.81, #3.7E" controlPointB="#17.AE, #1.C7" anchorPointB="#17.9F, #1.8D"/>
+                                                  <MorphCurves controlPointA="#18.81, #3.7E" anchorPointA="#18.81, #3.7E" controlPointB="#17.9F, #1.8D" anchorPointB="#17.9E, #1.89" isLine="true"/>
+                                             </MorphSegment>
+                                        </morphSegments>
+                                        <morphHintsList/>
+                                   </MorphShape>
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <RadialGradient>
+                                                            <matrix>
+                                                                 <Matrix a="0.04791259765625" d="0.04791259765625" tx="352.4" ty="44.7"/>
+                                                            </matrix>
+                                                            <GradientEntry color="#FF9148" ratio="0"/>
+                                                            <GradientEntry ratio="1"/>
+                                                       </RadialGradient>
+                                                  </FillStyle>
+                                             </fills>
+                                             <strokes>
+                                                  <StrokeStyle index="1">
+                                                       <SolidStroke scaleMode="normal">
+                                                            <fill>
+                                                                 <SolidColor/>
+                                                            </fill>
+                                                       </SolidStroke>
+                                                  </StrokeStyle>
+                                             </strokes>
+                                             <edges>
+                                                  <Edge fillStyle1="1" strokeStyle="1" edges="!7823 894[7823 1215 7596 1442!7596 1442[7369 1669 7048 1669!7048 1669[6727 1669 6500 1442!6500 1442[6273 1215 6273 894!6273 894[6273 573 6500 346!6500 346[6727 119 7048 119!7048 119[7369 119 7596 346!7596 346[7823 573 7823 894"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="21" duration="43" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <RadialGradient>
+                                                            <matrix>
+                                                                 <Matrix a="0.04791259765625" d="0.04791259765625" tx="352.4" ty="44.7"/>
+                                                            </matrix>
+                                                            <GradientEntry color="#4D315D" ratio="0"/>
+                                                            <GradientEntry color="#E7F504" ratio="0.474509803921569"/>
+                                                            <GradientEntry color="#332EB6" ratio="0.937254901960784"/>
+                                                       </RadialGradient>
+                                                  </FillStyle>
+                                             </fills>
+                                             <strokes>
+                                                  <StrokeStyle index="1">
+                                                       <SolidStroke scaleMode="normal">
+                                                            <fill>
+                                                                 <SolidColor/>
+                                                            </fill>
+                                                       </SolidStroke>
+                                                  </StrokeStyle>
+                                             </strokes>
+                                             <edges>
+                                                  <Edge fillStyle1="1" strokeStyle="1" edges="!8188 342[8158 406 8058 523!8058 523[7928 677 7900 717!7900 717[7823 824 7823 894!7823 894[7823 961 7875 1136!7875 1136[7905 1238 7978 1471!7978 1471[8108 1912 8020 2000!8020 2000[7935 2085 7558 1891!7558 1891[7358 1785 7269 1742!7269
+ 1742[7117 1669 7048 1669!7048 1669[6979 1669 6834 1739!6834 1739[6654 1833 6560 1881!6560 1881[6205 2065 6120 1980!6120 1980[6031 1891 6140 1461!6140 1461[6202 1233 6228 1133!6228 1133[6273 960 6273 894!6273 894[6273 825 6222 726!6222
+ 726[6216 714 6120 553!6120 553[6060 452 6046 393!6046 393[6029 312 6080 260!6080 260[6177 163 6540 133!6540 133[6707 119 7048 119!7048 119[7082 119 7294 110!7294 110[7501 102 7638 103!7638 103[8085 106 8180 200!8180 200[8231 251 8188
+ 342"/>
+                                                  <Edge cubics="!8180 200(;8331,351 7823,680 7823,894q8180 200Q8231 251q8188 342Q8158 406q8058 523Q7928 677q7900 717Q7823 824q7823 894);"/>
+                                                  <Edge cubics="!6080 260(;6231,109 6834,119 7048,119q6080 260Q6177 163q6540 133Q6707 119q7048 119);"/>
+                                                  <Edge cubics="!7048 1669(;6834,1669 6271,2131 6120,1980q7048 1669Q6979 1669q6834 1739Q6654 1833q6560 1881Q6205 2065q6120 1980);"/>
+                                                  <Edge cubics="!7823 894(;7823,1108 8171,1849 8020,2000q7823 894Q7823 961q7875 1136Q7905 1238q7978 1471Q8108 1912q8020 2000);"/>
+                                                  <Edge cubics="!8020 2000(;7869,2151 7262,1669 7048,1669q8020 2000Q7935 2085q7558 1891Q7358 1785q7269 1742Q7117 1669q7048 1669);"/>
+                                                  <Edge cubics="!7048 119(;7262,119 8029,49 8180,200q7048 119Q7082 119q7294 110Q7501 102q7638 103Q8085 106q8180 200);"/>
+                                                  <Edge cubics="!6120 1980(;5969,1829 6273,1108 6273,894q6120 1980Q6031 1891q6140 1461Q6202 1233q6228 1133Q6273 960q6273 894);"/>
+                                                  <Edge cubics="!6273 894(;6273,680 5929,411 6080,260q6273 894Q6273 825q6222 726Q6216 714q6120 553Q6060 452q6046 393Q6029 312q6080 260);"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 9" color="#4FFF4F">
+                         <frames>
+                              <DOMFrame index="0" duration="41" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Symbol 1" name="myTest" centerPoint3DX="373.9" centerPoint3DY="346.15" bits32="false">
+                                             <matrix>
+                                                  <Matrix tx="347.95" ty="320.2"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="25.95" y="25.95"/>
+                                             </transformationPoint>
+                                             <MatteColor color="#00CC33"/>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="41" duration="8" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Symbol 2" centerPoint3DX="224.15" centerPoint3DY="145.8">
+                                             <matrix>
+                                                  <Matrix a="0.812973022460938" d="0.861785888671875" tx="174.1" ty="120.8"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="61.5" y="29"/>
+                                             </transformationPoint>
+                                             <filters>
+                                                  <BevelFilter distance="8" highlightColor="#FF0000" isEnabled="false"/>
+                                                  <DropShadowFilter distance="8" inner="true" isEnabled="false"/>
+                                                  <AdjustColorFilter/>
+                                                  <GlowFilter blurX="10" blurY="10" isEnabled="false"/>
+                                                  <BlurFilter isEnabled="false"/>
+                                             </filters>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="kolo" centerPoint3DX="414" centerPoint3DY="111.5">
+                                             <matrix>
+                                                  <Matrix a="1.63809204101563" d="1.78048706054688" tx="328" ty="38.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="52.5" y="41"/>
+                                             </transformationPoint>
+                                             <filters>
+                                                  <BevelFilter highlightColor="#FF0000" knockout="true" shadowColor="#FF00FF"/>
+                                             </filters>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="Symbol 2" centerPoint3DX="141" centerPoint3DY="289.95">
+                                             <matrix>
+                                                  <Matrix a="0.813003540039063" d="0.862075805664063" tx="91" ty="264.95"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="61.5" y="29"/>
+                                             </transformationPoint>
+                                             <filters>
+                                                  <BevelFilter distance="8" highlightColor="#FF0000" shadowColor="#FF00FF" isEnabled="false"/>
+                                                  <DropShadowFilter color="#FF0000" distance="8" inner="true" knockout="true" isEnabled="false"/>
+                                                  <AdjustColorFilter/>
+                                                  <GlowFilter blurX="10" blurY="10" isEnabled="false"/>
+                                                  <GradientBevelFilter isEnabled="false">
+                                                       <GradientEntry color="#FF0000" ratio="0"/>
+                                                       <GradientEntry color="#FF0000" alpha="0" ratio="0.501960784313725"/>
+                                                       <GradientEntry alpha="0" ratio="0.501960784313725"/>
+                                                       <GradientEntry ratio="1"/>
+                                                  </GradientBevelFilter>
+                                                  <GradientGlowFilter knockout="true" type="outer">
+                                                       <GradientEntry color="#FF0000" alpha="0" ratio="0"/>
+                                                       <GradientEntry color="#00FF00" ratio="0.47843137254902"/>
+                                                       <GradientEntry color="#0000FF" ratio="1"/>
+                                                  </GradientGlowFilter>
+                                             </filters>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="klikatice" centerPoint3DX="125.85" centerPoint3DY="52.2">
+                                             <matrix>
+                                                  <Matrix tx="77.6" ty="19.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="48.25" y="32.7"/>
+                                             </transformationPoint>
+                                             <filters>
+                                                  <BevelFilter isEnabled="false"/>
+                                                  <DropShadowFilter knockout="true"/>
+                                             </filters>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="klikatice" centerPoint3DX="262.45" centerPoint3DY="52.2">
+                                             <matrix>
+                                                  <Matrix tx="214.2" ty="19.5"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="48.25" y="32.7"/>
+                                             </transformationPoint>
+                                             <filters>
+                                                  <BevelFilter isEnabled="false"/>
+                                                  <DropShadowFilter color="#FF0000" inner="true" knockout="true"/>
+                                             </filters>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="klikatice" centerPoint3DX="86.7" centerPoint3DY="159">
+                                             <matrix>
+                                                  <Matrix tx="38.45" ty="126.3"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="48.25" y="32.7"/>
+                                             </transformationPoint>
+                                             <filters>
+                                                  <BevelFilter highlightColor="#FF0000" knockout="true"/>
+                                                  <DropShadowFilter knockout="true" isEnabled="false"/>
+                                             </filters>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="kolo" centerPoint3DX="340.5" centerPoint3DY="181.25">
+                                             <matrix>
+                                                  <Matrix a="0.549667358398438" c="0.007171630859375" d="0.683441162109375" tx="311.4" ty="153.2"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="52.5" y="41.05"/>
+                                             </transformationPoint>
+                                             <filters>
+                                                  <BevelFilter blurX="10" blurY="10" distance="10" highlightColor="#FF0000" knockout="true"/>
+                                             </filters>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="trojuh" centerPoint3DX="480.6" centerPoint3DY="218.5">
+                                             <matrix>
+                                                  <Matrix tx="455.25" ty="195.25"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="25.35" y="23.25"/>
+                                             </transformationPoint>
+                                             <filters>
+                                                  <BevelFilter highlightColor="#FF0000"/>
+                                             </filters>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="Symbol 2" centerPoint3DX="304.75" centerPoint3DY="307.45">
+                                             <matrix>
+                                                  <Matrix a="0.812973022460938" d="0.861785888671875" tx="254.7" ty="282.45"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="61.5" y="29"/>
+                                             </transformationPoint>
+                                             <filters>
+                                                  <BevelFilter distance="8" highlightColor="#FF0000" isEnabled="false"/>
+                                                  <DropShadowFilter distance="8" inner="true" isEnabled="false"/>
+                                                  <AdjustColorFilter/>
+                                                  <GlowFilter blurX="10" blurY="10" isEnabled="false"/>
+                                                  <BlurFilter isEnabled="false"/>
+                                                  <GradientBevelFilter type="outer">
+                                                       <GradientEntry color="#FFFF00" ratio="0"/>
+                                                       <GradientEntry color="#FCFC14" alpha="0.909803921568627" ratio="0.12156862745098"/>
+                                                       <GradientEntry color="#00FF00" alpha="0.552941176470588" ratio="0.250980392156863"/>
+                                                       <GradientEntry color="#00FFFF" alpha="0" ratio="0.501960784313725"/>
+                                                       <GradientEntry color="#FF0000" ratio="0.752941176470588"/>
+                                                       <GradientEntry color="#0000FF" ratio="1"/>
+                                                       <GradientEntry color="#D6D6D6" ratio="1"/>
+                                                  </GradientBevelFilter>
+                                             </filters>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="49" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="blue" centerPoint3DX="212.8" centerPoint3DY="137.15">
+                                             <matrix>
+                                                  <Matrix a="1.03555297851563" b="-0.597854614257813" c="0.573638916015625" d="0.993606567382813" tx="114.6" ty="119.3"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="63.7" y="56.4"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="50" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Symbol 1" symbolType="graphic" loop="loop">
+                                             <matrix>
+                                                  <Matrix tx="243.3" ty="149.35"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="25.95" y="25.95"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="51" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText fontRenderingMode="standard" width="248" height="139" antiAliasSharpness="13" antiAliasThickness="20" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="31" ty="22.55"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>Test&#xD;Druhy radek&#xD;Treti&#xD;Ctvrty</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="30" bitmapSize="600" face="TimesNewRomanPSMT" fillColor="#FF0000"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                        <DOMStaticText fontRenderingMode="standard" width="248" height="33.25" antiAliasSharpness="13" antiAliasThickness="20" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="150.95" ty="201.45"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>Test2</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" alpha="0.498039215686275" size="30" bitmapSize="600" face="TimesNewRomanPSMT" fillColor="#FF0000"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="52" keyMode="9728">
+                                   <elements>
+                                        <DOMDynamicText width="187" height="46.75" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="169.95" ty="80.25"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>DynamicTest</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="30" bitmapSize="600" face="TimesNewRomanPSMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMDynamicText>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="53" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Symbol 3" centerPoint3DX="292" centerPoint3DY="141.8">
+                                             <matrix>
+                                                  <Matrix tx="187.75" ty="57.3"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="105.05" y="85.2"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="54" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Symbol 4" centerPoint3DX="287" centerPoint3DY="118.65">
+                                             <matrix>
+                                                  <Matrix tx="121.3" ty="37"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="164.85" y="80.9"/>
+                                             </transformationPoint>
+                                             <color>
+                                                  <Color alphaMultiplier="0.44140625"/>
+                                             </color>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="55" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Symbol 3" centerPoint3DX="214.25" centerPoint3DY="142">
+                                             <matrix>
+                                                  <Matrix tx="91.75" ty="48.05"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="122.5" y="93.95"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="Symbol 1" symbolType="graphic" loop="loop">
+                                             <matrix>
+                                                  <Matrix tx="406.3" ty="71.35"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="25.95" y="25.95"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 8" color="#FF4F4F">
+                         <frames>
+                              <DOMFrame index="0" duration="34" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <BitmapFill bitmapPath="Page-White-Code-32.png" bitmapIsClipped="false">
+                                                            <matrix>
+                                                                 <Matrix a="45.9778442382813" b="-3.92922973632813" c="-2.95111083984375" d="53.4724273681641" tx="56.4" ty="150.15"/>
+                                                            </matrix>
+                                                       </BitmapFill>
+                                                  </FillStyle>
+                                                  <FillStyle index="2">
+                                                       <LinearGradient>
+                                                            <matrix>
+                                                                 <Matrix a="0.0132598876953125" b="0.007659912109375" c="-0.0286865234375" d="0.0496826171875" tx="51.45" ty="58.05"/>
+                                                            </matrix>
+                                                            <GradientEntry color="#FFFFFF" ratio="0"/>
+                                                            <GradientEntry ratio="1"/>
+                                                       </LinearGradient>
+                                                  </FillStyle>
+                                             </fills>
+                                             <strokes>
+                                                  <StrokeStyle index="1">
+                                                       <SolidStroke scaleMode="normal">
+                                                            <fill>
+                                                                 <SolidColor color="#33FF00"/>
+                                                            </fill>
+                                                       </SolidStroke>
+                                                  </StrokeStyle>
+                                                  <StrokeStyle index="2">
+                                                       <SolidStroke scaleMode="normal" weight="5">
+                                                            <fill>
+                                                                 <SolidColor color="#33FF00"/>
+                                                            </fill>
+                                                       </SolidStroke>
+                                                  </StrokeStyle>
+                                             </strokes>
+                                             <edges>
+                                                  <Edge fillStyle1="1" strokeStyle="1" edges="
+!897 2861[1255 2580 1760 2580!1760 2580[2265 2580 2622 2861!2622 2861[2980 3142 2980 3540!2980 3540[2980 3938 2622 4219!2622 4219[2265 4500 1760 4500!1760 4500[1255 4500 897 4219!897 4219[540 3938 540 3540!540 3540[540 3142 897 2861"/>
+                                                  <Edge fillStyle1="2" strokeStyle="2" edges="
+!1679 2100|380 2100!380 2100|380 220!380 220|1679 220!1679 220|1679 2100"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 7" color="#4F80FF">
+                         <frames>
+                              <DOMFrame index="0" duration="34" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <RadialGradient focalPointRatio="0.337254901960784">
+                                                            <matrix>
+                                                                 <Matrix a="0.0684814453125" b="-0.018341064453125" c="0.01300048828125" d="0.048492431640625" tx="432.95" ty="277"/>
+                                                            </matrix>
+                                                            <GradientEntry color="#FF0000" ratio="0"/>
+                                                            <GradientEntry color="#6CF335" ratio="0.501960784313725"/>
+                                                            <GradientEntry ratio="1"/>
+                                                       </RadialGradient>
+                                                  </FillStyle>
+                                             </fills>
+                                             <strokes>
+                                                  <StrokeStyle index="1">
+                                                       <SolidStroke scaleMode="normal">
+                                                            <fill>
+                                                                 <SolidColor color="#33FF00"/>
+                                                            </fill>
+                                                       </SolidStroke>
+                                                  </StrokeStyle>
+                                             </strokes>
+                                             <edges>
+                                                  <Edge fillStyle0="1" edges="
+!7920 5603|7920 5797"/>
+                                                  <Edge fillStyle0="1" strokeStyle="1" edges="
+!7920 5797|9138 7015!9138 7015|10594 5559!10594 5559|9279 4244!9279 4244|7920 5603"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 6" color="#808080">
+                         <frames>
+                              <DOMFrame index="0" duration="19" keyMode="9728">
+                                   <elements>
+                                        <DOMGroup>
+                                             <transformationPoint>
+                                                  <Point x="186" y="353.85"/>
+                                             </transformationPoint>
+                                             <members>
+                                                  <DOMShape>
+                                                       <transformationPoint>
+                                                            <Point x="186" y="353.85"/>
+                                                       </transformationPoint>
+                                                       <fills>
+                                                            <FillStyle index="1">
+                                                                 <SolidColor color="#990000"/>
+                                                            </FillStyle>
+                                                            <FillStyle index="2">
+                                                                 <SolidColor color="#CC0033"/>
+                                                            </FillStyle>
+                                                       </fills>
+                                                       <edges>
+                                                            <Edge fillStyle0="1" fillStyle1="2" edges="
+!3159 7239[3270 7033 3327 6947!3327 6947[3353 6908 3412 6794!3412 6794[3470 6682 3500 6639!3500 6639[3602 6491 3649 6692!3649 6692|3713 6670!3713 6670[3760 6655 3782 6655!3782 6655[3942 6655 3985 6781!3985 6781[4007 6844 3996 6914!3996
+ 6914[3996 6948 3999 6995!3999 6995[4000 7031 3993 7054!3993 7054[3976 7106 3860 7224!3860 7224[3847 7237 3741 7292!3741 7292[3638 7346 3616 7372!3616 7372[3594 7396 3511 7442!3511 7442[3435 7483 3427 7483!3427 7483[3409 7483 3407 7468
+!3407 7468[3405 7453 3386 7453!3386 7453[3361 7468 3330 7483!3330 7483[3270 7512 3235 7512!3235 7512[3220 7512 3156 7501!3156 7501[3091 7490 3054 7490!3054 7490[3050 7494 3050 7457!3050 7457[3050 7441 3159 7239"/>
+                                                            <Edge fillStyle1="1" edges="
+!2675 7305[2675 6953 2924 6704!2924 6704[3174 6454 3525 6454!3525 6454[3622 6454 3711 6474!3711 6474[3733 6454 3765 6434!3765 6434[3806 6409 3930 6340!3930 6340[4062 6261 4196 6152!4196 6152[4256 6104 4311 6071!4311 6071[4428 5999 4520
+ 6000!4520 6000[4595 5999 4654 6049!4654 6049[4666 6059 4677 6071!4677 6071[4717 6116 4741 6186!4741 6186[4765 6256 4765 6315!4765 6315[4765 6361 4719 6443!4719 6443[4667 6534 4584 6614!4584 6614[4420 6774 4222 6815!4222 6815[4376 7028
+ 4376 7305!4376 7305[4376 7657 4127 7906!4127 7906[3962 8070 3753 8126!3753 8126[3645 8155 3525 8155!3525 8155[3406 8155 3299 8126!3299 8126[3089 8070 2924 7906!2924 7906[2675 7657 2675 7305!3831 6508[3832 6502 3834 6496!3834 6496|3830
+ 6500!3830 6500[3828 6503 3826 6507!3826 6507[3828 6508 3831 6508"/>
+                                                            <Edge cubics="!4765 6315(;4765,6414 4567,6737 4222,6815q4765 6315Q4765 6361q4719 6443Q4667 6534q4584 6614Q4420 6774q4222 6815);"/>
+                                                            <Edge cubics="!4196 6152(;4238,6119 4276,6091 4311,6071q4196 6152Q4256 6104q4311 6071);"/>
+                                                            <Edge cubics="!3834 6496(;3834,6496 3830,6500 3830,6500q3834 6496 3830 6500);"/>
+                                                            <Edge cubics="!3649 6692(3649,6692;3679,6684 3745,6655 3782,6655q3649 6692Q3649 6692q3713 6670Q3760 6655q3782 6655);"/>
+                                                            <Edge cubics="!3782 6655(;4037,6655 3996,6904 3996,6914q3782 6655Q3942 6655q3985 6781Q4007 6844q3996 6914);"/>
+                                                            <Edge cubics="!3996 6914(3996,6914;3996,7050 4032,7048 3860,7224q3996 6914Q3996 6948q3999 6995Q4000 7031q3993 7054Q3976 7106q3860 7224);"/>
+                                                            <Edge cubics="!3860 7224(;3829,7255 3656,7325 3616,7372q3860 7224Q3847 7237q3741 7292Q3638 7346q3616 7372);"/>
+                                                            <Edge cubics="!3616 7372(;3582,7409 3433,7483 3427,7483q3616 7372Q3594 7396q3511 7442Q3435 7483q3427 7483);"/>
+                                                            <Edge cubics="!3427 7483(;3390,7483 3423,7453 3386,7453q3427 7483Q3409 7483q3407 7468Q3405 7453q3386 7453);"/>
+                                                            <Edge cubics="!3386 7453(;3381,7453 3293,7512 3235,7512q3386 7453Q3361 7468q3330 7483Q3270 7512q3235 7512);"/>
+                                                            <Edge cubics="!3235 7512(;3198,7512 3120,7490 3054,7490q3235 7512Q3220 7512q3156 7501Q3091 7490q3054 7490);"/>
+                                                            <Edge cubics="!3054 7490(;3054,7490 3050,7494 3050,7457q3054 7490Q3050 7494q3050 7457);"/>
+                                                            <Edge cubics="!3050 7457(;3050,7436 3248,7067 3327,6947q3050 7457Q3050 7441q3159 7239Q3270 7033q3327 6947);"/>
+                                                            <Edge cubics="!3327 6947(;3435,6786 3574,6372 3649,6692q3327 6947Q3353 6908q3412 6794Q3470 6682q3500 6639Q3602 6491q3649 6692);"/>
+                                                            <Edge cubics="!3830 6500(;3829,6502 3827,6504 3826,6507q3830 6500Q3828 6503q3826 6507);"/>
+                                                            <Edge cubics="!3826 6507(;3827,6508 3829,6508 3831,6508q3826 6507Q3828 6508q3831 6508);"/>
+                                                            <Edge cubics="!3831 6508(;3832,6504 3833,6500 3834,6496q3831 6508Q3832 6502q3834 6496);"/>
+                                                            <Edge cubics="!3525 6454(;3590,6454 3652,6461 3711,6474q3525 6454Q3622 6454q3711 6474);"/>
+                                                            <Edge cubics="!4741 6186(;4757,6233 4765,6276 4765,6315q4741 6186Q4765 6256q4765 6315);"/>
+                                                            <Edge cubics="!4654 6049(;4662,6055 4669,6063 4677,6071q4654 6049Q4666 6059q4677 6071);"/>
+                                                            <Edge cubics="!4677 6071(;4703,6101 4725,6139 4741,6186q4677 6071Q4717 6116q4741 6186);"/>
+                                                            <Edge cubics="!4222 6815(;4325,6957 4376,7121 4376,7305q4222 6815Q4376 7028q4376 7305);"/>
+                                                            <Edge cubics="!4376 7305(;4376,7539 4293,7739 4127,7906q4376 7305Q4376 7657q4127 7906);"/>
+                                                            <Edge cubics="!3753 8126(;3682,8145 3605,8155 3525,8155q3753 8126Q3645 8155q3525 8155);"/>
+                                                            <Edge cubics="!4127 7906(;4017,8015 3893,8088 3753,8126q4127 7906Q3962 8070q3753 8126);"/>
+                                                            <Edge cubics="!2675 7305(;2675,7070 2758,6870 2924,6704q2675 7305Q2675 6953q2924 6704);"/>
+                                                            <Edge cubics="!2924 7906(;2758,7739 2675,7539 2675,7305q2924 7906Q2675 7657q2675 7305);"/>
+                                                            <Edge cubics="!3299 8126(;3159,8088 3034,8015 2924,7906q3299 8126Q3089 8070q2924 7906);"/>
+                                                            <Edge cubics="!2924 6704(;3091,6537 3291,6454 3525,6454q2924 6704Q3174 6454q3525 6454);"/>
+                                                            <Edge cubics="!3525 8155(;3446,8155 3370,8145 3299,8126q3525 8155Q3406 8155q3299 8126);"/>
+                                                            <Edge cubics="!3765 6434(;3792,6417 3847,6386 3930,6340q3765 6434Q3806 6409q3930 6340);"/>
+                                                            <Edge cubics="!3711 6474(;3725,6460 3744,6447 3765,6434q3711 6474Q3733 6454q3765 6434);"/>
+                                                            <Edge cubics="!3930 6340(;4018,6287 4107,6225 4196,6152q3930 6340Q4062 6261q4196 6152);"/>
+                                                            <Edge cubics="!4311 6071(;4389,6023 4459,5999 4520,6000q4311 6071Q4428 5999q4520 6000);"/>
+                                                            <Edge cubics="!4520 6000(;4570,5999 4615,6016 4654,6049q4520 6000Q4595 5999q4654 6049);"/>
+                                                       </edges>
+                                                  </DOMShape>
+                                             </members>
+                                        </DOMGroup>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="19" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 4" color="#FF4FFF">
+                         <frames>
+                              <DOMFrame index="0" duration="19" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText left="-273.7" width="350" height="33.25" isSelectable="false" orientation="vertical right to left">
+                                             <matrix>
+                                                  <Matrix a="0.738525390625" b="0.012725830078125" c="0.277175903320313" d="2.08859252929688" tx="428.65" ty="132.55"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="-90.15" y="14.75"/>
+                                             </transformationPoint>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>Hello World!</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="30" bitmapSize="600" face="TimesNewRomanPSMT" fillColor="#FF00CC"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                             <filters>
+                                                  <GlowFilter color="#9933FF"/>
+                                             </filters>
+                                        </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 11" color="#FF800A">
+                         <frames>
+                              <DOMFrame index="0" duration="52" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Symbolek" centerPoint3DX="291.95" centerPoint3DY="349.3">
+                                             <matrix>
+                                                  <Matrix a="0.759552001953125" d="0.705062866210938" tx="238.25" ty="311.05"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="70.7" y="54.25"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 5" color="#4FFFFF" current="true" isSelected="true">
+                         <frames>
+                              <DOMFrame index="0" duration="75" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="blue" centerPoint3DX="41.8" centerPoint3DY="341.7">
+                                             <matrix>
+                                                  <Matrix a="0.39276123046875" d="0.39276123046875" tx="31.15" ty="328.65"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="27.1" y="33.25"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                        <DOMSymbolInstance libraryItemName="blue" centerPoint3DX="462.95" centerPoint3DY="67">
+                                             <matrix>
+                                                  <Matrix a="0.490951538085938" d="0.490951538085938" tx="449.6" ty="50.7"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="27.2" y="33.2"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="75" keyMode="9728">
+                                   <elements>
+                                        <DOMStaticText width="233" height="33.5" isSelectable="false">
+                                             <matrix>
+                                                  <Matrix tx="134.95" ty="64.25"/>
+                                             </matrix>
+                                             <textRuns>
+                                                  <DOMTextRun>
+                                                       <characters>ABC</characters>
+                                                       <textAttrs>
+                                                            <DOMTextAttrs aliasText="false" size="30" bitmapSize="600" face="ArialMT"/>
+                                                       </textAttrs>
+                                                  </DOMTextRun>
+                                             </textRuns>
+                                        </DOMStaticText>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 3" color="#FF800A">
+                         <frames>
+                              <DOMFrame index="0" duration="18" tweenType="shape" keyMode="17922">
+                                   <MorphShape>
+                                        <morphSegments>
+                                             <MorphSegment startPointA="#D.D4, #3.7E" startPointB="#C.D, #3.AC" strokeIndex1="0" strokeIndex2="0">
+                                                  <MorphCurves controlPointA="#D.D4, #2.3D" anchorPointA="#E.B7, #1.5A" controlPointB="#F.93, #3.AC" anchorPointB="#12.55, #3.AC"/>
+                                                  <MorphCurves controlPointA="#F.9A, #0.77" anchorPointA="#10.DB, #0.77" controlPointB="#15.1F, #3.AC" anchorPointB="#17.E9, #3.AC"/>
+                                                  <MorphCurves controlPointA="#11.AC, #0.77" anchorPointA="#12.54, #0.D7" controlPointB="#19.B4, #3.AC" anchorPointB="#1B.7F, #3.AC"/>
+                                                  <MorphCurves controlPointA="#12.AF, #1.0A" anchorPointA="#12.FF, #1.5A" controlPointB="#1B.7F, #4.A4" anchorPointB="#1B.7F, #5.9C"/>
+                                                  <MorphCurves controlPointA="#13.E2, #2.3D" anchorPointA="#13.E2, #3.7E" controlPointB="#1B.7F, #8.64" anchorPointB="#1B.7F, #B.2C"/>
+                                                  <MorphCurves controlPointA="#13.E2, #4.BF" anchorPointA="#12.FF, #5.A2" controlPointB="#18.BB, #B.2C" anchorPointB="#15.F8, #B.2C"/>
+                                                  <MorphCurves controlPointA="#12.1C, #6.85" anchorPointA="#10.DB, #6.85" controlPointB="#13.31, #B.2C" anchorPointB="#10.6A, #B.2C"/>
+                                                  <MorphCurves controlPointA="#10.0A, #6.85" anchorPointA="#F.62, #6.25" controlPointB="#E.9D, #B.2C" anchorPointB="#C.D, #B.2C"/>
+                                                  <MorphCurves controlPointA="#F.07, #5.F2" anchorPointA="#E.B7, #5.A2" controlPointB="#C.D, #A.36" anchorPointB="#C.D, 9.25"/>
+                                                  <MorphCurves controlPointA="#D.D4, #4.BF" anchorPointA="#D.D4, 3.5" controlPointB="#C.D, #6.76" anchorPointB="#C.D, #3.AC"/>
+                                             </MorphSegment>
+                                             <MorphSegment startPointA="#D.D4, #3.7E" startPointB="#C.D, #3.AC" strokeIndex1="0" strokeIndex2="0" fillIndex1="0" fillIndex2="1">
+                                                  <MorphCurves controlPointA="#D.D4, #2.3D" anchorPointA="#E.B7, #1.5A" controlPointB="#F.93, #3.AC" anchorPointB="#12.55, #3.AC"/>
+                                                  <MorphCurves controlPointA="#F.9A, #0.77" anchorPointA="#10.DB, #0.77" controlPointB="#15.1F, #3.AC" anchorPointB="#17.E9, #3.AC"/>
+                                                  <MorphCurves controlPointA="#11.AC, #0.77" anchorPointA="#12.54, #0.D7" controlPointB="#19.B4, #3.AC" anchorPointB="#1B.7F, #3.AC"/>
+                                                  <MorphCurves controlPointA="#12.AF, #1.0A" anchorPointA="#12.FF, #1.5A" controlPointB="#1B.7F, #4.A4" anchorPointB="#1B.7F, #5.9C"/>
+                                                  <MorphCurves controlPointA="#13.E2, #2.3D" anchorPointA="#13.E2, #3.7E" controlPointB="#1B.7F, #8.64" anchorPointB="#1B.7F, #B.2C"/>
+                                                  <MorphCurves controlPointA="#13.E2, #4.BF" anchorPointA="#12.FF, #5.A2" controlPointB="#18.BB, #B.2C" anchorPointB="#15.F8, #B.2C"/>
+                                                  <MorphCurves controlPointA="#12.1C, #6.85" anchorPointA="#10.DB, #6.85" controlPointB="#13.31, #B.2C" anchorPointB="#10.6A, #B.2C"/>
+                                                  <MorphCurves controlPointA="#10.0A, #6.85" anchorPointA="#F.62, #6.25" controlPointB="#E.9D, #B.2C" anchorPointB="#C.D, #B.2C"/>
+                                                  <MorphCurves controlPointA="#F.07, #5.F2" anchorPointA="#E.B7, #5.A2" controlPointB="#C.D, #A.36" anchorPointB="#C.D, 9.25"/>
+                                                  <MorphCurves controlPointA="#D.D4, #4.BF" anchorPointA="#D.D4, 3.5" controlPointB="#C.D, #6.76" anchorPointB="#C.D, #3.AC"/>
+                                                  <MorphCurves controlPointA="#D.D4, 3.5" anchorPointA="#D.D4, #3.7E" controlPointB="#C.D, #3.AC" anchorPointB="#C.D, #3.AC" isLine="true"/>
+                                             </MorphSegment>
+                                        </morphSegments>
+                                        <morphHintsList/>
+                                   </MorphShape>
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor color="#FF99FF"/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <strokes>
+                                                  <StrokeStyle index="1">
+                                                       <SolidStroke scaleMode="normal">
+                                                            <fill>
+                                                                 <SolidColor/>
+                                                            </fill>
+                                                       </SolidStroke>
+                                                  </StrokeStyle>
+                                             </strokes>
+                                             <edges>
+                                                  <Edge fillStyle1="1" strokeStyle="1" edges="
+!5090 894[5090 1215 4863 1442!4863 1442[4636 1669 4315 1669!4315 1669[3994 1669 3767 1442!3767 1442[3540 1215 3540 894!3540 894[3540 573 3767 346!3767 346[3994 119 4315 119!4315 119[4636 119 4863 346!4863 346[5090 573 5090 894"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="18" keyMode="9728">
+                                   <elements>
+                                        <DOMShape>
+                                             <fills>
+                                                  <FillStyle index="1">
+                                                       <SolidColor color="#66FFFF"/>
+                                                  </FillStyle>
+                                             </fills>
+                                             <strokes>
+                                                  <StrokeStyle index="1">
+                                                       <SolidStroke scaleMode="normal">
+                                                            <fill>
+                                                                 <SolidColor/>
+                                                            </fill>
+                                                       </SolidStroke>
+                                                  </StrokeStyle>
+                                             </strokes>
+                                             <edges>
+                                                  <Edge fillStyle1="1" strokeStyle="1" edges="
+!7039 2860|3280 2860!3280 2860|3280 940!3280 940|7039 940!7039 940|7039 2860"/>
+                                             </edges>
+                                        </DOMShape>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 10" color="#9933CC">
+                         <frames>
+                              <DOMFrame index="0" duration="28" tweenType="motion" motionTweenSnap="true" keyMode="22017">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="Tween 5" symbolType="graphic" loop="loop">
+                                             <matrix>
+                                                  <Matrix tx="221.35" ty="168.25"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                              <DOMFrame index="28" keyMode="9728">
+                                   <elements>
+                                        <DOMSymbolInstance libraryItemName="blue" centerPoint3DX="466.75" centerPoint3DY="184.7">
+                                             <matrix>
+                                                  <Matrix a="1.44174194335938" b="0.832366943359375" c="-0.887069702148438" d="1.5364990234375" tx="425.1" ty="45.55"/>
+                                             </matrix>
+                                             <transformationPoint>
+                                                  <Point x="63.75" y="56.4"/>
+                                             </transformationPoint>
+                                        </DOMSymbolInstance>
+                                   </elements>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+                    <DOMLayer name="Layer 1" color="#4FFF4F">
+                         <frames>
+                              <DOMFrame index="0" duration="22" keyMode="9728">
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="22" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[stop();]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="23" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("unicodeTest");
+var k = "היפופוטמי, או א";
+
+trace(k);]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="24" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("ifWithElseTest");
+
+var i=5;
+if(i==258){
+	trace("onTrue");
+}else{
+	trace("onFalse"+i);
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="25" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("forTest");
+
+for(var i=0;i<10;i++){
+	trace("hello:"+i);
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="26" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("whileTest");
+var i=0;
+while(i<10){
+	trace("hello:"+i);
+	i++;
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="27" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("forWithContinueTest");
+
+for(var i=0;i<10;i++){
+	trace("hello:"+i);
+	if(i==5){
+		trace("i==5");
+		if(i==7){
+    		continue;
+		}
+		trace("hawk");
+	}
+	trace("end of the loop");
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="28" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("doWhileTest");
+var i=0;
+do{
+	trace("i="+i);
+	i++;
+}while(i<10);
+trace("end");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="29" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("switchTest");
+
+var i=5;
+
+switch(i){
+	case 0:
+	case 1:
+		trace("one");
+		break;
+	case 2:
+		trace("two");		
+	case 3:
+		trace("three");
+		break;
+	case 4:
+		trace("four");
+		break;
+    default: trace("default clause");
+}
+
+trace("scriptend");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="30" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("strictEqualsTest");
+var i=5;
+if(i===5){
+	trace("equals strict");
+}
+
+if(i!==5){
+	trace("not equals strict");
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="31" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("switchForTest");
+
+for(var i=0;i<10;i++){
+	switch(i){
+		case 0:
+			trace("zero");
+			continue;
+		case 5:
+			trace("five");
+			break;
+		case 10:
+			trace("ten");
+			break;
+	    case 1:
+			if(i==7){
+				continue;
+			}
+			trace("one");			
+		
+	    default:
+			trace("def");
+	}
+	trace("before loop end");
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="32" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("functionTest");
+
+function hello(what,second){
+	trace("hello "+what+"! "+second);
+}
+
+hello("friend",7);]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="33" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("multipleConditionsTest");
+var k=5;
+if((k==7)&&(k==8)){
+	trace("first");
+}
+
+if(k==9){
+	trace("second");
+}
+trace("finish");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="34" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("multipleConditions2Test");
+var k=5;
+if((k==7)&&(k==8)){
+	trace("first");
+}
+
+if((k==9)||(k==6)){
+	trace("second");
+}
+trace("finish");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="35" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("chainedAssignmentsTest");
+var a=7;
+var b=8;
+var c=9;
+var d=c=b=a=10;
+trace(d);]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="36" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("objectsTest");
+var flashBox:Box = new Box(box1);
+_root.onEnterFrame = function(){
+	flashBox.moveUp();
+}
+var ship:Moving = new Ship(200);
+var enemy:Moving = new Enemy(56);
+ship.moveDown(0.5);
+ship.moveUp(0.2);
+enemy.moveRight(230);
+enemy.moveLeft(100);
+
+var c:Cox=new Cox(box1);]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="37" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("doWhile2Test");
+var k=5;
+ do{
+	k++;
+	if(k==7){
+	   k=5*k;
+	}else{
+	   k=5+k;
+	}            
+ }while(k<9);]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="38" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("whileAndTest");
+var a=5;
+var b=10;
+while((a<10)&&(b>1)){
+	a++;
+	b--;
+}
+a=7;
+b=9;
+]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="39" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("forInTest");
+
+function testForIn(){
+	var arr=[];
+	for(var a in arr){
+		if(a>3){ 
+			if(a==5){
+				return 7;
+			}		
+			return 8;
+		}
+	}
+}
+
+trace(testForIn());
+
+var arr=[];
+	for(var a in arr){
+		trace(a);
+	}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="40" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("tryTest");
+var k=5;
+try {
+	k=5/0;
+}catch(e){
+	trace("bug "+e);
+}finally{
+	trace("huu");
+}
+trace("next");
+try {
+	k=6;
+}catch(e){
+	trace("bug2 "+e);
+}
+
+trace("next2");
+var k=5;
+try {
+	k=5/0;
+}finally{
+	trace("final");
+}
+trace("end");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="41" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("indicesTest");
+var k=[1,2,3];
+var b=k[1];
+trace(b);]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="42" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("incDecTest");
+function tst(){
+	return 1;
+}
+
+var i=5;
+var b=i++;
+var c=--i+5;
+trace("a:"+a+" b:"+b+" c:"+c);
+var arr=[1,2,3];
+
+var d=arr[tst()]++;
+trace(d);]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="43" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("chainedAssignments2Test");
+
+var a=5;
+var b=6;
+var c=7;
+var d=c=b=a=4;
+if((d=c=b=a=7)>2){
+	trace(d);
+}
+trace(d+1);
+
+for(var i=0;i<5;i++){
+	if(i==7){
+		continue;
+	}
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="44" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("function2Test");
+function a(){	
+	trace("hi");
+	var a=5;
+	if(a==7){
+		return;
+	}
+	a=a*9;
+	trace(a);
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="45" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("tryFunctionTest");
+function testtry(){
+	var k=5;
+	try{
+		if(k==3){
+			return;
+		}
+		if(k==4){
+			throw new Error();
+		}
+		k=7;
+	}catch(e){
+		trace("error");
+	}finally{
+		trace("finally");
+	}
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="46" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("ternarTest");
+var a=5;
+var b=a==4?2:3;
+trace(b);]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="47" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("forInInTest");
+function tst(){
+	var a=[];
+	a[0]=[];
+	
+	for(var b in a){
+		for(var c in b){
+			if(c==5){
+				return 5;
+			}
+		}
+		if(b==8){
+			return 3;
+		}
+	}
+	return 8;
+}
+
+tst();]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="48" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("registersFuncTest");
+function tst(px)
+   {
+      var register2=57;
+      register2=register2*27;
+   }
+   
+tst(5);   
+var s=String(5);]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="49" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("ifFrameLoadedTest");
+
+ifFrameLoaded(10){
+	trace("loaded");
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="50" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("function3Test");
+
+function tst(){
+	var k=5;
+	c = k = 8;
+	trace("hi");
+	trace(k);
+	if((e=d=f=c=9)>5){
+		trace("dd");
+	}
+		  
+}
+var c=7;
+var d=7;
+var e=8;
+tst();]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="51" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("commaOperatorTest");
+var a=0;
+var b=0;
+var c=0;
+while(a++,b+=2,c<10){
+	trace(c);
+	c++;
+}
+trace("konec");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="52" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("commaOperator2Test");
+var k=8;
+do{
+	if(k==9){
+		trace("h");
+		if(k==9){
+			trace("f");
+			continue;
+		}
+		trace("b");
+	}
+	trace("gg");
+}while(k++,k<10);
+trace("ss");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="53" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("function4Test");
+function tst(){
+	var k=5;
+	while(k<10){
+		if(k==5){
+			if(k==6){
+				return true;
+			}
+		}else{
+			return false;
+		}
+		k++;
+	}
+}
+
+tst();]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="54" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("pushTest");
+ord(5);]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="55" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("commaOperator3Test");
+var k=1;
+while(k++,k<10){
+	k*=5;
+	trace(k);
+}
+trace("end");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="56" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("commaOperator4Test");
+var k=0;
+do{
+	trace(k);
+	if(k==8){
+		trace("a");
+		if(k==9){
+			continue;
+		}else{
+			trace("d");
+		}
+		trace("b");
+	}
+	k++;	
+}while(k+=5,k<20);
+trace("end");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="57" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("globalFunctionsTest");
+var k = Array(1,2,3);
+var a = 1;
+var b = Boolean(a);
+call(5);
+var c=chr(65);
+clearInterval(5);
+clearTimeout(4);
+var mc;
+duplicateMovieClip(mc,"copy",5);
+a = escape("how");
+var f = eval("a");
+fscommand("alert(\"hi\");",""); //tuto
+a = getProperty(mc,_alpha);
+a = getTimer();
+getURL("http://localhost/","wnd","POST"); //tuto
+a = getVersion();
+gotoAndPlay(5);
+gotoAndStop(8);
+ifFrameLoaded(5){
+	trace("loaded");
+}
+a = int(f);
+a = isFinite(f);
+a = isNaN(f);
+a = length(f);
+loadMovie("http://localhost/test.swf",a,"GET"); //tuto
+loadMovieNum("http://localhost/test.swf",5,"GET"); //tuto
+loadVariables("http://localhost/vars.txt",a,"GET"); //tuto
+loadVariablesNum("http://localhost/vars.txt",4,"GET"); //tuto
+a = mbchr(f);
+a = mblength(f);
+a = mbord(f);
+a = mbsubstring("aaaa",5,4);
+MMExecute("destroyPC");
+nextFrame();
+nextScene();
+a = Number(f);
+a = Object(f);
+a = ord(f);
+a = parseFloat(f);
+a = parseInt(f,16);
+play();
+prevFrame();
+prevScene();
+print(mc,"bframe"); //tuto
+printAsBitmap(mc,"bframe"); //tuto
+printAsBitmapNum(5,"bframe"); //tuto
+printNum(4,"bframe"); //tuto
+a = random(10);
+removeMovieClip(mc);
+
+function tst(p1){
+	trace("test");
+}
+
+setInterval(tst,5,f);
+setProperty(mc,_alpha,5*5);
+setTimeout(ts,5,f);
+showRedrawRegions(false,0);
+startDrag(mc,true,5,5,6,6);
+stop();
+stopAllSounds();
+stopDrag();
+a = String(f);
+a = substring("aaaa",2,2);
+targetPath(f);
+tellTarget(mc){ //tuto
+	trace("told");
+}
+toggleHighQuality();
+a = unescape(f);
+unloadMovie(mc); //tuto
+unloadMovieNum(4);//tuto
+updateAfterEvent();
+]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="58" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("unaryOpTest");
+var a = 5;
+var c = ~a;
+var d = ~(a+c);
+var e = -c;]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="59" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("numbersTest");
+var x = null;
+trace("null:" + x);
+x = true;
+trace("true:" + x);
+x = false;
+trace("false:" + x);
+x = 1;
+trace("1:" + x);
+x = 2147483647;
+trace("0x7fffffff:" + x);
+x = 2147483648;
+trace("0x80000000:" + x);
+x = -2147483648;
+trace("-0x80000000:" + x);
+x = -2147483649;
+trace("-0x80000001:" + x);]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="60" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("switchDefaultTest");
+var k = 5;
+switch(k){
+	default:
+	case 5:
+		trace("default 5");
+	case 6:
+		trace("default 5,6");
+		break;
+	case 7:
+		trace("7");
+}
+trace("afterSwitch");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="61" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("switchDefaultTest2");
+var k = 5;
+switch(k){
+	case 5:
+		trace("5");
+		break;
+    default:
+		trace("default");
+	case 6:
+		trace("default, 6");
+		break;
+	case 7:
+		trace("7");
+}
+trace("afterSwitch");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="62" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("functionVariablesTest");
+function outfunc() {
+	var g = function (){
+		var a = 5;
+		var b = 6;
+		
+		var f = function (){
+			var c = a + 2;
+			trace(c);
+			return c;
+		}
+		return f();
+	}
+	return g();
+}
+]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="63" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("functionInnerParametersTest");
+function outfunc() {
+	var g = function (a,x){
+		var b = a + 3 + x;
+		
+		var f = function (){
+			var c = a + 2;
+			trace(c);
+			return c;
+		}
+		return f();
+	}
+	return g(5,2);
+}
+]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="64" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("loadClassesTest")
+var tst:com.jpexs.flash.test.TestLoader = new com.jpexs.flash.test.TestLoader();
+tst.includeTests(); //also test method call]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="65" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("forInBreakTest");
+var obj = {a:5,b:6,c:7};
+
+function testFunc1(){
+	for(var v in obj){
+		trace(v);
+	}	
+}
+
+function testFunc2(){
+	for(var v in obj){
+		if(v == "b"){
+			trace("found");
+			break;
+		}				
+	}	
+}
+
+function testFunc3(){		
+	for (var v in obj) {
+		if (v == "b") {
+			trace("hi");			
+			break;
+		}
+	}
+	trace("after");
+}
+
+function testFunc4(){		
+	for (var v in obj) {
+		if (v == "b") {
+			trace("hi");			
+			break;
+		}
+		if(v == "c"){
+			trace("hello");
+			break;
+		}
+		trace("hohoho");
+	}
+	trace("after");
+}
+
+function testFunc5(){		
+	var obj2 = {key1:1,key2:2,key3:3};
+	for (var v in obj) {
+		if (v == "a") {
+			trace("loop1_break");
+			break;
+		}
+		if(v == "b"){
+			trace("hello");
+			for (var v2 in obj2) {
+				if(v2 == "key1"){
+					trace("loop2_break");
+					break;
+				}
+				trace("loop2_inside");
+			}			
+			trace("after_loop2");
+		}
+		trace("loop1_inside");
+	}
+	trace("after_loop1");
+}
+
+function testFunc6(){
+	var obj2 = {key1:1,key2:2,key3:3};
+	for (var v in obj) {
+		if (v == "a") {
+			trace("loop1_break");
+			break;
+		}
+		trace("hello");
+		for (var v2 in obj2) {
+			if(v2 == "key1"){
+				trace("loop2_break");
+				break;
+			}
+			trace("loop2_inside");
+		}			
+		trace("after_loop2");			
+	}
+	trace("after_loop1");
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="66" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("switchVariantsTest");
+function test1()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+         trace("place2");
+      default:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test2()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test3()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+         trace("place2");
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test4()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+         trace("place2");
+      default:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test5()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+         trace("place2");
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test6()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+      default:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test7()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+         trace("place2");
+         break;
+      default:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test8()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+         trace("place2");
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test9()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test10()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      default:
+         trace("place2");
+         break;
+      case 2:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test11()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+         trace("place2");
+         break;
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test12()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test13()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      default:
+         trace("place2");
+         break;
+      case 2:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test14()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+         trace("place2");
+         break;
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test15()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+         trace("place2");
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test16()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test17()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+         trace("place2");
+   }
+   trace("after switch");
+}
+function test18()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+         trace("place2");
+   }
+   trace("after switch");
+}
+function test19()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+         trace("place2");
+   }
+   trace("after switch");
+}
+function test20()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+         trace("place2");
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test21()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+         trace("place2");
+         break;
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test22()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+         trace("place2");
+         break;
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test23()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+         trace("place2");
+         break;
+      default:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test24()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+         trace("place2");
+      default:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test25()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test26()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+         trace("place2");
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test27()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+         trace("place2");
+         break;
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test28()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+      default:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test29()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+         trace("place2");
+         break;
+      default:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test30()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test31()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+         trace("place2");
+         break;
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test32()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+      default:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test33()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      default:
+         trace("place1");
+      case 1:
+         trace("place2");
+      case 2:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test34()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+         trace("place2");
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test35()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      default:
+         trace("place1");
+         break;
+      case 1:
+         trace("place2");
+      case 2:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test36()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      default:
+         trace("place1");
+      case 1:
+         trace("place2");
+         break;
+      case 2:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test37()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+         trace("place2");
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test38()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      default:
+         trace("place1");
+      case 1:
+      case 2:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test39()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+         trace("place2");
+         break;
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test40()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+         trace("place2");
+         break;
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test41()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test42()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+         trace("place2");
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test43()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test44()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+         trace("place2");
+         break;
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test45()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test46()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      default:
+         trace("place2");
+      case 2:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test47()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+         trace("place2");
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test48()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      default:
+         trace("place2");
+      case 2:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test49()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      default:
+         trace("place2");
+         break;
+      case 2:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test50()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+         trace("place2");
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test51()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      default:
+         trace("place2");
+      case 2:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test52()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+         trace("place2");
+         break;
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test53()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+      case 2:
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test54()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      default:
+         trace("place1");
+         break;
+      case 1:
+      case 2:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test55()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+         trace("place2");
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test56()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      default:
+         trace("place1");
+         break;
+      case 1:
+         trace("place2");
+         break;
+      case 2:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test57()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+         trace("place2");
+         break;
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test58()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+         trace("place1");
+         break;
+      case 2:
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test59()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+         trace("place2");
+         break;
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+function test60()
+{
+   var _loc1_=random(100);
+   switch(_loc1_)
+   {
+      case 1:
+      case 2:
+      case 3:
+         trace("place3");
+   }
+   trace("after switch");
+}
+
+
+]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="67" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("tryTypeTest");
+var a = 5;
+
+try{
+	a = a / 0;
+}
+catch(e)
+{
+	trace("err:"+e);
+}
+
+try{
+	a = a / 0;
+}
+catch(e)
+{
+	if(a == 0){
+		throw e;
+	}
+	trace("err:"+e);
+}
+
+try{
+	a = a / 0;
+}
+catch(e:MyError)
+{
+	trace("err:"+e);
+}
+
+try{
+	a = a / 0;
+}
+catch(e1:MyError)
+{
+	trace("err:"+e1);
+}
+catch(e2){
+	trace("err:"+e2);
+}
+
+try{
+	a = a / 0;
+}
+catch(e:MyError)
+{
+	trace("err:"+e);
+}
+catch(e2:Error)
+{
+	trace("err:"+e2);
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="68" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("forInBreakTest");
+var obj = {a:5,b:6,c:7};
+for(var k in obj){
+	trace(k);
+	break;
+}
+trace("after");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="69" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("forWithContinue2Test");
+var s = "A";
+for(var i=0;i<10;i++){
+	if(s=="B"){
+		if(s=="C"){
+			continue;
+		}
+	}
+	trace("D");
+	for(var j=0;j<29;j++){
+		trace("E");
+	}
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="70" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("chainedAfterForInTest");
+var v1 = {};
+function f()
+{
+	var a = 5;
+	var b = {};
+	var c = "bagr";
+	
+
+	for(var x in _locy_){
+		trace(x);
+	}
+	
+	b["r1"] = c + 1 + ". " + ( 
+						 a ? "unk" : (b.r2 = v1[c][0]) 
+						 );
+}
+]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="71" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("forInSwitchTest");
+
+function f()
+{
+	var obj = {};
+	var obj2 = {};
+	
+	for(var k in obj){
+		var j = obj2[k];
+		switch(j){
+			case "A":
+			case "B":
+			case "C":
+				trace("Ret 5");
+				return 5;
+		}
+	}
+	trace("Final");
+	return 10;
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="72" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("deleteTest");
+var obj = {a:1,b:2};
+obj["salam likum"] = 58;
+delete obj.a;
+delete obj["salam likum"];
+delete "bagr aa";]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="73" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("setPropertyTest");
+setProperty("_root", _rotation, 45);
+_root._rotation = 60;
+trace(getProperty("_root",_rotation));
+trace(set("_root._rotation",60));]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="74" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("castOpTest");
+var a = 5;
+
+var b = null;
+
+
+b = flash.display.BitmapData(a);
+b = flash.external.ExternalInterface(a);
+b = flash.filters.BevelFilter(a);
+b = flash.filters.BitmapFilter(a);
+b = flash.filters.BlurFilter(a);
+b = flash.filters.ColorMatrixFilter(a);
+b = flash.filters.ConvolutionFilter(a);
+b = flash.filters.DisplacementMapFilter(a);
+b = flash.filters.DropShadowFilter(a);
+b = flash.filters.GlowFilter(a);
+b = flash.filters.GradientBevelFilter(a);
+b = flash.filters.GradientGlowFilter(a);
+b = flash.geom.ColorTransform(a);
+b = flash.geom.Matrix(a);
+b = flash.geom.Point(a);
+b = flash.geom.Rectangle(a);
+b = flash.geom.Transform(a);
+b = flash.net.FileReference(a);
+b = flash.net.FileReferenceList(a);
+b = flash.text.TextRenderer(a);
+b = Accordion(a);
+b = Alert(a);
+b = Array(a);
+b = BevelFilter(a);
+b = Binding(a);
+b = BitmapData(a);
+b = BitmapFilter(a);
+b = BlurFilter(a);
+b = Boolean(a);
+b = Button(a);
+b = Camera(a);
+b = Color(a);
+b = ColorMatrixFilter(a);
+b = ColorTransform(a);
+b = ComboBox(a);
+b = ComponentMixins(a);
+b = ContextMenu(a);
+b = ContextMenuItem(a);
+b = ConvolutionFilter(a);
+b = CustomActions(a);
+b = CheckBox(a);
+b = DataGrid(a);
+b = DataHolder(a);
+b = DataSet(a);
+b = DataType(a);
+b = Date(a);
+b = DateChooser(a);
+b = DateField(a);
+b = Delta(a);
+b = DeltaItem(a);
+b = DeltaPacket(a);
+b = DisplacementMapFilter(a);
+b = DropShadowFilter(a);
+b = EndPoint(a);
+b = Error(a);
+b = ExternalInterface(a);
+b = FileReference(a);
+b = FileReferenceList(a);
+b = FLVPlayback(a);
+b = Form(a);
+b = Function(a);
+b = GlowFilter(a);
+b = GradientBevelFilter(a);
+b = GradientGlowFilter(a);
+b = System.IME(a);
+b = Label(a);
+b = List(a);
+b = Loader(a);
+b = LoadVars(a);
+b = LocalConnection(a);
+b = Log(a);
+b = Matrix(a);
+b = MediaController(a);
+b = MediaDisplay(a);
+b = MediaPlayback(a);
+b = Menu(a);
+b = MenuBar(a);
+b = Microphone(a);
+b = MovieClip(a);
+b = MovieClipLoader(a);
+b = NetConnection(a);
+b = NetStream(a);
+b = Number(a);
+b = NumericStepper(a);
+b = Object(a);
+b = PendingCall(a);
+b = Point(a);
+b = PopUpManager(a);
+b = PrintJob(a);
+b = ProgressBar(a);
+b = RadioButton(a);
+b = RadioButtonGroup(a);
+b = RDBMSResolver(a);
+b = Rectangle(a);
+b = ScrollPane(a);
+b = System.security(a);
+b = SharedObject(a);
+b = Slide(a);
+b = SOAPCall(a);
+b = Sound(a);
+b = String(a);
+b = TextArea(a);
+b = TextField(a);
+b = TextFormat(a);
+b = TextInput(a);
+b = TextRenderer(a);
+b = TextSnapshot(a);
+b = Transform(a);
+b = Tree(a);
+b = TypedValue(a);
+b = UIScrollBar(a);
+b = Void(a);
+b = WebService(a);
+b = WebServiceConnector(a);
+b = Window(a);
+b = XML(a);
+b = XMLConnector(a);
+b = XMLNode(a);
+b = XMLSocket(a);
+b = XMLUI(a);
+b = XUpdateResolver(a);]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="75" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("compoundAssignmentsTest");
+
+function f()
+{
+	trace(arguments[0]);
+	var n = 0;
+	n += 20;
+	var x = n += 20;
+}
+
+var a = 0;
+
+a+=5;
+
+var x = a+=5;
+
+a.b.c += 10;
+
+x = a.b.c += 10;
+f(5);
+
+trace(a.b.c += 30);
+]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="76" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[var as = 5;
+var abstract=6;
+var Boolean = 7;
+var bytes = 8;
+var char = 9;
+var const = 10;
+var debugger = 11;
+var double = 12;
+var enum = 13;
+var export = 14;
+var final = 15;
+var float = 16;
+var goto = 17;
+var is = 18;
+var long = 19;
+var namespace = 20;
+var native = 21;
+var package = 22;
+var protected = 23;
+var short = 24;
+var synchronized = 25;
+var throws = 26;
+var transient = 27;
+var use = 28;
+var volatile = 29;
+
+//var and = 30;
+//var break = 31;
+//var case = 32;
+//var catch = 33;
+//var class = 34;
+//var continue = 35;
+//var default = 36;
+//var delete = 37;
+//var do = 38;
+//var dynamic = 39;
+//var else = 40;
+//var eq = 41;
+//var extends = 42;
+var false = 43;
+//var finally = 44;
+//var for = 45;
+//var function = 46;
+//var ge = 47;
+var get = 48;
+//var gt = 49;
+//var if = 50;
+//var ifFrameLoaded = 51;
+//var implements = 52;
+//var import = 53;
+//var in = 54;
+//var instanceof = 55;
+//var interface = 56;
+//var intrinsic = 57;
+//var le = 58;
+//var ne = 59;
+//var new = 60;
+//var not = 61;
+var null = 62;
+//var on = 63;
+//var onClipEvent = 64;
+//var or = 65;
+//var private = 66;
+//var public = 67;
+//var return = 68;
+var set = 69;
+//var static = 70;
+//var switch = 71;
+//var tellTarget = 72;
+//var throw = 73;
+//var try = 74;
+//var typeof = 75;
+var undefined = 76;
+//var var = 77;
+//var void = 78;
+//var while = 79;
+//var with = 80;
+var true = 81;
+var false = 82;
+var NaN = 83;
+var newline = 84;
+var Infinity = 85;
+var each = 86;
+
+]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="77" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("tellTargetTest");
+
+tellTarget(root["something"])
+{
+	trace("A");
+	var event1 = function(){
+		trace("B");
+		tellTarget(root["bagr"])
+		{
+			trace("C");
+		}
+		trace("D");
+	}
+}
+
+trace("E");
+tellTarget(root["somethingA"])
+{
+	trace("F");
+	tellTarget(root["somethingB"])
+	{
+		trace("G");
+	}
+	trace("H");
+}
+
+trace("I");
+tellTarget(root["somethingC"])
+{
+	trace("J");
+}
+trace("K");
+
+tellTarget(root["somethingD"])
+{
+	trace("L");
+	tellTarget(root["somethingE"])
+	{
+		trace("M");
+		
+		tellTarget(root["somethingF"])
+		{
+			trace("N");
+		}
+		trace("O");
+	}
+	trace("P");
+}
+trace("Q");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="78" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("registersVsDefineLocalTest");
+
+function x1(c){
+	//these are generated as registers
+	var a = 1;
+	var b = 2;
+
+	return a+b*c;
+}
+
+function x2(c){
+	var a0 = 1;
+	var a1 = 2;
+	var r = Math.floor(Math.random() * 2);
+	
+	return eval("a"+r)+b*c; //eval triggers using DefineLocal
+}
+
+function x3(c){
+	var a0 = 1;
+	var a1 = 2;
+	var r = Math.floor(Math.random() * 2);
+	set("a"+r, 12); //set does not trigger using DefineLocal - it will fail
+	return a0+b*c;
+}
+
+
+trace(x1(2)+x2(3)+x3(4));
+
+
+]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="79" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("deleteEvalTest");
+var k0 = 1;
+var k1 = 2;
+var r = Math.floor(Math.random() * 2);
+	
+trace (eval("k"+r));
+delete ("k"+r);	
+trace (eval("k"+r));]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="80" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("globalFuncAsVarTest");
+var trace = 5;
+
+function t(x){
+	trace(x);
+}
+
+trace = t;
+]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="81" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("switchAndTest");
+
+var a=5;
+var b=3;
+
+switch(true){
+	case a>=0 && a<=3:
+		trace("a 0-3");
+		break;
+	case a>=4 && a<=6:
+		trace("a 4-6");
+		//break;
+	case a>=7 && a<=10:
+		trace("a 7-10");
+		break;
+	case a>=11 && a<=20:
+		trace("a 11-20");
+		break;
+	case a==0 ? b>5 :b <5:
+		trace("a 0, b xx");
+		break;
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="82" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("ifframeLoaded2Test");
+trace("A");
+ifFrameLoaded(10){	
+	var d=5;
+	if(d == 4){
+		trace("B");
+	}else{
+		trace("C");
+	}
+	trace("D");
+	
+}
+trace("E");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="83" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("withTest");
+
+trace("before");
+with(_root.something) {
+	somesub = 5;
+	
+	with(subvar) {
+		somesub2 = 4;
+	}
+	trace("after1");
+}
+trace("after");]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="84" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("numbersCallTest");
+var a = (5).toString();
+var b = 5.2.toString();]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                              <DOMFrame index="85" keyMode="9728">
+                                   <Actionscript>
+                                        <script><![CDATA[trace("tryInsideForInTest");
+var obj = {};
+
+for(var thing in obj) {
+	try {
+		trace("a");
+	} catch(error:Object) {
+		// Blah blah blah
+	}
+}]]></script>
+                                   </Actionscript>
+                                   <elements/>
+                              </DOMFrame>
+                         </frames>
+                    </DOMLayer>
+               </layers>
+          </DOMTimeline>
+     </timelines>
+     <PrinterSettings/>
+     <publishHistory>
+          <PublishItem publishSize="108238" publishTime="1678904397"/>
+          <PublishItem publishSize="107972" publishTime="1667644454"/>
+          <PublishItem publishSize="108067" publishTime="1667642777"/>
+          <PublishItem publishSize="107872" publishTime="1638135730"/>
+          <PublishItem publishSize="107854" publishTime="1638131849"/>
+          <PublishItem publishSize="107768" publishTime="1638096020"/>
+          <PublishItem publishSize="107914" publishTime="1638095953"/>
+          <PublishItem publishSize="107914" publishTime="1638095908"/>
+          <PublishItem publishSize="107915" publishTime="1638095846"/>
+          <PublishItem publishSize="107854" publishTime="1638094581"/>
+          <PublishItem publishSize="107868" publishTime="1638094532"/>
+          <PublishItem publishSize="107862" publishTime="1638094259"/>
+          <PublishItem publishSize="107842" publishTime="1638089478"/>
+          <PublishItem publishSize="107836" publishTime="1638089380"/>
+          <PublishItem publishSize="107807" publishTime="1638089228"/>
+          <PublishItem publishSize="107782" publishTime="1638088848"/>
+          <PublishItem publishSize="107785" publishTime="1638088829"/>
+          <PublishItem publishSize="107773" publishTime="1638088816"/>
+          <PublishItem publishSize="107780" publishTime="1638088491"/>
+          <PublishItem publishSize="107758" publishTime="1638046510"/>
+     </publishHistory>
+</DOMDocument>

@@ -1,0 +1,37 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Tween 5" itemID="60429674-00000289" symbolType="graphic" lastModified="1614976628">
+  <timeline>
+    <DOMTimeline name="Tween 5">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="blue" centerPoint3DX="-90.4" centerPoint3DY="-45.95">
+                  <matrix>
+                    <Matrix tx="-154.15" ty="-102.35"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="63.75" y="56.4"/>
+                  </transformationPoint>
+                  <Actionscript>
+                    <script><![CDATA[onClipEvent(load){
+	trace("load unload");
+}]]></script>
+                  </Actionscript>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="myclip" centerPoint3DX="136.95" centerPoint3DY="74.65">
+                  <matrix>
+                    <Matrix a="0.276168823242188" d="0.382232666015625" tx="112.8" ty="49.05"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="87.45" y="66.95"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

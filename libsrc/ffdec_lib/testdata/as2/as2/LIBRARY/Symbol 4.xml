@@ -1,0 +1,32 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Symbol 4" itemID="51ab1902-00000238" lastModified="1370167554" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="Symbol 4">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Symbol 3" centerPoint3DX="85.95" centerPoint3DY="75">
+                  <matrix>
+                    <Matrix tx="-36.55" ty="-18.95"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="122.5" y="93.95"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+                <DOMSymbolInstance libraryItemName="Symbol 2" symbolType="graphic" loop="loop">
+                  <matrix>
+                    <Matrix a="1.90243530273438" c="0.0856170654296875" d="2.48275756835938" tx="84.85" ty="19.3"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="65.5" y="29"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>
