@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - FileAttributes tag - SWF relative Urls flag
 - AS3 P-code editing class trait
 - [#355] Updated Chinese translation
+- FLA Export - AS2 - Sprite linkage to class
 
 ### Fixed
 - [#1981] AS3 fully qualified (colliding) types in submethods

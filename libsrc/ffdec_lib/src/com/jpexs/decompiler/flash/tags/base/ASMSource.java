@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags.base;
 import com.jpexs.decompiler.flash.DisassemblyListener;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.ActionTreeOperation;
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
@@ -55,6 +56,17 @@ public interface ASMSource extends Exportable, HasSwfAndTag {
      */
     public GraphTextWriter getActionScriptSource(GraphTextWriter writer, ActionList actions) throws InterruptedException;
 
+    /**
+     * Converts actions to ActionScript source with executing operation on the tree.
+     *
+     * @param writer
+     * @param actions
+     * @param treeOperations
+     * @return ASM source
+     * @throws java.lang.InterruptedException
+     */
+    public GraphTextWriter getActionScriptSource(GraphTextWriter writer, ActionList actions, List<ActionTreeOperation> treeOperations) throws InterruptedException;
+    
     /**
      * Whether or not this object contains ASM source
      *

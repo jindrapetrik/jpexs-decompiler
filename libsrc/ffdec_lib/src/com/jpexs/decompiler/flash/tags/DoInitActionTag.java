@@ -22,6 +22,7 @@ import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.ActionList;
+import com.jpexs.decompiler.flash.action.ActionTreeOperation;
 import com.jpexs.decompiler.flash.action.ConstantPoolTooBigException;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSpecialType;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -152,6 +153,15 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
 
         return Action.actionsToSource(this, actions, getScriptName(), writer, getCharset());
     }
+    
+    @Override
+    public GraphTextWriter getActionScriptSource(GraphTextWriter writer, ActionList actions, List<ActionTreeOperation> treeOperations) throws InterruptedException {
+        if (actions == null) {
+            actions = getActions();
+        }
+
+        return Action.actionsToSource(this, actions, getScriptName(), writer, getCharset(), treeOperations);
+    }
 
     @Override
     public ActionList getActions() throws InterruptedException {
@@ -269,5 +279,5 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     @Override
     public void getNeededCharacters(Set<Integer> needed) {
         needed.add(spriteId);
-    }
+    }   
 }
