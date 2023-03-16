@@ -280,7 +280,7 @@ public class XFLConverter {
         }
     }
 
-    private static void convertShapeEdges(double startX, double startY, MATRIX mat, List<ShapeRecordAdvanced> recordsAdvanced, StringBuilder ret) {                        
+    private static void convertShapeEdges(boolean close, double startX, double startY, MATRIX mat, List<ShapeRecordAdvanced> recordsAdvanced, StringBuilder ret) {                        
         
         double x = startX;
         double y = startY;
@@ -296,11 +296,26 @@ public class XFLConverter {
         if (!hasMove) {
             ret.append("! ").append(formatEdgeDouble(startX, false)).append(" ").append(formatEdgeDouble(startY, false));
         }
+        double lastMoveToX = startX;
+        double lastMoveToY = startY; 
+        
         for (ShapeRecordAdvanced rec : recordsAdvanced) {
+            if (rec instanceof StyleChangeRecordAdvanced) {
+                StyleChangeRecordAdvanced scr = (StyleChangeRecordAdvanced)rec;
+                if (scr.stateMoveTo) {
+                   lastMoveToX = scr.moveDeltaX;
+                   lastMoveToY = scr.moveDeltaY;
+                }
+            }
             convertShapeEdge(mat, rec, x, y, ret);
             x = rec.changeX(x);
             y = rec.changeY(y);
         }
+        //hack for morphshapes. TODO: make this better
+        if (close && (Double.compare(lastMoveToX, x) != 0 || Double.compare(lastMoveToY, y) != 0)) {
+            StraightEdgeRecordAdvanced ser = new StraightEdgeRecordAdvanced(lastMoveToX - x, lastMoveToY - y);
+            convertShapeEdge(mat, ser, x, y, ret);            
+        }            
     }
 
     private static String getScaleMode(ILINESTYLE lineStyle) {
@@ -821,7 +836,7 @@ public class XFLConverter {
                                 currentLayer.writeAttribute("strokeStyle", strokeStyle);
                             }
                             StringBuilder edgesSb = new StringBuilder();
-                            convertShapeEdges(startEdgeX, startEdgeY, mat, edges, edgesSb);
+                            convertShapeEdges(((fillStyle0 > 0 || fillStyle1 > 0) && morphshape), startEdgeX, startEdgeY, mat, edges, edgesSb);
                             currentLayer.writeAttribute("edges", edgesSb.toString());
                             currentLayer.writeEndElement();
                             hasEdge = true;                            
@@ -908,7 +923,7 @@ public class XFLConverter {
                             currentLayer.writeAttribute("strokeStyle", lastStrokeStyle);
                         }
                         StringBuilder edgesSb = new StringBuilder();
-                        convertShapeEdges(startEdgeX, startEdgeY, mat, edges, edgesSb);
+                        convertShapeEdges(((lastFillStyle0 > 0 || lastFillStyle1 > 0) && morphshape), startEdgeX, startEdgeY, mat, edges, edgesSb);
                         currentLayer.writeAttribute("edges", edgesSb.toString());
                         currentLayer.writeEndElement();
                         hasEdge = true;
@@ -936,7 +951,7 @@ public class XFLConverter {
                     currentLayer.writeAttribute("strokeStyle", strokeStyle);
                 }
                 StringBuilder edgesSb = new StringBuilder();
-                convertShapeEdges(startEdgeX, startEdgeY, mat, edges, edgesSb);
+                convertShapeEdges(((fillStyle0 > 0 || fillStyle1 > 0) && morphshape), startEdgeX, startEdgeY, mat, edges, edgesSb);
                 currentLayer.writeAttribute("edges", edgesSb.toString());
                 currentLayer.writeEndElement();
                 hasEdge = true;                
@@ -959,7 +974,7 @@ public class XFLConverter {
     }
     
     /**
-     * A hack. This will remove a stroked path with no fill which has same stroke as subsequent path.
+     * A hack. This will remove a stroked path with no fill which has same stroke as subsequent path (or is its prefix).
      * This happens in the morphshape edges. This needs to be cleaned up before exporting to FLA.
      * 
      * @param layer
@@ -1001,7 +1016,7 @@ public class XFLConverter {
                     if (prevStrokeOnly != null &&
                             strokeStyle != null &&
                             strokeStyle.equals(prevStrokeOnly) &&
-                            prevEdgesStr.equals(edgesStr)) {
+                            edgesStr.startsWith(prevEdgesStr)) {
                             Node edgeToRemove = prevNode;
                             edgeToRemove.getParentNode().removeChild(edgeToRemove);
                     }

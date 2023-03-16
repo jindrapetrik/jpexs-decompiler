@@ -1,0 +1,30 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Symbol 2" itemID="51a43c10-00000240" symbolType="graphic" lastModified="1370021547">
+  <timeline>
+    <DOMTimeline name="Symbol 2">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#00FFFF"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!2540 1160|80 1160!80 1160|80 0!80 0|2540 0!2540 0|2540 1160"/>
+                    <Edge cubics="!2540 0(;2540,0 2540,1160 2540,1160q2540 0 2540 1160);"/>
+                    <Edge cubics="!80 1160(;80,1160 80,0 80,0q80 1160 80 0);"/>
+                    <Edge cubics="!2540 1160(;2540,1160 80,1160 80,1160q2540 1160 80 1160);"/>
+                    <Edge cubics="!80 0(;80,0 2540,0 2540,0q80 0 2540 0);"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

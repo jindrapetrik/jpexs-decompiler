@@ -1,0 +1,26 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="kolo" itemID="51a5fc86-00000244" lastModified="1370164793">
+  <timeline>
+    <DOMTimeline name="kolo">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#FF0000" alpha="0.898039215686275"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!2100 820[2100 1160 1792 1400!1792 1400[1485 1640 1050 1640!1050 1640[615 1640 307 1400!307 1400[0 1160 0 820!0 820[0 480 307 240!307 240[615 0 1050 0!1050 0[1485 0 1792 240!1792 240[2100 480 2100 820"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

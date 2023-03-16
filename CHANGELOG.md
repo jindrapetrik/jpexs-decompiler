@@ -36,6 +36,7 @@ All notable changes to this project will be documented in this file.
 - Do not display fonts added to stage (for example in testdata/as2.swf, the vertical text - sprite 10)
 - AS2 Class detection - TemporaryRegisterMark handling
 - FLA export scripts location
+- FLA export shape tweens (morphshapes)
 
 ### Changed
 - AS1/2/3 P-code - format Number values with EcmaScript toString function
