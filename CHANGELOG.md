@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
 - AS3 P-code editing class trait
 - [#355] Updated Chinese translation
 - FLA Export - AS2 - Sprite linkage to class
+- [#1682] AS1/2 Context menu add script on frames/buttons/placeObjects
+- Allow adding second DoAction to a frame
 
 ### Fixed
 - [#1981] AS3 fully qualified (colliding) types in submethods
@@ -37,6 +39,7 @@ All notable changes to this project will be documented in this file.
 - AS2 Class detection - TemporaryRegisterMark handling
 - FLA export scripts location
 - FLA export shape tweens (morphshapes)
+- AS1/2 adding CLIPACTIONRECORD to PlaceObject which already has a record
 
 ### Changed
 - AS1/2/3 P-code - format Number values with EcmaScript toString function
@@ -3008,6 +3011,7 @@ All notable changes to this project will be documented in this file.
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
 [#355]: https://www.free-decompiler.com/flash/issues/355
+[#1682]: https://www.free-decompiler.com/flash/issues/1682
 [#1981]: https://www.free-decompiler.com/flash/issues/1981
 [#1982]: https://www.free-decompiler.com/flash/issues/1982
 [#1986]: https://www.free-decompiler.com/flash/issues/1986
