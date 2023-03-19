@@ -227,7 +227,8 @@ public class AddScriptDialog extends AppDialog {
         for (Tag t : swf.getTags()) {
 
             if (t instanceof DoActionTag) {
-                hasScript = true;
+                //It is no longer a problem to have more than single DoAction
+                //hasScript = true;
             }
             if (t instanceof ShowFrameTag) {
                 MyFrame myf = new MyFrame(f);
@@ -288,7 +289,8 @@ public class AddScriptDialog extends AppDialog {
                 boolean hasScript = false;
                 for (Tag t2 : s.getTags()) {
                     if (t2 instanceof DoActionTag) {
-                        hasScript = true;
+                        //It is no longer a problem to have more than single DoAction
+                        //hasScript = true;
                     }
                     if (t2 instanceof ShowFrameTag) {
                         MyTreeNode frameNode = new MyTreeNode();
