@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [18.4.0] - 2023-03-19
 ### Added
 - AS3 support for logical AND/OR compound operator
@@ -2862,6 +2864,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.4.0...dev
 [18.4.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.6...version18.4.0
 [18.3.6]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.5...version18.3.6
 [18.3.5]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.4...version18.3.5
