@@ -63,6 +63,56 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="18.4.0" date="2023-03-19">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>AS3 support for logical AND/OR compound operator</li>
+					<li>AS3 Display missing namespaces along traits as §§namespace("url")</li>
+					<li>#1888, #1892 AS3 option to select SWF dependencies to properly resolve namespaces, types, etc. (currently in GUI only)</li>
+					<li>FileAttributes tag - SWF relative Urls flag</li>
+					<li>AS3 P-code editing class trait</li>
+					<li>#355 Updated Chinese translation</li>
+					<li>FLA Export - AS2 - Sprite linkage to class</li>
+					<li>#1682 AS1/2 Context menu add script on frames/buttons/placeObjects</li>
+					<li>Allow adding second DoAction to a frame</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1981 AS3 fully qualified (colliding) types in submethods</li>
+					<li>AS3 direct editation - Allow member or call for doubles</li>
+					<li>AS3 direct editation - Allow comma operator in XML filter operation</li>
+					<li>AS3 direct editation - Allow comma operator in switch expressions</li>
+					<li>AS3 XML embedded variables display and direct edit</li>
+					<li>AS3 Metadata values order</li>
+					<li>AS3 Metadata in P-code formatting</li>
+					<li>AS3 Metadata single value (null item key)</li>
+					<li>#1981 AS3 star import collisions</li>
+					<li>#1982 Slow calculation of large shape outlines - now use only rectangles for large shapes</li>
+					<li>#1986 AS2 Class detection - NullPointerException on certain classes</li>
+					<li>AS3 P-code ValueKind namespaces handling</li>
+					<li>AS3 direct editation - namespace definition without explicit value</li>
+					<li>AS3 direct editation - var/const outside package</li>
+					<li>AS3 interfaces - internal modifier on methods</li>
+					<li>AS3 direct editation - interface method namespace</li>
+					<li>AS3 p-code docs - deldescendants, negate_p operands</li>
+					<li>AS3 p-code - IGNORE_REST method flag incorrectly shown as EXPLICIT</li>
+					<li>#1989 AS3 - Slow deobfuscation (AVM2DeobfuscatorSimpleOld)</li>
+					<li>AS3 - getouterscope instruction support</li>
+					<li>#1990 Cloning DefineSprite causing incorrect tags written</li>
+					<li>Do not display fonts added to stage (for example in testdata/as2.swf, the vertical text - sprite 10)</li>
+					<li>AS2 Class detection - TemporaryRegisterMark handling</li>
+					<li>FLA export scripts location</li>
+					<li>FLA export shape tweens (morphshapes)</li>
+					<li>AS1/2 adding CLIPACTIONRECORD to PlaceObject which already has a record</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>AS1/2/3 P-code - format Number values with EcmaScript toString function</li>
+					<li>AS3 p-code - EXPLICIT method flag renamed to NATIVE</li>
+				</ul>
+			</description>
+		</release>
 		<release version="18.3.6" date="2023-02-25">
 			<description>
 				<p>Fixed</p>
