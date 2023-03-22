@@ -3143,7 +3143,7 @@ public class CommandLineArgumentParser {
         File inFile = new File(args.pop());
         File outFile = new File(args.pop());
 
-        if (args.size() == 3) {
+        if (args.size() == 1) {
             System.out.println("Replacing - only single argument passed, taking it as file to load replacements from");
             try {
                 List<String> lines = Files.readAllLines(Paths.get(args.pop()), StandardCharsets.UTF_8);
