@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed
 - [#1993] Incorrect scroll position causing shapes to be hidden
+- [#1994] Replace command in commandline with three argument causing replacements file load
 
 ## [18.4.0] - 2023-03-19
 ### Added
@@ -3014,6 +3015,7 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1993]: https://www.free-decompiler.com/flash/issues/1993
+[#1994]: https://www.free-decompiler.com/flash/issues/1994
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
 [#355]: https://www.free-decompiler.com/flash/issues/355
