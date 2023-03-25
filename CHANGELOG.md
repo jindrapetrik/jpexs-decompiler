@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - [#1994] Replace command in commandline with three argument causing replacements file load
 - [#1477] Open file (Context menu) with unicode characters, unicode in paths, on Windows
 - Starting app with parameters causing wrong GUI init
+- [#1991] ConcurrentModificationException on clearing cache thread
 
 ## [18.4.0] - 2023-03-19
 ### Added
@@ -3019,6 +3020,7 @@ All notable changes to this project will be documented in this file.
 [#1993]: https://www.free-decompiler.com/flash/issues/1993
 [#1994]: https://www.free-decompiler.com/flash/issues/1994
 [#1477]: https://www.free-decompiler.com/flash/issues/1477
+[#1991]: https://www.free-decompiler.com/flash/issues/1991
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
 [#355]: https://www.free-decompiler.com/flash/issues/355
