@@ -107,6 +107,7 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.StandardWatchEventKinds;
@@ -2650,10 +2651,27 @@ public class Main {
     }
 
     /**
+     * To bypass wrong encoded unicode characters coming from EXE,
+     * it Launch5j encodes characters using URLEncoder.
+     * @param args 
+     */
+    private static void decodeLaunch5jArgs(String[] args) {
+        String encargs = System.getProperty("l5j.encargs");
+        if ("true".equals(encargs) || "1".equals(encargs)) {
+            for (int i = 0; i < args.length; ++i) {
+                try {
+                    args[i] = URLDecoder.decode(args[i], "UTF-8");
+                } catch (Exception e) { }
+            }
+        }
+    }
+    
+    /**
      * @param args the command line arguments
      * @throws IOException On error
      */
     public static void main(String[] args) throws IOException {
+        decodeLaunch5jArgs(args);
         setSessionLoaded(false);
 
         clearTemp();
@@ -2686,7 +2704,7 @@ public class Main {
                     reloadLastSession();
                 }
             });
-        } else {
+        } else {                       
             checkLibraryVersion();
             setSessionLoaded(true);
             String[] filesToOpen = CommandLineArgumentParser.parseArguments(args);

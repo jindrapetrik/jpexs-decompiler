@@ -395,7 +395,7 @@
     <target name="-set-console-type">
         <property name="exe.type" value="console" />
     </target>
-    <target name="-exe-config" depends="-loadversion"> 
+    <!--<target name="-exe-config" depends="-loadversion"> 
         <echoxml file="${exe.config}">
             <launch4jConfig>
                 <dontWrapJar>true</dontWrapJar>
@@ -420,7 +420,6 @@
                     <jdkPreference>preferJre</jdkPreference>
                     <runtimeBits>64/32</runtimeBits>
                     <maxHeapPercent>${max.heap.size.percent}</maxHeapPercent>
-                    <!-- <opt>-Xss${max.stack.size}m</opt> -->
                     <opt>-Djava.net.preferIPv4Stack=true</opt>
                     <opt>-Djna.nosys=true</opt>
                 </jre>
@@ -444,7 +443,7 @@
                 </versionInfo>
             </launch4jConfig>
         </echoxml>
-    </target>    
+    </target>-->
     
     <target name="-exe-translator-config"> 
         <echoxml file="${translator_exe.config}">
@@ -487,18 +486,18 @@
             </launch4jConfig>
         </echoxml>
     </target>    
-    <target name="-exe-linux" unless="is_windows" depends="-load-tools,-exe-config,-exe-translator-config">
-        <java jar="${launch4j.path}/launch4j.jar" fork="true">
+    <target name="-exe-linux" unless="is_windows" depends="-load-tools,-exe-translator-config"> <!-- -exe-config -->
+        <!--<java jar="${launch4j.path}/launch4j.jar" fork="true">
             <arg line="${exe.config}" />
-        </java>
+        </java>-->
         <java jar="${launch4j.path}/launch4j.jar" fork="true">
             <arg line="${translator_exe.config}" />
         </java>
     </target>
-    <target name="-exe-windows" if="is_windows" depends="-load-tools,-exe-config,-exe-translator-config">
-        <java jar="${launch4j.path}/launch4j.jar" fork="true">
+    <target name="-exe-windows" if="is_windows" depends="-load-tools,-exe-translator-config"> <!-- -exe-config -->
+        <!--<java jar="${launch4j.path}/launch4j.jar" fork="true">
             <arg line="${exe.config}" />
-        </java>
+        </java>-->
         <java jar="${launch4j.path}/launch4j.jar" fork="true">
             <arg line="${translator_exe.config}" />
         </java>
