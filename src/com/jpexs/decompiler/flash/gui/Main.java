@@ -2709,8 +2709,8 @@ public class Main {
             setSessionLoaded(true);
             String[] filesToOpen = CommandLineArgumentParser.parseArguments(args);
             if (filesToOpen != null && filesToOpen.length > 0) {
+                initGui();                    
                 View.execInEventDispatch(() -> {
-                    initGui();
                     shouldCloseWhenClosingLoadingDialog = true;
                     if (Configuration.allowOnlyOneInstance.get() && FirstInstance.openFiles(Arrays.asList(filesToOpen))) { //Try to open in first instance
                         Main.exit();

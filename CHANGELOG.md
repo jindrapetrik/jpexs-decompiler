@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - [#1993] Incorrect scroll position causing shapes to be hidden
 - [#1994] Replace command in commandline with three argument causing replacements file load
 - [#1477] Open file (Context menu) with unicode characters, unicode in paths, on Windows
+- Starting app with parameters causing wrong GUI init
 
 ## [18.4.0] - 2023-03-19
 ### Added
