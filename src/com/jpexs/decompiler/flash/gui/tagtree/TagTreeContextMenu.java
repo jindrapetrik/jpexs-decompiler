@@ -645,7 +645,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                         getTree().setSelectionRow(row);
                     }
 
-                    TreePath[] paths = getTree().getSelectionPaths();
+                    TreePath[] paths = getTree().getSelectionPathsSorted();
                     if (paths == null || paths.length == 0) {
                         return;
                     }
