@@ -1405,18 +1405,7 @@ public abstract class MainFrameMenu implements MenuBuilder {
                 path = mainPath + "\\..\\..\\libsrc\\ffdec_lib\\testdata\\as3\\as3.swf";
                 sourceInfos[1] = new OpenableSourceInfo(null, path, null);
                 Main.openFile(sourceInfos);
-            }, PRIORITY_MEDIUM, null, true, null, false);
-            addMenuItem("/debug/createNewSwf", "Create new SWF", "continue16", e -> {
-                SWF swf = new SWF();
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                try {
-                    swf.saveTo(baos);
-                } catch (IOException ex) {
-                    Logger.getLogger(MainFrameMenu.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                Main.openFile(new OpenableSourceInfo(new ByteArrayInputStream(baos.toByteArray()), "new.swf", "New SWF"));
-            }, PRIORITY_MEDIUM, null, true, null, false);
+            }, PRIORITY_MEDIUM, null, true, null, false);            
             finishMenu("/debug");
         }
 
