@@ -9,6 +9,9 @@ All notable changes to this project will be documented in this file.
 - Starting app with parameters causing wrong GUI init
 - [#1991] ConcurrentModificationException on clearing cache thread
 
+### Changed
+- [#1996] Items are now exported in order of appearance in the tag tree (usually SWF order), previously was it in order of selection
+
 ## [18.4.0] - 2023-03-19
 ### Added
 - AS3 support for logical AND/OR compound operator
@@ -3021,6 +3024,7 @@ All notable changes to this project will be documented in this file.
 [#1994]: https://www.free-decompiler.com/flash/issues/1994
 [#1477]: https://www.free-decompiler.com/flash/issues/1477
 [#1991]: https://www.free-decompiler.com/flash/issues/1991
+[#1996]: https://www.free-decompiler.com/flash/issues/1996
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
 [#355]: https://www.free-decompiler.com/flash/issues/355

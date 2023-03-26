@@ -496,7 +496,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             items.addAll(folderListPanel.selectedItems.values());
         } else {
             AbstractTagTree tree = (AbstractTagTree) e.getSource();
-            TreePath[] paths = tree.getSelectionPaths();
+            TreePath[] paths = tree.getSelectionPathsSorted();
             if (paths != null) {
                 for (TreePath treePath : paths) {
                     TreeItem item = (TreeItem) treePath.getLastPathComponent();
@@ -583,7 +583,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             items.addAll(folderListPanel.selectedItems.values());
         } else {
             AbstractTagTree tree = (AbstractTagTree) e.getSource();
-            TreePath[] paths = tree.getSelectionPaths();
+            TreePath[] paths = tree.getSelectionPathsSorted();
             if (paths != null) {
                 for (TreePath treePath : paths) {
                     TreeItem item = (TreeItem) treePath.getLastPathComponent();

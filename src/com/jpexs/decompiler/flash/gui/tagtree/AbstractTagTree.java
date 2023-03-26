@@ -102,6 +102,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -501,8 +502,7 @@ public abstract class AbstractTagTree extends JTree {
     }
 
     public List<TreeItem> getAllSelected() {
-        TreeSelectionModel tsm = getSelectionModel();
-        TreePath[] tps = tsm.getSelectionPaths();
+        TreePath[] tps = getSelectionPathsSorted();
         List<TreeItem> ret = new ArrayList<>();
         if (tps == null) {
             return ret;
@@ -525,12 +525,25 @@ public abstract class AbstractTagTree extends JTree {
         return ret;
     }
 
+    public TreePath[] getSelectionPathsSorted() {
+        TreePath[] paths = getSelectionPaths();
+        if (paths == null) {
+            return null;
+        }
+        Arrays.sort(paths, new Comparator<TreePath>(){
+            @Override
+            public int compare(TreePath o1, TreePath o2) {
+                return getRowForPath(o1) - getRowForPath(o2);
+            }            
+        });
+        return paths;
+    }
+    
     public List<TreeItem> getSelected() {
         if (!mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
             return new ArrayList<>(mainPanel.folderPreviewPanel.selectedItems.values());
         }
-        TreeSelectionModel tsm = getSelectionModel();
-        TreePath[] tps = tsm.getSelectionPaths();
+        TreePath[] tps = getSelectionPathsSorted();
         List<TreeItem> ret = new ArrayList<>();
         if (tps == null) {
             return ret;
