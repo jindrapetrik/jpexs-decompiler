@@ -80,7 +80,7 @@ public class ConstructIns extends InstructionDefinition {
 
     public static boolean walkXML(GraphTargetItem item, List<GraphTargetItem> list) {
         boolean ret = walkXMLSub(item, list);
-        if (list.size() == 1) {
+        if (list.size() == 1 && (list.get(0) instanceof StringAVM2Item)) {
             return true;
         }
         return ret;
