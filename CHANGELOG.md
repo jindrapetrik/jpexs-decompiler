@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - [#1477] Open file (Context menu) with unicode characters, unicode in paths, on Windows
 - Starting app with parameters causing wrong GUI init
 - [#1991] ConcurrentModificationException on clearing cache thread
+- [#1999] AS3 decompilation - XML constructor call with other than string argument
 
 ### Changed
 - [#1996] Items are now exported in order of appearance in the tag tree (usually SWF order), previously was it in order of selection
@@ -3024,6 +3025,7 @@ All notable changes to this project will be documented in this file.
 [#1994]: https://www.free-decompiler.com/flash/issues/1994
 [#1477]: https://www.free-decompiler.com/flash/issues/1477
 [#1991]: https://www.free-decompiler.com/flash/issues/1991
+[#1999]: https://www.free-decompiler.com/flash/issues/1999
 [#1996]: https://www.free-decompiler.com/flash/issues/1996
 [#1888]: https://www.free-decompiler.com/flash/issues/1888
 [#1892]: https://www.free-decompiler.com/flash/issues/1892
