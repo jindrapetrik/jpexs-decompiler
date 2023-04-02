@@ -2775,7 +2775,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     }
                 };
 
-                if (mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
+                if (!mainPanel.folderPreviewPanel.isSomethingSelected()) {
                     mainPanel.treeOperation(r);
                 } else {
                     //current folder must stay selected

@@ -33,11 +33,14 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.WeakHashMap;
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -63,8 +66,7 @@ public class FolderListPanel extends JPanel {
 
     private int selectedIndex = -1;
 
-    public Map<Integer, TreeItem> selectedItems = new HashMap<>();
-
+    private Map<Integer, TreeItem> selectedItems = new TreeMap<>();
     
     private static final int PREVIEW_SIZE = 150;
 
@@ -160,7 +162,7 @@ public class FolderListPanel extends JPanel {
                 }
 
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    mainPanel.getContextPopupMenu().update(new ArrayList<>(selectedItems.values()));
+                    mainPanel.getContextPopupMenu().update(getSelectedItemsSorted());
                     mainPanel.getContextPopupMenu().show(FolderListPanel.this, e.getX(), e.getY());
                 }
                 repaint();
@@ -270,4 +272,12 @@ public class FolderListPanel extends JPanel {
             }
         }
     }      
+    
+    public List<TreeItem> getSelectedItemsSorted() {
+        return new ArrayList<>(selectedItems.values());
+    }
+    
+    public boolean isSomethingSelected() {
+        return !selectedItems.isEmpty();
+    }
 }

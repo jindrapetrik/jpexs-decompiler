@@ -540,8 +540,8 @@ public abstract class AbstractTagTree extends JTree {
     }
     
     public List<TreeItem> getSelected() {
-        if (!mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
-            return new ArrayList<>(mainPanel.folderPreviewPanel.selectedItems.values());
+        if (mainPanel.folderPreviewPanel.isSomethingSelected()) {
+            return mainPanel.folderPreviewPanel.getSelectedItemsSorted();
         }
         TreePath[] tps = getSelectionPathsSorted();
         List<TreeItem> ret = new ArrayList<>();

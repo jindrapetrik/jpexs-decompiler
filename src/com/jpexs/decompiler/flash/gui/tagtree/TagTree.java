@@ -312,12 +312,14 @@ public class TagTree extends AbstractTagTree {
     @Override
     public List<TreeItem> getSelection(Openable openable) {
         List<TreeItem> sel;
-        if (mainPanel.folderPreviewPanel.selectedItems.isEmpty()) {
+        if (!mainPanel.folderPreviewPanel.isSomethingSelected()) {
             sel = getAllSelected();
         } else {
             sel = new ArrayList<>();
 
-            for (TreeItem treeItem : mainPanel.folderPreviewPanel.selectedItems.values()) {
+            List<TreeItem> siSorted = mainPanel.folderPreviewPanel.getSelectedItemsSorted();
+            
+            for (TreeItem treeItem : siSorted) {
                 sel.add(treeItem);
                 getAllSubs(treeItem, sel);
             }
