@@ -44,16 +44,20 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.TreePath;
 import org.pushingpixels.substance.api.ColorSchemeAssociationKind;
 import org.pushingpixels.substance.api.ComponentState;
 import org.pushingpixels.substance.api.DecorationAreaType;
@@ -74,11 +78,7 @@ public class FolderPreviewPanel extends JPanel {
 
     private boolean repaintQueued;
 
-    private int lastWidth;
-
-    private int lastHeight;
-
-    public Map<Integer, TreeItem> selectedItems = new LinkedHashMap<>();
+    private Map<Integer, TreeItem> selectedItems = new TreeMap<>();
 
     private Cache<Integer, SerializableImage> cachedPreviews;
     
@@ -156,7 +156,7 @@ public class FolderPreviewPanel extends JPanel {
                 }
 
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    mainPanel.getContextPopupMenu().update(new ArrayList<>(selectedItems.values()));
+                    mainPanel.getContextPopupMenu().update(getSelectedItemsSorted());
                     mainPanel.getContextPopupMenu().show(FolderPreviewPanel.this, e.getX(), e.getY());
                 }
                 repaint();
@@ -386,4 +386,22 @@ public class FolderPreviewPanel extends JPanel {
         }
         return image;
     }
+    
+    public List<TreeItem> getSelectedItemsSorted() {
+        return new ArrayList<>(selectedItems.values());
+    }
+    
+    public boolean isSomethingSelected() {
+        return !selectedItems.isEmpty();
+    }
+
+    public Map<Integer, TreeItem> getSelectedItems() {
+        return selectedItems;
+    }
+
+    public void setSelectedItems(Map<Integer, TreeItem> selectedItems) {
+        this.selectedItems = selectedItems;
+    }
+    
+    
 }

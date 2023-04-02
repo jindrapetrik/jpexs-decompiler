@@ -491,9 +491,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         Object source = e.getSource();
         List<TreeItem> items = new ArrayList<>();
         if (source == folderPreviewPanel) {
-            items.addAll(folderPreviewPanel.selectedItems.values());
+            items.addAll(folderPreviewPanel.getSelectedItemsSorted());
         } else if (source == folderListPanel) {
-            items.addAll(folderListPanel.selectedItems.values());
+            items.addAll(folderListPanel.getSelectedItemsSorted());
         } else {
             AbstractTagTree tree = (AbstractTagTree) e.getSource();
             TreePath[] paths = tree.getSelectionPathsSorted();
@@ -578,9 +578,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         Object source = e.getSource();
         List<TreeItem> items = new ArrayList<>();
         if (source == folderPreviewPanel) {
-            items.addAll(folderPreviewPanel.selectedItems.values());
+            items.addAll(folderPreviewPanel.getSelectedItemsSorted());
         } else if (source == folderListPanel) {
-            items.addAll(folderListPanel.selectedItems.values());
+            items.addAll(folderListPanel.getSelectedItemsSorted());
         } else {
             AbstractTagTree tree = (AbstractTagTree) e.getSource();
             TreePath[] paths = tree.getSelectionPathsSorted();
@@ -5049,7 +5049,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         
         JScrollBar folderPreviewScrollBar = ((JScrollPane)folderPreviewPanel.getParent().getParent()).getVerticalScrollBar();
         int scrollValue = folderPreviewScrollBar.getValue();        
-        Map<Integer, TreeItem> folderItems = new HashMap<>(folderPreviewPanel.selectedItems);   
+        Map<Integer, TreeItem> folderItems = new HashMap<>(folderPreviewPanel.getSelectedItems());   
         
 
         if (scrollToVisible) {
@@ -5269,7 +5269,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             pinsPanel.setCurrent(oldItem);
         }
         
-        folderPreviewPanel.selectedItems = folderItems;
+        folderPreviewPanel.setSelectedItems(folderItems);
         folderPreviewScrollBar.setValue(scrollValue);     
         
         View.execInEventDispatchLater(new Runnable(){
