@@ -63,6 +63,23 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="18.4.1" date="2023-04-05">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#1993 Incorrect scroll position causing shapes to be hidden</li>
+					<li>#1994 Replace command in commandline with three argument causing replacements file load</li>
+					<li>#1477 Open file (Context menu) with unicode characters, unicode in paths, on Windows</li>
+					<li>Starting app with parameters causing wrong GUI init</li>
+					<li>#1991 ConcurrentModificationException on clearing cache thread</li>
+					<li>#1999 AS3 decompilation - XML constructor call with other than string argument</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#1996 Items are now exported in order of appearance in the tag tree (usually SWF order), previously was it in order of selection</li>
+				</ul>
+			</description>
+		</release>
 		<release version="18.4.0" date="2023-03-19">
 			<description>
 				<p>Added</p>
