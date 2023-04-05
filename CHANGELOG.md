@@ -1,6 +1,8 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
 ## [18.4.1] - 2023-04-05
 ### Fixed
 - [#1993] Incorrect scroll position causing shapes to be hidden
@@ -2874,6 +2876,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
+[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.4.1...dev
 [18.4.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.4.0...version18.4.1
 [18.4.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.6...version18.4.0
 [18.3.6]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.5...version18.3.6
