@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed 
+- [#2004] Freezing when a shape has nonimage character set as fill
 
 ## [18.4.1] - 2023-04-05
 ### Fixed
@@ -3024,6 +3026,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2004]: https://www.free-decompiler.com/flash/issues/2004
 [#1993]: https://www.free-decompiler.com/flash/issues/1993
 [#1994]: https://www.free-decompiler.com/flash/issues/1994
 [#1477]: https://www.free-decompiler.com/flash/issues/1477

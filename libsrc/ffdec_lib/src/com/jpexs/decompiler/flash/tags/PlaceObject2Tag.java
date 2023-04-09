@@ -289,7 +289,7 @@ public class PlaceObject2Tag extends PlaceObjectTypeTag implements ASMSourceCont
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         if (placeFlagHasCharacter) {
             needed.add(characterId);
         }

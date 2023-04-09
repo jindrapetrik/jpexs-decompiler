@@ -16,6 +16,9 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.EnumValue;
@@ -81,12 +84,18 @@ public class MORPHFILLSTYLE implements NeedsCharacters, Serializable {
     public MATRIX endBitmapMatrix;
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         if ((fillStyleType == REPEATING_BITMAP)
                 || (fillStyleType == CLIPPED_BITMAP)
                 || (fillStyleType == NON_SMOOTHED_REPEATING_BITMAP)
                 || (fillStyleType == NON_SMOOTHED_CLIPPED_BITMAP)) {
-            needed.add(bitmapId);
+            if (bitmapId == 65535) { //In some cases, this special value is used, but is not used. Ignore it. (#1851)
+                return;
+            }
+            CharacterTag character = swf.getCharacter(bitmapId);
+            if (character instanceof ImageTag) {
+                needed.add(bitmapId);
+            }
         }
     }
 

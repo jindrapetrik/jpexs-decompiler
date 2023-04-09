@@ -50,9 +50,9 @@ public class SHAPE implements NeedsCharacters, Serializable {
     private Shape fastCachedOutline;
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         for (SHAPERECORD r : shapeRecords) {
-            r.getNeededCharacters(needed);
+            r.getNeededCharacters(needed, swf);
         }
     }
 

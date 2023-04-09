@@ -66,7 +66,7 @@ public abstract class ButtonTag extends DrawableTag implements Timelined {
     public abstract boolean trackAsMenu();
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         for (BUTTONRECORD r : getRecords()) {
             needed.add(r.characterId);
         }

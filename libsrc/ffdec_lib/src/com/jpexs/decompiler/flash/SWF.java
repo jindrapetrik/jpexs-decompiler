@@ -658,7 +658,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 int characterId = ((CharacterTag) tag).getCharacterId();
                 if (characterId != -1) {
                     Set<Integer> needed = new HashSet<>();
-                    tag.getNeededCharacters(needed);
+                    tag.getNeededCharacters(needed, this);
                     for (Integer needed1 : needed) {
                         Set<Integer> s = dep.get(needed1);
                         if (s == null) {
@@ -4382,7 +4382,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 CharacterTag cht = (CharacterTag) t;
                 if (cht.getCharacterId() != -1) {
                     Set<Integer> needed = new HashSet<>();
-                    cht.getNeededCharacters(needed);
+                    cht.getNeededCharacters(needed, this);
                     characterToNeeded.put(cht.getCharacterId(), needed);
                 }
             }

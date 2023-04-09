@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.annotations.SWFArray;
 import java.io.Serializable;
@@ -31,9 +32,9 @@ public class FILLSTYLEARRAY implements NeedsCharacters, Serializable {
     public FILLSTYLE[] fillStyles;
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         for (FILLSTYLE fs : fillStyles) {
-            fs.getNeededCharacters(needed);
+            fs.getNeededCharacters(needed, swf);
         }
     }
 

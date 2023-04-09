@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import java.io.Serializable;
 import java.util.Set;
@@ -29,9 +30,9 @@ public class MORPHFILLSTYLEARRAY implements NeedsCharacters, Serializable {
     public MORPHFILLSTYLE[] fillStyles;
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         for (MORPHFILLSTYLE fs : fillStyles) {
-            fs.getNeededCharacters(needed);
+            fs.getNeededCharacters(needed, swf);
         }
     }
 

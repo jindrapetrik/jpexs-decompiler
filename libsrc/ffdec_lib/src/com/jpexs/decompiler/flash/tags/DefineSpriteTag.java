@@ -375,7 +375,7 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         for (Tag t : getTags()) {
             if ((t instanceof CharacterIdTag) && !(t instanceof SoundStreamHeadTypeTag) && !(t instanceof DefineExternalStreamSound)) {
                 needed.add(((CharacterIdTag) t).getCharacterId());

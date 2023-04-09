@@ -5444,7 +5444,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                 jpegTablesTag = imageTag.getSwf().getJtt();
             }
             Set<Integer> needed = new LinkedHashSet<>();
-            imageTag.getNeededCharacters(needed);
+            imageTag.getNeededCharacters(needed, swf);
 
             List<CharacterTag> neededCopies = new ArrayList<>();
             for (int n : needed) {
