@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.EnumValue;
@@ -88,9 +89,9 @@ public class LINESTYLE2 implements NeedsCharacters, Serializable, ILINESTYLE {
     public FILLSTYLE fillType;
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         if (hasFillFlag) {
-            fillType.getNeededCharacters(needed);
+            fillType.getNeededCharacters(needed, swf);
         }
     }
 

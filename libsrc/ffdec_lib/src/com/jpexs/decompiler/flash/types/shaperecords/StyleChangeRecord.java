@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types.shaperecords;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.types.BasicType;
 import com.jpexs.decompiler.flash.types.FILLSTYLEARRAY;
@@ -83,9 +84,9 @@ public final class StyleChangeRecord extends SHAPERECORD implements Cloneable {
     public int numLineBits;
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         if (stateNewStyles) {
-            fillStyles.getNeededCharacters(needed);
+            fillStyles.getNeededCharacters(needed, swf);
         }
     }
 

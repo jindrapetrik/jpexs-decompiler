@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.base.NeedsCharacters;
 import com.jpexs.decompiler.flash.types.shaperecords.EndShapeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
@@ -35,11 +36,11 @@ public class SHAPEWITHSTYLE extends SHAPE implements NeedsCharacters, Serializab
     public LINESTYLEARRAY lineStyles;
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
-        fillStyles.getNeededCharacters(needed);
-        lineStyles.getNeededCharacters(needed);
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
+        fillStyles.getNeededCharacters(needed, swf);
+        lineStyles.getNeededCharacters(needed, swf);
         for (SHAPERECORD r : shapeRecords) {
-            r.getNeededCharacters(needed);
+            r.getNeededCharacters(needed, swf);
         }
     }
 

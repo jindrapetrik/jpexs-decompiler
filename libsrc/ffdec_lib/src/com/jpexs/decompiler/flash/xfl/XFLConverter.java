@@ -1815,7 +1815,7 @@ public class XFLConverter {
                 for (Tag tag : swf.getTags()) {
                     if (tag instanceof ShapeTag) {
                         Set<Integer> needed = new HashSet<>();
-                        tag.getNeededCharacters(needed);
+                        tag.getNeededCharacters(needed, swf);
                         ShapeTag sht = (ShapeTag) tag;
                         if (needed.contains(imageTag.getCharacterId())) {
                             List<FILLSTYLE> fs = new ArrayList<>();

@@ -944,7 +944,7 @@ public class DefineEditTextTag extends TextTag {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         if (hasFont) {
             needed.add(fontId);
         }

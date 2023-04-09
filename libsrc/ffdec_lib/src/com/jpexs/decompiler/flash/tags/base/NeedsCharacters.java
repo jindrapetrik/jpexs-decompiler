@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.SWF;
 import java.util.Set;
 
 /**
@@ -24,7 +25,7 @@ import java.util.Set;
  */
 public interface NeedsCharacters {
 
-    public void getNeededCharacters(Set<Integer> needed);
+    public void getNeededCharacters(Set<Integer> needed, SWF swf);
 
     public boolean replaceCharacter(int oldCharacterId, int newCharacterId);
 

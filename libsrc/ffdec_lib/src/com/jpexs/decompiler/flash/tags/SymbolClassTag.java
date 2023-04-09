@@ -141,7 +141,7 @@ public class SymbolClassTag extends SymbolClassTypeTag {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         for (int t : tags) {
             if (t != 0) { //main class
                 needed.add(t);

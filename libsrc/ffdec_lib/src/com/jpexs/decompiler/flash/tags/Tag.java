@@ -608,7 +608,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
     }
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
     }
     
     public Set<Integer> getMissingNeededCharacters(Set<Integer> needed) {
@@ -645,7 +645,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
 
     public void getNeededCharactersDeep(Set<Integer> needed) {
         Set<Integer> needed2 = new LinkedHashSet<>();
-        getNeededCharacters(needed2);
+        getNeededCharacters(needed2, swf);
         List<Integer> needed3 = new ArrayList<>(needed2);
 
         for (int i = 0; i < needed3.size(); i++) {
@@ -656,7 +656,7 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
             if (swf.getCharacters().containsKey(characterId)) {
                 Set<Integer> needed4 = new LinkedHashSet<>();
                 CharacterTag character = swf.getCharacter(characterId);                
-                character.getNeededCharacters(needed4);
+                character.getNeededCharacters(needed4, swf);
                 List<Integer> newItems = new ArrayList<>();
                 for(int n : needed4) {
                     int index = needed3.indexOf((Integer) n);

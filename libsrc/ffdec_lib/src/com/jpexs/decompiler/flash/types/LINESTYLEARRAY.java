@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.types;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape3Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape4Tag;
@@ -41,15 +42,15 @@ public class LINESTYLEARRAY implements NeedsCharacters, Serializable {
     public LINESTYLE2[] lineStyles2 = new LINESTYLE2[0];
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         if (lineStyles != null) {
             for (ILINESTYLE ls : lineStyles) {
-                ls.getNeededCharacters(needed);
+                ls.getNeededCharacters(needed, swf);
             }
         }
         if (lineStyles != null) {
             for (ILINESTYLE ls : lineStyles2) {
-                ls.getNeededCharacters(needed);
+                ls.getNeededCharacters(needed, swf);
             }
         }
     }

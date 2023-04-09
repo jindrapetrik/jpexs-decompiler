@@ -62,7 +62,7 @@ public abstract class SHAPERECORD implements Cloneable, NeedsCharacters, Seriali
     public abstract void calculateBits();
 
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
     }
 
     @Override

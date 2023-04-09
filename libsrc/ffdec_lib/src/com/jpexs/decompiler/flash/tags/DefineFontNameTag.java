@@ -97,7 +97,7 @@ public class DefineFontNameTag extends Tag implements CharacterIdTag {
     }
     
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         needed.add(fontId);
     }
 }

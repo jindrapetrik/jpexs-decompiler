@@ -188,7 +188,7 @@ public class DefineFontInfoTag extends FontInfoTag {
     }
     
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         needed.add(fontID);
     }
 }

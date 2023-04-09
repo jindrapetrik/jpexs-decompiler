@@ -277,7 +277,7 @@ public class DoInitActionTag extends Tag implements CharacterIdTag, ASMSource {
     }
     
     @Override
-    public void getNeededCharacters(Set<Integer> needed) {
+    public void getNeededCharacters(Set<Integer> needed, SWF swf) {
         needed.add(spriteId);
     }   
 }
