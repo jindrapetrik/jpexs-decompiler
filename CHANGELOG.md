@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed 
 - [#2004] Freezing when a shape has nonimage character set as fill
+- [#2004] Nonrepeating fill border
 
 ## [18.4.1] - 2023-04-05
 ### Fixed

@@ -661,7 +661,7 @@ public class BitmapExporter extends ShapeExporterBase {
                 Shape prevClip = graphics.getClip();
                 graphics.clip(shp);
                 Matrix inverse = null;
-                if (fillRepeat) {
+                //if (fillRepeat) {
                     try {
                         double scx = fillTransform.getScaleX();
                         double scy = fillTransform.getScaleY();
@@ -678,7 +678,7 @@ public class BitmapExporter extends ShapeExporterBase {
                     } catch (NoninvertibleTransformException ex) {
                         // it should never happen as we already checked the determinant of the matrix
                     }
-                }
+                //}
                 fillTransform.preConcatenate(oldAf);
                 graphics.setTransform(fillTransform);
                 graphics.setPaint(fillPaint);
@@ -697,8 +697,56 @@ public class BitmapExporter extends ShapeExporterBase {
                         double minY = rect.yMin;
                         graphics.fill(new Rectangle((int) minX, (int) minY, (int) (rect.xMax - minX), (int) (rect.yMax - minY)));
                     }
-                } else {                    
-                    graphics.drawImage(((TexturePaint) fillPaint).getImage(), 0, 0, null);
+                } else {            
+                    if (inverse != null) {
+                        ExportRectangle rect = inverse.transform(new ExportRectangle(shp.getBounds2D()));
+                        //left
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
+                                (int)rect.xMin, 0, 0, ((TexturePaint) fillPaint).getImage().getHeight(),
+                                0,0,1,((TexturePaint) fillPaint).getImage().getHeight(),
+                               null);
+                        //top left
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
+                                (int)rect.xMin, (int)rect.yMin, 0, 0,
+                                0,0,1, 1,
+                               null);                        
+                        //top
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
+                                0, (int)rect.yMin, ((TexturePaint) fillPaint).getImage().getWidth(), 0,
+                                0,0,((TexturePaint) fillPaint).getImage().getWidth(),1,
+                               null);
+                        //top right
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
+                                ((TexturePaint) fillPaint).getImage().getWidth(), (int)rect.yMin, (int)rect.xMax, 0,
+                                ((TexturePaint) fillPaint).getImage().getWidth() - 1,0,((TexturePaint) fillPaint).getImage().getWidth(), 1,
+                               null);                                               
+                        //right
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
+                                ((TexturePaint) fillPaint).getImage().getWidth(), 0, (int)rect.xMax, ((TexturePaint) fillPaint).getImage().getHeight(),
+                                ((TexturePaint) fillPaint).getImage().getWidth() - 1,0,((TexturePaint) fillPaint).getImage().getWidth(),
+                                ((TexturePaint) fillPaint).getImage().getHeight(),
+                               null);
+                        //bottom right
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
+                                ((TexturePaint) fillPaint).getImage().getWidth(),((TexturePaint) fillPaint).getImage().getHeight(), (int)rect.xMax, (int)rect.yMax,
+                                ((TexturePaint) fillPaint).getImage().getWidth() - 1, ((TexturePaint) fillPaint).getImage().getHeight() - 1,
+                                ((TexturePaint) fillPaint).getImage().getWidth(), ((TexturePaint) fillPaint).getImage().getHeight(),
+                               null);                                               
+                        //bottom
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
+                                0, ((TexturePaint) fillPaint).getImage().getHeight(), ((TexturePaint) fillPaint).getImage().getWidth(), (int)rect.yMax,
+                                0,((TexturePaint) fillPaint).getImage().getHeight() - 1,((TexturePaint) fillPaint).getImage().getWidth(),((TexturePaint) fillPaint).getImage().getHeight(),
+                               null);
+                        //bottom left
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 
+                                (int)rect.xMin,((TexturePaint) fillPaint).getImage().getHeight(), 0, (int)rect.yMax,
+                                0, ((TexturePaint) fillPaint).getImage().getHeight() - 1,
+                                1, ((TexturePaint) fillPaint).getImage().getHeight(),
+                               null);                                               
+                        
+                        //actual central image
+                        graphics.drawImage(((TexturePaint) fillPaint).getImage(), 0, 0, null);
+                    }
                 }
                 graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, interpolationBefore);
 
