@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -82,7 +84,7 @@ public class Cache<K, V> implements Freed {
 
     public static <K, V> Cache<K, V> getInstance(boolean weak, boolean memoryOnly, String name, boolean temporary) {
         if (oldCleaner == null) {
-            oldCleaner = new Thread("Old cache cleaner") {
+            oldCleaner = new Thread("Cache cleaner") {
                 @Override
                 public void run() {
                     while (!Thread.interrupted()) {
@@ -92,7 +94,7 @@ public class Cache<K, V> implements Freed {
                             return;
                         }
                         try {
-                            clearAllOld();
+                            clearAllOldAndOverMax();
                         } catch (Exception cme) {
                             Logger.getLogger(Cache.class.getSimpleName()).log(Level.SEVERE, "Error during clearing cache thread", cme);
                         }
@@ -230,6 +232,37 @@ public class Cache<K, V> implements Freed {
         return ret;
     }
 
+    private synchronized int clearOverMax() {
+        Set<K> keys = new HashSet<>(lastAccessed.keySet());
+        int num = 0;
+        
+        if (Configuration.maxCachedNum.get() > 0 && keys.size() > Configuration.maxCachedNum.get())
+        {
+            List<K> keysList = new ArrayList<>(keys);
+            Collections.sort(keysList, new Comparator<K>(){
+                @Override
+                public int compare(K o1, K o2) {
+                    long t1 = lastAccessed.get(o1);
+                    long t2 = lastAccessed.get(o2);
+                    if (t1 > t2) {
+                        return 1;
+                    }
+                    if (t2 > t1) {
+                        return  -1;
+                    }
+                    return 0;
+                }                
+            });
+            int cnt = keysList.size() - Configuration.maxCachedNum.get();
+            for (int i = 0; i < cnt; i++) {
+                remove(keysList.get(i));
+                num++;
+            }
+        }
+        
+        return num;
+    }
+    
     private synchronized int clearOld() {
         long currentTime = System.currentTimeMillis();
         Set<K> keys = new HashSet<>(lastAccessed.keySet());
@@ -237,7 +270,7 @@ public class Cache<K, V> implements Freed {
         if (temporaryThreshold == 0) {
             return 0;
         }
-        int num = 0;
+        int num = 0;                       
         for (K key : keys) {
             long time = lastAccessed.get(key);
             if (time < currentTime - temporaryThreshold) {
@@ -248,12 +281,13 @@ public class Cache<K, V> implements Freed {
         return num;
     }
 
-    private static void clearAllOld() {
+    private static void clearAllOldAndOverMax() {
         int num = 0;
         synchronized (instancesLock) {
             for (WeakReference<Cache> cw : instances) {
                 Cache c = cw.get();
                 if (c != null) {
+                    num += c.clearOverMax();
                     if (c.temporary) {
                         num += c.clearOld();
                     }
