@@ -794,6 +794,10 @@ public final class Configuration {
     @ConfigurationCategory("limit")
     public static ConfigurationItem<Integer> maxCachedTime = null;
     
+    @ConfigurationDefaultInt(500)
+    @ConfigurationCategory("limit")
+    public static ConfigurationItem<Integer> maxCachedNum = null;
+    
     @ConfigurationDefaultString("")
     @ConfigurationCategory("paths")
     @ConfigurationFile(".*\\.swc$")

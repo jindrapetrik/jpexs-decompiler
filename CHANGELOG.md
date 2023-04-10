@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#1998] Setting for maximum number of items in the cache - allows less memory consumption (Defaults to 500 per cache)
+
 ### Fixed 
 - [#2004] Freezing when a shape has nonimage character set as fill
 - [#2004] Nonrepeating fill border
@@ -3027,6 +3030,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1998]: https://www.free-decompiler.com/flash/issues/1998
 [#2004]: https://www.free-decompiler.com/flash/issues/2004
 [#1993]: https://www.free-decompiler.com/flash/issues/1993
 [#1994]: https://www.free-decompiler.com/flash/issues/1994
