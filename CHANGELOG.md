@@ -9,7 +9,8 @@ All notable changes to this project will be documented in this file.
 - [#2004] Freezing when a shape has nonimage character set as fill
 - [#2004] Nonrepeating fill border
 - [#2008] AS3 P-code editing optional Double value when it has no fractional part
-- Zero line number on AS3 P-code editation error
+- AS3 P-code editation - zero line number on error
+- [#2007] AS3 renaming invalid identifiers - not refreshing AbcIndex afterwards
 
 ## [18.4.1] - 2023-04-05
 ### Fixed
@@ -3035,6 +3036,7 @@ All notable changes to this project will be documented in this file.
 [#1998]: https://www.free-decompiler.com/flash/issues/1998
 [#2004]: https://www.free-decompiler.com/flash/issues/2004
 [#2008]: https://www.free-decompiler.com/flash/issues/2008
+[#2007]: https://www.free-decompiler.com/flash/issues/2007
 [#1993]: https://www.free-decompiler.com/flash/issues/1993
 [#1994]: https://www.free-decompiler.com/flash/issues/1994
 [#1477]: https://www.free-decompiler.com/flash/issues/1477

@@ -477,7 +477,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 }
             }
         }
-        abcIndex.rebuildPkgToObjectsNameMap();
+        abcIndex.rebuildPkgToObjectsNameMap();        
         numAbcIndexDependencies = swfs.size();
     }
 
@@ -2712,7 +2712,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public int deobfuscateAS3Identifiers(RenameType renameType) {
-        
+        AbcIndexing ai = getAbcIndex();
         Map<Tag, Map<Integer, String>> stringUsageTypesMap = new HashMap<>();
         Map<Tag, Set<Integer>> stringUsagesMap = new HashMap<>();
         informListeners("deobfuscate", "Getting usages...");                
@@ -2754,7 +2754,13 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 sc.setModified(true);
             }
         }
-        deobfuscation.deobfuscateInstanceNames(true, deobfuscated, renameType, getTags(), new HashMap<>());
+        deobfuscation.deobfuscateInstanceNames(true, deobfuscated, renameType, getTags(), new HashMap<>());        
+        
+        for (Tag tag : getTags()) {
+            if (tag instanceof ABCContainerTag) {
+                ai.refreshAbc(((ABCContainerTag)tag).getABC());
+            }
+        }
         return deobfuscated.size();
     }
 
