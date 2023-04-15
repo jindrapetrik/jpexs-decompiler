@@ -619,8 +619,10 @@ public class ASM3Parser {
                 value = lexer.lex();
                 if (value.type == ParsedSymbol.TYPE_KEYWORD_NULL) {
                     value_index = 0;
+                } else if (value.type == ParsedSymbol.TYPE_INTEGER) {
+                    value_index = constants.getDoubleId((Integer) value.value, true);
                 } else {
-                    expected(value, ParsedSymbol.TYPE_FLOAT, "Double or null");
+                    expected(value, ParsedSymbol.TYPE_FLOAT, "Integer, double or null");
                     value_index = constants.getDoubleId((Double) value.value, true);
                 }
                 expected(ParsedSymbol.TYPE_PARENT_CLOSE, ")", lexer);
