@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - [#2004] Freezing when a shape has nonimage character set as fill
 - [#2004] Nonrepeating fill border
 - [#2008] AS3 P-code editing optional Double value when it has no fractional part
+- Zero line number on AS3 P-code editation error
 
 ## [18.4.1] - 2023-04-05
 ### Fixed
