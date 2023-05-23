@@ -504,7 +504,7 @@ public class ActionScript2Parser {
                             traitsStatic.add(false);
 
                             if (isSetter) {
-                                //add return getter automatically                            
+                                //add return getter automatically
                                 GraphTargetItem thisVar = new VariableActionItem("this", null, false);
                                 ft.addVariable((VariableActionItem) thisVar);
                                 GraphTargetItem callM = new CallMethodActionItem(null, null, thisVar, pushConst("__get__" + fname), new ArrayList<>());
@@ -723,7 +723,7 @@ public class ActionScript2Parser {
 
                 s = lex();
                 expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE, SymbolType.COMMA);
-                int lvmethod = 1;
+                int lvmethod = 0;
                 if (s.type == SymbolType.COMMA) {
                     s = lex();
                     expected(s, lexer.yyline(), SymbolType.STRING);
@@ -2354,7 +2354,7 @@ public class ActionScript2Parser {
                 //can change constant indices as ActionPush contains always 1 byte per constant
                 canChangeInPlace = true;
             } else {
-                //variable number bytes per ActionPush constant, 
+                //variable number bytes per ActionPush constant,
                 //must generate again to make relative offsets in jumps work
                 canChangeInPlace = false;
             }
@@ -2408,7 +2408,7 @@ public class ActionScript2Parser {
                 List<GraphTargetItem> tree = treeFromString(s, newConstantPool);
                 return actionsFromTree(tree, newConstantPool, false /*do not order again*/, charset);
             } catch (NeedsGenerateAgainException ex) {
-                //should not happen as doOrder parameter is set to false 
+                //should not happen as doOrder parameter is set to false
                 return new ArrayList<>();
             }
         }
