@@ -35,30 +35,30 @@ search_jar_file() {
 }
 
 check_java_version () {
-	JVER1=`echo $JAVA_VERSION_OUTPUT | sed 's/java version "\([0-9]*\)\.[0-9]*\.[0-9]*_[0-9]*".*/\1/'`
-	JVER2=`echo $JAVA_VERSION_OUTPUT | sed 's/java version "[0-9]*\.\([0-9]*\)\.[0-9]*_[0-9]*".*/\1/'`
-	JVER3=`echo $JAVA_VERSION_OUTPUT | sed 's/java version "[0-9]*\.[0-9]*\.\([0-9]*\)_[0-9]*".*/\1/'`
-	JVER4=`echo $JAVA_VERSION_OUTPUT | sed 's/java version "[0-9]*\.[0-9]*\.[0-9]*_\([0-9]*\)".*/\1/'`
+	JVER1=$(echo $JAVA_VERSION_OUTPUT | sed 's/java version "\([0-9]*\)\.[0-9]*\.[0-9]*_[0-9]*".*/\1/')
+	JVER2=$(echo $JAVA_VERSION_OUTPUT | sed 's/java version "[0-9]*\.\([0-9]*\)\.[0-9]*_[0-9]*".*/\1/')
+	JVER3=$(echo $JAVA_VERSION_OUTPUT | sed 's/java version "[0-9]*\.[0-9]*\.\([0-9]*\)_[0-9]*".*/\1/')
+	JVER4=$(echo $JAVA_VERSION_OUTPUT | sed 's/java version "[0-9]*\.[0-9]*\.[0-9]*_\([0-9]*\)".*/\1/')
 
-	if [ $JVER1 -gt $REQ_JVER1 ]; then
+	if [ "$JVER1" -gt $REQ_JVER1 ]; then
 		return 0
-	elif [ $JVER1 -lt $REQ_JVER1 ]; then
+	elif [ "$JVER1" -lt $REQ_JVER1 ]; then
 		return 1
 	fi
 
-	if [ $JVER2 -gt $REQ_JVER2 ]; then
+	if [ "$JVER2" -gt $REQ_JVER2 ]; then
 		return 0
-	elif [ $JVER2 -lt $REQ_JVER2 ]; then
+	elif [ "$JVER2" -lt $REQ_JVER2 ]; then
 		return 1
 	fi
 
-	if [ $JVER3 -gt $REQ_JVER3 ]; then
+	if [ "$JVER3" -gt $REQ_JVER3 ]; then
 		return 0
-	elif [ $JVER3 -lt $REQ_JVER3 ]; then
+	elif [ "$JVER3" -lt $REQ_JVER3 ]; then
 		return 1
 	fi
 
-	if [ $JVER4 -lt $REQ_JVER4 ]; then
+	if [ "$JVER4" -lt $REQ_JVER4 ]; then
 		return 1
 	fi
 
@@ -68,14 +68,14 @@ check_java_version () {
 # Handle symlinks
 PROGRAM="$0"
 while [ -L "$PROGRAM" ]; do
-	PROGRAM=`readlink -f "$PROGRAM"`
+	PROGRAM=$(readlink -f "$PROGRAM")
 done
-pushd "`dirname \"$PROGRAM\"`" > /dev/null
+pushd "$(dirname \"$PROGRAM\")" > /dev/null
 
 search_jar_file || exit 1
 
-if [ ${JAR_FILE:0:1} != '/' ] ; then
-    JAR_FILE=`pwd`/$JAR_FILE
+if [ "${JAR_FILE:0:1}" != '/' ] ; then
+    JAR_FILE=$(pwd)/$JAR_FILE
 fi
 
 popd > /dev/null
@@ -89,38 +89,38 @@ fi
 
 args=(-Djava.net.preferIPv4Stack=true${MEMORY_PARAM}${STACK_SIZE_PARAM} -jar $JAR_FILE "$@")
 
-if [ "`uname`" = "Darwin" ]; then
+if [ "$(uname)" = "Darwin" ]; then
 	args=(-Xdock:name=FFDec -Xdock:icon=icon.png "${args[@]}")
 fi
 
 # Check default java
-if [ -x "`which java`" ]; then
-	JAVA_VERSION_OUTPUT=`java -version 2>&1`
-	JAVA_VERSION_OUTPUT=`echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/'`
+if [ -x "$(which java)" ]; then
+	JAVA_VERSION_OUTPUT=$(java -version 2>&1)
+	JAVA_VERSION_OUTPUT=$(echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/')
 	check_java_version && exec java "${args[@]}"
 fi
 
 # Test other possible Java locations
 for JRE_PATH in $LOOKUP_JRE_DIRS; do
 	if [ -x "$JRE_PATH/bin/java" ]; then
-		JAVA_VERSION_OUTPUT=`"$JRE_PATH/bin/java" -version 2>&1`
+		JAVA_VERSION_OUTPUT=$("$JRE_PATH/bin/java" -version 2>&1)
 		JAVA_VERSION_OUTPUT=`echo $JAVA_VERSION_OUTPUT | sed 's/openjdk version/java version/'`
 		check_java_version && {
 			export JRE_PATH
-			exec $JRE_PATH/bin/java "${args[@]}"
+			exec "$JRE_PATH"/bin/java "${args[@]}"
 		}
 	fi
 done
 
 # Failed
-if [ -x "`which xmessage`" ]; then
+if [ -x "$(which xmessage)" ]; then
 	xmessage -nearmouse -file - <<EOF
 Failed to find a suitable java version.
-Required: $REQ_JVER1.$REQ_JVER2.$REQ_JVER3_$REQ_JVER4 or newer.
+Required: $REQ_JVER1.$REQ_JVER2.$REQ_JVER3$REQ_JVER4 or newer.
 EOF
 else
 	echo Failed to find a suitable java version.
-	echo Required: $REQ_JVER1.$REQ_JVER2.$REQ_JVER3_$REQ_JVER4 or newer.
+	echo Required: $REQ_JVER1.$REQ_JVER2.$REQ_JVER3$REQ_JVER4 or newer.
 fi
 
 exit 1
