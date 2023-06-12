@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - [#2008] AS3 P-code editing optional Double value when it has no fractional part
 - AS3 P-code editation - zero line number on error
 - [#2007] AS3 renaming invalid identifiers - not refreshing AbcIndex afterwards
+- AS1/2 - loadMovie / loadVariables / loadMovieNum / loadVariablesNum editation incorrectly setting GET as method
 
 ## [18.4.1] - 2023-04-05
 ### Fixed
