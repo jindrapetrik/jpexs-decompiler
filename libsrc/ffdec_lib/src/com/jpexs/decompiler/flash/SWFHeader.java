@@ -46,6 +46,11 @@ public class SWFHeader {
      * ScaleForm GFx
      */
     public boolean gfx = false;
+    
+    /**
+     * Harman SWF Encryption
+     */
+    public boolean encrypted = false;
 
     /**
      * Frame rate

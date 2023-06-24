@@ -1268,6 +1268,7 @@ public class Main {
         result.sourceInfo = sourceInfo;
 
         boolean hasVideoStreams = false;
+        boolean hasEncrypted = false;
         for (Openable openable : result) {
 
             openable.setOpenableList(result);
@@ -1289,6 +1290,10 @@ public class Main {
                     }
                 }
 
+                if (swf.encrypted) {
+                    hasEncrypted = true;
+                }
+                
                 swf.addEventListener(new EventListener() {
                     @Override
                     public void handleExportingEvent(String type, int index, int count, Object data) {
@@ -1343,6 +1348,16 @@ public class Main {
                 }
 
             });
+        }
+        
+        if (hasEncrypted) {
+            View.execInEventDispatchLater(new Runnable() {
+                @Override
+                public void run() {
+                    ViewMessages.showMessageDialog(getDefaultMessagesComponent(), AppStrings.translate("warning.cannotencrypt").replace("%file%", sourceInfo.getFileTitleOrName()), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE, Configuration.warningCannotEncrypt);
+                }
+
+            });            
         }
 
         return result;
