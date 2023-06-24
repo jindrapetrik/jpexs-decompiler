@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - [#1998] Setting for maximum number of items in the cache - allows less memory consumption (Defaults to 500 per cache)
+- [#2038], [#2028], [#2034], [#2036] Support for Harman AIR encrypted SWFs (Read-only)
 
 ### Fixed 
 - [#2004] Freezing when a shape has nonimage character set as fill
@@ -3035,6 +3036,10 @@ All notable changes to this project will be documented in this file.
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1998]: https://www.free-decompiler.com/flash/issues/1998
+[#2038]: https://www.free-decompiler.com/flash/issues/2038
+[#2028]: https://www.free-decompiler.com/flash/issues/2028
+[#2034]: https://www.free-decompiler.com/flash/issues/2034
+[#2036]: https://www.free-decompiler.com/flash/issues/2036
 [#2004]: https://www.free-decompiler.com/flash/issues/2004
 [#2008]: https://www.free-decompiler.com/flash/issues/2008
 [#2007]: https://www.free-decompiler.com/flash/issues/2007

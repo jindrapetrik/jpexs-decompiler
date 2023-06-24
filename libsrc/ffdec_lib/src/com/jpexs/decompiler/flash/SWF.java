@@ -190,6 +190,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -211,6 +214,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 /**
  * Class representing SWF file
@@ -293,6 +299,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * ScaleForm GFx
      */
     public boolean gfx = false;
+    
+    /**
+     * HARMAN encryption
+     */
+    public boolean encrypted = false;
 
     @Internal
     public OpenableList openableList;
@@ -414,7 +425,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             "ZWS", // LZMA compressed Flash
             "GFX", // Uncompressed ScaleForm GFx
             "CFX", // Compressed ScaleForm GFx
-            "ABC" // Non-standard LZMA compressed Flash
+            "ABC", // Non-standard LZMA compressed Flash
+            "fWS", //Harman encrypted uncompressed Flash,
+            "cWS", //Harman encrypted ZLib compressed Flash,
+            "zWS" //Harman encrypted LZMA compressed Flash              
     );
 
     /**
@@ -1106,10 +1120,13 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public byte[] getHeaderBytes() {
-        return getHeaderBytes(compression, gfx);
+        return getHeaderBytes(compression, gfx, encrypted);
     }
 
     private static byte[] getHeaderBytes(SWFCompression compression, boolean gfx) {
+        return getHeaderBytes(compression, gfx, false);
+    }    
+    private static byte[] getHeaderBytes(SWFCompression compression, boolean gfx, boolean encrypted) {
         if (compression == SWFCompression.LZMA_ABC) {
             return new byte[]{'A', 'B', 'C'};
         }
@@ -1132,6 +1149,10 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         } else {
             ret[1] = 'W';
             ret[2] = 'S';
+        }
+        
+        if (!gfx && encrypted) {
+            ret[0] += 32; //to lowercase
         }
 
         return ret;
@@ -1463,6 +1484,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         SWFHeader header = decompress(is, baos, true);
         gfx = header.gfx;
+        encrypted = header.encrypted;
         compression = header.compression;
         lzmaProperties = header.lzmaProperties;
         uncompressedData = baos.toByteArray();
@@ -1964,7 +1986,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         SWFHeader header = new SWFHeader();
         header.version = version;
         header.fileSize = fileSize;
-        header.gfx = headerData[1] == 'F' && headerData[2] == 'X';
+        header.gfx = headerData[1] == 'F' && headerData[2] == 'X';        
         return header;
     }
 
@@ -1984,6 +2006,20 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             sos.write(getHeaderBytes(SWFCompression.NONE, header.gfx));
             sos.writeUI8(header.version);
             sos.writeUI32(fileSize);
+            
+            switch (hdr[0]) {
+                case 'c':
+                case 'z':
+                case 'f':
+                    header.encrypted = true;
+                    HarmanDecryption dec = new HarmanDecryption();
+                    try {
+                        is = dec.decrypt(is, hdr); //Note: this call will uppercase hdr[0]
+                    } catch (IOException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException ex) {
+                        throw new SwfOpenException(AppResources.translate("error.swf.decryptionProblem"));
+                    }
+                    break;
+            }
 
             switch (hdr[0]) {
                 case 'C': { // CWS, CFX

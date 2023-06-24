@@ -911,6 +911,9 @@ public final class Configuration {
     @ConfigurationCategory("script")
     public static ConfigurationItem<Boolean> warningInitializersClass = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationName("warning.cannotencrypt")
+    public static ConfigurationItem<Boolean> warningCannotEncrypt = null;
     
     private enum OSId {
         WINDOWS, OSX, UNIX
