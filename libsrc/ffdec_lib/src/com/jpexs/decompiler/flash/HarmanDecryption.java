@@ -105,9 +105,7 @@ public class HarmanDecryption {
 
         // aes key
         // this one is stored at the end of the file
-        byte aesKey[] = new byte[32];
-        //int aesKeyIdx = 8 + 4 + paddedLength; //skip header, size, data
-
+        byte aesKey[] = new byte[32];        
         byte data[] = new byte[paddedLength];
         dais.readFully(data);
 
@@ -132,10 +130,6 @@ public class HarmanDecryption {
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, new IvParameterSpec(aesIV));
 
         byte decryptedData[] = cipher.doFinal(data);
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        baos.write(decryptedData);
-
         return new ByteArrayInputStream(Arrays.copyOfRange(decryptedData, 0, decryptedLength));
     }
 }
