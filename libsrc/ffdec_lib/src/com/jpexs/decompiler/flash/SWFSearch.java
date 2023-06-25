@@ -78,7 +78,12 @@ public class SWFSearch {
                 "CWS".getBytes(), // ZLib compressed Flash
                 "ZWS".getBytes(), // LZMA compressed Flash
                 "GFX".getBytes(), // Uncompressed ScaleForm GFx
-                "CFX".getBytes()); // Compressed ScaleForm GFx
+                "CFX".getBytes(), // Compressed ScaleForm GFx
+                "fWS".getBytes(), //Harman encrypted uncompressed Flash,
+                "cWS".getBytes(), //Harman encrypted ZLib compressed Flash,
+                "zWS".getBytes() //Harman encrypted LZMA compressed Flash    
+                );
+                    
         int pos = 0;
         long biggestSize = 0;
         long smallestSize = Long.MAX_VALUE;
