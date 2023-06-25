@@ -124,7 +124,6 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG2Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsJPEG3Tag;
-import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.FileAttributesTag;
 import com.jpexs.decompiler.flash.tags.JPEGTablesTag;
@@ -168,9 +167,7 @@ import com.jpexs.process.ProcessTools;
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.Kernel32;
 import gnu.jpdf.PDFJob;
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Paper;
 import java.io.BufferedInputStream;
@@ -231,12 +228,9 @@ import com.jpexs.decompiler.flash.tags.base.UnsupportedSamplingRateException;
 import com.jpexs.decompiler.flash.timeline.Timeline;
 import com.jpexs.helpers.SerializableImage;
 import gnu.jpdf.PDFGraphics;
-import java.awt.AlphaComposite;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
-import java.util.Comparator;
 
 /**
  *
@@ -474,6 +468,11 @@ public class CommandLineArgumentParser {
         if (filter == null || filter.equals("decompress")) {
             out.println(" " + (cnt++) + ") -decompress <infile> <outfile>");
             out.println("  ...Decompress <infile> and save it to <outfile>");
+        }
+        
+        if (filter == null || filter.equals("decrypt")) {
+            out.println(" " + (cnt++) + ") -decrypt <infile> <outfile>");
+            out.println("  ...Decrypts HARMAN Air encrypted file <infile> and save it to <outfile>");
         }
 
         if (filter == null || filter.equals("swf2xml")) {
@@ -1007,6 +1006,9 @@ public class CommandLineArgumentParser {
             System.exit(0);
         } else if (command.equals("decompress")) {
             parseDecompress(args);
+            System.exit(0);
+        } else if (command.equals("decrypt")) {
+            parseDecrypt(args);
             System.exit(0);
         } else if (command.equals("swf2xml")) {
             parseSwf2Xml(args, charset);
@@ -2703,6 +2705,26 @@ public class CommandLineArgumentParser {
         System.exit(result ? 0 : 1);
     }
 
+    private static void parseDecrypt(Stack<String> args) {
+        if (args.size() < 2) {
+            badArguments("decrypt");
+        }
+        
+        boolean result = false;
+        try {
+            try (InputStream fis = new BufferedInputStream(new StdInAwareFileInputStream(args.pop())); OutputStream fos = new BufferedOutputStream(new FileOutputStream(args.pop()))) {
+                result = SWF.decrypt(fis, fos);
+                System.out.println(result ? "OK" : "FAIL");
+            } catch (FileNotFoundException ex) {
+                System.err.println("File not found.");
+                System.exit(1);
+            }
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+
+        System.exit(result ? 0 : 1);
+    }
     private static void parseDecompress(Stack<String> args) {
         if (args.size() < 2) {
             badArguments("decompress");
