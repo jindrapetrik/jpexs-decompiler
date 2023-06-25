@@ -1,7 +1,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [18.5.0] - 2023-06-25
 ### Added
 - [#1998] Setting for maximum number of items in the cache - allows less memory consumption (Defaults to 500 per cache)
 - [#2038], [#2028], [#2034], [#2036] Support for Harman AIR encrypted SWFs (Read-only)
@@ -2888,7 +2888,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Initial public release
 
-[Unreleased]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.4.1...dev
+[18.5.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.4.1...version18.5.0
 [18.4.1]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.4.0...version18.4.1
 [18.4.0]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.6...version18.4.0
 [18.3.6]: https://github.com/jindrapetrik/jpexs-decompiler/compare/version18.3.5...version18.3.6

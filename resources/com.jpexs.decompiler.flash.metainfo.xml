@@ -63,6 +63,25 @@
 		</screenshot>
 	</screenshots>
 	<releases>
+		<release version="18.5.0" date="2023-06-25">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1998 Setting for maximum number of items in the cache - allows less memory consumption (Defaults to 500 per cache)</li>
+					<li>#2038, #2028, #2034, #2036 Support for Harman AIR encrypted SWFs (Read-only)</li>
+					<li>Decrypt Harman AIR SWFs via commandline</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2004 Freezing when a shape has nonimage character set as fill</li>
+					<li>#2004 Nonrepeating fill border</li>
+					<li>#2008 AS3 P-code editing optional Double value when it has no fractional part</li>
+					<li>AS3 P-code editation - zero line number on error</li>
+					<li>#2007 AS3 renaming invalid identifiers - not refreshing AbcIndex afterwards</li>
+					<li>AS1/2 - loadMovie / loadVariables / loadMovieNum / loadVariablesNum editation incorrectly setting GET as method</li>
+				</ul>
+			</description>
+		</release>
 		<release version="18.4.1" date="2023-04-05">
 			<description>
 				<p>Fixed</p>
