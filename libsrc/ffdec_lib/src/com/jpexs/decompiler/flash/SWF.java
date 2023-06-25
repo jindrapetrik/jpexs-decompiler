@@ -299,7 +299,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * ScaleForm GFx
      */
     public boolean gfx = false;
-    
+
     /**
      * HARMAN encryption
      */
@@ -409,10 +409,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     @Internal
     private AbcIndexing abcIndex;
-    
+
     private int numAbcIndexDependencies = 0;
-    
-        
+
     private static AbcIndexing playerGlobalAbcIndex;
 
     private static AbcIndexing airGlobalAbcIndex;
@@ -446,7 +445,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public static AbcIndexing getAirGlobalAbcIndex() {
         return airGlobalAbcIndex;
     }
-    
+
     public void resetAbcIndex() {
         abcIndex = null;
     }
@@ -479,19 +478,19 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     public int getNumAbcIndexDependencies() {
         return numAbcIndexDependencies;
-    }        
-    
+    }
+
     public void setAbcIndexDependencies(List<SWF> swfs) {
         abcIndex = null;
         getAbcIndex();
-        for (SWF swf:swfs) {
-            for (Tag tag:swf.tags) {
+        for (SWF swf : swfs) {
+            for (Tag tag : swf.tags) {
                 if (tag instanceof ABCContainerTag) {
-                    abcIndex.addAbc(((ABCContainerTag)tag).getABC());
+                    abcIndex.addAbc(((ABCContainerTag) tag).getABC());
                 }
             }
         }
-        abcIndex.rebuildPkgToObjectsNameMap();        
+        abcIndex.rebuildPkgToObjectsNameMap();
         numAbcIndexDependencies = swfs.size();
     }
 
@@ -1125,7 +1124,8 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
     private static byte[] getHeaderBytes(SWFCompression compression, boolean gfx) {
         return getHeaderBytes(compression, gfx, false);
-    }    
+    }
+
     private static byte[] getHeaderBytes(SWFCompression compression, boolean gfx, boolean encrypted) {
         if (compression == SWFCompression.LZMA_ABC) {
             return new byte[]{'A', 'B', 'C'};
@@ -1150,7 +1150,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             ret[1] = 'W';
             ret[2] = 'S';
         }
-        
+
         if (!gfx && encrypted) {
             ret[0] += 32; //to lowercase
         }
@@ -1178,7 +1178,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             sos.writeFIXED8(frameRate);
             sos.writeUI16(frameCount);
 
-            sos.writeTags(includeImported ?  getTags() : getLocalTags());
+            sos.writeTags(includeImported ? getTags() : getLocalTags());
             if (hasEndTag) {
                 sos.writeUI16(0);
             }
@@ -1961,6 +1961,40 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
     }
 
+    /**
+     * Decrypts Harman AIR encryption
+     * @param is
+     * @param os
+     * @return
+     * @throws IOException 
+     */
+    public static boolean decrypt(InputStream is, OutputStream os) throws IOException {
+        byte[] hdr = new byte[8];
+
+        // SWFheader: signature, version and fileSize
+        if (is.read(hdr) != 8) {
+            throw new SwfOpenException(AppResources.translate("error.swf.headerTooShort"));
+        }
+        
+        decodeHeader(hdr);
+        
+        switch (hdr[0]) {
+            case 'c':
+            case 'z':
+            case 'f':
+                HarmanDecryption dec = new HarmanDecryption();
+                try {
+                    is = dec.decrypt(is, hdr); //Note: this call will uppercase hdr[0]
+                    os.write(hdr);
+                    Helper.copyStream(is, os);
+                    return true;
+                } catch (IOException | InvalidAlgorithmParameterException | InvalidKeyException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException ex) {
+                    throw new SwfOpenException(AppResources.translate("error.swf.decryptionProblem"));
+                }                
+        }
+        return false;
+    }
+
     private static void decodeLZMAStream(InputStream is, OutputStream os, byte[] lzmaProperties, long fileSize) throws IOException {
         Decoder decoder = new Decoder();
         if (!decoder.SetDecoderProperties(lzmaProperties)) {
@@ -1986,7 +2020,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         SWFHeader header = new SWFHeader();
         header.version = version;
         header.fileSize = fileSize;
-        header.gfx = headerData[1] == 'F' && headerData[2] == 'X';        
+        header.gfx = headerData[1] == 'F' && headerData[2] == 'X';
         return header;
     }
 
@@ -2006,7 +2040,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             sos.write(getHeaderBytes(SWFCompression.NONE, header.gfx));
             sos.writeUI8(header.version);
             sos.writeUI32(fileSize);
-            
+
             switch (hdr[0]) {
                 case 'c':
                 case 'z':
@@ -2751,20 +2785,20 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         AbcIndexing ai = getAbcIndex();
         Map<Tag, Map<Integer, String>> stringUsageTypesMap = new HashMap<>();
         Map<Tag, Set<Integer>> stringUsagesMap = new HashMap<>();
-        informListeners("deobfuscate", "Getting usages...");                
+        informListeners("deobfuscate", "Getting usages...");
         for (Tag tag : getTags()) {
-            if (tag instanceof ABCContainerTag) {        
+            if (tag instanceof ABCContainerTag) {
                 Map<Integer, String> stringUsageTypes = new HashMap<>();
-                Set<Integer> stringUsages = ((ABCContainerTag)tag).getABC().getStringUsages();
-                ((ABCContainerTag)tag).getABC().getStringUsageTypes(stringUsageTypes);
+                Set<Integer> stringUsages = ((ABCContainerTag) tag).getABC().getStringUsages();
+                ((ABCContainerTag) tag).getABC().getStringUsageTypes(stringUsageTypes);
                 stringUsageTypesMap.put(tag, stringUsageTypes);
                 stringUsagesMap.put(tag, stringUsages);
             }
         }
-        
+
         for (Tag tag : getTags()) {
-            if (tag instanceof ABCContainerTag) {                
-                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(stringUsageTypesMap.get(tag),stringUsagesMap.get(tag), deobfuscated, renameType, true);
+            if (tag instanceof ABCContainerTag) {
+                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(stringUsageTypesMap.get(tag), stringUsagesMap.get(tag), deobfuscated, renameType, true);
                 ((ABCContainerTag) tag).getABC().constants.clearCachedMultinames();
                 ((ABCContainerTag) tag).getABC().constants.clearCachedDottedChains();
                 tag.setModified(true);
@@ -2772,7 +2806,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         for (Tag tag : getTags()) {
             if (tag instanceof ABCContainerTag) {
-                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(stringUsageTypesMap.get(tag),stringUsagesMap.get(tag), deobfuscated, renameType, false);
+                ((ABCContainerTag) tag).getABC().deobfuscateIdentifiers(stringUsageTypesMap.get(tag), stringUsagesMap.get(tag), deobfuscated, renameType, false);
                 ((ABCContainerTag) tag).getABC().constants.clearCachedMultinames();
                 ((ABCContainerTag) tag).getABC().constants.clearCachedDottedChains();
                 tag.setModified(true);
@@ -2790,11 +2824,11 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                 sc.setModified(true);
             }
         }
-        deobfuscation.deobfuscateInstanceNames(true, deobfuscated, renameType, getTags(), new HashMap<>());        
-        
+        deobfuscation.deobfuscateInstanceNames(true, deobfuscated, renameType, getTags(), new HashMap<>());
+
         for (Tag tag : getTags()) {
             if (tag instanceof ABCContainerTag) {
-                ai.refreshAbc(((ABCContainerTag)tag).getABC());
+                ai.refreshAbc(((ABCContainerTag) tag).getABC());
             }
         }
         return deobfuscated.size();

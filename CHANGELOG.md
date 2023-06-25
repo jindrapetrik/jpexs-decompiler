@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - [#1998] Setting for maximum number of items in the cache - allows less memory consumption (Defaults to 500 per cache)
 - [#2038], [#2028], [#2034], [#2036] Support for Harman AIR encrypted SWFs (Read-only)
+- Decrypt Harman AIR SWFs via commandline
 
 ### Fixed 
 - [#2004] Freezing when a shape has nonimage character set as fill
