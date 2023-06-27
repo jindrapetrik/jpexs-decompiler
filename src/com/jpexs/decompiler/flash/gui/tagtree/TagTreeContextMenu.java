@@ -113,6 +113,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -3309,10 +3310,11 @@ public class TagTreeContextMenu extends JPopupMenu {
 
     private void collectDepthAsSprites(ActionEvent e) {
         List<TreeItem> frames = getSelectedItems();
-        Timelined timelined = ((Frame) frames.get(0)).timeline.timelined;
+        Frame first = (Frame) frames.get(0);
+        Timelined timelined = first.timeline.timelined;
         SWF swf = timelined instanceof SWF ? (SWF) timelined : ((DefineSpriteTag) timelined).getSwf();
 
-        Set<Integer> originalDepths = new HashSet<>();
+        Set<Integer> originalDepths = new TreeSet<>();
 
         for (TreeItem item : frames) {
             Frame f = (Frame) item;
@@ -3344,7 +3346,13 @@ public class TagTreeContextMenu extends JPopupMenu {
                     sprite.addTag(showFrame);
                 }
 
-                swf.addTag(sprite);
+                if(replace) {
+                    timelined.addTag(timelined.indexOfTag(first.innerTags.get(0)), sprite);
+                } else {
+                    timelined.addTag(sprite);
+                }
+                sprite.setTimelined(timelined);
+                sprite.getTimeline();
                 sprites.put(d, sprite);
             }
 
@@ -3383,9 +3391,11 @@ public class TagTreeContextMenu extends JPopupMenu {
                             }
                         }
 
-                        if (depth != -1) {
+                        if (sprites.containsKey(depth)) {
                             DefineSpriteTag sprite = sprites.get(depth);
                             Tag clone = t.cloneTag();
+                            clone.setModified(true);
+                            
                             if (firstMatrix && i == 0 && clone instanceof PlaceObjectTypeTag) {
                                 PlaceObjectTypeTag place = (PlaceObjectTypeTag) clone;
                                 if (place.getMatrix() == null) {
@@ -3400,7 +3410,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                     }
                                 }
                             }
-
+                            
                             clone.setTimelined(sprite);
                             sprite.addTag(i, clone);
 
@@ -3413,8 +3423,6 @@ public class TagTreeContextMenu extends JPopupMenu {
                         }
                     }
                 }
-
-                Frame first = (Frame) frames.get(0);
 
                 for (Entry<Integer, DefineSpriteTag> entry : sprites.entrySet()) {
                     DefineSpriteTag sprite = entry.getValue();
@@ -3467,10 +3475,14 @@ public class TagTreeContextMenu extends JPopupMenu {
                                 place.matrix.translateY = minY;
                             }
 
-                            place.setTimelined(first.timeline.timelined);
+                            place.setTimelined(timelined);
                             first.innerTags.add(place);
+                            timelined.addTag(timelined.indexOfTag(first.innerTags.get(0)), place);
                         }
                     }
+                    
+                    sprite.setSwf(swf, true);
+                    sprite.resetTimeline();
                 }
 
                 swf.updateCharacters();
@@ -3478,6 +3490,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     swf.computeDependentCharacters();
                     swf.computeDependentFrames();
                 }
+                swf.resetTimelines(swf);
                 mainPanel.refreshTree(swf);
             } catch (InterruptedException | IOException ex) {
                 Logger.getLogger(TagTreeContextMenu.class.getName()).log(Level.SEVERE, null, ex);
