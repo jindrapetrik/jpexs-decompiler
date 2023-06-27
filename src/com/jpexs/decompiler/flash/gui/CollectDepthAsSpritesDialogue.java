@@ -50,6 +50,8 @@ public class CollectDepthAsSpritesDialogue extends AppDialog {
     private final JCheckBox replaceCheckBox;
 
     private final JCheckBox offsetCheckBox;
+    
+    private final JCheckBox firstMatrixCheckBox;
 
     private int result = ERROR_OPTION;
 
@@ -74,6 +76,9 @@ public class CollectDepthAsSpritesDialogue extends AppDialog {
         
         offsetCheckBox = new JCheckBox(translate("collect.offset"));
         cnt.add(offsetCheckBox);
+        
+        firstMatrixCheckBox = new JCheckBox(translate("collect.matrix"));
+        cnt.add(firstMatrixCheckBox);
 
         JPanel panButtons = new JPanel(new FlowLayout());
         okButton.addActionListener(this::okButtonActionPerformed);
@@ -115,6 +120,10 @@ public class CollectDepthAsSpritesDialogue extends AppDialog {
     
     public boolean getOffset() {
         return offsetCheckBox.isSelected();
+    }
+    
+    public boolean getEnsureFirstMatrix() {
+        return firstMatrixCheckBox.isSelected();
     }
 
     public int showDialog(Collection<Integer> depths) {        

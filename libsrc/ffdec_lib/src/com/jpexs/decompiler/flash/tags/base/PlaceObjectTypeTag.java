@@ -90,6 +90,8 @@ public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag {
     public abstract void setPlaceFlagHasClipActions(boolean placeFlagHasClipActions);
 
     public abstract void setPlaceFlagHasMatrix(boolean placeFlagHasMatrix);
+    
+    public abstract void setPlaceFlagMove(boolean placeFlagMove);
 
     @Override
     public String getName() {

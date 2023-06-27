@@ -539,6 +539,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         add(pasteInsideMenuItem);
 
         collectDepthAsSpritesItem = new JMenuItem(mainPanel.translate("contextmenu.collectDepthAsSprites"));
+        collectDepthAsSpritesItem.setIcon(View.getIcon("sprite16"));
         collectDepthAsSpritesItem.addActionListener(this::collectDepthAsSprites);
         add(collectDepthAsSpritesItem);
 
@@ -3330,6 +3331,7 @@ public class TagTreeContextMenu extends JPopupMenu {
             List<Integer> depths = dialog.getDepths();
             boolean replace = dialog.getReplace();
             boolean offset = dialog.getOffset();
+            boolean firstMatrix = dialog.getEnsureFirstMatrix();
 
             Map<Integer, DefineSpriteTag> sprites = new HashMap<>();
             for (int d : depths) {
@@ -3349,19 +3351,56 @@ public class TagTreeContextMenu extends JPopupMenu {
             try {
                 for (int i = frames.size() - 1; i > -1; i--) {
                     Frame f = (Frame) frames.get(i);
+                    Map<Integer, PlaceObjectTypeTag> prevMatrixAtDepth = new HashMap<>();
+                    int pf = f.frame - 1;
+
                     for (int j = 0; j < f.innerTags.size(); j++) {
                         Tag t = f.innerTags.get(j);
-                        
+
                         int depth = -1;
                         if (t instanceof RemoveTag) {
                             depth = ((RemoveTag) t).getDepth();
                         } else if (t instanceof PlaceObjectTypeTag) {
-                            depth = ((PlaceObjectTypeTag) t).getDepth();
+                            PlaceObjectTypeTag place = (PlaceObjectTypeTag) t;
+                            depth = place.getDepth();
+
+                            if (firstMatrix && i == 0) {
+                                if (place.getMatrix() == null) {
+                                    for (; pf > -1; pf--) {
+                                        if (prevMatrixAtDepth.containsKey(depth)) {
+                                            break;
+                                        }
+
+                                        Frame prev = f.timeline.getFrame(pf);
+                                        for (Tag pt : prev.innerTags) {
+                                            if (pt instanceof PlaceObjectTypeTag) {
+                                                PlaceObjectTypeTag pplace = (PlaceObjectTypeTag) pt;
+                                                prevMatrixAtDepth.putIfAbsent(pplace.getDepth(), pplace);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
 
                         if (depth != -1) {
                             DefineSpriteTag sprite = sprites.get(depth);
                             Tag clone = t.cloneTag();
+                            if (firstMatrix && i == 0 && clone instanceof PlaceObjectTypeTag) {
+                                PlaceObjectTypeTag place = (PlaceObjectTypeTag) clone;
+                                if (place.getMatrix() == null) {
+                                    PlaceObjectTypeTag previous = prevMatrixAtDepth.get(place.getDepth());
+                                    if (previous != null) {
+                                        MATRIX m = previous.getMatrix();
+                                        if (m != null) {
+                                            place.setPlaceFlagHasMatrix(true);
+                                            place.setPlaceFlagMove(true);
+                                            place.setMatrix(new MATRIX(m));
+                                        }
+                                    }
+                                }
+                            }
+
                             clone.setTimelined(sprite);
                             sprite.addTag(i, clone);
 
@@ -3435,7 +3474,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                 }
 
                 swf.updateCharacters();
-                if(replace) {
+                if (replace) {
                     swf.computeDependentCharacters();
                     swf.computeDependentFrames();
                 }
