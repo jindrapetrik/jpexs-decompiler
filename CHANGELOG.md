@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- [#2043] StartSound2 tag handling
 
 ## [18.5.0] - 2023-06-25
 ### Added
@@ -3039,6 +3041,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#2043]: https://www.free-decompiler.com/flash/issues/2043
 [#1998]: https://www.free-decompiler.com/flash/issues/1998
 [#2038]: https://www.free-decompiler.com/flash/issues/2038
 [#2028]: https://www.free-decompiler.com/flash/issues/2028

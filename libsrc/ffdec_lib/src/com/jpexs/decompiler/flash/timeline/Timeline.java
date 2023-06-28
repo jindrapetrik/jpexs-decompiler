@@ -310,7 +310,7 @@ public class Timeline {
             } else if (t instanceof StartSound2Tag) {
                 frame.sounds.add(-1);
                 frame.soundClasses.add(((StartSound2Tag) t).soundClassName);
-                frame.soundInfos.add(((StartSoundTag) t).soundInfo);
+                frame.soundInfos.add(((StartSound2Tag) t).soundInfo);
             } else if (t instanceof SetBackgroundColorTag) {
                 frame.backgroundColor = ((SetBackgroundColorTag) t).backgroundColor;
             } else if (t instanceof PlaceObjectTypeTag) {
