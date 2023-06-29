@@ -24,7 +24,6 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.List;
-import java.util.Vector;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
