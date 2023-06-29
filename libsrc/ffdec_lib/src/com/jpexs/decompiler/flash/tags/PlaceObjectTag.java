@@ -174,6 +174,11 @@ public class PlaceObjectTag extends PlaceObjectTypeTag {
     }
 
     @Override
+    public void setDepth(int depth) {
+        this.depth = depth;
+    }
+
+    @Override
     public MATRIX getMatrix() {
         return matrix;
     }

@@ -33,15 +33,13 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag {
+public abstract class PlaceObjectTypeTag extends Tag implements CharacterIdTag, DepthTag {
 
     public PlaceObjectTypeTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
 
     public abstract int getPlaceObjectNum();
-
-    public abstract int getDepth();
 
     public abstract MATRIX getMatrix();
 

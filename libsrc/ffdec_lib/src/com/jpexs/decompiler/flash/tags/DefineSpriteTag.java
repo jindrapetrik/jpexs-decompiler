@@ -26,6 +26,7 @@ import com.jpexs.decompiler.flash.exporters.commonshape.SVGExporter;
 import com.jpexs.decompiler.flash.tags.base.BoundedTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.DepthTag;
 import com.jpexs.decompiler.flash.tags.base.DrawableTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
 import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
@@ -54,7 +55,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Defines a sprite character
@@ -508,5 +511,29 @@ public class DefineSpriteTag extends DrawableTag implements Timelined {
     @Override
     public void setFrameCount(int frameCount) {
         this.frameCount = frameCount;
-    }  
+    }
+    
+    public void compactDepths() {
+        Set<Integer> depths = new TreeSet<>();
+                        
+        for(Tag t : subTags) {
+            if(t instanceof DepthTag) {
+                depths.add(((DepthTag)t).getDepth());
+            }
+        }
+
+        Map<Integer, Integer> depthMap = new HashMap<>();
+        int j = 0;
+        for(int d : depths) {
+            depthMap.put(d, j);
+            j++;
+        }
+
+        for(Tag t : subTags) {
+            if(t instanceof DepthTag) {
+                DepthTag dt = (DepthTag)t;
+                dt.setDepth(depthMap.get(dt.getDepth()));
+            }
+        }
+    }
 }
