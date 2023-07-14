@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2023 JPEXS
- * 
+ *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
- * 
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -282,7 +282,7 @@ public class TagTreeContextMenu extends JPopupMenu {
         changeCharsetMenu = new JMenu();
         JMenu currentCharsetMenu = changeCharsetMenu;
         int charsetCnt = 0;
-        for (String charsetStr : Utf8Helper.allowedCharsets) {
+        for (String charsetStr : Utf8Helper.getAllowedCharsets()) {
             if (charsetCnt == 30) {
                 JMenu moreMenu = new JMenu(mainPanel.translate("contextmenu.more"));
                 currentCharsetMenu.add(moreMenu);
@@ -2249,8 +2249,8 @@ public class TagTreeContextMenu extends JPopupMenu {
         TreePath swfPath = mainPanel.tagTree.getFullModel().getTreePath(swf);
         FolderItem scriptsNode = (FolderItem) mainPanel.tagTree.getFullModel().getScriptsNode(swf);
         TreePath scriptsPath = swfPath.pathByAddingChild(scriptsNode);
-        
-        
+
+
         TreePath doinitPath = scriptsPath.pathByAddingChild(doinit);
         mainPanel.tagTree.setSelectionPath(doinitPath);
         mainPanel.tagTree.scrollPathToVisible(doinitPath);
@@ -2388,7 +2388,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                             if (tags.get(i) instanceof DoInitActionTag) {
                                 DoInitActionTag doinit = (DoInitActionTag) tags.get(i);
                                 if (!exportedIds.contains(doinit.spriteId)) {
-                                    //this is #initpragma, make sure class is inserted before it                                
+                                    //this is #initpragma, make sure class is inserted before it
                                     insertPos = i;
                                     break;
                                 }
@@ -2831,7 +2831,7 @@ public class TagTreeContextMenu extends JPopupMenu {
     private void cloneActionPerformed(ActionEvent e) {
         List<TreeItem> items = getSelectedItems();
         /* Currently useless since all selected items must have the same parent
-        * but a better way to detect for parent/child selection 
+        * but a better way to detect for parent/child selection
         * could remove that limitation */
         Set<SWF> swfs = new HashSet<>();
 
@@ -3313,7 +3313,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                         while (spriteTag.getTimelined() instanceof DefineSpriteTag) {
                             spriteTag = (DefineSpriteTag) spriteTag.getTimelined();
                         }
-                        realTargetTimelined = spriteTag.getTimelined(); //should be SWF                        
+                        realTargetTimelined = spriteTag.getTimelined(); //should be SWF
                         realPosition = spriteTag;
                     }
                 }
