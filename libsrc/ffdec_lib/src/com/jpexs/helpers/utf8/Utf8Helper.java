@@ -1,16 +1,16 @@
 /*
  *  Copyright (C) 2010-2023 JPEXS, All rights reserved.
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 3.0 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.
  */
@@ -39,16 +39,21 @@ public class Utf8Helper {
     public static String charsetName = "UTF-8";
 
     public static Charset charset = Charset.forName("UTF-8");
-    
+
     private static List<String> allowedVariableLengthCharsets = Arrays.asList(
             "GB2312", "Shift_JIS", "UTF-8", "UTF-16", "UTF16-BE", "UTF-16-LE", "UTF-32", "UTF-32LE", "UTF-32BE");
-    
-    /**
-     * Allowed charsets. They are limited to single byte charsets + allowedVariableLengthCharsets
-     */
-    public static List<String> allowedCharsets = new ArrayList<>();
 
-    static {
+    private static List<String> allowedCharsets = null;
+
+    /**
+     * Get a list of allowed charsets. They are limited to single byte charsets + allowedVariableLengthCharsets
+     */
+    public static List<String> getAllowedCharsets() {
+        if (allowedCharsets != null)
+            return allowedCharsets;
+
+        allowedCharsets = new ArrayList<>();
+
         Map<String, Charset> charsets = Charset.availableCharsets();
         for (String s : charsets.keySet()) {
             Charset charset = charsets.get(s);
@@ -56,9 +61,9 @@ public class Utf8Helper {
             int minLen = Integer.MAX_VALUE;
             try {
                 for (int i = 0; i < 65536; i++) {
-
                     ByteBuffer buf = charset.encode("" + (char) i);
                     int len = buf.remaining();
+
                     if (len > maxLen) {
                         maxLen = len;
                     }
@@ -68,12 +73,13 @@ public class Utf8Helper {
                 }
                 if ((minLen == maxLen && minLen == 1) || allowedVariableLengthCharsets.contains(s)) {
                     allowedCharsets.add(s);
-                }                    
+                }
             } catch (UnsupportedOperationException ex) {
                 //System.out.println(s + " ... ERROR");
             }
-
         }
+
+        return allowedCharsets;
     }
 
     public static String urlDecode(String s) {
