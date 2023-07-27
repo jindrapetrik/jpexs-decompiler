@@ -4,6 +4,7 @@
 *.orig.*
 *.chg.*
 *.rej
+*.iml
 *.conflict~
 *.identcache
 *.recompiled.swf
@@ -20,6 +21,7 @@ Thumbs.db
 /coverage/
 /dist/
 /mac/
+/.idea/
 /testdata/decompile/
 /testdata/recompile/
 /build_exe.xml
