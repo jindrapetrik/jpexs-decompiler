@@ -119,8 +119,7 @@ public class InitVectorAVM2Item extends AVM2Item {
         ABC abc = g.abcIndex.getSelectedAbc();
         AVM2ConstantPool constants = abc.constants;
         List<GraphSourceItem> ret = toSourceMerge(localData, generator,
-                ins(AVM2Instructions.FindPropertyStrict, constants.getMultinameId(Multiname.createMultiname(false, constants.getStringId("Vector", true), constants.getNamespaceSetId(new int[]{constants.getNamespaceId(Namespace.KIND_PACKAGE, "__AS3__.vec", 0, true)}, true)), true)),
-                ins(AVM2Instructions.GetProperty, constants.getMultinameId(Multiname.createMultiname(false, constants.getStringId("Vector", true), allNsSet(g.abcIndex)), true)),
+                new TypeItem(VECTOR_FQN),
                 subtype,
                 ins(AVM2Instructions.ApplyType, 1),
                 new IntegerValueAVM2Item(null, null, arguments.size()),
