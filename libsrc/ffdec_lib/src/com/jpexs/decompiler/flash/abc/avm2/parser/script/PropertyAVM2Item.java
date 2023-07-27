@@ -41,10 +41,8 @@ import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.LocalData;
 import com.jpexs.helpers.Reference;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -407,6 +405,7 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
         int propertyId = propIndex.getVal();
         Object obj = resolveObject(localData, generator, assignedValue == null);
         Reference<Integer> ret_temp = new Reference<>(-1);
+        boolean isSuper = (obj instanceof NameAVM2Item) && "super".equals(((NameAVM2Item) obj).getVariableName());
         if (assignedValue != null) {
             GraphTargetItem targetType = propType.getVal();
             String srcType = assignedValue.returnType().toString();
@@ -414,18 +413,24 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
             if (!targetType.toString().equals(srcType) && !propertyName.startsWith("@")) {
                 //coerced = makeCoerced(assignedValue, targetType);
             }
-            return toSourceMerge(localData, generator, obj, coerced,
+            return toSourceMerge(localData, generator,
+                    isSuper ? null : obj,
+                    coerced,
+                    isSuper ? ins(AVM2Instructions.FindProperty, propertyId) : null,
+                    isSuper ? ins(AVM2Instructions.Swap) : null,
                     needsReturn ? dupSetTemp(localData, generator, ret_temp) : null,
-                    ins(AVM2Instructions.SetProperty, propertyId),
+                    ins(isSuper ? AVM2Instructions.SetSuper : AVM2Instructions.SetProperty, propertyId),
                     needsReturn ? getTemp(localData, generator, ret_temp) : null,
-                    killTemp(localData, generator, Arrays.asList(ret_temp)));
+                    killTemp(localData, generator, Collections.singletonList(ret_temp)));
         } else {
             if (obj instanceof AVM2Instruction && (((AVM2Instruction) obj).definition instanceof FindPropertyStrictIns)) {
                 return toSourceMerge(localData, generator, ins(AVM2Instructions.GetLex, propertyId),
                         needsReturn ? null : ins(AVM2Instructions.Pop)
                 );
             }
-            return toSourceMerge(localData, generator, obj, ins(AVM2Instructions.GetProperty, propertyId),
+            return toSourceMerge(localData, generator,
+                    isSuper ? ins(AVM2Instructions.FindPropertyStrict, propertyId) : obj,
+                    ins(isSuper ? AVM2Instructions.GetSuper : AVM2Instructions.GetProperty, propertyId),
                     needsReturn ? null : ins(AVM2Instructions.Pop)
             );
         }
