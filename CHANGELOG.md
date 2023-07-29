@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - [#2043] StartSound2 tag handling
+- PR176 - slow loading of allowed charsets - now lazy loaded
+- PR178 - infinite recursion when getter/setter calls same property of superclass
 
 ## [18.5.0] - 2023-06-25
 ### Added
