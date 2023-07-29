@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- [#1449] Updated Turkish translation
+
 ### Fixed
 - [#2043] StartSound2 tag handling
 
@@ -3041,6 +3044,7 @@ All notable changes to this project will be documented in this file.
 [alpha 9]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha8...alpha9
 [alpha 8]: https://github.com/jindrapetrik/jpexs-decompiler/compare/alpha7...alpha8
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
+[#1449]: https://www.free-decompiler.com/flash/issues/1449
 [#2043]: https://www.free-decompiler.com/flash/issues/2043
 [#1998]: https://www.free-decompiler.com/flash/issues/1998
 [#2038]: https://www.free-decompiler.com/flash/issues/2038
@@ -3373,7 +3377,6 @@ All notable changes to this project will be documented in this file.
 [#1378]: https://www.free-decompiler.com/flash/issues/1378
 [#1415]: https://www.free-decompiler.com/flash/issues/1415
 [#1484]: https://www.free-decompiler.com/flash/issues/1484
-[#1449]: https://www.free-decompiler.com/flash/issues/1449
 [#1456]: https://www.free-decompiler.com/flash/issues/1456
 [#1240]: https://www.free-decompiler.com/flash/issues/1240
 [#1308]: https://www.free-decompiler.com/flash/issues/1308
