@@ -226,7 +226,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
         if (ignorePackage == null) {
             ignorePackage = getPackage(abc);
         }
-        super.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, fullyQualifiedNames);
+        super.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, fullyQualifiedNames); // I don't think this is necessary? It causes class variable names to be listed as dependencies, but their DottedChain consists of only 1 part, which gets categorized as a root package and filtered from imports. Unless I'm missing something, this is wrong but it doesn't break anything
         DependencyParser.parseDependenciesFromMultiname(abcIndex, customNs, abc, dependencies, abc.constants.getMultiname(type_index), getPackage(abc), fullyQualifiedNames, DependencyType.SIGNATURE);
     }
 
