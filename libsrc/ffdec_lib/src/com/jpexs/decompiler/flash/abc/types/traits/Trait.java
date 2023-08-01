@@ -260,10 +260,6 @@ public abstract class Trait implements Cloneable, Serializable {
             DottedChain ipath = imports.get(i);
             String name = ipath.getLast();
             if (ipath.getWithoutLast().equals(ignorePackage)) { //do not check classes from same package, they are imported automatically
-                if (importnames.contains(name)) {
-                    fullyQualifiedNames.add(DottedChain.parseWithSuffix(name));
-                }
-                
                 imports.remove(i);
                 i--;                
                 continue;
