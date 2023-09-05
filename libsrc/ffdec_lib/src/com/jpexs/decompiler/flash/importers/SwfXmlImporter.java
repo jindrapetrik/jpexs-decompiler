@@ -221,7 +221,7 @@ public class SwfXmlImporter {
                 xmlReader.nextTag();
                 xmlReader.require(XMLStreamConstants.START_ELEMENT, null, "swf");
 
-                processElement(xmlReader, swf, swf, null);
+                processElement(xmlReader, swf, swf, null, MAX_XML_IMPORT_VERSION_MAJOR);
             }
             
             swf.clearAllCache();
@@ -290,7 +290,7 @@ public class SwfXmlImporter {
         }*/
     }
 
-    private void processElement(XMLStreamReader reader, Object obj, SWF swf, Tag tag) throws XMLStreamException {
+    private void processElement(XMLStreamReader reader, Object obj, SWF swf, Tag tag, int xmlExportMajor) throws XMLStreamException {
         // Check if element started and start if needed
         if(!reader.isStartElement()) {
             reader.nextTag();
@@ -305,11 +305,10 @@ public class SwfXmlImporter {
             String value = reader.getAttributeValue(i);
             attributes.put(name, value);
         }
-        int xmlExportMajor = 1;
-        int xmlExportMinor = 0;
+        
         if ("SWF".equals(attributes.get("type")))
         {
-            
+            int xmlExportMinor = 0;
             if (attributes.containsKey("_xmlExportMajor")) {
                 xmlExportMajor = Integer.parseInt(attributes.get("_xmlExportMajor"));
             }
@@ -447,7 +446,7 @@ public class SwfXmlImporter {
                 tag = (Tag) childObj;
             }
 
-            processElement(reader, childObj, swf, tag);
+            processElement(reader, childObj, swf, tag, xmlExportMajor);
             ret = childObj;
         } else {
             String isNullAttr = attributes.get("isNull");
