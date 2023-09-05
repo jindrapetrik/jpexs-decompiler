@@ -77,7 +77,6 @@ public abstract class Tag implements NeedsCharacters, Exportable, Serializable {
      * If true, then Tag is written to the stream as longer than 0x3f even if it
      * is not
      */
-    @Internal
     public boolean forceWriteAsLong = false;
 
     protected String tagName;
