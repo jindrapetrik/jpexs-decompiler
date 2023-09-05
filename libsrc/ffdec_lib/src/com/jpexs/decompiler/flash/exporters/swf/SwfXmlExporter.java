@@ -53,6 +53,9 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class SwfXmlExporter {
 
+    public static final int XML_EXPORT_VERSION_MAJOR = 2;
+    public static final int XML_EXPORT_VERSION_MINOR = 0;
+
     private static final Logger logger = Logger.getLogger(SwfXmlExporter.class.getName());
 
     private final Map<Class, List<Field>> cachedFields = new HashMap<>();
@@ -65,18 +68,17 @@ public class SwfXmlExporter {
                 XMLStreamWriter xmlWriter = XMLOutputFactory.newInstance().createXMLStreamWriter(writer);
 
                 xmlWriter.writeStartDocument();
-                xmlWriter.writeComment("WARNING: The structure of this XML is not final. In later versions of FFDec it can be changed.");
-                xmlWriter.writeComment(ApplicationInfo.applicationVerName);
-
+                xmlWriter.writeComment("WARNING: The structure of this XML is not final. In later versions of FFDec it can be changed. Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMinor keys.");
+                
                 exportXml(swf, xmlWriter);
 
                 xmlWriter.writeEndDocument();
                 xmlWriter.flush();
                 xmlWriter.close();
             }
-            
+
             if (!new XmlPrettyFormat().prettyFormat(tmp, outFile, 2, true)) {
-                logger.log(Level.SEVERE, "Cannot prettyformat SVG");
+                logger.log(Level.SEVERE, "Cannot prettyformat XML");
             }
             tmp.delete();
         } catch (Exception ex) {
@@ -89,7 +91,7 @@ public class SwfXmlExporter {
     }
 
     public void exportXml(SWF swf, XMLStreamWriter writer) throws IOException, XMLStreamException {
-        generateXml(writer, "swf", swf, false, false);
+        generateXml(writer, "swf", swf, false);
     }
 
     public List<Field> getSwfFieldsCached(Class cls) {
@@ -102,14 +104,14 @@ public class SwfXmlExporter {
             });
 
             result.sort((o1, o2) -> {
-                
+
                 boolean a1 = canBeAttribute(o1.getType());
                 boolean a2 = canBeAttribute(o2.getType());
-                
-                if(a1 == a2 && a1 == true) {
+
+                if (a1 == a2 && a1 == true) {
                     return o1.getName().compareTo(o2.getName());
                 }
-                
+
                 return a1 ? -1 : a2 ? 1 : 0;
             });
 
@@ -142,26 +144,25 @@ public class SwfXmlExporter {
         return cls != null && (cls.isArray() || List.class.isAssignableFrom(cls));
     }
 
-    private void generateXml(XMLStreamWriter writer, String name, Object obj, boolean isListItem, boolean needsCData) throws XMLStreamException {
+    private void generateXml(XMLStreamWriter writer, String name, Object obj, boolean isListItem) throws XMLStreamException {
         Class cls = obj != null ? obj.getClass() : null;
 
-        if (obj != null && needsCData && cls == String.class) {
+        /*if (obj != null && cls == String.class) {
             writer.writeStartElement(name);
             writer.writeAttribute("type", "String");
             writer.writeCData((String) obj);
             writer.writeEndElement();
-        } else if (obj != null && isPrimitive(cls)) {
+        } else */
+        if (obj != null && isPrimitive(cls)) {
             Object value = obj;
-            if (value instanceof String) {
-                value = Helper.removeInvalidXMLCharacters((String) value);
-            }
+            String stringValue = Helper.escapeXmlExportString(value.toString());
 
             if (isListItem) {
                 writer.writeStartElement(name);
-                writer.writeCharacters(value.toString());
+                writer.writeCharacters(stringValue);
                 writer.writeEndElement();
             } else {
-                writer.writeAttribute(name, value.toString());
+                writer.writeAttribute(name, stringValue);
             }
         } else if (cls != null && obj != null && cls.isEnum()) {
             writer.writeAttribute(name, obj.toString());
@@ -181,7 +182,7 @@ public class SwfXmlExporter {
             writer.writeStartElement(name);
             int length = Array.getLength(value);
             for (int i = 0; i < length; i++) {
-                generateXml(writer, "item", Array.get(value, i), true, false);
+                generateXml(writer, "item", Array.get(value, i), true);
             }
             writer.writeEndElement();
         } else if (obj != null) {
@@ -197,26 +198,33 @@ public class SwfXmlExporter {
             }
 
             writer.writeStartElement(name);
+            
+            if (obj instanceof SWF) {
+                writer.writeAttribute("_xmlExportMajor", "" + XML_EXPORT_VERSION_MAJOR);
+                writer.writeAttribute("_xmlExportMinor", "" + XML_EXPORT_VERSION_MINOR);
+                writer.writeAttribute("_generator", ApplicationInfo.applicationVerName);
+            }
+            
             writer.writeAttribute("type", clazz.getSimpleName());
 
             if (obj instanceof UnknownTag) {
                 writer.writeAttribute("tagId", String.valueOf(((Tag) obj).getId()));
-            }    
+            }
             if (obj instanceof SWF) {
-                writer.writeAttribute("charset", ((SWF) obj).getCharset());
+                writer.writeAttribute("charset", ((SWF) obj).getCharset());                
             }
 
             for (Field f : fields) {
-                Multiline multilineA = f.getAnnotation(Multiline.class);
+                //Multiline multilineA = f.getAnnotation(Multiline.class);
 
                 try {
                     f.setAccessible(true);
-                    generateXml(writer, f.getName(), f.get(obj), false, multilineA != null);
+                    generateXml(writer, f.getName(), f.get(obj), false);
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
             }
-           
+
             writer.writeEndElement();
         } else if (isListItem) {
             writer.writeStartElement(name);

@@ -111,6 +111,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StraightEdgeRecord;
 import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.HashArrayList;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.ReflectionTools;
 import com.jpexs.helpers.utf8.Utf8InputStreamReader;
 import java.io.BufferedInputStream;
@@ -139,7 +140,9 @@ import javax.xml.stream.XMLStreamReader;
  */
 @SuppressWarnings("unchecked")
 public class SwfXmlImporter {
-
+    
+    public static final int MAX_XML_IMPORT_VERSION_MAJOR = 2;
+    
     private static final Logger logger = Logger.getLogger(SwfXmlImporter.class.getName());
 
     private static final Map<String, Class> swfTags;
@@ -246,7 +249,7 @@ public class SwfXmlImporter {
         XMLInputFactory xmlFactory = XMLInputFactory.newInstance();
         try {
             XMLStreamReader reader = xmlFactory.createXMLStreamReader(new StringReader(xml));
-            return processObject(reader, requiredType, swf, null);
+            return processObject(reader, requiredType, swf, null, 1);
         } catch (IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException | XMLStreamException ex) {
             Logger.getLogger(SwfXmlImporter.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -302,6 +305,23 @@ public class SwfXmlImporter {
             String value = reader.getAttributeValue(i);
             attributes.put(name, value);
         }
+        int xmlExportMajor = 1;
+        int xmlExportMinor = 0;
+        if ("SWF".equals(attributes.get("type")))
+        {
+            
+            if (attributes.containsKey("_xmlExportMajor")) {
+                xmlExportMajor = Integer.parseInt(attributes.get("_xmlExportMajor"));
+            }
+            
+            if (attributes.containsKey("_xmlExportMinor")) {
+                xmlExportMinor = Integer.parseInt(attributes.get("_xmlExportMinor"));
+            }
+            
+            if (xmlExportMajor > MAX_XML_IMPORT_VERSION_MAJOR) {
+                throw new RuntimeException("The XML file was exported with newer XML format (major " + xmlExportMajor+", minor "+xmlExportMinor+"). Please download newer version of FFDec to correctly parse it.");
+            }            
+        }
         
         for (Map.Entry<String, String> entry : attributes.entrySet()) {
             String name = entry.getKey();
@@ -309,11 +329,16 @@ public class SwfXmlImporter {
             
             if (name.equals("tagId") && "UnknownTag".equals(attributes.get("type"))) {
                 continue;
-            }
+            }                       
             if (name.equals("charset") && "SWF".equals(attributes.get("type"))) {
                 ((SWF) obj).setCharset(val);
                 continue;
             }
+            
+            //skip meta parameters starting with "_". expandable in the future...
+            if ("SWF".equals(attributes.get("type")) && name.startsWith("_")) { 
+                continue;
+            }            
             
             //backwards compatibility
             if (name.equals("reserved1") && "FileAttributesTag".equals(attributes.get("type"))) {
@@ -330,7 +355,7 @@ public class SwfXmlImporter {
             if (!name.equals("type")) {
                 try {
                     Field field = getField(cls, name);
-                    setFieldValue(field, obj, getAs(field.getType(), val));
+                    setFieldValue(field, obj, getAs(field.getType(), val, xmlExportMajor));
                 } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
                     logger.log(Level.SEVERE, null, ex);
                 }
@@ -353,7 +378,7 @@ public class SwfXmlImporter {
                     // Check for list item elements
                     reader.nextTag();
                     while(reader.isStartElement()) {
-                        Object childObj = processObject(reader, reqType, swf, tag);
+                        Object childObj = processObject(reader, reqType, swf, tag, xmlExportMajor);
                         list.add(childObj);
                         
                         reader.nextTag();
@@ -371,7 +396,7 @@ public class SwfXmlImporter {
                     setFieldValue(field, obj, value);
                 }
                 else {
-                    Object childObj = processObject(reader, null, swf, tag);
+                    Object childObj = processObject(reader, null, swf, tag, xmlExportMajor);
                     setFieldValue(field, obj, childObj);
                 }
             } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException ex) {
@@ -389,7 +414,7 @@ public class SwfXmlImporter {
         }
     }
 
-    private Object processObject(XMLStreamReader reader, Class requiredType, SWF swf, Tag tag) throws IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException, XMLStreamException {
+    private Object processObject(XMLStreamReader reader, Class requiredType, SWF swf, Tag tag, int xmlExportMajor) throws IllegalArgumentException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException, XMLStreamException {
         // Check if element started and start if needed
         if(!reader.isStartElement()) {
             reader.nextTag();
@@ -429,7 +454,7 @@ public class SwfXmlImporter {
             if (Boolean.parseBoolean(isNullAttr)) {
                 ret = null;
             } else {
-                ret = getAs(requiredType, reader.getElementText());
+                ret = getAs(requiredType, reader.getElementText(), xmlExportMajor);
             }
         }
         
@@ -473,7 +498,7 @@ public class SwfXmlImporter {
         return null;
     }
 
-    private Object getAs(Class cls, String stringValue) throws IllegalArgumentException, IllegalAccessException {
+    private Object getAs(Class cls, String stringValue, int xmlExportMajor) throws IllegalArgumentException, IllegalAccessException {
         if (cls == Byte.class || cls == byte.class) {
             return Byte.parseByte(stringValue);
         } else if (cls == Short.class || cls == short.class) {
@@ -491,7 +516,7 @@ public class SwfXmlImporter {
         } else if (cls == Character.class || cls == char.class) {
             return stringValue.charAt(0);
         } else if (cls == String.class) {
-            return stringValue;
+            return xmlExportMajor >= 2 ? Helper.unescapeXmlExportString(stringValue) : stringValue;
         } else if (cls == ByteArrayRange.class) {
             ByteArrayRange range = new ByteArrayRange(stringValue);
             return range;
