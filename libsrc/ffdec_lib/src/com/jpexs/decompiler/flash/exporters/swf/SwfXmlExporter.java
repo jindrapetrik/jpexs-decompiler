@@ -68,7 +68,7 @@ public class SwfXmlExporter {
                 XMLStreamWriter xmlWriter = XMLOutputFactory.newInstance().createXMLStreamWriter(writer);
 
                 xmlWriter.writeStartDocument();
-                xmlWriter.writeComment("WARNING: The structure of this XML is not final. In later versions of FFDec it can be changed. Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMinor keys.");
+                xmlWriter.writeComment("\r\nWARNING: The structure of this XML is not final.\r\nIn later versions of FFDec it can be changed.\r\nMake sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMinor keys.\r\n");
                 
                 exportXml(swf, xmlWriter);
 
