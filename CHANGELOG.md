@@ -4,15 +4,18 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Added
 - [#1449] Updated Turkish translation
-- [#2070] - SWF to XML format has new meta fields describing XML export major/minor version
+- [#2070] SWF to XML format has new meta fields describing XML export major/minor version
 (major = uncompatible change)
+- [#2070] forceWriteAsLong Tag internal attribute is now visible and editable
+ (including XML export), allows decide whether to write length in tag header as long
 
 ### Fixed
-- [#2070] - Handling newlines and tabs in string values inside SWF to XML export
+- [#2070] Handling newlines and tabs in string values inside SWF to XML export
 
 ### Changed
-- [#2070] - String values inside SWF to XML export are backslash escaped to properly handle newlines and tabs.
-Older versions of FFDec can read this new format wrong and corrupt SWFs.
+- [#2070] String values inside SWF to XML export are backslash escaped 
+to properly handle newlines and tabs. Older versions of FFDec can read this
+new format wrong and corrupt SWFs.
 Major version of SWF to XML export changed to 2.
 
 ### Fixed
