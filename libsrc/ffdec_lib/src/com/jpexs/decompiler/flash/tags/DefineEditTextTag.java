@@ -53,6 +53,7 @@ import com.jpexs.decompiler.flash.types.RGBA;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.annotations.Conditional;
 import com.jpexs.decompiler.flash.types.annotations.EnumValue;
+import com.jpexs.decompiler.flash.types.annotations.Multiline;
 import com.jpexs.decompiler.flash.types.annotations.SWFType;
 import com.jpexs.decompiler.flash.types.annotations.SWFVersion;
 import com.jpexs.helpers.ByteArrayRange;
@@ -172,6 +173,7 @@ public class DefineEditTextTag extends TextTag {
     public String variableName;
 
     @Conditional("hasText")
+    @Multiline
     public String initialText;
 
     public static final int ALIGN_LEFT = 0;
