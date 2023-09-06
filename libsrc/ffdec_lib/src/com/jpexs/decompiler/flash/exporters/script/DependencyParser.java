@@ -76,7 +76,10 @@ public class DependencyParser {
                 }
             }
         }
-
+        
+        if (dependencyType == DependencyType.NAMESPACE) {
+            return;
+        }        
         if (ns.kind != Namespace.KIND_PACKAGE) { // && (ns.kind != Namespace.KIND_PACKAGE_INTERNAL)) {
             return;
         }
