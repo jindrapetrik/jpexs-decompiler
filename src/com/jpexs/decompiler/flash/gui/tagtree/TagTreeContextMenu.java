@@ -23,6 +23,7 @@ import com.jpexs.decompiler.flash.TagRemoveListener;
 import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.parser.AVM2ParseException;
+import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.avm2.parser.script.ActionScript3Parser;
 import com.jpexs.decompiler.flash.action.Action;
 import com.jpexs.decompiler.flash.action.parser.ActionParseException;
@@ -1934,7 +1935,9 @@ public class TagTreeContextMenu extends JPopupMenu {
                     }
                 }
                 try {
-                    ActionScript3Parser parser = new ActionScript3Parser(swf.getAbcIndex());
+                    AbcIndexing abcIndex = swf.getAbcIndex();
+                    abcIndex.selectAbc(doAbc.getABC());
+                    ActionScript3Parser parser = new ActionScript3Parser(abcIndex);
 
                     DottedChain dc = new DottedChain(pkgParts);
                     String script = "package " + dc.toPrintableString(true) + " {"
