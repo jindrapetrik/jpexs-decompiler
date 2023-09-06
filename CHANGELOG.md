@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
 - [#2070] Handling newlines and tabs in string values inside SWF to XML export
 - [#2017], PR179 Classes in same package displayed as fully qualified
 - PR177 AS3 direct editation - Vector literal
-- [#2052] Adding new script placing class to incorrect DoABC tag
+- [#2052], [#2058] Adding new script placing class to incorrect DoABC tag
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 
@@ -3066,6 +3066,7 @@ Major version of SWF to XML export changed to 2.
 [#2070]: https://www.free-decompiler.com/flash/issues/2070
 [#2017]: https://www.free-decompiler.com/flash/issues/2017
 [#2052]: https://www.free-decompiler.com/flash/issues/2052
+[#2058]: https://www.free-decompiler.com/flash/issues/2058
 [#2043]: https://www.free-decompiler.com/flash/issues/2043
 [#1998]: https://www.free-decompiler.com/flash/issues/1998
 [#2038]: https://www.free-decompiler.com/flash/issues/2038
