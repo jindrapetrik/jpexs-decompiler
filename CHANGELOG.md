@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - [#2070] Handling newlines and tabs in string values inside SWF to XML export
 - [#2017], PR179 Classes in same package displayed as fully qualified
+- PR177 AS3 direct editation - Vector literal
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 
