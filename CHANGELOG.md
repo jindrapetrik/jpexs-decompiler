@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - [#2052], [#2058] Adding new script placing class to incorrect DoABC tag
 - [#2072] AS3 direct editation - incorrectly using trait names of top level classes
 - [#2029] Simplify expressions stripping getlex and also ignoring some types of expressions
+- [#2052] Detection of switches based on notequal operator
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 

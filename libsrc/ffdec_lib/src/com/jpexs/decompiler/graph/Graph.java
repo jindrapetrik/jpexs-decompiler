@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.action.swf7.ActionDefineFunction2;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.graph.model.AndItem;
+import com.jpexs.decompiler.graph.model.BinaryOpItem;
 import com.jpexs.decompiler.graph.model.BranchStackResistant;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
@@ -2346,19 +2347,27 @@ public class Graph {
 
                         if (it instanceof IfItem) {
                             IfItem ii = (IfItem) it;
-                            if (ii.expression instanceof EqualsTypeItem) {
-                                if (!ii.onFalse.isEmpty() && !ii.onTrue.isEmpty()
-                                        && ii.onTrue.get(ii.onTrue.size() - 1) instanceof PushItem
-                                        && ii.onTrue.get(ii.onTrue.size() - 1).value instanceof IntegerValueTypeItem) {
-                                    int cpos = ((IntegerValueTypeItem) ii.onTrue.get(ii.onTrue.size() - 1).value).intValue();
+                            List<GraphTargetItem> iiOnTrue = ii.onTrue;
+                            List<GraphTargetItem> iiOnFalse = ii.onFalse;
+                            if ((ii.expression instanceof EqualsTypeItem) || (ii.expression instanceof NotEqualsTypeItem)) {
+                                
+                                if (ii.expression instanceof NotEqualsTypeItem) {
+                                    iiOnTrue = ii.onFalse;
+                                    iiOnFalse = ii.onTrue;
+                                }
+                                                                
+                                if (!iiOnFalse.isEmpty() && !iiOnTrue.isEmpty()
+                                        && iiOnTrue.get(iiOnTrue.size() - 1) instanceof PushItem
+                                        && iiOnTrue.get(iiOnTrue.size() - 1).value instanceof IntegerValueTypeItem) {
+                                    int cpos = ((IntegerValueTypeItem) iiOnTrue.get(iiOnTrue.size() - 1).value).intValue();
                                     caseCommaCommands.put(cpos, commaCommands);
-                                    caseExpressionLeftSides.put(cpos, ((EqualsTypeItem) ii.expression).getLeftSide());
-                                    caseExpressionRightSides.put(cpos, ((EqualsTypeItem) ii.expression).getRightSide());
+                                    caseExpressionLeftSides.put(cpos, ((BinaryOpItem) ii.expression).getLeftSide());
+                                    caseExpressionRightSides.put(cpos, ((BinaryOpItem) ii.expression).getRightSide());
                                     commaCommands = new ArrayList<>();
-                                    for (int f = 0; f < ii.onFalse.size() - 1; f++) {
-                                        commaCommands.add(ii.onFalse.get(f));
+                                    for (int f = 0; f < iiOnFalse.size() - 1; f++) {
+                                        commaCommands.add(iiOnFalse.get(f));
                                     }
-                                    it = ii.onFalse.get(ii.onFalse.size() - 1);
+                                    it = iiOnFalse.get(iiOnFalse.size() - 1);
                                     if (it instanceof PushItem) {
                                         it = it.value;
                                     }
@@ -2374,14 +2383,21 @@ public class Graph {
                             }
                         } else if (it instanceof TernarOpItem) {
                             TernarOpItem to = (TernarOpItem) it;
-                            if (to.expression instanceof EqualsTypeItem) {
-                                if (to.onTrue instanceof IntegerValueTypeItem) {
-                                    int cpos = ((IntegerValueTypeItem) to.onTrue).intValue();
-                                    caseExpressionLeftSides.put(cpos, ((EqualsTypeItem) to.expression).getLeftSide());
-                                    caseExpressionRightSides.put(cpos, ((EqualsTypeItem) to.expression).getRightSide());
+                            GraphTargetItem toOnTrue = to.onTrue;
+                            GraphTargetItem toOnFalse = to.onFalse;
+                            if ((to.expression instanceof EqualsTypeItem) || (to.expression instanceof NotEqualsTypeItem)) {
+                                if (to.expression instanceof NotEqualsTypeItem) {
+                                    toOnTrue = to.onFalse;
+                                    toOnFalse = to.onTrue;
+                                }
+                                
+                                if (toOnTrue instanceof IntegerValueTypeItem) {
+                                    int cpos = ((IntegerValueTypeItem) toOnTrue).intValue();
+                                    caseExpressionLeftSides.put(cpos, ((BinaryOpItem) to.expression).getLeftSide());
+                                    caseExpressionRightSides.put(cpos, ((BinaryOpItem) to.expression).getRightSide());
                                     caseCommaCommands.put(cpos, commaCommands);
                                     commaCommands = new ArrayList<>();
-                                    it = to.onFalse;
+                                    it = toOnFalse;
                                     if (it instanceof CommaExpressionItem) {
                                         commaCommands = new ArrayList<>();
                                         CommaExpressionItem ce = (CommaExpressionItem) it;
