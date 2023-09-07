@@ -1,0 +1,118 @@
+class
+ refid "tests:TestMutatingSwitch"
+ instance QName(PackageNamespace("tests"), "TestMutatingSwitch")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestMutatingSwitch")
+  iinit
+   refid "tests:TestMutatingSwitch/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestMutatingSwitch/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+      getlocal0
+            pushscope
+            jump ofs0028
+   ofs0006:
+            label
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageInternalNs(""),PrivateNamespace("MyClass"),ProtectedNamespace("MyClass"),StaticProtectedNs("MyClass"),PrivateNamespace("MyClass.as$0")])
+            pushstring "A"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageInternalNs(""),PrivateNamespace("MyClass"),ProtectedNamespace("MyClass"),StaticProtectedNs("MyClass"),PrivateNamespace("MyClass.as$0")]), 1
+            returnvoid
+   ofs000f:
+            label
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageInternalNs(""),PrivateNamespace("MyClass"),ProtectedNamespace("MyClass"),StaticProtectedNs("MyClass"),PrivateNamespace("MyClass.as$0")])
+            pushstring "B"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageInternalNs(""),PrivateNamespace("MyClass"),ProtectedNamespace("MyClass"),StaticProtectedNs("MyClass"),PrivateNamespace("MyClass.as$0")]), 1
+            returnvoid
+   ofs0018:
+            label
+            findpropstrict Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageInternalNs(""),PrivateNamespace("MyClass"),ProtectedNamespace("MyClass"),StaticProtectedNs("MyClass"),PrivateNamespace("MyClass.as$0")])
+            pushstring "C"
+            callpropvoid Multiname("trace",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageInternalNs(""),PrivateNamespace("MyClass"),ProtectedNamespace("MyClass"),StaticProtectedNs("MyClass"),PrivateNamespace("MyClass.as$0")]), 1
+            returnvoid
+   ofs0021:
+            label
+            returnvoid
+   ofs0023:
+            label
+            jump ofs0076
+   ofs0028:
+            getlocal0
+            getproperty QName(PackageInternalNs(""),"k")
+            setlocal1
+            pushstring "a"
+            getlocal1
+            ifstrictne ofs0039
+            pushbyte 0
+            jump ofs0063
+   ofs0039:
+            pushstring "b"
+            getlocal1
+            ifstricteq ofs0044  ; here is stricteq instead of neq
+            jump ofs004a
+   ofs0044:
+            pushbyte 1
+            jump ofs0063
+   ofs004a:
+            pushstring "c"
+            getlocal1
+            ifstrictne ofs0057
+            pushbyte 2
+            jump ofs0063
+   ofs0057:
+            jump ofs0061
+            pushbyte 3
+            jump ofs0061
+   ofs0061:
+            pushbyte 3
+   ofs0063:
+            kill 1
+            lookupswitch ofs0023, [ofs0006, ofs000f, ofs0018, ofs0021]
+   ofs0076:
+            returnvoid
+                        
+     end ; code
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestMutatingSwitch/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

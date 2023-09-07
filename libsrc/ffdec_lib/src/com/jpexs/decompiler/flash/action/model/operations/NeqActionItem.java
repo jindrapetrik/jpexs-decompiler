@@ -24,6 +24,7 @@ import com.jpexs.decompiler.flash.ecma.EcmaScript;
 import com.jpexs.decompiler.graph.CompilationException;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
+import com.jpexs.decompiler.graph.NotEqualsTypeItem;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.decompiler.graph.model.BinaryOpItem;
@@ -35,7 +36,7 @@ import java.util.List;
  *
  * @author JPEXS
  */
-public class NeqActionItem extends BinaryOpItem implements LogicalOpItem, Inverted {
+public class NeqActionItem extends BinaryOpItem implements LogicalOpItem, Inverted, NotEqualsTypeItem {
 
     boolean version2;
 

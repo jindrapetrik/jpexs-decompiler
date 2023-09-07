@@ -155,6 +155,25 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     }
 
     @Test
+    public void testMutatingSwitch() {
+        decompileMethod("assembled", "testMutatingSwitch", "switch(this.k)\r\n"
+                + "{\r\n"
+                + "case \"a\":\r\n"
+                + "trace(\"A\");\r\n"
+                + "return;\r\n"
+                + "case \"b\":\r\n"
+                + "trace(\"B\");\r\n"
+                + "return;\r\n"
+                + "case \"c\":\r\n"
+                + "trace(\"C\");\r\n"
+                + "return;\r\n"
+                + "default:\r\n"
+                + "return;\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testPushWhile() {
         decompileMethod("assembled", "testPushWhile", "var _loc3_:int = 5;\r\n"
                 + "§§push(obfuscated[\"xxx\"] = new [\"ByteArray\"]());\r\n"
