@@ -372,7 +372,9 @@ public abstract class GraphTargetItem implements Serializable, Cloneable {
 
     public boolean isCompileTime() {
         Set<GraphTargetItem> dependencies = new HashSet<>();
-        dependencies.add(this);
+        if (!((this instanceof SimpleValue) && ((SimpleValue)this).isSimpleValue())) {
+            dependencies.add(this);
+        }
         return isCompileTime(dependencies);
     }
 

@@ -24,6 +24,7 @@ import com.jpexs.decompiler.graph.GraphPart;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
+import com.jpexs.decompiler.graph.SimpleValue;
 import com.jpexs.decompiler.graph.SourceGenerator;
 import com.jpexs.decompiler.graph.TypeItem;
 import java.util.ArrayList;
@@ -51,7 +52,9 @@ public class IfItem extends GraphTargetItem implements Block {
         if (dependencies.contains(expression)) {
             return false;
         }
-        dependencies.add(expression);
+        if (!((expression instanceof SimpleValue) && ((SimpleValue)expression).isSimpleValue())) {
+            dependencies.add(expression);
+        }
         return expression.isCompileTime(dependencies);
     }
 
