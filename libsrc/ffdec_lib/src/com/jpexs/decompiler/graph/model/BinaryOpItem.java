@@ -22,6 +22,7 @@ import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphSourceItemPos;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.GraphTargetVisitorInterface;
+import com.jpexs.decompiler.graph.SimpleValue;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -106,11 +107,15 @@ public abstract class BinaryOpItem extends GraphTargetItem implements BinaryOp {
         if (dependencies.contains(leftSide)) {
             return false;
         }
-        dependencies.add(leftSide);
+        if (!((leftSide instanceof SimpleValue) && ((SimpleValue)leftSide).isSimpleValue())) {            
+            dependencies.add(leftSide);
+        }
         if (leftSide != rightSide && dependencies.contains(rightSide)) {
             return false;
         }
-        dependencies.add(rightSide);
+        if (!((rightSide instanceof SimpleValue) && ((SimpleValue)rightSide).isSimpleValue())) {
+            dependencies.add(rightSide);
+        }
         return leftSide.isConvertedCompileTime(dependencies) && rightSide.isConvertedCompileTime(dependencies);
     }
 

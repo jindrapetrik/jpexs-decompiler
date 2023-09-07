@@ -30,7 +30,7 @@ import java.util.Objects;
  *
  * @author JPEXS
  */
-public class GetLexAVM2Item extends AVM2Item implements SimpleValue {
+public class GetLexAVM2Item extends AVM2Item {
 
     public Multiname propertyName;
     
@@ -70,12 +70,7 @@ public class GetLexAVM2Item extends AVM2Item implements SimpleValue {
     @Override
     public boolean hasReturnValue() {
         return true;
-    }
-
-    @Override
-    public boolean isSimpleValue() {
-        return true;
-    }
+    } 
 
     @Override
     public int hashCode() {
