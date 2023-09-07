@@ -1746,6 +1746,8 @@ public class AVM2Code implements Cloneable {
             vtype = ((GetSlotAVM2Item) assignment).slotType;
         } else if ((assignment.value instanceof SimpleValue) && ((SimpleValue) assignment.value).isSimpleValue()) {
             vtype = assignment.value.returnType();
+        } else if (assignment.value instanceof GetLexAVM2Item) {
+            vtype = assignment.value.returnType();
         }
         
         boolean isNull = false;
