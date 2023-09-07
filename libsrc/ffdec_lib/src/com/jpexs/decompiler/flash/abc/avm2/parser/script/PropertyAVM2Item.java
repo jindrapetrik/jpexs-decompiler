@@ -232,6 +232,11 @@ public class PropertyAVM2Item extends AssignableAVM2Item {
 
                                 int nsKind = openedNamespaces.get(i).kind;
                                 DottedChain nsname = openedNamespaces.get(i).name;
+                                
+                                if (nsname.isTopLevel()) {
+                                    continue;
+                                }
+                                
                                 int name_index = 0;
                                 int string_property_index = constants.getStringId(propertyName, false);
                                 if (string_property_index > -1) {
