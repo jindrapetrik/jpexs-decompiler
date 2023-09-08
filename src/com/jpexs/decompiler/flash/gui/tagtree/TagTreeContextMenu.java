@@ -2750,7 +2750,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                                 ((Tag) container).setModified(true);
                             }
                         }
-
+                        
                         for (Tag tag : tagsToRemove) {
                             SWF swf = tag.getSwf();
                             if (!tagsToRemoveBySwf.containsKey(swf)) {
@@ -2770,6 +2770,17 @@ public class TagTreeContextMenu extends JPopupMenu {
                             });
                             swf.computeDependentCharacters();
                             swf.computeDependentFrames();
+                        }
+                        
+                        Set<Timelined> timelinesToUpdate = new LinkedHashSet<>();
+                        for (Tag tag : tagsToRemove) {
+                            if (tag instanceof ShowFrameTag) {
+                                Timelined t = tag.getTimelined();
+                                timelinesToUpdate.add(t);
+                            }
+                        }
+                        for (Timelined t:timelinesToUpdate) {
+                            t.setFrameCount(t.getTimeline().getFrameCount());
                         }
 
                         for (SWF swf : swfsToClearCache) {

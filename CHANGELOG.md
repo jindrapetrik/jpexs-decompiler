@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - [#2072] AS3 direct editation - incorrectly using trait names of top level classes
 - [#2029] Simplify expressions stripping getlex and also ignoring some types of expressions
 - [#2052] Detection of switches based on notequal operator
+- [#2073] Recalculating frameCount field in SWF header and DefineSprite after deleting frame
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 
@@ -3072,6 +3073,7 @@ Major version of SWF to XML export changed to 2.
 [#2058]: https://www.free-decompiler.com/flash/issues/2058
 [#2072]: https://www.free-decompiler.com/flash/issues/2072
 [#2029]: https://www.free-decompiler.com/flash/issues/2029
+[#2073]: https://www.free-decompiler.com/flash/issues/2073
 [#2043]: https://www.free-decompiler.com/flash/issues/2043
 [#1998]: https://www.free-decompiler.com/flash/issues/1998
 [#2038]: https://www.free-decompiler.com/flash/issues/2038
