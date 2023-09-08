@@ -540,7 +540,7 @@ public abstract class AbstractTagTree extends JTree {
     }
     
     public List<TreeItem> getSelected() {
-        if (mainPanel.folderPreviewPanel.isSomethingSelected()) {
+        if (mainPanel.folderPreviewCard.isVisible() && mainPanel.folderPreviewPanel.isSomethingSelected()) {
             return mainPanel.folderPreviewPanel.getSelectedItemsSorted();
         }
         TreePath[] tps = getSelectionPathsSorted();

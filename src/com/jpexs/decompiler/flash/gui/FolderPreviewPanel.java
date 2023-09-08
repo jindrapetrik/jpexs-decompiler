@@ -170,10 +170,10 @@ public class FolderPreviewPanel extends JPanel {
         executor.shutdownNow();
         executor = Executors.newFixedThreadPool(Configuration.parallelSpeedUp.get() ? Configuration.getParallelThreadCount() : 1);
         cachedPreviews.clear();
-        revalidate();
-        repaint();
         selectedItems.clear();
         selectedIndex = -1;
+        revalidate();
+        repaint();        
         ((JScrollPane)getParent().getParent()).getVerticalScrollBar().setValue(0);
     }
 

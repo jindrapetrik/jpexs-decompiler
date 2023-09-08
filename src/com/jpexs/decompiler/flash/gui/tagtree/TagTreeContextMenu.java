@@ -2789,7 +2789,7 @@ public class TagTreeContextMenu extends JPopupMenu {
                     }
                 };
 
-                if (!mainPanel.folderPreviewPanel.isSomethingSelected()) {
+                if (!(mainPanel.folderPreviewCard.isVisible() && mainPanel.folderPreviewPanel.isSomethingSelected())) {
                     mainPanel.treeOperation(r);
                 } else {
                     //current folder must stay selected
