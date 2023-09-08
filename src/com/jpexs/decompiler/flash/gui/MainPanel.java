@@ -348,6 +348,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     private final JPanel displayPanel;
 
     public FolderPreviewPanel folderPreviewPanel;
+    
+    private String currentFolderName = null;
+    
+    public JPanel folderPreviewCard;
 
     public FolderListPanel folderListPanel;
 
@@ -974,7 +978,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     }
 
     private JPanel createFolderPreviewCard() {
-        JPanel folderPreviewCard = new JPanel(new BorderLayout());
+        folderPreviewCard = new JPanel(new BorderLayout());
         folderPreviewPanel = new FolderPreviewPanel(this, new ArrayList<>());
         FasterScrollPane folderPreviewScrollPane = new FasterScrollPane(folderPreviewPanel);
         folderPreviewCard.add(folderPreviewScrollPane, BorderLayout.CENTER);
@@ -4493,7 +4497,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
     private void showCard(String card) {
         CardLayout cl = (CardLayout) (displayPanel.getLayout());
-        cl.show(displayPanel, card);
+        cl.show(displayPanel, card);        
     }
 
     private void valueChanged(Object source, TreePath selectedPath) {
@@ -5047,6 +5051,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
     public void reload(boolean forceReload, boolean scrollToVisible) {
         View.checkAccess();
         
+        String previousFolderName = currentFolderName;
+        
         JScrollBar folderPreviewScrollBar = ((JScrollPane)folderPreviewPanel.getParent().getParent()).getVerticalScrollBar();
         int scrollValue = folderPreviewScrollBar.getValue();        
         Map<Integer, TreeItem> folderItems = new HashMap<>(folderPreviewPanel.getSelectedItems());   
@@ -5269,8 +5275,10 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             pinsPanel.setCurrent(oldItem);
         }
         
-        folderPreviewPanel.setSelectedItems(folderItems);
-        folderPreviewScrollBar.setValue(scrollValue);     
+        if (currentFolderName != null && currentFolderName.equals(previousFolderName)) {
+            folderPreviewPanel.setSelectedItems(folderItems);
+            folderPreviewScrollBar.setValue(scrollValue);   
+        }
         
         View.execInEventDispatchLater(new Runnable(){
             @Override
@@ -5397,7 +5405,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         SWF swf = item.swf;
         addFolderPreviewItems(folderPreviewItems, folderName, swf);
 
-        folderPreviewPanel.setItems(folderPreviewItems);
+        currentFolderName = folderName;
+        folderPreviewPanel.setItems(folderPreviewItems);        
         showCard(CARDFOLDERPREVIEWPANEL);
     }
 

@@ -10,6 +10,9 @@ All notable changes to this project will be documented in this file.
  (including XML export), allows decide whether to write length in tag header as long
 
 ### Fixed
+- [#2043] StartSound2 tag handling
+- PR176 - slow loading of allowed charsets - now lazy loaded
+- PR178 - infinite recursion when getter/setter calls same property of superclass
 - [#2070] Handling newlines and tabs in string values inside SWF to XML export
 - [#2017], PR179 Classes in same package displayed as fully qualified
 - PR177 AS3 direct editation - Vector literal
@@ -18,17 +21,13 @@ All notable changes to this project will be documented in this file.
 - [#2029] Simplify expressions stripping getlex and also ignoring some types of expressions
 - [#2052] Detection of switches based on notequal operator
 - [#2073] Recalculating frameCount field in SWF header and DefineSprite after deleting frame
+- Handling currently selected tags when using folder preview selection (Not working Replace button, etc.)
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 
 to properly handle newlines and tabs. Older versions of FFDec can read this
 new format wrong and corrupt SWFs.
 Major version of SWF to XML export changed to 2.
-
-### Fixed
-- [#2043] StartSound2 tag handling
-- PR176 - slow loading of allowed charsets - now lazy loaded
-- PR178 - infinite recursion when getter/setter calls same property of superclass
 
 ## [18.5.0] - 2023-06-25
 ### Added

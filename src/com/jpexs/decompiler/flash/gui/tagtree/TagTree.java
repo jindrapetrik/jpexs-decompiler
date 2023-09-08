@@ -312,7 +312,7 @@ public class TagTree extends AbstractTagTree {
     @Override
     public List<TreeItem> getSelection(Openable openable) {
         List<TreeItem> sel;
-        if (!mainPanel.folderPreviewPanel.isSomethingSelected()) {
+        if (!(mainPanel.folderPreviewCard.isVisible() && mainPanel.folderPreviewPanel.isSomethingSelected())) {
             sel = getAllSelected();
         } else {
             sel = new ArrayList<>();
