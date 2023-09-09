@@ -7,7 +7,7 @@ package tests_classes
     import flash.media.Sound;
     import flash.utils.ByteArray;
  
-    public class TestEmbed extends Sprite 
+    public class TestEmbedAir extends Sprite 
     { 
         [Embed(source="../../assets/image.png")] 
         public var imagePngClass:Class;
@@ -33,8 +33,8 @@ package tests_classes
         public var soundClass:Class; 
         
         //not supported in Flex, AIR only
-        //[Embed(source="../../assets/font.ttf", fontFamily="Great Vibes", fontWeight= "normal", fontStyle = "normal", mimeType="application/x-font-truetype")]
-        //private var fontClass:Class;
+        [Embed(source="../../assets/font.ttf", fontFamily="Great Vibes", fontWeight= "normal", fontStyle = "normal", mimeType="application/x-font-truetype")]
+        private var fontClass:Class;
                 
         [Embed(source="../../assets/data.bin", mimeType="application/octet-stream")] 
         public var binaryDataClass:Class;                 
@@ -42,14 +42,14 @@ package tests_classes
         
         
          
-        public function TestEmbed()
+        public function TestEmbedAir()
         { 
             var someBitmap:Bitmap = new imagePngClass() as Bitmap;
             trace("Dimensions: " + someBitmap.width + "x" + someBitmap.height);
             
             var someGridSprite:Sprite = new imageGridPngClass() as Sprite;            
             
-            var someSprite:Sprite = new imageSvgClass() as Sprite;
+            //var someSprite:Sprite = new imageSvgClass() as Sprite;
             
             var someMovieClip:MovieClip = new movieSwfClass() as MovieClip;
             

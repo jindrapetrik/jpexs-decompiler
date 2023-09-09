@@ -143,8 +143,6 @@ package
         
         TestOtherClass;
         
-        TestEmbed;
-        
         public function Main()
         {
             if (stage) init();
