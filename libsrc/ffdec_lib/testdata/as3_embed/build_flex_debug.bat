@@ -1,5 +1,6 @@
 @echo off
 set COMPILERKIND=flex
-set SWFNAME=as3_embed
-c:\flex\bin\mxmlc.exe -debug=true -output bin/%SWFNAME%.%COMPILERKIND%.swf src/MainFlex.as 1> buildlog.%COMPILERKIND%.txt 2>&1
+c:\flex\bin\mxmlc.exe -debug=true -output bin/as3_embed_attrib.%COMPILERKIND%.swf src/MainAttributesFlex.as 1> buildlog.attrib.%COMPILERKIND%.txt 2>&1
+c:\flex\bin\mxmlc.exe -debug=true -output bin/as3_embed_classes.%COMPILERKIND%.swf src/MainClassesFlex.as 1> buildlog.classes.%COMPILERKIND%.txt 2>&1
+
 rem -warnings=false

@@ -2,18 +2,18 @@ package
 {
     import flash.display.Sprite;
     import flash.events.Event;
-    import tests_classes.TestEmbedFlex;
+    import embed_attributes.TestEmbedFlex;
     
     /**
      * ...
      * @author JPEXS
      */
-    public class MainFlex extends Sprite
+    public class MainAttributesFlex extends Sprite
     {        
         
         TestEmbedFlex;
         
-        public function MainFlex()
+        public function MainAttributesFlex()
         {
             if (stage) init();
             else addEventListener(Event.ADDED_TO_STAGE, init);
