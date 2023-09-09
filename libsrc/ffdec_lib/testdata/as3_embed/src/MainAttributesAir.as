@@ -2,18 +2,18 @@ package
 {
     import flash.display.Sprite;
     import flash.events.Event;
-    import tests_classes.TestEmbedAir;
+    import embed_attributes.TestEmbedAir;
     
     /**
      * ...
      * @author JPEXS
      */
-    public class MainAir extends Sprite
+    public class MainAttributesAir extends Sprite
     {        
         
         TestEmbedAir;
         
-        public function MainAir()
+        public function MainAttributesAir()
         {
             if (stage) init();
             else addEventListener(Event.ADDED_TO_STAGE, init);

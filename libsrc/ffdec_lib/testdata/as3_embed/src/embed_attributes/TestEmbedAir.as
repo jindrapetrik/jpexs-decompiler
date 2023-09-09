@@ -1,4 +1,4 @@
-package tests_classes
+package embed_attributes
 { 
     import flash.display.Sprite; 
     import flash.media.Sound;
