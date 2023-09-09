@@ -3079,6 +3079,7 @@ public class XFLConverter {
 
         Map<Integer, PlaceObjectTypeTag> depthToClipPlace = new HashMap<>();
         Map<PlaceObjectTypeTag, Integer> clipFinishFrames = new HashMap<>();
+        Tag lastTag = null;
         for (Tag t : timelineTags) {
             if (t instanceof ShowFrameTag) {
                 f++;
@@ -3103,7 +3104,13 @@ public class XFLConverter {
                     depthToClipPlace.remove(re.getDepth());
                 }
             }
+            lastTag = t;
         }
+        
+        //Some sprites do not end with ShowFrame:
+        if (lastTag != null && !(lastTag instanceof ShowFrameTag)) {
+            f++;
+        }            
 
         int frameCount = f;
 

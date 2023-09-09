@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
 - [#2052] Detection of switches based on notequal operator
 - [#2073] Recalculating frameCount field in SWF header and DefineSprite after deleting frame
 - Handling currently selected tags when using folder preview selection (Not working Replace button, etc.)
+- FLA export - Sprites which do not end with ShowFrame tag
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 
