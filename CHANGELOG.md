@@ -43,7 +43,7 @@ Major version of SWF to XML export changed to 2.
 - [#2008] AS3 P-code editing optional Double value when it has no fractional part
 - AS3 P-code editation - zero line number on error
 - [#2007] AS3 renaming invalid identifiers - not refreshing AbcIndex afterwards
-- AS1/2 - loadMovie / loadVariables / loadMovieNum / loadVariablesNum editation incorrectly setting GET as method
+- [PR173] AS1/2 - loadMovie / loadVariables / loadMovieNum / loadVariablesNum editation incorrectly setting GET as method
 
 ## [18.4.1] - 2023-04-05
 ### Fixed
@@ -4015,6 +4015,7 @@ Major version of SWF to XML export changed to 2.
 [PR178]: https://github.com/jindrapetrik/jpexs-decompiler/pull/178
 [PR179]: https://github.com/jindrapetrik/jpexs-decompiler/pull/179
 [PR177]: https://github.com/jindrapetrik/jpexs-decompiler/pull/177
+[PR173]: https://github.com/jindrapetrik/jpexs-decompiler/pull/173
 [PR119]: https://github.com/jindrapetrik/jpexs-decompiler/pull/119
 [PR144]: https://github.com/jindrapetrik/jpexs-decompiler/pull/144
 [PR130]: https://github.com/jindrapetrik/jpexs-decompiler/pull/130
