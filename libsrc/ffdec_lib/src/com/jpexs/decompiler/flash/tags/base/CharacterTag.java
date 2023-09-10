@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.tags.DefineScalingGridTag;
 import com.jpexs.decompiler.flash.tags.Tag;
 import com.jpexs.helpers.ByteArrayRange;
 import com.jpexs.helpers.Helper;
+import java.util.LinkedHashSet;
 
 /**
  *
@@ -28,18 +29,22 @@ import com.jpexs.helpers.Helper;
  */
 public abstract class CharacterTag extends Tag implements CharacterIdTag {
 
-    protected String className;
+    protected LinkedHashSet<String> classNames = new LinkedHashSet<>();
 
     public CharacterTag(SWF swf, int id, String name, ByteArrayRange data) {
         super(swf, id, name, data);
     }
 
-    public void setClassName(String className) {
-        this.className = className;
+    public void setClassNames(LinkedHashSet<String> classNames) {
+        this.classNames = new LinkedHashSet<>(classNames);
     }
 
-    public String getClassName() {
-        return className;
+    public LinkedHashSet<String> getClassNames() {
+        return new LinkedHashSet<>(classNames);
+    }
+    
+    public void addClassName(String className) {
+        classNames.add(className);
     }
 
     @Override
@@ -48,8 +53,8 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
         if (exportName != null) {
             nameAppend = ": " + Helper.escapePCodeString(exportName);
         }
-        if (className != null) {
-            nameAppend = ": " + Helper.escapePCodeString(className);
+        if (!classNames.isEmpty()) {
+            nameAppend = ": " + Helper.joinEscapePCodeString(", ", classNames);
         }
         return tagName + " (" + getCharacterId() + nameAppend + ")";
     }
@@ -57,11 +62,11 @@ public abstract class CharacterTag extends Tag implements CharacterIdTag {
     @Override
     public String getExportFileName() {
         String result = super.getExportFileName();
-        return result + "_" + getCharacterId() + (exportName != null ? "_" + exportName : "") + (className != null ? "_" + className : "");
+        return result + "_" + getCharacterId() + (exportName != null ? "_" + exportName : "") + (!classNames.isEmpty() ? "_" + String.join("___",classNames) : "");
     }
 
     public String getCharacterExportFileName() {
-        return getCharacterId() + (exportName != null ? "_" + exportName : "") + (className != null ? "_" + className : "");
+        return getCharacterId() + (exportName != null ? "_" + exportName : "") + (!classNames.isEmpty() ? "_" + String.join("___",classNames) : "");
     }
 
     protected String exportName;

@@ -3373,7 +3373,7 @@ public final class ImagePanel extends JPanel implements MediaDisplay {
                             if (cls == null) {
                                 continue;
                             }
-                            if (cls.equals(c.getClassName())) {
+                            if (c.getClassNames().contains(cls)) {
                                 sounds.set(k, cid);
                             }
                         }

@@ -241,6 +241,17 @@ public class Helper {
         return ret.toString();
     }
 
+    public static String joinEscapePCodeString(String glue, Collection<String> collection) {
+        StringBuilder sb = new StringBuilder();
+        for (String s:collection) {
+            if (sb.length() > 0) {
+                sb.append(glue);
+            }
+            sb.append(escapePCodeString(s));
+        }
+        return sb.toString();
+    }
+    
     /**
      * Escapes string by adding backslashes
      *

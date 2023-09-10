@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
  (including XML export), allows decide whether to write length in tag header as long
 - [#2073] Editing of frame count in SWF header (with warning that it won't update ShowFrame count)
 - Show font AS linkage class in its name in the tree (besides font name)
+- [#2057] Show all assigned AS linkage classes in the item name (instead just one)
 
 ### Fixed
 - [#2043] StartSound2 tag handling
@@ -3075,6 +3076,7 @@ Major version of SWF to XML export changed to 2.
 [#1449]: https://www.free-decompiler.com/flash/issues/1449
 [#2070]: https://www.free-decompiler.com/flash/issues/2070
 [#2073]: https://www.free-decompiler.com/flash/issues/2073
+[#2057]: https://www.free-decompiler.com/flash/issues/2057
 [#2043]: https://www.free-decompiler.com/flash/issues/2043
 [#2017]: https://www.free-decompiler.com/flash/issues/2017
 [#2052]: https://www.free-decompiler.com/flash/issues/2052

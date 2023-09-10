@@ -3308,16 +3308,26 @@ public class XFLConverter {
 
     private static Map<Integer, String> getCharacterClasses(ReadOnlyTagList tags) {
         Map<Integer, String> ret = new HashMap<>();
+        Set<Integer> multipleClassesCharacters = new HashSet<>();
         for (Tag t : tags) {
             if (t instanceof SymbolClassTag) {
                 SymbolClassTag sc = (SymbolClassTag) t;
                 for (int i = 0; i < sc.tags.size(); i++) {
                     if (!ret.containsKey(sc.tags.get(i)) && !ret.containsValue(sc.names.get(i))) {
                         ret.put(sc.tags.get(i), sc.names.get(i));
+                    } else if (ret.containsKey(sc.tags.get(i))){
+                        multipleClassesCharacters.add(sc.tags.get(i));
                     }
                 }
             }
         }
+        
+        for (int i: multipleClassesCharacters) {
+            ret.remove(i);
+        }
+        
+        //TODO: handle multiple classes assigned to same character (Can happen when Embed tag used with identical file)
+        
         return ret;
     }
 
