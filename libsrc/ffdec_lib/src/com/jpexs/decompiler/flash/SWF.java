@@ -397,7 +397,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     private String charset = "UTF-8";
 
     @Internal
-    private Map<Integer, String> importedTagToClassMapping = new HashMap<>();
+    private Map<Integer, LinkedHashSet<String>> importedTagToClassesMapping = new HashMap<>();
 
     @Internal
     private Map<Integer, String> importedTagToExportNameMapping = new HashMap<>();
@@ -800,7 +800,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
         }
         for (Tag t : getTags()) {
             if (t instanceof FontTag) {
-                if (fontClass.equals(((FontTag) t).getClassName())) {
+                if (((FontTag) t).getClassNames().contains(fontClass)) {
                     return (FontTag) t;
                 }
             }
@@ -1627,12 +1627,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                 if (cht instanceof CharacterTag) {
                                     importedCharacters.add((CharacterTag) chtCopy);
                                     String exportName = ((CharacterTag) cht).getExportName();
-                                    String className = ((CharacterTag) cht).getClassName();
+                                    LinkedHashSet<String> classNames = ((CharacterTag) cht).getClassNames();
                                     if (exportName != null) {
                                         importedTagToExportNameMapping.put(importedId, exportName);
                                     }
-                                    if (className != null) {
-                                        importedTagToClassMapping.put(importedId, className);
+                                    if (!classNames.isEmpty()) {
+                                        importedTagToClassesMapping.put(importedId, classNames);
                                     }
                                 } else {
                                     chtCopy.setTimelined(this);
@@ -1668,12 +1668,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                                 if (cht instanceof CharacterTag) {
                                     importedCharacters.add((CharacterTag) chtCopy);
                                     String exportName = ((CharacterTag) cht).getExportName();
-                                    String className = ((CharacterTag) cht).getClassName();
+                                    LinkedHashSet<String> classNames = ((CharacterTag) cht).getClassNames();
                                     if (exportName != null) {
                                         importedTagToExportNameMapping.put(importedId, exportName);
                                     }
-                                    if (className != null) {
-                                        importedTagToClassMapping.put(importedId, className);
+                                    if (!classNames.isEmpty()) {
+                                        importedTagToClassesMapping.put(importedId, classNames);
                                     }
                                 } else {
                                     chtCopy.setSwf(this);
@@ -1905,14 +1905,26 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public void assignClassesToSymbols() {
-        HashMap<Integer, String> classes = new HashMap<>(importedTagToClassMapping);
+        HashMap<Integer, LinkedHashSet<String>> classes = new HashMap<>();
+        
+        for (int ch : importedTagToClassesMapping.keySet()) {
+            classes.put(ch, new LinkedHashSet<>(importedTagToClassesMapping.get(ch)));
+        }
+        
+        Set<String> uniqueClasses = new HashSet<>();
         for (Tag t : getTags()) {
             if (t instanceof SymbolClassTag) {
                 SymbolClassTag sct = (SymbolClassTag) t;
-                for (int i = 0; i < sct.tags.size(); i++) {
-                    if ((!classes.containsKey(sct.tags.get(i))) && (!classes.containsValue(sct.names.get(i)))) {
-                        classes.put(sct.tags.get(i), sct.names.get(i));
+                for (int i = 0; i < sct.tags.size(); i++) {                    
+                    if (!classes.containsKey(sct.tags.get(i))) {
+                        classes.put(sct.tags.get(i), new LinkedHashSet<>());
                     }
+                    if (uniqueClasses.contains(sct.names.get(i))) {
+                        //when two characters have assigned same class, only first assignment is valid                        
+                        continue;
+                    }
+                    uniqueClasses.add(sct.names.get(i));
+                    classes.get(sct.tags.get(i)).add(sct.names.get(i));
                 }
             }
         }
@@ -1924,14 +1936,16 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
                     continue;
                 }
                 if (classes.containsKey(ct.getCharacterId())) {
-                    ct.setClassName(classes.get(ct.getCharacterId()));
+                    ct.setClassNames(classes.get((Integer)ct.getCharacterId()));
                 }
             }
         }
 
         classToCharacter.clear();
         for (int ch : classes.keySet()) {
-            classToCharacter.put(classes.get(ch), ch);
+            for (String cls:classes.get(ch)) {
+                classToCharacter.put(cls, ch);
+            }
         }
     }
 

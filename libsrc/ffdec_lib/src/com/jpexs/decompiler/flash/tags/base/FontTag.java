@@ -211,8 +211,8 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
         if (exportName != null) {
             nameAppendList.add(exportName);
         }
-        if (className != null) {
-            nameAppendList.add(Helper.escapePCodeString(className));
+        if (!classNames.isEmpty()) {
+            nameAppendList.add(Helper.joinEscapePCodeString(", ", classNames));
         }
         String fontName = getFontNameIntag();
         if (fontName != null) {
