@@ -22,19 +22,25 @@ import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.helpers.TableLayoutHelper;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -59,6 +65,10 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
     private final JLabel frameRateLabel = new JLabel();
 
     private final JLabel frameCountLabel = new JLabel();
+    
+    private final JSpinner frameCountEditor = new JSpinner();
+    
+    private final JPanel frameCountEditorPanel = new JPanel();
 
     private final JLabel displayRectTwipsLabel = new JLabel();
 
@@ -153,6 +163,26 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         frameRateEditorPanel.setLayout(layout);
         frameRateEditor.setPreferredSize(new Dimension(80, frameRateEditor.getPreferredSize().height));
         frameRateEditorPanel.add(frameRateEditor);
+        
+        frameCountEditorPanel.setLayout(layout);
+        frameCountEditor.setPreferredSize(new Dimension(80, frameCountEditor.getPreferredSize().height));
+        frameCountEditorPanel.add(frameCountEditor);
+        
+        JLabel frameCountWarningIcon = new JLabel(View.getIcon("warning16"));
+        frameCountWarningIcon.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+        frameCountWarningIcon.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        frameCountWarningIcon.setToolTipText(AppStrings.translate("warning.icon"));
+        frameCountWarningIcon.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    ViewMessages.showMessageDialog(HeaderInfoPanel.this,
+                            AppStrings.translate("warning.edit.headerframecount"), AppStrings.translate("message.warning"), JOptionPane.WARNING_MESSAGE);
+                }
+            }            
+        });
+        frameCountEditorPanel.add(frameCountWarningIcon);
+
 
         displayRectEditorPanel.setLayout(layout);
         displayRectEditorPanel.setMinimumSize(new Dimension(10, displayRectEditorPanel.getMinimumSize().height));
@@ -220,6 +250,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         propertiesPanel.add(frameRateEditorPanel, "1,5");
         propertiesPanel.add(new JLabel(AppStrings.translate("header.framecount")), "0,6");
         propertiesPanel.add(frameCountLabel, "1,6");
+        propertiesPanel.add(frameCountEditorPanel, "1,6");
         propertiesPanel.add(new JLabel(AppStrings.translate("header.displayrect")), "0,7");
         propertiesPanel.add(displayRectTwipsLabel, "1,7");
         propertiesPanel.add(displayRectEditorPanel, "1,7");
@@ -278,6 +309,7 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         swf.version = getVersionNumber();
         swf.gfx = gfxCheckBox.isSelected();
         swf.frameRate = ((Number) (frameRateEditor.getModel().getValue())).floatValue();
+        swf.frameCount = ((Number) (frameCountEditor.getModel().getValue())).intValue();
         double multiplier = 1.0;
         if (unit == UNIT_PIXELS) {
             multiplier = 20.0;
@@ -330,6 +362,9 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         frameRateEditor.setModel(new SpinnerNumberModel(swf.frameRate, -0x80000000, 0x7fffffff, 1));
 
         frameCountLabel.setText("" + swf.frameCount);
+        frameCountEditor.setModel(new SpinnerNumberModel(swf.frameCount, -0x80000000, 0x7fffffff, 1));
+        
+        
         displayRectTwipsLabel.setText(AppStrings.translate("header.displayrect.value.twips")
                 .replace("%xmin%", Integer.toString(swf.displayRect.Xmin))
                 .replace("%ymin%", Integer.toString(swf.displayRect.Ymin))
@@ -414,6 +449,8 @@ public class HeaderInfoPanel extends JPanel implements TagEditorPanel {
         gfxCheckBox.setVisible(edit);
         frameRateLabel.setVisible(!edit);
         frameRateEditorPanel.setVisible(edit);
+        frameCountLabel.setVisible(!edit);
+        frameCountEditorPanel.setVisible(edit);
 
         displayRectTwipsLabel.setVisible(!edit);
         displayRectPixelsLabel.setVisible(!edit);
