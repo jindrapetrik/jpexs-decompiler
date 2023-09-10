@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 (major = uncompatible change)
 - [#2070] forceWriteAsLong Tag internal attribute is now visible and editable
  (including XML export), allows decide whether to write length in tag header as long
+- [#2073] Editing of frame count in SWF header (with warning that it won't update ShowFrame count)
 
 ### Fixed
 - [#2043] StartSound2 tag handling
