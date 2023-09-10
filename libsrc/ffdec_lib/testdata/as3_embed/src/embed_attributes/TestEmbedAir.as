@@ -34,10 +34,13 @@ package embed_attributes
         
         //not supported in Flex, AIR only
         [Embed(source="../../assets/font.ttf", fontFamily="Great Vibes", fontWeight= "normal", fontStyle = "normal", mimeType="application/x-font-truetype")]
-        private var fontClass:Class;
+        public var fontClass:Class;
                 
         [Embed(source="../../assets/data.bin", mimeType="application/octet-stream")] 
-        public var binaryDataClass:Class;                 
+        public var binaryDataClass:Class; 
+        
+        [Embed(source="../../assets/movie_symbol.swf", symbol="symbols.MySymbol")]
+        public var swfSymbolClass:Class;               
         
         
         
@@ -60,6 +63,8 @@ package embed_attributes
             
             var someData:ByteArray = new binaryDataClass() as ByteArray;
             trace("Length: " + someData.length); 
+            
+            var symbol:Sprite = new swfSymbolClass() as Sprite;
             
         } 
     } 

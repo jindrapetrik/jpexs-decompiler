@@ -17,6 +17,7 @@ package
         TestImageSvg;
         TestSameImage;
         TestSound;
+        TestSwfSymbol;
         
         public function MainClassesFlex()
         {
