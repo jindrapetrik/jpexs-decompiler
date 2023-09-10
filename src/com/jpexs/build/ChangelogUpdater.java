@@ -32,7 +32,9 @@ import java.util.regex.Pattern;
 public class ChangelogUpdater {
 
     private static final String GITHUB_ADDRESS = "https://github.com/jindrapetrik/jpexs-decompiler/";
-    private static final String ISSUE_TRACKER_ADDRESS = "https://www.free-decompiler.com/flash/issues/";
+    private static final String ISSUE_TRACKER_ADDRESS = "https://www.free-decompiler.com/flash/issues/";    
+    
+    private static final String PR_URL_PREFIX = GITHUB_ADDRESS + "pull/";
     
     private static final String CHANGELOG_FILENAME = "CHANGELOG.md";
 
@@ -41,8 +43,11 @@ public class ChangelogUpdater {
         changeLog = changeLog.replaceAll("\\[[^\\]]+\\]: [^\\r\\n]+\\r\\n", "");
 
         changeLog = changeLog.replaceAll("\\[#([0-9]+)\\]", "#$1");
-
         changeLog = changeLog.replaceAll("#([0-9]+)", "[#$1]");
+        
+        changeLog = changeLog.replaceAll("\\[PR([0-9]+)\\]", "PR$1");
+        changeLog = changeLog.replaceAll("PR([0-9]+)", "[PR$1]");
+
 
         Pattern issuePattern = Pattern.compile("\\[#([0-9]+)\\]");
 
@@ -52,6 +57,14 @@ public class ChangelogUpdater {
             issues.add(Integer.parseInt(issueMatcher.group(1)));
         }
 
+        Pattern prPattern = Pattern.compile("PR([0-9]+)");
+        Matcher prMatcher = prPattern.matcher(changeLog);        
+        Set<Integer> prs = new LinkedHashSet<>();
+        while (prMatcher.find()) {
+            prs.add(Integer.parseInt(prMatcher.group(1)));            
+        }
+        
+        
         Pattern headerPattern = Pattern.compile("## \\[([^\\]]+)\\]");
 
         Matcher headerMatcher = headerPattern.matcher(changeLog);
@@ -89,6 +102,9 @@ public class ChangelogUpdater {
 
         for (int issue : issues) {
             changeLog += "[#" + issue + "]: " + ISSUE_TRACKER_ADDRESS + issue + "\r\n";
+        }
+        for (int pr : prs) {
+            changeLog += "[PR" + pr + "]: " + PR_URL_PREFIX + pr + "\r\n";
         }
 
         Helper.writeFile(CHANGELOG_FILENAME, changeLog.getBytes("UTF-8"));
