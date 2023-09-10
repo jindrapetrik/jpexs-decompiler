@@ -24,6 +24,8 @@ All notable changes to this project will be documented in this file.
 - [#2073] Recalculating frameCount field in SWF header and DefineSprite after deleting frame
 - Handling currently selected tags when using folder preview selection (Not working Replace button, etc.)
 - FLA export - Sprites which do not end with ShowFrame tag
+- [PR109] FLA export - large font size of DefineEditText
+- [PR110] FLA export - image instances
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 
@@ -4015,6 +4017,8 @@ Major version of SWF to XML export changed to 2.
 [PR178]: https://github.com/jindrapetrik/jpexs-decompiler/pull/178
 [PR179]: https://github.com/jindrapetrik/jpexs-decompiler/pull/179
 [PR177]: https://github.com/jindrapetrik/jpexs-decompiler/pull/177
+[PR109]: https://github.com/jindrapetrik/jpexs-decompiler/pull/109
+[PR110]: https://github.com/jindrapetrik/jpexs-decompiler/pull/110
 [PR173]: https://github.com/jindrapetrik/jpexs-decompiler/pull/173
 [PR119]: https://github.com/jindrapetrik/jpexs-decompiler/pull/119
 [PR144]: https://github.com/jindrapetrik/jpexs-decompiler/pull/144
