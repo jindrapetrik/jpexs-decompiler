@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 - FLA export - Sprites which do not end with ShowFrame tag
 - [PR109] FLA export - large font size of DefineEditText
 - [PR110] FLA export - image instances
+- FLA export - missing AS linkage class for fonts
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 

@@ -2534,7 +2534,7 @@ public class XFLConverter {
         }
     }
 
-    private static void convertFonts(ReadOnlyTagList tags, XFLXmlWriter writer) throws XMLStreamException {
+    private static void convertFonts(Map<Integer, String> characterClasses, ReadOnlyTagList tags, XFLXmlWriter writer) throws XMLStreamException {
         boolean hasFont = false;
         for (Tag t : tags) {
             if (t instanceof FontTag) {
@@ -2620,6 +2620,16 @@ public class XFLConverter {
                     "size", "0",
                     "id", Integer.toString(fontId),
                     "embedRanges", embedRanges});
+                
+                boolean linkageExportForAS = false;
+                if (characterClasses.containsKey(fontId)) {
+                    linkageExportForAS = true;
+                    writer.writeAttribute("linkageClassName", characterClasses.get(fontId));
+                }
+                if (linkageExportForAS) {
+                    writer.writeAttribute("linkageExportForAS", true);
+                }
+                
                 if (!"".equals(embeddedCharacters)) {
                     writer.writeAttribute("embeddedCharacters", embeddedCharacters);
                 }
@@ -3784,7 +3794,7 @@ public class XFLConverter {
                 domDocument.writeAttribute("height", doubleToString(height));
             }
 
-            convertFonts(swf.getTags(), domDocument);
+            convertFonts(characterClasses, swf.getTags(), domDocument);
             convertLibrary(swf, characterVariables, characterClasses, characterScriptPacks, nonLibraryShapes, backgroundColor, swf.getTags(), characters, files, datfiles, flaVersion, domDocument);
 
             //domDocument.writeStartElement("timelines");
