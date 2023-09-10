@@ -33,6 +33,7 @@ import com.jpexs.decompiler.flash.types.SHAPE;
 import com.jpexs.decompiler.flash.types.TEXTRECORD;
 import com.jpexs.decompiler.flash.types.shaperecords.SHAPERECORD;
 import com.jpexs.helpers.ByteArrayRange;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.SerializableImage;
 import java.awt.Color;
 import java.awt.Font;
@@ -211,7 +212,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
             nameAppendList.add(exportName);
         }
         if (className != null) {
-            nameAppendList.add(className);
+            nameAppendList.add(Helper.escapePCodeString(className));
         }
         String fontName = getFontNameIntag();
         if (fontName != null) {
