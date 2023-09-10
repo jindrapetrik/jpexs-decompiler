@@ -112,6 +112,8 @@ public class MetainfoUpdater {
     }
     
     private static String filterLiText(String li) {
-        return li.replaceAll("\\[(#[0-9]+)\\]", "$1");
+        li = li.replaceAll("\\[(#[0-9]+)\\]", "$1");
+        li = li.replaceAll("\\[(PR[0-9]+)\\]", "$1");
+        return li;
     }
 }

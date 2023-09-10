@@ -12,11 +12,11 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 - [#2043] StartSound2 tag handling
-- PR176 - slow loading of allowed charsets - now lazy loaded
-- PR178 - infinite recursion when getter/setter calls same property of superclass
+- [PR176] - slow loading of allowed charsets - now lazy loaded
+- [PR178] - infinite recursion when getter/setter calls same property of superclass
 - [#2070] Handling newlines and tabs in string values inside SWF to XML export
-- [#2017], PR179 Classes in same package displayed as fully qualified
-- PR177 AS3 direct editation - Vector literal
+- [#2017], [PR179] Classes in same package displayed as fully qualified
+- [PR177] AS3 direct editation - Vector literal
 - [#2052], [#2058] Adding new script placing class to incorrect DoABC tag
 - [#2072] AS3 direct editation - incorrectly using trait names of top level classes
 - [#2029] Simplify expressions stripping getlex and also ignoring some types of expressions
@@ -417,7 +417,7 @@ Major version of SWF to XML export changed to 2.
 
 ## [17.0.1] - 2022-11-21
 ### Added
-- PR119 Option to set scale factor in advanced settings (Set it to 2.0 on Mac retina displays)
+- [PR119] Option to set scale factor in advanced settings (Set it to 2.0 on Mac retina displays)
 
 ### Fixed
 - [#1880] JPEG Fixer
@@ -533,7 +533,7 @@ Major version of SWF to XML export changed to 2.
 - [#1460] Bulk importing images
 - Bulk importing scripts/text/images added to SWF context menu
 - [#1465] Configuration option to disable SWF preview autoplay
-- Setting for disabling expanding first level of tree nodes on SWF load
+- [PR144] Setting for disabling expanding first level of tree nodes on SWF load
 
 ### Fixed
 - FLA export printing xxx string on exporting character with id 320
@@ -638,14 +638,14 @@ Major version of SWF to XML export changed to 2.
 ## [16.0.0] - 2022-10-30
 ### Added
 - Replace characters references
-- Replace commandline action allows to load replacements list from a textfile
-- SymbolClass export from commandline
-- data-characterId and data-characterName tags to SVG export
+- [PR130] Replace commandline action allows to load replacements list from a textfile
+- [PR129] SymbolClass export from commandline
+- [PR128] data-characterId and data-characterName tags to SVG export
 - [#1731] Image viewer zoom support
-- Cloning of tags and frames
+- [PR134] Cloning of tags and frames
 - Changing tag position
 - Tag list view
-- Inserting new tags before and after selection
+- [PR135] Inserting new tags before and after selection
 - [#1825], [#1737] Adding new frames
 - Context menu icons
 - Icon of tag in raw editor
@@ -679,7 +679,7 @@ Major version of SWF to XML export changed to 2.
 
 ## [15.1.1] - 2022-07-03
 ### Added
-- Support for loading external images in DefineExternalImage2, DefineSubImage
+- [PR122] Support for loading external images in DefineExternalImage2, DefineSubImage
 
 ### Changed
 - Updated pt_BR translation
@@ -693,7 +693,7 @@ Major version of SWF to XML export changed to 2.
 
 ## [15.1.0] - 2022-02-20
 ### Added
-- Display object depth in flash panel
+- [PR116] Display object depth in flash panel
 - Show imported files on script import, able to cancel import
 - [#270] AS3 show progress on deofuscating p-code
 - [#1718] Show progress on injecting debug info / SWD generation (before Debugging)
@@ -712,7 +712,7 @@ Major version of SWF to XML export changed to 2.
 - AS3 - direct editation - call on local register
 - AS3 - direct editation - resolve properties and local regs before types
 - AS3 - direct editation - call on index
-- Incorrect position in Flash Player preview and SWF export
+- [PR117] Incorrect position in Flash Player preview and SWF export
 - AS1/2 actioncontainers (like try) inside ifs
 - AS1/2 switch detection
 - [#1766] AS3 - direct editation - namespaces on global level without leading colon
@@ -723,11 +723,11 @@ Major version of SWF to XML export changed to 2.
 - [#1773] - Auto set flagWideCodes on FontInfo wide character adding
 - [#1769] - Do not mark getter+setter as colliding (#xxx suffix)
 - [#1801] - Flex SDK not required on commandline when Flex compilation is disabled
-- Multiname - performance issues
+- [PR118] Multiname - performance issues
 
 ## [15.0.0] - 2021-11-29
 ### Added
-- Frame dependencies
+- [PR114] Frame dependencies
 
 ### Changed
 - AS1/2 direct editation no longer marked as experimental
@@ -774,7 +774,7 @@ Major version of SWF to XML export changed to 2.
 - AS1/2 - empty tellTarget
 - AS1/2 - deobfuscate object literal names
 - AS1/2 - spacing in with statement
-- Playercontrols frame display incorrect frame
+- [PR113] Playercontrols frame display incorrect frame
 - AS1/2 - direct editation - empty parenthesis nullpointer
 - AS1/2 - delete on nonmember
 - AS1/2 - direct editation - Infinity, NaN can be used as identifiers, are normal variables
@@ -829,9 +829,9 @@ Major version of SWF to XML export changed to 2.
 - SoundStreamHead has associated sprite id in its name in the tagtree
 - [#1485] Improved skins support, night mode
 - [#1681] AS3 - context menu for adding classes on packages
-- GFX: Support for loading external images
+- [PR101] GFX: Support for loading external images
 - Updated Japanese translation
-- Try loading .gfx files if .swf failed to load for imports and similar
+- [PR102] Try loading .gfx files if .swf failed to load for imports and similar
 - [#1744] SVG shape import from commandline
 - [#1496] repeat escape sequence `\{xx}C` to avoid long same char strings/names
 
@@ -1218,7 +1218,7 @@ Major version of SWF to XML export changed to 2.
 
 ## [11.3.0] - 2020-04-25
 ### Added
-- Possibility to open SWF files using open on Mac
+- [PR69] Possibility to open SWF files using open on Mac
 - Updated turkish translation
 
 ### Fixed
@@ -1226,8 +1226,8 @@ Major version of SWF to XML export changed to 2.
 - [#1457] AS3 switch without lookupswitch ins detection
 - [#1457] pushing on stack before exit item (return/throw)
 - [#1503] NullPointer Exception on commandline FLA export
-- AS3 direct editation - invalid generation of lookupswitch
-- AS3 direct editation - fix access to protected members with super
+- [PR74] AS3 direct editation - invalid generation of lookupswitch
+- [PR75] AS3 direct editation - fix access to protected members with super
 - [#1529] commandline selection of tag ids now applies to sprites and buttons
 
 ### Changed
@@ -1296,6 +1296,7 @@ Major version of SWF to XML export changed to 2.
 - [#1369] Allow zoom in sprite (and button) export
 - Debug tooltips on hover
 - AS3 deobfuscation - removing push instructions immediately followed by pop
+- [PR53] Click to Jump feature in the basic tag info
 
 ### Changed
 - Homepage is now on GitHub jindrapetrik/jpexs-decompiler instead of free-decompiler.com
@@ -1412,7 +1413,7 @@ Major version of SWF to XML export changed to 2.
 - [#1210] Frame Export fix
 - Improved/fixed go to declaration in AS3
 - [#1217] PCode window not in same position as AS
-- Hide memor search on non windows platform
+- Hide memory search on non windows platform
 - [#1244] Incorrect showing of NOP instructions
 - [#1244] Remove unknown actions when deobfuscation is enabled, compole unknown instructions back
 - [#1241] File content is different from hex view
@@ -3069,13 +3070,13 @@ Major version of SWF to XML export changed to 2.
 [alpha 7]: https://github.com/jindrapetrik/jpexs-decompiler/releases/tag/alpha7
 [#1449]: https://www.free-decompiler.com/flash/issues/1449
 [#2070]: https://www.free-decompiler.com/flash/issues/2070
+[#2073]: https://www.free-decompiler.com/flash/issues/2073
+[#2043]: https://www.free-decompiler.com/flash/issues/2043
 [#2017]: https://www.free-decompiler.com/flash/issues/2017
 [#2052]: https://www.free-decompiler.com/flash/issues/2052
 [#2058]: https://www.free-decompiler.com/flash/issues/2058
 [#2072]: https://www.free-decompiler.com/flash/issues/2072
 [#2029]: https://www.free-decompiler.com/flash/issues/2029
-[#2073]: https://www.free-decompiler.com/flash/issues/2073
-[#2043]: https://www.free-decompiler.com/flash/issues/2043
 [#1998]: https://www.free-decompiler.com/flash/issues/1998
 [#2038]: https://www.free-decompiler.com/flash/issues/2038
 [#2028]: https://www.free-decompiler.com/flash/issues/2028
@@ -4010,3 +4011,26 @@ Major version of SWF to XML export changed to 2.
 [#32]: https://www.free-decompiler.com/flash/issues/32
 [#31]: https://www.free-decompiler.com/flash/issues/31
 [#27]: https://www.free-decompiler.com/flash/issues/27
+[PR176]: https://github.com/jindrapetrik/jpexs-decompiler/pull/176
+[PR178]: https://github.com/jindrapetrik/jpexs-decompiler/pull/178
+[PR179]: https://github.com/jindrapetrik/jpexs-decompiler/pull/179
+[PR177]: https://github.com/jindrapetrik/jpexs-decompiler/pull/177
+[PR119]: https://github.com/jindrapetrik/jpexs-decompiler/pull/119
+[PR144]: https://github.com/jindrapetrik/jpexs-decompiler/pull/144
+[PR130]: https://github.com/jindrapetrik/jpexs-decompiler/pull/130
+[PR129]: https://github.com/jindrapetrik/jpexs-decompiler/pull/129
+[PR128]: https://github.com/jindrapetrik/jpexs-decompiler/pull/128
+[PR134]: https://github.com/jindrapetrik/jpexs-decompiler/pull/134
+[PR135]: https://github.com/jindrapetrik/jpexs-decompiler/pull/135
+[PR122]: https://github.com/jindrapetrik/jpexs-decompiler/pull/122
+[PR116]: https://github.com/jindrapetrik/jpexs-decompiler/pull/116
+[PR117]: https://github.com/jindrapetrik/jpexs-decompiler/pull/117
+[PR118]: https://github.com/jindrapetrik/jpexs-decompiler/pull/118
+[PR114]: https://github.com/jindrapetrik/jpexs-decompiler/pull/114
+[PR113]: https://github.com/jindrapetrik/jpexs-decompiler/pull/113
+[PR101]: https://github.com/jindrapetrik/jpexs-decompiler/pull/101
+[PR102]: https://github.com/jindrapetrik/jpexs-decompiler/pull/102
+[PR69]: https://github.com/jindrapetrik/jpexs-decompiler/pull/69
+[PR74]: https://github.com/jindrapetrik/jpexs-decompiler/pull/74
+[PR75]: https://github.com/jindrapetrik/jpexs-decompiler/pull/75
+[PR53]: https://github.com/jindrapetrik/jpexs-decompiler/pull/53
