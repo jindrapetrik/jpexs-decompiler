@@ -47,6 +47,7 @@ import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.helpers.CancellableWorker;
+import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Reference;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -881,11 +882,15 @@ public class DecompiledEditorPane extends DebuggableEditorPane implements CaretL
                 protected Void doInBackground() throws Exception {
 
                     if (decompileNeeded) {
+                        //long timeBefore = System.currentTimeMillis();
                         View.execInEventDispatch(() -> {
                             setText("// " + AppStrings.translate("work.decompiling") + "...");
                         });
 
                         HighlightedText htext = SWF.getCached(scriptLeaf);
+                        //long timeAfter = System.currentTimeMillis();
+                        //long delta = timeAfter - timeBefore;
+                        //System.err.println("Finished in " + Helper.formatTimeSec(delta));
                         View.execInEventDispatch(() -> {
                             setSourceCompleted(scriptLeaf, htext);
                         });

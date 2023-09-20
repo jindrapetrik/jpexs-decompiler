@@ -72,6 +72,8 @@ public class GraphPart implements Serializable {
     public int discoveredTime;
 
     public int finishedTime;
+    
+    public int closedTime;
 
     public int order;
 

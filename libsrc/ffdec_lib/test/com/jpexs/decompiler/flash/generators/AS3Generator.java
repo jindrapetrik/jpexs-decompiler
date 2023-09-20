@@ -61,6 +61,22 @@ public class AS3Generator {
         for (ScriptPack pack : scriptPacks) {
             sortedPacks.put(pack.getClassPath().toRawString(), pack);
         }
+        s.append("/*\r\n"
+                + " *  Copyright (C) 2010-2023 JPEXS, All rights reserved.\r\n"
+                + " * \r\n"
+                + " * This library is free software; you can redistribute it and/or\r\n"
+                + " * modify it under the terms of the GNU Lesser General Public\r\n"
+                + " * License as published by the Free Software Foundation; either\r\n"
+                + " * version 3.0 of the License, or (at your option) any later version.\r\n"
+                + " * \r\n"
+                + " * This library is distributed in the hope that it will be useful,\r\n"
+                + " * but WITHOUT ANY WARRANTY; without even the implied warranty of\r\n"
+                + " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\r\n"
+                + " * Lesser General Public License for more details.\r\n"
+                + " * \r\n"
+                + " * You should have received a copy of the GNU Lesser General Public\r\n"
+                + " * License along with this library.\r\n"
+                + " */\r\n");
         s.append("package com.jpexs.decompiler.flash.as3decompile;\r\n");
         s.append("\r\n");
         s.append("import com.jpexs.decompiler.flash.ActionScript3DecompileTestBase;\r\n");
@@ -142,12 +158,12 @@ public class AS3Generator {
                             MethodBody b = abc.findBody(((TraitMethodGetterSetter) t).method_info);
                             List<Traits> ts = new ArrayList<>();
                             ts.add(abc.instance_info.get(classId).instance_traits);
-                            
+
                             Configuration.autoDeobfuscate.set(clsName.toLowerCase().contains("obfus"));
-                            
+
                             List<MethodBody> callStack = new ArrayList<>();
                             callStack.add(b);
-                            b.convert(callStack, swf.getAbcIndex(),new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true, new HashSet<>());
+                            b.convert(callStack, swf.getAbcIndex(), new ConvertData(), "", ScriptExportMode.AS, false, ((TraitMethodGetterSetter) t).method_info, pack.scriptIndex, classId, abc, null, new ScopeStack(), 0, new NulWriter(), new ArrayList<>(), ts, true, new HashSet<>());
                             b.toString(callStack, swf.getAbcIndex(), "", ScriptExportMode.AS, abc, null, src, new ArrayList<>(), new HashSet<>());
                             String[] srcs = src.toString().split("[\r\n]+");
                             for (int i = 0; i < srcs.length; i++) {
@@ -178,7 +194,6 @@ public class AS3Generator {
         Configuration.showMethodBodyId.set(false);
         Configuration.simplifyExpressions.set(false);
         Configuration.displayDupInstructions.set(true);
-
 
         useFile("ActionScript3ClassicDecompileTest", new String[][]{{"testdata/as3_new/bin/as3_new.flex.swf", "classic"}}, false);
         useFile("ActionScript3ClassicAirDecompileTest", new String[][]{{"testdata/as3_new/bin/as3_new.air.swf", "classic_air"}}, false);

@@ -1,0 +1,145 @@
+class
+ refid "tests:TestSwitchMostCommon"
+ instance QName(PackageNamespace("tests"), "TestSwitchMostCommon")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestSwitchMostCommon")
+  iinit
+   refid "tests:TestSwitchMostCommon/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestSwitchMostCommon/instance/run"
+    param QName(PackageNamespace("flash.events"),"KeyboardEvent")
+    returns QName(PackageNamespace(""), "void")
+    body
+         maxstack 10
+         localcount 8
+         initscopedepth 10
+         maxscopedepth 11
+         
+         code
+            getlocal0
+            pushscope
+            pushbyte 0
+            setlocal2
+            pushundefined
+            coerce_a
+            setlocal 4
+            getlex Multiname("something",[PrivateNamespace("*","111"),PackageNamespace("","9369"),PrivateNamespace("*","412"),PackageInternalNs(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("flash.text"),PackageNamespace("flash.external"),PackageNamespace("it.gotoandplay.smartfoxserver"),Namespace("com.facebook.graph"),ProtectedNamespace("Game"),StaticProtectedNs("Game"),StaticProtectedNs("flash.display:MovieClip"),StaticProtectedNs("flash.display:Sprite"),StaticProtectedNs("flash.display:DisplayObjectContainer"),StaticProtectedNs("flash.display:InteractiveObject"),StaticProtectedNs("flash.display:DisplayObject"),StaticProtectedNs("flash.events:EventDispatcher")])
+            pushnull
+            equals
+            iffalse ofs00b5
+            jump ofs0026
+   ofs0017:
+            label
+            pushbyte 7
+            setlocal2
+            jump ofs006f
+   ofs001f:
+            label
+            returnvoid
+   ofs0021:
+            label
+            jump ofs006f
+   ofs0026:
+            getlocal1
+            getproperty Multiname("keyCode",[PrivateNamespace("*","111"),PackageNamespace("","9369"),PrivateNamespace("*","412"),PackageInternalNs(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("flash.text"),PackageNamespace("flash.external"),PackageNamespace("it.gotoandplay.smartfoxserver"),Namespace("com.facebook.graph"),ProtectedNamespace("Game"),StaticProtectedNs("Game"),StaticProtectedNs("flash.display:MovieClip"),StaticProtectedNs("flash.display:Sprite"),StaticProtectedNs("flash.display:DisplayObjectContainer"),StaticProtectedNs("flash.display:InteractiveObject"),StaticProtectedNs("flash.display:DisplayObject"),StaticProtectedNs("flash.events:EventDispatcher")])
+            setlocal 5
+            pushbyte 89
+            getlocal 5
+            ifstrictne ofs003a
+            pushbyte 0
+            jump ofs004a
+   ofs003a:
+            pushbyte 112
+            getlocal 5
+            ifstrictne ofs0048
+            pushbyte 1
+            jump ofs004a
+   ofs0048:
+            pushbyte 2
+   ofs004a:
+            kill 5
+            lookupswitch ofs0021, [ofs0017, ofs001f, ofs0021]
+   ofs005a:
+            label
+            returnvoid
+   ofs005c:
+            label
+            returnvoid
+   ofs005e:
+            label
+            pushbyte 1
+            setlocal2
+            jump ofs006b
+   ofs0066:
+            label
+            jump ofs006b
+   ofs006b:
+            jump ofs00b5
+   ofs006f:
+            getlocal1
+            getproperty Multiname("charCode",[PrivateNamespace("*","111"),PackageNamespace("","9369"),PrivateNamespace("*","412"),PackageInternalNs(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageNamespace("flash.text"),PackageNamespace("flash.external"),PackageNamespace("it.gotoandplay.smartfoxserver"),Namespace("com.facebook.graph"),ProtectedNamespace("Game"),StaticProtectedNs("Game"),StaticProtectedNs("flash.display:MovieClip"),StaticProtectedNs("flash.display:Sprite"),StaticProtectedNs("flash.display:DisplayObjectContainer"),StaticProtectedNs("flash.display:InteractiveObject"),StaticProtectedNs("flash.display:DisplayObject"),StaticProtectedNs("flash.events:EventDispatcher")])
+            setlocal 5
+            pushbyte 49
+            getlocal 5
+            ifstrictne ofs0084
+            pushbyte 0
+            jump ofs00a2
+   ofs0084:
+            pushbyte 69
+            getlocal 5
+            ifstrictne ofs0092
+            pushbyte 1
+            jump ofs00a2
+   ofs0092:
+            pushbyte 113
+            getlocal 5
+            ifstrictne ofs00a0
+            pushbyte 2
+            jump ofs00a2
+   ofs00a0:
+            pushbyte 3
+   ofs00a2:
+            kill 5
+            lookupswitch ofs0066, [ofs005a, ofs005c, ofs005e, ofs0066]
+   ofs00b5:
+            returnvoid
+         end ; code
+      end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestSwitchMostCommon/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

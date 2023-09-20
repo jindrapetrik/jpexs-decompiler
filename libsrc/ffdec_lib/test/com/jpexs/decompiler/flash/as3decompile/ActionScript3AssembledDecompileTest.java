@@ -331,6 +331,33 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
     }
 
     @Test
+    public void testSwitchMostCommon() {
+        decompileMethod("assembled", "testSwitchMostCommon", "var _loc2_:int = 0;\r\n"
+                + "var _loc4_:* = undefined;\r\n"
+                + "if(something == null)\r\n"
+                + "{\r\n"
+                + "switch(param1.keyCode)\r\n"
+                + "{\r\n"
+                + "case 89:\r\n"
+                + "_loc2_ = 7;\r\n"
+                + "break;\r\n"
+                + "case 112:\r\n"
+                + "return;\r\n"
+                + "}\r\n"
+                + "switch(param1.charCode)\r\n"
+                + "{\r\n"
+                + "case 49:\r\n"
+                + "return;\r\n"
+                + "case 69:\r\n"
+                + "return;\r\n"
+                + "case 113:\r\n"
+                + "_loc2_ = 1;\r\n"
+                + "}\r\n"
+                + "}\r\n",
+                 false);
+    }
+
+    @Test
     public void testTryCatchLoopBreakLevel2() {
         decompileMethod("assembled", "testTryCatchLoopBreakLevel2", "var a:int = 0;\r\n"
                 + "a = 0;\r\n"

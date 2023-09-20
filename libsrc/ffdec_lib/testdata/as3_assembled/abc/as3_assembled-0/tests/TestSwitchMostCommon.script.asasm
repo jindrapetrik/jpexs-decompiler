@@ -1,0 +1,29 @@
+script
+ sinit
+  refid "tests:TestSwitchMostCommon/init"
+  body
+   maxstack 2
+   localcount 1
+   initscopedepth 1
+   maxscopedepth 3
+   code
+    getlocal0
+    pushscope
+
+    findpropstrict      Multiname("TestSwitchMostCommon", [PackageNamespace("tests")])
+    getlex              QName(PackageNamespace(""), "Object")
+    pushscope
+
+    getlex              Multiname("Object", [PrivateNamespace(null, "tests:TestSwitchMostCommon"), PackageNamespace(""), PackageNamespace("tests"), PackageInternalNs("tests"), Namespace("http://adobe.com/AS3/2006/builtin")])
+    newclass            "tests:TestSwitchMostCommon"
+    popscope
+    initproperty        QName(PackageNamespace("tests"), "TestSwitchMostCommon")
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+ trait class QName(PackageNamespace("tests"), "TestSwitchMostCommon")
+  #include "TestSwitchMostCommon.class.asasm"
+ end ; trait
+end ; script
