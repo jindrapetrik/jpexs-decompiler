@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
 - [PR109] FLA export - large font size of DefineEditText
 - [PR110] FLA export - image instances
 - FLA export - missing AS linkage class for fonts
+- [#2077] Switch detection problems producing §§goto
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 
@@ -3083,6 +3084,7 @@ Major version of SWF to XML export changed to 2.
 [#2058]: https://www.free-decompiler.com/flash/issues/2058
 [#2072]: https://www.free-decompiler.com/flash/issues/2072
 [#2029]: https://www.free-decompiler.com/flash/issues/2029
+[#2077]: https://www.free-decompiler.com/flash/issues/2077
 [#1998]: https://www.free-decompiler.com/flash/issues/1998
 [#2038]: https://www.free-decompiler.com/flash/issues/2038
 [#2028]: https://www.free-decompiler.com/flash/issues/2028

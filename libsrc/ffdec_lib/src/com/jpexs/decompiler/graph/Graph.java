@@ -55,12 +55,15 @@ import com.jpexs.decompiler.graph.model.UniversalLoopItem;
 import com.jpexs.decompiler.graph.model.WhileItem;
 import com.jpexs.decompiler.graph.precontinues.GraphPrecontinueDetector;
 import com.jpexs.helpers.Reference;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -121,7 +124,94 @@ public class Graph {
         for (GraphPart head : heads) {
             time = head.setTime(time, ordered, visited);
             head.setNumblocks(1);
+        }        
+    }
+    
+    /**
+     * Calculates time of closing the node.
+     * The node is closed when all its input edges are already visited
+     * (not counting back edges), then all its output edges are processed.     
+     * 
+     * This time is useful when sorting nodes according their occurence 
+     * in getMostCommonPart method - used for switch detection
+     * 
+     * @param loops Already calculated loops to get backedges from.
+     */
+    private void calculateClosedTime(List<Loop> loops) {
+        ArrayDeque<GraphPart> openedNodes = new ArrayDeque<>();
+        Set<GraphPart> closedNodes = new HashSet<>();
+        Set<LevelMapEdge> visitedEdges = new HashSet<>();
+        openedNodes.addAll(heads);
+        for(GraphPart h:heads) {
+            for (GraphPart r:h.refs) {
+                visitedEdges.add(new LevelMapEdge(r, h));
+            }
         }
+        for (Loop el:loops) {
+            for (GraphPart be:el.backEdges) {
+                visitedEdges.add(new LevelMapEdge(be, el.loopContinue));
+            }
+        }
+        
+        int closedTime = 1;
+        
+        loopopened: while (!openedNodes.isEmpty()) {
+            GraphPart part = openedNodes.remove();        
+            if (closedNodes.contains(part)) {
+                continue;
+            }
+            for (GraphPart r:part.refs) {
+                if (!visitedEdges.contains(new LevelMapEdge(r, part))) {
+                    continue loopopened;
+                }
+            }
+            for (GraphPart n:part.nextParts) {
+                openedNodes.add(n);
+                visitedEdges.add(new LevelMapEdge(part, n));
+            }
+            closedNodes.add(part);
+            part.closedTime = closedTime++;
+            //System.err.println("part "+part+" closedTime: "+part.closedTime);
+        }
+        
+    }
+    
+    private class LevelMapEdge {
+        public GraphPart from;
+        public GraphPart to;
+
+        public LevelMapEdge(GraphPart from, GraphPart to) {
+            this.from = from;
+            this.to = to;
+        }                
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 31 * hash + Objects.hashCode(this.from);
+            hash = 31 * hash + Objects.hashCode(this.to);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final LevelMapEdge other = (LevelMapEdge) obj;
+            //use == comparison, not equals, as some parts may be equal
+            // (the refs to throw targets have -1,-1 as start/end)
+            if (this.from != other.from) {
+                return false;
+            }
+            return this.to == other.to;
+        }                
     }
 
     public List<GraphException> getExceptions() {
@@ -377,7 +467,31 @@ public class Graph {
             allReachable.add(p);
             allReachable.addAll(r1);
         }
+        Comparator<PartCommon> comparator = new Comparator<PartCommon>() {
+            @Override
+            public int compare(PartCommon o1, PartCommon o2) {
+                int levelCompare = o2.level - o1.level;
+                if (levelCompare == 0) {
+                    try {
+                        if (o1.part.leadsTo(localData, Graph.this, code, o2.part, loops, throwStates, false)) {
+                            return -1;
+                        }
+                        if (o2.part.leadsTo(localData, Graph.this, code, o1.part, loops, throwStates, false)) {
+                            return 1;
+                        }
+                        return 0;
+                    } catch (InterruptedException ex) {
+                        //ignore
+                        return 0;
+                    }
+                    //return o1.part.discoveredTime - o2.part.discoveredTime;
+                } else {
+                    return levelCompare;
+                }
+            }
+        };
         Set<PartCommon> commonSet = new TreeSet<>();
+        
         for (GraphPart r : allReachable) {
             if (loopContinues.contains(r)) {
                 continue;
@@ -496,7 +610,12 @@ public class Graph {
                 return null;
             }
             if (debugPrintLoopList) {
-                System.err.println("selected " + pc.part);
+                StringBuilder sb = new StringBuilder();
+                for (GraphPart p : parts) {
+                    sb.append(" ");
+                    sb.append(p.toString());
+                }
+                System.err.println("most common part of" + sb.toString() + " is " + pc.part);
             }
             return pc.part;
         }
@@ -504,7 +623,7 @@ public class Graph {
         return null;
     }
 
-    private class PartCommon implements Comparable<PartCommon> {
+    private class PartCommon  implements Comparable<PartCommon> {
 
         public GraphPart part;
         public int level;
@@ -518,7 +637,7 @@ public class Graph {
         public int compareTo(PartCommon o) {
             int ret = o.level - level;
             if (ret == 0) {
-                ret = part.start - o.part.start;
+                ret = part.closedTime - o.part.closedTime;
             }
             return ret;
         }
@@ -637,6 +756,7 @@ public class Graph {
 
         //TODO: Make getPrecontinues faster
         getBackEdges(localData, loops, throwStates);
+        calculateClosedTime(loops);
 
         new GraphPrecontinueDetector().detectPrecontinues(heads, allParts, loops, throwStates);
         if (debugPrintLoopList) {
@@ -1732,16 +1852,16 @@ public class Graph {
                     getLoopsWalk(localData, next, loops, throwStates, stopPart, false, visited, level);
                 }
             } else if (part.nextParts.size() == 1) {
-                
+
                 if (!isLoop || currentLoop == null) {
                     part = part.nextParts.get(0);
                     first = false;
                     continue loopwalk; //to avoid recursion
-                } else {                
+                } else {
                     getLoopsWalk(localData, part.nextParts.get(0), loops, throwStates, stopPart, false, visited, level);
                 }
             }
-            
+
             if (isLoop && currentLoop != null) {
                 GraphPart found;
 
@@ -2350,12 +2470,12 @@ public class Graph {
                             List<GraphTargetItem> iiOnTrue = ii.onTrue;
                             List<GraphTargetItem> iiOnFalse = ii.onFalse;
                             if ((ii.expression instanceof EqualsTypeItem) || (ii.expression instanceof NotEqualsTypeItem)) {
-                                
+
                                 if (ii.expression instanceof NotEqualsTypeItem) {
                                     iiOnTrue = ii.onFalse;
                                     iiOnFalse = ii.onTrue;
                                 }
-                                                                
+
                                 if (!iiOnFalse.isEmpty() && !iiOnTrue.isEmpty()
                                         && iiOnTrue.get(iiOnTrue.size() - 1) instanceof PushItem
                                         && iiOnTrue.get(iiOnTrue.size() - 1).value instanceof IntegerValueTypeItem) {
@@ -2390,7 +2510,7 @@ public class Graph {
                                     toOnTrue = to.onFalse;
                                     toOnFalse = to.onTrue;
                                 }
-                                
+
                                 if (toOnTrue instanceof IntegerValueTypeItem) {
                                     int cpos = ((IntegerValueTypeItem) toOnTrue).intValue();
                                     caseExpressionLeftSides.put(cpos, ((BinaryOpItem) to.expression).getLeftSide());

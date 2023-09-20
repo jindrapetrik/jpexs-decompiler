@@ -32,5 +32,6 @@ program
  #include "tests/TestActivationProps.script.asasm"
  #include "tests/TestSwapAssignment.script.asasm"
  #include "tests/TestMutatingSwitch.script.asasm"
+ #include "tests/TestSwitchMostCommon.script.asasm"
  ; place to add next
 end ; program
