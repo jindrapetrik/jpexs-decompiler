@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 - [PR110] FLA export - image instances
 - FLA export - missing AS linkage class for fonts
 - [#2077] Switch detection problems producing §§goto
+- [#2077] Recursion of deleting method with newfunction instruction
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 
