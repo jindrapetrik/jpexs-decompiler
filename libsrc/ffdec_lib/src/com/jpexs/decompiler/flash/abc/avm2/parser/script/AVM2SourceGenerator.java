@@ -614,7 +614,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         AVM2Instruction forwardJump = ins(AVM2Instructions.Jump, 0);
         ret.add(forwardJump);
 
-        int defIndex = -1;
+        int defIndex = item.caseValues.size();
 
         for (int i = item.caseValues.size() - 1; i >= 0; i--) {
             if (item.caseValues.get(i) instanceof DefaultItem) {
@@ -653,7 +653,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
         cases.addAll(0, preCases);
 
-        AVM2Instruction lookupOp = new AVM2Instruction(0, AVM2Instructions.LookupSwitch, new int[item.caseValues.size() + 1 + 1]);
+        AVM2Instruction lookupOp = new AVM2Instruction(0, AVM2Instructions.LookupSwitch, new int[1 + 1 + item.caseValues.size() + 1]);
         cases.addAll(toInsList(AssignableAVM2Item.killTemp(localData, this, Arrays.asList(switchedReg))));
         List<AVM2Instruction> bodies = new ArrayList<>();
         List<Integer> bodiesOffsets = new ArrayList<>();
@@ -668,10 +668,12 @@ public class AVM2SourceGenerator implements SourceGenerator {
             bodiesOffsets.add(0, -(insToBytes(bodies).length + casesLen));
         }
         lookupOp.operands[0] = defOffset;
-        lookupOp.operands[1] = item.valuesMapping.size() - 1; // as per avm2 spec: "There are case_count+1 case offsets"
+        lookupOp.operands[1] = item.valuesMapping.size(); 
+        // as per avm2 spec: "There are case_count+1 case offsets"
         for (int i = 0; i < item.valuesMapping.size(); i++) {
             lookupOp.operands[2 + i] = bodiesOffsets.get(item.valuesMapping.get(i));
         }
+        lookupOp.operands[2 + item.valuesMapping.size()] = defOffset;
 
         forwardJump.operands[0] = insToBytes(bodies).length;
         ret.addAll(bodies);
@@ -1677,9 +1679,6 @@ public class AVM2SourceGenerator implements SourceGenerator {
         }
         registerNames.addAll(paramNames);
         slotNames.addAll(paramNames);
-        /*for (GraphTargetItem p : paramTypes) {
-         slotTypes.add("" + p);
-         }*/
         if (hasRest) {
             registerTypes.add(TypeItem.ARRAY);
             slotTypes.add(TypeItem.ARRAY);
@@ -1721,8 +1720,8 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 if (an instanceof NameAVM2Item) {
                     NameAVM2Item n = (NameAVM2Item) an;
                     if (n.isDefinition() && !registerNames.contains(n.getVariableName())) {
-                        if (!needsActivation || (n.getSlotScope() <= 0)) {
-                            String varName = n.getVariableName();
+                        String varName = n.getVariableName();
+                        if (!needsActivation) {
                             Matcher m = pat.matcher(varName);
                             //In first round, make all register that match standard loc_xx register
                             if ((round == 1) && (m.matches())) {
@@ -1731,16 +1730,12 @@ public class AVM2SourceGenerator implements SourceGenerator {
                                 while (registerNames.size() <= regIndex) {
                                     registerNames.add(UNUSED);
                                     registerTypes.add(TypeItem.UNBOUNDED);
-                                    registerLines.add(paramLine);
-                                    slotNames.add(UNUSED);
-                                    slotTypes.add(TypeItem.UNBOUNDED);
+                                    registerLines.add(paramLine);                                    
                                 }
                                 registerNames.set(regIndex, varName);
                                 registerTypes.set(regIndex, n.type);
                                 registerLines.set(regIndex, n.line);
-
-                                slotNames.add(varName);
-                                slotTypes.add(n.type);
+                                
                             } //in second round the rest
                             else if (round == 2 && !m.matches()) {
 
@@ -1760,10 +1755,16 @@ public class AVM2SourceGenerator implements SourceGenerator {
                                 }
                                 registerNames.set(newRegIndex, n.getVariableName());
                                 registerTypes.set(newRegIndex, n.type);
-                                registerLines.set(newRegIndex, n.line);
-
-                                slotNames.add(n.getVariableName());
-                                slotTypes.add(n.type);
+                                registerLines.set(newRegIndex, n.line);                               
+                            }
+                        }
+                        else
+                        {
+                            if (round == 1) {
+                                if (!slotNames.contains(varName)) {
+                                    slotNames.add(varName);
+                                    slotTypes.add(n.type);
+                                }                                    
                             }
                         }
                     }
@@ -1771,13 +1772,20 @@ public class AVM2SourceGenerator implements SourceGenerator {
             }
         }
 
+        
+        for (int j = registerNames.size() - 1; j >= 0; j--) {
+            if (UNUSED.equals(registerNames.get(j))) {
+                registerNames.remove(j);
+                registerTypes.remove(j);
+                registerLines.remove(j);
+            }
+        }
         for (int j = 0; j < registerNames.size(); j++) {
             if (UNUSED.equals(registerNames.get(j))) {
                 String standardName = String.format(mask, j);
-                registerNames.set(j, standardName);
-                slotNames.set(j, standardName);
+                registerNames.set(j, standardName);                
             }
-        }
+        }               
 
         int slotScope = subMethod ? 0 : 1;
 
