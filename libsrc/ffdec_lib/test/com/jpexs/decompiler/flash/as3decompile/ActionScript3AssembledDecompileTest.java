@@ -466,4 +466,14 @@ public class ActionScript3AssembledDecompileTest extends ActionScript3DecompileT
                 + "}\r\n",
                  false);
     }
+
+    @Test
+    public void testXmlStar() {
+        decompileMethod("assembled", "testXmlStar", "var _loc1_:XML = <a>\r\n"
+                + "<b>xxx</b>\r\n"
+                + "<b>yyy</b>\r\n"
+                + "</a>;\r\n"
+                + "var _loc2_:* = _loc1_.b.*;\r\n",
+                 false);
+    }
 }
