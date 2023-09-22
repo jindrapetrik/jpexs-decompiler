@@ -2315,7 +2315,8 @@ public class ActionScript3ClassicAirDecompileTest extends ActionScript3Decompile
                 + "</ul>\r\n"
                 + "</{xtagb} >\r\n"
                 + "</{xtaga} >\r\n"
-                + ";\r\n",
+                + ";\r\n"
+                + "var m:XMLList = myXML.*;\r\n",
                  false);
     }
 }

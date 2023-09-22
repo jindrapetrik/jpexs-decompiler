@@ -33,6 +33,7 @@ All notable changes to this project will be documented in this file.
 - [#2077] AS3 recursion of deleting method with newfunction instruction
 - [#2077] AS3 direct editation - incorrect slot names
 - [#2077] AS3 direct editation - switch statement missing offset
+- [#2077] AS3 allow star string as property name (XML access)
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 

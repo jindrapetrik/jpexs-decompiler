@@ -135,7 +135,12 @@ public class FullMultinameAVM2Item extends AVM2Item {
             AVM2ConstantPool constants = localData.constantsAvm2;
             List<DottedChain> fullyQualifiedNames = property ? new ArrayList<>() : localData.fullyQualifiedNames;
             if (multinameIndex > 0 && multinameIndex < constants.getMultinameCount()) {
-                writer.append(constants.getMultiname(multinameIndex).getNameWithCustomNamespace(localData.abc, fullyQualifiedNames, false, true));
+                String simpleName = constants.getMultiname(multinameIndex).getName(constants, fullyQualifiedNames, true, false);
+                if ("*".equals(simpleName)) {
+                    writer.append("*");
+                } else {
+                    writer.append(constants.getMultiname(multinameIndex).getNameWithCustomNamespace(localData.abc, fullyQualifiedNames, false, true));
+                }
             } else {
                 writer.append("§§multiname(").append(multinameIndex).append(")");
             }

@@ -51,6 +51,9 @@ package tests
                             </{xtagb}>
                         </{xtaga}>			
                         ; //intentionally on new line
+                        
+                        
+            var m:XMLList = myXML.*;                        
 		}
 		
 	}

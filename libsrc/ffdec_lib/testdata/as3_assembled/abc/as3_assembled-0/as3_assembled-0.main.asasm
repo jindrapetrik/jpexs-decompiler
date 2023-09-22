@@ -33,5 +33,6 @@ program
  #include "tests/TestSwapAssignment.script.asasm"
  #include "tests/TestMutatingSwitch.script.asasm"
  #include "tests/TestSwitchMostCommon.script.asasm"
+ #include "tests/TestXmlStar.script.asasm"
  ; place to add next
 end ; program

@@ -1,0 +1,69 @@
+class
+ refid "tests:TestXmlStar"
+ instance QName(PackageNamespace("tests"), "TestXmlStar")
+  extends QName(PackageNamespace(""), "Object")
+  flag SEALED
+  flag PROTECTEDNS
+  protectedns ProtectedNamespace("tests:TestXmlStar")
+  iinit
+   refid "tests:TestXmlStar/instance/init"
+   body
+    maxstack 1
+    localcount 1
+    initscopedepth 4
+    maxscopedepth 5
+    code
+     getlocal0
+     pushscope
+
+     getlocal0
+     constructsuper      0
+
+     returnvoid
+    end ; code
+   end ; body
+  end ; method
+  trait method QName(PackageNamespace(""), "run")
+   method
+    refid "tests:TestXmlStar/instance/run"
+    returns QName(PackageNamespace(""), "void")
+    body
+     maxstack 2
+     localcount 4
+     initscopedepth 4
+     maxscopedepth 5
+     code
+      getlocal0
+      pushscope        
+            getlex QName(PackageNamespace(""),"XML")
+            pushstring "<a>\r\n            <b>xxx</b>\r\n            <b>yyy</b>\r\n          </a>"
+            construct 1
+            coerce QName(PackageNamespace(""),"XML")
+            setlocal1
+            getlocal1
+            getproperty Multiname("b",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageInternalNs(""),PrivateNamespace("Run"),ProtectedNamespace("Run"),StaticProtectedNs("Run"),PrivateNamespace("Run.as$0")])
+            getproperty Multiname("*",[PackageNamespace(""),Namespace("http://adobe.com/AS3/2006/builtin"),PackageInternalNs(""),PrivateNamespace("Run"),ProtectedNamespace("Run"),StaticProtectedNs("Run"),PrivateNamespace("Run.as$0")])
+            setlocal2    
+      
+      returnvoid
+     end ; code
+    end ; body
+   end ; method
+  end ; trait
+ end ; instance
+ cinit
+  refid "tests:TestXmlStar/class/init"
+  body
+   maxstack 1
+   localcount 1
+   initscopedepth 3
+   maxscopedepth 4
+   code
+    getlocal0
+    pushscope
+
+    returnvoid
+   end ; code
+  end ; body
+ end ; method
+end ; class

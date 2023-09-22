@@ -2178,6 +2178,7 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "var xattrval:String = null;\r\n"
                 + "var xcontent:String = null;\r\n"
                 + "var xxx:XML = null;\r\n"
+                + "var m:XMLList = null;\r\n"
                 + "var name:String = \"ahoj\";\r\n"
                 + "var myXML:XML = <order id=\"604\">\r\n"
                 + "<book isbn=\"12345\">\r\n"
@@ -2314,7 +2315,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "-->\r\n"
                 + "</ul>\r\n"
                 + "</{xtagb}>\r\n"
-                + "</{xtaga}>;\r\n",
+                + "</{xtaga}>;\r\n"
+                + "m = myXML.*;\r\n",
                  false);
     }
 }
