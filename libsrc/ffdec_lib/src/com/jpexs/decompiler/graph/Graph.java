@@ -124,66 +124,71 @@ public class Graph {
         for (GraphPart head : heads) {
             time = head.setTime(time, ordered, visited);
             head.setNumblocks(1);
-        }        
+        }
     }
-    
+
     /**
-     * Calculates time of closing the node.
-     * The node is closed when all its input edges are already visited
-     * (not counting back edges), then all its output edges are processed.     
-     * 
-     * This time is useful when sorting nodes according their occurence 
-     * in getMostCommonPart method - used for switch detection
-     * 
+     * Calculates time of closing the node. The node is closed when all its
+     * input edges are already visited (not counting back edges), then all its
+     * output edges are processed.
+     *
+     * This time is useful when sorting nodes according their occurence in
+     * getMostCommonPart method - used for switch detection
+     *
      * @param loops Already calculated loops to get backedges from.
      */
     private void calculateClosedTime(List<Loop> loops) {
         ArrayDeque<GraphPart> openedNodes = new ArrayDeque<>();
         Set<GraphPart> closedNodes = new HashSet<>();
         Set<LevelMapEdge> visitedEdges = new HashSet<>();
-        openedNodes.addAll(heads);
-        for(GraphPart h:heads) {
-            for (GraphPart r:h.refs) {
+        for (GraphPart h : heads) {
+            for (GraphPart r : h.refs) {
                 visitedEdges.add(new LevelMapEdge(r, h));
             }
         }
-        for (Loop el:loops) {
-            for (GraphPart be:el.backEdges) {
+        for (Loop el : loops) {
+            for (GraphPart be : el.backEdges) {
                 visitedEdges.add(new LevelMapEdge(be, el.loopContinue));
             }
         }
-        
+
         int closedTime = 1;
-        
-        loopopened: while (!openedNodes.isEmpty()) {
-            GraphPart part = openedNodes.remove();        
-            if (closedNodes.contains(part)) {
-                continue;
-            }
-            for (GraphPart r:part.refs) {
-                if (!visitedEdges.contains(new LevelMapEdge(r, part))) {
-                    continue loopopened;
+
+        for (GraphPart h : heads) {
+            openedNodes.add(h);
+
+            loopopened:
+            while (!openedNodes.isEmpty()) {
+                GraphPart part = openedNodes.remove();
+                if (closedNodes.contains(part)) {
+                    continue;
                 }
+                for (GraphPart r : part.refs) {
+                    if (!visitedEdges.contains(new LevelMapEdge(r, part))) {
+                        continue loopopened;
+                    }
+                }
+                for (GraphPart n : part.nextParts) {
+                    openedNodes.add(n);
+                    visitedEdges.add(new LevelMapEdge(part, n));
+                }
+                closedNodes.add(part);
+                part.closedTime = closedTime++;
+                //System.err.println("part " + part + " closedTime: " + part.closedTime);
             }
-            for (GraphPart n:part.nextParts) {
-                openedNodes.add(n);
-                visitedEdges.add(new LevelMapEdge(part, n));
-            }
-            closedNodes.add(part);
-            part.closedTime = closedTime++;
-            //System.err.println("part "+part+" closedTime: "+part.closedTime);
         }
-        
+
     }
-    
+
     private class LevelMapEdge {
+
         public GraphPart from;
         public GraphPart to;
 
         public LevelMapEdge(GraphPart from, GraphPart to) {
             this.from = from;
             this.to = to;
-        }                
+        }
 
         @Override
         public int hashCode() {
@@ -211,7 +216,7 @@ public class Graph {
                 return false;
             }
             return this.to == other.to;
-        }                
+        }
     }
 
     public List<GraphException> getExceptions() {
@@ -491,7 +496,7 @@ public class Graph {
             }
         };
         Set<PartCommon> commonSet = new TreeSet<>();
-        
+
         for (GraphPart r : allReachable) {
             if (loopContinues.contains(r)) {
                 continue;
@@ -623,7 +628,7 @@ public class Graph {
         return null;
     }
 
-    private class PartCommon  implements Comparable<PartCommon> {
+    private class PartCommon implements Comparable<PartCommon> {
 
         public GraphPart part;
         public int level;
@@ -644,7 +649,7 @@ public class Graph {
 
         @Override
         public String toString() {
-            return "" + part.toString() + " (level=" + level;
+            return "" + part.toString() + " (level=" + level + ")";
         }
 
         @Override
