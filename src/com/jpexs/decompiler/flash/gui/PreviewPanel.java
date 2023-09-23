@@ -1438,6 +1438,7 @@ public class PreviewPanel extends JPersistentSplitPane implements TagEditorPanel
     }
 
     public void showEmpty() {
+        setParametersPanelVisible(false);
         showCardLeft(EMPTY_CARD);
     }
 
