@@ -502,14 +502,16 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
 
             if (Configuration.getPlayerSWC() != null) {
                 SWC swc = new SWC(new FileInputStream(Configuration.getPlayerSWC()));
-                SWF swf = new SWF(swc.getOpenable("library.swf"), true);
+                //set allowRenameIdentifiers parameter to FALSE otherwise there will be an infinite loop
+                SWF swf = new SWF(swc.getOpenable("library.swf"), null, null, null, true, false, true, null, Charset.defaultCharset().name(), false);
                 playerGlobalAbcIndex = new AbcIndexing(swf);
             }
         }
         if (airGlobalAbcIndex == null) {
             if (Configuration.getAirSWC() != null) {
                 SWC swc = new SWC(new FileInputStream(Configuration.getAirSWC()));
-                SWF swf = new SWF(swc.getOpenable("library.swf"), true);
+                //set allowRenameIdentifiers to FALSE
+                SWF swf = new SWF(swc.getOpenable("library.swf"), null, null, null, true, false, true, null, Charset.defaultCharset().name(), false);
                 airGlobalAbcIndex = new AbcIndexing(swf);
             }
         }
@@ -1452,17 +1454,20 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     }
 
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, String charset) throws IOException, InterruptedException {
-        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, null, charset);
+        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, null, charset, true);
     }
 
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy) throws IOException, InterruptedException {
-        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, null, Charset.defaultCharset().name());
+        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, null, Charset.defaultCharset().name(), true);
     }
 
     public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver) throws IOException, InterruptedException {
-        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, resolver, Charset.defaultCharset().name());
+        this(is, file, fileTitle, listener, parallelRead, checkOnly, lazy, resolver, Charset.defaultCharset().name(), true);
     }
 
+    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver, String charset) throws IOException, InterruptedException {
+        this(is, file, fileTitle, listener, parallelRead,checkOnly, lazy, resolver, charset, true);
+    }    
     /**
      * Construct SWF from stream
      *
@@ -1474,10 +1479,12 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
      * @param checkOnly Check only file validity
      * @param lazy
      * @param resolver Resolver for imported tags
+     * @param charset Character set for all texts (for older SWF versions)
+     * @param allowRenameIdentifiers Allow auto renaming identifiers when enabled
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver, String charset) throws IOException, InterruptedException {
+    public SWF(InputStream is, String file, String fileTitle, ProgressListener listener, boolean parallelRead, boolean checkOnly, boolean lazy, UrlResolver resolver, String charset, boolean allowRenameIdentifiers) throws IOException, InterruptedException {
         this.file = file;
         this.fileTitle = fileTitle;
         this.charset = charset;
@@ -1538,7 +1545,7 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
             }
         }
 
-        if (Configuration.autoRenameIdentifiers.get()) {
+        if (allowRenameIdentifiers && Configuration.autoRenameIdentifiers.get()) {
             deobfuscateIdentifiers(RenameType.TYPENUMBER);
             AbcMultiNameCollisionFixer collisionFixer = new AbcMultiNameCollisionFixer();
             collisionFixer.fixCollisions(this);
