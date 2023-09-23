@@ -32,9 +32,29 @@ package embed_attributes
         [Embed(source="../../assets/sound.mp3")] 
         public var soundClass:Class; 
         
-        //not supported in Flex, AIR only
-        [Embed(source="../../assets/font.ttf", fontFamily="Great Vibes", fontWeight= "normal", fontStyle = "normal", mimeType="application/x-font-truetype")]
+        [Embed(
+          source="../../assets/font.ttf",
+          fontFamily="Great Vibes",
+          fontWeight="normal",
+          fontStyle="normal",
+          mimeType="application/x-font-truetype",
+          unicodeRange="U+0020,U+0041-005A", 
+      	  advancedAntiAliasing="true",
+          embedAsCFF="false"
+          )]
         public var fontClass:Class;
+        
+        [Embed(
+          source="../../assets/font.ttf",
+          fontFamily="Great Vibes",
+          fontWeight="normal",
+          fontStyle="normal",
+          mimeType="application/x-font-truetype",
+          unicodeRange="U+0030-0039,U+002E", 
+      	  advancedAntiAliasing="true",
+          embedAsCFF="true"
+          )]
+        public var fontClassCFF:Class;
                 
         [Embed(source="../../assets/data.bin", mimeType="application/octet-stream")] 
         public var binaryDataClass:Class; 

@@ -8,11 +8,11 @@ package embed_classes
     fontWeight="normal",
     fontStyle="normal",
     mimeType="application/x-font-truetype",
-    unicodeRange="U+0020,U+0041-005A", 
+    unicodeRange="U+0030-0039,U+002E", 
 	advancedAntiAliasing="true",
-    embedAsCFF="false"
+    embedAsCFF="true"
     )]
-    public class TestFont extends Font
+    public class TestFontCFF extends Font
     {
     } 
 }

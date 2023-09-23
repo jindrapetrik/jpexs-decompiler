@@ -11,7 +11,8 @@ package
     public class MainClassesFlex extends Sprite
     {                
         TestBinaryData;
-        //TestFont;
+        TestFont;
+        //TestFontCFF;
         TestImage;
         TestImageGrid;
         TestImageSvg;
