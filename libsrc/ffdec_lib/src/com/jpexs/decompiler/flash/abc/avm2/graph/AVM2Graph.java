@@ -101,6 +101,7 @@ import com.jpexs.decompiler.graph.model.AnyItem;
 import com.jpexs.decompiler.graph.model.BreakItem;
 import com.jpexs.decompiler.graph.model.CommaExpressionItem;
 import com.jpexs.decompiler.graph.model.ContinueItem;
+import com.jpexs.decompiler.graph.model.DoWhileItem;
 import com.jpexs.decompiler.graph.model.ExitItem;
 import com.jpexs.decompiler.graph.model.FalseItem;
 import com.jpexs.decompiler.graph.model.GotoItem;
@@ -934,6 +935,17 @@ public class AVM2Graph extends Graph {
         }
     }
 
+    private GraphPart findNearestPartOutsideCatch(GraphPart tryTarget, Set<GraphPart> catchParts) {
+        for (GraphPart p : catchParts) {
+            for (GraphPart n : p.nextParts) {
+                if (!catchParts.contains(n)) {
+                    return n;
+                }
+            }
+        }
+        return null;
+    }
+
     private boolean checkTry(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, AVM2LocalData localData, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, Set<GraphPart> allParts, TranslateStack stack, int staticOperation, String path, int recursionLevel) throws InterruptedException {
         if (localData.parsedExceptions == null) {
             localData.parsedExceptions = new ArrayList<>();
@@ -1019,6 +1031,34 @@ public class AVM2Graph extends Graph {
                 //we need to search a part which is first outside the try..block
                 afterPart = searchFirstPartOutSideTryCatch(localData, catchedExceptions.get(0), loops, allParts);
                 //System.err.println("oursidetrycatch: " + afterPart);
+            }
+
+            //List<GraphPart> catchedExceptionsAfter = new ArrayList<>();
+            
+            List<GraphPart> catchAfterParts = new ArrayList<>();
+                
+            if (afterPart == null) {
+
+                loope:
+                for (int e = 0; e < catchedExceptions.size(); e++) {
+                    ABCException ex = catchedExceptions.get(e);
+                    int eId = catchedExceptionIds.get(e);
+                    for (ThrowState ts : throwStates) {
+                        if (ts.exceptionId == eId) {
+                            GraphPart possibleAfter = findNearestPartOutsideCatch(ts.targetPart, ts.catchParts);
+                            if (possibleAfter != null) {
+                                if (!stopPart.contains(possibleAfter)) {
+                                    catchAfterParts.add(possibleAfter);
+                                }
+                            }                            
+                        }
+                    }
+                }
+                if (catchAfterParts.size() == 1) {
+                    afterPart = catchAfterParts.iterator().next();
+                } else if (catchAfterParts.size() > 1) {
+                    afterPart = getMostCommonPart(localData, catchAfterParts, loops, throwStates, stopPart);
+                }
             }
 
             GraphPart exAfterPart = afterPart;
@@ -1193,6 +1233,11 @@ public class AVM2Graph extends Graph {
                 stopPart2.add(exAfterPart);
                 if (defaultPart != null) {
                     stopPart2.add(defaultPart);
+                    stopPartKind2.add(StopPartKind.OTHER);
+                }
+                
+                for (GraphPart p:catchAfterParts) {
+                    stopPart2.add(p);
                     stopPartKind2.add(StopPartKind.OTHER);
                 }
 
@@ -1422,13 +1467,30 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected boolean checkPartOutput(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, Loop currentLoop, int staticOperation, String path, int recursionLevel) throws InterruptedException {
+    protected boolean checkPartOutput(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos,
+             Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos,
+             Set<GraphPart> visited, GraphSource code,
+             BaseLocalData localData, Set<GraphPart> allParts,
+             TranslateStack stack, GraphPart parent,
+             GraphPart part, List<GraphPart> stopPart,
+             List<StopPartKind> stopPartKind, List<Loop> loops,
+             List<ThrowState> throwStates, Loop currentLoop,
+             int staticOperation, String path,
+             int recursionLevel) throws InterruptedException {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         return checkTry(currentRet, foundGotos, partCodes, partCodePos, visited, aLocalData, part, stopPart, stopPartKind, loops, throwStates, allParts, stack, staticOperation, path, recursionLevel);
     }
 
     @Override
-    protected List<GraphTargetItem> check(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos, Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos, Set<GraphPart> visited, GraphSource code, BaseLocalData localData, Set<GraphPart> allParts, TranslateStack stack, GraphPart parent, GraphPart part, List<GraphPart> stopPart, List<StopPartKind> stopPartKind, List<Loop> loops, List<ThrowState> throwStates, List<GraphTargetItem> output, Loop currentLoop, int staticOperation, String path) throws InterruptedException {
+    protected List<GraphTargetItem> check(List<GraphTargetItem> currentRet, List<GotoItem> foundGotos,
+             Map<GraphPart, List<GraphTargetItem>> partCodes, Map<GraphPart, Integer> partCodePos,
+             Set<GraphPart> visited, GraphSource code,
+             BaseLocalData localData, Set<GraphPart> allParts,
+             TranslateStack stack, GraphPart parent,
+             GraphPart part, List<GraphPart> stopPart,
+             List<StopPartKind> stopPartKind, List<Loop> loops,
+             List<ThrowState> throwStates, List<GraphTargetItem> output,
+             Loop currentLoop, int staticOperation, String path) throws InterruptedException {
         List<GraphTargetItem> ret = null;
 
         /*if (ret != null) {
@@ -1557,7 +1619,10 @@ public class AVM2Graph extends Graph {
     }
 
     @Override
-    protected GraphPart checkPartWithOutput(List<GraphTargetItem> output, TranslateStack stack, BaseLocalData localData, GraphPart prev, GraphPart part, Set<GraphPart> allParts) {
+    protected GraphPart checkPartWithOutput(List<GraphTargetItem> output, TranslateStack stack,
+             BaseLocalData localData, GraphPart prev,
+             GraphPart part, Set<GraphPart> allParts
+    ) {
         AVM2LocalData aLocalData = (AVM2LocalData) localData;
         if (aLocalData.finallyJumps == null) {
             aLocalData.finallyJumps = new HashMap<>();
@@ -1986,6 +2051,45 @@ public class AVM2Graph extends Graph {
     protected void finalProcessAfter(List<GraphTargetItem> list, int level, FinalProcessLocalData localData, String path) {
         super.finalProcessAfter(list, level, localData, path);
         for (int i = 0; i < list.size(); i++) {
+            
+            //Remove continues from all branches of try...catch block if its continue to parent loop
+            if (list.get(i) instanceof LoopItem) {
+                LoopItem li = (LoopItem) list.get(i);
+                if (li.hasBaseBody()) {
+                    List<GraphTargetItem> loopCommands = li.getBaseBodyCommands();
+                    if (!loopCommands.isEmpty()) {
+                        if (loopCommands.get(loopCommands.size() - 1) instanceof TryAVM2Item) {
+                            TryAVM2Item ta = (TryAVM2Item) loopCommands.get(loopCommands.size() - 1);
+                            for (List<GraphTargetItem> cc : ta.catchCommands) {
+                                if (!cc.isEmpty()) {
+                                    if (cc.get(cc.size() - 1) instanceof ContinueItem) {
+                                        ContinueItem ci = (ContinueItem) cc.get(cc.size() - 1);
+                                        if (ci.loopId == li.loop.id) {
+                                            cc.remove(cc.size() - 1);
+                                        }
+                                    }
+                                }
+                            }
+                            if (!ta.tryCommands.isEmpty()) {
+                                if (ta.tryCommands.get(ta.tryCommands.size() - 1) instanceof ContinueItem) {
+                                    ContinueItem ci = (ContinueItem) ta.tryCommands.get(ta.tryCommands.size() - 1);
+                                    if (ci.loopId == li.loop.id) {
+                                        ta.tryCommands.remove(ta.tryCommands.size() - 1);
+                                    }
+                                }
+                            }
+                            if (!ta.finallyCommands.isEmpty()) {
+                                if (ta.finallyCommands.get(ta.finallyCommands.size() - 1) instanceof ContinueItem) {
+                                    ContinueItem ci = (ContinueItem) ta.finallyCommands.get(ta.finallyCommands.size() - 1);
+                                    if (ci.loopId == li.loop.id) {
+                                        ta.finallyCommands.remove(ta.finallyCommands.size() - 1);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             if (list.get(i) instanceof SetTypeAVM2Item) {
                 if (((SetTypeAVM2Item) list.get(i)).getValue().getThroughDuplicate() instanceof ExceptionAVM2Item) {
 
@@ -2319,12 +2423,12 @@ public class AVM2Graph extends Graph {
                                                 }
                                             }
                                         }
-                                        
+
                                         if (isSetLocUsage) {
                                             nextReferencedRegisters.add(regIndex);
                                             foundGetLoc = true;
                                             return;
-                                        }                                        
+                                        }
                                     }
                                 }
                             }
@@ -2440,7 +2544,7 @@ public class AVM2Graph extends Graph {
 
         List<ThrowState> ret = new ArrayList<>();
         for (int e = 0; e < body.exceptions.length; e++) {
-            ThrowState ts = new ThrowState();
+            ThrowState ts = new ThrowState();            
             ts.exceptionId = e;
             ts.state = 0;
             ts.targetPart = searchPart(code.adr2pos(body.exceptions[e].target), allParts);
@@ -2477,7 +2581,7 @@ public class AVM2Graph extends Graph {
             //Search all parts which have same or greater scope level, these all belong to catch
             Set<GraphPart> catchParts = new HashSet<>();
             if (scopePos > -1) {
-                walkCatchParts(avm2LocalData.codeStats, part, ip, catchParts, scopePos);
+                walkCatchParts(avm2LocalData.codeStats, part, ip, catchParts, scopePos, allParts, body.exceptions[e].isFinally());
             } else {
                 logger.fine("No newcatch..pushscope found in catch, probably swftools");
                 part = ts.targetPart;
@@ -2546,18 +2650,71 @@ public class AVM2Graph extends Graph {
         }
     }
 
-    private void walkCatchParts(CodeStats stats, GraphPart part, int startIp, Set<GraphPart> catchParts, int scopePos) {
+        private void walkCatchParts(CodeStats stats, GraphPart part, int startIp, Set<GraphPart> catchParts, int scopePos, Set<GraphPart> allParts, boolean isFinally) {
         if (catchParts.contains(part)) {
             return;
         }
-        catchParts.add(part);
         for (int ip = startIp; ip <= part.end; ip++) {
             if (stats.instructionStats[ip].scopepos_after < scopePos) {
+                
+                //popscope can be followed by jump (break/continue),
+                //in such case, treat as single block
+                if (ip >= 0 && ip < code.size()) {
+                    boolean onlyKillJump = true;
+                    for (int j = ip + 1; j <= part.end; j++) {
+                        AVM2Instruction ins = (AVM2Instruction) code.get(j);
+                        if (ins.definition instanceof KillIns) {
+                            continue;
+                        }
+                        if (ins.definition instanceof JumpIns) {
+                            continue;
+                        }
+                        if (ins.definition instanceof DebugLineIns) {
+                            continue;
+                        }
+                        onlyKillJump = false;
+                        break;
+                    }
+                    if (onlyKillJump) {
+                        catchParts.add(part);
+                        return;                        
+                    }
+                }
+                if (ip < part.end && !isFinally) {
+                    //split part into half
+                    GraphPart secondPart = new GraphPart(ip + 1, part.end);
+                    part.end = ip;                    
+                    for (GraphPart n : part.nextParts) {
+                        n.refs.remove(part);
+                        n.refs.add(secondPart);
+                    }                  
+                    secondPart.nextParts.addAll(part.nextParts);
+                    part.nextParts.clear();
+                    part.nextParts.add(secondPart);
+                    secondPart.refs.add(part);
+                    
+                    secondPart.type = GraphPart.TYPE_NONE;
+                    secondPart.discoveredTime = part.discoveredTime;
+                    secondPart.closedTime = part.closedTime;
+                    secondPart.finishedTime = part.finishedTime;
+                    secondPart.iloop_header = part.iloop_header;
+                    secondPart.irreducible = part.irreducible;
+                    secondPart.level = part.level;
+                    secondPart.numBlocks = part.numBlocks;
+                    secondPart.order = part.order;
+                    secondPart.path = part.path;
+                    secondPart.posX = part.posX;
+                    secondPart.posY = part.posY;
+                    secondPart.traversed = true;  
+                    allParts.add(secondPart);
+                }
+                catchParts.add(part);
                 return;
             }
         }
+        catchParts.add(part);
         for (GraphPart n : part.nextParts) {
-            walkCatchParts(stats, n, n.start, catchParts, scopePos);
+            walkCatchParts(stats, n, n.start, catchParts, scopePos, allParts, isFinally);
         }
     }
 

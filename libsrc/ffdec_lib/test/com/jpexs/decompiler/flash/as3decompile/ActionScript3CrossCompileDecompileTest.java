@@ -155,11 +155,9 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "}\r\n"
                 + "catch(e:EOFError)\r\n"
                 + "{\r\n"
-                + "continue;\r\n"
                 + "}\r\n"
                 + "catch(e:Error)\r\n"
                 + "{\r\n"
-                + "continue;\r\n"
                 + "}\r\n"
                 + "}\r\n",
                  false);
@@ -216,8 +214,8 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "catch(e:Error)\r\n"
                 + "{\r\n"
                 + "trace(\"in catch\");\r\n"
-                + "a++;\r\n"
                 + "}\r\n"
+                + "a++;\r\n"
                 + "}\r\n"
                 + "return \"OK\";\r\n",
                  false);
@@ -242,8 +240,8 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "catch(e:Error)\r\n"
                 + "{\r\n"
                 + "trace(\"in catch2\");\r\n"
-                + "trace(\"a=\" + a);\r\n"
                 + "}\r\n"
+                + "trace(\"a=\" + a);\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
                  false);
@@ -342,8 +340,8 @@ public class ActionScript3CrossCompileDecompileTest extends ActionScript3Decompi
                 + "catch(e:Error)\r\n"
                 + "{\r\n"
                 + "trace(\"in catch\");\r\n"
-                + "trace(\"a=\" + a);\r\n"
                 + "}\r\n"
+                + "trace(\"a=\" + a);\r\n"
                 + "}\r\n"
                 + "trace(\"after\");\r\n",
                  false);

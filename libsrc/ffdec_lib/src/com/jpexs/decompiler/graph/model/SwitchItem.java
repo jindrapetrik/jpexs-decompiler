@@ -175,4 +175,14 @@ public class SwitchItem extends LoopItem implements Block {
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     }
+
+    @Override
+    public boolean hasBaseBody() {
+        return false;
+    }
+
+    @Override
+    public List<GraphTargetItem> getBaseBodyCommands() {
+        return null;
+    }
 }
