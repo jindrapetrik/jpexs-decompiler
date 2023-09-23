@@ -12,6 +12,7 @@ package
     {                
         TestBinaryData;
         TestFont;
+        TestFontCFF;
         TestImage;
         TestImageGrid;
         //TestImageSvg;
