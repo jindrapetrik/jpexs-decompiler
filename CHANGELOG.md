@@ -38,6 +38,7 @@ All notable changes to this project will be documented in this file.
 - AS3 try..catch inside loop unneccessary continue
 - [#2077] AS3 colliding types in current package with trait names
 - NullPointer on reload / uncache
+- [#2076] Auto rename identifiers infinite loop caused by renaming in playerglobal library
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 
@@ -3093,6 +3094,7 @@ Major version of SWF to XML export changed to 2.
 [#2072]: https://www.free-decompiler.com/flash/issues/2072
 [#2029]: https://www.free-decompiler.com/flash/issues/2029
 [#2077]: https://www.free-decompiler.com/flash/issues/2077
+[#2076]: https://www.free-decompiler.com/flash/issues/2076
 [#1998]: https://www.free-decompiler.com/flash/issues/1998
 [#2038]: https://www.free-decompiler.com/flash/issues/2038
 [#2028]: https://www.free-decompiler.com/flash/issues/2028
