@@ -37,6 +37,7 @@ All notable changes to this project will be documented in this file.
 - [#2077] AS3 try..catch parts outside block
 - AS3 try..catch inside loop unneccessary continue
 - [#2077] AS3 colliding types in current package with trait names
+- NullPointer on reload / uncache
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 
