@@ -530,4 +530,32 @@ public class ActionScript3ClassTest extends ActionScript3DecompileTestBase {
                 + "   }\n"
                 + "}");
     }
+
+    @Test
+    public void testCollidingTraitNames() {
+        decompileScriptPack("standard", "tests_classes.TestCollidingTraitNames", "package tests_classes\n"
+                + "{\n"
+                + "   public class TestCollidingTraitNames extends CollidingAttributeParent\n"
+                + "   {\n"
+                + "       \n"
+                + "      \n"
+                + "      public var CollidingAttribute:tests_classes.CollidingAttribute;\n"
+                + "      \n"
+                + "      public function TestCollidingTraitNames()\n"
+                + "      {\n"
+                + "         super();\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function test() : void\n"
+                + "      {\n"
+                + "         var t:tests_classes.CollidingAttribute2 = null;\n"
+                + "      }\n"
+                + "      \n"
+                + "      public function CollidingMethod() : void\n"
+                + "      {\n"
+                + "         var t:tests_classes.CollidingMethod = null;\n"
+                + "      }\n"
+                + "   }\n"
+                + "}");
+    }
 }

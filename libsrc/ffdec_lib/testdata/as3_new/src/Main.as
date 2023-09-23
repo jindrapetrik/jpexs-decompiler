@@ -23,7 +23,8 @@ package
         TestCatchFinally;
         TestChain2;
         TestChainedAssignments;
-        TestCollidingTry;
+        TestCollidingTraitNames;
+        TestCollidingTry;        
         TestComplexExpressions;
         TestContinueLevels;
         TestConvert;        
