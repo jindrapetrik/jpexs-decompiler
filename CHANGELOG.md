@@ -40,6 +40,7 @@ All notable changes to this project will be documented in this file.
 - [#2077] AS3 colliding types in current package with trait names
 - NullPointer on reload / uncache
 - [#2076] Auto rename identifiers infinite loop caused by renaming in playerglobal library
+- Not working "Show in Projector" button for DefineFont4 (hide)
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 

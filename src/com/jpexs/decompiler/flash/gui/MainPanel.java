@@ -141,6 +141,7 @@ import com.jpexs.decompiler.flash.tags.DefineBitsJPEG4Tag;
 import com.jpexs.decompiler.flash.tags.DefineBitsTag;
 import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
 import com.jpexs.decompiler.flash.tags.DefineButtonTag;
+import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
 import com.jpexs.decompiler.flash.tags.DefineShape2Tag;
 import com.jpexs.decompiler.flash.tags.DefineSoundTag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
@@ -4984,7 +4985,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             previewPanel.showFontPanel((FontTag) treeItem);
         } else if ((treeItem instanceof TextTag) && internalViewer) {
             previewPanel.showTextPanel((TextTag) treeItem);
-        } else if ((treeItem instanceof Frame) || (treeItem instanceof CharacterTag) || (treeItem instanceof FontTag) || (treeItem instanceof SoundStreamHeadTypeTag)) {
+        } else if ((!(treeItem instanceof DefineFont4Tag)) && ((treeItem instanceof Frame) || (treeItem instanceof CharacterTag) || (treeItem instanceof FontTag) || (treeItem instanceof SoundStreamHeadTypeTag))) {
             previewPanel.createAndShowTempSwf(treeItem);
 
             if (treeItem instanceof TextTag) {
