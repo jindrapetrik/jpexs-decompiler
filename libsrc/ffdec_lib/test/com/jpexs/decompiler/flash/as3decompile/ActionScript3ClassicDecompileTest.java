@@ -1883,8 +1883,8 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "}\r\n"
                 + "catch(e:Error)\r\n"
                 + "{\r\n"
-                + "return 4;\r\n"
-                + "}\r\n",
+                + "}\r\n"
+                + "return 4;\r\n",
                  false);
     }
 
@@ -2128,11 +2128,9 @@ public class ActionScript3ClassicDecompileTest extends ActionScript3DecompileTes
                 + "}\r\n"
                 + "catch(e:EOFError)\r\n"
                 + "{\r\n"
-                + "continue;\r\n"
                 + "}\r\n"
                 + "catch(e:Error)\r\n"
                 + "{\r\n"
-                + "continue;\r\n"
                 + "}\r\n"
                 + "}\r\n",
                  false);

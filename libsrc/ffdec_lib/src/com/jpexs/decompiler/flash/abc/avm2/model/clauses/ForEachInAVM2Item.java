@@ -166,4 +166,14 @@ public class ForEachInAVM2Item extends LoopItem implements Block {
     public List<GraphSourceItem> toSource(SourceGeneratorLocalData localData, SourceGenerator generator) throws CompilationException {
         return ((AVM2SourceGenerator) generator).generate(localData, this);
     }
+
+    @Override
+    public boolean hasBaseBody() {
+        return true;
+    }
+
+    @Override
+    public List<GraphTargetItem> getBaseBodyCommands() {
+        return commands;
+    }
 }

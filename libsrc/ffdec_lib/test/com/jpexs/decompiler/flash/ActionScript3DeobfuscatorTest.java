@@ -64,6 +64,7 @@ public class ActionScript3DeobfuscatorTest extends ActionScriptTestBase {
         Configuration.decompilationTimeoutSingleMethod.set(Integer.MAX_VALUE);
         Configuration.padAs3PCodeInstructionName.set(false);
         Configuration.useOldStyleGetSetLocalsAs3PCode.set(false);
+        Configuration.labelOnSeparateLineAs3PCode.set(true);
         swf = new SWF(new BufferedInputStream(new FileInputStream("testdata/as3/as3.swf")), false);
     }
 

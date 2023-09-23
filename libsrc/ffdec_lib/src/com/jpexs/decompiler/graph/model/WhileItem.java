@@ -150,4 +150,14 @@ public class WhileItem extends LoopItem implements Block {
     public GraphTargetItem returnType() {
         return TypeItem.UNBOUNDED;
     }
+
+    @Override
+    public boolean hasBaseBody() {
+        return true;
+    }
+
+    @Override
+    public List<GraphTargetItem> getBaseBodyCommands() {
+        return commands;
+    }
 }

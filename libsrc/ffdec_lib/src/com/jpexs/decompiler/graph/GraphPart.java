@@ -64,9 +64,7 @@ public class GraphPart implements Serializable {
     public List<GraphPart> refs = new ArrayList<>();
 
     public boolean ignored = false;
-
-    public List<Object> forContinues = new ArrayList<>();
-
+    
     public int level;
 
     public int discoveredTime;

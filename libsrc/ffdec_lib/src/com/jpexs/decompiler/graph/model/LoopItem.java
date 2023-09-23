@@ -19,6 +19,7 @@ package com.jpexs.decompiler.graph.model;
 import com.jpexs.decompiler.graph.GraphSourceItem;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.Loop;
+import java.util.List;
 
 /**
  *
@@ -32,4 +33,8 @@ public abstract class LoopItem extends GraphTargetItem {
         super(src, lineStartItem, NOPRECEDENCE);
         this.loop = loop;
     }
+    
+    public abstract boolean hasBaseBody();
+    
+    public abstract List<GraphTargetItem> getBaseBodyCommands();
 }

@@ -643,6 +643,10 @@ public class Graph {
             int ret = o.level - level;
             if (ret == 0) {
                 ret = part.closedTime - o.part.closedTime;
+                
+                if (ret == 0) { //some nodes may be split in half and thus have same closedTime - like in try..catch
+                    return part.start - o.part.start;
+                }
             }
             return ret;
         }
