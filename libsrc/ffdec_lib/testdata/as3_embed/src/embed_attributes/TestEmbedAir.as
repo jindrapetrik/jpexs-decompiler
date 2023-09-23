@@ -54,7 +54,18 @@ package embed_attributes
       	  advancedAntiAliasing="true",
           embedAsCFF="true"
           )]
-        public var fontClassCFF:Class;
+        public var fontClassCffFromTtf:Class;
+        
+        [Embed(
+          source="../../assets/font.cff",
+          fontFamily="Great Vibes",
+          fontWeight="normal",
+          fontStyle="normal",
+          mimeType="application/x-font-truetype",          
+          embedAsCFF="true"
+          )]
+        public var fontClassCffFromCff:Class;
+        
                 
         [Embed(source="../../assets/data.bin", mimeType="application/octet-stream")] 
         public var binaryDataClass:Class; 
