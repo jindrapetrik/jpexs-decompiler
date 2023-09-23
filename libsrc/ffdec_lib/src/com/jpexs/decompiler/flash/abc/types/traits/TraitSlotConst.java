@@ -106,7 +106,7 @@ public class TraitSlotConst extends Trait implements TraitWithSlot {
             slotconst = "namespace";
         }
         writer.hilightSpecial(slotconst + " ", HighlightSpecialType.TRAIT_TYPE);
-        writer.hilightSpecial(getName(abc).getName(abc.constants, fullyQualifiedNames, false, true), HighlightSpecialType.TRAIT_NAME);
+        writer.hilightSpecial(getName(abc).getName(abc.constants, new ArrayList<>(), false, true), HighlightSpecialType.TRAIT_NAME);
         writer.hilightSpecial(typeStr, HighlightSpecialType.TRAIT_TYPE_NAME);
         return writer;
     }
