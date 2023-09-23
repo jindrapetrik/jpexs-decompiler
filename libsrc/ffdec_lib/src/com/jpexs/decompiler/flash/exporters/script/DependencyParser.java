@@ -186,6 +186,8 @@ public class DependencyParser {
                     } */         
                 }
                 for (int k = 0; k < ins.definition.operands.length; k++) {
+                    //this should probably handle only some subset of multiname instructions,
+                    // like findproperty, findpropstrict, constructprop, not simple getproperty
                     if (ins.definition.operands[k] == AVM2Code.DAT_MULTINAME_INDEX) {
                         int m = ins.operands[k];
                         if (m < abc.constants.getMultinameCount()) {
