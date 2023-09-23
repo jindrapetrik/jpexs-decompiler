@@ -39,6 +39,7 @@ import com.jpexs.decompiler.flash.search.MethodId;
 import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.ScopeStack;
+import com.jpexs.decompiler.graph.TypeItem;
 import com.jpexs.helpers.Helper;
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
@@ -193,7 +194,35 @@ public abstract class Trait implements Cloneable, Serializable {
         }
         return false;
     }
-        
+
+    private void getAllClassTraitNames(List<String> traitNamesInThisScript, AbcIndexing abcIndex, ABC abc, int classIndex, Integer scriptIndex, boolean isParent) {
+        boolean publicProtectedOnly = isParent;
+        for (Trait it : abc.instance_info.get(classIndex).instance_traits.traits) {            
+            if (publicProtectedOnly) {
+                Namespace ns = it.getName(abc).getNamespace(abc.constants);
+                if (ns.kind != Namespace.KIND_PACKAGE && ns.kind != Namespace.KIND_PROTECTED) {
+                    continue;
+                }
+            }
+            traitNamesInThisScript.add(it.getName(abc).getName(abc.constants, new ArrayList<>(), true, true));
+        }
+        for (Trait ct : abc.class_info.get(classIndex).static_traits.traits) {
+            if (publicProtectedOnly) {
+                Namespace ns = ct.getName(abc).getNamespace(abc.constants);
+                if (ns.kind != Namespace.KIND_PACKAGE && ns.kind != Namespace.KIND_STATIC_PROTECTED) {
+                    continue;
+                }
+            }
+            traitNamesInThisScript.add(ct.getName(abc).getName(abc.constants, new ArrayList<>(), true, true));        
+        }
+        if (abc.instance_info.get(classIndex).super_index == 0) {
+            return;
+        }
+        DottedChain fullClassName = abc.constants.getMultiname(abc.instance_info.get(classIndex).super_index).getNameWithNamespace(abc.constants, true);
+        AbcIndexing.ClassIndex ci = abcIndex.findClass(new TypeItem(fullClassName), abc, scriptIndex);
+        getAllClassTraitNames(traitNamesInThisScript, abcIndex, ci.abc, ci.index, ci.scriptIndex, true);        
+    }
+
     public void writeImports(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, ABC abc, GraphTextWriter writer, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
 
         List<String> namesInThisPackage = new ArrayList<>();
@@ -205,6 +234,15 @@ public abstract class Trait implements Cloneable, Serializable {
                         namesInThisPackage.add(classPath.className);
                     }
                 }
+            }
+        }
+
+        List<String> traitNamesInThisScript = new ArrayList<>();
+        for (Trait st : abc.script_info.get(scriptIndex).traits.traits) {
+            if (st instanceof TraitClass) {
+                getAllClassTraitNames(traitNamesInThisScript, abcIndex, abc, ((TraitClass) st).class_info, scriptIndex, false);
+            } else {
+                traitNamesInThisScript.add(st.getName(abc).getName(abc.constants, new ArrayList<>(), true, true));
             }
         }
 
@@ -226,8 +264,9 @@ public abstract class Trait implements Cloneable, Serializable {
 
         List<String> importnames = new ArrayList<>();
         importnames.addAll(namesInThisPackage);
+        importnames.addAll(traitNamesInThisScript);
         importnames.addAll(Arrays.asList(builtInClasses));
-        
+
         for (DottedChain imp : imports) {
             if (imp.getLast().equals("*")) {
                 Set<String> objectsInPkg = abcIndex.getPackageObjects(imp.getWithoutLast());
@@ -240,8 +279,7 @@ public abstract class Trait implements Cloneable, Serializable {
                 }
             }
         }
-        
-        
+
         for (int i = 0; i < imports.size(); i++) {
             DottedChain imp = imports.get(i);
             DottedChain pkg = imp.getWithoutLast();
@@ -255,24 +293,26 @@ public abstract class Trait implements Cloneable, Serializable {
                 i--;
             }
         }
-        
+
         for (int i = 0; i < imports.size(); i++) {
             DottedChain ipath = imports.get(i);
             String name = ipath.getLast();
-            if (ipath.getWithoutLast().equals(ignorePackage)) { //do not check classes from same package, they are imported automatically
+            if (ipath.getWithoutLast().equals(ignorePackage)) { //do not check classes from same package, they are imported automatically                
+                if (traitNamesInThisScript.contains(name)) {
+                    fullyQualifiedNames.add(DottedChain.parseWithSuffix(name));
+                }
+
                 imports.remove(i);
-                i--;                
+                i--;
                 continue;
             }
-            
+
             if (importnames.contains(name)) {
                 fullyQualifiedNames.add(DottedChain.parseWithSuffix(name));
             } else {
                 importnames.add(name);
             }
         }
-
-        
 
         boolean hasImport = false;
         Collections.sort(imports);
@@ -284,9 +324,9 @@ public abstract class Trait implements Cloneable, Serializable {
                     writer.appendNoHilight(imp.getWithoutLast().toPrintableString(true));
                     writer.appendNoHilight(".");
                 }
-                if ("*".equals(imp.getLast())){
+                if ("*".equals(imp.getLast())) {
                     writer.appendNoHilight("*");
-                }else{
+                } else {
                     writer.hilightSpecial(IdentifiersDeobfuscation.printIdentifier(true, imp.getLast()), HighlightSpecialType.TYPE_NAME, imp.toRawString());
                 }
                 writer.appendNoHilight(";").newLine();
@@ -370,7 +410,7 @@ public abstract class Trait implements Cloneable, Serializable {
             } else {
                 writer.appendNoHilight("static ");
             }
-        }        
+        }
         return writer;
     }
 
@@ -423,7 +463,7 @@ public abstract class Trait implements Cloneable, Serializable {
         }
         if ((kindFlags & ATTR_Metadata) > 0) {
             for (int m : metadata) {
-                writer.newLine();            
+                writer.newLine();
                 writer.append("metadata ");
                 writer.append("\"");
                 writer.append(Helper.escapePCodeString(abc.constants.getString(abc.metadata_info.get(m).name_index)));

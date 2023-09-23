@@ -91,7 +91,8 @@ public class DependencyParser {
             if (pkg.equals(InitVectorAVM2Item.VECTOR_PACKAGE)) { //special case - is imported always
                 return;
             }
-            if (!pkg.equals(ignorePackage)) {
+            //if (!pkg.equals(ignorePackage)) 
+            {
                 dependencies.add(dep);
             }
         }
