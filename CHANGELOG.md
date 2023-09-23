@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - [#2073] Editing of frame count in SWF header (with warning that it won't update ShowFrame count)
 - Show font AS linkage class in its name in the tree (besides font name)
 - [#2057] Show all assigned AS linkage classes in the item name (instead just one)
+- Exporting ByteArrayRange in the raw editor with the Export button
 
 ### Fixed
 - [#2043] StartSound2 tag handling
