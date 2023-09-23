@@ -214,7 +214,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.jpexs.decompiler.flash.Bundle;
 import com.jpexs.decompiler.flash.exporters.DualPdfGraphics2D;
+import com.jpexs.decompiler.flash.exporters.Font4Exporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.ExportRectangle;
+import com.jpexs.decompiler.flash.exporters.modes.Font4ExportMode;
+import com.jpexs.decompiler.flash.exporters.settings.Font4ExportSettings;
 import com.jpexs.decompiler.flash.gui.translator.Translator;
 import com.jpexs.decompiler.flash.importers.MovieImporter;
 import com.jpexs.decompiler.flash.importers.SoundImporter;
@@ -350,6 +353,7 @@ public class CommandLineArgumentParser {
             out.println("   morphshape - MorphShapes (Default format: SVG)");
             out.println("        movie - Movies (Default format: FLV without sound)");
             out.println("        font - Fonts (Default format: TTF)");
+            out.println("        font4 - DefineFont4 (Default format: CFF)");
             out.println("        frame - Frames (Default format: PNG)");
             out.println("        sprite - Sprites (Default format: PNG)");
             out.println("        button - Buttons (Default format: PNG)");
@@ -410,6 +414,7 @@ public class CommandLineArgumentParser {
             out.println("         sound:flv - FLV format for Sounds");
             out.println("         font:ttf - TTF format for Fonts");
             out.println("         font:woff - WOFF format for Fonts");
+            out.println("         font4:cff - CFF format for DefineFont4");
             out.println("         fla:<flaversion> or xfl:<flaversion> - Specify FLA format version");
             out.println("            - values for <flaversion>: cs5,cs5.5,cs6,cc");
             out.println("      You can set multiple formats at once using comma (,)");
@@ -2258,6 +2263,7 @@ public class CommandLineArgumentParser {
             "morphshape",
             "movie",
             "font",
+            "font4",
             "frame",
             "sprite",
             "button",
@@ -2434,6 +2440,11 @@ public class CommandLineArgumentParser {
                     new FontExporter().exportFonts(handler, outDir + (multipleExportTypes ? File.separator + FontExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new FontExportSettings(enumFromStr(formats.get("font"), FontExportMode.class)), evl);
                 }
 
+                if (exportAll || exportFormats.contains("font4")) {
+                    System.out.println("Exporting DefineFont4s...");
+                    new Font4Exporter().exportFonts(handler, outDir + (multipleExportTypes ? File.separator + FontExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new Font4ExportSettings(enumFromStr(formats.get("font4"), Font4ExportMode.class)), evl);
+                }
+                
                 if (exportAll || exportFormats.contains("sound")) {
                     System.out.println("Exporting sounds...");
                     new SoundExporter().exportSounds(handler, outDir + (multipleExportTypes ? File.separator + SoundExportSettings.EXPORT_FOLDER_NAME : ""), new ReadOnlyTagList(extags), new SoundExportSettings(enumFromStr(formats.get("sound"), SoundExportMode.class)), evl);

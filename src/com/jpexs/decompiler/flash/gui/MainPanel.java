@@ -46,6 +46,7 @@ import com.jpexs.decompiler.flash.configuration.SwfSpecificCustomConfiguration;
 import com.jpexs.decompiler.flash.dumpview.DumpInfo;
 import com.jpexs.decompiler.flash.dumpview.DumpInfoSwfNode;
 import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
+import com.jpexs.decompiler.flash.exporters.Font4Exporter;
 import com.jpexs.decompiler.flash.exporters.FontExporter;
 import com.jpexs.decompiler.flash.exporters.FrameExporter;
 import com.jpexs.decompiler.flash.exporters.ImageExporter;
@@ -59,6 +60,7 @@ import com.jpexs.decompiler.flash.exporters.TextExporter;
 import com.jpexs.decompiler.flash.exporters.commonshape.Matrix;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ButtonExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.Font4ExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FrameExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
@@ -74,6 +76,7 @@ import com.jpexs.decompiler.flash.exporters.script.AS2ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.script.AS3ScriptExporter;
 import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ButtonExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.Font4ExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.FrameExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
@@ -1872,6 +1875,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             List<Tag> binaryData = new ArrayList<>();
             Map<Integer, List<Integer>> frames = new HashMap<>();
             List<Tag> fonts = new ArrayList<>();
+            List<Tag> fonts4 = new ArrayList<>();
             List<Tag> symbolNames = new ArrayList<>();
 
             for (TreeItem d : sel) {
@@ -1925,7 +1929,9 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     if (nodeType == TreeNodeType.TEXT) {
                         texts.add((Tag) d);
                     }
-                    if (nodeType == TreeNodeType.FONT) {
+                    if (d instanceof DefineFont4Tag) {
+                        fonts4.add((Tag)d);
+                    } else if (nodeType == TreeNodeType.FONT) {                        
                         fonts.add((Tag) d);
                     }
                     if (nodeType == TreeNodeType.OTHER_TAG) {
@@ -2006,6 +2012,11 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             if (export.isOptionEnabled(FontExportMode.class)) {
                 ret.addAll(new FontExporter().exportFonts(handler, selFile2 + File.separator + FontExportSettings.EXPORT_FOLDER_NAME, new ReadOnlyTagList(fonts),
                         new FontExportSettings(export.getValue(FontExportMode.class)), evl));
+            }
+
+            if (export.isOptionEnabled(Font4ExportMode.class)) {
+                ret.addAll(new Font4Exporter().exportFonts(handler, selFile2 + File.separator + Font4ExportSettings.EXPORT_FOLDER_NAME, new ReadOnlyTagList(fonts4),
+                        new Font4ExportSettings(export.getValue(Font4ExportMode.class)), evl));
             }
 
             if (export.isOptionEnabled(SymbolClassExportMode.class)) {
@@ -5035,6 +5046,8 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
             swf.addTag(showFrameTag);
             showFrameTag.setTimelined(swf);
             previewPanel.showImagePanel(swf, swf, 0, true, true, !Configuration.animateSubsprites.get(), false, !Configuration.playFrameSounds.get(), true, false);
+        } else if (treeItem instanceof DefineFont4Tag) {
+            previewPanel.showGenericTagPanel((Tag)treeItem);            
         } else {
             previewPanel.showEmpty();
         }

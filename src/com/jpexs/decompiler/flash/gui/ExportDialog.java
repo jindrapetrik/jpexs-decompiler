@@ -20,6 +20,7 @@ import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ButtonExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.Font4ExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.FrameExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
@@ -33,6 +34,7 @@ import com.jpexs.decompiler.flash.exporters.modes.SymbolClassExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.TextExportMode;
 import com.jpexs.decompiler.flash.gui.tagtree.TagTreeModel;
 import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
 import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
 import com.jpexs.decompiler.flash.tags.DefineVideoStreamTag;
 import com.jpexs.decompiler.flash.tags.base.ASMSource;
@@ -84,6 +86,7 @@ public class ExportDialog extends AppDialog {
         TagTreeModel.FOLDER_SPRITES,
         TagTreeModel.FOLDER_BUTTONS,
         TagTreeModel.FOLDER_FONTS,
+        "fonts4",
         TagTreeModel.FOLDER_MORPHSHAPES,
         "symbolclass"
     };
@@ -101,6 +104,7 @@ public class ExportDialog extends AppDialog {
         {Frame.class},
         {ButtonTag.class},
         {FontTag.class},
+        {DefineFont4Tag.class},
         {MorphShapeTag.class},
         {SymbolClassTypeTag.class}
     };
@@ -118,6 +122,7 @@ public class ExportDialog extends AppDialog {
         SpriteExportMode.class,
         ButtonExportMode.class,
         FontExportMode.class,
+        Font4ExportMode.class,
         MorphShapeExportMode.class,
         SymbolClassExportMode.class
     };
