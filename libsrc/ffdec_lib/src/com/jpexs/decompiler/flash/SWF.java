@@ -3253,6 +3253,9 @@ public final class SWF implements SWFContainerItem, Timelined, Openable {
     public static void uncache(ScriptPack pack) {
         if (pack != null) {
             Openable openable = pack.getOpenable();
+            if (openable == null) {
+                return;
+            }
             SWF swf = (openable instanceof SWF) ? (SWF) openable : ((ABC) openable).getSwf();
             if (swf != null) {
                 swf.as3Cache.remove(pack);
