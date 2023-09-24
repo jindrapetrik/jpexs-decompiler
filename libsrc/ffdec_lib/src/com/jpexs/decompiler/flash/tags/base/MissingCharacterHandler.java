@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.tags.base;
 
+import com.jpexs.decompiler.flash.ValueTooLargeException;
 import java.awt.Font;
 import java.util.Map;
 
@@ -50,7 +51,6 @@ public class MissingCharacterHandler {
         if (!f.canDisplay(character)) {
             return false;
         }
-        font.addCharacter(character, f);
-        return true;
+        return font.addCharacter(character, f);
     }
 }

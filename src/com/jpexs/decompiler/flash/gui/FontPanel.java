@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.gui;
 
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.ValueTooLargeException;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.gui.helpers.TableLayoutHelper;
 import com.jpexs.decompiler.flash.tags.DefineFontTag;
@@ -192,6 +193,7 @@ public class FontPanel extends JPanel implements TagEditorPanel {
         boolean yestoall = false;
         boolean notoall = false;
         boolean replaced = false;
+        int numAdded = 0;
         for (int ic : selChars) {
             char c = (char) ic;
             if (oldchars.indexOf((int) c) > -1) {
@@ -219,7 +221,11 @@ public class FontPanel extends JPanel implements TagEditorPanel {
                 replaced = true;
             }
 
-            f.addCharacter(c, font);
+            if (!f.addCharacter(c, font)) {
+                ViewMessages.showMessageDialog(mainPanel,AppStrings.translate("error.font.cannotaddcharacter").replace("%numchars%", "" + numAdded), AppStrings.translate("error"), JOptionPane.ERROR_MESSAGE);
+                break;
+            }
+            numAdded++;
             oldchars += c;
         }
 

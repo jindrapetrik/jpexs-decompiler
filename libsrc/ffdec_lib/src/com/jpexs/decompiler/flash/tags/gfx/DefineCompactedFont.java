@@ -149,7 +149,7 @@ public final class DefineCompactedFont extends FontTag {
     }
 
     @Override
-    public void addCharacter(char character, Font cfont) {
+    public boolean addCharacter(char character, Font cfont) {
         int fontStyle = getFontStyle();
         FontType font = fonts.get(0);
 
@@ -217,6 +217,7 @@ public final class DefineCompactedFont extends FontTag {
 
         setModified(true);
         getSwf().clearImageCache();
+        return true;
     }
 
     @Override
