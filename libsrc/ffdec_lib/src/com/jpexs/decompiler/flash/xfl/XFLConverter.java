@@ -71,6 +71,7 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.HighlightedTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.StringBuilderTextWriter;
+import com.jpexs.decompiler.flash.tags.ABCContainerTag;
 import com.jpexs.decompiler.flash.tags.CSMTextSettingsTag;
 import com.jpexs.decompiler.flash.tags.DefineButton2Tag;
 import com.jpexs.decompiler.flash.tags.DefineButtonCxformTag;
@@ -148,6 +149,7 @@ import com.jpexs.decompiler.flash.types.shaperecords.StyleChangeRecord;
 import com.jpexs.decompiler.flash.types.sound.MP3FRAME;
 import com.jpexs.decompiler.flash.types.sound.MP3SOUNDDATA;
 import com.jpexs.decompiler.flash.types.sound.SoundFormat;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.Graph;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
@@ -1871,8 +1873,22 @@ public class XFLConverter {
                         break;
                 }
                 if (characterClasses.containsKey(symbol.getCharacterId())) {
-                    writer.writeAttribute("linkageExportForAS", true);
-                    writer.writeAttribute("linkageClassName", characterClasses.get(symbol.getCharacterId()));
+                    String className = characterClasses.get(symbol.getCharacterId());
+                    boolean isBitmapData = false;
+                    for (ABCContainerTag c : swf.getAbcList()) {
+                        int classIndex = c.getABC().findClassByName(className);
+                        if (classIndex != -1) {
+                            if (swf.getAbcIndex().isInstanceOf(c.getABC(), classIndex, DottedChain.parseNoSuffix("flash.display.BitmapData"))) {
+                                isBitmapData = true;
+                            }
+                            break;
+                        }
+                    }
+                    if (isBitmapData) {
+                        writer.writeAttribute("linkageExportForAS", true);
+                        writer.writeAttribute("linkageClassName", characterClasses.get(symbol.getCharacterId()));
+                    }
+                    //if it's not BitmapData, then it should use Embed
                 }
                 writer.writeAttribute("quality", 50);
                 writer.writeAttribute("href", symbolFile);
@@ -4152,7 +4168,7 @@ public class XFLConverter {
         }
         if (useAS3 && settings.exportScript) {
             try {
-                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, true);
+                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(ScriptExportMode.AS, false, true, false, true);
                 swf.exportActionScript(handler, scriptsDir.getAbsolutePath(), scriptExportSettings, parallel, null);
             } catch (Exception ex) {
                 logger.log(Level.SEVERE, "Error during ActionScript3 export", ex);

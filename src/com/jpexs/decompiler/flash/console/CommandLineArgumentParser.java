@@ -450,6 +450,12 @@ public class CommandLineArgumentParser {
             out.println("      DO NOT PUT space between comma (,) and next class.");
         }
 
+        if (filter == null || filter.equals("exportembed")) {
+            out.println(" " + (cnt++) + ") -exportembed");
+            out.println("  ...Allows exporting embedded assets via [Embed tag]");
+            out.println("     Use in combination with -export -format script:as");
+        }
+        
         if (filter == null || filter.equals("dumpswf")) {
             out.println(" " + (cnt++) + ") -dumpSWF <infile>");
             out.println("  ...dumps list of SWF tags to console");
@@ -864,6 +870,7 @@ public class CommandLineArgumentParser {
         String charset = Charset.defaultCharset().name();
         boolean cliMode = false;
         boolean air = false;
+        boolean exportEmbed = false;
         Selection selection = new Selection();
         Selection selectionIds = new Selection();
         List<String> selectionClasses = null;
@@ -892,6 +899,9 @@ public class CommandLineArgumentParser {
                     break;
                 case "-selectclass":
                     selectionClasses = parseSelectClass(args);
+                    break;
+                case "-exportembed":
+                    exportEmbed = true;
                     break;
                 case "-zoom":
                     zoom = parseZoom(args);
@@ -1004,7 +1014,7 @@ public class CommandLineArgumentParser {
         } else if (command.equals("proxy")) {
             parseProxy(args);
         } else if (command.equals("export")) {
-            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset);
+            parseExport(selectionClasses, selection, selectionIds, args, handler, traceLevel, format, zoom, charset, exportEmbed);
             System.exit(0);
         } else if (command.equals("compress")) {
             parseCompress(args);
@@ -2250,7 +2260,7 @@ public class CommandLineArgumentParser {
 
     }
 
-    private static void parseExport(List<String> selectionClasses, Selection selection, Selection selectionIds, Stack<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats, double zoom, String charset) {
+    private static void parseExport(List<String> selectionClasses, Selection selection, Selection selectionIds, Stack<String> args, AbortRetryIgnoreHandler handler, Level traceLevel, Map<String, String> formats, double zoom, String charset, boolean exportEmbed) {
         if (args.size() < 3) {
             badArguments("export");
         }
@@ -2514,7 +2524,7 @@ public class CommandLineArgumentParser {
                     singleScriptFile = false;
                 }
 
-                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(enumFromStr(formats.get("script"), ScriptExportMode.class), singleScriptFile, false);
+                ScriptExportSettings scriptExportSettings = new ScriptExportSettings(enumFromStr(formats.get("script"), ScriptExportMode.class), singleScriptFile, false, exportEmbed, false);
                 boolean exportAllScript = exportAll || exportFormats.contains("script");
                 boolean exportAs2Script = exportAllScript || exportFormats.contains("script_as2");
                 boolean exportAs3Script = exportAllScript || exportFormats.contains("script_as3");

@@ -16,6 +16,7 @@
  */
 package com.jpexs.decompiler.flash.gui;
 
+import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
@@ -46,8 +47,10 @@ import com.jpexs.decompiler.flash.tags.base.ShapeTag;
 import com.jpexs.decompiler.flash.tags.base.SoundTag;
 import com.jpexs.decompiler.flash.tags.base.SymbolClassTypeTag;
 import com.jpexs.decompiler.flash.tags.base.TextTag;
+import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.TagScript;
+import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
 import com.jpexs.decompiler.flash.treeitems.TreeItem;
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -144,6 +147,8 @@ public class ExportDialog extends AppDialog {
 
     private JTextField zoomTextField = new JTextField();
 
+    private JCheckBox embedCheckBox;
+
     public <E> E getValue(Class<E> option) {
         for (int i = 0; i < optionClasses.length; i++) {
             if (option == optionClasses[i]) {
@@ -163,6 +168,10 @@ public class ExportDialog extends AppDialog {
         }
 
         return false;
+    }
+
+    public boolean isEmbedEnabled() {
+        return embedCheckBox.isSelected();
     }
 
     public double getZoom() {
@@ -318,6 +327,36 @@ public class ExportDialog extends AppDialog {
             top += combos[i].getHeight();
         }
 
+        embedCheckBox = new JCheckBox(translate("embed"));
+
+        boolean hasAs3 = false;
+        if (exportables == null) {
+            hasAs3 = true; //??
+        } else {
+            for (TreeItem ti : exportables) {
+                if (ti instanceof AS3ClassTreeItem) {
+                    hasAs3 = true;
+                    break;
+                }
+            }
+        }
+
+        int w = 10 + labWidth + 10 + checkBoxWidth + 10 + comboWidth + 10;
+
+        if (hasAs3 && Arrays.asList(optionClasses).contains(ScriptExportMode.class)) {
+            top += 2;
+            embedCheckBox.setBounds(10, top, embedCheckBox.getPreferredSize().width, embedCheckBox.getPreferredSize().height);
+            comboPanel.add(embedCheckBox);
+            top += embedCheckBox.getHeight();
+
+            if (embedCheckBox.getWidth() + 10 > w) {
+                w = embedCheckBox.getWidth() + 10;
+            }
+            if (Configuration.lastExportEnableEmbed.get()) {
+                embedCheckBox.setSelected(true);
+            }
+        }
+
         int zoomWidth = 50;
         if (zoomable) {
             top += 2;
@@ -333,7 +372,7 @@ public class ExportDialog extends AppDialog {
             top += zoomTextField.getHeight();
         }
 
-        Dimension dim = new Dimension(10 + labWidth + 10 + checkBoxWidth + 10 + comboWidth + 10, top + 10);
+        Dimension dim = new Dimension(w, top + 10);
         comboPanel.setMinimumSize(dim);
         comboPanel.setPreferredSize(dim);
         cnt.add(comboPanel, BorderLayout.CENTER);

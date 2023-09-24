@@ -21,7 +21,17 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.types.traits.Traits;
 import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
+import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
+import com.jpexs.decompiler.flash.tags.DefineFontAlignZonesTag;
+import com.jpexs.decompiler.flash.tags.DefineSoundTag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
+import com.jpexs.decompiler.flash.types.sound.SoundFormat;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import java.util.List;
@@ -80,7 +90,101 @@ public class InstanceInfo {
         return "name_index=" + abc.constants.getMultiname(name_index).toString(abc.constants, fullyQualifiedNames) + " super_index=" + supIndexStr + " flags=" + flags + " protectedNS=" + protectedNS + " interfaces=" + Helper.intArrToString(interfaces) + " method_index=" + iinit_index + "\r\n" + instance_traits.toString(abc, fullyQualifiedNames);
     }
 
-    public GraphTextWriter getClassHeaderStr(GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames, boolean allowPrivate) {
+    public GraphTextWriter getClassHeaderStr(GraphTextWriter writer, ABC abc, List<DottedChain> fullyQualifiedNames, boolean allowPrivate, boolean allowEmbed) {
+
+        final String ASSETS_DIR = "/_assets/";
+        if (allowEmbed) {
+            if (abc.getSwf() != null) {
+                String className = getName(abc.constants).getNameWithNamespace(abc.constants, false).toRawString();
+                CharacterTag ct = abc.getSwf().getCharacterByClass(className);
+                if (ct != null) {
+                    if (ct instanceof DefineBinaryDataTag) {
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + ct.getCharacterExportFileName() + ".bin\", mimeType=\"application/octet-stream\")]").newLine();
+                    }
+                    if (ct instanceof ImageTag) {
+                        ImageTag it = (ImageTag) ct;
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + ct.getCharacterExportFileName() + ((ImageTag) ct).getImageFormat().getExtension() + "\")]").newLine();
+                    }
+                    if (ct instanceof DefineSpriteTag) {
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + "assets.swf\", symbol=\"" + className + "\")]").newLine();
+                    }
+                    if (ct instanceof DefineSoundTag) {
+                        //should be mp3, otherwise it won't work. Should we convert this?
+                        DefineSoundTag st = (DefineSoundTag) ct;
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + ct.getCharacterExportFileName() + "." + (st.getSoundFormat().formatId == SoundFormat.FORMAT_MP3 ? "mp3" : "wav") + "\")]").newLine();
+                    }
+                    if (ct instanceof FontTag) {
+                        FontTag ft = (FontTag) ct;
+
+                        boolean hasFontAlignZones = false;
+                        List<CharacterIdTag> sameIdTags = ft.getSwf().getCharacterIdTags(ft.getFontId());
+                        for (CharacterIdTag sit : sameIdTags) {
+                            if (sit instanceof DefineFontAlignZonesTag) {
+                                hasFontAlignZones = true;
+                                break;
+                            }
+                        }
+
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + ct.getCharacterExportFileName() + ".ttf\",").newLine();
+                        writer.appendNoHilight("fontName=\"" + ft.getFontName() + "\",").newLine();
+                        writer.appendNoHilight("mimeType=\"application/x-font\",").newLine();
+                        writer.appendNoHilight("fontWeight=\"" + (ft.isBold() ? "bold" : "normal") + "\",").newLine();
+                        writer.appendNoHilight("fontStyle=\"" + (ft.isItalic() ? "italic" : "normal") + "\",").newLine();
+                        String fontChars = ft.getCharacters();
+                        if (!fontChars.isEmpty()) {
+                            Character firstC = null;
+                            Character lastC = null;
+                            StringBuilder sb = new StringBuilder();
+                            for (int i = 0; i < fontChars.length(); i++) {
+                                char c = fontChars.charAt(i);
+                                if (firstC == null) {
+                                    firstC = c;
+                                    lastC = c;
+                                    continue;
+                                }
+
+                                if (lastC + 1 != c) {
+                                    if (!sb.isEmpty()) {
+                                        sb.append(",");
+                                    }
+                                    if (firstC == lastC) {
+                                        sb.append(String.format("U+%04X", (int) firstC));
+                                    } else {
+                                        sb.append(String.format("U+%04X-%04X", (int) firstC, (int) lastC));
+                                    }
+                                    firstC = c;
+                                }
+                                lastC = c;
+                            }
+                            if (!sb.isEmpty()) {
+                                sb.append(",");
+                            }
+                            if (firstC == lastC) {
+                                sb.append(String.format("U+%04X", (int) firstC));
+                            } else {
+                                sb.append(String.format("U+%04X-%04X", (int) firstC, (int) lastC));
+                            }
+                            writer.appendNoHilight("unicodeRange=\"").appendNoHilight(sb.toString()).appendNoHilight("\",").newLine();
+                        }
+                        writer.appendNoHilight("advancedAntiAliasing=\"" + (hasFontAlignZones ? "true" : "false") + "\",").newLine();
+                        writer.appendNoHilight("embedAsCFF=\"false\"").newLine();
+                        writer.appendNoHilight(")]").newLine();
+                    }
+                    
+                    if (ct instanceof DefineFont4Tag) {
+                        DefineFont4Tag ft4 = (DefineFont4Tag)ct;
+                        writer.appendNoHilight("[Embed(source=\"" + ASSETS_DIR + ct.getCharacterExportFileName() + ".cff\",").newLine();
+                        writer.appendNoHilight("fontName=\"" + ft4.fontName + "\",").newLine();
+                        writer.appendNoHilight("mimeType=\"application/x-font\",").newLine();
+                        writer.appendNoHilight("fontWeight=\"" + (ft4.fontFlagsBold ? "bold" : "normal") + "\",").newLine();
+                        writer.appendNoHilight("fontStyle=\"" + (ft4.fontFlagsItalic ? "italic" : "normal") + "\",").newLine();
+                        writer.appendNoHilight("embedAsCFF=\"true\"").newLine();
+                        writer.appendNoHilight(")]").newLine();
+                    }
+                }
+            }
+        }
+
         String modifiers;
         Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
         modifiers = ns.getPrefix(abc);
@@ -104,7 +208,7 @@ public class InstanceInfo {
 
         writer.appendNoHilight(modifiers + objType);
         String classTypeName = abc.constants.getMultiname(name_index).getNameWithNamespace(abc.constants, true).toRawString();
-                
+
         writer.hilightSpecial(abc.constants.getMultiname(name_index).getName(abc.constants, null/* No full names here*/, false, true), HighlightSpecialType.CLASS_NAME, classTypeName);
 
         if (super_index > 0) {

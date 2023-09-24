@@ -34,11 +34,23 @@ public class ScriptExportSettings {
     public FileTextWriter singleFileWriter;
 
     public boolean ignoreFrameScripts;
+    
+    public boolean exportEmbed;
+    
+    public boolean exportEmbedFlaMode;
 
-    public ScriptExportSettings(ScriptExportMode mode, boolean singleFile, boolean ignoreFrameScripts) {
+    public ScriptExportSettings(
+            ScriptExportMode mode, 
+            boolean singleFile, 
+            boolean ignoreFrameScripts,
+            boolean exportEmbed,
+            boolean exportEmbedFlaMode
+            ) {
         this.mode = mode;
         this.singleFile = singleFile;
         this.ignoreFrameScripts = ignoreFrameScripts;
+        this.exportEmbed = exportEmbed;
+        this.exportEmbedFlaMode = exportEmbedFlaMode;
     }
 
     public String getFileExtension() {

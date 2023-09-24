@@ -13,6 +13,9 @@ All notable changes to this project will be documented in this file.
 - [#2057] Show all assigned AS linkage classes in the item name (instead just one)
 - Exporting ByteArrayRange in the raw editor with the Export button
 - Export DefineFont4 to OpenType CFF file
+- AS3 - Show `Embed` tag over asset classes (readonly)
+- AS3 - Checkbox for exporting assets embedded using `Embed` (-exportembed in commandline)
+- FLA export - AS3 - Using `Embed` tag for DefineBinaryData, images not extending BitmapData
 
 ### Fixed
 - [#2043] StartSound2 tag handling

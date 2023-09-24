@@ -872,4 +872,21 @@ public final class AbcIndexing {
         }
         return null;
     }
+    
+    public boolean isInstanceOf(ABC abc, int classIndex, DottedChain searchClassName) {
+        DottedChain clsName = abc.instance_info.get(classIndex).getName(abc.constants).getNameWithNamespace(abc.constants, false);
+        if (searchClassName.equals(clsName)) {
+            return true;
+        }
+        if (abc.instance_info.get(classIndex).super_index == 0) {
+            return false;
+        }
+        DottedChain parentClassName = abc.constants.getMultiname(abc.instance_info.get(classIndex).super_index).getNameWithNamespace(abc.constants, false);
+
+        AbcIndexing.ClassIndex ci = findClass(new TypeItem(parentClassName), abc, null);
+        if (ci == null) {
+            return false;
+        }
+        return isInstanceOf(ci.abc, ci.index, searchClassName);
+    }
 }

@@ -83,6 +83,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -342,7 +343,7 @@ public class PreviewExporter {
                 Frame fn = (Frame) treeItem;
                 Timelined parent = fn.timeline.timelined;
 
-                Set<Integer> doneCharacters = new HashSet<>();
+                Set<Integer> doneCharacters = new LinkedHashSet<>();
                 for (Tag t : parent.getTags()) {
                     if (t instanceof FileAttributesTag || t instanceof SetBackgroundColorTag) {
                         continue;
@@ -353,7 +354,7 @@ public class PreviewExporter {
                         continue;
                     }
 
-                    Set<Integer> needed = new HashSet<>();
+                    Set<Integer> needed = new LinkedHashSet<>();
                     t.getNeededCharactersDeep(needed);
                     for (int n : needed) {
                         if (!doneCharacters.contains(n)) {

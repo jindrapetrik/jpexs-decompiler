@@ -915,6 +915,10 @@ public final class Configuration {
     @ConfigurationName("warning.cannotencrypt")
     public static ConfigurationItem<Boolean> warningCannotEncrypt = null;
     
+    @ConfigurationDefaultBoolean(true)
+    @ConfigurationCategory("export")
+    public static ConfigurationItem<Boolean> lastExportEnableEmbed = null;
+    
     private enum OSId {
         WINDOWS, OSX, UNIX
     }
