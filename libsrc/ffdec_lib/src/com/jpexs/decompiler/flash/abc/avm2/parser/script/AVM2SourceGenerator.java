@@ -2180,20 +2180,41 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 continue;
             }
             if (item instanceof ClassAVM2Item) {
+                int minClassIndex = 0;
                 localData.currentClass = ((ClassAVM2Item) item).pkg.name.addWithSuffix(((ClassAVM2Item) item).className).toRawString();
                 InstanceInfo instanceInfo = abcIndex.getSelectedAbc().instance_info.get(((TraitClass) traits[k]).class_info);
+                ABC abc = abcIndex.getSelectedAbc();
                 if (((ClassAVM2Item) item).extendsOp != null) {
                     instanceInfo.super_index = typeName(localData, ((ClassAVM2Item) item).extendsOp);
                 } else {
                     instanceInfo.super_index = abcIndex.getSelectedAbc().constants.getMultinameId(Multiname.createQName(false, str("Object"), namespace(Namespace.KIND_PACKAGE, "")), true);
                 }
+                if (instanceInfo.super_index != 0) {
+                    int foundClass = abc.findClassByName(abc.constants.getMultiname(instanceInfo.super_index).getNameWithNamespace(abc.constants, true));
+                    if (foundClass > -1) {
+                        if (foundClass > minClassIndex) {
+                            minClassIndex = foundClass;
+                        }
+                    }
+                }
                 instanceInfo.interfaces = new int[((ClassAVM2Item) item).implementsOp.size()];
                 for (int i = 0; i < ((ClassAVM2Item) item).implementsOp.size(); i++) {
-                    instanceInfo.interfaces[i] = superIntName(localData, ((ClassAVM2Item) item).implementsOp.get(i));
+                    instanceInfo.interfaces[i] = superIntName(localData, ((ClassAVM2Item) item).implementsOp.get(i));                                        
+                    int foundIface = abc.findClassByName(abc.constants.getMultiname(instanceInfo.interfaces[i]).getNameWithNamespace(abc.constants, true));
+                    if (foundIface > -1) {
+                        if (foundIface > minClassIndex) {
+                            minClassIndex = foundIface;
+                        }
+                    }                    
+                }
+                int oldClassIndex = ((TraitClass) traits[k]).class_info;
+                if (oldClassIndex <= minClassIndex) {
+                    abc.moveClass(oldClassIndex, minClassIndex + 1);
                 }
                 localData.currentClass = null;
             }
             if (item instanceof InterfaceAVM2Item) {
+                int minClassIndex = 0;
                 localData.currentClass = ((InterfaceAVM2Item) item).pkg.name.addWithSuffix(((InterfaceAVM2Item) item).name).toRawString();
                 ABC abc = abcIndex.getSelectedAbc();
                 InstanceInfo instanceInfo = abc.instance_info.get(((TraitClass) traits[k]).class_info);                
@@ -2201,6 +2222,17 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 for (int i = 0; i < ((InterfaceAVM2Item) item).superInterfaces.size(); i++) {
                     GraphTargetItem un = ((InterfaceAVM2Item) item).superInterfaces.get(i);
                     instanceInfo.interfaces[i] = superIntName(localData, un);
+                    
+                    int foundIface = abc.findClassByName(abc.constants.getMultiname(instanceInfo.interfaces[i]).getNameWithNamespace(abc.constants, true));
+                    if (foundIface > -1) {
+                        if (foundIface > minClassIndex) {
+                            minClassIndex = foundIface;
+                        }
+                    }
+                }
+                int oldClassIndex = ((TraitClass) traits[k]).class_info;
+                if (oldClassIndex <= minClassIndex) {
+                    abc.moveClass(oldClassIndex, minClassIndex + 1);
                 }
                 localData.currentClass = null;
             }

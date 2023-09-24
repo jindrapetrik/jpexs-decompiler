@@ -71,6 +71,7 @@ import com.jpexs.decompiler.flash.treeitems.Openable;
 import com.jpexs.decompiler.flash.treeitems.OpenableList;
 import com.jpexs.decompiler.flash.types.annotations.Internal;
 import com.jpexs.decompiler.graph.DottedChain;
+import com.jpexs.helpers.Reference;
 import com.jpexs.helpers.utf8.Utf8PrintWriter;
 import java.io.File;
 import java.io.IOException;
@@ -290,32 +291,32 @@ public class ABC implements Openable {
         }
         return ret;
     }
-   
+
     public void getTraitStringUsages(Set<Integer> ret, Traits traits) {
-        for (Trait t:traits.traits) {
+        for (Trait t : traits.traits) {
             if (t instanceof TraitClass) {
-                int ci = ((TraitClass)t).class_info;
+                int ci = ((TraitClass) t).class_info;
                 getTraitStringUsages(ret, instance_info.get(ci).instance_traits);
                 getTraitStringUsages(ret, class_info.get(ci).static_traits);
             }
             if (t instanceof TraitSlotConst) {
-                TraitSlotConst tsc = (TraitSlotConst)t;
+                TraitSlotConst tsc = (TraitSlotConst) t;
                 if (tsc.value_kind == ValueKind.CONSTANT_Utf8) {
                     ret.add(tsc.value_index);
                 }
             }
         }
     }
-    
+
     public Set<Integer> getStringUsages() {
         Set<Integer> ret = new HashSet<>();
-        
-        for (ScriptInfo si:script_info) {
+
+        for (ScriptInfo si : script_info) {
             getTraitStringUsages(ret, si.traits);
         }
-        
-        for (MethodInfo mi: method_info) {
-            if((mi.flags & MethodInfo.FLAG_HAS_OPTIONAL) == MethodInfo.FLAG_HAS_OPTIONAL) {
+
+        for (MethodInfo mi : method_info) {
+            if ((mi.flags & MethodInfo.FLAG_HAS_OPTIONAL) == MethodInfo.FLAG_HAS_OPTIONAL) {
                 for (ValueKind vk : mi.optional) {
                     if (vk.value_kind == ValueKind.CONSTANT_Utf8) {
                         ret.add(vk.value_index);
@@ -423,7 +424,7 @@ public class ABC implements Openable {
         }
     }
 
-    public void deobfuscateIdentifiers(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, HashMap<DottedChain, DottedChain> namesMap, RenameType renameType, boolean doClasses) {        
+    public void deobfuscateIdentifiers(Map<Integer, String> stringUsageTypes, Set<Integer> stringUsages, HashMap<DottedChain, DottedChain> namesMap, RenameType renameType, boolean doClasses) {
         Set<Integer> namespaceUsages = getNsStringUsages();
         AVM2Deobfuscation deobfuscation = getDeobfuscation();
 
@@ -448,13 +449,13 @@ public class ABC implements Openable {
         } else {
             return;
         }
-       
+
         for (int i = 1; i < constants.getMultinameCount(); i++) {
             informListeners("deobfuscate", "name " + i + "/" + constants.getMultinameCount());
-               
+
             Multiname m = constants.getMultiname(i);
             int strIndex = m.name_index;
-            if (m.kind == Multiname.MULTINAME && strIndex > 0 && "*".equals(constants.getString(strIndex))) {                    
+            if (m.kind == Multiname.MULTINAME && strIndex > 0 && "*".equals(constants.getString(strIndex))) {
                 continue;
             }
             constants.getMultiname(i).name_index = deobfuscation.deobfuscateName(stringUsageTypes, stringUsages, namespaceUsages, namesMap, constants.getMultiname(i).name_index, false, renameType);
@@ -1218,11 +1219,11 @@ public class ABC implements Openable {
             }
         }
     }
-    
+
     private boolean isSameName(int expectedQNameIndex, int checkedNameIndex, boolean exactMatch) {
         if (expectedQNameIndex == checkedNameIndex) {
             return true;
-        }        
+        }
         if (exactMatch) {
             return false;
         }
@@ -1231,7 +1232,7 @@ public class ABC implements Openable {
         if (checkedName == null) {
             return false;
         }
-        
+
         if (expectedQName.name_index != checkedName.name_index) {
             return false;
         }
@@ -1241,11 +1242,11 @@ public class ABC implements Openable {
         if (checkedName.kind != Multiname.MULTINAME) {
             return false;
         }
-        for (int ns:constants.getNamespaceSet(checkedName.namespace_set_index).namespaces) {
+        for (int ns : constants.getNamespaceSet(checkedName.namespace_set_index).namespaces) {
             if (ns == expectedQName.namespace_index) {
                 return true;
             }
-        }           
+        }
         return false;
     }
 
@@ -1451,7 +1452,7 @@ public class ABC implements Openable {
         }
 
         for (int s = 0; s < script_info.size(); s++) {
-            checkAllMultinameUsedInMethod(script_info.get(s).init_index, ret, s, -1, 0, TraitMultinameUsage.TRAITS_TYPE_SCRIPT, true, null, -1);                
+            checkAllMultinameUsedInMethod(script_info.get(s).init_index, ret, s, -1, 0, TraitMultinameUsage.TRAITS_TYPE_SCRIPT, true, null, -1);
             findAllMultinameUsageInTraits(script_info.get(s).traits, TraitMultinameUsage.TRAITS_TYPE_SCRIPT, s, -1, ret, -1);
         }
 
@@ -1600,6 +1601,60 @@ public class ABC implements Openable {
                 }
             }
         }
+    }
+
+    private void moveClassInTraits(Traits traits, int oldIndex, int newIndex) {
+        for (Trait t : traits.traits) {
+            if (t instanceof TraitClass) {
+                TraitClass tc = (TraitClass) t;
+                moveClassInTraits(instance_info.get(tc.class_info).instance_traits, oldIndex, newIndex);
+                moveClassInTraits(class_info.get(tc.class_info).static_traits, oldIndex, newIndex);
+                tc.class_info = moveClassIndex(oldIndex, newIndex, tc.class_info);
+            }
+        }
+    }
+    
+    private int moveClassIndex(int oldIndex, int newIndex, int currentIndex) {
+        if (newIndex > oldIndex) {
+            newIndex--;
+        }
+        if (currentIndex == oldIndex) {
+            return newIndex;
+        }
+        if (currentIndex > oldIndex) {
+            currentIndex = currentIndex - 1;
+        }
+        if (currentIndex >= newIndex) {
+            currentIndex = currentIndex + 1;
+        }
+        return currentIndex;
+    }
+
+    public void moveClass(int oldIndex, int newIndex) {       
+        for (MethodBody b : bodies) {
+            for (AVM2Instruction ins : b.getCode().code) {
+                for (int i = 0; i < ins.definition.operands.length; i++) {
+                    if (ins.definition.operands[i] == AVM2Code.DAT_CLASS_INDEX) {
+                        ins.setOperand(i, moveClassIndex(oldIndex, newIndex, ins.operands[0]), b.getCode(), b);
+                    }
+                }
+            }
+        }
+        
+        for (ScriptInfo si : script_info) {
+            moveClassInTraits(si.traits, oldIndex, newIndex);
+        }
+        for (MethodBody b : bodies) {
+            moveClassInTraits(b.traits, oldIndex, newIndex);
+        }
+                
+        if (newIndex > oldIndex) {
+            newIndex--;
+        }
+        InstanceInfo ii = instance_info.remove(oldIndex);
+        ClassInfo ci = class_info.remove(oldIndex);
+        instance_info.add(newIndex, ii);
+        class_info.add(newIndex, ci);
     }
 
     public void addClass(ClassInfo ci, InstanceInfo ii, int index) {
@@ -2222,9 +2277,9 @@ public class ABC implements Openable {
         String name = constants.getString(ns.name_index);
         if (name.equals("http://adobe.com/AS3/2006/builtin")) { //TODO: This should really be resolved using ABC indexing, not hardcoded constant
             return DottedChain.parseNoSuffix("AS3");
-        }  
-        
-        return getSwf().getAbcIndex().nsValueToName(name);      
+        }
+
+        return getSwf().getAbcIndex().nsValueToName(name);
         /*
         for (ABCContainerTag abcTag : getAbcTags()) {
             DottedChain dc = abcTag.getABC().nsValueToName(name);

@@ -47,6 +47,7 @@ All notable changes to this project will be documented in this file.
 - Not working "Show in Projector" button for DefineFont4 (hide)
 - Proper error message when there is no room for new characters in the font (DefineFont1)
 - Synchronization problems when adding characters to the font vs its display
+- [#2086] AS3 direct editation - Correct class order (instanceinfo,classinfo) respecting extends/implements
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 
@@ -3103,6 +3104,7 @@ Major version of SWF to XML export changed to 2.
 [#2029]: https://www.free-decompiler.com/flash/issues/2029
 [#2077]: https://www.free-decompiler.com/flash/issues/2077
 [#2076]: https://www.free-decompiler.com/flash/issues/2076
+[#2086]: https://www.free-decompiler.com/flash/issues/2086
 [#1998]: https://www.free-decompiler.com/flash/issues/1998
 [#2038]: https://www.free-decompiler.com/flash/issues/2038
 [#2028]: https://www.free-decompiler.com/flash/issues/2028
