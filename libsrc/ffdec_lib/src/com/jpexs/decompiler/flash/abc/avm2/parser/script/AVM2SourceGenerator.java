@@ -2180,7 +2180,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 continue;
             }
             if (item instanceof ClassAVM2Item) {
-                int minClassIndex = 0;
+                int minClassIndex = -1;
                 localData.currentClass = ((ClassAVM2Item) item).pkg.name.addWithSuffix(((ClassAVM2Item) item).className).toRawString();
                 InstanceInfo instanceInfo = abcIndex.getSelectedAbc().instance_info.get(((TraitClass) traits[k]).class_info);
                 ABC abc = abcIndex.getSelectedAbc();
@@ -2214,7 +2214,7 @@ public class AVM2SourceGenerator implements SourceGenerator {
                 localData.currentClass = null;
             }
             if (item instanceof InterfaceAVM2Item) {
-                int minClassIndex = 0;
+                int minClassIndex = -1;
                 localData.currentClass = ((InterfaceAVM2Item) item).pkg.name.addWithSuffix(((InterfaceAVM2Item) item).name).toRawString();
                 ABC abc = abcIndex.getSelectedAbc();
                 InstanceInfo instanceInfo = abc.instance_info.get(((TraitClass) traits[k]).class_info);                
