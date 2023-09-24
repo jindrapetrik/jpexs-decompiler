@@ -18,7 +18,10 @@ package com.jpexs.decompiler.flash.exporters.script;
 
 import com.jpexs.decompiler.flash.AbortRetryIgnoreHandler;
 import com.jpexs.decompiler.flash.EventListener;
+import com.jpexs.decompiler.flash.ReadOnlyTagList;
+import com.jpexs.decompiler.flash.RetryTask;
 import com.jpexs.decompiler.flash.SWF;
+import com.jpexs.decompiler.flash.SWFOutputStream;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.abc.avm2.model.CallPropertyAVM2Item;
 import com.jpexs.decompiler.flash.abc.avm2.model.CoerceAVM2Item;
@@ -41,9 +44,42 @@ import com.jpexs.decompiler.flash.abc.types.traits.TraitClass;
 import com.jpexs.decompiler.flash.abc.types.traits.TraitMethodGetterSetter;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.ecma.EcmaScript;
+import com.jpexs.decompiler.flash.exporters.BinaryDataExporter;
+import com.jpexs.decompiler.flash.exporters.Font4Exporter;
+import com.jpexs.decompiler.flash.exporters.FontExporter;
+import com.jpexs.decompiler.flash.exporters.ImageExporter;
+import com.jpexs.decompiler.flash.exporters.SoundExporter;
+import com.jpexs.decompiler.flash.exporters.modes.BinaryDataExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.Font4ExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.FontExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.ImageExportMode;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
+import com.jpexs.decompiler.flash.exporters.modes.SoundExportMode;
+import com.jpexs.decompiler.flash.exporters.settings.BinaryDataExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.Font4ExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.FontExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.ImageExportSettings;
 import com.jpexs.decompiler.flash.exporters.settings.ScriptExportSettings;
+import com.jpexs.decompiler.flash.exporters.settings.SoundExportSettings;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
+import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
+import com.jpexs.decompiler.flash.tags.DefineSoundTag;
+import com.jpexs.decompiler.flash.tags.DefineSpriteTag;
+import com.jpexs.decompiler.flash.tags.EndTag;
+import com.jpexs.decompiler.flash.tags.FileAttributesTag;
+import com.jpexs.decompiler.flash.tags.SetBackgroundColorTag;
+import com.jpexs.decompiler.flash.tags.ShowFrameTag;
+import com.jpexs.decompiler.flash.tags.SymbolClassTag;
+import com.jpexs.decompiler.flash.tags.Tag;
+import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.FontTag;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
+import com.jpexs.decompiler.flash.tags.base.PlaceObjectTypeTag;
+import com.jpexs.decompiler.flash.tags.base.RemoveTag;
+import com.jpexs.decompiler.flash.types.RGB;
+import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
 import com.jpexs.helpers.CancellableWorker;
@@ -51,10 +87,14 @@ import com.jpexs.helpers.Helper;
 import com.jpexs.helpers.Path;
 import com.jpexs.helpers.XmlPrettyFormat;
 import com.jpexs.helpers.utf8.Utf8Helper;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -115,7 +155,7 @@ public class AS3ScriptExporter {
                                                                 int name2 = ((FullMultinameAVM2Item) cap.propertyName).multinameIndex;
                                                                 for (Trait ct : pack.abc.instance_info.get(cindex).instance_traits.traits) {
                                                                     if (ct.name_index == name2 && (ct instanceof TraitMethodGetterSetter)) {
-                                                                        tagContent.append(handleMxmlMethod(abcIndex,namespaces, pack, cindex, (TraitMethodGetterSetter) ct));
+                                                                        tagContent.append(handleMxmlMethod(abcIndex, namespaces, pack, cindex, (TraitMethodGetterSetter) ct));
                                                                     }
                                                                 }
                                                             }
@@ -430,6 +470,129 @@ public class AS3ScriptExporter {
                 } catch (ExecutionException ex) {
                     logger.log(Level.SEVERE, "Error during ABC export", ex);
                 }
+            }
+        }
+
+        if (exportSettings.exportEmbedFlaMode || exportSettings.exportEmbed) {
+            final String ASSETS_DIR = outdir + "/_assets/";
+            List<Tag> exportTagList = new ArrayList<>();
+            List<DefineSpriteTag> spriteTagList = new ArrayList<>();
+
+            for (ScriptPack item : packs) {
+                if (!item.isSimple && Configuration.ignoreCLikePackages.get()) {
+                    continue;
+                }
+                String className = item.getClassPath().toRawString();
+                CharacterTag ct = swf.getCharacterByClass(className);
+                if (ct == null) {
+                    continue;
+                }
+                if (ct instanceof DefineBinaryDataTag) {
+                    exportTagList.add(ct);
+                }
+                if (ct instanceof ImageTag) {
+                    int classIndex = item.abc.findClassByName(className);
+                    if (exportSettings.exportEmbedFlaMode && classIndex != -1 && swf.getAbcIndex().isInstanceOf(item.abc, classIndex, DottedChain.parseNoSuffix("flash.display.BitmapData"))) {
+                        continue;
+                    }
+                    exportTagList.add(ct);
+                }
+                if (!exportSettings.exportEmbedFlaMode) {
+                    if (ct instanceof DefineSpriteTag) {
+                        spriteTagList.add((DefineSpriteTag) ct);
+                    }
+                    if (ct instanceof DefineSoundTag) {
+                        exportTagList.add(ct);
+                    }
+                    if (ct instanceof FontTag) {
+                        exportTagList.add(ct);
+                    }
+                }
+                if (ct instanceof DefineFont4Tag) {
+                    exportTagList.add(ct);
+                }
+            }
+            ReadOnlyTagList rttl = new ReadOnlyTagList(exportTagList);
+            try {
+                BinaryDataExporter bde = new BinaryDataExporter();
+                bde.exportBinaryData(handler, ASSETS_DIR, rttl, new BinaryDataExportSettings(BinaryDataExportMode.RAW), evl);
+                ImageExporter ie = new ImageExporter();
+                ie.exportImages(handler, ASSETS_DIR, rttl, new ImageExportSettings(ImageExportMode.PNG_GIF_JPEG), evl);
+                SoundExporter se = new SoundExporter();
+                se.exportSounds(handler, ASSETS_DIR, rttl, new SoundExportSettings(SoundExportMode.MP3_WAV), evl);
+                FontExporter fe = new FontExporter();
+                fe.exportFonts(handler, ASSETS_DIR, rttl, new FontExportSettings(FontExportMode.TTF), evl);
+                Font4Exporter f4e = new Font4Exporter();
+                f4e.exportFonts(handler, ASSETS_DIR, rttl, new Font4ExportSettings(Font4ExportMode.CFF), evl);
+
+                if (!spriteTagList.isEmpty()) {
+                    new RetryTask(() -> {
+                        try (FileOutputStream fos = new FileOutputStream(ASSETS_DIR + "/assets.swf")) {
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                            SWFOutputStream sos2 = new SWFOutputStream(baos, swf.version, swf.getCharset());
+                            sos2.writeRECT(swf.displayRect);
+                            sos2.writeFIXED8(swf.frameRate);
+                            sos2.writeUI16(1);
+                            FileAttributesTag fa = swf.getFileAttributes();
+                            if (fa != null) {
+                                fa.writeTag(sos2);
+                            }
+                            SetBackgroundColorTag setBgColorTag = swf.getBackgroundColor();
+                            if (setBgColorTag != null) {
+                                setBgColorTag.writeTag(sos2);
+                            }
+
+                            Set<Integer> neededCharacters = new LinkedHashSet<>();
+                            List<Integer> symbolClassIds = new ArrayList<>();
+                            List<String> symbolClassNames = new ArrayList<>();
+                            for (DefineSpriteTag st : spriteTagList) {
+                                st.getNeededCharactersDeep(neededCharacters);
+                                neededCharacters.add(st.spriteId);
+                            }
+                            for (int n : neededCharacters) {
+                                CharacterTag ct = (CharacterTag) swf.getCharacter(n);
+                                if (ct == null) {
+                                    continue;
+                                }
+                                ct.writeTag(sos2);
+                                for (String cls : ct.getClassNames()) {
+                                    symbolClassIds.add(ct.getCharacterId());
+                                    symbolClassNames.add(cls);
+                                }
+                                List<CharacterIdTag> cidTags = swf.getCharacterIdTags(n);
+                                for (CharacterIdTag t : cidTags) {
+                                    if (t instanceof PlaceObjectTypeTag) {
+                                        continue;                                        
+                                    }
+                                    if (t instanceof RemoveTag) {
+                                        continue;
+                                    }
+                                    ((Tag) t).writeTag(sos2);                                    
+                                }
+                            }
+
+                            SymbolClassTag sc = new SymbolClassTag(swf);
+                            sc.names = symbolClassNames;
+                            sc.tags = symbolClassIds;
+                            sc.writeTag(sos2);
+                            
+                            new ShowFrameTag(swf).writeTag(sos2);
+                            new EndTag(swf).writeTag(sos2);
+
+                            SWFOutputStream sos = new SWFOutputStream(fos, swf.version, swf.getCharset());
+                            sos.write("FWS".getBytes());
+                            sos.write(swf.version);
+                            byte data[] = baos.toByteArray();
+                            long fileSize = sos.getPos() + data.length + 4;
+                            sos.writeUI32(fileSize);
+                            sos.write(data);                           
+                        }
+                    }, handler).run();
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(AS3ScriptExporter.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(AS3ScriptExporter.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 

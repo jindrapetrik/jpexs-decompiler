@@ -611,9 +611,15 @@ public class ActionScript3Parser {
                 expected(s, lexer.yyline(), SymbolType.PARENT_CLOSE);
                 s = lex();
             }
-            metadata.add(en);
             expected(s, lexer.yyline(), SymbolType.BRACKET_CLOSE);
             s = lex();
+            
+            /**
+             * Skip Embed metadata - these are loaded automatically by the assignment in SymbolClass tag
+             */
+            if (!"Embed".equals(name)) {
+                metadata.add(en);
+            }                             
         }
         lexer.pushback(s);
         return metadata;

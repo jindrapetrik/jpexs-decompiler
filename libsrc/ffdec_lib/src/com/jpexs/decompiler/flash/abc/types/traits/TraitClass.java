@@ -40,6 +40,10 @@ import com.jpexs.decompiler.flash.helpers.GraphTextWriter;
 import com.jpexs.decompiler.flash.helpers.NulWriter;
 import com.jpexs.decompiler.flash.helpers.hilight.HighlightSpecialType;
 import com.jpexs.decompiler.flash.search.MethodId;
+import com.jpexs.decompiler.flash.tags.DefineBinaryDataTag;
+import com.jpexs.decompiler.flash.tags.DefineFont4Tag;
+import com.jpexs.decompiler.flash.tags.base.CharacterTag;
+import com.jpexs.decompiler.flash.tags.base.ImageTag;
 import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.decompiler.graph.GraphTargetItem;
 import com.jpexs.decompiler.graph.ScopeStack;
@@ -109,7 +113,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
     @Override
     public GraphTextWriter toStringHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) {
-        abc.instance_info.get(class_info).getClassHeaderStr(writer, abc, fullyQualifiedNames, false);
+        abc.instance_info.get(class_info).getClassHeaderStr(writer, abc, fullyQualifiedNames, false, false /*??*/);
         return writer;
     }
 
@@ -117,13 +121,15 @@ public class TraitClass extends Trait implements TraitWithSlot {
     public void convertHeader(Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel) {
     }
 
+    
+
     @Override
     public GraphTextWriter toString(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
 
         InstanceInfo instanceInfo = abc.instance_info.get(class_info);
-        
-        boolean isInterface  = instanceInfo.isInterface();
-        
+
+        boolean isInterface = instanceInfo.isInterface();
+
         Multiname instanceInfoMultiname = instanceInfo.getName(abc.constants);
         DottedChain packageName = instanceInfoMultiname.getNamespace(abc.constants).getName(abc.constants); //assume not null name
 
@@ -132,11 +138,42 @@ public class TraitClass extends Trait implements TraitWithSlot {
 
         String instanceInfoName = instanceInfoMultiname.getName(abc.constants, fullyQualifiedNames, false, true);
 
-        
         getMetaData(parent, convertData, abc, writer);
+
+        boolean allowEmbed = true;
+
+        if (convertData.exportEmbedFlaMode) {
+            allowEmbed = false;
+            if (abc.getSwf() != null) {
+                CharacterTag ct = abc.getSwf().getCharacterByClass(instanceInfoMultiname.getNameWithNamespace(abc.constants, false).toRawString());
+                if (ct == null) {
+                    allowEmbed = false;
+                } else {
+                    if (ct instanceof DefineBinaryDataTag) {
+                        allowEmbed = true;
+                    }
+
+                    if (ct instanceof ImageTag) {
+                        allowEmbed = true;
+                        if (abcIndex.isInstanceOf(abc, class_info, DottedChain.parseNoSuffix("flash.display.BitmapData"))) {
+                            allowEmbed = false;
+                        }
+                    }
+                    
+                    if (ct instanceof DefineFont4Tag) {
+                        allowEmbed = true;
+                    }
+
+                    if (ct.getClassNames().size() > 1) {
+                        allowEmbed = true;
+                    }
+                }
+            }
+        }
+
         //class header
-        instanceInfo.getClassHeaderStr(writer, abc, fullyQualifiedNames, false);
-        writer.endTrait();        
+        instanceInfo.getClassHeaderStr(writer, abc, fullyQualifiedNames, false, allowEmbed);
+        writer.endTrait();
         writer.startBlock();
         writer.startClass(class_info);
 
@@ -177,7 +214,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         //instance initializer - constructor
         if (!instanceInfo.isInterface()) {
             String modifier = "public ";
-            Multiname m = abc.constants.getMultiname(instanceInfo.name_index);           
+            Multiname m = abc.constants.getMultiname(instanceInfo.name_index);
 
             writer.newLine();
             writer.startTrait(GraphTextWriter.TRAIT_INSTANCE_INITIALIZER);
@@ -209,7 +246,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         //instance methods
         instanceInfo.instance_traits.toString(abcIndex, new Class[]{TraitClass.class, TraitFunction.class, TraitMethodGetterSetter.class}, this, convertData, path +/*packageName +*/ "/" + instanceInfoName, abc, false, exportMode, false, scriptIndex, class_info, writer, fullyQualifiedNames, parallel, convertData.ignoreFrameScripts ? frameTraitNames : new ArrayList<>(), isInterface);
 
-        writer.endClass();        
+        writer.endClass();
         writer.endBlock(); // class
         writer.newLine();
         return writer;
@@ -236,8 +273,8 @@ public class TraitClass extends Trait implements TraitWithSlot {
             }
         } else {
             convertData.thisHasDefaultToPrimitive = true;
-        }        
-        ScopeStack newScopeStack = (ScopeStack)scopeStack.clone();
+        }
+        ScopeStack newScopeStack = (ScopeStack) scopeStack.clone();
         //class initializer
         int bodyIndex = abc.findBodyIndex(classInfo.cinit_index);
         if (bodyIndex != -1) {
@@ -245,27 +282,27 @@ public class TraitClass extends Trait implements TraitWithSlot {
             List<Traits> ts = new ArrayList<>();
             ts.add(classInfo.static_traits);
             List<MethodBody> callStack = new ArrayList<>();
-            callStack.add(abc.bodies.get(bodyIndex));   
-            
+            callStack.add(abc.bodies.get(bodyIndex));
+
             if (!abc.instance_info.get(class_info).isInterface()) {
                 AbcIndexing.ClassIndex cls = abcIndex.findClass(AbcIndexing.multinameToType(abc.instance_info.get(class_info).name_index, abc.constants), abc, scriptIndex);
                 List<AbcIndexing.ClassIndex> clsList = new ArrayList<>();
                 cls = cls.parent;
-                while(cls != null) {
+                while (cls != null) {
                     clsList.add(0, cls);
                     cls = cls.parent;
                 }
-                for (AbcIndexing.ClassIndex cls2: clsList) {
+                for (AbcIndexing.ClassIndex cls2 : clsList) {
                     newScopeStack.push(new ClassAVM2Item(cls2.abc.instance_info.get(cls2.index).getName(cls2.abc.constants).getNameWithNamespace(cls2.abc.constants, true)));
-                }                
-            }                                                 
-            
+                }
+            }
+
             abc.bodies.get(bodyIndex).convert(callStack, abcIndex, convertData, path +/*packageName +*/ "/" + instanceInfoName + ".staticinitializer", exportMode, true, classInfo.cinit_index, scriptIndex, class_info, abc, this, newScopeStack, GraphTextWriter.TRAIT_CLASS_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
-            
-            newScopeStack.push(new ClassAVM2Item(abc.instance_info.get(class_info).getName(abc.constants)));        
+
+            newScopeStack.push(new ClassAVM2Item(abc.instance_info.get(class_info).getName(abc.constants)));
             classInitializerIsEmpty = !writer.getMark();
-        }            
-        
+        }
+
         //constructor - instance initializer
         if (!instanceInfo.isInterface()) {
             bodyIndex = abc.findBodyIndex(instanceInfo.iinit_index);
@@ -274,7 +311,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
                 ts.add(instanceInfo.instance_traits);
                 MethodBody constructorBody = abc.bodies.get(bodyIndex);
                 List<MethodBody> callStack = new ArrayList<>();
-                callStack.add(constructorBody);                
+                callStack.add(constructorBody);
                 constructorBody.convert(callStack, abcIndex, convertData, path +/*packageName +*/ "/" + instanceInfoName + ".initializer", exportMode, false, instanceInfo.iinit_index, scriptIndex, class_info, abc, this, new ScopeStack(), GraphTextWriter.TRAIT_INSTANCE_INITIALIZER, writer, fullyQualifiedNames, ts, true, new HashSet<>());
 
                 if (convertData.ignoreFrameScripts) {
@@ -372,7 +409,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         writer.appendNoHilight("instance ").hilightSpecial(abc.constants.multinameToString(ii.name_index), HighlightSpecialType.INSTANCE_NAME).newLine();
         writer.indent();
         writer.appendNoHilight("extends ").hilightSpecial(abc.constants.multinameToString(ii.super_index), HighlightSpecialType.EXTENDS).newLine();
-        for(int iface : ii.interfaces) {
+        for (int iface : ii.interfaces) {
             writer.appendNoHilight("implements ").hilightSpecial(abc.constants.multinameToString(iface), HighlightSpecialType.IMPLEMENTS).newLine();
         }
         if ((ii.flags & InstanceInfo.CLASS_SEALED) == InstanceInfo.CLASS_SEALED) {
@@ -386,7 +423,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         }
         if ((ii.flags & InstanceInfo.CLASS_PROTECTEDNS) == InstanceInfo.CLASS_PROTECTEDNS) {
             writer.appendNoHilight("flag PROTECTEDNS").newLine();
-        }        
+        }
         if ((ii.flags & InstanceInfo.CLASS_NON_NULLABLE) == InstanceInfo.CLASS_NON_NULLABLE) {
             writer.appendNoHilight("flag NON_NULLABLE").newLine();
         }
@@ -396,7 +433,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         writer.unindent();
         writer.appendNoHilight("end ; instance").newLine();
         writer.unindent();
-        writer.appendNoHilight("end ; class").newLine();        
+        writer.appendNoHilight("end ; class").newLine();
         return writer;
     }
 

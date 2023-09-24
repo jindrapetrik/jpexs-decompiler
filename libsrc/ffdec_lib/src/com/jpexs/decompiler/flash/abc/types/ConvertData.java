@@ -34,6 +34,10 @@ public class ConvertData {
     public boolean thisHasDefaultToPrimitive;
 
     public boolean ignoreFrameScripts;
+    
+    public boolean exportEmbed;
+    
+    public boolean exportEmbedFlaMode;
 
     public ConvertData() {
         deobfuscationMode = Configuration.autoDeobfuscate.get() ? 1 : 0;
