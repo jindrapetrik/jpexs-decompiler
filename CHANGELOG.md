@@ -42,6 +42,8 @@ All notable changes to this project will be documented in this file.
 - NullPointer on reload / uncache
 - [#2076] Auto rename identifiers infinite loop caused by renaming in playerglobal library
 - Not working "Show in Projector" button for DefineFont4 (hide)
+- Proper error message when there is no room for new characters in the font (DefineFont1)
+- Synchronization problems when adding characters to the font vs its display
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 

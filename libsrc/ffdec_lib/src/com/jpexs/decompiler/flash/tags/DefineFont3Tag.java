@@ -231,7 +231,7 @@ public class DefineFont3Tag extends FontTag {
      * @throws java.io.IOException
      */
     @Override
-    public void getData(SWFOutputStream sos) throws IOException {
+    public synchronized void getData(SWFOutputStream sos) throws IOException {
         checkWideParameters();
         List<Long> offsetTable = new ArrayList<>();
         ByteArrayOutputStream baosGlyphShapes = new ByteArrayOutputStream();
@@ -307,12 +307,12 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public int getGlyphWidth(int glyphIndex) {
+    public synchronized int getGlyphWidth(int glyphIndex) {
         return glyphShapeTable.get(glyphIndex).getBounds(1).getWidth();
     }
 
     @Override
-    public double getGlyphAdvance(int glyphIndex) {
+    public synchronized double getGlyphAdvance(int glyphIndex) {
         if (fontFlagsHasLayout && glyphIndex != -1) {
             return fontAdvanceTable.get(glyphIndex);
         } else {
@@ -321,17 +321,17 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public char glyphToChar(int glyphIndex) {
+    public synchronized char glyphToChar(int glyphIndex) {
         return Utf8Helper.codePointToChar(codeTable.get(glyphIndex), getCodesCharset());
     }
 
     @Override
-    public int charToGlyph(char c) {
+    public synchronized int charToGlyph(char c) {
         return codeTable.indexOf(Utf8Helper.charToCodePoint(c, getCodesCharset()));
     }
 
     @Override
-    public List<SHAPE> getGlyphShapeTable() {
+    public synchronized List<SHAPE> getGlyphShapeTable() {
         return glyphShapeTable;
     }
 
@@ -424,7 +424,7 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public void addCharacter(char character, Font font) {
+    public synchronized boolean addCharacter(char character, Font font) {
 
         //Font Align Zones will be removed as adding new character zones is not supported:-(
         for (int i = 0; i < swf.getTags().size(); i++) {
@@ -508,10 +508,11 @@ public class DefineFont3Tag extends FontTag {
         checkWideParameters();
         setModified(true);
         getSwf().clearImageCache();
+        return true;
     }
 
     @Override
-    public boolean removeCharacter(char character) {
+    public synchronized boolean removeCharacter(char character) {
 
         //Font Align Zones will be removed as removing character zones is not supported:-(
         for (int i = 0; i < swf.getTags().size(); i++) {
@@ -566,7 +567,7 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public void setAdvanceValues(Font font) {
+    public synchronized void setAdvanceValues(Font font) {
         List<RECT> newFontBoundsTable = new ArrayList<>();
         List<Integer> newFontAdvanceTable = new ArrayList<>();
         for (int i = 0; i < codeTable.size(); i++) {
@@ -590,12 +591,12 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public int getCharacterCount() {
+    public synchronized int getCharacterCount() {
         return codeTable.size();
     }
 
     @Override
-    public String getCharacters() {
+    public synchronized String getCharacters() {
         StringBuilder ret = new StringBuilder(codeTable.size());
         for (int i : codeTable) {
             Character c = Utf8Helper.codePointToChar(i, getCodesCharset());
@@ -610,7 +611,7 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public RECT getGlyphBounds(int glyphIndex) {
+    public synchronized RECT getGlyphBounds(int glyphIndex) {
         if (fontFlagsHasLayout) {
             return fontBoundsTable.get(glyphIndex);
         }
@@ -618,7 +619,7 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
+    public synchronized int getGlyphKerningAdjustment(int glyphIndex, int nextGlyphIndex) {
         if (glyphIndex == -1 || nextGlyphIndex == -1) {
             return 0;
         }
@@ -628,7 +629,7 @@ public class DefineFont3Tag extends FontTag {
     }
 
     @Override
-    public int getCharKerningAdjustment(char c1, char c2) {
+    public synchronized int getCharKerningAdjustment(char c1, char c2) {
         int c1Code = Utf8Helper.charToCodePoint(c1, getCodesCharset());
         int c2Code = Utf8Helper.charToCodePoint(c2, getCodesCharset());
         

@@ -65,7 +65,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
 
     public abstract List<SHAPE> getGlyphShapeTable();
 
-    public abstract void addCharacter(char character, Font font);
+    public abstract boolean addCharacter(char character, Font font);
 
     public abstract boolean removeCharacter(char character);
 
@@ -440,7 +440,7 @@ public abstract class FontTag extends DrawableTag implements AloneTag {
     }
 
     @Override
-    public void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
+    public synchronized void toImage(int frame, int time, int ratio, RenderContext renderContext, SerializableImage image, SerializableImage fullImage, boolean isClip, Matrix transformation, Matrix strokeTransformation, Matrix absoluteTransformation, Matrix fullTransformation, ColorTransform colorTransform, double unzoom, boolean sameImage, ExportRectangle viewRect, boolean scaleStrokes, int drawMode, int blendMode, boolean canUseSmoothing) {
         SHAPERECORD.shapeListToImage(1, swf, getGlyphShapeTable(), image, frame, Color.black, colorTransform);
     }
 

@@ -19,6 +19,7 @@ package com.jpexs.decompiler.flash.tags;
 import com.jpexs.decompiler.flash.SWF;
 import com.jpexs.decompiler.flash.SWFInputStream;
 import com.jpexs.decompiler.flash.SWFOutputStream;
+import com.jpexs.decompiler.flash.ValueTooLargeException;
 import com.jpexs.decompiler.flash.tags.base.CharacterIdTag;
 import com.jpexs.decompiler.flash.tags.base.FontInfoTag;
 import com.jpexs.decompiler.flash.tags.base.FontTag;
@@ -35,6 +36,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -107,7 +110,7 @@ public class DefineFontTag extends FontTag {
      * @throws java.io.IOException
      */
     @Override
-    public void getData(SWFOutputStream sos) throws IOException {
+    public synchronized void getData(SWFOutputStream sos) throws IOException {
         sos.writeUI16(fontId);
         ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
         List<Integer> offsetTable = new ArrayList<>();
@@ -133,7 +136,7 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public int getGlyphWidth(int glyphIndex) {
+    public synchronized int getGlyphWidth(int glyphIndex) {
         return glyphShapeTable.get(glyphIndex).getBounds(1).getWidth();
     }
 
@@ -154,7 +157,7 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public char glyphToChar(int glyphIndex) {
+    public synchronized char glyphToChar(int glyphIndex) {
         ensureFontInfo();
         if (fontInfoTag != null) {
             return Utf8Helper.codePointToChar(fontInfoTag.getCodeTable().get(glyphIndex), getCodesCharset());
@@ -174,7 +177,7 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public List<SHAPE> getGlyphShapeTable() {
+    public synchronized List<SHAPE> getGlyphShapeTable() {
         return glyphShapeTable;
     }
 
@@ -275,9 +278,9 @@ public class DefineFontTag extends FontTag {
     }
     
     
-
+    
     @Override
-    public void addCharacter(char character, Font font) {
+    public synchronized boolean addCharacter(char character, Font font) {
         SHAPE shp = SHAPERECORD.fontCharacterToSHAPE(font, (int) Math.round(getDivider() * 1024), character);
         ensureFontInfo();
         int code = (int) Utf8Helper.charToCodePoint(character, getCodesCharset());
@@ -307,6 +310,31 @@ public class DefineFontTag extends FontTag {
             pos = 0;
         }
 
+        
+        //Check whether offset is not too large
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SWFOutputStream sos2 = new SWFOutputStream(baos, getVersion(), getCharset());
+        for (int s = 0; s <= glyphShapeTable.size(); s++) {
+            SHAPE shape;
+            if (s == glyphShapeTable.size() || pos == s) {
+                if (pos != s) {
+                    break;
+                }
+                shape = shp;
+            } else {
+                shape = glyphShapeTable.get(s);
+            }
+            int offset = glyphShapeTable.size() * 2 + (int) sos2.getPos();
+            if (offset > 0xffff) {
+                return false;                          
+            }
+            try {
+                sos2.writeSHAPE(shape, 1);
+            } catch (IOException ex) {
+                //should not happen
+            }
+        }
+        
         if (!exists) {
             shiftGlyphIndices(fontId, pos, true);
             glyphShapeTable.add(pos, shp);
@@ -319,10 +347,11 @@ public class DefineFontTag extends FontTag {
 
         setModified(true);
         getSwf().clearImageCache();
+        return true;
     }
 
     @Override
-    public boolean removeCharacter(char character) {
+    public synchronized boolean removeCharacter(char character) {
         ensureFontInfo();
         if (fontInfoTag == null) {
             return false;
@@ -362,7 +391,7 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public int getCharacterCount() {
+    public synchronized int getCharacterCount() {
         ensureFontInfo();
         if (fontInfoTag != null) {
             List<Integer> codeTable = fontInfoTag.getCodeTable();
@@ -372,7 +401,7 @@ public class DefineFontTag extends FontTag {
     }
 
     @Override
-    public String getCharacters() {
+    public synchronized String getCharacters() {
         ensureFontInfo();
         if (fontInfoTag != null) {
             List<Integer> codeTable = fontInfoTag.getCodeTable();

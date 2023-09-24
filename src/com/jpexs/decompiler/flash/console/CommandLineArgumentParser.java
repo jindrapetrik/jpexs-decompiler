@@ -4059,9 +4059,7 @@ public class CommandLineArgumentParser {
                         return false;
                     }
 
-                    font.addCharacter(character, f);
-
-                    return true;
+                    return font.addCharacter(character, f);
                 }
             }, new TextImportErrorHandler() {
                 private String getTextTagInfo(TextTag textTag) {

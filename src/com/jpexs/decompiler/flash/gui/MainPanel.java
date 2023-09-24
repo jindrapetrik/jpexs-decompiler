@@ -4105,9 +4105,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
                     return false;
                 }
 
-                font.addCharacter(character, f);
-
-                return true;
+                return font.addCharacter(character, f);
             }
         };
     }
