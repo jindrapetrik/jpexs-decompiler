@@ -144,7 +144,7 @@ public class InstanceInfo {
                                 }
 
                                 if (lastC + 1 != c) {
-                                    if (!sb.isEmpty()) {
+                                    if (sb.length() > 0) {
                                         sb.append(",");
                                     }
                                     if (firstC == lastC) {
@@ -156,7 +156,7 @@ public class InstanceInfo {
                                 }
                                 lastC = c;
                             }
-                            if (!sb.isEmpty()) {
+                            if (sb.length() > 0) {
                                 sb.append(",");
                             }
                             if (firstC == lastC) {
