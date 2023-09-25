@@ -43,7 +43,9 @@ public class MethodInfo {
 
     public void delete(ABC abc, boolean d) {
         this.deleted = d;
-        MethodBody body = abc.findBody(this);
+        
+        //NewFunctions are now deleted later, in ABC.pack
+        /*MethodBody body = abc.findBody(this);
         if (body != null) {
             for (AVM2Instruction ins : body.getCode().code) {
                 if (ins.definition instanceof NewFunctionIns) {
@@ -52,7 +54,7 @@ public class MethodInfo {
                     }
                 }
             }
-        }
+        }*/
     }
 
     public int[] param_types = new int[]{};
