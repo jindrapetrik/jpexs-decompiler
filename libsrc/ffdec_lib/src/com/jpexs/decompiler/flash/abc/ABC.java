@@ -25,6 +25,7 @@ import com.jpexs.decompiler.flash.abc.avm2.AVM2Code;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2ConstantPool;
 import com.jpexs.decompiler.flash.abc.avm2.AVM2Deobfuscation;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.AVM2Instruction;
+import com.jpexs.decompiler.flash.abc.avm2.instructions.construction.NewFunctionIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.executing.CallPropertyIns;
 import com.jpexs.decompiler.flash.abc.avm2.instructions.stack.PushStringIns;
 import com.jpexs.decompiler.flash.abc.types.ABCException;
@@ -80,6 +81,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1613,7 +1616,7 @@ public class ABC implements Openable {
             }
         }
     }
-    
+
     private int moveClassIndex(int oldIndex, int newIndex, int currentIndex) {
         if (newIndex > oldIndex) {
             newIndex--;
@@ -1630,7 +1633,7 @@ public class ABC implements Openable {
         return currentIndex;
     }
 
-    public void moveClass(int oldIndex, int newIndex) {       
+    public void moveClass(int oldIndex, int newIndex) {
         for (MethodBody b : bodies) {
             for (AVM2Instruction ins : b.getCode().code) {
                 for (int i = 0; i < ins.definition.operands.length; i++) {
@@ -1640,14 +1643,14 @@ public class ABC implements Openable {
                 }
             }
         }
-        
+
         for (ScriptInfo si : script_info) {
             moveClassInTraits(si.traits, oldIndex, newIndex);
         }
         for (MethodBody b : bodies) {
             moveClassInTraits(b.traits, oldIndex, newIndex);
         }
-                
+
         if (newIndex > oldIndex) {
             newIndex--;
         }
@@ -1837,6 +1840,56 @@ public class ABC implements Openable {
     }
 
     private void packMethods() {
+        Set<Integer> newFunctionsToDelete = new LinkedHashSet<>();
+        Map<Integer, Integer> newFunctionsUsage = new HashMap<>();
+        for (int m = 0; m < method_info.size(); m++) {
+            MethodBody body = findBody(m);
+            if (body != null) {
+                for (AVM2Instruction ins : body.getCode().code) {
+                    if (ins.definition instanceof NewFunctionIns) {
+                        if (ins.operands[0] < method_info.size()) {
+                            if (method_info.get(m).deleted) {
+                                if (!method_info.get(ins.operands[0]).deleted) {
+                                    newFunctionsToDelete.add(ins.operands[0]);
+                                }
+                            } else {
+                                if (!newFunctionsUsage.containsKey(ins.operands[0])) {
+                                    newFunctionsUsage.put(ins.operands[0], 0);
+                                }
+                                newFunctionsUsage.put(ins.operands[0], newFunctionsUsage.get(ins.operands[0]) + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        while(!newFunctionsToDelete.isEmpty()) {
+            Iterator<Integer> it = newFunctionsToDelete.iterator();            
+            int m = it.next();
+            it.remove();
+            int usageCount = newFunctionsUsage.containsKey(m) ? newFunctionsUsage.get(m) : 0;
+            if (usageCount == 0 && !method_info.get(m).deleted) {
+                method_info.get(m).delete(this, true);
+                MethodBody body = findBody(m);
+                if (body != null) {
+                    for (AVM2Instruction ins : body.getCode().code) {
+                        if (ins.definition instanceof NewFunctionIns) {
+                            if (ins.operands[0] < method_info.size()) {
+                                if (!method_info.get(ins.operands[0]).deleted) {
+                                    newFunctionsToDelete.add(ins.operands[0]);
+                                }
+                                if (!newFunctionsUsage.containsKey(ins.operands[0])) {
+                                    newFunctionsUsage.put(ins.operands[0], 1);
+                                }
+                                newFunctionsUsage.put(ins.operands[0], newFunctionsUsage.get(ins.operands[0]) - 1);
+                            }
+                        }
+                    }
+                }
+            }            
+        }
+        
         for (int m = 0; m < method_info.size(); m++) {
             if (method_info.get(m).deleted) {
                 removeMethod(m);

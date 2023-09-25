@@ -48,6 +48,7 @@ All notable changes to this project will be documented in this file.
 - Proper error message when there is no room for new characters in the font (DefineFont1)
 - Synchronization problems when adding characters to the font vs its display
 - [#2086] AS3 direct editation - Correct class order (instanceinfo,classinfo) respecting extends/implements
+- [#2086] AS3 direct editation - not deleting old nested methods when they have multiple usages
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 
