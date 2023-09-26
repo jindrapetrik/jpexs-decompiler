@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - AS3 - Show `Embed` tag over asset classes (readonly)
 - AS3 - Checkbox for exporting assets embedded using `Embed` (-exportembed in commandline)
 - FLA export - AS3 - Using `Embed` tag for DefineBinaryData, images not extending BitmapData
+- [#2066] AS3 Support for api-versioned SWFs
 
 ### Fixed
 - [#2043] StartSound2 tag handling
@@ -3098,6 +3099,7 @@ Major version of SWF to XML export changed to 2.
 [#2070]: https://www.free-decompiler.com/flash/issues/2070
 [#2073]: https://www.free-decompiler.com/flash/issues/2073
 [#2057]: https://www.free-decompiler.com/flash/issues/2057
+[#2066]: https://www.free-decompiler.com/flash/issues/2066
 [#2043]: https://www.free-decompiler.com/flash/issues/2043
 [#2017]: https://www.free-decompiler.com/flash/issues/2017
 [#2052]: https://www.free-decompiler.com/flash/issues/2052

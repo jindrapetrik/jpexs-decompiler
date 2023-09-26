@@ -335,9 +335,10 @@ public final class AbcIndexing {
             this.type = type;
             if (scriptIndex != null) {
                 for (Trait t : abc.script_info.get(scriptIndex).traits.traits) {
-                    Namespace ns = t.getName(abc).getNamespace(abc.constants);
-                    if (ns.kind == Namespace.KIND_PACKAGE) {
-                        pkg = ns.getName(abc.constants);
+                    Multiname m = t.getName(abc);
+                    int nskind = m.getSimpleNamespaceKind(abc.constants);
+                    if (nskind == Namespace.KIND_PACKAGE) {
+                        pkg = m.getSimpleNamespaceName(abc.constants);
                     }
                 }
             }
@@ -818,7 +819,7 @@ public final class AbcIndexing {
                         continue;
                     }
                     ClassInfo ci = abc.class_info.get(tc.class_info);
-                    int nsKind = abc.constants.getMultiname(tc.name_index).getNamespace(abc.constants).kind;
+                    int nsKind = abc.constants.getMultiname(tc.name_index).getSimpleNamespaceKind(abc.constants);
                     Integer classScriptIndex = nsKind == Namespace.KIND_PACKAGE ? null : i;
                     ClassIndex cindex = new ClassIndex(tc.class_info, abc, null, classScriptIndex);
                     addedClasses.add(cindex);

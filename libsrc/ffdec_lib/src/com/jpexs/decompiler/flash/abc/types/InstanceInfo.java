@@ -187,7 +187,7 @@ public class InstanceInfo {
 
         String modifiers;
         Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
-        modifiers = ns.getPrefix(abc);
+        modifiers = ns.getPrefix();
         if (!allowPrivate && modifiers.equals("private")) {
             modifiers = "";
         }

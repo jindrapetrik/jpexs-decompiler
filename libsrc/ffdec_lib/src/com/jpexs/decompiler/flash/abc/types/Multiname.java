@@ -24,8 +24,11 @@ import com.jpexs.decompiler.graph.DottedChain;
 import com.jpexs.helpers.Helper;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  *
@@ -410,19 +413,26 @@ public class Multiname {
         if (cached != null) {
             return cached;
         }
-        Namespace ns = getNamespace(constants);
-        if (ns == null) {
-            NamespaceSet nss = getNamespaceSet(constants);
-            if (nss != null) {
-                if (nss.namespaces.length == 1) {
-                    ns = constants.getNamespace(nss.namespaces[0]);
+        
+        DottedChain nsName = getSimpleNamespaceName(constants);
+        if (nsName == null) {                            
+            Namespace ns = getNamespace(constants);
+            if (ns == null) {
+                NamespaceSet nss = getNamespaceSet(constants);
+                if (nss != null) {
+                    if (nss.namespaces.length == 1) {
+                        ns = constants.getNamespace(nss.namespaces[0]);
+                    }
                 }
+            }
+            if (ns != null) {
+                nsName = ns.getName(constants);
             }
         }
         String name = getName(constants, null, true, false);
         DottedChain ret;
-        if (ns != null) {
-            ret = ns.getName(constants).add(name, withSuffix ? getNamespaceSuffix() : "");
+        if (nsName != null) {
+            ret = nsName.add(name, withSuffix ? getNamespaceSuffix() : "");
         } else {
             ret = new DottedChain(new String[]{name}, new String[]{withSuffix ? getNamespaceSuffix() : ""});        
         }
@@ -436,6 +446,60 @@ public class Multiname {
         } else {
             return constants.getNamespace(namespace_index);
         }
+    }
+    
+    /**
+     * Gets simple namespace name as dottedchain. Ignores swf api versioning.
+     * @param constants
+     * @return 
+     */
+    public DottedChain getSimpleNamespaceName(AVM2ConstantPool constants) {                        
+        if (hasOwnNamespace()) {
+            if (namespace_index == 0 || namespace_index == -1) {
+                return DottedChain.EMPTY;
+            }
+            return getNamespace(constants).getName(constants);
+        }           
+        if (hasOwnNamespaceSet()) {
+            NamespaceSet nss = getNamespaceSet(constants);
+            if (nss == null) {
+                return null;
+            }
+            return nss.getNonversionedName(constants);
+        }
+        return null;
+    }
+    
+    /**
+     * Gets simplpe namespace kind. Ignores swf api versioning.
+     * @param constants
+     * @return 
+     */
+    public int getSimpleNamespaceKind(AVM2ConstantPool constants) {
+        if (hasOwnNamespace()) {
+            if (namespace_index == 0 || namespace_index == -1) {
+                return 0;
+            }
+            return getNamespace(constants).kind;
+        }   
+        if (hasOwnNamespaceSet()) {
+            NamespaceSet nss = getNamespaceSet(constants);
+            if (nss == null) {
+                return 0;
+            }
+            return nss.getNonversionedKind(constants);
+        }
+        return 0;
+    }
+    
+    public List<Integer> getApiVersions(AVM2ConstantPool constants) {
+        if (hasOwnNamespace()) {
+            return new ArrayList<>();
+        }
+        if (hasOwnNamespaceSet()) {
+            return getNamespaceSet(constants).getApiVersions(constants);
+        }
+        return new ArrayList<>();
     }
 
     public NamespaceSet getNamespaceSet(AVM2ConstantPool constants) {
