@@ -26,6 +26,10 @@ import com.jpexs.decompiler.graph.DottedChain;
  * @author JPEXS
  */
 public class Namespace {
+    
+    public static final int MIN_API_MARK = 0xE000;
+    
+    public static final int MAX_API_MARK = 0xF8FF;
 
     public static final int KIND_NAMESPACE = 8;
 
@@ -107,7 +111,18 @@ public class Namespace {
         return kindStr + (nameStr == null || nameStr.isEmpty() ? "" : " " + nameStr);
     }
 
-    public String getPrefix(ABC abc) {
+    public String getPrefix() {
+        String kindStr = "?";
+        for (int k = 0; k < nameSpaceKinds.length; k++) {
+            if (nameSpaceKinds[k] == kind) {
+                kindStr = namePrefixes[k];
+                break;
+            }
+        }
+        return kindStr;
+    }
+    
+    public static String getPrefix(int kind) {
         String kindStr = "?";
         for (int k = 0; k < nameSpaceKinds.length; k++) {
             if (nameSpaceKinds[k] == kind) {

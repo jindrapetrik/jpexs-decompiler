@@ -170,14 +170,15 @@ public abstract class Trait implements Cloneable, Serializable {
     }
 
     protected DottedChain getPackage(ABC abc) {
-        return getName(abc).getNamespace(abc.constants).getName(abc.constants);
+        return getName(abc).getSimpleNamespaceName(abc.constants);
     }
 
     public void getDependencies(AbcIndexing abcIndex, int scriptIndex, int classIndex, boolean isStatic, String ignoredCustom, ABC abc, List<Dependency> dependencies, DottedChain ignorePackage, List<DottedChain> fullyQualifiedNames) throws InterruptedException {
         if (ignoredCustom == null) {
-            Namespace n = getName(abc).getNamespace(abc.constants);
-            if (n.kind == Namespace.KIND_NAMESPACE) {
-                ignoredCustom = n.getName(abc.constants).toRawString();
+            Multiname m = getName(abc);
+            int nskind = m.getSimpleNamespaceKind(abc.constants);
+            if (nskind == Namespace.KIND_NAMESPACE) {
+                ignoredCustom = m.getSimpleNamespaceName(abc.constants).toRawString();
             }
         }
         DependencyParser.parseDependenciesFromMultiname(abcIndex, ignoredCustom, abc, dependencies, getName(abc), ignorePackage, fullyQualifiedNames, DependencyType.NAMESPACE);
@@ -199,8 +200,8 @@ public abstract class Trait implements Cloneable, Serializable {
         boolean publicProtectedOnly = isParent;
         for (Trait it : abc.instance_info.get(classIndex).instance_traits.traits) {            
             if (publicProtectedOnly) {
-                Namespace ns = it.getName(abc).getNamespace(abc.constants);
-                if (ns.kind != Namespace.KIND_PACKAGE && ns.kind != Namespace.KIND_PROTECTED) {
+                int nskind = it.getName(abc).getSimpleNamespaceKind(abc.constants);
+                if (nskind != Namespace.KIND_PACKAGE && nskind != Namespace.KIND_PROTECTED) {
                     continue;
                 }
             }
@@ -208,8 +209,8 @@ public abstract class Trait implements Cloneable, Serializable {
         }
         for (Trait ct : abc.class_info.get(classIndex).static_traits.traits) {
             if (publicProtectedOnly) {
-                Namespace ns = ct.getName(abc).getNamespace(abc.constants);
-                if (ns.kind != Namespace.KIND_PACKAGE && ns.kind != Namespace.KIND_STATIC_PROTECTED) {
+                int nskind = ct.getName(abc).getSimpleNamespaceKind(abc.constants);
+                if (nskind != Namespace.KIND_PACKAGE && nskind != Namespace.KIND_STATIC_PROTECTED) {
                     continue;
                 }
             }
@@ -249,9 +250,10 @@ public abstract class Trait implements Cloneable, Serializable {
         //imports
         List<Dependency> dependencies = new ArrayList<>();
         String customNs = null;
-        Namespace ns = getName(abc).getNamespace(abc.constants);
-        if (ns.kind == Namespace.KIND_NAMESPACE) {
-            customNs = ns.getName(abc.constants).toRawString();
+        Multiname multiname = getName(abc);
+        int nskind = multiname.getSimpleNamespaceKind(abc.constants);
+        if (nskind == Namespace.KIND_NAMESPACE) {
+            customNs = multiname.getSimpleNamespaceName(abc.constants).toRawString();
         }
         getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, new ArrayList<>());
 
@@ -367,6 +369,15 @@ public abstract class Trait implements Cloneable, Serializable {
             writer.append("]");
             writer.newLine();
         }
+        getApiVersions(abc, writer);
+        return writer;
+    }
+    
+    public final GraphTextWriter getApiVersions(ABC abc, GraphTextWriter writer) {
+        List<Integer> apiVersions = abc.constants.getMultiname(name_index).getApiVersions(abc.constants);
+        for(int version:apiVersions) {
+            writer.appendNoHilight("[API(\"" + version + "\")]").newLine();
+        }
         return writer;
     }
 
@@ -384,21 +395,21 @@ public abstract class Trait implements Cloneable, Serializable {
             DottedChain dc = abc.findCustomNs(m.namespace_index);
             String nsname = dc != null ? dc.getLast() : null;
 
-            Namespace ns = m.getNamespace(abc.constants);
+            int nskind = m.getSimpleNamespaceKind(abc.constants);
 
             if (insideInterface) {
                 //no namespace identifier
-            } else if (ns.kind == Namespace.KIND_NAMESPACE && nsname == null) {
+            } else if (nskind == Namespace.KIND_NAMESPACE && nsname == null) {
                 writer.append("§§namespace(\"");
-                writer.append(Helper.escapeActionScriptString(ns.getRawName(abc.constants)));
+                writer.append(Helper.escapeActionScriptString(m.getSimpleNamespaceName(abc.constants).toRawString()));
                 writer.append("\") ");
             } else if (nsname != null) {
                 String identifier = IdentifiersDeobfuscation.printIdentifier(true, nsname);
                 if (identifier != null && !identifier.isEmpty()) {
                     writer.appendNoHilight(identifier).appendNoHilight(" ");
                 }
-            } else if (ns != null) {
-                String nsPrefix = ns.getPrefix(abc);
+            } else if (nskind != 0) {
+                String nsPrefix = Namespace.getPrefix(nskind);
                 if (nsPrefix != null && !nsPrefix.isEmpty()) {
                     writer.appendNoHilight(nsPrefix).appendNoHilight(" ");
                 }
@@ -508,9 +519,10 @@ public abstract class Trait implements Cloneable, Serializable {
     }
 
     public GraphTextWriter toStringPackaged(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, GraphTextWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, boolean insideInterface) throws InterruptedException {
-        Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
-        if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-            String nsname = ns.getName(abc.constants).toPrintableString(true);
+        Multiname name = abc.constants.getMultiname(name_index);
+        int nskind = name.getSimpleNamespaceKind(abc.constants);
+        if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
+            String nsname = name.getSimpleNamespaceName(abc.constants).toPrintableString(true);
             writer.appendNoHilight("package");
             if (!nsname.isEmpty()) {
                 writer.appendNoHilight(" " + nsname); //assume not null name
@@ -524,9 +536,10 @@ public abstract class Trait implements Cloneable, Serializable {
     }
 
     public void convertPackaged(AbcIndexing abcIndex, Trait parent, ConvertData convertData, String path, ABC abc, boolean isStatic, ScriptExportMode exportMode, int scriptIndex, int classIndex, NulWriter writer, List<DottedChain> fullyQualifiedNames, boolean parallel, ScopeStack scopeStack) throws InterruptedException {
-        Namespace ns = abc.constants.getMultiname(name_index).getNamespace(abc.constants);
-        if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-            String nsname = ns.getName(abc.constants).toPrintableString(true);
+        Multiname name = abc.constants.getMultiname(name_index);
+        int nskind = name.getSimpleNamespaceKind(abc.constants);
+        if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
+            String nsname = name.getSimpleNamespaceName(abc.constants).toPrintableString(true);
             convert(abcIndex, parent, convertData, path + nsname, abc, isStatic, exportMode, scriptIndex, classIndex, writer, fullyQualifiedNames, parallel, scopeStack);
         }
     }

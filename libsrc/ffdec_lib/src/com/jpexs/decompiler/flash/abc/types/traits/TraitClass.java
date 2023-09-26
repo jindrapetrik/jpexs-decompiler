@@ -139,7 +139,7 @@ public class TraitClass extends Trait implements TraitWithSlot {
         String instanceInfoName = instanceInfoMultiname.getName(abc.constants, fullyQualifiedNames, false, true);
 
         getMetaData(parent, convertData, abc, writer);
-
+        
         boolean allowEmbed = true;
 
         if (convertData.exportEmbedFlaMode) {

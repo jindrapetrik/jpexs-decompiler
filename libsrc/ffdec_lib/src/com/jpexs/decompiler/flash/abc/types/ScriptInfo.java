@@ -97,19 +97,19 @@ public class ScriptInfo {
         for (int j = 0; j < traits.traits.size(); j++) {
             Trait t = traits.traits.get(j);
             Multiname name = t.getName(abc);
-            Namespace ns = name.getNamespace(abc.constants);
-            if (!((ns.kind == Namespace.KIND_PACKAGE_INTERNAL)
-                    || (ns.kind == Namespace.KIND_PACKAGE))) {
+            int nskind = name.getSimpleNamespaceKind(abc.constants);
+            if (!((nskind == Namespace.KIND_PACKAGE_INTERNAL)
+                    || (nskind == Namespace.KIND_PACKAGE))) {
                 otherTraits.add(j);
             }
         }
         for (int j = 0; j < traits.traits.size(); j++) {
             Trait t = traits.traits.get(j);
             Multiname name = t.getName(abc);
-            Namespace ns = name.getNamespace(abc.constants);
-            if ((ns.kind == Namespace.KIND_PACKAGE_INTERNAL)
-                    || (ns.kind == Namespace.KIND_PACKAGE)) {
-                DottedChain packageName = ns.getName(abc.constants); // assume not null package
+            int nskind = name.getSimpleNamespaceKind(abc.constants);
+            if ((nskind == Namespace.KIND_PACKAGE_INTERNAL)
+                    || (nskind == Namespace.KIND_PACKAGE)) {
+                DottedChain packageName = name.getSimpleNamespaceName(abc.constants); // assume not null package
                 String objectName = name.getName(abc.constants, null, true, false);
                 String namespaceSuffix = name.getNamespaceSuffix();
                 List<Integer> traitIndices = new ArrayList<>();
@@ -134,9 +134,8 @@ public class ScriptInfo {
             for (int traitIndex : otherTraits) {
                 Trait t = traits.traits.get(traitIndex);
                 Multiname name = t.getName(abc);
-                Namespace ns = name.getNamespace(abc.constants);
-
-                DottedChain packageName = ns.getName(abc.constants);
+                
+                DottedChain packageName = name.getSimpleNamespaceName(abc.constants);
                 String objectName = name.getName(abc.constants, null, true, false);
                 String namespaceSuffix = name.getNamespaceSuffix();
 

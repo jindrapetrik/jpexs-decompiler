@@ -21,6 +21,7 @@ import com.jpexs.decompiler.flash.abc.avm2.parser.script.AbcIndexing;
 import com.jpexs.decompiler.flash.abc.types.ConvertData;
 import com.jpexs.decompiler.flash.abc.types.MethodBody;
 import com.jpexs.decompiler.flash.abc.types.MethodInfo;
+import com.jpexs.decompiler.flash.abc.types.Multiname;
 import com.jpexs.decompiler.flash.abc.types.Namespace;
 import com.jpexs.decompiler.flash.configuration.Configuration;
 import com.jpexs.decompiler.flash.exporters.modes.ScriptExportMode;
@@ -70,9 +71,10 @@ public class TraitMethodGetterSetter extends Trait {
         super.getDependencies(abcIndex, scriptIndex, classIndex, isStatic, customNs, abc, dependencies, ignorePackage, fullyQualifiedNames);
 
         if (customNs == null) {
-            Namespace n = getName(abc).getNamespace(abc.constants);
-            if (n.kind == Namespace.KIND_NAMESPACE) {
-                customNs = n.getName(abc.constants).toRawString();
+            Multiname m = getName(abc);
+            int nskind = m.getSimpleNamespaceKind(abc.constants);
+            if (nskind == Namespace.KIND_NAMESPACE) {
+                customNs = m.getSimpleNamespaceName(abc.constants).toRawString();
             }
         }
         //if (method_info != 0)
