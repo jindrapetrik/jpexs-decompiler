@@ -49,6 +49,7 @@ All notable changes to this project will be documented in this file.
 - Synchronization problems when adding characters to the font vs its display
 - [#2086] AS3 direct editation - Correct class order (instanceinfo,classinfo) respecting extends/implements
 - [#2086] AS3 direct editation - not deleting old nested methods when they have multiple usages
+- [#2009] Missing images in MacOs icon
 
 ### Changed
 - [#2070] String values inside SWF to XML export are backslash escaped 
@@ -3106,6 +3107,7 @@ Major version of SWF to XML export changed to 2.
 [#2077]: https://www.free-decompiler.com/flash/issues/2077
 [#2076]: https://www.free-decompiler.com/flash/issues/2076
 [#2086]: https://www.free-decompiler.com/flash/issues/2086
+[#2009]: https://www.free-decompiler.com/flash/issues/2009
 [#1998]: https://www.free-decompiler.com/flash/issues/1998
 [#2038]: https://www.free-decompiler.com/flash/issues/2038
 [#2028]: https://www.free-decompiler.com/flash/issues/2028
