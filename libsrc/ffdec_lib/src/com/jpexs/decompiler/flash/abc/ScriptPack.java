@@ -117,18 +117,17 @@ public class ScriptPack extends AS3ClassTreeItem {
         DottedChain packageName = DottedChain.TOPLEVEL;
         for (int t : traitIndices) {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
-            Namespace ns = name.getNamespace(abc.constants);
-            if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-                packageName = ns.getName(abc.constants); // assume not null
+            int nskind = name.getSimpleNamespaceKind(abc.constants);
+            if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
+                packageName = name.getSimpleNamespaceName(abc.constants); // assume not null
             }
         }
         return packageName;
     }
 
-    public Trait getPublicTrait() {        
+    public Trait getPublicTrait() {
         for (int t : traitIndices) {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
-            //Namespace ns = name.getNamespace(abc.constants);
             int nskind = name.getSimpleNamespaceKind(abc.constants);
             if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
                 return abc.script_info.get(scriptIndex).traits.traits.get(t);
@@ -141,8 +140,8 @@ public class ScriptPack extends AS3ClassTreeItem {
         String scriptName = "";
         for (int t : traitIndices) {
             Multiname name = abc.script_info.get(scriptIndex).traits.traits.get(t).getName(abc);
-            Namespace ns = name.getNamespace(abc.constants);
-            if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
+            int nskind = name.getSimpleNamespaceKind(abc.constants);
+            if ((nskind == Namespace.KIND_PACKAGE) || (nskind == Namespace.KIND_PACKAGE_INTERNAL)) {
                 scriptName = name.getName(abc.constants, null, false, true);
             }
         }
@@ -166,19 +165,6 @@ public class ScriptPack extends AS3ClassTreeItem {
         return getExportFile(directory, exportSettings.getFileExtension());
     }
 
-    /*public String getPath() {
-     String packageName = "";
-     String scriptName = "";
-     for (int t : traitIndices) {
-     Multiname name = abc.script_info[scriptIndex].traits.traits.get(t).getName(abc);
-     Namespace ns = name.getNamespace(abc.constants);
-     if ((ns.kind == Namespace.KIND_PACKAGE) || (ns.kind == Namespace.KIND_PACKAGE_INTERNAL)) {
-     packageName = ns.getName(abc.constants);
-     scriptName = name.getName(abc.constants, new ArrayList<>());
-     }
-     }
-     return packageName.equals("") ? scriptName : packageName + "." + scriptName;
-     }*/
     public void convert(AbcIndexing abcIndex, final NulWriter writer, final List<Trait> traits, final ConvertData convertData, final ScriptExportMode exportMode, final boolean parallel) throws InterruptedException {
 
         int sinit_index = abc.script_info.get(scriptIndex).init_index;
