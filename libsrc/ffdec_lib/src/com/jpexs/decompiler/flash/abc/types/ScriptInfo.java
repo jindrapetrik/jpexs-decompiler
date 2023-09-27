@@ -75,9 +75,9 @@ public class ScriptInfo {
         for (int j = 0; j < traits.traits.size(); j++) {
             Trait t = traits.traits.get(j);
             Multiname name = t.getName(abc);
-            Namespace ns = name.getNamespace(abc.constants);
-            if ((ns.kind == Namespace.KIND_PACKAGE_INTERNAL)
-                    || (ns.kind == Namespace.KIND_PACKAGE)) {
+            int nskind = name.getSimpleNamespaceKind(abc.constants);
+            if ((nskind == Namespace.KIND_PACKAGE_INTERNAL)
+                    || (nskind == Namespace.KIND_PACKAGE)) {
                 packageTraits.add(j);
             }
         }
