@@ -211,7 +211,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         if (!isSimple && traitIndices.isEmpty()) {
             for (Trait t : abc.script_info.get(scriptIndex).traits.traits) {
                 String fullName = t.getName(abc).getNameWithNamespace(abc.constants, false).toPrintableString(true);
-                writer.appendNoHilight("include(\"" + fullName.replace(".", "/") + ".as\");").newLine();
+                writer.appendNoHilight("include \"" + fullName.replace(".", "/") + ".as\";").newLine();
             }
             writer.newLine();
         }
