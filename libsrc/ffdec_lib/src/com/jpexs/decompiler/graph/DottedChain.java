@@ -248,6 +248,19 @@ public class DottedChain implements Serializable, Comparable<DottedChain> {
         newParts.add(new PathPart(name, attribute, namespaceSuffix));
         return new DottedChain(newParts, false);
     }
+    
+    public DottedChain preAdd(String name, String namespaceSuffix) {
+        return preAdd(false, name, namespaceSuffix);
+    }
+    
+    public DottedChain preAdd(boolean attribute, String name, String namespaceSuffix) {
+        if (name == null) {
+            return new DottedChain(this);
+        }
+        List<PathPart> newParts = new ArrayList<>(parts);
+        newParts.add(0, new PathPart(name, attribute, namespaceSuffix));
+        return new DottedChain(newParts, false);
+    }
 
     protected String toString(boolean as3, boolean raw, boolean withSuffix) {
         if (isNull) {

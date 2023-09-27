@@ -103,6 +103,21 @@ public class ScriptInfo {
                 otherTraits.add(j);
             }
         }
+        
+        int publicTraitsCount = 0;
+        for (int j = 0; j < traits.traits.size(); j++) {
+            Trait t = traits.traits.get(j);
+            Multiname name = t.getName(abc);
+            int nskind = name.getSimpleNamespaceKind(abc.constants);
+            if ((nskind == Namespace.KIND_PACKAGE_INTERNAL)
+                    || (nskind == Namespace.KIND_PACKAGE)) {
+                publicTraitsCount++;
+            }
+        }
+        
+        boolean isSimple = publicTraitsCount == 1;
+        
+        
         for (int j = 0; j < traits.traits.size(); j++) {
             Trait t = traits.traits.get(j);
             Multiname name = t.getName(abc);
@@ -121,14 +136,14 @@ public class ScriptInfo {
                 }
 
                 if (packagePrefix == null || packageName.toPrintableString(true).startsWith(packagePrefix)) {
+                    
                     ClassPath cp = new ClassPath(packageName, objectName, namespaceSuffix);
-                    ret.add(new ScriptPack(cp, abc, allAbcs, scriptIndex, traitIndices));
+                    ScriptPack pack = new ScriptPack(cp, abc, allAbcs, scriptIndex, traitIndices);
+                    pack.isSimple = isSimple;
+                    ret.add(pack);
                 }
             }
-        }
-        if (ret.size() == 1) {
-            ret.get(0).isSimple = true;
-        }
+        }        
         if (ret.isEmpty() && !otherTraits.isEmpty()) { //no public/package internal traits to determine common pack name
             //make each trait separate pack
             for (int traitIndex : otherTraits) {
@@ -145,6 +160,9 @@ public class ScriptInfo {
                 ClassPath cp = new ClassPath(packageName, objectName, namespaceSuffix);
                 ret.add(new ScriptPack(cp, abc, allAbcs, scriptIndex, traitIndices));
             }
+        }               
+        if (!isSimple) {
+            ret.add(new ScriptPack(new ClassPath(DottedChain.EMPTY, "script_"+scriptIndex, ""), abc, allAbcs, scriptIndex, new ArrayList<>()));
         }
         if (packagePrefix == null) {
             cachedPacks = new ArrayList<>(ret);

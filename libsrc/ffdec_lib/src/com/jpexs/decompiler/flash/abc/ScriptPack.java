@@ -112,7 +112,7 @@ public class ScriptPack extends AS3ClassTreeItem {
         this.path = path;
         this.allABCs = allAbcs;
     }
-
+        
     public DottedChain getPathPackage() {
         DottedChain packageName = DottedChain.TOPLEVEL;
         for (int t : traitIndices) {
@@ -182,8 +182,8 @@ public class ScriptPack extends AS3ClassTreeItem {
             List<MethodBody> callStack = new ArrayList<>();
             callStack.add(abc.bodies.get(sinit_bodyIndex));            
             abc.bodies.get(sinit_bodyIndex).convert(callStack, abcIndex, convertData, path +/*packageName +*/ "/.scriptinitializer", exportMode, true, sinit_index, scriptIndex, -1, abc, null, new ScopeStack(), GraphTextWriter.TRAIT_SCRIPT_INITIALIZER, writer, new ArrayList<>(), ts, true, new HashSet<>());
-            scriptInitializerIsEmpty = !writer.getMark();
-
+            scriptInitializerIsEmpty = !writer.getMark();            
+            
         }
         ScopeStack scopeStack = new ScopeStack();
         scopeStack.push(new GlobalAVM2Item(null, null));
@@ -206,7 +206,17 @@ public class ScriptPack extends AS3ClassTreeItem {
         //script initializer
         int script_init = abc.script_info.get(scriptIndex).init_index;
         int bodyIndex = abc.findBodyIndex(script_init);
-        if (bodyIndex != -1 && Configuration.enableScriptInitializerDisplay.get()) {
+        
+        
+        if (!isSimple && traitIndices.isEmpty()) {
+            for (Trait t : abc.script_info.get(scriptIndex).traits.traits) {
+                String fullName = t.getName(abc).getNameWithNamespace(abc.constants, false).toPrintableString(true);
+                writer.appendNoHilight("include(\"" + fullName.replace(".", "/") + ".as\");").newLine();
+            }
+            writer.newLine();
+        }
+        
+        if (bodyIndex != -1 && (isSimple || traitIndices.isEmpty())) { // && Configuration.enableScriptInitializerDisplay.get()) {
             //Note: There must be trait/method highlight even if the initializer is empty to TraitList in GUI to work correctly
             //TODO: handle this better in GUI(?)
             writer.startTrait(GraphTextWriter.TRAIT_SCRIPT_INITIALIZER);
@@ -228,8 +238,6 @@ public class ScriptPack extends AS3ClassTreeItem {
                 writer.newLine();
             }
             first = false;
-        } else {
-            //"/*classInitializer*/";
         }
 
         for (int t : traitIndices) {
