@@ -59,7 +59,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     public ClassesListTreeModel(SWF swf, boolean flat) {
         super(null, null, null);
         this.flat = flat;
-        root = new AS3Package(null, swf, flat, false);
+        root = new AS3Package(null, swf, flat, false, null, null);
         this.targetItem = swf;
         this.list = swf.getAS3Packs();
         setFilter(null);
@@ -68,7 +68,7 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
     public ClassesListTreeModel(ABC abc, boolean flat) {
         super(null, null, null);
         this.flat = flat;
-        root = new AS3Package(null, abc.getOpenable(), flat, false);
+        root = new AS3Package(null, abc.getOpenable(), flat, false, null, null);
         this.targetItem = abc;
         List<ABC> allAbcs = new ArrayList<>();
         allAbcs.add(abc);
@@ -131,12 +131,30 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
             }
 
             DottedChain packageStr = item.getClassPath().packageStr;
-            AS3Package pkg = ensurePackage(packageStr);
-            pkg.addScriptPack(item);
+            AS3Package pkg = ensurePackage(packageStr, item.abc, item.isSimple ? null : item.scriptIndex, item);
+            if (pkg != null) {
+                pkg.addScriptPack(item);
+            }
         }
     }
 
-    private AS3Package ensurePackage(DottedChain packageStr) {
+    private AS3Package ensurePackage(DottedChain packageStr, ABC abc, Integer scriptIndex, ScriptPack pack) {
+        AS3Package parent = root;
+        
+        if (scriptIndex != null) {
+            String pathElement = "script_" + scriptIndex;
+            AS3Package pkg = parent.getSubPackage(pathElement);
+            if (pkg == null) {
+                pkg = new AS3Package(pathElement, getOpenable(), false, false, abc, scriptIndex);
+                parent.addSubPackage(pkg);
+            }
+            if (pack.traitIndices.isEmpty()) {
+                pkg.setCompoundInitializerPack(pack);
+                return null;
+            }            
+            parent = pkg;
+        }
+        
         if (flat) {
             String fullName = packageStr.toPrintableString(true);
             boolean defaultPackage = false;
@@ -144,19 +162,19 @@ public class ClassesListTreeModel extends AS3ClassTreeItem implements TreeModel 
                 fullName = AppResources.translate("package.default");
                 defaultPackage = true;
             }
-            AS3Package pkg = root.getSubPackage(fullName);
+            AS3Package pkg = parent.getSubPackage(fullName);
             if (pkg == null) {
-                pkg = new AS3Package(fullName, getOpenable(), true, defaultPackage);
-                root.addSubPackage(pkg);
+                pkg = new AS3Package(fullName, getOpenable(), true, defaultPackage, null, null);
+                parent.addSubPackage(pkg);
             }
             return pkg;
         }
-        AS3Package parent = root;
+
         for (int i = 0; i < packageStr.size(); i++) {
             String pathElement = packageStr.get(i);
             AS3Package pkg = parent.getSubPackage(pathElement);
             if (pkg == null) {
-                pkg = new AS3Package(pathElement, getOpenable(), false, false);
+                pkg = new AS3Package(pathElement, getOpenable(), false, false, null, null);
                 parent.addSubPackage(pkg);
             }
 

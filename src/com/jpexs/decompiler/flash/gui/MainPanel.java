@@ -189,6 +189,7 @@ import com.jpexs.decompiler.flash.tags.gfx.DefineExternalImage2;
 import com.jpexs.decompiler.flash.tags.gfx.DefineExternalStreamSound;
 import com.jpexs.decompiler.flash.tags.gfx.DefineSubImage;
 import com.jpexs.decompiler.flash.tags.text.TextParseException;
+import com.jpexs.decompiler.flash.timeline.AS3Package;
 import com.jpexs.decompiler.flash.timeline.DepthState;
 import com.jpexs.decompiler.flash.timeline.Frame;
 import com.jpexs.decompiler.flash.timeline.TagScript;
@@ -5131,7 +5132,23 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
 
         boolean internalViewer = !isAdobeFlashPlayerEnabled();
 
-        if (treeItem instanceof ScriptPack) {
+        if ((treeItem instanceof AS3Package) && ((AS3Package)treeItem).isCompoundScript()) {
+            final ScriptPack scriptLeaf = ((AS3Package)treeItem).getCompoundInitializerPack();
+            if (!Main.isInited() || !Main.isWorking() || Main.isDebugging()) {
+                ABCPanel abcPanel = getABCPanel();
+                abcPanel.detailPanel.methodTraitPanel.methodCodePanel.clear();
+                abcPanel.setAbc(scriptLeaf.abc);
+                abcPanel.decompiledTextArea.setScript(scriptLeaf, true);
+                abcPanel.decompiledTextArea.setNoTrait();
+            }
+
+            if (Configuration.displayAs3TraitsListAndConstantsPanel.get()) {
+                showDetail(DETAILCARDAS3NAVIGATOR);
+            } else {
+                showDetail(DETAILCARDEMPTYPANEL);
+            }
+            showCard(CARDACTIONSCRIPT3PANEL);
+        } else if (treeItem instanceof ScriptPack) {
             final ScriptPack scriptLeaf = (ScriptPack) treeItem;
             if (!Main.isInited() || !Main.isWorking() || Main.isDebugging()) {
                 ABCPanel abcPanel = getABCPanel();
@@ -5274,7 +5291,7 @@ public final class MainPanel extends JPanel implements TreeSelectionListener, Se
         } else if (treeItem instanceof BUTTONRECORD) {
             showPreview(treeItem, previewPanel, -1, null);
             showCard(CARDPREVIEWPANEL);
-        } else if (!(treeItem instanceof ScriptPack)) {
+        } else if (!((treeItem instanceof ScriptPack) || ((treeItem instanceof AS3Package) &&((AS3Package)treeItem).isCompoundScript()))) {
             if (treePath == null) {
                 showCard(CARDEMPTYPANEL);
             } else {

@@ -17,6 +17,7 @@
 package com.jpexs.decompiler.flash.timeline;
 
 import com.jpexs.decompiler.flash.IdentifiersDeobfuscation;
+import com.jpexs.decompiler.flash.abc.ABC;
 import com.jpexs.decompiler.flash.abc.ClassPath;
 import com.jpexs.decompiler.flash.abc.ScriptPack;
 import com.jpexs.decompiler.flash.treeitems.AS3ClassTreeItem;
@@ -47,15 +48,33 @@ public class AS3Package extends AS3ClassTreeItem {
     private boolean flat;
     
     private boolean defaultPackage;
+    
+    private Integer compoundScriptIndex;
+    
+    private ABC abc;
+    
+    private ScriptPack compoundInitializerPack = null;
 
-    public AS3Package(String packageName, Openable openable, boolean flat, boolean defaultPackage) {
+    public AS3Package(String packageName, Openable openable, boolean flat, boolean defaultPackage, ABC abc, Integer compoundScriptIndex) {
         super(packageName, "", null);
         this.flat = flat;
         this.openable = openable;
         this.packageName = packageName;
         this.defaultPackage = defaultPackage;
+        this.compoundScriptIndex = compoundScriptIndex;
+        this.abc = abc;
     }
 
+    public void setCompoundInitializerPack(ScriptPack compoundInitializerPack) {
+        this.compoundInitializerPack = compoundInitializerPack;
+    }
+
+    public ScriptPack getCompoundInitializerPack() {
+        return compoundInitializerPack;
+    }
+
+    
+    
     public boolean isDefaultPackage() {
         return defaultPackage;
     }
@@ -63,9 +82,21 @@ public class AS3Package extends AS3ClassTreeItem {
     public boolean isFlat() {
         return flat;
     }
-    
-    
 
+    public boolean isCompoundScript() {
+        return compoundScriptIndex != null;
+    }
+
+    public Integer getCompoundScriptIndex() {
+        return compoundScriptIndex;
+    }
+
+    public ABC getAbc() {
+        return abc;
+    }
+    
+    
+        
     @Override
     public Openable getOpenable() {
         return openable;
