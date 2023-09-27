@@ -373,6 +373,10 @@ public abstract class Trait implements Cloneable, Serializable {
         return writer;
     }
     
+    public boolean isApiVersioned(ABC abc) {
+        return abc.constants.getMultiname(name_index).isApiVersioned(abc.constants);
+    }
+    
     public final GraphTextWriter getApiVersions(ABC abc, GraphTextWriter writer) {
         List<Integer> apiVersions = abc.constants.getMultiname(name_index).getApiVersions(abc.constants);
         for(int version:apiVersions) {
